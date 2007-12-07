@@ -167,20 +167,22 @@ public class MenuBar {
 										Channel channel = channels.getActiveChannel();
 										Settings deviceSetting = Settings.getInstance();
 										FileDialog csvFileDialog = application.openFileOpenDialog("Import CSV absolut", new String[] { "*.csv" }, deviceSetting.getDataFilePath());
-										String csvFilePath = csvFileDialog.getFilterPath() + System.getProperty("file.separator") + csvFileDialog.getFileName();
-										addSubHistoryMenuItem(csvFileDialog.getFileName());
-										String recordSetKey = "1) CSV Import";
-										if (channel.getActiveRecordSet() != null) {
-											recordSetKey = (channel.size() + 1) + ") CSV Import";
+										if (csvFileDialog.getFileName().length() > 1) {
+											String csvFilePath = csvFileDialog.getFilterPath() + System.getProperty("file.separator") + csvFileDialog.getFileName();
+											addSubHistoryMenuItem(csvFileDialog.getFileName());
+											String recordSetKey = "1) CSV Import";
+											if (channel.getActiveRecordSet() != null) {
+												recordSetKey = (channel.size() + 1) + ") CSV Import";
+											}
+											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), false, true));
+											channel.applyTemplate(recordSetKey);
+											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), false);
+											channel.setActiveRecordSet(recordSetKey);
+											channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+											//application.getGraphicsWindow().redrawGrahics();
+											application.updateDataTable();
+											application.updateDigitalWindowChilds();
 										}
-										channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), false, true));
-										channel.applyTemplate(recordSetKey);
-										CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), false);
-										channel.setActiveRecordSet(recordSetKey);
-										channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-										//application.getGraphicsWindow().redrawGrahics();
-										application.updateDataTable();
-										application.updateDigitalWindowChilds();
 									}
 									catch (Exception e) {
 										// TODO Auto-generated catch block
@@ -198,22 +200,25 @@ public class MenuBar {
 										log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
 										Channel channel = channels.getActiveChannel();
 										Settings deviceSetting = Settings.getInstance();
-										FileDialog csvFileDialog = application.openFileOpenDialog("Import CSV raw", new String[] { "*.csv" }, deviceSetting.getDataFilePath());
-										String csvFilePath = csvFileDialog.getFilterPath() + System.getProperty("file.separator") + csvFileDialog.getFileName();
-										addSubHistoryMenuItem(csvFileDialog.getFileName());
-										String recordSetKey = "1) CSV Import";
-										if (channel.getActiveRecordSet() != null) {
-											recordSetKey = (channel.size() + 1) + ") CSV Import";
+										String path = deviceSetting.getDataFilePath();
+										FileDialog csvFileDialog = application.openFileOpenDialog("Import CSV raw", new String[] { "*.csv" }, path);
+										if (csvFileDialog.getFileName().length() > 1) {
+											String csvFilePath = csvFileDialog.getFilterPath() + System.getProperty("file.separator") + csvFileDialog.getFileName();
+											addSubHistoryMenuItem(csvFileDialog.getFileName());
+											String recordSetKey = "1) CSV Import";
+											if (channel.getActiveRecordSet() != null) {
+												recordSetKey = (channel.size() + 1) + ") CSV Import";
+											}
+											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), true, true));
+											channel.applyTemplate(recordSetKey);
+											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), true);
+											channels.getActiveChannel().setActiveRecordSet(recordSetKey);
+											channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+											//application.getGraphicsWindow().redrawGrahics();
+											channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
+											application.updateDataTable();
+											application.updateDigitalWindowChilds();
 										}
-										channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), true, true));
-										channel.applyTemplate(recordSetKey);
-										CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), true);
-										channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-										channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-										//application.getGraphicsWindow().redrawGrahics();
-										channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
-										application.updateDataTable();
-										application.updateDigitalWindowChilds();
 									}
 									catch (Exception e) {
 										// TODO Auto-generated catch block
@@ -348,7 +353,7 @@ public class MenuBar {
 								deviceSelect.setActiveConfig(deviceConfig);
 								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
 								deviceSelect.setupDevice(deviceConfig);
-								
+
 								application.updateDataTable();
 								application.updateDigitalWindow();
 							}
@@ -379,7 +384,7 @@ public class MenuBar {
 								deviceSelect.setActiveConfig(deviceConfig);
 								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
 								deviceSelect.setupDevice(deviceConfig);
-								
+
 								application.updateDataTable();
 								application.updateDigitalWindow();
 							}
@@ -443,7 +448,8 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
 							log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath());
-							FileDialog fileDialog = application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATE_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath());
+							FileDialog fileDialog = application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATE_EXTENSION }, Settings.getInstance()
+									.getGraphicsTemplatePath());
 							Channel activeChannel = channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							log.fine("templateFilePath = " + fileDialog.getFileName());
@@ -466,7 +472,8 @@ public class MenuBar {
 							log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.load();
 							channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
-							application.updateGraphicsWindow();;
+							application.updateGraphicsWindow();
+							;
 						}
 					});
 				}
