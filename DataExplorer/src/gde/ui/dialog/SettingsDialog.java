@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import osde.config.Settings;
+import osde.device.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -102,7 +103,9 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
-					dispose();
+					if (settings.getActiveDevice().startsWith("---")) settings.setActiveDevice("---;---;---");
+					settings.store();
+					if (settings.isGlobalSerialPort()&& application.getActiveConfig() != null) application.getActiveConfig().setPort(serialPort.getText());
 				}
 			});
 			{ // begin default data path group
@@ -240,7 +243,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					public void paintControl(PaintEvent evt) {
 						log.finest("serialPortGroup.paintControl, event=" + evt);
 						useGlobalSerialPort.setSelection(settings.isGlobalSerialPort());
-						serialPort.setText(settings.getGlobalSerialPort());
+						serialPort.setText(settings.getSerialPort());
 					}
 				});
 				{
@@ -270,10 +273,10 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					serialPort = new CCombo(serialPortGroup, SWT.NONE);
 					serialPort.setLayoutData(serialPortLData);
 					if (System.getProperty("os.name").toLowerCase().startsWith("window")) {
-						serialPort.setItems(new String[] { "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9" });
+						serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
 					}
 					else {
-						serialPort.setItems(new String[] { "/dev/ttys0", "/dev/ttys1", "/dev/ttys2", "/dev/ttys3", "/dev/ttys4", "/dev/ttys5", "/dev/ttys6", "/dev/ttys7", "/dev/ttys8" });
+						serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
 					}
 					serialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -306,10 +309,12 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						if (settings.isGlobalLogLevel()) {
 							enableIndividualLogging(false);
 							globalLoggingCombo.setEnabled(true);
+							globalLogLevel.setSelection(true);
 						}
 						else {
 							enableIndividualLogging(true);
 							globalLoggingCombo.setEnabled(false);
+							globalLogLevel.setSelection(false);
 						}
 						updateLoggingLevels();
 					}
@@ -505,7 +510,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				okButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.finest("okButton.widgetSelected, event=" + evt);
-						dispose();
+						dialogShell.dispose();
 					}
 				});
 			} // end ok button
@@ -519,14 +524,6 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * overwrite dispose method to handle save settings
-	 */
-	public void dispose() {
-		settings.store();
-		dialogShell.dispose();
 	}
 
 	/**
