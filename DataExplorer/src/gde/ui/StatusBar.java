@@ -123,7 +123,7 @@ public class StatusBar {
 	 * @param activeName
 	 * @param activePort
 	 */
-	public void update(String activeName, String activePort) {
+	public void updateDevicePort(String activeName, String activePort) {
 		activeDeviceLabel.setText(activeName);
 		activePortLabel.setText(activePort);
 		statusComposite.layout(true);
@@ -140,17 +140,6 @@ public class StatusBar {
 	public CLabel getPortLabel() {
 		return activePortLabel;
 	}
-
-	//	private void initGUI() {
-	//		try {
-	//			{
-	//				statusComposite.setSize(747, 38);
-	//			}
-	//		}
-	//		catch (Exception e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
 
 	/**
 	 * set the serial com port rx light on
