@@ -2,7 +2,6 @@ package osde.ui.menu;
 
 import java.util.logging.Logger;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -492,17 +491,38 @@ public class CurveSelectorContextMenu {
 
 			separator = new MenuItem(popupmenu, SWT.SEPARATOR);
 
-			copyCurveCompare = new MenuItem(popupmenu, SWT.CHECK);
+			copyCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
 			copyCurveCompare.setText("Kopiere Kurvenvergleich");
 			copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.finest("copyCurveCompare Action performed!");
-					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					application.getCompareSet().put(recordNameKey, recordSet.get(recordNameKey));
-					application.updateCompareWindow();
+					String newRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					RecordSet compareSet = application.getCompareSet();
+					boolean isComparable = true;
+					if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != recordSet.getTimeStep_ms()) {
+						application.openMessageDialog("Zeitbasis der Kurven, die verglichen werden sollen passt nicht zusammen! Vermutlich wurden sie mit unterschiedlichen Geräten aufgenommen. Das ist zu Zeit noch nicht unterstützt, da hier eine Umrechnung auf eine einheitliche Zeitbasis stattfinden muss.");
+						isComparable = false;
+						return;
+					}
+					if (!compareSet.isEmpty() && !compareSet.getActiveRecordNames()[0].startsWith(newRecordKey)) {
+						application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0] + "), die verglichen werden sollen passen nicht zusammen!");
+						isComparable = false;
+						return;
+					}
+					if (compareSet.isEmpty() || isComparable) {
+								compareSet.setTimeStep_ms(recordSet.getTimeStep_ms());
+								String recordkey = newRecordKey+compareSet.size();
+								compareSet.addRecordName(recordkey);
+								compareSet.put(recordkey , recordSet.get(newRecordKey).clone());
+								int maxRecordSize = compareSet.getMaxSize();
+								for (String recordKey : compareSet.keySet()) {
+									if (compareSet.get(recordKey).size() > maxRecordSize) compareSet.setMaxSize(compareSet.get(recordKey).size());
+								}
+								application.updateCompareWindow();
+					}
 				}
 			});
-			cleanCurveCompare = new MenuItem(popupmenu, SWT.CHECK);
+			cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
 			cleanCurveCompare.setText("Lösche Kurvenvergleich");
 			cleanCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {

@@ -30,7 +30,7 @@ public class TimeLine {
 	 */
 	public synchronized int[] getScaleMaxTimeNumber(RecordSet recordSet) {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
-		int numberOfPoints = recordSet.getRecord(recordSet.getRecordNames()[0]).size();
+		int numberOfPoints = (recordSet.getMaxSize() == 0) ? recordSet.getRecord(recordSet.getRecordNames()[0]).size() : recordSet.getMaxSize();
 		long totalTime_msec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 100;
 		long totalTime_sec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000;
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
