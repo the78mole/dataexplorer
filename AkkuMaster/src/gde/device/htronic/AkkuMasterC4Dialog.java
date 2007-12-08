@@ -390,19 +390,19 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 	public double translateValue(String recordKey, double value) {
 		double newValue = 0;
 		log.fine(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.CURRENT)) {
+		else if (recordKey.startsWith(RecordSet.CURRENT)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.CHARGE)) {
+		else if (recordKey.startsWith(RecordSet.CHARGE)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.POWER)) {
+		else if (recordKey.startsWith(RecordSet.POWER)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.ENERGY)) {
+		else if (recordKey.startsWith(RecordSet.ENERGY)) {
 			newValue = value;
 		}
 		log.fine(String.format("value calculated for %s - %f", recordKey, newValue));
@@ -416,19 +416,19 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 	public double reverseTranslateValue(String recordKey, double value) {
 		double newValue = 0;
 		log.fine(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.CURRENT)) {
+		else if (recordKey.startsWith(RecordSet.CURRENT)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.CHARGE)) {
+		else if (recordKey.startsWith(RecordSet.CHARGE)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.POWER)) {
+		else if (recordKey.startsWith(RecordSet.POWER)) {
 			newValue = value;
 		}
-		else if (recordKey.equals(RecordSet.ENERGY)) {
+		else if (recordKey.startsWith(RecordSet.ENERGY)) {
 			newValue = value;
 		}
 		log.fine(String.format("value calculated for %s - %f", recordKey, newValue));
@@ -441,19 +441,19 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 	public String getDataUnit(String recordKey) {
 		String unit = "";
 		HashMap<String, Object> record = deviceConfig.getRecordConfig(recordKey);
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			unit = (String) record.get("Einheit1");
 		}
-		else if (recordKey.equals(RecordSet.CURRENT)) {
+		else if (recordKey.startsWith(RecordSet.CURRENT)) {
 			unit = (String) record.get("Einheit2");
 		}
-		else if (recordKey.equals(RecordSet.CHARGE)) {
+		else if (recordKey.startsWith(RecordSet.CHARGE)) {
 			unit = (String) record.get("Einheit3");
 		}
-		else if (recordKey.equals(RecordSet.POWER)) {
+		else if (recordKey.startsWith(RecordSet.POWER)) {
 			unit = (String) record.get("Einheit4");
 		}
-		else if (recordKey.equals(RecordSet.ENERGY)) {
+		else if (recordKey.startsWith(RecordSet.ENERGY)) {
 			unit = (String) record.get("Einheit5");
 		}
 		return unit;

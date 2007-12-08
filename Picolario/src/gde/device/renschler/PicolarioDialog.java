@@ -484,11 +484,11 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 	public double translateValue(String recordKey, double value) {
 		double newValue = 0.0;
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			// calculate voltage U = 2.5 + (byte3 - 45) * 0.0532
 			newValue = 2.5 + (value - 45.0) * 0.0532;
 		}
-		else if (recordKey.equals(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			int firstValue = 0; // != 0 if first value must subtracted
 			int offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
@@ -502,7 +502,15 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 				break;
 			}
 			if (doSubtractFirst) {
-				firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
+				try { // use exception handling instead of transfer graphicsWindow type
+					firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
+				}
+				catch (NullPointerException e) {
+					firstValue = application.getCompareSet().getRecord(recordKey).get(0).intValue() / 1000;
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
 			}
 			else if (doReduceHeight) {
 				offset = heightOffsetValue;
@@ -512,7 +520,7 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
 			newValue = (value - firstValue) * factor - offset;
 		}
-		else if (recordKey.equals(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(RecordSet.SLOPE)) {
 			double factor = 1.0; // != 1 if a unit translation is required
 			switch (heightUnitSelection) { // Feet 1, Meter 0
 			case 0: // Meter , Feet is default
@@ -535,11 +543,11 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 	public double reverseTranslateValue(String recordKey, double value) {
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("input value for %s - %f", recordKey, value));
 		double newValue = 0;
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			// calculate voltage U = 2.5 + (value - 45) * 0.0532
 			newValue = (value - 2.5) / 0.0532 + 45.0;
 		}
-		else if (recordKey.equals(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			int firstValue = 0; // != 0 if first value must subtracted
 			int offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
@@ -563,7 +571,7 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
 			newValue = (value - offset) / factor + firstValue;
 		}
-		else if (recordKey.equals(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(RecordSet.SLOPE)) {
 			double factor = 1.0; // != 1 if a unit translation is required
 			switch (heightUnitSelection) { // Feet 1, Meter 0
 			case 0: // Meter , Feet is default
@@ -586,13 +594,13 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 		String unit = "";
 		HashMap<String, Object> record = deviceConfig.getRecordConfig(recordKey);
 		//channel.get("Messgröße1");
-		if (recordKey.equals(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			unit = (String) record.get("Einheit1");
 		}
-		else if (recordKey.equals(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			unit = heightDataUnit;
 		}
-		else if (recordKey.equals(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(RecordSet.SLOPE)) {
 			unit = heightDataUnit + "/" + ((String) record.get("Einheit3")).split("/")[1];
 		}
 		return unit;
