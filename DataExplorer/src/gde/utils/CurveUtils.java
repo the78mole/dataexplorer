@@ -97,7 +97,7 @@ public class CurveUtils {
 		}
 		record.setMinDisplayValue(yMinValueDisplay);
 		record.setMaxDisplayValue(yMaxValueDisplay);
-		String graphText = recordName + "   " + record.getSymbol() + "   [" + device.getDataUnit(recordName) + "]";
+		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getDataUnit(recordName) + "]";
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
