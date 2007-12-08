@@ -600,6 +600,7 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 	 */
 	public String getDataUnit(String recordKey) {
 		String unit = "";
+		recordKey = recordKey.split("_")[0];
 		HashMap<String, Object> record = deviceConfig.getRecordConfig(recordKey);
 		//channel.get("Messgröße1");
 		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
