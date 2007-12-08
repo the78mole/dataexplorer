@@ -440,6 +440,7 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 	 */
 	public String getDataUnit(String recordKey) {
 		String unit = "";
+		recordKey = recordKey.split("_")[0];
 		HashMap<String, Object> record = deviceConfig.getRecordConfig(recordKey);
 		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
 			unit = (String) record.get("Einheit1");
