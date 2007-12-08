@@ -41,7 +41,7 @@ public class CurveUtils {
 		if (log.isLoggable(Level.FINEST)) log.finest("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
 		boolean isCompareSet = record.getParent().isCompareSet();
-		String recordName = record.getName();
+		String recordName = isCompareSet ? record.getKeyName() : record.getName();
 		log.fine("drawing record =" + recordName + " isCompareSet = " + isCompareSet);
 
 		//Draw the curve
@@ -65,7 +65,7 @@ public class CurveUtils {
 			yMaxValueDisplay = record.getDefinedMaxValue();
 			if (isRaw) yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
 
-			if (log.isLoggable(Level.FINEST)) log.finest("defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
+			if (log.isLoggable(Level.FINE)) log.fine("defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
 		}
 		else {
 			// TODO exclude imported data where values don't need correction
@@ -134,7 +134,7 @@ public class CurveUtils {
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
-		gc.setClipping(x0, y0 - height, width, height);
+		//gc.setClipping(x0, y0 - height, width, height);
 		Integer[] intRecord = record.get();
 		int intRecordSize = intRecord.length;
 

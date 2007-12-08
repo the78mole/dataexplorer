@@ -120,7 +120,7 @@ public class GraphicsWindow {
 					curveSelectorTable.setMenu(popupmenu);
 					curveSelectorTable.layout();
 					contextMenu = new CurveSelectorContextMenu();
-					contextMenu.createMenu(application, popupmenu);
+					contextMenu.createMenu(popupmenu);
 					curveSelectorTable.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finest("curveTable.paintControl, event=" + evt);
