@@ -81,28 +81,32 @@ public class DigitalWindow {
 	 * method to update digital window
 	 */
 	public synchronized void update() {
-		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) { // just created  or device switched
-			// if recordSet name signature changed new displays need to be created
-			if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
-				oldRecordSet = recordSet;
-				String[] activeRecordKeys = recordSet.getActiveRecordNames();
-				for (String recordKey : activeRecordKeys) {
-					DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getDeviceDialog());
-					display.create();
-					log.fine("created digital display for " + recordKey);
-					displays.put(recordKey, display);
+		final RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (recordSet != null) { // just created  or device switched
+					// if recordSet name signature changed new displays need to be created
+					if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
+						oldRecordSet = recordSet;
+						String[] activeRecordKeys = recordSet.getActiveRecordNames();
+						for (String recordKey : activeRecordKeys) {
+							DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getDeviceDialog());
+							display.create();
+							log.fine("created digital display for " + recordKey);
+							displays.put(recordKey, display);
+						}
+						digitalMainComposite.layout();
+					}
 				}
-				digitalMainComposite.layout();
+				else { // clean up after device switched
+					for (String recordKey : displays.keySet().toArray(new String[0])) {
+						log.fine("clean child " + recordKey);
+						displays.get(recordKey).dispose();
+						displays.remove(recordKey);
+					}
+					digitalMainComposite.layout();
+				}
 			}
-		}
-		else { // clean up after device switched
-			for (String recordKey : displays.keySet().toArray(new String[0])) {
-				log.fine("clean child " + recordKey);
-				displays.get(recordKey).dispose();
-				displays.remove(recordKey);
-			}
-			digitalMainComposite.layout();
-		}
+		});
 	}
 }
