@@ -47,6 +47,7 @@ public class GraphicsWindow {
 
 	public static final int								TYPE_NORMAL							= 0;
 	public static final int								TYPE_COMPARE						= 1;
+	public static final String						WINDOW_TYPE							= "window_type";
 
 	private final TabFolder								displayTab;
 	private SashForm											graphicSashForm;
@@ -136,17 +137,28 @@ public class GraphicsWindow {
 							popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
 							popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
 							if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
-								Record activeRecord = channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
+								Record activeRecord;
+								switch (type) {
+								case TYPE_COMPARE:
+									activeRecord = application.getCompareSet().getRecord(recordName);
+									break;
+
+								default:
+									activeRecord = channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
+									break;
+								}
 								if (item.getChecked()) {
 									activeRecord.setVisible(true);
 									popupmenu.getItem(0).setSelection(true);
 									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
+									item.setData(WINDOW_TYPE, type);
 									graphicCanvas.redraw();
 								}
 								else {
 									activeRecord.setVisible(false);
 									popupmenu.getItem(0).setSelection(false);
 									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
+									item.setData(WINDOW_TYPE, type);
 									graphicCanvas.redraw();
 								}
 							}
@@ -170,23 +182,6 @@ public class GraphicsWindow {
 				});
 			} // graphicCanvas
 			graphicSashForm.setWeights(new int[] { 9, 100 }); // 9:100  -> 9 == width required for curveSelectorTable
-//			graphicSashForm.addPaintListener(new PaintListener() {
-//				public void paintControl(PaintEvent evt) {
-//					if (isCurveSelectorEnabled) {
-//						Point graphicSashFormSize = graphicSashForm.getSize();
-//						int newTableWeight = 12500 / graphicSashFormSize.x;
-//						if (newTableWeight != tableWeight) {
-//							tableWeight = newTableWeight;
-//							log.fine("tableWeight =" + tableWeight + " - " + newTableWeight + " windowCompSize.x=" + graphicSashFormSize.x);
-//							graphicSashForm.setWeights(new int[] { tableWeight, 100 });
-//						}
-//					}
-//					else {
-//						tableWeight = 0;
-//						graphicSashForm.setWeights(new int[] { 0, 100 });
-//					}
-//				}
-//			});
 		} // graphicSashForm
 	}
 
@@ -240,10 +235,16 @@ public class GraphicsWindow {
 		int numberCurvesLeft = 0;
 		String[] recordNames = recordSet.getRecordNames();
 		for (String string : recordNames) {
-			if (recordSet.getRecord(string).isVisible()) if (recordSet.getRecord(string).isPositionLeft())
-				numberCurvesLeft++;
-			else
-				numberCurvesRight++;
+			if (recordSet.getRecord(string).isVisible()) {
+				if (recordSet.getRecord(string).isPositionLeft())
+					numberCurvesLeft++;
+				else
+					numberCurvesRight++;
+			}
+		}
+		if (recordSet.isCompareSet()) {
+			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
+			numberCurvesRight = numberCurvesRight > 0 ? 1 : 0;
 		}
 		log.fine("nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight);
 
@@ -317,29 +318,41 @@ public class GraphicsWindow {
 	 */
 	private void updateCurveSelector() {
 		final DeviceConfiguration activeConfig = application.getActiveConfig();
-		final RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		final RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				curveSelectorTable.removeAll();
 
 				for (int i = 1; i <= recordSet.size(); i++) {
-					Record record = recordSet.getRecord((String) activeConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+					Record record;
+					switch (type) {
+					case TYPE_COMPARE:
+						String recordKey = recordSet.getRecordNames()[0].split("_")[0];
+						record = recordSet.getRecord(recordKey + "_" + (i - 1));
+						break;
+
+					default: // TYPE_NORMAL
+						record = recordSet.getRecord((String) activeConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+						break;
+					}
 					log.finer(record.getName());
 
 					TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					//item.setFont(font);
-					item.setText(new String[] { record.getName() });
+					item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + (i - 1));
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
-					if (recordSet.getRecord(record.getName()).isVisible()) {
+					if (record.isVisible()) {
 						item.setChecked(true);
 						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
+						item.setData(WINDOW_TYPE, type);
 					}
 					else {
 						item.setChecked(false);
 						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-						if (!recordSet.getRecord(record.getName()).isDisplayable()) item.getGrayed();
+						item.setData(WINDOW_TYPE, type);
+						if (!recordSet.getRecord(record.getName()).isDisplayable()) item.setGrayed(true);
 					}
 				}
 			}
