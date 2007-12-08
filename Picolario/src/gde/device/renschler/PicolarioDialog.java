@@ -506,7 +506,7 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 					firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
 				}
 				catch (NullPointerException e) {
-					firstValue = application.getCompareSet().getRecord(recordKey).get(0).intValue() / 1000;
+					firstValue = application.getCompareSet().get(recordKey).get(0).intValue() / 1000;
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -563,7 +563,15 @@ public class PicolarioDialog extends Dialog implements osde.device.DeviceDialog 
 				break;
 			}
 			if (doSubtractFirst) {
-				firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
+				try { // use exception handling instead of transfer graphicsWindow type
+					firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
+				}
+				catch (NullPointerException e) {
+					firstValue = application.getCompareSet().get(recordKey).get(0).intValue() / 1000;
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
 			}
 			else if (doReduceHeight) {
 				offset = heightOffsetValue;
