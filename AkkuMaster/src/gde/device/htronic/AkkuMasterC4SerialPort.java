@@ -257,8 +257,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 			break;
 		}
 
-		values.put(PROCESS_POWER, (Integer) values.get(PROCESS_VOLTAGE) * (Integer) values.get(PROCESS_CURRENT)); // Errechnete Leistung	[mW]
-		values.put(PROCESS_ENERGIE, (Integer) values.get(PROCESS_VOLTAGE) * (Integer) values.get(PROCESS_CAPACITY)); // Errechnete Energie	[mWh]
+		int voltage = (Integer) values.get(PROCESS_VOLTAGE);
+		values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); 		// Errechnete Leistung	[mW]
+		values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
 
 		return values;
 	}
@@ -525,7 +526,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		}
 
 	}
-	
+
 	/**
 	 * log string array
 	 * @param array

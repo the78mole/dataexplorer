@@ -545,12 +545,12 @@ public class AkkuMasterChannelTab {
 														// build the point array according curves from record set
 														int[] points = new int[recordSet.size()];
 
-														points[0] = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
-														points[1] = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
+														points[0] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
+														points[1] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
 														// display adaption * 1000  -  / 1000
-														points[2] = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
-														points[3] = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; 		//Leistung		[mW]
-														points[4] = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; 	//Energie		[mWh]
+														points[2] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
+														points[3] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; 		//Leistung		[mW]
+														points[4] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; 	//Energie		[mWh]
 														log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh");
 
 														recordSet.addPoints(points, true);
