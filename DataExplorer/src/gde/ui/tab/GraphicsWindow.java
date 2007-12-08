@@ -352,7 +352,7 @@ public class GraphicsWindow {
 						item.setChecked(false);
 						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
 						item.setData(WINDOW_TYPE, type);
-						if (!recordSet.getRecord(record.getName()).isDisplayable()) item.setGrayed(true);
+						if (!recordSet.get(record.getKeyName()).isDisplayable()) item.setGrayed(true);
 					}
 				}
 			}
