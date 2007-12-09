@@ -305,11 +305,10 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				loggingGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.finest("loggingGroup.paintControl, event=" + evt);
-						globalLogLevel.setSelection(settings.isGlobalSerialPort());
+						globalLogLevel.setSelection(settings.isGlobalLogLevel());
 						if (settings.isGlobalLogLevel()) {
 							enableIndividualLogging(false);
 							globalLoggingCombo.setEnabled(true);
-							globalLogLevel.setSelection(true);
 						}
 						else {
 							enableIndividualLogging(true);
