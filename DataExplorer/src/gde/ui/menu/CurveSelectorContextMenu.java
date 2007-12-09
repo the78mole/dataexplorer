@@ -526,16 +526,13 @@ public class CurveSelectorContextMenu {
 
 							if (newMinValue < oldMinValue) {
 								compareSet.setMinValue(newMinValue); // store new min value into record set
-								for (String minRecordKey : compareSet.keySet()) { // loop through all others and make equal
-									compareSet.get(minRecordKey).setStartEndDefined(true, newMinValue, oldMaxValue);
-								}
 							}
 							oldMinValue = compareSet.getMinValue();
 							if (newMaxValue > oldMaxValue) {
 								compareSet.setMaxValue(newMaxValue); // store new max value into record set
-								for (String maxRecordKey : compareSet.keySet()) { // loop through all others and make equal
-									compareSet.get(maxRecordKey).setStartEndDefined(true, oldMinValue, newMaxValue);
-								}
+							}
+							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
+								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
 							}
 						}
 

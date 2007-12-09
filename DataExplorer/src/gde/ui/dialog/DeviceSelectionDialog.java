@@ -212,6 +212,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								catch (Exception e) {
 									log.log(Level.SEVERE, e.getMessage(), e);
+									application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getMessage());
 								}
 							}
 						});
