@@ -142,7 +142,17 @@ public class Channel extends HashMap<String, RecordSet> {
 			log.fine("applied graphics template file " + template.getCurrentFilePath());
 		}
 	}
-
+	
+	/**
+	 * remove active record set and records
+	 * @param deleteRecordSetName
+	 */
+	public void remove(String deleteRecordSetName) {
+		super.remove(deleteRecordSetName);
+		if (this.size() == 0) this.activeRecordSet = null;
+		else this.activeRecordSet = this.get(this.getRecordSetNames()[0]);
+	}
+	
 	/**
 	 * @return the activeRecordSet
 	 */
