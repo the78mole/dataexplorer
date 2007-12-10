@@ -40,10 +40,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.common.Channel;
-import osde.common.Channels;
 import osde.config.DeviceConfiguration;
 import osde.config.Settings;
+import osde.data.Channel;
+import osde.data.Channels;
 import osde.device.DefaultDeviceDialog;
 import osde.device.DeviceDialog;
 import osde.device.DeviceSerialPort;

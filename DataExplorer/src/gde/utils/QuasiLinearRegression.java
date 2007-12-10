@@ -3,8 +3,8 @@ package osde.utils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.common.Record;
-import osde.common.RecordSet;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 

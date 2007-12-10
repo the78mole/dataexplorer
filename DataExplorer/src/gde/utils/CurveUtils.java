@@ -8,7 +8,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import osde.common.Record;
+import osde.data.Record;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 

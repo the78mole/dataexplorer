@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.common.Channels;
+import osde.data.Channels;
 
 /**
  * @author Winfried Bruegmann

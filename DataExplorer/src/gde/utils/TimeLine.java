@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import osde.common.RecordSet;
+import osde.data.RecordSet;
 
 /**
  * @author Winfried Bruegmann

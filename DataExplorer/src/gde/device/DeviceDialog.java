@@ -3,7 +3,7 @@
  */
 package osde.device;
 
-import osde.common.RecordSet;
+import osde.data.RecordSet;
 
 /**
  * defines the interface for device dialog implementation

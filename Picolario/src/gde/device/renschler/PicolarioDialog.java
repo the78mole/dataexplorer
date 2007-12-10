@@ -21,9 +21,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.common.Channels;
-import osde.common.RecordSet;
 import osde.config.DeviceConfiguration;
+import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;

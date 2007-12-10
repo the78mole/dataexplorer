@@ -13,9 +13,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import osde.common.Channels;
-import osde.common.Record;
-import osde.common.RecordSet;
+import osde.data.Channels;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;

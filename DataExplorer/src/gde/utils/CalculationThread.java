@@ -2,7 +2,7 @@ package osde.utils;
 
 import java.util.logging.Logger;
 
-import osde.common.RecordSet;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 

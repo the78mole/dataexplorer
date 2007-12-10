@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.common.Channels;
-import osde.common.RecordSet;
+import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.AxisEndValuesDialog;

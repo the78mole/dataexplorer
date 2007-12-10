@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import osde.common.Channel;
-import osde.common.Channels;
-import osde.common.RecordSet;
+import osde.data.Channel;
+import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.StatusBar;
 import osde.utils.CalculationThread;

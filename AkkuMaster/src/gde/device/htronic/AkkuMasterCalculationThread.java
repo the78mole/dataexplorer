@@ -3,8 +3,8 @@ package osde.device.htronic;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.common.Record;
-import osde.common.RecordSet;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**

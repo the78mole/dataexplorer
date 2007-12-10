@@ -30,10 +30,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.common.Channels;
-import osde.common.Record;
-import osde.common.RecordSet;
 import osde.config.DeviceConfiguration;
+import osde.data.Channels;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.CurveUtils;

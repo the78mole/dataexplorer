@@ -18,11 +18,11 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.common.Channels;
-import osde.common.Record;
-import osde.common.RecordSet;
 import osde.config.DeviceConfiguration;
 import osde.config.Settings;
+import osde.data.Channels;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 

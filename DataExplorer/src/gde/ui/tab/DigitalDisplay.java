@@ -9,9 +9,9 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import osde.common.Channels;
-import osde.common.Record;
-import osde.common.RecordSet;
+import osde.data.Channels;
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
