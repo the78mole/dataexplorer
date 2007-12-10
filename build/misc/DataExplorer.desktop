@@ -2,14 +2,14 @@
 Comment=
 Comment[en_US]=
 Encoding=UTF-8
-Exec=/opt/jdk1.6.0_02/bin/java -Djava.util.logging.config.file=/home/winfried/.OpenSerialDataExplorer/logging.properties -jar /opt/OpenSerialDataExplorer/OpenSerialDataExplorer.jar
+Exec=/opt/jdk1.6.0_02/bin/java -jar /opt/OpenSerialDataExplorer/OpenSerialDataExplorer.jar
 GenericName=OpenSerialDataExplorer
 GenericName[en_US]=OpenSerialDataExplorer
-Icon=/opt/OpenSerialDataExplorer.png
+Icon=/opt/OpenSerialDataExplorer/OpenSerialDataExplorer.xpm
 MimeType=
 Name=OSDE
 Name[en_US]=OSDE
-Path=/opt/OpenSerialDataExplorer/
+Path=/opt/OpenSerialDataExplorer
 StartupNotify=true
 Terminal=false
 TerminalOptions=

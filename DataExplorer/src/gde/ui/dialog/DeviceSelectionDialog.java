@@ -65,7 +65,7 @@ import osde.ui.StatusBar;
 */
 public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private Logger																log							= Logger.getLogger(this.getClass().getName());
-
+	private String																fileSep = System.getProperty("file.separator");
 	private Shell																	dialogShell;
 	private CTabItem															cTabItem1;
 	private Composite															composite2;
@@ -158,9 +158,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			try {
 				if (files[i].endsWith(".ini")) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(settings.getDevicesIniPath() + files[i], false);
+					devConfig = new DeviceConfiguration(settings.getDevicesIniPath() + fileSep + files[i], false);
 					if (devConfig.isUsed()) {
-						devConfig = new DeviceConfiguration(settings.getDevicesIniPath() + files[i], true);
+						devConfig = new DeviceConfiguration(settings.getDevicesIniPath() + fileSep + files[i], true);
 						activeDevices.add(devConfig.getName());
 						if (devConfig.getName().equals(activeName)) {
 							activeConfig = devConfig;
@@ -313,7 +313,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									deviceCanvas = new Canvas(group1, SWT.NONE);
 									deviceCanvas.setBounds(12, 70, 227, 165);
-									deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + "NoDevicePicture.jpg"));
+									deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + fileSep + "NoDevicePicture.jpg"));
 								}
 								{
 									herstellerDescription = new Text(group1, SWT.MULTI | SWT.WRAP);
@@ -687,7 +687,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		log.fine(dialogShell.getDisplay().toString());
 		if (activeConfig == null) {
-			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + "/NoDevicePicture.jpg"));
+			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + fileSep + "NoDevicePicture.jpg"));
 		}
 		else {
 			log.fine(settings.getDevicesIniPath() + activeConfig.getImagePath());
