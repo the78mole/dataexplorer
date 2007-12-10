@@ -216,8 +216,9 @@ public class MenuToolBar {
 				}
 				menuToolBar.pack();
 			}
-			menuCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(176, 26));
-			menuCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(176, 26));
+			menuCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(231, 26));
+			menuCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(231, 26));
+			menuCoolItem.setSize(new org.eclipse.swt.graphics.Point(231, 26));
 			menuCoolItem.setControl(menuToolBar);
 			
 		}
