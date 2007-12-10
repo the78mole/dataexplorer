@@ -237,7 +237,7 @@ public class MenuBar {
 						exportFileMenuItem.setMenu(exportMenu);
 						{
 							csvExportMenuItem1 = new MenuItem(exportMenu, SWT.CASCADE);
-							csvExportMenuItem1.setText("CSV Locale.GERMANY absolut");
+							csvExportMenuItem1.setText("CSV absolut");
 							csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
@@ -254,7 +254,7 @@ public class MenuBar {
 					}
 					{
 						csvExportMenuItem2 = new MenuItem(exportMenu, SWT.CASCADE);
-						csvExportMenuItem2.setText("CSV Locale.GERMANY, raw");
+						csvExportMenuItem2.setText("CSV raw");
 						csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
