@@ -475,9 +475,10 @@ public class MenuBar {
 							template.setNewFileName(fileDialog.getFileName());
 							log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.load();
+							if (activeChannel.getActiveRecordSet() != null) {
 							channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
 							application.updateGraphicsWindow();
-							;
+							}
 						}
 					});
 				}
