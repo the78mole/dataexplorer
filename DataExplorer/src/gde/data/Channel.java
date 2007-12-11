@@ -90,25 +90,27 @@ public class Channel extends HashMap<String, RecordSet> {
 	public void saveTemplate() {
 		final RecordSet recordSet = this.getActiveRecordSet();
 
-		for (String recordName : recordSet.getRecordNames()) {
-			Record record = recordSet.get(recordName);
-			template.setProperty(recordName + Record.IS_VISIBLE, new Boolean(record.isVisible()).toString());
-			template.setProperty(recordName + Record.IS_POSITION_LEFT, new Boolean(record.isPositionLeft()).toString());
-			String rgb = record.getColor().getRGB().red + "," + record.getColor().getRGB().green + "," + record.getColor().getRGB().blue;
-			template.setProperty(recordName + Record.COLOR, rgb);
-			template.setProperty(recordName + Record.LINE_WITH, new Integer(record.getLineWidth()).toString());
-			template.setProperty(recordName + Record.LINE_STYLE, new Integer(record.getLineStyle()).toString());
-			template.setProperty(recordName + Record.IS_ROUND_OUT, new Boolean(record.isRoundOut()).toString());
-			template.setProperty(recordName + Record.IS_START_POINT_ZERO, new Boolean(record.isStartpointZero()).toString());
-			template.setProperty(recordName + Record.NUMBER_FORMAT, new Integer(record.getNumberFormat()).toString());
-			//template.setProperty(recordName + Record.MAX_VALUE, new Double(record.getMaxValue()).toString());
-			//template.setProperty(recordName + Record.MIN_VALUE, new Double(record.getMinValue()).toString());
-			template.setProperty(recordName + Record.IS_START_END_DEFINED, new Boolean(record.isStartEndDefined()).toString());
-			template.setProperty(recordName + Record.DEFINED_MAX_VALUE, new Double(record.getDefinedMaxValue()).toString());
-			template.setProperty(recordName + Record.DEFINED_MIN_VALUE, new Double(record.getDefinedMinValue()).toString());
+		if (recordSet != null) {
+			for (String recordName : recordSet.getRecordNames()) {
+				Record record = recordSet.get(recordName);
+				template.setProperty(recordName + Record.IS_VISIBLE, new Boolean(record.isVisible()).toString());
+				template.setProperty(recordName + Record.IS_POSITION_LEFT, new Boolean(record.isPositionLeft()).toString());
+				String rgb = record.getColor().getRGB().red + "," + record.getColor().getRGB().green + "," + record.getColor().getRGB().blue;
+				template.setProperty(recordName + Record.COLOR, rgb);
+				template.setProperty(recordName + Record.LINE_WITH, new Integer(record.getLineWidth()).toString());
+				template.setProperty(recordName + Record.LINE_STYLE, new Integer(record.getLineStyle()).toString());
+				template.setProperty(recordName + Record.IS_ROUND_OUT, new Boolean(record.isRoundOut()).toString());
+				template.setProperty(recordName + Record.IS_START_POINT_ZERO, new Boolean(record.isStartpointZero()).toString());
+				template.setProperty(recordName + Record.NUMBER_FORMAT, new Integer(record.getNumberFormat()).toString());
+				//template.setProperty(recordName + Record.MAX_VALUE, new Double(record.getMaxValue()).toString());
+				//template.setProperty(recordName + Record.MIN_VALUE, new Double(record.getMinValue()).toString());
+				template.setProperty(recordName + Record.IS_START_END_DEFINED, new Boolean(record.isStartEndDefined()).toString());
+				template.setProperty(recordName + Record.DEFINED_MAX_VALUE, new Double(record.getDefinedMaxValue()).toString());
+				template.setProperty(recordName + Record.DEFINED_MIN_VALUE, new Double(record.getDefinedMinValue()).toString());
+			}
+			template.store();
+			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + fileSep + this.getActiveRecordSet().getName() + this.name);
 		}
-		template.store();
-		log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + fileSep + this.getActiveRecordSet().getName() + this.name);
 	}
 
 	/**
