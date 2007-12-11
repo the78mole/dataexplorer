@@ -19,7 +19,6 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
@@ -307,8 +306,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				RowLayout loggingGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				loggingGroup.setLayout(loggingGroupLayout);
 				FormData loggingGroupLData = new FormData();
-				loggingGroupLData.width = 451;
-				loggingGroupLData.height = 172;
+				loggingGroupLData.width = 460;
+				loggingGroupLData.height = 195;
 				loggingGroupLData.left =  new FormAttachment(0, 1000, 12);
 				loggingGroupLData.top =  new FormAttachment(0, 1000, 219);
 				loggingGroupLData.right =  new FormAttachment(1000, 1000, -19);
@@ -332,8 +331,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				});
 				{
 					RowData composite1LData = new RowData();
-					composite1LData.width = 194;
-					composite1LData.height = 53;
+					composite1LData.width = 195;
+					composite1LData.height = 50;
 					globalLoggingComposite = new Composite(loggingGroup, SWT.NONE);
 					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					globalLoggingComposite.setLayout(composite1Layout);
@@ -341,8 +340,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						globalLogLevel = new Button(globalLoggingComposite, SWT.CHECK | SWT.LEFT);
 						RowData globalLogLevelLData = new RowData();
-						globalLogLevelLData.width = 156;
-						globalLogLevelLData.height = 22;
+						globalLogLevelLData.width = 150;
+						globalLogLevelLData.height = 20;
 						globalLogLevel.setLayoutData(globalLogLevelLData);
 						globalLogLevel.setText(" globaler Log Level");
 						globalLogLevel.addSelectionListener(new SelectionAdapter() {
@@ -386,12 +385,16 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					RowLayout individualLoggingComositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					RowData individualLoggingComositeLData = new RowData();
 					individualLoggingComositeLData.width = 246;
-					individualLoggingComositeLData.height = 158;
+					individualLoggingComositeLData.height = 184;
 					individualLoggingComosite.setLayoutData(individualLoggingComositeLData);
 					individualLoggingComosite.setLayout(individualLoggingComositeLayout);
 					{
 						uiLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout uiLevelLabelLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						RowData cLabel1LData = new RowData();
+						cLabel1LData.width = 150;
+						cLabel1LData.height = 20;
+						uiLevelLabel.setLayoutData(cLabel1LData);
 						uiLevelLabel.setLayout(uiLevelLabelLayout);
 						uiLevelLabel.setText("Graphische Oberfläche : ");
 					}
@@ -409,8 +412,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						deviceLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData cLabel1LData = new RowData();
-						cLabel1LData.width = 153;
-						cLabel1LData.height = 22;
+						cLabel1LData.width = 150;
+						cLabel1LData.height = 20;
 						deviceLevelLabel.setLayoutData(cLabel1LData);
 						deviceLevelLabel.setLayout(cLabel1Layout);
 						deviceLevelLabel.setText("Geräte :");
@@ -429,8 +432,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						commonLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData cLabel2LData = new RowData();
-						cLabel2LData.width = 153;
-						cLabel2LData.height = 22;
+						cLabel2LData.width = 150;
+						cLabel2LData.height = 20;
 						commonLevelLabel.setLayoutData(cLabel2LData);
 						commonLevelLabel.setLayout(cLabel2Layout);
 						commonLevelLabel.setText("Datenmodell : ");
@@ -449,8 +452,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						configLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData cLabel3LData = new RowData();
-						cLabel3LData.width = 153;
-						cLabel3LData.height = 22;
+						cLabel3LData.width = 150;
+						cLabel3LData.height = 20;
 						configLevelLabel.setLayoutData(cLabel3LData);
 						configLevelLabel.setLayout(cLabel3Layout);
 						configLevelLabel.setText("Konfiguration :");
@@ -469,8 +472,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						utilsLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData cLabel4LData = new RowData();
-						cLabel4LData.width = 153;
-						cLabel4LData.height = 22;
+						cLabel4LData.width = 150;
+						cLabel4LData.height = 20;
 						utilsLevelLabel.setLayoutData(cLabel4LData);
 						utilsLevelLabel.setLayout(cLabel4Layout);
 						utilsLevelLabel.setText("allgem. Funktionen : ");
@@ -489,8 +492,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						serialIOLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData cLabel4LData = new RowData();
-						cLabel4LData.width = 153;
-						cLabel4LData.height = 22;
+						cLabel4LData.width = 150;
+						cLabel4LData.height = 20;
 						serialIOLevelLabel.setLayoutData(cLabel4LData);
 						serialIOLevelLabel.setLayout(cLabel4Layout);
 						serialIOLevelLabel.setText("serial I/O : ");
@@ -510,11 +513,11 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			} // end logging group
 			{ // begin ok button
 				FormData okButtonLData = new FormData();
-				okButtonLData.width = 250;
-				okButtonLData.height = 26;
-				okButtonLData.left = new FormAttachment(0, 1000, 101);
-				okButtonLData.right = new FormAttachment(1000, 1000, -137);
-				okButtonLData.bottom = new FormAttachment(1000, 1000, -22);
+				okButtonLData.width = 260;
+				okButtonLData.height = 25;
+				okButtonLData.left =  new FormAttachment(0, 1000, 103);
+				okButtonLData.right =  new FormAttachment(1000, 1000, -135);
+				okButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
 				okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				okButton.setLayoutData(okButtonLData);
 				okButton.setText("OK");
