@@ -164,8 +164,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("defaultDataPathAdjustButton.widgetSelected, event=" + evt);
-							DirectoryDialog directoryDialog = application.openDirFileDialog("Einstellungen - Standard Daten Pfad", settings.getDataFilePath());
-							String defaultDataDirectory = directoryDialog.getFilterPath();
+							String defaultDataDirectory = application.openDirFileDialog("Einstellungen - Standard Daten Pfad", settings.getDataFilePath());
 							log.fine("default directory from directoy dialog = " + defaultDataDirectory);
 							settings.setDataFilePath(defaultDataDirectory);
 							defaultDataPath.setText(defaultDataDirectory);
