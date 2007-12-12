@@ -48,9 +48,10 @@ public class CurveSelectorContextMenu {
 					log.finest("popupmenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-					recordSet = type == GraphicsWindow.TYPE_NORMAL ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+					recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 					String recordNameKey = selectedItem.getText();
 					lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
+					if(type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
 				}
 
 				public void menuHidden(MenuEvent evt) {

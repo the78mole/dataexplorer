@@ -691,7 +691,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		else {
 			log.fine(settings.getDevicesIniPath() + activeConfig.getImagePath());
-			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + activeConfig.getImagePath()));
+			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesIniPath() + fileSep + activeConfig.getImagePath()));
 
 			herstellerText.setText(activeConfig.getHersteller());
 			deviceText.setText(activeConfig.getName());

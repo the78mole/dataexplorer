@@ -16,16 +16,17 @@ import java.util.logging.Logger;
  *
  */
 public class GraphicsTemplate extends Properties {
-	private Logger		log								= Logger.getLogger(this.getClass().getName());
-	static final long	serialVersionUID	= 260357;
+	static final long			serialVersionUID	= 260357;
+	private Logger				log								= Logger.getLogger(this.getClass().getName());
+	private final String	fileSep						= System.getProperty("file.separator");
 
-	private boolean		isAvailable				= false;
-	private boolean		isSaved						= false;																				// indicates if template is saved to file
-	private String		defaultFileName;
-	private String		newFileName;
-	private String		currentFileFilePath;
-	private String		templatePath;
-	private String		templateFilePath;
+	private boolean				isAvailable				= false;
+	private boolean				isSaved						= false;																				// indicates if template is saved to file
+	private String				defaultFileName;
+	private String				newFileName;
+	private String				currentFileFilePath;
+	private String				templatePath;
+	private String				templateFilePath;
 
 	/**
 	 * 
@@ -56,7 +57,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			currentFileFilePath = this.templatePath + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
+			currentFileFilePath = this.templatePath + fileSep + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
 			log.fine("opening template file " + currentFileFilePath);
 			this.loadFromXML(new FileInputStream(new File(currentFileFilePath)));
 			isAvailable = true;
