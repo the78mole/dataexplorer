@@ -38,7 +38,6 @@ public class TimeLine {
 		if (log.isLoggable(Level.FINE)) log.fine("time line sec=" + totalTime_sec + "; min=" + totalTime_min + "; std=" + totalTime_std);
 		int maxTimeNumber; // the biggest number in the scale to be displayed
 
-		String timeLineText = "Zeit t [Std]";
 		if (totalTime_std > 5) {
 			maxTimeNumber = (int) totalTime_std;
 			timeLineText = "Zeit   t   [Std]";
@@ -114,7 +113,7 @@ public class TimeLine {
 	 */
 	private void drawHorizontalTickMarks(GC gc, int x0, int y0, int width, int startNumber, int endNumber, int scaleFactor, int ticklength, int miniticks, int gap) {
 
-		double numberTicks = (endNumber - startNumber) / 10.0; // alle 10 min/sec ein Strich
+		double numberTicks = (endNumber - startNumber) / 10.0; // every 10th units one tick
 		log.finest("numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
 		double deltaTick = 1.0 * width / numberTicks;
 		miniticks++;
@@ -137,7 +136,7 @@ public class TimeLine {
 			}
 			//draw numbers to the scale	
 			int actualInt = startNumber + i * 100 / scaleFactor; // correct scaleFactor base 10
-			int numberInt = actualInt % 60 == 0 ? actualInt / 60 : actualInt % 60;
+			int numberInt = actualInt % 60 == 0 ? actualInt / 60 : actualInt % 60;  // min ; Std
 			String numberStr = new Integer(numberInt).toString();
 			GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 		}
