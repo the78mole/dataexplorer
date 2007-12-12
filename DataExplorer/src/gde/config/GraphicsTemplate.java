@@ -85,7 +85,7 @@ public class GraphicsTemplate extends Properties {
 				tmpPath.mkdir();
 			}
 
-			currentFileFilePath = this.templatePath + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
+			currentFileFilePath = this.templatePath + fileSep + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
 			this.storeToXML(new FileOutputStream(new File(currentFileFilePath)), "-- OpenSerialDataExplorer GraphicsTemplate --");
 			isSaved = true;
 			newFileName = null;
