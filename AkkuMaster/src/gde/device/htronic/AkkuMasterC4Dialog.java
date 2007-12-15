@@ -13,14 +13,12 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.config.DeviceConfiguration;
 import osde.data.Channels;
-import osde.data.RecordSet;
+import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -36,10 +34,9 @@ import osde.ui.SWTResourceManager;
 * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
-public class AkkuMasterC4Dialog extends Dialog implements osde.device.DeviceDialog {
+public class AkkuMasterC4Dialog extends DeviceDialog {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());
 
-	private Shell										dialogShell;
 	private CLabel									gesammtentladestromAnzeigeText;
 	private CLabel									gesammtladestromAnzeigeText;
 	private Text										gesammtEntladeStromText;
@@ -64,20 +61,22 @@ public class AkkuMasterC4Dialog extends Dialog implements osde.device.DeviceDial
 	private HashMap<String, Object>	version;
 	private final int								numberChannels				= 4;
 	private final int								maxCurrent						= 2000;
-	private DeviceConfiguration			deviceConfig;
-	private AkkuMasterCalculationThread	threadPower, threadEnergy;
-	private Channels										channels;
-	private int													lastTabFolderNummer	= 0;
+	private Channels								channels;
+	private int											lastTabFolderNummer		= 0;
 
-public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceConfig) {
-		super(parent, style);
-		this.deviceConfig = deviceConfig;
+	/**
+	 * constructor initialize all variables required
+	 * @param parent Shell
+	 * @param device AkkuMasterC4 class implementation == IDevice
+	 */
+	public AkkuMasterC4Dialog(Shell parent, AkkuMasterC4 device) {
+		super(parent);
+		this.serialPort = device.getSerialPort();
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 	}
 
 	public void open() {
-		serialPort = (AkkuMasterC4SerialPort) application.getDeviceSerialPort();
 
 		FormData gesammtEntladeStromTextLData = new FormData();
 		gesammtEntladeStromTextLData.width = 170;
@@ -126,23 +125,23 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 
 				///////////////////////////////////////////////////				
 				if (channel1Tab == null && numberChannels > 0)
-					channel1Tab = new AkkuMasterChannelTab(this, " Kanal 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aZellenZahl, aAkkuTyp, aProgramm,
-							aLadestromMilliA, aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel1Tab = new AkkuMasterChannelTab(this, " Kanal 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
+							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
 				channel1Tab.addChannelTab(tabFolder);
 
 				if (channel2Tab == null && numberChannels > 1)
-					channel2Tab = new AkkuMasterChannelTab(this, " Kanal 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aZellenZahl, aAkkuTyp, aProgramm,
-							aLadestromMilliA, aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel2Tab = new AkkuMasterChannelTab(this, " Kanal 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
+							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
 				channel2Tab.addChannelTab(tabFolder);
 
 				if (channel3Tab == null && numberChannels > 2)
-					channel3Tab = new AkkuMasterChannelTab(this, " Kanal 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aZellenZahl, aAkkuTyp, aProgramm,
-							aLadestromMilliA, aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel3Tab = new AkkuMasterChannelTab(this, " Kanal 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
+							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
 				channel3Tab.addChannelTab(tabFolder);
 
 				if (channel4Tab == null && numberChannels > 3)
-					channel4Tab = new AkkuMasterChannelTab(this, " Kanal 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aZellenZahl, aAkkuTyp, aProgramm,
-							aLadestromMilliA, aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel4Tab = new AkkuMasterChannelTab(this, " Kanal 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
+							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
 				channel4Tab.addChannelTab(tabFolder);
 				///////////////////////////////////////////////////		
 
@@ -158,10 +157,10 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 								log.finest("versionComposite.paintControl, event=" + evt);
 								try {
 									version = serialPort.getVersion();
-									versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String)version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
-									datum.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String)version.get(AkkuMasterC4SerialPort.VERSION_DATE));
-									stromvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String)version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
-									frontplattenvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String)version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
+									versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
+									datum.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
+									stromvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
+									frontplattenvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
 								}
 								catch (Exception e) {
 									application.openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
@@ -297,7 +296,6 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 		}
 		else {
 			dialogShell.setActive();
-			//dialogShell.forceFocus();
 		}
 		Display display = dialogShell.getDisplay();
 		while (!dialogShell.isDisposed()) {
@@ -384,108 +382,10 @@ public AkkuMasterC4Dialog(Shell parent, int style, DeviceConfiguration deviceCon
 	}
 
 	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
-	 */
-	public double translateValue(String recordKey, double value) {
-		double newValue = 0;
-		log.fine(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			newValue = value;
-		}
-		log.fine(String.format("value calculated for %s - %f", recordKey, newValue));
-		return newValue;
-	}
-
-	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
-	 */
-	public double reverseTranslateValue(String recordKey, double value) {
-		double newValue = 0;
-		log.fine(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			newValue = value;
-		}
-		log.fine(String.format("value calculated for %s - %f", recordKey, newValue));
-		return newValue;
-	}
-
-	/**
-	 * @return the dataUnit
-	 */
-	public String getDataUnit(String recordKey) {
-		String unit = "";
-		recordKey = recordKey.split("_")[0];
-		HashMap<String, Object> record = deviceConfig.getRecordConfig(recordKey);
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			unit = (String) record.get("Einheit1");
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			unit = (String) record.get("Einheit2");
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			unit = (String) record.get("Einheit3");
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			unit = (String) record.get("Einheit4");
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			unit = (String) record.get("Einheit5");
-		}
-		return unit;
-	}
-
-	/**
-	 * function to calculate values for inactive records
-	 * @return double with the adapted value
-	 */
-	public void makeInActiveDisplayable(RecordSet recordSet) {
-		// since there are measurement point every 10 seconds during cpturing only and the calculation will take place directly switch all to displayable
-		if (recordSet.isFromFile() && recordSet.isRaw()) {
-			// calculate the values required
-			try {
-				threadPower = new AkkuMasterCalculationThread(RecordSet.POWER, channels.getActiveChannel().getActiveRecordSet());
-				threadPower.start();
-				threadEnergy = new AkkuMasterCalculationThread(RecordSet.ENERGY, channels.getActiveChannel().getActiveRecordSet());
-				threadEnergy.start();
-			}
-			catch (RuntimeException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
 	 * the number drives which tab folder is displayed next if dialog opened
 	 * @param lastTabFolderNummer the lastTabFolderNummer to set
 	 */
 	public void setLastTabFolderNummer(int lastTabFolderNummer) {
 		this.lastTabFolderNummer = lastTabFolderNummer;
 	}
-
 }

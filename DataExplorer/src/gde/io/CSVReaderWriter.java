@@ -23,7 +23,7 @@ import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 
@@ -174,9 +174,9 @@ public class CSVReaderWriter {
 			sb = new StringBuffer();
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-			DeviceConfiguration deviceConfig = OpenSerialDataExplorer.getInstance().getActiveConfig();
+			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 			for (int i = 1; i <= recordSet.size(); i++) {
-				Record record = recordSet.getRecord((String) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+				Record record = recordSet.getRecord((String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
 				if (isRaw) {
 					if (record.isActive()) // only use active records for writing raw data
 						sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);					
@@ -188,8 +188,6 @@ public class CSVReaderWriter {
 			log.finer("header line = " + sb.toString());
 			writer.write(sb.toString());
 
-			// get access to the active device for value translation
-			DeviceDialog device = OpenSerialDataExplorer.getInstance().getDeviceDialog();
 			// write data
 			int recordEntries = recordSet.getRecord(recordSet.getRecordNames()[0]).size();
 			for (int i = 0; i < recordEntries; i++) {
@@ -198,7 +196,7 @@ public class CSVReaderWriter {
 				sb.append((df2.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace(',', decimalSeparator)).append(separator).append(' ');
 				// add data entries
 				for (int j = 0; j < recordSet.size(); j++) {
-					Record record = recordSet.getRecord((String) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + (j + 1)));
+					Record record = recordSet.getRecord((String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + (j + 1)));
 					if (isRaw) { // do not change any values
 						if (record.isActive())
 							sb.append(df3.format(new Double(record.get(i))/1000.0)).append(separator);

@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 import osde.data.Record;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -19,9 +19,9 @@ import osde.ui.OpenSerialDataExplorer;
 public class CurveUtils {
 	private Logger							log			= Logger.getLogger(this.getClass().getName());
 	private final String				lineSep	= System.getProperty("line.separator");
-	private final DeviceDialog	device;																								// defines the link to a device where values may corrected
+	private final IDevice	device;																								// defines the link to a device where values may corrected
 
-	public CurveUtils(DeviceDialog device) {
+	public CurveUtils(IDevice device) {
 		this.device = device;
 		//this.device = application != null ? application.getDeviceDialog() : null;
 	}

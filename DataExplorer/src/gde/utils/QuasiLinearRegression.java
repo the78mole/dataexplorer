@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -16,15 +15,11 @@ import osde.ui.OpenSerialDataExplorer;
 public class QuasiLinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(this.getClass().getName());
 
-	@SuppressWarnings("unused")
-	private final OpenSerialDataExplorer	application;
-
 	/**
-	 * @param dialog
+	 * @param device
 	 */
-	public QuasiLinearRegression(DeviceDialog dialog) {
-		super(dialog);
-		this.application = OpenSerialDataExplorer.getInstance();
+	public QuasiLinearRegression() {
+		super();
 	}
 
 	/**

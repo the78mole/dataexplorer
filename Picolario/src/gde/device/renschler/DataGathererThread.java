@@ -22,19 +22,19 @@ public class DataGathererThread extends Thread {
 	private String[]								datagramNumbers;
 	private final String						RECORD_SET_NAME	= ") Flugaufzeichnung";
 	private PicolarioSerialPort			serialPort;
-	private PicolarioDialog					dialog;
+	private Picolario								device;
 	private CalculationThread				calculationThread;
 	private boolean									threadStop			= false;
 
 	/**
 	 * 
 	 */
-	public DataGathererThread(OpenSerialDataExplorer application, PicolarioDialog dialog, PicolarioSerialPort serialPort, String[] datagramNumbers) {
+	public DataGathererThread(OpenSerialDataExplorer application, Picolario device, PicolarioSerialPort serialPort, String[] datagramNumbers) {
 		this.application = application;
-		this.dialog = dialog;
+		this.device = device;
 		this.serialPort = serialPort;
 		this.datagramNumbers = datagramNumbers;
-		this.calculationThread = new QuasiLinearRegression(dialog);
+		this.calculationThread = new QuasiLinearRegression();
 	}
 
 	/**
@@ -53,10 +53,10 @@ public class DataGathererThread extends Thread {
 			String recordSetKey;
 
 			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
-				dialog.resetTelegramLabel();
-				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), dialog);
+				device.getDialog().resetTelegramLabel();
+				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), device);
 				recordSetKey = (channel.size() + 1) + RECORD_SET_NAME;
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
 				log.fine(recordSetKey + " created");
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
@@ -85,7 +85,7 @@ public class DataGathererThread extends Thread {
 				channel.get(recordSetKey).setAllDisplayable();
 				channel.applyTemplate(recordSetKey);
 			}// end for
-			dialog.enableReadButtons();
+			device.getDialog().enableReadButtons();
 			log.fine("exit data gatherer");
 
 		}

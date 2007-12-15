@@ -72,7 +72,7 @@ public class AnalogWindow {
 				oldRecordSet = recordSet;
 				String[] activeRecordKeys = recordSet.getActiveRecordNames();
 				for (String recordKey : activeRecordKeys) {
-					AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getDeviceDialog());
+					AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 					display.create();
 					log.fine("created analog display for " + recordKey);
 					displays.put(recordKey, display);

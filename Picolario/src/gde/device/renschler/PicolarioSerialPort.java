@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.config.DeviceConfiguration;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.device.DeviceSerialPort;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
@@ -66,7 +66,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, DeviceDialog dialog) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice dialog) throws IOException {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();

@@ -470,7 +470,7 @@ public class AkkuMasterChannelTab {
 									channels.switchChannel(channel.getName());
 									// prepare timed data gatherer thread
 									int delay = 0;
-									int period = application.getActiveConfig().getTimeStep_ms(); // repeat every 10 sec.
+									int period = application.getActiveDevice().getTimeStep_ms(); // repeat every 10 sec.
 									timer = new Timer();
 									timerTask = new TimerTask() {
 										private Logger	log						= Logger.getLogger(this.getClass().getName());
@@ -507,7 +507,7 @@ public class AkkuMasterChannelTab {
 															isCollectDataStopped = false;
 															// record set does not exist or is outdated, build a new name and create
 															recordSetKey = (channel.size() + 1) + ") " + processName;
-															channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), true, false));
+															channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
 															log.fine(recordSetKey + " created for channel " + channel.getName());
 															if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 															channel.get(recordSetKey).setAllDisplayable();

@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -19,8 +18,8 @@ public class LinearRegression extends CalculationThread {
 	/**
 	 * @param dialog
 	 */
-	public LinearRegression(DeviceDialog dialog) {
-		super(dialog);
+	public LinearRegression() {
+		super();
 	}
 
 	/**

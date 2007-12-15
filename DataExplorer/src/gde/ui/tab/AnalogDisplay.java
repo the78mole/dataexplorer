@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -31,12 +31,12 @@ public class AnalogDisplay extends Composite {
 
 	private final Channels			channels;
 	private final String				recordKey;
-	private final DeviceDialog	device;
+	private final IDevice	device;
 
 	/**
 	 * 
 	 */
-	public AnalogDisplay(Composite analogWindow, String recordKey, DeviceDialog device) {
+	public AnalogDisplay(Composite analogWindow, String recordKey, IDevice device) {
 		super(analogWindow, SWT.NONE);
 		GridLayout AnalogDisplayLayout = new GridLayout();
 		AnalogDisplayLayout.makeColumnsEqualWidth = true;

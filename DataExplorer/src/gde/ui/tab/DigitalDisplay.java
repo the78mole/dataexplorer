@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -25,9 +25,9 @@ public class DigitalDisplay extends Composite {
 
 	private final Channels			channels;
 	private final String				recordKey;
-	private final DeviceDialog	device;
+	private final IDevice	device;
 
-	public DigitalDisplay(Composite digitalWindow, String recordKey, DeviceDialog device) {
+	public DigitalDisplay(Composite digitalWindow, String recordKey, IDevice device) {
 		super(digitalWindow, SWT.NONE);
 		FillLayout digitalComposite1Layout = new FillLayout(SWT.VERTICAL);
 		this.setLayout(digitalComposite1Layout);

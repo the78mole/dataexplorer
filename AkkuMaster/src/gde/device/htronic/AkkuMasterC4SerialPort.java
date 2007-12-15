@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import osde.config.DeviceConfiguration;
-import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.device.DeviceSerialPort;
 import osde.ui.StatusBar;
 
@@ -226,7 +226,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, DeviceDialog dialog) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog) throws IOException {
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
 
 		String[] configuration = getConfiguration(channel);

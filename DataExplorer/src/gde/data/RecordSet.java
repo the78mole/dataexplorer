@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 import osde.config.DeviceConfiguration;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.DataToolBar;
 
@@ -189,22 +190,22 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * method to create a record set with given name "1) Laden" containing records according the active device configuration
 	 * @param recordName
-	 * @param deviceConfig 
+	 * @param device 
 	 */
-	public static RecordSet createRecordSet(String recordName, DeviceConfiguration deviceConfig, boolean isRaw, boolean isFromFile) {
-		int size = deviceConfig.getNumberRecords(); // all channels must have the same size, use channel1
+	public static RecordSet createRecordSet(String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
+		int size = device.getNumberRecords(); // all channels must have the same size, use channel1
 		String[] recordNames = new String[size];
-		for (int i = 1; i <= deviceConfig.getNumberRecords(); i++) {
-			recordNames[i - 1] = (String) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i);
+		for (int i = 1; i <= device.getNumberRecords(); i++) {
+			recordNames[i - 1] = (String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i);
 			if (log.isLoggable(Level.FINE)) log.fine("- " + recordNames[i - 1]);
 		}
 
-		RecordSet newRecordSet = new RecordSet(recordName, recordNames, deviceConfig.getTimeStep_ms(), isRaw, isFromFile);
+		RecordSet newRecordSet = new RecordSet(recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile);
 		for (int k = 1; k <= recordNames.length; k++) {
-			Record tmpRecord = new Record(recordNames[k - 1], (String) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_UNIT + k), (String) deviceConfig.getConfiguredRecords().get(
-					DeviceConfiguration.MEASUREMENT_SYMBOL + k), (int) deviceConfig.getTimeStep_ms(), (Integer) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_FACTOR + k),
-					(Integer) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_OFFSET + k), (Integer) deviceConfig.getConfiguredRecords().get(
-							DeviceConfiguration.MEASUREMENT_GAUGE_MAX + k), (Boolean) deviceConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_IS_ACTIVE + k), 5);
+			Record tmpRecord = new Record(recordNames[k - 1], (String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_UNIT + k), (String) device.getConfiguredRecords().get(
+					DeviceConfiguration.MEASUREMENT_SYMBOL + k), (int) device.getTimeStep_ms(), (Integer) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_FACTOR + k),
+					(Integer) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_OFFSET + k), (Integer) device.getConfiguredRecords().get(
+							DeviceConfiguration.MEASUREMENT_GAUGE_MAX + k), (Boolean) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_IS_ACTIVE + k), 5);
 
 			int x = k - 1;
 
@@ -365,7 +366,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check if all records from this record set are displayable, starts calcualation if not
 	 */
 	public void checkAllDisplayable() {
-		application.getDeviceDialog().makeInActiveDisplayable(this);
+		application.getDevice().makeInActiveDisplayable(this);
 	}
 
 	/**

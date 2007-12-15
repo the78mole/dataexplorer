@@ -46,7 +46,7 @@ public class MenuToolBar {
 	private ToolItem											openToolItem;
 	private ToolItem											newToolItem;
 	private ToolBar												menuToolBar;
-	private Composite mainToolComposite;
+	private Composite											mainToolComposite;
 
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
 		this.application = parent;
@@ -81,7 +81,7 @@ public class MenuToolBar {
 						newToolItem.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("newToolItem.widgetSelected, event=" + evt);
-								application.getDeviceSelectionDialog().setupDataChannels(application.getActiveConfig());
+								application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
 								application.updateDataTable();
 								application.updateDigitalWindow();
 							}
@@ -133,7 +133,7 @@ public class MenuToolBar {
 						deviceToolItem.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("deviceToolItem.widgetSelected, event=" + evt);
-								application.getDeviceSelectionDialog().open();
+								application.setActiveDevice(application.getDeviceSelectionDialog().open());
 							}
 						});
 					}
@@ -146,24 +146,24 @@ public class MenuToolBar {
 						prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("prevDeviceToolItem.widgetSelected, event=" + evt);
-								if (application.getDeviceSerialPort() == null || !application.getDeviceSerialPort().isConnected()) { // allow device switch only if port noct connected
+								// allow device switch only if port not connected
+								if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) {
 									DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
-								int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-								int size = deviceSelect.getActiveDevices().size();
-								if (selection > 0 && selection <= size) {
-									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection - 1));
-								}
-								else
-									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
-								
-								if (application.getDeviceDialog() != null) application.getDeviceDialog().close();
-								deviceSelect.setActiveConfig(deviceConfig);
-								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
-								deviceSelect.setupDevice(deviceConfig);
-								
-								application.updateDataTable();
-								application.updateDigitalWindow();
+									DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
+									int size = deviceSelect.getActiveDevices().size();
+									if (selection > 0 && selection <= size) {
+										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection - 1));
+									}
+									else
+										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
+
+									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
+										application.getDeviceDialog().dispose();
+									}
+									deviceSelect.setActiveConfig(deviceConfig);
+									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
+									deviceSelect.setupDevice();
 								}
 								else {
 									application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -181,23 +181,23 @@ public class MenuToolBar {
 						nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("nextDeviceToolItem.widgetSelected, event=" + evt);
-								if (application.getDeviceSerialPort() == null || !application.getDeviceSerialPort().isConnected()) { // allow device switch only if port noct connected
+								// allow device switch only if port not connected
+								if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) {
 									DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
-								int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-								int size = deviceSelect.getActiveDevices().size() - 1;
-								if (selection >= 0 && selection < size)
-									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection + 1));
-								else
-									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
-								
-								if (application.getDeviceDialog() != null) application.getDeviceDialog().close();
-								deviceSelect.setActiveConfig(deviceConfig);
-								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
-								deviceSelect.setupDevice(deviceConfig);
-								
-								application.updateDataTable();
-								application.updateDigitalWindow();
+									DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
+									int size = deviceSelect.getActiveDevices().size() - 1;
+									if (selection >= 0 && selection < size)
+										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection + 1));
+									else
+										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
+
+									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
+										application.getDeviceDialog().dispose();
+									}
+									deviceSelect.setActiveConfig(deviceConfig);
+									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
+									deviceSelect.setupDevice();
 								}
 								else {
 									application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -211,12 +211,12 @@ public class MenuToolBar {
 						toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("toolBoxToolItem.widgetSelected, event=" + evt);
-								final OpenSerialDataExplorer inst = OpenSerialDataExplorer.getInstance();
-								//if (inst.getDeviceSerialPort().isConnected()) {
-									inst.getDeviceDialog().open();
-									//}
-								//else
-									//	inst.openMessageDialog("Erst den seriellen Port öffnen");
+								if (application.getDeviceDialog() != null) {
+									application.getDeviceDialog().open();
+								}
+								else {
+									application.setActiveDevice(application.getDeviceSelectionDialog().open());
+								}
 							}
 						});
 					}

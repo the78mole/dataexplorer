@@ -90,7 +90,7 @@ public class DigitalWindow {
 						oldRecordSet = recordSet;
 						String[] activeRecordKeys = recordSet.getActiveRecordNames();
 						for (String recordKey : activeRecordKeys) {
-							DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getDeviceDialog());
+							DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 							display.create();
 							log.fine("created digital display for " + recordKey);
 							displays.put(recordKey, display);

@@ -3,44 +3,43 @@
  */
 package osde.device;
 
-import osde.data.RecordSet;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Shell;
 
 /**
- * defines the interface for device dialog implementation
+ * @author Winfried Bruegmann
+ *
  */
-public interface DeviceDialog {
-	
+public abstract class DeviceDialog extends Dialog {
+
+	protected Shell	dialogShell;
+
+	/**
+	 * constructor for the dialog, in most cases this dialog should not modal  
+	 * @param parent
+	 */
+	public DeviceDialog(Shell parent) {
+		super(parent);
+	}
+
 	/**
 	 * default method where the default controls are defined, this needs to be overwritten by specific device dialog
 	 */
-	public void open();
-	
-	/**
-	 * method to close the dialog, overwrite this if extra cleanup is required
-	 */
-	public void close();
+	abstract public void open();
 
 	/**
-	 * @return the dataUnit
+	 * default method to dispose (close) a dialog shell
+	 * implement all cleanup operation in a disposeListener method
 	 */
-	public String getDataUnit(String recordKey);
+	public void dispose() {
+		dialogShell.dispose();
+	}
 
 	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
+	 * default method to dispose (close) a dialog shell
+	 * implement all cleanup operation in a disposeListener method
 	 */
-	public double translateValue(String recordKey, double value);
-
-	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
-	 */
-	public double reverseTranslateValue(String recordKey, double value);
-
-	/**
-	 * function to calculate values for inactive records
-	 * @return double with the adapted value
-	 */
-	public void makeInActiveDisplayable(RecordSet recordSet);
-
+	public boolean isDisposed() {
+		return dialogShell != null ? dialogShell.isDisposed() : true;
+	}
 }

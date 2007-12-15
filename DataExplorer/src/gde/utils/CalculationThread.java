@@ -3,7 +3,6 @@ package osde.utils;
 import java.util.logging.Logger;
 
 import osde.data.RecordSet;
-import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -14,7 +13,6 @@ public abstract class CalculationThread extends Thread {
 
 	protected static String									newLine			= System.getProperty("line.separator");
 
-	protected DeviceDialog			dialog;
 	protected RecordSet											recordSet;
 	protected final OpenSerialDataExplorer	apllication;
 	protected boolean												threadStop	= false;
@@ -22,8 +20,7 @@ public abstract class CalculationThread extends Thread {
 	/**
 	 * 
 	 */
-	public CalculationThread(DeviceDialog dialog) {
-		this.dialog = dialog;
+	public CalculationThread() {
 		this.apllication = OpenSerialDataExplorer.getInstance();
 	}
 

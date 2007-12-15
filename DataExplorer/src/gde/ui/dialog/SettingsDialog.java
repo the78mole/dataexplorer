@@ -1,6 +1,5 @@
 package osde.ui.dialog;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -91,9 +90,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 		try {
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
 			SWTResourceManager.registerResourceUser(dialogShell);
-
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
@@ -105,19 +102,9 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
 					if (settings.getActiveDevice().startsWith("---")) settings.setActiveDevice("---;---;---");
 					settings.store();
-					if (settings.isGlobalSerialPort()&& application.getActiveConfig() != null) application.getActiveConfig().setPort(serialPort.getText());
+					if (settings.isGlobalSerialPort()&& application.getActiveDevice() != null) application.getActiveDevice().setPort(serialPort.getText());
 					// set logging levels
-					if (settings.isGlobalLogLevel()) {
-						settings.setGlobalLogLevel(Level.parse(settings.getProperty(Settings.GLOBAL_LOG_LEVEL)));
-					}
-					else {
-						settings.setIndividualLogLevel("osde.ui", Level.parse(settings.getProperty(Settings.UI_LOG_LEVEL)));
-						settings.setIndividualLogLevel("osde.data", Level.parse(settings.getProperty(Settings.DATA_LOG_LEVEL)));
-						settings.setIndividualLogLevel("osde.config", Level.parse(settings.getProperty(Settings.CONFIG_LOG_LEVEL)));
-						settings.setIndividualLogLevel("osde.device", Level.parse(settings.getProperty(Settings.DEVICE_LOG_LEVEL)));
-						settings.setIndividualLogLevel("osde.utils", Level.parse(settings.getProperty(Settings.UTILS_LOG_LEVEL)));
-						settings.setIndividualLogLevel("osde.serial", Level.parse(settings.getProperty(Settings.SERIAL_IO_LOG_LEVEL)));
-					}
+					settings.updateLogLevel();
 				}
 			});
 			{ // begin default data path group

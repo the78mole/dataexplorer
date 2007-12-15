@@ -104,7 +104,7 @@ public class MenuBar {
 					newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("newFileMenuItem.widgetSelected, event=" + evt);
-							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveConfig());
+							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
 							application.updateDataTable();
 							application.updateDigitalWindow();
 						}
@@ -174,7 +174,7 @@ public class MenuBar {
 											if (channel.getActiveRecordSet() != null) {
 												recordSetKey = (channel.size() + 1) + ") CSV Import";
 											}
-											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), false, true));
+											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), false, true));
 											channel.applyTemplate(recordSetKey);
 											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), false);
 											channel.setActiveRecordSet(recordSetKey);
@@ -209,7 +209,7 @@ public class MenuBar {
 											if (channel.getActiveRecordSet() != null) {
 												recordSetKey = (channel.size() + 1) + ") CSV Import";
 											}
-											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveConfig(), true, true));
+											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, true));
 											channel.applyTemplate(recordSetKey);
 											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), true);
 											channels.getActiveChannel().setActiveRecordSet(recordSetKey);
@@ -332,7 +332,7 @@ public class MenuBar {
 					selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
-							application.getDeviceSelectionDialog().open();
+							application.setActiveDevice(application.getDeviceSelectionDialog().open());
 						}
 					});
 				}
@@ -343,7 +343,7 @@ public class MenuBar {
 					prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("prevDeviceMenuItem.widgetSelected, event=" + evt);
-							if (application.getDeviceSerialPort() == null || !application.getDeviceSerialPort().isConnected()) { // allow device switch only if port noct connected
+							if (application.getActiveDevice().getSerialPort() == null || !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
 								int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
@@ -353,13 +353,12 @@ public class MenuBar {
 								}
 								else
 									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
-								if (application.getDeviceDialog() != null) application.getDeviceDialog().close();
+								if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
+									application.getDeviceDialog().dispose();
+								}
 								deviceSelect.setActiveConfig(deviceConfig);
-								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
-								deviceSelect.setupDevice(deviceConfig);
-
-								application.updateDataTable();
-								application.updateDigitalWindow();
+								if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
+								deviceSelect.setupDevice();
 							}
 							else {
 								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -374,7 +373,7 @@ public class MenuBar {
 					nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("nextDeviceMenuItem.widgetSelected, event=" + evt);
-							if (application.getDeviceSerialPort() == null || !application.getDeviceSerialPort().isConnected()) { // allow device switch only if port noct connected
+							if (application.getActiveDevice().getSerialPort() == null || !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
 								int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
@@ -384,13 +383,12 @@ public class MenuBar {
 								else
 									deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
 
-								if (application.getDeviceDialog() != null) application.getDeviceDialog().close();
+								if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
+									application.getDeviceDialog().dispose();
+								}
 								deviceSelect.setActiveConfig(deviceConfig);
-								if (!deviceSelect.checkPortSelection()) application.setActiveConfig(application.getDeviceSelectionDialog().open());
-								deviceSelect.setupDevice(deviceConfig);
-
-								application.updateDataTable();
-								application.updateDigitalWindow();
+								if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
+								deviceSelect.setupDevice();
 							}
 							else {
 								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -404,7 +402,7 @@ public class MenuBar {
 					toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
-							application.getDeviceSelectionDialog().open();
+							application.setActiveDevice(application.getDeviceSelectionDialog().open());
 						}
 					});
 				}

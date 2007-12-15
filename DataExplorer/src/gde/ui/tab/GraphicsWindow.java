@@ -34,6 +34,7 @@ import osde.config.DeviceConfiguration;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.CurveUtils;
@@ -279,7 +280,7 @@ public class GraphicsWindow {
 		gc.drawLine(xMax, y0, xMax, yMax);
 
 		// draw curves for each active record
-		CurveUtils cu = new CurveUtils(application.getDeviceDialog());
+		CurveUtils cu = new CurveUtils(application.getActiveDevice());
 		for (String record : recordSet.getRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
 			log.fine("drawing record = " + actualRecord.getName());
@@ -317,7 +318,7 @@ public class GraphicsWindow {
 	 * method to update the curves displayed in the curve selector panel 
 	 */
 	private void updateCurveSelector() {
-		final DeviceConfiguration activeConfig = application.getActiveConfig();
+		final IDevice activeConfig = application.getActiveDevice();
 		final RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {

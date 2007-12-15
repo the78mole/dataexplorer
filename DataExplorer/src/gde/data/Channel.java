@@ -30,7 +30,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.name = "K" + channelNumber + ": Kanal " + channelNumber;
 
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = application.getActiveConfig().getName() + "_" + this.name.split(":")[0];
+		String filename = application.getDevice().getName() + "_" + this.name.split(":")[0];
 		this.template = new GraphicsTemplate(Settings.getInstance().getApplHomePath(), filename);
 	}
 
@@ -45,7 +45,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.put(newRecordSet.getName(), newRecordSet);
 
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = application.getActiveConfig().getName() + "_" + this.name.split(":")[0];
+		String filename = application.getDevice().getName() + "_" + this.name.split(":")[0];
 		this.template = new GraphicsTemplate(Settings.getInstance().getApplHomePath(), filename);
 	}
 
