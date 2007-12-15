@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="UniLog" default="compile">
+
+	<property name="module.output" location="build/classes"/>
+
+	<path id="compile.classpath">
+		<pathelement location="../OpenSerialDataExplorer/build/classes" />
+		<pathelement location="../build/lib/RXTXcomm.jar" />
+		<fileset dir="${eclipse.base}">
+			<include name="plugins/org.eclipse.swt.*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="compile" description="compile the project">
+		<property name="include.debug.info" value="yes" />
+		<mkdir dir="${module.output}" />
+		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8">
+			<src path="src" />
+		</javac>
+	</target>
+
+	<target name="package" depends="compile">
+        <jar manifest="META-INF/MANIFEST.MF" jarfile="build/UniLog.jar">
+			<metainf dir="src/META-INF" excludes="MANIFEST.MF"/>
+			<metainf dir="META-INF" excludes="MANIFEST.MF"/>
+        	<fileset dir="${module.output}" includes="**/*.class"/>
+    	</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+</project>
