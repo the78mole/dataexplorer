@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -23,11 +24,11 @@ public class Record extends Vector<Integer> {
 	private int									timeStep_ms;
 
 	private int									factor;																															// Faktor
-	private int									offset								= 0;																						// ??
-	private int									scale									= 1;																						// gauge/Multiplicator
+	private int									offset								= 0;																					// ??
+	private int									scale									= 1;																					// gauge/Multiplicator
 	private boolean							isEmpty								= true;
 	private int									maxValue							= -20000;																			// max value of the curve
-	private int									minValue							= 20000;																				// min value of the curve
+	private int									minValue							= 20000;																			// min value of the curve
 
 	private RecordSet						parent;
 	private String							keyName;
@@ -44,19 +45,21 @@ public class Record extends Vector<Integer> {
 	private boolean							isRoundOut						= false;
 	private boolean							isStartpointZero			= false;
 	private boolean							isStartEndDefined			= false;
-	private int									numberFormat					= 1;																						// 0 = 0000, 1 = 000.0, 2 = 00.00
-	private double							maxDisplayValue						= maxValue;																		// overwrite calculated boundaries
-	private double							minDisplayValue						= minValue;
+	private int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
+	private double							maxDisplayValue				= maxValue;																		// overwrite calculated boundaries
+	private double							minDisplayValue				= minValue;
 
-	public final static String	IS_ACTIVE							= "_isActive";																	// active means this measurement can be red from device, other wise its calculated
+	private final IDevice				device;																															// record need to know its device to calculate data from raw
+
+	public final static String	IS_ACTIVE							= "_isActive";																// active means this measurement can be red from device, other wise its calculated
 	public final static String	IS_DIPLAYABLE					= "_isDisplayable";														// true for all active records, true for passive records when data calculated
 	public final static String	IS_VISIBLE						= "_isVisible";																// defines if data are displayed 
-	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";														// defines the side where the axis id displayed 
+	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";													// defines the side where the axis id displayed 
 	public final static String	COLOR									= "_color";																		// defines which color is used to draw the curve
 	public final static String	LINE_WITH							= "_lineWidth";
 	public final static String	LINE_STYLE						= "_lineStyle";
-	public final static String	IS_ROUND_OUT					= "_isRoundOut";																// defines if axis values are rounded
-	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";													// defines if axis value starts at zero
+	public final static String	IS_ROUND_OUT					= "_isRoundOut";															// defines if axis values are rounded
+	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";												// defines if axis value starts at zero
 	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";												// defines that explicite end values are defined for axis
 	public final static String	NUMBER_FORMAT					= "_numberFormat";
 	public final static String	MAX_VALUE							= "_maxValue";
@@ -84,6 +87,7 @@ public class Record extends Vector<Integer> {
 		this.isActive = isActive;
 		this.isDisplayable = isActive ? true : false;
 		this.df = new DecimalFormat("0.0");
+		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 	}
 
 	/**
@@ -102,7 +106,7 @@ public class Record extends Vector<Integer> {
 		this.isDisplayable = record.isDisplayable;
 		this.maxValue = record.maxValue;
 		this.minValue = record.minValue;
-		this.df = (DecimalFormat)record.df.clone();
+		this.df = (DecimalFormat) record.df.clone();
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
 		this.color = record.color;
@@ -113,14 +117,16 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = record.numberFormat;
 		this.maxDisplayValue = record.maxDisplayValue;
 		this.minDisplayValue = record.minDisplayValue;
+		this.device = record.device;
 	}
-	
+
 	/**
 	 * overwritten clone method used to compare curves
 	 */
 	public Record clone() {
 		return new Record(this);
 	}
+
 	/**
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
@@ -366,6 +372,13 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setKeyName(String keyName) {
 		this.keyName = keyName;
+	}
+
+	/**
+	 * @return the device
+	 */
+	public IDevice getDevice() {
+		return device;
 	}
 
 }

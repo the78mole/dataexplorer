@@ -17,14 +17,8 @@ import osde.ui.OpenSerialDataExplorer;
  * this class contains utilities to draw curves and vertical scales
  */
 public class CurveUtils {
-	private Logger							log			= Logger.getLogger(this.getClass().getName());
-	private final String				lineSep	= System.getProperty("line.separator");
-	private final IDevice	device;																								// defines the link to a device where values may corrected
-
-	public CurveUtils(IDevice device) {
-		this.device = device;
-		//this.device = application != null ? application.getDeviceDialog() : null;
-	}
+	private static Logger				log			= Logger.getLogger(CurveUtils.class.getClass().getName());
+	private static final String	lineSep	= System.getProperty("line.separator");
 
 	/**
 	 * draws the data as graph using gives rectangle for display
@@ -36,7 +30,8 @@ public class CurveUtils {
 	 * @param height
 	 * @param scaleWidthSpace
 	 */
-	public void draw(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
+	public static void draw(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
+		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 
 		if (log.isLoggable(Level.FINEST)) log.finest("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
@@ -140,7 +135,7 @@ public class CurveUtils {
 
 		int i = 0;
 		int timeStep = record.getTimeStep_ms();
-		double adaptXMaxValue = isCompareSet ? (1.0 * (intRecordSize-1) * record.getParent().getMaxSize() / intRecordSize * timeStep) : (1.0 * (intRecordSize-1) * timeStep);
+		double adaptXMaxValue = isCompareSet ? (1.0 * (intRecordSize - 1) * record.getParent().getMaxSize() / intRecordSize * timeStep) : (1.0 * (intRecordSize - 1) * timeStep);
 		double factorX = (1.0 * width) / adaptXMaxValue;
 		double factorY = (1.0 * height) / (yMaxValue - yMinValue);
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("factorX = %.3f factorY = %.3f (yMaxValue - yMinValue) = %.3f", factorX, factorY, (yMaxValue - yMinValue)));
