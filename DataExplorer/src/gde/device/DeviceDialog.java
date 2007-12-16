@@ -3,6 +3,7 @@
  */
 package osde.device;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
@@ -10,7 +11,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Winfried Bruegmann
  *
  */
-public abstract class DeviceDialog extends Dialog {
+public abstract class DeviceDialog extends Dialog{
 
 	protected Shell	dialogShell;
 
@@ -19,7 +20,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * @param parent
 	 */
 	public DeviceDialog(Shell parent) {
-		super(parent);
+		super(parent, SWT.NONE);
 	}
 
 	/**
@@ -41,5 +42,19 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public boolean isDisposed() {
 		return dialogShell != null ? dialogShell.isDisposed() : true;
+	}
+
+	/**
+	 * default method to drive visibility of a dialog shell
+	 */
+	public void setVisible(boolean value) {
+		dialogShell.setVisible(value);
+	}
+
+	/**
+	 * default method to set the focus of a dialog shell
+	 */
+	public boolean setFocus() {
+		return dialogShell != null ? dialogShell.setFocus() : false;
 	}
 }
