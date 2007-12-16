@@ -280,11 +280,10 @@ public class GraphicsWindow {
 		gc.drawLine(xMax, y0, xMax, yMax);
 
 		// draw curves for each active record
-		CurveUtils cu = new CurveUtils(application.getActiveDevice());
 		for (String record : recordSet.getRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
 			log.fine("drawing record = " + actualRecord.getName());
-			if (actualRecord.isVisible() && actualRecord.isDisplayable()) cu.draw(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
+			if (actualRecord.isVisible() && actualRecord.isDisplayable()) CurveUtils.draw(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 			gc.setClipping(0, 0, canvas.getSize().x, canvas.getSize().y);
 		}
 	}
@@ -305,59 +304,49 @@ public class GraphicsWindow {
 	 * method to update the curves displayed in the curve selector panel 
 	 */
 	public void updateCurveSelectorTable() {
-		RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
-		if (activeRecordSet != null)
-			updateCurveSelector();
-		else {
-			curveSelectorTable.removeAll();
-			curveSelectorTable.redraw(); // blank out, nothing to show
-		}
-	}
-
-	/**
-	 * method to update the curves displayed in the curve selector panel 
-	 */
-	private void updateCurveSelector() {
 		final IDevice activeConfig = application.getActiveDevice();
 		final RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				curveSelectorTable.removeAll();
+		if (isCurveSelectorEnabled && recordSet != null) {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					curveSelectorTable.removeAll();
 
-				for (int i = 1; i <= recordSet.size(); i++) {
-					Record record;
-					switch (type) {
-					case TYPE_COMPARE:
-						String recordKey = recordSet.getRecordNames()[0].split("_")[0];
-						record = recordSet.getRecord(recordKey + "_" + (i - 1));
-						break;
+					for (int i = 1; i <= recordSet.size(); i++) {
+						Record record;
+						switch (type) {
+						case TYPE_COMPARE:
+							String recordKey = recordSet.getRecordNames()[0].split("_")[0];
+							record = recordSet.getRecord(recordKey + "_" + (i - 1));
+							break;
 
-					default: // TYPE_NORMAL
-						record = recordSet.getRecord((String) activeConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
-						break;
-					}
-					log.finer(record.getName());
+						default: // TYPE_NORMAL
+							record = recordSet.getRecord((String) activeConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+							break;
+						}
+						log.finer(record.getName());
 
-					TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
-					item.setForeground(record.getColor());
-					//item.setFont(font);
-					item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + (i - 1));
-					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
-					if (record.isVisible()) {
-						item.setChecked(true);
-						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
-						item.setData(WINDOW_TYPE, type);
-					}
-					else {
-						item.setChecked(false);
-						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-						item.setData(WINDOW_TYPE, type);
-						if (!recordSet.get(record.getKeyName()).isDisplayable()) item.setGrayed(true);
+						TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
+						item.setForeground(record.getColor());
+						//item.setFont(font);
+						item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + (i - 1));
+						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
+						if (record.isVisible()) {
+							item.setChecked(true);
+							item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
+							item.setData(WINDOW_TYPE, type);
+						}
+						else {
+							item.setChecked(false);
+							item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
+							item.setData(WINDOW_TYPE, type);
+							if (!recordSet.get(record.getKeyName()).isDisplayable()) item.setGrayed(true);
+						}
 					}
 				}
-			}
-		});
+			});
+		}
+		else curveSelectorTable.removeAll();
 	}
 
 	public Canvas getGraphicCanvas() {
