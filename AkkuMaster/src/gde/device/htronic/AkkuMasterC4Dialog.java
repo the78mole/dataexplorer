@@ -7,6 +7,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -77,31 +81,32 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	}
 
 	public void open() {
-
-		FormData gesammtEntladeStromTextLData = new FormData();
-		gesammtEntladeStromTextLData.width = 170;
-		gesammtEntladeStromTextLData.height = 20;
-		gesammtEntladeStromTextLData.left = new FormAttachment(0, 1000, 12);
-		gesammtEntladeStromTextLData.top = new FormAttachment(0, 1000, 34);
-
 		log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
 		if (dialogShell == null || dialogShell.isDisposed()) {
 
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM);
-
-			{
-				//Register as a resource user - SWTResourceManager will
-				//handle the obtaining and disposing of resources
-				SWTResourceManager.registerResourceUser(dialogShell);
-			}
-
+			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
 			dialogShell.setSize(439, 593);
 			dialogShell.setText("Akkumaster C4 ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+			dialogShell.addFocusListener(new FocusAdapter() {
+				public void focusGained(FocusEvent evt) {
+					log.fine("dialogShell.focusGained, event="+evt);
+					if (!serialPort.isConnected()) {
+						application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
+					}
+				}
+			});
+			dialogShell.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent evt) {
+					log.fine("dialogShell.widgetDisposed, event=" + evt);
+					//TODO check if some thing to do before exiting
+				}
+			});
 			{
 				FormData tabFolderLData = new FormData();
 				tabFolderLData.width = 427;
@@ -295,6 +300,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			dialogShell.open();
 		}
 		else {
+			dialogShell.setVisible(true);
 			dialogShell.setActive();
 		}
 		Display display = dialogShell.getDisplay();

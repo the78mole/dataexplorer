@@ -7,6 +7,8 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -53,10 +55,10 @@ public class PicolarioDialog extends DeviceDialog {
 	private Button										reduceByDefinedValueButton;
 	private Label											heightReductionLabel;
 	private boolean										doSubtractFirst				= true;																				// indicates to subtract first values from all other
-	private boolean										doReduceHeight				= false;																			// indicates that the height has to be corrected by an offset
-	private int												heightUnitSelection		= 0;																					// Feet 0, Meter 1
-	private int												heightOffsetSelection	= 7;																					// represents the offset the measurment should be modified
-	private int												heightOffsetValue			= 100;																				// represents the offset value
+	private boolean										doReduceHeight				= false;																				// indicates that the height has to be corrected by an offset
+	private int												heightUnitSelection		= 0;																						// Feet 0, Meter 1
+	private int												heightOffsetSelection	= 7;																						// represents the offset the measurment should be modified
+	private int												heightOffsetValue			= 100;																					// represents the offset value
 
 	private Group											readDataGroup3;
 	private Button										readSingle;
@@ -66,7 +68,7 @@ public class PicolarioDialog extends DeviceDialog {
 	private CLabel										numberRedTelegramLabel;
 	private CCombo										recordSetSelectCombo;
 	private String										redDatagrams					= "0";
-	private String										heightDataUnit				= "m";																				// Meter is default
+	private String										heightDataUnit				= "m";																					// Meter is default
 
 	private final Picolario						device;
 	private final PicolarioSerialPort	serialPort;
@@ -97,6 +99,14 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setSize(344, 419);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+			dialogShell.addFocusListener(new FocusAdapter() {
+				public void focusGained(FocusEvent evt) {
+					log.fine("dialogShell.focusGained, event="+evt);
+					if (!serialPort.isConnected()) {
+						application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
+					}
+				}
+			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -357,6 +367,7 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.open();
 		}
 		else {
+			dialogShell.setVisible(true);
 			dialogShell.setActive();
 		}
 		Display display = dialogShell.getDisplay();

@@ -4,6 +4,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -40,13 +44,13 @@ public class UniLogDialog extends DeviceDialog {
 	private Button												okButton;
 
 	@SuppressWarnings("unused")
-	private final UniLog						device;				// get device specific things, get serial port, ...
+	private final UniLog									device;																						// get device specific things, get serial port, ...
 	@SuppressWarnings("unused")
-	private final DeviceSerialPort				serialPort; 	// open/close port execute getData()....
+	private final DeviceSerialPort				serialPort;																				// open/close port execute getData()....
 	@SuppressWarnings("unused")
-	private final OpenSerialDataExplorer	application;	// interaction with application instance
+	private final OpenSerialDataExplorer	application;																				// interaction with application instance
 	@SuppressWarnings("unused")
-	private final Channels								channels;			// interaction with channels, source of all records
+	private final Channels								channels;																					// interaction with channels, source of all records
 
 	/**
 	* main method to test this dialog inside a shell 
@@ -82,43 +86,64 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void open() {
 		try {
-			Shell parent = getParent();
-			dialogShell = new Shell(parent, SWT.DIALOG_TRIM); // !SWT.APPLICATION_MODAL
-			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setLayout(new FormLayout());
-			dialogShell.layout();
-			dialogShell.pack();
-			dialogShell.setSize(336, 393);
-			{
-				FormData InfoTextLData = new FormData();
-				InfoTextLData.width = 304;
-				InfoTextLData.height = 114;
-				InfoTextLData.left = new FormAttachment(0, 1000, 12);
-				InfoTextLData.top = new FormAttachment(0, 1000, 81);
-				InfoText = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
-				InfoText.setLayoutData(InfoTextLData);
-				InfoText.setText("Für diese Gerät ist die Kommunikationsschnittstelle nicht implementiert.");
-				InfoText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
-				InfoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-			}
-			{
-				FormData okButtonLData = new FormData();
-				okButtonLData.width = 52;
-				okButtonLData.height = 33;
-				okButtonLData.left = new FormAttachment(0, 1000, 132);
-				okButtonLData.top = new FormAttachment(0, 1000, 309);
-				okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				okButton.setLayoutData(okButtonLData);
-				okButton.setText("OK");
-				okButton.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.finest("okButton.widgetSelected, event=" + evt);
-						dialogShell.dispose();
+			log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
+			if (dialogShell == null || dialogShell.isDisposed()) {
+				Shell parent = getParent();
+				dialogShell = new Shell(parent, SWT.DIALOG_TRIM); // !SWT.APPLICATION_MODAL
+				SWTResourceManager.registerResourceUser(dialogShell);
+				dialogShell.setLayout(new FormLayout());
+				dialogShell.layout();
+				dialogShell.pack();
+				dialogShell.setSize(336, 393);
+				dialogShell.addFocusListener(new FocusAdapter() {
+					public void focusGained(FocusEvent evt) {
+						log.fine("dialogShell.focusGained, event="+evt);
+						if (!serialPort.isConnected()) {
+							application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
+						}
 					}
 				});
+				dialogShell.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent evt) {
+						log.fine("dialogShell.widgetDisposed, event=" + evt);
+						//TODO check if some thing to do before exiting
+					}
+				});
+				{
+					FormData InfoTextLData = new FormData();
+					InfoTextLData.width = 304;
+					InfoTextLData.height = 114;
+					InfoTextLData.left = new FormAttachment(0, 1000, 12);
+					InfoTextLData.top = new FormAttachment(0, 1000, 81);
+					InfoText = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+					InfoText.setLayoutData(InfoTextLData);
+					InfoText.setText("Für diese Gerät ist die Kommunikationsschnittstelle nicht implementiert.");
+					InfoText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+					InfoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				}
+				{
+					FormData okButtonLData = new FormData();
+					okButtonLData.width = 52;
+					okButtonLData.height = 33;
+					okButtonLData.left = new FormAttachment(0, 1000, 132);
+					okButtonLData.top = new FormAttachment(0, 1000, 309);
+					okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+					okButton.setLayoutData(okButtonLData);
+					okButton.setText("OK");
+					okButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("okButton.widgetSelected, event=" + evt);
+							dialogShell.dispose();
+						}
+					});
+				}
+				dialogShell.setLocation(getParent().toDisplay(100, 100));
+				dialogShell.open();
 			}
-			dialogShell.setLocation(getParent().toDisplay(100, 100));
-			dialogShell.open();
+			else {
+				dialogShell.setVisible(true);
+				dialogShell.setActive();
+			}
 			Display display = dialogShell.getDisplay();
 			while (!dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
