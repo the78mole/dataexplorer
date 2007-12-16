@@ -53,6 +53,11 @@ public interface IDevice {
 	public int getTimeStep_ms();
 	
 	/**
+	 * set new time step in ms
+	 */
+	public void setTimeStep_ms(int newTimeStep_ms);
+	
+	/**
 	 * @return the port configured for the device
 	 */
 	public String getPort();
@@ -116,6 +121,11 @@ public interface IDevice {
 	 * @return the device serial port
 	 */
 	public DeviceSerialPort getSerialPort();
+	
+	/**
+	 * @return the records this is the key to get access to measurement specific properties
+	 */
+	public HashMap<String, Object> getRecords();
 	
 	/**
 	 * @return the dataUnit
