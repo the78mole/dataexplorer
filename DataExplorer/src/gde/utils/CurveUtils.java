@@ -129,7 +129,7 @@ public class CurveUtils {
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
-		//gc.setClipping(x0, y0 - height, width, height);
+		gc.setClipping(x0, y0 - height, width, height);
 		Integer[] intRecord = record.get();
 		int intRecordSize = intRecord.length;
 
