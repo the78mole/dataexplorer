@@ -87,7 +87,7 @@ public class TimeLine {
 		// Set the line color and draw a horizontal time axis
 		gc.setForeground(color);
 		gc.drawLine(x0, y0, x0 + width, y0);
-		if (log.isLoggable(Level.FINE)) log.fine("Zeitachse = " + x0 + ", " + y0 + ", " + x0 + width + ", " + y0);
+		if (log.isLoggable(Level.FINE)) log.fine(String.format("Zeitachse - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, maxNumber, scaleFactor));
 
 		Point pt = gc.textExtent(timeLineText);
 		int ticklength = pt.y / 2;
@@ -113,8 +113,17 @@ public class TimeLine {
 	 */
 	private void drawHorizontalTickMarks(GC gc, int x0, int y0, int width, int startNumber, int endNumber, int scaleFactor, int ticklength, int miniticks, int gap) {
 
-		double numberTicks = (endNumber - startNumber) / 10.0; // every 10th units one tick
-		log.finest("numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
+		double numberTicks;
+		int timeDelta = endNumber - startNumber;
+		if (timeDelta >= 10 && timeDelta < 30 && scaleFactor == 10) {
+			numberTicks = timeDelta / 5.0; // every 5 th units one tick
+			scaleFactor = scaleFactor * 2;
+			log.fine("numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
+		}
+		else {
+			numberTicks = timeDelta / 10.0; // every 10th units one tick
+			log.fine("numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
+		}
 		double deltaTick = 1.0 * width / numberTicks;
 		miniticks++;
 		Point pt = gc.textExtent("000,00");
