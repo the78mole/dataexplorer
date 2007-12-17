@@ -3,6 +3,8 @@ package osde.ui.menu;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.graphics.Color;
@@ -45,16 +47,23 @@ public class CurveSelectorContextMenu {
 		try {
 			popupmenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
-					log.finest("popupmenu MenuListener " + evt);
-					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-					recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-					String recordNameKey = selectedItem.getText();
-					lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
-					if(type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
+						log.finest("popupmenu MenuListener " + evt);
+						TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+						if (selectedItem != null && !selectedItem.isDisposed()) {
+							int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
+							recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+							String recordNameKey = selectedItem.getText();
+							lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
+							if (type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
+						}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+				}
+			});
+			popupmenu.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent evt) {
+					log.finest("popupmenu DisposeListener " + evt);
 				}
 			});
 
@@ -64,16 +73,18 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("lineVisibler Action performed!");
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					if (lineVisible.getSelection()) { // true
-						recordSet.getRecord(recordNameKey).setVisible(true);
-						selectedItem.setChecked(true);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						if (lineVisible.getSelection()) { // true
+							recordSet.getRecord(recordNameKey).setVisible(true);
+							selectedItem.setChecked(true);
+						}
+						else { // false
+							recordSet.getRecord(recordNameKey).setVisible(false);
+							selectedItem.setChecked(false);
+						}
+						application.updateGraphicsWindow();
 					}
-					else { // false
-						recordSet.getRecord(recordNameKey).setVisible(false);
-						selectedItem.setChecked(false);
-					}
-					application.updateGraphicsWindow();
 				}
 			});
 
@@ -83,11 +94,13 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event evt) {
 					log.finest("lineColor performed! " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					Color color = new Color(Display.getCurrent(), application.openColorDialog());
-					selectedItem.setForeground(color);
-					recordSet.getRecord(recordNameKey).setColor(color);
-					application.updateGraphicsWindow();
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						Color color = new Color(Display.getCurrent(), application.openColorDialog());
+						selectedItem.setForeground(color);
+						recordSet.getRecord(recordNameKey).setColor(color);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 			lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
@@ -98,29 +111,31 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.finest("lineWidthMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					int width = recordSet.getRecord(recordNameKey).getLineWidth();
-					switch (width) {
-					case 1:
-						lineWidthMenuItem1.setSelection(true);
-						lineWidthMenuItem2.setSelection(false);
-						lineWidthMenuItem3.setSelection(false);
-						break;
-					case 2:
-						lineWidthMenuItem1.setSelection(false);
-						lineWidthMenuItem2.setSelection(true);
-						lineWidthMenuItem3.setSelection(false);
-						break;
-					case 3:
-						lineWidthMenuItem1.setSelection(false);
-						lineWidthMenuItem2.setSelection(false);
-						lineWidthMenuItem3.setSelection(true);
-						break;
-					default:
-						lineWidthMenuItem1.setSelection(false);
-						lineWidthMenuItem2.setSelection(false);
-						lineWidthMenuItem3.setSelection(false);
-						break;
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						int width = recordSet.getRecord(recordNameKey).getLineWidth();
+						switch (width) {
+						case 1:
+							lineWidthMenuItem1.setSelection(true);
+							lineWidthMenuItem2.setSelection(false);
+							lineWidthMenuItem3.setSelection(false);
+							break;
+						case 2:
+							lineWidthMenuItem1.setSelection(false);
+							lineWidthMenuItem2.setSelection(true);
+							lineWidthMenuItem3.setSelection(false);
+							break;
+						case 3:
+							lineWidthMenuItem1.setSelection(false);
+							lineWidthMenuItem2.setSelection(false);
+							lineWidthMenuItem3.setSelection(true);
+							break;
+						default:
+							lineWidthMenuItem1.setSelection(false);
+							lineWidthMenuItem2.setSelection(false);
+							lineWidthMenuItem3.setSelection(false);
+							break;
+						}
 					}
 				}
 
@@ -135,10 +150,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("Linienedicke 1");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineWidth(1);
-					application.updateGraphicsWindow();
-					lineWidthMenuItem2.setSelection(false);
-					lineWidthMenuItem3.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineWidth(1);
+						application.updateGraphicsWindow();
+						lineWidthMenuItem2.setSelection(false);
+						lineWidthMenuItem3.setSelection(false);
+					}
 				}
 			});
 			lineWidthMenuItem2 = new MenuItem(lineWidthMenu, SWT.CHECK);
@@ -148,10 +165,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("Linienedicke 2");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineWidth(2);
-					application.updateGraphicsWindow();
-					lineWidthMenuItem1.setSelection(false);
-					lineWidthMenuItem3.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineWidth(2);
+						application.updateGraphicsWindow();
+						lineWidthMenuItem1.setSelection(false);
+						lineWidthMenuItem3.setSelection(false);
+					}
 				}
 			});
 			lineWidthMenuItem3 = new MenuItem(lineWidthMenu, SWT.CHECK);
@@ -161,10 +180,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("Linienedicke 3");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineWidth(3);
-					application.updateGraphicsWindow();
-					lineWidthMenuItem1.setSelection(false);
-					lineWidthMenuItem2.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineWidth(3);
+						application.updateGraphicsWindow();
+						lineWidthMenuItem1.setSelection(false);
+						lineWidthMenuItem2.setSelection(false);
+					}
 				}
 			});
 
@@ -176,29 +197,31 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.finest("lineTypeMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					int type = recordSet.getRecord(recordNameKey).getLineStyle();
-					switch (type) {
-					case SWT.LINE_SOLID:
-						lineTypeMenuItem1.setSelection(true);
-						lineTypeMenuItem2.setSelection(false);
-						lineTypeMenuItem3.setSelection(false);
-						break;
-					case SWT.LINE_DASH:
-						lineTypeMenuItem1.setSelection(false);
-						lineTypeMenuItem2.setSelection(true);
-						lineTypeMenuItem3.setSelection(false);
-						break;
-					case SWT.LINE_DOT:
-						lineTypeMenuItem1.setSelection(false);
-						lineTypeMenuItem2.setSelection(false);
-						lineTypeMenuItem3.setSelection(true);
-						break;
-					default:
-						lineTypeMenuItem1.setSelection(false);
-						lineTypeMenuItem2.setSelection(false);
-						lineTypeMenuItem3.setSelection(false);
-						break;
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						int type = recordSet.getRecord(recordNameKey).getLineStyle();
+						switch (type) {
+						case SWT.LINE_SOLID:
+							lineTypeMenuItem1.setSelection(true);
+							lineTypeMenuItem2.setSelection(false);
+							lineTypeMenuItem3.setSelection(false);
+							break;
+						case SWT.LINE_DASH:
+							lineTypeMenuItem1.setSelection(false);
+							lineTypeMenuItem2.setSelection(true);
+							lineTypeMenuItem3.setSelection(false);
+							break;
+						case SWT.LINE_DOT:
+							lineTypeMenuItem1.setSelection(false);
+							lineTypeMenuItem2.setSelection(false);
+							lineTypeMenuItem3.setSelection(true);
+							break;
+						default:
+							lineTypeMenuItem1.setSelection(false);
+							lineTypeMenuItem2.setSelection(false);
+							lineTypeMenuItem3.setSelection(false);
+							break;
+						}
 					}
 				}
 
@@ -213,10 +236,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("lineTypeMenuItem1");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_SOLID);
-					application.updateGraphicsWindow();
-					lineTypeMenuItem2.setSelection(false);
-					lineTypeMenuItem3.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_SOLID);
+						application.updateGraphicsWindow();
+						lineTypeMenuItem2.setSelection(false);
+						lineTypeMenuItem3.setSelection(false);
+					}
 				}
 			});
 			lineTypeMenuItem2 = new MenuItem(lineTypeMenu, SWT.CHECK);
@@ -226,10 +251,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("lineTypeMenuItem2");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DASH);
-					application.updateGraphicsWindow();
-					lineTypeMenuItem1.setSelection(false);
-					lineTypeMenuItem3.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DASH);
+						application.updateGraphicsWindow();
+						lineTypeMenuItem1.setSelection(false);
+						lineTypeMenuItem3.setSelection(false);
+					}
 				}
 			});
 			lineTypeMenuItem3 = new MenuItem(lineTypeMenu, SWT.CHECK);
@@ -239,10 +266,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("lineTypeMenuItem3");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DOT);
-					application.updateGraphicsWindow();
-					lineTypeMenuItem1.setSelection(false);
-					lineTypeMenuItem2.setSelection(false);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DOT);
+						application.updateGraphicsWindow();
+						lineTypeMenuItem1.setSelection(false);
+						lineTypeMenuItem2.setSelection(false);
+					}
 				}
 			});
 			new MenuItem(popupmenu, SWT.SEPARATOR);
@@ -253,33 +282,34 @@ public class CurveSelectorContextMenu {
 			axisEndValues.setMenu(axisEndValuesMenu);
 			axisEndValuesMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
-					log.finest("popupmenu MenuListener " + evt);
+					log.finest("axisEndValuesMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					boolean isRounded = recordSet.getRecord(recordNameKey).isRoundOut();
-					boolean isStart0 = recordSet.getRecord(recordNameKey).isStartpointZero();
-					boolean isManual = recordSet.getRecord(recordNameKey).isStartEndDefined();
-
-					if (isManual) {
-						axisEndAuto.setSelection(false);
-						axisEndRound.setSelection(false);
-						axisStarts0.setSelection(false);
-						axisEndManual.setSelection(true);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						boolean isRounded = recordSet.getRecord(recordNameKey).isRoundOut();
+						boolean isStart0 = recordSet.getRecord(recordNameKey).isStartpointZero();
+						boolean isManual = recordSet.getRecord(recordNameKey).isStartEndDefined();
+						if (isManual) {
+							axisEndAuto.setSelection(false);
+							axisEndRound.setSelection(false);
+							axisStarts0.setSelection(false);
+							axisEndManual.setSelection(true);
+						}
+						else if (isStart0) {
+							axisEndAuto.setSelection(false);
+							//axisEndRound.setSelection(false);
+							axisStarts0.setSelection(true);
+							axisEndManual.setSelection(false);
+						}
+						else if (isRounded) {
+							axisEndAuto.setSelection(false);
+							axisEndRound.setSelection(true);
+							//axisStarts0.setSelection(false);
+							axisEndManual.setSelection(false);
+						}
+						//					else
+						//						axisEndAuto.setSelection(true);
 					}
-					else if (isStart0) {
-						axisEndAuto.setSelection(false);
-						//axisEndRound.setSelection(false);
-						axisStarts0.setSelection(true);
-						axisEndManual.setSelection(false);
-					}
-					else if (isRounded) {
-						axisEndAuto.setSelection(false);
-						axisEndRound.setSelection(true);
-						//axisStarts0.setSelection(false);
-						axisEndManual.setSelection(false);
-					}
-					//					else
-					//						axisEndAuto.setSelection(true);
 				}
 
 				public void menuHidden(MenuEvent evt) {
@@ -293,13 +323,15 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisEndAuto");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					axisStarts0.setSelection(false);
-					recordSet.getRecord(recordNameKey).setStartpointZero(false);
-					axisEndRound.setSelection(false);
-					recordSet.getRecord(recordNameKey).setRoundOut(false);
-					axisEndManual.setSelection(false);
-					recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
-					application.updateGraphicsWindow();
+					if (recordNameKey != null) {
+						axisStarts0.setSelection(false);
+						recordSet.getRecord(recordNameKey).setStartpointZero(false);
+						axisEndRound.setSelection(false);
+						recordSet.getRecord(recordNameKey).setRoundOut(false);
+						axisEndManual.setSelection(false);
+						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 			axisEndRound = new MenuItem(axisEndValuesMenu, SWT.CHECK);
@@ -308,21 +340,21 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisEndRound");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (axisEndRound.getSelection()) { //true
-						//					axisStarts0.setSelection(false);
-						//					recordSet.getRecord(recordNameKey).setStartpointZero(false);
-						axisEndAuto.setSelection(false);
-						recordSet.getRecord(recordNameKey).setRoundOut(true);
-						axisEndManual.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+					if (recordNameKey != null) {
+						if (axisEndRound.getSelection()) { //true
+							axisEndAuto.setSelection(false);
+							recordSet.getRecord(recordNameKey).setRoundOut(true);
+							axisEndManual.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+						}
+						else { // false
+							axisEndAuto.setSelection(true);
+							recordSet.getRecord(recordNameKey).setRoundOut(false);
+							axisEndManual.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+						}
+						application.updateGraphicsWindow();
 					}
-					else { // false
-						axisEndAuto.setSelection(true);
-						recordSet.getRecord(recordNameKey).setRoundOut(false);
-						axisEndManual.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
-					}
-					application.updateGraphicsWindow();
 				}
 			});
 			axisStarts0 = new MenuItem(axisEndValuesMenu, SWT.CHECK);
@@ -331,21 +363,21 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisStarts0");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (axisStarts0.getSelection()) { // true
-						axisEndAuto.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartpointZero(true);
-						axisEndManual.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+					if (recordNameKey != null) {
+						if (axisStarts0.getSelection()) { // true
+							axisEndAuto.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartpointZero(true);
+							axisEndManual.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+						}
+						else { // false
+							axisEndAuto.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartpointZero(false);
+							axisEndManual.setSelection(false);
+							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+						}
+						application.updateGraphicsWindow();
 					}
-					else { // false
-						axisEndAuto.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartpointZero(false);
-						axisEndManual.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
-					}
-
-					application.updateGraphicsWindow();
-					;
 				}
 			});
 			axisEndManual = new MenuItem(axisEndValuesMenu, SWT.CHECK);
@@ -354,17 +386,17 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisEndManual Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					axisEndManual.setSelection(true);
-					axisEndAuto.setSelection(false);
-					axisStarts0.setSelection(false);
-					recordSet.getRecord(recordNameKey).setStartpointZero(false);
-					axisEndRound.setSelection(false);
-					recordSet.getRecord(recordNameKey).setRoundOut(false);
-
-					double[] newMinMax = axisEndValuesDialog.open();
-					recordSet.getRecord(recordNameKey).setStartEndDefined(true, newMinMax[0], newMinMax[1]);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						axisEndManual.setSelection(true);
+						axisEndAuto.setSelection(false);
+						axisStarts0.setSelection(false);
+						recordSet.getRecord(recordNameKey).setStartpointZero(false);
+						axisEndRound.setSelection(false);
+						recordSet.getRecord(recordNameKey).setRoundOut(false);
+						double[] newMinMax = axisEndValuesDialog.open();
+						recordSet.getRecord(recordNameKey).setStartEndDefined(true, newMinMax[0], newMinMax[1]);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 
@@ -376,29 +408,31 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.finest("axisNumberFormatMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					int format = recordSet.getRecord(recordNameKey).getNumberFormat();
-					switch (format) {
-					case 0:
-						axisNumberFormat0.setSelection(true);
-						axisNumberFormat1.setSelection(false);
-						axisNumberFormat2.setSelection(false);
-						break;
-					case 1:
-						axisNumberFormat0.setSelection(false);
-						axisNumberFormat1.setSelection(true);
-						axisNumberFormat2.setSelection(false);
-						break;
-					case 2:
-						axisNumberFormat0.setSelection(false);
-						axisNumberFormat1.setSelection(false);
-						axisNumberFormat2.setSelection(true);
-						break;
-					default:
-						axisNumberFormat0.setSelection(false);
-						axisNumberFormat1.setSelection(false);
-						axisNumberFormat2.setSelection(false);
-						break;
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						int format = recordSet.getRecord(recordNameKey).getNumberFormat();
+						switch (format) {
+						case 0:
+							axisNumberFormat0.setSelection(true);
+							axisNumberFormat1.setSelection(false);
+							axisNumberFormat2.setSelection(false);
+							break;
+						case 1:
+							axisNumberFormat0.setSelection(false);
+							axisNumberFormat1.setSelection(true);
+							axisNumberFormat2.setSelection(false);
+							break;
+						case 2:
+							axisNumberFormat0.setSelection(false);
+							axisNumberFormat1.setSelection(false);
+							axisNumberFormat2.setSelection(true);
+							break;
+						default:
+							axisNumberFormat0.setSelection(false);
+							axisNumberFormat1.setSelection(false);
+							axisNumberFormat2.setSelection(false);
+							break;
+						}
 					}
 				}
 
@@ -412,9 +446,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisNumberFormat0");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setNumberFormat(0);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setNumberFormat(0);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 			axisNumberFormat1 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
@@ -423,9 +458,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisNumberFormat1");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setNumberFormat(1);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setNumberFormat(1);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 			axisNumberFormat2 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
@@ -434,9 +470,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisNumberFormat2");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setNumberFormat(2);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setNumberFormat(2);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 
@@ -448,15 +485,17 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.finest("axisPositionMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					String recordNameKey = selectedItem.getText();
-					boolean isLeft = recordSet.getRecord(recordNameKey).isPositionLeft();
-					if (isLeft) {
-						axisPositionLeft.setSelection(true);
-						axisPositionRight.setSelection(false);
-					}
-					else {
-						axisPositionLeft.setSelection(false);
-						axisPositionRight.setSelection(true);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						String recordNameKey = selectedItem.getText();
+						boolean isLeft = recordSet.getRecord(recordNameKey).isPositionLeft();
+						if (isLeft) {
+							axisPositionLeft.setSelection(true);
+							axisPositionRight.setSelection(false);
+						}
+						else {
+							axisPositionLeft.setSelection(false);
+							axisPositionRight.setSelection(true);
+						}
 					}
 				}
 
@@ -470,9 +509,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisPositionLeft Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setPositionLeft(true);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setPositionLeft(true);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 			axisPositionRight = new MenuItem(axisPositionMenu, SWT.CHECK);
@@ -481,9 +521,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("axisPositionRight Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					recordSet.getRecord(recordNameKey).setPositionLeft(false);
-					application.updateGraphicsWindow();
-					;
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setPositionLeft(false);
+						application.updateGraphicsWindow();
+					}
 				}
 			});
 
@@ -495,49 +536,51 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("copyCurveCompare Action performed!");
 					String newRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					RecordSet compareSet = application.getCompareSet();
-					boolean isComparable = true;
-					if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != recordSet.getTimeStep_ms()) {
-						application
-								.openMessageDialog("Zeitbasis der Kurven, die verglichen werden sollen passt nicht zusammen! Vermutlich wurden sie mit unterschiedlichen Geräten aufgenommen. Das ist zu Zeit noch nicht unterstützt, da hier eine Umrechnung auf eine einheitliche Zeitbasis stattfinden muss.");
-						isComparable = false;
-						return;
-					}
-					if (!compareSet.isEmpty() && !compareSet.getActiveRecordNames()[0].startsWith(newRecordKey)) {
-						application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0].split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
-						isComparable = false;
-						return;
-					}
-					if (compareSet.isEmpty() || isComparable) {
-						compareSet.setTimeStep_ms(recordSet.getTimeStep_ms());
-						String recordkey = newRecordKey + "_" + compareSet.size();
-						compareSet.addRecordName(recordkey);
-						compareSet.put(recordkey, recordSet.get(newRecordKey).clone());
-						int maxRecordSize = compareSet.getMaxSize();
-						double oldMinValue = compareSet.getMinValue();
-						double oldMaxValue = compareSet.getMaxValue();
-						log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
-						for (String recordKey : compareSet.keySet()) {
-							if (compareSet.get(recordKey).size() > maxRecordSize) {
-								compareSet.setMaxSize(compareSet.get(recordKey).size());
-							}
-							double newMinValue = compareSet.get(recordKey).getDefinedMinValue();
-							double newMaxValue = compareSet.get(recordKey).getDefinedMaxValue();
-							log.fine(String.format("scale values from record to be added min=%.3f max=%.3f", newMinValue, newMaxValue));
-
-							if (newMinValue < oldMinValue) {
-								compareSet.setMinValue(newMinValue); // store new min value into record set
-							}
-							oldMinValue = compareSet.getMinValue();
-							if (newMaxValue > oldMaxValue) {
-								compareSet.setMaxValue(newMaxValue); // store new max value into record set
-							}
-							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
-								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
-							}
+					if (newRecordKey != null) {
+						RecordSet compareSet = application.getCompareSet();
+						boolean isComparable = true;
+						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != recordSet.getTimeStep_ms()) {
+							application
+									.openMessageDialog("Zeitbasis der Kurven, die verglichen werden sollen passt nicht zusammen! Vermutlich wurden sie mit unterschiedlichen Geräten aufgenommen. Das ist zu Zeit noch nicht unterstützt, da hier eine Umrechnung auf eine einheitliche Zeitbasis stattfinden muss.");
+							isComparable = false;
+							return;
 						}
+						if (!compareSet.isEmpty() && !compareSet.getActiveRecordNames()[0].startsWith(newRecordKey)) {
+							application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0].split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
+							isComparable = false;
+							return;
+						}
+						if (compareSet.isEmpty() || isComparable) {
+							compareSet.setTimeStep_ms(recordSet.getTimeStep_ms());
+							String recordkey = newRecordKey + "_" + compareSet.size();
+							compareSet.addRecordName(recordkey);
+							compareSet.put(recordkey, recordSet.get(newRecordKey).clone());
+							int maxRecordSize = compareSet.getMaxSize();
+							double oldMinValue = compareSet.getMinValue();
+							double oldMaxValue = compareSet.getMaxValue();
+							log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
+							for (String recordKey : compareSet.keySet()) {
+								if (compareSet.get(recordKey).size() > maxRecordSize) {
+									compareSet.setMaxSize(compareSet.get(recordKey).size());
+								}
+								double newMinValue = compareSet.get(recordKey).getDefinedMinValue();
+								double newMaxValue = compareSet.get(recordKey).getDefinedMaxValue();
+								log.fine(String.format("scale values from record to be added min=%.3f max=%.3f", newMinValue, newMaxValue));
 
-						application.updateCompareWindow();
+								if (newMinValue < oldMinValue) {
+									compareSet.setMinValue(newMinValue); // store new min value into record set
+								}
+								oldMinValue = compareSet.getMinValue();
+								if (newMaxValue > oldMaxValue) {
+									compareSet.setMaxValue(newMaxValue); // store new max value into record set
+								}
+								for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
+									compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
+								}
+							}
+
+							application.updateCompareWindow();
+						}
 					}
 				}
 			});
