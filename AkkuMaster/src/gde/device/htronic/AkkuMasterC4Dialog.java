@@ -83,9 +83,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	public void open() {
 		log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
 		if (dialogShell == null || dialogShell.isDisposed()) {
-
-			Shell parent = getParent();
-			dialogShell = new Shell(parent, SWT.DIALOG_TRIM);
+			dialogShell = new Shell(new Shell(SWT.MODELESS), SWT.DIALOG_TRIM);
 			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
