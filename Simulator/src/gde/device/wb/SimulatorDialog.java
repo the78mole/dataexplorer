@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -45,6 +46,12 @@ import osde.ui.SWTResourceManager;
 */
 public class SimulatorDialog extends DeviceDialog {
 	private Logger												log										= Logger.getLogger(this.getClass().getName());
+	private CLabel currentLabel;
+	private CCombo currentCombo;
+	private CLabel voltageLabel;
+	private CCombo voltageCombo;
+	private CLabel timeLabel;
+	private CCombo timeCombo;
 
 	private Button												stopButton;
 
@@ -58,6 +65,10 @@ public class SimulatorDialog extends DeviceDialog {
 
 	private Channel												channel;
 	private Timer													timer;
+	private CLabel timeResultLabel;
+	private CLabel timesLabel;
+	private CCombo clusterCombo;
+	private CLabel clusterLabel;
 	private TimerTask											timerTask;
 	private boolean												isCollectDataStopped	= false;
 	private int														recordNumber					= 0;
@@ -106,6 +117,132 @@ public class SimulatorDialog extends DeviceDialog {
 				dialogShell.setSize(336, 393);
 				dialogShell.setText("Simulator");
 				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+				{
+					FormData timeResultLabelLData = new FormData();
+					timeResultLabelLData.width = 94;
+					timeResultLabelLData.height = 22;
+					timeResultLabelLData.left =  new FormAttachment(0, 1000, 213);
+					timeResultLabelLData.top =  new FormAttachment(0, 1000, 111);
+					timeResultLabel = new CLabel(dialogShell, SWT.NONE);
+					timeResultLabel.setLayoutData(timeResultLabelLData);
+					timeResultLabel.setText("=  Zeit pro Takt");
+				}
+				{
+					FormData timesLabelLData = new FormData();
+					timesLabelLData.width = 13;
+					timesLabelLData.height = 22;
+					timesLabelLData.left =  new FormAttachment(0, 1000, 106);
+					timesLabelLData.top =  new FormAttachment(0, 1000, 111);
+					timesLabel = new CLabel(dialogShell, SWT.NONE);
+					timesLabel.setLayoutData(timesLabelLData);
+					timesLabel.setText("*");
+				}
+				{
+					FormData clusterComboLData = new FormData();
+					clusterComboLData.width = 84;
+					clusterComboLData.height = 17;
+					clusterComboLData.left =  new FormAttachment(0, 1000, 125);
+					clusterComboLData.top =  new FormAttachment(0, 1000, 138);
+					clusterCombo = new CCombo(dialogShell, SWT.NONE);
+					clusterCombo.setLayoutData(clusterComboLData);
+					clusterCombo.setItems(new String[] {"10", "20", "50", "100" });
+					clusterCombo.setText(new Integer(device.getClusterSize()).toString());
+					clusterCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							device.setClusterSize(new Integer(clusterCombo.getText()).intValue());
+							log.fine(" new clusterSize = " + device.getClusterSize());
+						}
+					});
+				}
+				{
+					FormData clusterLabelLData = new FormData();
+					clusterLabelLData.width = 82;
+					clusterLabelLData.height = 22;
+					clusterLabelLData.left =  new FormAttachment(0, 1000, 125);
+					clusterLabelLData.top =  new FormAttachment(0, 1000, 111);
+					clusterLabel = new CLabel(dialogShell, SWT.NONE);
+					clusterLabel.setLayoutData(clusterLabelLData);
+					clusterLabel.setText("Datenpunkte");
+				}
+				{
+					FormData currentLabelLData = new FormData();
+					currentLabelLData.width = 70;
+					currentLabelLData.height = 22;
+					currentLabelLData.left =  new FormAttachment(0, 1000, 29);
+					currentLabelLData.top =  new FormAttachment(0, 1000, 221);
+					currentLabel = new CLabel(dialogShell, SWT.CENTER | SWT.EMBEDDED);
+					currentLabel.setLayoutData(currentLabelLData);
+					currentLabel.setText("Strom");
+				}
+				{
+					FormData currentComboLData = new FormData();
+					currentComboLData.width = 84;
+					currentComboLData.height = 17;
+					currentComboLData.left =  new FormAttachment(0, 1000, 29);
+					currentComboLData.top =  new FormAttachment(0, 1000, 244);
+					currentCombo = new CCombo(dialogShell, SWT.NONE);
+					currentCombo.setLayoutData(currentComboLData);
+					currentCombo.setText("cCombo1");
+					currentCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.fine("currentCombo.widgetSelected, event="+evt);
+							//TODO add your code for currentCombo.widgetSelected
+						}
+					});
+				}
+				{
+					FormData voltageLabelLData = new FormData();
+					voltageLabelLData.width = 84;
+					voltageLabelLData.height = 22;
+					voltageLabelLData.left =  new FormAttachment(0, 1000, 29);
+					voltageLabelLData.top =  new FormAttachment(0, 1000, 167);
+					voltageLabel = new CLabel(dialogShell, SWT.NONE);
+					voltageLabel.setLayoutData(voltageLabelLData);
+					voltageLabel.setText("Spannung");
+				}
+				{
+					FormData voltageComboLData = new FormData();
+					voltageComboLData.width = 84;
+					voltageComboLData.height = 17;
+					voltageComboLData.left =  new FormAttachment(0, 1000, 29);
+					voltageComboLData.top =  new FormAttachment(0, 1000, 198);
+					voltageCombo = new CCombo(dialogShell, SWT.NONE);
+					voltageCombo.setLayoutData(voltageComboLData);
+					voltageCombo.setText("cCombo1");
+					voltageCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.fine("voltageCombo.widgetSelected, event="+evt);
+							//TODO add your code for voltageCombo.widgetSelected
+						}
+					});
+				}
+				{
+					FormData timeLabelLData = new FormData();
+					timeLabelLData.width = 74;
+					timeLabelLData.height = 22;
+					timeLabelLData.left =  new FormAttachment(0, 1000, 29);
+					timeLabelLData.top =  new FormAttachment(0, 1000, 111);
+					timeLabel = new CLabel(dialogShell, SWT.NONE);
+					timeLabel.setLayoutData(timeLabelLData);
+					timeLabel.setText("Zeit [msec]");
+				}
+				{
+					FormData timeComboLData = new FormData();
+					timeComboLData.width = 84;
+					timeComboLData.height = 17;
+					timeComboLData.left =  new FormAttachment(0, 1000, 29);
+					timeComboLData.top =  new FormAttachment(0, 1000, 138);
+					timeCombo = new CCombo(dialogShell, SWT.NONE);
+					timeCombo.setLayoutData(timeComboLData);
+					timeCombo.setItems(new String[] {"1", "2", "3", "4" ,"5", "10", "20", "50", "100", "1000", "10000" });
+					timeCombo.setText(new Integer(device.getTimeStep_ms()).toString());
+					timeCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							device.setTimeStep_ms(new Integer(timeCombo.getText()).intValue());
+							log.fine(" new timeStep_ms = " + device.getTimeStep_ms());
+						}
+					});
+				}
 				dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -116,11 +253,11 @@ public class SimulatorDialog extends DeviceDialog {
 					FormData descriptionLData = new FormData();
 					descriptionLData.width = 277;
 					descriptionLData.height = 60;
-					descriptionLData.left = new FormAttachment(0, 1000, 24);
-					descriptionLData.top = new FormAttachment(0, 1000, 87);
+					descriptionLData.left =  new FormAttachment(0, 1000, 26);
+					descriptionLData.top =  new FormAttachment(0, 1000, 49);
 					description = new Text(dialogShell, SWT.CENTER | SWT.WRAP);
 					description.setLayoutData(descriptionLData);
-					description.setText("Mit START wird eine neue Serie an Daten generiert, bis STOP gedrückt wird");
+					description.setText("Mit START wird eine neue Serie an Daten generiert, bis STOP gedrückt wird ");
 					description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 				}
 				{
@@ -137,16 +274,18 @@ public class SimulatorDialog extends DeviceDialog {
 				}
 				{
 					FormData startButtonLData = new FormData();
-					startButtonLData.width = 198;
+					startButtonLData.width = 121;
 					startButtonLData.height = 31;
-					startButtonLData.left = new FormAttachment(0, 1000, 62);
-					startButtonLData.top = new FormAttachment(0, 1000, 203);
+					startButtonLData.left =  new FormAttachment(0, 1000, 29);
+					startButtonLData.top =  new FormAttachment(0, 1000, 296);
 					startButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 					startButton.setLayoutData(startButtonLData);
 					startButton.setText("START");
 					startButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("startButton.widgetSelected, event=" + evt);
+							log.fine("startButton.widgetSelected, event=" + evt);
+							startButton.setEnabled(false);
+							stopButton.setEnabled(true);
 							channel = channels.getActiveChannel();
 							channels.switchChannel(channel.getName());
 
@@ -220,18 +359,21 @@ public class SimulatorDialog extends DeviceDialog {
 				}
 				{
 					FormData okButtonLData = new FormData();
-					okButtonLData.width = 203;
-					okButtonLData.height = 33;
-					okButtonLData.left = new FormAttachment(0, 1000, 62);
-					okButtonLData.top = new FormAttachment(0, 1000, 273);
+					okButtonLData.width = 121;
+					okButtonLData.height = 31;
+					okButtonLData.left =  new FormAttachment(0, 1000, 180);
+					okButtonLData.top =  new FormAttachment(0, 1000, 296);
 					stopButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 					stopButton.setLayoutData(okButtonLData);
 					stopButton.setText("STOP");
+					stopButton.setEnabled(false);
 					stopButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.fine("stopButton.widgetSelected, event=" + evt);
 							stopTimer();
 							isCollectDataStopped = true;
+							startButton.setEnabled(true);
+							stopButton.setEnabled(false);
 						}
 					});
 				}
