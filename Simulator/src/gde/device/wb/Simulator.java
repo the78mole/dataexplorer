@@ -76,7 +76,13 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return the dataUnit
 	 */
 	public String getDataUnit(String recordKey) {
-		return "?";  // m/s, V, mAh
+		String unit;
+		if (recordKey.equals(RecordSet.VOLTAGE)) 
+			unit = "V";
+		else
+			unit = "A";
+			
+		return unit;  // m/s, V, mAh
 	}
 	
 	/**
