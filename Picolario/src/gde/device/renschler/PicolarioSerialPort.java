@@ -14,6 +14,7 @@ import osde.device.DeviceSerialPort;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
 import osde.ui.StatusBar;
+import osde.utils.Checksum;
 
 /**
  * this class is used to communicate with the Renschler Picolario device
@@ -66,7 +67,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice dialog) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device) throws IOException {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -109,7 +110,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 						//acknowledge request next
 						this.write(new byte[] { readBuffer[readBuffer.length - 1], readBuffer[readBuffer.length - 1] });
 						// update the dialog
-						if (dialog != null) ((PicolarioDialog)dialog).setAlreadyRedText(numberRed++);
+						if (device != null) ((PicolarioDialog)device.getDialog()).setAlreadyRedText(numberRed++);
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
@@ -168,35 +169,17 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		if (readBuffer.length == maxBytes)
 			isGoodPackage = true;
 		else if (readBuffer.length < maxBytes && (readBuffer.length - 1) % modulo == 0) isGoodPackage = true;
-		//		else
-		//			isGoodPackage = verifyChecksum(readBuffer);
+		else isGoodPackage = verifyChecksum(readBuffer);
 
 		return isGoodPackage;
 	}
-
-	@SuppressWarnings("unused")
+	
+	/**
+	 * method to check telegram trailing checksum
+	 * @param readBuffer byte array
+	 * @return boolean value comparing last value of the byte array with the XOR checksum
+	 */
 	private boolean verifyChecksum(final byte[] readBuffer) {
-		//TODO need to implement algorithm here, wait for answer Uwe Renschler
-		return true;
+		return readBuffer[readBuffer.length-1] == Checksum.XOR(readBuffer);
 	}
-
-	public int calculateSimpleCecksum(byte[] readBuffer) {
-		int checksum = 0;
-
-		//		for (int i = 0; i < readBuffer.length - 1; i++) {
-		//			checksum = checksum + readBuffer[i]; // 1250 -> 8
-
-		//						checksum = checksum + (readBuffer[i] - (readBuffer[i] % 10)) / 10; // 260 -> 8
-		//						checksum = checksum + (readBuffer[i] % 10);
-
-		//						checksum = checksum + ((readBuffer[i] & 0xF0) >> 4); // 350 -> 8
-		//						checksum = checksum + ((readBuffer[i] & 0x0F) >> 0);
-
-		//			checksum = checksum + ((readBuffer[i] & 0xF0) / 10); // 380 -> 11 -> 2
-		//			checksum = checksum + ((readBuffer[i] & 0x0F) >> 0);
-		//		}
-
-		return checksum;
-	}
-
 }
