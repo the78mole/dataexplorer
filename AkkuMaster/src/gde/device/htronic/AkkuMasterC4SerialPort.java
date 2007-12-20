@@ -227,6 +227,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog) throws IOException {
+		boolean isActive = true;
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
 
 		String[] configuration = getConfiguration(channel);
@@ -252,14 +253,17 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 			values.put(PROCESS_CAPACITY, new Integer("0"));
 			break;
 		default:
+			isActive = false;
 			values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " AkkuMaster_inactiv");
 			values.put(PROCESS_CAPACITY, new Integer("0"));
 			break;
 		}
 
-		int voltage = (Integer) values.get(PROCESS_VOLTAGE);
-		values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); 		// Errechnete Leistung	[mW]
-		values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+		if (isActive) {
+			int voltage = (Integer) values.get(PROCESS_VOLTAGE);
+			values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); // Errechnete Leistung	[mW]
+			values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+		}
 
 		return values;
 	}
