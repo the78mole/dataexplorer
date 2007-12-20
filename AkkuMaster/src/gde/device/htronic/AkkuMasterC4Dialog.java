@@ -91,14 +91,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			dialogShell.setSize(439, 593);
 			dialogShell.setText("Akkumaster C4 ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
-			dialogShell.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent evt) {
-					log.fine("dialogShell.focusGained, event="+evt);
-					if (!serialPort.isConnected()) {
-						application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
-					}
-				}
-			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -159,11 +151,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							public void paintControl(PaintEvent evt) {
 								log.finest("versionComposite.paintControl, event=" + evt);
 								try {
-									version = serialPort.getVersion();
-									versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
-									datum.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
-									stromvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
-									frontplattenvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
+									if (serialPort != null && serialPort.isConnected()) {
+										version = serialPort.getVersion();
+										versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
+										datum.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
+										stromvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
+										frontplattenvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
+									}
+									else 
+										application.openMessageDialog("Erst den seriellen Port öffnen");
 								}
 								catch (Exception e) {
 									application.openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");

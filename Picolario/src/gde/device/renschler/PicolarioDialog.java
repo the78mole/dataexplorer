@@ -98,14 +98,6 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setSize(344, 419);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
-			dialogShell.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent evt) {
-					log.fine("dialogShell.focusGained, event="+evt);
-					if (!serialPort.isConnected()) {
-						application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
-					}
-				}
-			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -131,7 +123,7 @@ public class PicolarioDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt);
 							try {
-								if (serialPort != null) {
+								if (serialPort != null && serialPort.isConnected()) {
 									int availableRecords = serialPort.readNumberAvailableRecordSets();
 									numberAvailable = new Integer(availableRecords).toString();
 									numberAvailableRecordSetsLabel.setText(numberAvailable);
