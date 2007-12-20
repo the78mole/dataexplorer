@@ -142,6 +142,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				//record.setMinValue(new Double(template.getProperty(recordName + Record.DEFINED_MIN_VALUE)).intValue());
 			}
 			log.fine("applied graphics template file " + template.getCurrentFilePath());
+			application.updateGraphicsWindow();
 		}
 	}
 	
