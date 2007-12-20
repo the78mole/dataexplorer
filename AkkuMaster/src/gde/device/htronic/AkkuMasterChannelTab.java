@@ -414,8 +414,6 @@ public class AkkuMasterChannelTab {
 										int memoryNumber = memoryNumberCombo.getSelectionIndex();
 										log.fine("memoryNumber =" + memoryNumber);
 
-										serialPort.setMemoryNumberCycleCoundSleepTime(channelSig, memoryNumber, 1, 25);
-
 										if (parent.getMaxCurrent() < parent.getActiveCurrent() + dischargeCurrent_mA || parent.getMaxCurrent() < parent.getActiveCurrent() + chargeCurrent_mA) {
 											application.openMessageDialog("Der für das Gerät erlaubte Gesammtstrom würde mit den angegebenen Werten für Entladestrom = " + dischargeCurrent_mA
 													+ " mA oder für den Ladestrom = " + chargeCurrent_mA + " mA überschritten, bitte korrigieren.");
