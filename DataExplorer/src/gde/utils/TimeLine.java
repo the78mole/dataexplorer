@@ -164,9 +164,10 @@ public class TimeLine {
 			String numberStr = new Integer(numberInt).toString();
 			FontData[] fd = gc.getFont().getFontData();
 			if (isMod60 && actualInt != 0)	fd[0].setStyle(SWT.BOLD);
-			else fd[0].setStyle(SWT.NORMAL);
 			gc.setFont(new Font(gc.getDevice(), fd));
 			GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+			fd[0].setStyle(SWT.NORMAL);
+			gc.setFont(new Font(gc.getDevice(), fd));
 		}
 	}
 
