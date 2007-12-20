@@ -197,6 +197,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
 					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
+						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getHersteller() + ";" + activeDeviceConfig.getPort());
 						setupDevice();
 					}
 					if (settings.isAutoOpenSerialPort()) {
