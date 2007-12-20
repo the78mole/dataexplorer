@@ -196,7 +196,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
-					if (activeDeviceConfig == null || activeDevice == null || activeDevice != application.getActiveDevice()) {
+					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
 						setupDevice();
 					}
 					if (settings.isAutoOpenSerialPort()) {
@@ -637,7 +637,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					closeButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.fine("closeButton.widgetSelected, event=" + evt);
-							dialogShell.setVisible(false);
 							dialogShell.dispose();
 						}
 					});
@@ -743,7 +742,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * method to setup new device, this might occur using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
-		checkPortSelection();
+		if (!checkPortSelection()) {
+			if (settings.isGlobalSerialPort())
+				application.openSettingsDialog();
+			else
+				application.setActiveDevice(open());
+		}
+		else if (settings.getActiveDevice().startsWith("---")) {
+			application.setActiveDevice(open());
+		}
 		activeDevice = this.getInstanceOfDevice();
 		application.setActiveDevice(activeDevice);
 		setupDataChannels(activeDevice);
