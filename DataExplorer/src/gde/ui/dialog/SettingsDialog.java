@@ -102,7 +102,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
 					if (settings.getActiveDevice().startsWith("---")) settings.setActiveDevice("---;---;---");
 					settings.store();
-					if (settings.isGlobalSerialPort()&& application.getActiveDevice() != null) application.getActiveDevice().setPort(serialPort.getText());
+					if (settings.isGlobalSerialPort()) application.setGloabalSerialPort(serialPort.getText());
 					// set logging levels
 					settings.updateLogLevel();
 				}
@@ -242,6 +242,11 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						log.finest("serialPortGroup.paintControl, event=" + evt);
 						useGlobalSerialPort.setSelection(settings.isGlobalSerialPort());
 						serialPort.setText(settings.getSerialPort());
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
+							}
+						});
 					}
 				});
 				{
@@ -256,7 +261,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
 							if (useGlobalSerialPort.getSelection()) {
-								settings.setIsGlobalSerialPort("true");
+								settings.setIsGlobalSerialPort("true");								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
 							}
 							else {
 								settings.setIsGlobalSerialPort("false");
@@ -270,12 +275,6 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					serialPortLData.height = 20;
 					serialPort = new CCombo(serialPortGroup, SWT.NONE);
 					serialPort.setLayoutData(serialPortLData);
-					if (System.getProperty("os.name").toLowerCase().startsWith("window")) {
-						serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
-					}
-					else {
-						serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
-					}
 					serialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("serialPort.widgetSelected, event=" + evt);
