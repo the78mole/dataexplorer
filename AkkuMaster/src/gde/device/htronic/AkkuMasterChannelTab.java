@@ -46,37 +46,34 @@ public class AkkuMasterChannelTab {
 
 	private CTabItem											kanal1Tab;
 	private Button												direktStartButton;
-	private Group													programmGroup;
+	private Group													programGroup;
 	private Group													dataGatherOnlyGroup;
 	private CCombo												memoryNumberCombo;
-	private Button												memoryNumberButton;
 	private CCombo												capacityMilliAh;
 	private Group													akkuGroup;
-	private CCombo												anzahlWiederholungen;
-	private Text													ladeStromText;
+	private CCombo												numberCycles;
+	private Text													chargeCurrentText;
 	private Button												stopAuzeichnungButton;
 	private Button												startAufzeichnungButton;
-	private CCombo												wiederholungen;
-	private CCombo												warteZeitMin;
-	private Text													wiederholungSpeicher;
-	private Text													warteZeitMinText;
-	private Text													anzahlWiederholungText;
-	private Button												programmwiederholungButton;
+	private CCombo												waitTimeMin;
+	private Text													memoryNumberText;
+	private Text													waitTimeMinText;
+	private Text													numberCyclesText;
 	private CCombo												waitTimeDays;
 	private Text													waitTimeDaysText;
-	private CCombo												entladeStromMilliA;
-	private Text													entladeStromText;
-	private CCombo												ladeStromMilliA;
-	private CCombo												programm;
-	private Text													programmText;
-	private Group													programmtypGroup;
-	private Text													akkuTypText;
-	private CCombo												akkuTyp;
-	private CCombo												zellenAnzahl;
-	private Text													zellenAnzahlText;
+	private CCombo												dischargeCurrent;
+	private Text													dischargeCurrentText;
+	private CCombo												chargeCurrent;
+	private CCombo												program;
+	private Text													programText;
+	private Group													programTypeGroup;
+	private Text													akkuTypeText;
+	private CCombo												akkuType;
+	private CCombo												countCells;
+	private Text													countCellsText;
 	private Text													capacityText;
 	private Text													direktStartText;
-	private Group													programmwiederholungGroup;
+	private Group													programCycleGroup;
 	private Button												programmButton;
 	private Composite											kanalKomposite;
 	private boolean												isDirectStart						= true;
@@ -149,14 +146,16 @@ public class AkkuMasterChannelTab {
 						direktStartButton = new Button(dataGatherOnlyGroup, SWT.RADIO | SWT.LEFT);
 						direktStartButton.setText("  Nur Datenaufnahme");
 						direktStartButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-						direktStartButton.setBounds(0, 12, 310, 22);
+						direktStartButton.setBounds(12, 15, 310, 22);
 						direktStartButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("direktStartButton.widgetSelected, event=" + evt);
 								if (direktStartButton.getSelection()) {
 									try {
-										if (serialPort.isConnected())
+										if (serialPort.isConnected()) {
 											updateAdjustedValues();
+											startAufzeichnungButton.setEnabled(true);
+										}
 										else {
 											direktStartButton.setSelection(false);
 											OpenSerialDataExplorer.getInstance().openMessageDialog("Erst den seriellen Port öffnen");
@@ -173,21 +172,23 @@ public class AkkuMasterChannelTab {
 					}
 				}
 				{
-					programmGroup = new Group(kanalKomposite, SWT.NONE);
-					programmGroup.setLayout(null);
-					programmGroup.setBounds(12, 88, 403, 334);
+					programGroup = new Group(kanalKomposite, SWT.NONE);
+					programGroup.setLayout(null);
+					programGroup.setBounds(12, 95, 403, 325);
 					{
-						programmButton = new Button(programmGroup, SWT.RADIO | SWT.LEFT);
+						programmButton = new Button(programGroup, SWT.RADIO | SWT.LEFT);
 						programmButton.setText("  Selbst konfiguriertes Programm");
-						programmButton.setBounds(0, 10, 295, 21);
+						programmButton.setBounds(12, 15, 295, 21);
 						programmButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 						programmButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("direktStartButton.widgetSelected, event=" + evt);
+								log.finest("programmButton.widgetSelected, event=" + evt);
 								if (programmButton.getSelection()) {
 									try {
-										if (serialPort.isConnected())
+										if (serialPort.isConnected()) {
 											updateAdjustedValues();
+											startAufzeichnungButton.setEnabled(true);
+										}
 										else {
 											programmButton.setSelection(false);
 											OpenSerialDataExplorer.getInstance().openMessageDialog("Erst den seriellen Port öffnen");
@@ -203,10 +204,10 @@ public class AkkuMasterChannelTab {
 						});
 					}
 					{
-						akkuGroup = new Group(programmGroup, SWT.NONE);
+						akkuGroup = new Group(programGroup, SWT.NONE);
 						akkuGroup.setLayout(null);
 						akkuGroup.setText("Akku");
-						akkuGroup.setBounds(15, 51, 369, 67);
+						akkuGroup.setBounds(15, 40, 369, 67);
 						{
 							capacityText = new Text(akkuGroup, SWT.NONE);
 							capacityText.setBounds(12, 20, 105, 18);
@@ -221,215 +222,176 @@ public class AkkuMasterChannelTab {
 							capacityMilliAh.setBounds(12, 40, 105, 18);
 						}
 						{
-							zellenAnzahlText = new Text(akkuGroup, SWT.NONE);
-							zellenAnzahlText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							zellenAnzahlText.setBounds(130, 20, 105, 18);
-							zellenAnzahlText.setText("  Zellenzahl");
-							zellenAnzahlText.setEditable(false);
+							countCellsText = new Text(akkuGroup, SWT.NONE);
+							countCellsText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							countCellsText.setBounds(130, 20, 105, 18);
+							countCellsText.setText("  Zellenzahl");
+							countCellsText.setEditable(false);
 						}
 						{
-							zellenAnzahl = new CCombo(akkuGroup, SWT.NONE);
-							zellenAnzahl.setBounds(130, 40, 105, 18);
-							zellenAnzahl.setItems(aZellenZahl);
-							zellenAnzahl.setText(aZellenZahl[3]);
-							zellenAnzahl.setEditable(false);
-							zellenAnzahl.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							countCells = new CCombo(akkuGroup, SWT.NONE);
+							countCells.setBounds(130, 40, 105, 18);
+							countCells.setItems(aZellenZahl);
+							countCells.setText(aZellenZahl[3]);
+							countCells.setEditable(false);
+							countCells.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						}
 						{
-							akkuTypText = new Text(akkuGroup, SWT.NONE);
-							akkuTypText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							akkuTypText.setBounds(255, 20, 105, 18);
-							akkuTypText.setText("   Akkutyp");
-							akkuTypText.setDoubleClickEnabled(false);
-							akkuTypText.setDragDetect(false);
-							akkuTypText.setEditable(false);
+							akkuTypeText = new Text(akkuGroup, SWT.NONE);
+							akkuTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							akkuTypeText.setBounds(255, 20, 105, 18);
+							akkuTypeText.setText("   Akkutyp");
+							akkuTypeText.setDoubleClickEnabled(false);
+							akkuTypeText.setDragDetect(false);
+							akkuTypeText.setEditable(false);
 						}
 						{
-							akkuTyp = new CCombo(akkuGroup, SWT.NONE);
-							akkuTyp.setBounds(255, 40, 105, 18);
-							akkuTyp.setItems(aAkkuTyp);
-							akkuTyp.setText(aAkkuTyp[0]);
-							akkuTyp.setEditable(false);
-							akkuTyp.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							akkuType = new CCombo(akkuGroup, SWT.NONE);
+							akkuType.setBounds(255, 40, 105, 18);
+							akkuType.setItems(aAkkuTyp);
+							akkuType.setText(aAkkuTyp[0]);
+							akkuType.setEditable(false);
+							akkuType.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						}
 					}
 					{
-						programmtypGroup = new Group(programmGroup, SWT.NONE);
-						programmtypGroup.setBounds(15, 122, 369, 123);
-						programmtypGroup.setText("Programmtyp");
-						programmtypGroup.setLayout(null);
+						programTypeGroup = new Group(programGroup, SWT.NONE);
+						programTypeGroup.setBounds(15, 110, 369, 123);
+						programTypeGroup.setText("Programmtyp");
+						programTypeGroup.setLayout(null);
 						{
-							programmText = new Text(programmtypGroup, SWT.NONE);
-							programmText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							programmText.setBounds(130, 20, 105, 18);
-							programmText.setText("Programmname");
+							programText = new Text(programTypeGroup, SWT.NONE);
+							programText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							programText.setBounds(130, 20, 105, 18);
+							programText.setText("Programmname");
 						}
 						{
-							programm = new CCombo(programmtypGroup, SWT.NONE);
-							programm.setBounds(12, 40, 347, 18);
-							programm.setItems(aProgramm);
-							programm.setText(aProgramm[2]);
-							programm.setEditable(false);
-							programm.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							program = new CCombo(programTypeGroup, SWT.NONE);
+							program.setBounds(12, 40, 347, 18);
+							program.setItems(aProgramm);
+							program.select(2);
+							program.setEditable(false);
+							program.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							program.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("program.widgetSelected, event=" + evt);
+									int cycleType = program.getSelectionIndex() + 1;
+									switch (cycleType) {
+									case 5:
+										enableProgramCycle(true);
+										break;
+
+									default:
+										enableProgramCycle(false);
+										break;
+									}
+								}
+							});
 						}
 						{
-							ladeStromText = new Text(programmtypGroup, SWT.NONE);
-							ladeStromText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							ladeStromText.setBounds(12, 70, 105, 18);
-							ladeStromText.setText("  Ladestrom [mA]");
-							ladeStromText.setEditable(false);
+							chargeCurrentText = new Text(programTypeGroup, SWT.NONE);
+							chargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							chargeCurrentText.setBounds(12, 70, 105, 18);
+							chargeCurrentText.setText("  Ladestrom [mA]");
+							chargeCurrentText.setEditable(false);
 						}
 						{
-							ladeStromMilliA = new CCombo(programmtypGroup, SWT.NONE);
-							ladeStromMilliA.setBounds(12, 93, 105, 18);
-							ladeStromMilliA.setItems(aLadestromMilliA);
-							ladeStromMilliA.setText(aLadestromMilliA[5]);
+							chargeCurrent = new CCombo(programTypeGroup, SWT.NONE);
+							chargeCurrent.setBounds(12, 93, 105, 18);
+							chargeCurrent.setItems(aLadestromMilliA);
+							chargeCurrent.setText(aLadestromMilliA[5]);
 						}
 						{
-							entladeStromText = new Text(programmtypGroup, SWT.NONE);
-							entladeStromText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							entladeStromText.setBounds(130, 70, 105, 18);
-							entladeStromText.setDragDetect(false);
-							entladeStromText.setDoubleClickEnabled(false);
-							entladeStromText.setText("Entladestrom [mA]");
-							entladeStromText.setEditable(false);
+							dischargeCurrentText = new Text(programTypeGroup, SWT.NONE);
+							dischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							dischargeCurrentText.setBounds(130, 70, 105, 18);
+							dischargeCurrentText.setDragDetect(false);
+							dischargeCurrentText.setDoubleClickEnabled(false);
+							dischargeCurrentText.setText("Entladestrom [mA]");
+							dischargeCurrentText.setEditable(false);
 						}
 						{
-							entladeStromMilliA = new CCombo(programmtypGroup, SWT.NONE);
-							entladeStromMilliA.setBounds(130, 93, 105, 18);
-							entladeStromMilliA.setItems(aEntladeStromMilliA);
-							entladeStromMilliA.setText(aEntladeStromMilliA[5]);
+							dischargeCurrent = new CCombo(programTypeGroup, SWT.NONE);
+							dischargeCurrent.setBounds(130, 93, 105, 18);
+							dischargeCurrent.setItems(aEntladeStromMilliA);
+							dischargeCurrent.setText(aEntladeStromMilliA[5]);
 						}
 						{
-							waitTimeDaysText = new Text(programmtypGroup, SWT.NONE);
+							memoryNumberText = new Text(programTypeGroup, SWT.NONE);
+							memoryNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							memoryNumberText.setBounds(255, 70, 105, 18);
+							memoryNumberText.setText("Speicher No");
+							memoryNumberText.setEditable(false);
+						}
+						{
+							memoryNumberCombo = new CCombo(programTypeGroup, SWT.NONE);
+							memoryNumberCombo.setBounds(255, 93, 105, 18);
+							memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" });
+							memoryNumberCombo.select(1);
+						}
+					}
+					{
+						programCycleGroup = new Group(programGroup, SWT.NONE);
+						programCycleGroup.setLayout(null);
+						programCycleGroup.setBounds(15, 240, 369, 75);
+						programCycleGroup.setText("Programmwiederholung");
+						{
+							numberCyclesText = new Text(programCycleGroup, SWT.NONE);
+							numberCyclesText.setBounds(23, 23, 60, 18);
+							numberCyclesText.setText("Anzahl");
+							numberCyclesText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							numberCyclesText.setEditable(false);
+						}
+						{
+							numberCycles = new CCombo(programCycleGroup, SWT.NONE);
+							numberCycles.setBounds(12, 49, 89, 18);
+							numberCycles.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							numberCycles.setItems(aAnzahlWiederholungen);
+							numberCycles.select(0);
+						}
+						{
+							waitTimeMinText = new Text(programCycleGroup, SWT.NONE);
+							waitTimeMinText.setBounds(128, 23, 90, 18);
+							waitTimeMinText.setText("Wartezeit [Min]");
+							waitTimeMinText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							waitTimeMinText.setEditable(false);
+						}
+						{
+							waitTimeMin = new CCombo(programCycleGroup, SWT.NONE);
+							waitTimeMin.setBounds(128, 49, 90, 18);
+							waitTimeMin.setItems(aWarteZeitMin);
+							waitTimeMin.select(2);
+							waitTimeMin.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+						}
+						{
+							waitTimeDaysText = new Text(programCycleGroup, SWT.NONE);
 							waitTimeDaysText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							waitTimeDaysText.setBounds(255, 70, 105, 18);
-							waitTimeDaysText.setText("Wartezeit [Min]");
+							waitTimeDaysText.setBounds(268, 23, 60, 18);
+							waitTimeDaysText.setText("Wartezeit [Tage]");
+							waitTimeDaysText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							waitTimeDaysText.setEditable(false);
 						}
 						{
-							waitTimeDays = new CCombo(programmtypGroup, SWT.NONE);
-							waitTimeDays.setBounds(255, 93, 105, 18);
-							waitTimeDays.setText("5");
-							waitTimeDays.setEnabled(false);
+							waitTimeDays = new CCombo(programCycleGroup, SWT.NONE);
+							waitTimeDays.setBounds(259, 49, 83, 18);
+							waitTimeDays.setText("1");
+							waitTimeDays.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						}
-					}
-					{
-						programmwiederholungGroup = new Group(programmGroup, SWT.NONE);
-						programmwiederholungGroup.setLayout(null);
-						programmwiederholungGroup.setBounds(15, 250, 369, 75);
-						programmwiederholungGroup.setText("Programmwiederholung");
-						{
-							anzahlWiederholungText = new Text(programmwiederholungGroup, SWT.NONE);
-							anzahlWiederholungText.setBounds(23, 23, 60, 18);
-							anzahlWiederholungText.setText("Anzahl");
-							anzahlWiederholungText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							anzahlWiederholungText.setEditable(false);
-							anzahlWiederholungText.setEnabled(false);
-						}
-						{
-							anzahlWiederholungen = new CCombo(programmwiederholungGroup, SWT.NONE);
-							anzahlWiederholungen.setBounds(12, 49, 89, 18);
-							anzahlWiederholungen.setEditable(false);
-							anzahlWiederholungen.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							anzahlWiederholungen.setEnabled(false);
-							anzahlWiederholungen.setItems(aAnzahlWiederholungen);
-							anzahlWiederholungen.setText(aAnzahlWiederholungen[0]);
-						}
-						{
-							warteZeitMinText = new Text(programmwiederholungGroup, SWT.NONE);
-							warteZeitMinText.setBounds(128, 23, 90, 18);
-							warteZeitMinText.setText("Wartezeit [Min]");
-							warteZeitMinText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							warteZeitMinText.setEditable(false);
-							warteZeitMinText.setEnabled(false);
-						}
-						{
-							warteZeitMin = new CCombo(programmwiederholungGroup, SWT.NONE);
-							warteZeitMin.setBounds(128, 49, 90, 18);
-							warteZeitMin.setItems(aWarteZeitMin);
-							warteZeitMin.setText(aWarteZeitMin[2]);
-							warteZeitMin.setEnabled(false);
-							warteZeitMin.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-						}
-						{
-							wiederholungSpeicher = new Text(programmwiederholungGroup, SWT.NONE);
-							wiederholungSpeicher.setBounds(268, 23, 60, 18);
-							wiederholungSpeicher.setText(" Speicher");
-							wiederholungSpeicher.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							wiederholungSpeicher.setEditable(false);
-							wiederholungSpeicher.setEnabled(false);
-						}
-						{
-							wiederholungen = new CCombo(programmwiederholungGroup, SWT.NONE);
-							wiederholungen.setBounds(259, 49, 83, 18);
-							wiederholungen.setText("0");
-							wiederholungen.setEditable(false);
-							wiederholungen.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							wiederholungen.setEnabled(false);
-						}
-					}
-					{
-						programmwiederholungButton = new Button(programmGroup, SWT.CHECK | SWT.LEFT);
-						programmwiederholungButton.setBounds(1, 274, 14, 30);
-						programmwiederholungButton.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("programmwiederholungButton.widgetSelected, event=" + evt);
-								if (programmwiederholungButton.getSelection()) {
-									anzahlWiederholungText.setEnabled(true);
-									anzahlWiederholungen.setEnabled(true);
-									warteZeitMinText.setEnabled(true);
-									warteZeitMin.setEnabled(true);
-									wiederholungSpeicher.setEnabled(true);
-									wiederholungen.setEnabled(true);
-								}
-								else {
-									anzahlWiederholungText.setEnabled(false);
-									anzahlWiederholungen.setEnabled(false);
-									warteZeitMinText.setEnabled(false);
-									warteZeitMin.setEnabled(false);
-									wiederholungSpeicher.setEnabled(false);
-									wiederholungen.setEnabled(false);
-								}
-							};
-						});
-					}
-					{
-						memoryNumberCombo = new CCombo(programmGroup, SWT.NONE);
-						memoryNumberCombo.setBounds(270, 30, 105, 18);
-						memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" });
-						memoryNumberCombo.select(1);
-						memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("programNumber.widgetSelected, event=" + evt);
-								//TODO implement gathering of data and update corresponding fields
-								log.fine("selectionIndex = " + memoryNumberCombo.getSelectionIndex());
-								//								try {
-								//									serialPort.setMemoryNumberCycleCoundSleepTime(programNumberCombo.getSelectionIndex() + 1, 1, 25);
-								//									serialPort.print(serialPort.getAdjustedValues(channelSig));
-								//								}
-								//								catch (IOException e) {
-								//									System.err.println(e.getMessage());
-								//								}
-							}
-						});
-					}
-					{
-						memoryNumberButton = new Button(programmGroup, SWT.CHECK | SWT.LEFT);
-						memoryNumberButton.setBounds(70, 30, 190, 18);
-						memoryNumberButton.setText("Speichernummer verwenden");
-						memoryNumberButton.setBackground(SWTResourceManager.getColor(225, 224, 228));
+						enableProgramCycle(false);
 					}
 				}
 				{
-					startAufzeichnungButton = new Button(kanalKomposite, SWT.CHECK | SWT.LEFT);
-					startAufzeichnungButton.setBounds(12, 428, 139, 28);
-					startAufzeichnungButton.setText("  Start Aufzeichnung");
+					startAufzeichnungButton = new Button(kanalKomposite, SWT.PUSH | SWT.CENTER);
+					startAufzeichnungButton.setBounds(12, 428, 190, 28);
+					startAufzeichnungButton.setText("S t a r t");
+					startAufzeichnungButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					startAufzeichnungButton.setSelection(isCollectData);
+					startAufzeichnungButton.setEnabled(false);
 					startAufzeichnungButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("startAufzeichnungButton.widgetSelected, event=" + evt);
-							startAufzeichnungButton.setSelection(true);
+							startAufzeichnungButton.setEnabled(false);
+							stopAuzeichnungButton.setEnabled(true);
 							if (!isCollectData) {
 								isCollectData = true;
 
@@ -438,13 +400,13 @@ public class AkkuMasterChannelTab {
 										updateAdjustedValues();
 									}
 									else {
-										int programNumber = new Integer(programm.getText().split(" ")[0]).intValue();
+										int programNumber = new Integer(program.getText().split(" ")[0]).intValue();
 										int waitTime_days = 1; // new Integer(warteZeitTage.getText()).intValue();
-										int accuTyp = new Integer(akkuTyp.getText().split(" ")[0]).intValue();
-										int cellCount = new Integer(zellenAnzahl.getText().split(" ")[0]).intValue();
+										int accuTyp = new Integer(akkuType.getText().split(" ")[0]).intValue();
+										int cellCount = new Integer(countCells.getText().split(" ")[0]).intValue();
 										int akkuCapacity = new Integer(capacityMilliAh.getText()).intValue();
-										int dischargeCurrent_mA = new Integer(entladeStromMilliA.getText()).intValue();
-										int chargeCurrent_mA = new Integer(ladeStromMilliA.getText()).intValue();
+										int dischargeCurrent_mA = new Integer(dischargeCurrent.getText()).intValue();
+										int chargeCurrent_mA = new Integer(chargeCurrent.getText()).intValue();
 										log.fine(" programNumber = " + programNumber + " waitTime_days = " + waitTime_days + " accuTyp = " + accuTyp + " cellCount = " + cellCount + " akkuCapacity = " + akkuCapacity
 												+ " dischargeCurrent_mA = " + dischargeCurrent_mA + " chargeCurrent_mA = " + chargeCurrent_mA);
 										serialPort.writeNewProgram(channelSig, programNumber, waitTime_days, accuTyp, cellCount, akkuCapacity, dischargeCurrent_mA, chargeCurrent_mA);
@@ -452,8 +414,7 @@ public class AkkuMasterChannelTab {
 										int memoryNumber = memoryNumberCombo.getSelectionIndex();
 										log.fine("memoryNumber =" + memoryNumber);
 
-										//TODO add checkbox "benutze Speichernummer"
-										//serialPort.setMemoryNumberCycleCoundSleepTime(channelSig, memoryNumber, 1, 120);
+										serialPort.setMemoryNumberCycleCoundSleepTime(channelSig, memoryNumber, 1, 25);
 
 										if (parent.getMaxCurrent() < parent.getActiveCurrent() + dischargeCurrent_mA || parent.getMaxCurrent() < parent.getActiveCurrent() + chargeCurrent_mA) {
 											application.openMessageDialog("Der für das Gerät erlaubte Gesammtstrom würde mit den angegebenen Werten für Entladestrom = " + dischargeCurrent_mA
@@ -582,7 +543,7 @@ public class AkkuMasterChannelTab {
 													}
 													isCollectData = false;
 													stopTimer();
-													application.openMessageDialog("Das angeschlossenen Gerät meldet eine Fehlerstatus, bitte überprüfen.");
+													application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
 												}
 											}
 											catch (IOException e) {
@@ -602,13 +563,17 @@ public class AkkuMasterChannelTab {
 				}
 				{
 					stopAuzeichnungButton = new Button(kanalKomposite, SWT.PUSH | SWT.CENTER);
-					stopAuzeichnungButton.setBounds(207, 428, 193, 28);
+					stopAuzeichnungButton.setBounds(225, 428, 190, 28);
 					stopAuzeichnungButton.setText("S t o p");
+					stopAuzeichnungButton.setEnabled(false);
 					stopAuzeichnungButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					stopAuzeichnungButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("stopAuzeichnungButton.widgetSelected, event=" + evt);
-							startAufzeichnungButton.setSelection(false);
+							startAufzeichnungButton.setEnabled(false);
+							direktStartButton.setSelection(false);
+							programmButton.setSelection(false);
+							stopAuzeichnungButton.setEnabled(false);
 							if (!isDirectStart) try {
 								serialPort.stop(channelSig);
 							}
@@ -634,17 +599,17 @@ public class AkkuMasterChannelTab {
 			String[] configuration = serialPort.getConfiguration(channelSig);
 			if(log.isLoggable(Level.FINER)) serialPort.print(configuration);
 			if (!configuration[0].equals("0")) { // AkkuMaster somehow active
-				programm.setText(aProgramm[new Integer(configuration[2].split(" ")[0]).intValue() - 1]);
-				akkuTyp.setText(aAkkuTyp[new Integer(configuration[3].split(" ")[0]).intValue()]);
-				zellenAnzahl.select(new Integer(configuration[4].split(" ")[0]).intValue() - 1);
+				program.setText(aProgramm[new Integer(configuration[2].split(" ")[0]).intValue() - 1]);
+				akkuType.setText(aAkkuTyp[new Integer(configuration[3].split(" ")[0]).intValue()]);
+				countCells.select(new Integer(configuration[4].split(" ")[0]).intValue() - 1);
 				capacityMilliAh.setText(configuration[5].split(" ")[0]);
-				entladeStromMilliA.setText(configuration[6].split(" ")[0]);
-				ladeStromMilliA.setText(configuration[7].split(" ")[0]);
+				dischargeCurrent.setText(configuration[6].split(" ")[0]);
+				chargeCurrent.setText(configuration[7].split(" ")[0]);
 				waitTimeDays.setText(configuration[7].split(" ")[0]);
 
 				String[] adjustments = serialPort.getAdjustedValues(channelSig);
 				memoryNumberCombo.select(new Integer(adjustments[0].split(" ")[0]));
-				wiederholungen.setText(adjustments[0].split(" ")[0]);
+				numberCycles.setText(adjustments[1].split(" ")[0]);
 				if(log.isLoggable(Level.FINER)) serialPort.print(adjustments);
 			}
 		}
@@ -663,5 +628,17 @@ public class AkkuMasterChannelTab {
 				startAufzeichnungButton.setSelection(false);
 			}
 		});
+	}
+
+	/**
+	 * enalbe program cycle group
+	 */
+	private void enableProgramCycle(boolean value) {
+		numberCyclesText.setEnabled(value);
+		numberCycles.setEnabled(value);
+		waitTimeMinText.setEnabled(value);
+		waitTimeMin.setEnabled(value);
+		waitTimeDaysText.setEnabled(value);
+		waitTimeDays.setEnabled(value);
 	}
 }
