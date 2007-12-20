@@ -96,6 +96,7 @@ public class UniLogDialog extends DeviceDialog {
 				dialogShell.addFocusListener(new FocusAdapter() {
 					public void focusGained(FocusEvent evt) {
 						log.fine("dialogShell.focusGained, event="+evt);
+						// this is only placed in the focus listener as hint, do not forget place this query 
 						if (!serialPort.isConnected()) {
 							application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
 						}
