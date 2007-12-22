@@ -22,25 +22,25 @@ import osde.log.LogFormatter;
 import osde.utils.XMLUtils;
 
 public class DeviceConfiguration {
-	private final static Logger							log										= Logger.getLogger(DeviceSerialPort.class.getName());
+	private final static Logger									log												= Logger.getLogger(DeviceSerialPort.class.getName());
 
 	private final DeviceType										device;
 	private final SerialPortType								serialPort;
 	private final TimeBaseType									timeBase;
-	private final HashMap<Integer, ChannelType>	channels							= new HashMap<Integer, ChannelType>();
-	private final String[]									masurementNames;
-	private Document												doc;
-	private File														xmlFile;
-	private boolean													isChangePropery				= false;
+	private final HashMap<Integer, ChannelType>	channels									= new HashMap<Integer, ChannelType>();
+	private final String[]											masurementNames;
+	private Document														doc;
+	private File																xmlFile;
+	private boolean															isChangePropery						= false;
 
-	public final static String							TIME_UNIT							= "unit";
-	public final static String							TIME_UNIT_SYBOL				= "symbol";
-	public final static String							MEASUREMENT						= "measurement";
-	public final static String							MEASUREMENT_UNIT			= "unit";
-	public final static String							MEASUREMENT_SYMBOL		= "symbol";
-	public final static String							MEASUREMENT_FACTOR		= "factor";
-	public final static String							MEASUREMENT_OFFSET		= "offset";
-	public final static String							MEASUREMENT_IS_ACTIVE	= "isActive";
+	public final static int											DEVICE_TYPE_CHARGER				= 1;
+	public final static int											DEVICE_TYPE_LOGGER				= 2;
+	public final static int											DEVICE_TYPE_BALANCER			= 3;
+	public final static int											DEVICE_TYPE_CURRENT_SINK	= 4;
+	public final static int											DEVICE_TYPE_POWER_SUPPLY	= 5;
+	public final static int											DEVICE_TYPE_GPS						= 5;
+	public final static int											DEVICE_TYPE_RECEIVER			= 7;
+	public final static int											DEVICE_TYPE_MULTIMETER		= 8;
 
 	/**
 	 * method to test this class
@@ -140,7 +140,7 @@ public class DeviceConfiguration {
 		}
 		else
 			throw new SAXException("<Channel> Element fehlerhaft in " + xmlFilePath);
-		
+
 		// all measurements for all channels are equal !
 		this.masurementNames = channels.get(1).getMeasurementNames().toArray(new String[1]);
 
@@ -151,9 +151,9 @@ public class DeviceConfiguration {
 	 * copy constructor
 	 */
 	public DeviceConfiguration(DeviceConfiguration deviceConfig) {
-		this.device = new DeviceType((Element)deviceConfig.doc.getElementsByTagName("Device").item(0));
-		this.serialPort = new SerialPortType((Element)deviceConfig.doc.getElementsByTagName("SerialPort").item(0));
-		this.timeBase = new TimeBaseType((Element)deviceConfig.doc.getElementsByTagName("TimeBase").item(0));
+		this.device = new DeviceType((Element) deviceConfig.doc.getElementsByTagName("Device").item(0));
+		this.serialPort = new SerialPortType((Element) deviceConfig.doc.getElementsByTagName("SerialPort").item(0));
+		this.timeBase = new TimeBaseType((Element) deviceConfig.doc.getElementsByTagName("TimeBase").item(0));
 		for (int i = 1; i <= deviceConfig.channels.size(); ++i) {
 			this.channels.put(i, deviceConfig.channels.get(i));
 		}
@@ -235,7 +235,7 @@ public class DeviceConfiguration {
 	 * @return the channel 1 to n
 	 */
 	public ChannelType getChannelType(int number) {
-		return channels.get(MEASUREMENT + number);
+		return channels.get(number);
 	}
 
 	public boolean isUsed() {
@@ -334,7 +334,7 @@ public class DeviceConfiguration {
 	public boolean isRTS() {
 		return this.serialPort.isRTS();
 	}
-	
+
 	/**
 	 * method to query the unit of measurement data by a given record key
 	 * @param recordKey
@@ -361,10 +361,10 @@ public class DeviceConfiguration {
 	/**
 	 * @return the measurement definitions matching key (voltage, current, ...)
 	 */
-	public MeasurementType getMeasurementDefinition(String recordKey) {		
+	public MeasurementType getMeasurementDefinition(String recordKey) {
 		MeasurementType measurementDefinition = null;
 		// assuming all channels have identical measurements
-		ChannelType channel = channels.get(1); 
+		ChannelType channel = channels.get(1);
 		// loop through channels and find 
 		for (int i = 0; i < channel.size(); i++) {
 			if (channel.get(i).getName().equals(recordKey)) {
