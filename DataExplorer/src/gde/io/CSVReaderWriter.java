@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -163,13 +161,11 @@ public class CSVReaderWriter {
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) {
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8 for Linux
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			df2.setGroupingUsed(false);
 			df3.setGroupingUsed(false);
-			df2.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.GERMANY));
-			df3.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.GERMANY));
 			sb = new StringBuffer();
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
@@ -204,11 +200,11 @@ public class CSVReaderWriter {
 					Record record = recordSet.getRecord(recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (record.isActive())
-							sb.append(df3.format(new Double(record.get(i))/1000.0)).append(separator);
+							sb.append(df3.format(new Double(record.get(i))/1000.0).replace(',', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(record.getName(), record.get(i))/1000.0)).append(separator);
+						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace(',', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(newLine);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
