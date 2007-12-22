@@ -11,12 +11,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.config.DeviceConfiguration;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.device.DeviceConfiguration;
 import osde.io.CSVReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;

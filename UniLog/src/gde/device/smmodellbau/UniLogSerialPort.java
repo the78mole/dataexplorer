@@ -5,7 +5,7 @@ import gnu.io.NoSuchPortException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
 import osde.ui.StatusBar;

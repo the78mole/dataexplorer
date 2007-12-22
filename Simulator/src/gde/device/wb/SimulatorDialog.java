@@ -146,11 +146,11 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterCombo = new CCombo(dialogShell, SWT.NONE);
 					clusterCombo.setLayoutData(clusterComboLData);
 					clusterCombo.setItems(new String[] {"10", "20", "50", "100" });
-					clusterCombo.setText(new Integer(device.getClusterSize()).toString());
+					clusterCombo.setText(new Integer(device.getDataBlockSize()).toString());
 					clusterCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							device.setClusterSize(new Integer(clusterCombo.getText()).intValue());
-							log.fine(" new clusterSize = " + device.getClusterSize());
+							device.setDataBlockSize(new Integer(clusterCombo.getText()).intValue());
+							log.fine(" new clusterSize = " + device.getDataBlockSize());
 						}
 					});
 				}
@@ -291,7 +291,7 @@ public class SimulatorDialog extends DeviceDialog {
 
 							// prepare timed data gatherer thread
 							int delay = 0;
-							int period = device.getTimeStep_ms() * device.getClusterSize();
+							int period = device.getTimeStep_ms() * device.getDataBlockSize();
 							log.fine("timer period = " + period + " ms");
 							timer = new Timer();
 							timerTask = new TimerTask() {

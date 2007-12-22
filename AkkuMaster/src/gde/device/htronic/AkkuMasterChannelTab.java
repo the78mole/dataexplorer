@@ -328,6 +328,11 @@ public class AkkuMasterChannelTab {
 							memoryNumberCombo.setBounds(255, 93, 105, 18);
 							memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" });
 							memoryNumberCombo.select(1);
+							memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									//TODO check if values can be updated using the selected memory
+								}
+							});
 						}
 					}
 					{

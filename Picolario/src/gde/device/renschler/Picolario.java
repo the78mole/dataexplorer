@@ -7,14 +7,18 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.config.DeviceConfiguration;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
@@ -38,9 +42,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchPortException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 */
-	public Picolario(String iniFile, boolean isDetailed) throws FileNotFoundException, IOException, NoSuchPortException {
-		super(iniFile, isDetailed);
+	public Picolario(String iniFile) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+		super(iniFile);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application.getStatusBar());
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
@@ -197,16 +203,16 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public String getDataUnit(String recordKey) {
 		String unit = "";
 		recordKey = recordKey.split("_")[0];
-		HashMap<String, Object> record = this.getRecordConfig(recordKey);
+		MeasurementType measurement = this.getMeasurementDefinition(recordKey);
 		//channel.get("Messgröße1");
 		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			unit = (String) record.get("Einheit1");
+			unit = (String) measurement.getUnit();
 		}
 		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			unit = dialog.getHeightDataUnit();
 		}
 		else if (recordKey.startsWith(RecordSet.SLOPE)) {
-			unit = dialog.getHeightDataUnit() + "/" + ((String) record.get("Einheit3")).split("/")[1];
+			unit = dialog.getHeightDataUnit() + "/" +  measurement.getUnit().split("/")[1];
 		}
 		return unit;
 	}

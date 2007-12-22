@@ -11,8 +11,9 @@ import java.util.logging.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DataCalculationType;
 import osde.device.IDevice;
+import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.DataToolBar;
 
@@ -193,24 +194,18 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param device 
 	 */
 	public static RecordSet createRecordSet(String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
-		int size = device.getNumberRecords(); // all channels must have the same size, use channel1
-		String[] recordNames = new String[size];
-		for (int i = 1; i <= device.getNumberRecords(); i++) {
-			recordNames[i - 1] = (String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i);
-			if (log.isLoggable(Level.FINE)) log.fine("- " + recordNames[i - 1]);
-		}
-
+		// assume all channels have the same size
+		String[] recordNames = device.getMeasurementNames();
 		RecordSet newRecordSet = new RecordSet(recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile);
-		for (int k = 1; k <= recordNames.length; k++) {
-			Record tmpRecord = new Record(recordNames[k - 1], (String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_UNIT + k), (String) device.getConfiguredRecords().get(
-					DeviceConfiguration.MEASUREMENT_SYMBOL + k), (int) device.getTimeStep_ms(), (Integer) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_FACTOR + k),
-					(Integer) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_OFFSET + k), (Integer) device.getConfiguredRecords().get(
-							DeviceConfiguration.MEASUREMENT_GAUGE_MAX + k), (Boolean) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT_IS_ACTIVE + k), 5);
-
-			int x = k - 1;
+		for (int i = 0; i < recordNames.length; i++) {
+			String recordKey = recordNames[i];
+			MeasurementType measurement = device.getMeasurementDefinition(recordKey);
+			DataCalculationType dataCalculation = measurement.getDataCalculation();
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), dataCalculation.getOffset(), dataCalculation.getFactor(), device
+					.getTimeStep_ms(), 5);
 
 			// set color defaults
-			switch (x) {
+			switch (i) {
 			case 0: // erste Kurve
 				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 0, 255)); //(SWT.COLOR_BLUE));
 				break;
@@ -234,7 +229,7 @@ public class RecordSet extends HashMap<String, Record> {
 				break;
 			}
 			// set position defaults
-			if (x % 2 == 0) {
+			if (i % 2 == 0) {
 				tmpRecord.setPositionLeft(true); //position left
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
@@ -242,8 +237,8 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setPositionLeft(false); // position right
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
-			newRecordSet.put(recordNames[k - 1], tmpRecord);
-			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[k - 1]);
+			newRecordSet.put(recordNames[i], tmpRecord);
+			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[i]);
 		}
 		if (log.isLoggable(Level.FINE)) {
 			for (String key : recordNames) {

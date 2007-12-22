@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.DeviceSerialPort;
 import osde.ui.StatusBar;

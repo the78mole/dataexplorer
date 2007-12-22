@@ -7,13 +7,16 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.config.DeviceConfiguration;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -35,9 +38,11 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchPortException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 */
-	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException {
-		super(deviceProperties, true);
+	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, application.getStatusBar());
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
@@ -107,31 +112,6 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		}
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
 		return newValue;
-	}
-
-	/**
-	 * @return the dataUnit
-	 */
-	public String getDataUnit(String recordKey) {
-		String unit = "";
-		recordKey = recordKey.split("_")[0];
-		HashMap<String, Object> record = this.getRecordConfig(recordKey);
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			unit = (String) record.get("Einheit1");
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			unit = (String) record.get("Einheit2");
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			unit = (String) record.get("Einheit3");
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			unit = (String) record.get("Einheit4");
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			unit = (String) record.get("Einheit5");
-		}
-		return unit;
 	}
 
 	/**

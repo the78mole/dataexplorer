@@ -23,9 +23,8 @@ public class Record extends Vector<Integer> {
 	private String							symbol;																															// Symbol h
 	private int									timeStep_ms;
 
-	private int									factor;																															// Faktor
-	private int									offset								= 0;																					// ??
-	private int									scale									= 1;																					// gauge/Multiplicator
+	private double							factor								= 1.0;																				// offset + factor * x
+	private double							offset								= 0;																					// offset + factor * x
 	private boolean							isEmpty								= true;
 	private int									maxValue							= -20000;																			// max value of the curve
 	private int									minValue							= 20000;																			// min value of the curve
@@ -75,16 +74,15 @@ public class Record extends Vector<Integer> {
 	 * @param factor
 	 * @param initialCapacity
 	 */
-	public Record(String name, String unit, String symbol, int timeStep_ms, int factor, int offset, int scale, boolean isActive, int initialCapacity) {
+	public Record(String name, String symbol, String unit, boolean isActive, double offset, double factor, int timeStep_ms, int initialCapacity) {
 		super(initialCapacity);
 		this.name = name;
-		this.unit = unit;
 		this.symbol = symbol;
-		this.timeStep_ms = timeStep_ms;
-		this.factor = factor;
+		this.unit = unit;
 		this.offset = offset;
-		this.scale = scale;
+		this.factor = factor;
 		this.isActive = isActive;
+		this.timeStep_ms = timeStep_ms;
 		this.isDisplayable = isActive ? true : false;
 		this.df = new DecimalFormat("0.0");
 		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
@@ -96,13 +94,12 @@ public class Record extends Vector<Integer> {
 	private Record(Record record) {
 		super(record);
 		this.name = record.name;
-		this.unit = record.unit;
 		this.symbol = record.symbol;
-		this.timeStep_ms = record.timeStep_ms;
-		this.factor = record.factor;
-		this.offset = record.offset;
-		this.scale = record.scale;
+		this.unit = record.unit;
 		this.isActive = record.isActive;
+		this.offset = record.offset;
+		this.factor = record.factor;
+		this.timeStep_ms = record.timeStep_ms;
 		this.isDisplayable = record.isDisplayable;
 		this.maxValue = record.maxValue;
 		this.minValue = record.minValue;
@@ -164,16 +161,12 @@ public class Record extends Vector<Integer> {
 		return symbol;
 	}
 
-	public int getFactor() {
+	public double getFactor() {
 		return factor;
 	}
 
-	public int getOffset() {
+	public double getOffset() {
 		return offset;
-	}
-
-	public int getScale() {
-		return scale;
 	}
 
 	public boolean isVisible() {

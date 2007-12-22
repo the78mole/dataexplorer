@@ -8,7 +8,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.DeviceSerialPort;
 import osde.exception.ReadWriteOutOfSyncException;

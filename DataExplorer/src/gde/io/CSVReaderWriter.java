@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.config.DeviceConfiguration;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
@@ -164,7 +163,7 @@ public class CSVReaderWriter {
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) {
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1"));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			df2.setGroupingUsed(false);
@@ -175,14 +174,20 @@ public class CSVReaderWriter {
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
-			for (int i = 1; i <= recordSet.size(); i++) {
-				Record record = recordSet.getRecord((String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+			String[] recordNames = device.getMeasurementNames();
+			for (int i = 0; i < recordNames.length; i++) {
+				Record record = recordSet.getRecord(recordNames[i]);
+				log.finest("append " + recordNames[i]);
 				if (isRaw) {
-					if (record.isActive()) // only use active records for writing raw data
-						sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);					
+					if (record.isActive()) {// only use active records for writing raw data
+						sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	
+						log.finest("append " + recordNames[i]);
+					}
 				}
-				else
-					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);					
+				else {
+					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	
+					log.finest("append " + recordNames[i]);
+				}
 			}
 			sb.deleteCharAt(sb.length() - 1).append(newLine);
 			log.finer("header line = " + sb.toString());
@@ -195,8 +200,8 @@ public class CSVReaderWriter {
 				// add time entry
 				sb.append((df2.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace(',', decimalSeparator)).append(separator).append(' ');
 				// add data entries
-				for (int j = 0; j < recordSet.size(); j++) {
-					Record record = recordSet.getRecord((String) device.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + (j + 1)));
+				for (int j = 0; j < recordNames.length; j++) {
+					Record record = recordSet.getRecord(recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (record.isActive())
 							sb.append(df3.format(new Double(record.get(i))/1000.0)).append(separator);

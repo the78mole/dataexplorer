@@ -3,8 +3,6 @@
  */
 package osde.device;
 
-import java.util.HashMap;
-
 import osde.data.RecordSet;
 
 /**
@@ -25,12 +23,7 @@ public interface IDevice {
 	/**
 	 * @return device manufacturer
 	 */
-	public String getHersteller();
-	
-	/**
-	 * @return the record definitions
-	 */
-	public HashMap<String, Object> getConfiguredRecords();
+	public String getManufacturer();
 	
 	/**
 	 * @return device group
@@ -40,12 +33,7 @@ public interface IDevice {
 	/**
 	 * @return link to manufacturer
 	 */
-	public String getHerstellerLink1();
-	
-	/**
-	 * @return link to OpenSerialExplorer home page
-	 */
-	public String getOpenSerialDataExplorerLink();
+	public String getManufacturerURL();
 	
 	/**
 	 * @return time step in ms
@@ -70,7 +58,7 @@ public interface IDevice {
 	/**
 	 * @return the baude rate of the device
 	 */
-	public int getBaude();
+	public int getBaudeRate();
 	
 	/**
 	 * @return the data bit configuration of the device
@@ -85,7 +73,7 @@ public interface IDevice {
 	/**
 	 * @return the flow control configuration of the device
 	 */
-	public int getFlowCtrl();
+	public int getFlowCtrlMode();
 	
 	/**
 	 * @return the parity bit configuration of the device
@@ -95,24 +83,34 @@ public interface IDevice {
 	/**
 	 * @return  the DTR configuration of the device
 	 */
-	public boolean isDtr();
+	public boolean isDTR();
 	
 	/**
 	 * @return  the RTS configuration of the device
 	 */
-	public boolean isRts();
+	public boolean isRTS();
 	
 	/**
-	 * @return the numberRecords
-	 */
-	public int getNumberRecords();
-	
-	/**
-	 * @return the channelCount
+	 * @return the channel count
 	 */
 	public int getChannelCount();
 	
 	/**
+	 * @return the number of measurements of a channel
+	 */
+	public int getNumberOfMeasurements();
+	
+	/**
+	 * @return the measurement definitions matching key (voltage, current, ...)
+	 */
+	public MeasurementType getMeasurementDefinition(String recordKey);
+	
+	/**
+	 * @return the sorted measurement names
+	 */
+	public String[] getMeasurementNames();
+
+		/**
 	 * @return the device dialog
 	 */
 	public DeviceDialog getDialog();
@@ -121,11 +119,6 @@ public interface IDevice {
 	 * @return the device serial port
 	 */
 	public DeviceSerialPort getSerialPort();
-	
-	/**
-	 * @return the records this is the key to get access to measurement specific properties
-	 */
-	public HashMap<String, Object> getRecords();
 	
 	/**
 	 * @return the dataUnit
@@ -150,4 +143,8 @@ public interface IDevice {
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet);
 
+	/**
+	 * writes updated device properties XML
+	 */
+	public void store();
 }

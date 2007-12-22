@@ -1,6 +1,6 @@
 package osde.device.renschler;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 import gnu.io.SerialPort;
 
@@ -17,7 +17,7 @@ public class PicolarioSerialPortTest {
 	public static void main(String[] args) {
 		DeviceConfiguration deviceConfig;
 		try {
-			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Picolario.ini", true);
+			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Picolario.xml");
 			picolario = new PicolarioSerialPort(deviceConfig, null);
 			DeviceSerialPort.listConfiguredSerialPorts();
 

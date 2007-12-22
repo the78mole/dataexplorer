@@ -5,7 +5,7 @@ import gnu.io.SerialPort;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import osde.config.DeviceConfiguration;
+import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 
 
@@ -20,7 +20,7 @@ public class AkkuMasterC4Test {
 	public static void main(String[] args) {
 		DeviceConfiguration deviceConfig;
 		try {
-			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Htronic Akkumaster C4.ini", true);
+			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Htronic Akkumaster C4.ini");
 			akkuMaster = new AkkuMasterC4SerialPort(deviceConfig, null);
 			DeviceSerialPort.listConfiguredSerialPorts();
 			SerialPort serialPort = akkuMaster.open();

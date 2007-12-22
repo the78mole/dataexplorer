@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.config.DeviceConfiguration;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -304,32 +303,33 @@ public class GraphicsWindow {
 	 * method to update the curves displayed in the curve selector panel 
 	 */
 	public void updateCurveSelectorTable() {
-		final IDevice activeConfig = application.getActiveDevice();
+		final IDevice device = application.getActiveDevice();
 		final RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 
 		if (isCurveSelectorEnabled && recordSet != null) {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					curveSelectorTable.removeAll();
-
-					for (int i = 1; i <= recordSet.size(); i++) {
+					
+					String[] recordKeys = device.getMeasurementNames();
+					for (int i = 0; i < recordSet.size(); i++) {
 						Record record;
 						switch (type) {
 						case TYPE_COMPARE:
 							String recordKey = recordSet.getRecordNames()[0].split("_")[0];
-							record = recordSet.getRecord(recordKey + "_" + (i - 1));
+							record = recordSet.getRecord(recordKey + "_" + i);
 							break;
 
 						default: // TYPE_NORMAL
-							record = recordSet.getRecord((String) activeConfig.getConfiguredRecords().get(DeviceConfiguration.MEASUREMENT + i));
+							record = recordSet.getRecord(recordKeys[i]);
 							break;
 						}
-						log.finer(record.getName());
+						if (log.isLoggable(Level.FINER)) log.finer(record.getName());
 
 						TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
 						item.setForeground(record.getColor());
 						//item.setFont(font);
-						item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + (i - 1));
+						item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
 						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 						if (record.isVisible()) {
 							item.setChecked(true);

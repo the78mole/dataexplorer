@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
-import osde.config.DeviceConfiguration;
 import osde.data.RecordSet;
+import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
 import osde.ui.StatusBar;
@@ -54,8 +54,8 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 		//int xBound = new Double(Math.random() * 1000000).intValue();
 		xBound = xBound + 100;
 		lastVoltage = xBound / 2;
-		int yBound = deviceConfig.getClusterSize();
-		for (int i = 0; i < deviceConfig.getClusterSize(); i++) {
+		int yBound = deviceConfig.getDataBlockSize();
+		for (int i = 0; i < deviceConfig.getDataBlockSize(); i++) {
 			current.add(i * 3000 + lastCurrent);
 			voltage.add(getNormalizedSine(i, xBound / 2, yBound) - lastVoltage);
 		}
