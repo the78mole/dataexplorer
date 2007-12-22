@@ -3,8 +3,6 @@ package osde.utils;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
-import sun.misc.CRC16;
-
 public class Checksum {
 
 	/**
@@ -20,8 +18,7 @@ public class Checksum {
 				(byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x07 };
 
 		System.out.println("CRC16    = " + Integer.toHexString(Checksum.crc16(b)));
-		System.out.println("sunCRC32 = " + Integer.toHexString(Checksum.sunCRC32(b)));
-		System.out.println("sunCRC16 = " + Integer.toHexString(Checksum.sunCRC16(b)));
+		System.out.println("CRC32 = " + Integer.toHexString(Checksum.CRC32(b)));
 		System.out.println("Adler32  = " + Long.toHexString(Checksum.adler32(b)));
 		System.out.println("ADD      = " + Integer.toHexString(Checksum.AND(b)));
 		// Picolario seams to use XOR checksum
@@ -81,7 +78,7 @@ public class Checksum {
 	 * @param b byte array to compute CRC on
 	 * @return 32-bit CRC, signed
 	 */
-	public static int sunCRC32(byte[] b) {
+	public static int CRC32(byte[] b) {
 		// create a new CRC-calculating object
 		CRC32 crc = new CRC32();
 		// loop, calculating CRC for each byte of the string
@@ -89,19 +86,6 @@ public class Checksum {
 			crc.update(b[i]);
 		}
 		return (int) crc.getValue();
-	}
-
-	/**
-	 * calculate CRC-16 with sun method
-	 * @param b byte array to compute CRC on
-	 * @return 32-bit CRC, signed
-	 */
-	public static int sunCRC16(byte[] b) {
-		CRC16 crc = new CRC16();
-		for (int i = 0; i < b.length; i++) {
-			crc.update(b[i]);
-		}
-		return crc.value;
 	}
 
 	/**
