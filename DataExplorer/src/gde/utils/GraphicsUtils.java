@@ -12,6 +12,9 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
+import osde.ui.SWTResourceManager;
+
+
 /**
  * This class contains utility methods for drawing graphics
  */
@@ -32,10 +35,24 @@ public class GraphicsUtils {
 	 * @param direction direction of drawn scale
 	 */
 	public static void drawVerticalTickMarks(GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
-		
+
+		// enable scale value 0.0  -- algorithm must round algorithm
 		int numberTicks = 10;
+		double deltaScale = (endNumber - startNumber);
+		if (startNumber < 0 && endNumber > 0) {
+			if (deltaScale < 100) {
+				numberTicks = (int)deltaScale / 5;
+			}
+			else if (deltaScale >= 100 && deltaScale <= 300) { //part below 0
+				numberTicks = (int)deltaScale / 10;
+			}
+			else {
+				numberTicks = (int)deltaScale / 20;
+			}
+		}
+
 		int dist = 10;
-		double deltaValue = (endNumber - startNumber) / 10;
+		double deltaValue = deltaScale / numberTicks;
 		double deltaTick = 1.0 * height / numberTicks;
 		miniticks++;
 
@@ -89,7 +106,7 @@ public class GraphicsUtils {
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
-		Image stringImage = new Image(display, pt.x, pt.y);
+		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
 
 		// Create a GC so we can draw the image
 		GC stringGc = new GC(stringImage);
@@ -116,7 +133,7 @@ public class GraphicsUtils {
 		stringGc.dispose();
 
 		// Dispose the image
-		stringImage.dispose();
+		//stringImage.dispose();
 	}
 
 	/**
@@ -146,14 +163,14 @@ public class GraphicsUtils {
 
 		// Determine which way to rotate, depending on up or down
 		boolean up = (style & SWT.UP) == SWT.UP;
-
+		int dx=0, dy=0;
 		// Run through the horizontal pixels
 		for (int sx = 0; sx < sd.width; sx++) {
 			// Run through the vertical pixels
 			for (int sy = 0; sy < sd.height; sy++) {
 				// Determine where to move pixel to in destination image data
-				int dx = up ? sy : sd.height - sy - 1;
-				int dy = up ? sd.width - sx - 1 : sx;
+				dx = up ? sy : sd.height - sy - 1;
+				dy = up ? sd.width - sx - 1 : sx;
 
 				// Swap the x, y source data to y, x in the destination
 				dd.setPixel(dx, dy, sd.getPixel(sx, sy));
@@ -161,13 +178,15 @@ public class GraphicsUtils {
 		}
 
 		// Create the vertical image
-		Image vertical = new Image(display, dd);
+		//Image vertical = new Image(display, dd);
+		log.fine("imageData x = " + dd.width + " y = " + dd.height); 
+		Image vertical = SWTResourceManager.getImage(dd);
 
 		// Draw the vertical image onto the original GC
 		gc.drawImage(vertical, x, y);
 
 		// Dispose the vertical image
-		vertical.dispose();
+		//vertical.dispose();
 	}
 
 	/**
@@ -205,7 +224,7 @@ public class GraphicsUtils {
 		gc.dispose();
 
 		// Create an image the same size as the string
-		Image stringImage = new Image(display, pt.x, pt.y);
+		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
 
 		// Create a gc for the image
 		gc = new GC(stringImage);
@@ -223,7 +242,7 @@ public class GraphicsUtils {
 		gc.dispose();
 
 		// Dispose the horizontal image
-		stringImage.dispose();
+		//stringImage.dispose();
 
 		// Return the rotated image
 		return image;
@@ -254,14 +273,14 @@ public class GraphicsUtils {
 
 		// Determine which way to rotate, depending on up or down
 		boolean up = (style & SWT.UP) == SWT.UP;
-
+		int dx = 0, dy = 0;
 		// Run through the horizontal pixels
 		for (int sx = 0; sx < sd.width; sx++) {
 			// Run through the vertical pixels
 			for (int sy = 0; sy < sd.height; sy++) {
 				// Determine where to move pixel to in destination image data
-				int dx = up ? sy : sd.height - sy - 1;
-				int dy = up ? sd.width - sx - 1 : sx;
+				dx = up ? sy : sd.height - sy - 1;
+				dy = up ? sd.width - sx - 1 : sx;
 
 				// Swap the x, y source data to y, x in the destination
 				dd.setPixel(dx, dy, sd.getPixel(sx, sy));
@@ -269,6 +288,6 @@ public class GraphicsUtils {
 		}
 
 		// Create the vertical image
-		return new Image(display, dd);
+		return SWTResourceManager.getImage(dx, dy);
 	}
 }

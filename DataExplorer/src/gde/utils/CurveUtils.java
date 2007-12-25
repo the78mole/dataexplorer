@@ -17,7 +17,7 @@ import osde.ui.OpenSerialDataExplorer;
  * this class contains utilities to draw curves and vertical scales
  */
 public class CurveUtils {
-	private static Logger				log			= Logger.getLogger(CurveUtils.class.getClass().getName());
+	private static Logger				log			= Logger.getLogger(CurveUtils.class.getName());
 	private static final String	lineSep	= System.getProperty("line.separator");
 
 	/**
@@ -47,12 +47,12 @@ public class CurveUtils {
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
+		boolean isRaw = record.getParent().isRaw();
 
-		if (yMaxValue == yMinValue) {
+		if (yMaxValue == yMinValue && !isRaw) {
 			yMaxValue = new Double(yMaxValue + 1).intValue();
 			yMinValue = new Double(yMinValue - 1).intValue();
 		}
-		boolean isRaw = record.getParent().isRaw();
 		if (record.isStartEndDefined()) {
 			yMinValueDisplay = record.getDefinedMinValue();
 			if (isRaw) yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
@@ -70,20 +70,13 @@ public class CurveUtils {
 			}
 
 			if (record.isRoundOut() || yMaxValue == yMinValue) { // equal value disturbs the scaling alogorithm
-				if (yMinValueDisplay < 0)
-					yMinValueDisplay = yMinValueDisplay > -10 ? (int) (yMinValueDisplay - 1) : yMinValueDisplay - (10 + (yMinValueDisplay % 10));
-				else
-					yMinValueDisplay = yMinValueDisplay < 10 ? (int) (yMinValueDisplay - 1) : yMinValueDisplay - (yMinValueDisplay % 10);
+				double[] roundValues = round(yMinValueDisplay, yMaxValueDisplay);
+				yMinValueDisplay = roundValues[0]; 	// min
+				yMaxValueDisplay = roundValues[1];	// max
 				if (isRaw) yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
-
-				if (yMaxValueDisplay < 0)
-					yMaxValueDisplay = yMaxValueDisplay < -10 ? (int) (yMaxValueDisplay + 1) : yMaxValueDisplay + 10 - (yMaxValueDisplay % 10);
-				else
-					yMaxValueDisplay = yMaxValueDisplay < 10 ? (int) (yMaxValueDisplay + 1) : yMaxValueDisplay + 10 - (yMaxValueDisplay % 10);
-
 				if (isRaw) yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
 
-				if (log.isLoggable(Level.FINE)) log.fine("rounded yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
+				if (log.isLoggable(Level.FINE)) log.fine(String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue));
 			}
 			if (record.isStartpointZero()) {
 				yMinValue = yMinValueDisplay = 0;
@@ -173,5 +166,64 @@ public class CurveUtils {
 			}
 		}
 		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+	}
+
+	/**
+	 * @param double array minValue, maxValue 
+	 * @return double array roundMinValue, roundMaxValue 
+	 */
+	private static double[] round(double minValue, double maxValue) {
+		double[] outValues = {0.0, 0.0};
+		
+		if (minValue < 0)
+			if (minValue > -10)
+				outValues[0] = (int) (minValue - 1);
+			else if (minValue < -50)
+				outValues[0] = minValue - (10 + (minValue % 10));
+			else
+				outValues[0] = minValue - (5 + (minValue % 5));
+		else	// minValue > 0 
+			if (minValue < 10)
+				outValues[0] = (int) (minValue - 1);
+			else if  (minValue < 50)
+				outValues[0] = minValue - (minValue % 10);
+			else
+				outValues[0] = minValue - (minValue % 5);
+
+			
+		if (maxValue < 0)
+			if (maxValue > -10)
+				outValues[1] = (int) (maxValue + 1);
+			else if (maxValue > -50)
+				outValues[1] = maxValue + 5 - (maxValue % 5);
+			else
+				outValues[1] = maxValue + 10 - (maxValue % 10);
+		else
+			if (maxValue < 10)
+				outValues[1] = (int) (maxValue + 1);
+			else if (maxValue > 50)
+				outValues[1] = maxValue + 10 - (maxValue % 10);
+			else
+				outValues[1] = maxValue + 5 - (maxValue % 5);
+		
+		// enable scale value 0.0  -- algorithm must fit scale tick mark calculation
+		if(minValue < 0 && maxValue > 0) {
+			double deltaScale = outValues[1] - outValues[0];
+			if (deltaScale < 100) {
+				outValues[0] = outValues[0] - (5 + (outValues[0] % 5));
+				outValues[1] = outValues[1] + (outValues[1] % 5);
+			}		
+			else if (deltaScale >= 100 && deltaScale <= 300) { 
+				outValues[0] = outValues[0] - (10 + (outValues[0] % 10));
+				outValues[1] = outValues[1] + (outValues[1] % 10);
+			}	
+			else { // > 300
+				outValues[0] = outValues[0] - (20 + (outValues[0] % 20));
+				outValues[1] = outValues[1] + (outValues[1] % 20);
+			}
+		}
+
+		if (log.isLoggable(Level.FINE)) log.fine(minValue + " --> " + outValues[0] + " " + maxValue + " --> " + outValues[1]);
+		return outValues;
 	}
 }
