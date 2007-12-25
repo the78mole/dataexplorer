@@ -128,7 +128,7 @@ public class TimeLine {
 			scaleFactor = scaleFactor/10;
 			if (log.isLoggable(Level.FINE)) log.fine("0 numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
 		}
-		else if (timeDelta >= 10 && timeDelta < 30 && scaleFactor == 10) {
+		else if (timeDelta >= 10 && timeDelta < 60 && scaleFactor == 10) {
 			numberTicks = timeDelta / 5.0; // every 5 th units one tick
 			scaleFactor = scaleFactor * 2;
 			if (log.isLoggable(Level.FINE)) log.fine("1 numberTicks = " + numberTicks + " startNumber = " + startNumber + " endNumber = " + endNumber);
