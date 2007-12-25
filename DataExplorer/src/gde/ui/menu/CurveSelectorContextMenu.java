@@ -144,7 +144,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			lineWidthMenuItem1 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
+			lineWidthMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.gif"));
 			lineWidthMenuItem1.setText("  1");
 			lineWidthMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -159,7 +159,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			lineWidthMenuItem2 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineWidth2.jpg"));
+			lineWidthMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineWidth2.gif"));
 			lineWidthMenuItem2.setText("  2");
 			lineWidthMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -174,7 +174,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			lineWidthMenuItem3 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineWidth3.jpg"));
+			lineWidthMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineWidth3.gif"));
 			lineWidthMenuItem3.setText("  3");
 			lineWidthMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -230,7 +230,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			lineTypeMenuItem1 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineType1.jpg"));
+			lineTypeMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineType1.gif"));
 			lineTypeMenuItem1.setText("durchgezogen");
 			lineTypeMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -245,7 +245,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			lineTypeMenuItem2 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineType2.jpg"));
+			lineTypeMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineType2.gif"));
 			lineTypeMenuItem2.setText("gestrichelt");
 			lineTypeMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -260,7 +260,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			lineTypeMenuItem3 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineType3.jpg"));
+			lineTypeMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineType3.gif"));
 			lineTypeMenuItem3.setText("gepunktet");
 			lineTypeMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
