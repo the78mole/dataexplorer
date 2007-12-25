@@ -20,7 +20,8 @@ public class MeasurementType {
 		this.name = XMLUtils.getTextValue(element, "name");
 		this.symbol = XMLUtils.getTextValue(element, "symbol");
 		this.unit = XMLUtils.getTextValue(element, "unit");
-		this.isActive = XMLUtils.getBooleanValue(element, "isActive");
+		
+		this.isActive = XMLUtils.getBooleanValue(element, "isActive"); // optional element
 
 		this.dataCalculation = new DataCalculationType(); // optional element
 		NodeList timeBaseNodeList = element.getElementsByTagName("DataCalculation");
