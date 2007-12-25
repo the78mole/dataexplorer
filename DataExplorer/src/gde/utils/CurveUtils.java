@@ -69,12 +69,18 @@ public class CurveUtils {
 				yMaxValueDisplay = device.translateValue(recordName, yMaxValue);
 			}
 
-			if (record.isRoundOut() || yMaxValue == yMinValue) { // equal value disturbs the scaling alogorithm
+			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling alogorithm
 				double[] roundValues = round(yMinValueDisplay, yMaxValueDisplay);
 				yMinValueDisplay = roundValues[0]; 	// min
 				yMaxValueDisplay = roundValues[1];	// max
-				if (isRaw) yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
-				if (isRaw) yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+				if (isRaw) {
+					yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
+					yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+				}
+				else {
+					yMinValue = yMinValueDisplay;
+					yMaxValue = yMaxValueDisplay;
+				}
 
 				if (log.isLoggable(Level.FINE)) log.fine(String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue));
 			}
