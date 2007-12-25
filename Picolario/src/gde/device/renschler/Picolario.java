@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
@@ -92,7 +93,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			int firstValue = 0; // != 0 if first value must subtracted
-			int offset = 0; // != 0 if curve has an defined offset
+			double offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
 			// prepare the data for adding to record set
 			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
@@ -114,10 +115,24 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
+			else if (dialog.isDoSubtractLast()) {
+				try { // use exception handling instead of transfer graphicsWindow type
+					Record record = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey);
+					firstValue = record.get(record.size()-1).intValue() / 1000;
+				}
+				catch (NullPointerException e) {
+					Record record = application.getCompareSet().get(recordKey);
+					firstValue = record.get(record.size()-1).intValue() / 1000;
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+			}
 			else if (dialog.isDoReduceHeight()) {
 				offset = dialog.getHeightOffsetValue();
+				if (log.isLoggable(Level.FINER)) log.finer("dialog.isDoReduceHeight() == true -> value = " + offset);
 			}
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("firstValue = %d, offset = %d, factor = %f", firstValue, offset, factor));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("firstValue = %d, offset = %f, factor = %f", firstValue, offset, factor));
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("doSubtractFirst = %s, doReduceHeight = %s", dialog.isDoSubtractFirst(), dialog.isDoReduceHeight()));
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
 			newValue = (value - firstValue) * factor - offset;
@@ -134,7 +149,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			newValue = value * factor;
 		}
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
+		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
 		return newValue;
 	}
 
@@ -151,7 +166,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
 			int firstValue = 0; // != 0 if first value must subtracted
-			int offset = 0; // != 0 if curve has an defined offset
+			double offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
 			// prepare the data for adding to record set
 			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
@@ -175,11 +190,24 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
+			else if (dialog.isDoSubtractLast()) {
+				try { // use exception handling instead of transfer graphicsWindow type
+					Record record = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey);
+					firstValue = record.get(record.size()-1).intValue() / 1000;
+				}
+				catch (NullPointerException e) {
+					Record record = application.getCompareSet().get(recordKey);
+					firstValue = record.get(record.size()-1).intValue() / 1000;
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+			}
 			else if (dialog.isDoReduceHeight()) {
 				offset = dialog.getHeightOffsetValue();
 			}
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
-			newValue = (value - offset) / factor + firstValue;
+			newValue = (value + offset) / factor + firstValue;
 		}
 		else if (recordKey.startsWith(RecordSet.SLOPE)) {
 			double factor = 1.0; // != 1 if a unit translation is required
@@ -193,7 +221,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			newValue = value / factor;
 		}
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("new value calculated for %s - newValue %f", recordKey, newValue));
+		if(log.isLoggable(Level.FINEST)) log.finest(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
 		return newValue;
 	}
 

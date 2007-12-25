@@ -1,5 +1,6 @@
 package osde.device.renschler;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -7,8 +8,8 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -45,23 +46,25 @@ public class PicolarioDialog extends DeviceDialog {
 	private String										numberAvailable				= "0";
 
 	private Group											heightAdaptionGroup2;
-	private Button										reduceByFirstValueAbziehenButton;
+	private Button										reduceByFirstValueButton;
 	private CCombo										heightUnit;
 	private Label											heightUnitLabel;
 	private CCombo										heightOffset;
 	private Button										noAdaptioButton;
 	private Button										reduceByDefinedValueButton;
 	private Label											heightReductionLabel;
-	private boolean										doSubtractFirst				= true;																				// indicates to subtract first values from all other
+	private boolean										doSubtractFirst				= true;																					// indicates to subtract first values from all other
+	private boolean										doSubtractLast				= false;																				// indicates to subtract last values from all other
 	private boolean										doReduceHeight				= false;																				// indicates that the height has to be corrected by an offset
 	private int												heightUnitSelection		= 0;																						// Feet 0, Meter 1
 	private int												heightOffsetSelection	= 7;																						// represents the offset the measurment should be modified
-	private int												heightOffsetValue			= 100;																					// represents the offset value
+	private double										heightOffsetValue			= 100;																					// represents the offset value
 
 	private Group											readDataGroup3;
 	private Button										readSingle;
 	private Button										stopButton;
 	private CLabel										alreadyRedLabel;
+	private Button reduceByLastValueButton;
 	private Button										readAllRecords;
 	private CLabel										numberRedTelegramLabel;
 	private CCombo										recordSetSelectCombo;
@@ -93,7 +96,7 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(344, 419);
+			dialogShell.setSize(344, 431);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
@@ -228,10 +231,10 @@ public class PicolarioDialog extends DeviceDialog {
 				heightAdaptionGroup2.setLayout(null);
 				FormData heightAdaptionGroupLData = new FormData();
 				heightAdaptionGroupLData.width = 306;
-				heightAdaptionGroupLData.height = 107;
-				heightAdaptionGroupLData.left = new FormAttachment(0, 1000, 12);
-				heightAdaptionGroupLData.top = new FormAttachment(0, 1000, 85);
-				heightAdaptionGroupLData.right = new FormAttachment(1000, 1000, -12);
+				heightAdaptionGroupLData.height = 119;
+				heightAdaptionGroupLData.left =  new FormAttachment(0, 1000, 12);
+				heightAdaptionGroupLData.top =  new FormAttachment(0, 1000, 85);
+				heightAdaptionGroupLData.right =  new FormAttachment(1000, 1000, -12);
 				heightAdaptionGroup2.setLayoutData(heightAdaptionGroupLData);
 				heightAdaptionGroup2.setText("2. Einstellungen für die Höhenberechnung");
 				{
@@ -242,7 +245,8 @@ public class PicolarioDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("noAdaptioButton.widgetSelected, event=" + evt);
 							noAdaptioButton.setSelection(true);
-							reduceByFirstValueAbziehenButton.setSelection(false);
+							reduceByFirstValueButton.setSelection(false);
+							reduceByLastValueButton.setSelection(false);
 							reduceByDefinedValueButton.setSelection(false);
 							doSubtractFirst = false;
 							doReduceHeight = false;
@@ -251,17 +255,37 @@ public class PicolarioDialog extends DeviceDialog {
 					});
 				}
 				{
-					reduceByFirstValueAbziehenButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
-					reduceByFirstValueAbziehenButton.setText("ersten Höhenwert von den folgenden abziehen");
-					reduceByFirstValueAbziehenButton.setSelection(doSubtractFirst);
-					reduceByFirstValueAbziehenButton.setBounds(12, 42, 297, 16);
-					reduceByFirstValueAbziehenButton.addSelectionListener(new SelectionAdapter() {
+					reduceByFirstValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
+					reduceByFirstValueButton.setText("ersten Höhenwert von den folgenden abziehen");
+					reduceByFirstValueButton.setSelection(doSubtractFirst);
+					reduceByFirstValueButton.setBounds(12, 42, 297, 16);
+					reduceByFirstValueButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("ertsenWertAbziehenButton.widgetSelected, event=" + evt);
+							log.finest("reduceByFirstValueButton.widgetSelected, event=" + evt);
 							noAdaptioButton.setSelection(false);
-							reduceByFirstValueAbziehenButton.setSelection(true);
+							reduceByFirstValueButton.setSelection(true);
+							reduceByLastValueButton.setSelection(false);
 							reduceByDefinedValueButton.setSelection(false);
 							doSubtractFirst = true;
+							doSubtractLast = false;
+							doReduceHeight = false;
+							application.updateGraphicsWindow();
+						}
+					});
+				}
+				{
+					reduceByLastValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
+					reduceByLastValueButton.setBounds(12, 62, 293, 18);
+					reduceByLastValueButton.setText("letzten Höhenwert von allen anderen abziehen");
+					reduceByLastValueButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("reduceByLastValueButton.widgetSelected, event=" + evt);
+							noAdaptioButton.setSelection(false);
+							reduceByFirstValueButton.setSelection(false);
+							reduceByLastValueButton.setSelection(true);
+							reduceByDefinedValueButton.setSelection(false);
+							doSubtractFirst = false;
+							doSubtractLast = true;
 							doReduceHeight = false;
 							application.updateGraphicsWindow();
 						}
@@ -271,64 +295,68 @@ public class PicolarioDialog extends DeviceDialog {
 					reduceByDefinedValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
 					reduceByDefinedValueButton.setText("Höhe um");
 					reduceByDefinedValueButton.setSelection(doReduceHeight);
-					reduceByDefinedValueButton.setBounds(12, 65, 75, 16);
+					reduceByDefinedValueButton.setBounds(12, 84, 75, 16);
 					reduceByDefinedValueButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("höheVerringernButton.widgetSelected, event=" + evt);
+							log.finest("reduceByDefinedValueButton.widgetSelected, event=" + evt);
 							noAdaptioButton.setSelection(false);
-							reduceByFirstValueAbziehenButton.setSelection(false);
+							reduceByFirstValueButton.setSelection(false);
+							reduceByLastValueButton.setSelection(false);
 							reduceByDefinedValueButton.setSelection(true);
 							doReduceHeight = true;
 							doSubtractFirst = false;
+							doSubtractLast = false;
+							heightOffsetValue = new Double(heightOffset.getText()).doubleValue();
 							application.updateGraphicsWindow();
 						}
 					});
 				}
 				{
 					heightOffset = new CCombo(heightAdaptionGroup2, SWT.BORDER);
-					String[] heightOffsetValues = new String[] { "-500", "-400", "-300", "-200", "-100", "-50", "50", "100", "150", "200", "250", "300", "400", "500", "600", "700", "800", "900", "1000" };
+					final String[] heightOffsetValues = new String[] {"-200", "-100", "-50", "0", "50", "100", "150", "200", "250", "300", "400", "500", "750", "1000", "1500" };
 					heightOffset.setItems(heightOffsetValues);
-					heightOffset.setText(new Integer(heightOffsetValue).toString());
+					heightOffset.setText(new Double(heightOffsetValue).toString());
 					for (int i = 0; i < heightOffsetValues.length; i++) {
 						if (heightOffsetValues.equals(heightOffsetValue)) heightOffset.select(heightOffsetSelection);
 					}
-					heightOffset.setBounds(92, 63, 84, 21);
+					heightOffset.setBounds(94, 84, 84, 21);
 					heightOffset.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("höheVerringernCombo.widgetSelected, event=" + evt);
-							heightOffsetSelection = heightUnit.getSelectionIndex();
+							log.finest("heightOffset.widgetSelected, event=" + evt);
+							heightOffsetValue = new Double(heightOffsetValues[heightOffset.getSelectionIndex()]).doubleValue();
 							application.updateGraphicsWindow();
 						}
 					});
-					heightOffset.addKeyListener(new KeyListener() {
+					heightOffset.addKeyListener(new KeyAdapter() {
 						public void keyPressed(KeyEvent evt) {
 							log.finest("heightOffset.keyPressed, event=" + evt);
 							if (evt.character == SWT.CR) {
 								//heightOffsetSelection 
-								heightOffsetValue = new Integer(heightOffset.getText()).intValue();
-								application.updateGraphicsWindow();
+								try {
+									heightOffsetValue = new Double(heightOffset.getText().replace(',', '.')).doubleValue();
+									application.updateGraphicsWindow();
+								}
+								catch (NumberFormatException e) {
+									log.log(Level.WARNING, e.getMessage(), e);
+									application.openMessageDialog("Eingabefehler : " + e.getMessage());
+								}
 							}
 						}
-
-						public void keyReleased(KeyEvent evt) {
-							//log.finest("heightOffset.keyPressed, event=" + evt);
-						}
 					});
-
 				}
 				{
 					heightReductionLabel = new Label(heightAdaptionGroup2, SWT.NONE);
-					heightReductionLabel.setBounds(187, 63, 60, 19);
+					heightReductionLabel.setBounds(187, 82, 60, 19);
 					heightReductionLabel.setText("verringern");
 				}
 				{
 					heightUnitLabel = new Label(heightAdaptionGroup2, SWT.NONE);
-					heightUnitLabel.setBounds(12, 89, 76, 19);
+					heightUnitLabel.setBounds(12, 108, 76, 19);
 					heightUnitLabel.setText("Höhenmass");
 				}
 				{
 					heightUnit = new CCombo(heightAdaptionGroup2, SWT.BORDER | SWT.LEFT);
-					heightUnit.setBounds(92, 87, 84, 21);
+					heightUnit.setBounds(94, 108, 84, 21);
 					heightUnit.setItems(new java.lang.String[] { "Meter", "Fuß" });
 					heightUnit.setEditable(false);
 					heightUnit.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -379,7 +407,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public int getReduceHeightSelectionType() {
 		int selection = noAdaptioButton.getSelection() ? 1 : 0;
-		selection = selection + (reduceByFirstValueAbziehenButton.getSelection() ? 1 : 0);
+		selection = selection + (reduceByFirstValueButton.getSelection() ? 1 : 0);
 		selection = selection + (reduceByDefinedValueButton.getSelection() ? 1 : 0);
 		return selection;
 	}
@@ -463,7 +491,7 @@ public class PicolarioDialog extends DeviceDialog {
 	/**
 	 * @return the heightOffsetValue
 	 */
-	public int getHeightOffsetValue() {
+	public double getHeightOffsetValue() {
 		return heightOffsetValue;
 	}
 
@@ -479,5 +507,12 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public boolean isDoSubtractFirst() {
 		return doSubtractFirst;
+	}
+
+	/**
+	 * @return the doSubtractLast
+	 */
+	public boolean isDoSubtractLast() {
+		return doSubtractLast;
 	}
 }
