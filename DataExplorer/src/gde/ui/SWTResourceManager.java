@@ -3,6 +3,8 @@ package osde.ui;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -11,9 +13,12 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
+
+import osde.utils.GraphicsUtils;
 
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
@@ -25,6 +30,7 @@ import org.eclipse.swt.widgets.Widget;
  * #SWTResourceManager:version4.0.0#
  */
 public class SWTResourceManager {
+	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());
 
 	@SuppressWarnings("unchecked")
 	private static HashMap resources = new HashMap();
@@ -96,8 +102,7 @@ public class SWTResourceManager {
 						lfCls.getField("lfUnderline").set(lf, new Byte((byte) 1));
 				}
 			} catch (Throwable e) {
-				System.err.println(
-					"Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e);
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 		Font font = new Font(Display.getDefault(), fd);
@@ -110,6 +115,38 @@ public class SWTResourceManager {
 		if(img != null && widget != null)
 			img.setBackground(widget.getBackground());
 		return img;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Image getImage(int x, int y) {
+		String key = x + "_" + y;
+		try {
+			if (resources.containsKey(key))
+				return (Image) resources.get(key);
+			Image img = new Image(Display.getDefault(), x, y);
+			if (img != null)
+				resources.put(key, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Image getImage(ImageData imageData) {
+		String key = imageData.getClass().getCanonicalName() + "_" + imageData.width + "_" + imageData.height;
+		try {
+			if (resources.containsKey(key))
+				return (Image) resources.get(key);
+			Image img = new Image(Display.getDefault(), imageData);
+			if (img != null)
+				resources.put(key, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -125,7 +162,7 @@ public class SWTResourceManager {
 				resources.put(url, img);
 			return img;
 		} catch (Exception e) {
-			System.err.println("SWTResourceManager.getImage: Error getting image "+url+", "+e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		}
 	}
