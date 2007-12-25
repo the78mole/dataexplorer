@@ -126,6 +126,26 @@ public interface IDevice {
 	public String getDataUnit(String recordKey);
 
 	/**
+	 * @return the offset
+	 */
+	public double getOffset(String recordKey);
+
+	/**
+	 * @param offset the offset to set
+	 */
+	public void setOffset(String recordKey, double offset);
+
+	/**
+	 * @return the factor
+	 */
+	public double getFactor(String recordKey);
+
+	/**
+	 * @param factor the factor to set
+	 */
+	public void setFactor(String recordKey, double factor);
+
+	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */

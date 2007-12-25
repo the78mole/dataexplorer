@@ -381,4 +381,31 @@ public class DeviceConfiguration {
 		return masurementNames;
 	}
 
+	/**
+	 * @return the offset
+	 */
+	public double getOffset(String recordKey) {
+		return this.getMeasurementDefinition(recordKey).getDataCalculation().getOffset();
+	}
+
+	/**
+	 * @param offset the offset to set
+	 */
+	public void setOffset(String recordKey, double offset) {
+		this.getMeasurementDefinition(recordKey).getDataCalculation().setOffset(offset);
+	}
+
+	/**
+	 * @return the factor
+	 */
+	public double getFactor(String recordKey) {
+		return getMeasurementDefinition(recordKey).getDataCalculation().getFactor();
+	}
+
+	/**
+	 * @param factor the factor to set
+	 */
+	public void setFactor(String recordKey, double factor) {
+		this.getMeasurementDefinition(recordKey).getDataCalculation().setFactor(factor);
+	}
 }
