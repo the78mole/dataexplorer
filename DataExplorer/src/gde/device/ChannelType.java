@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device;
 
 import java.util.Iterator;
@@ -6,6 +22,10 @@ import java.util.Vector;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * @author Winfried Brügmann
+ * ChannelType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
+ */
 public class ChannelType extends Vector<MeasurementType> {
 	static final long							serialVersionUID	= 26031957L;
 
