@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.htronic;
 
 import java.io.IOException;
@@ -25,6 +41,10 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+/**
+ * @author Winfried Brügmann
+ * class implementation for one channel tab, this will be initialized according number of available channels
+ */
 public class AkkuMasterChannelTab {
 	private Logger												log											= Logger.getLogger(this.getClass().getName());
 
@@ -89,7 +109,7 @@ public class AkkuMasterChannelTab {
 	private final OpenSerialDataExplorer	application;
 
 	/**
-	 * constructor
+	 * constructor initialization of one channel tab
 	 * @param name
 	 * @param channel byte signature
 	 * @param serial port

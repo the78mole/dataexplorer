@@ -1,6 +1,19 @@
-/**
- * 
- */
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.htronic;
 
 import gnu.io.NoSuchPortException;
@@ -22,7 +35,7 @@ import osde.ui.OpenSerialDataExplorer;
 
 /**
  * @author Winfried Brügmann
- *
+ * AkkuMaster C4 device class implementation
  */
 public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());
@@ -34,7 +47,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	private AkkuMasterCalculationThread	threadPower, threadEnergy;
 
 	/**
-	 * @param deviceProperties
+	 * constructor using the device properties file for initialization
+	 * @param deviceProperties file
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchPortException 

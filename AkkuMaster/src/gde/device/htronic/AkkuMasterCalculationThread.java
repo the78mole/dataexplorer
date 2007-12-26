@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.htronic;
 
 import java.util.logging.Level;
@@ -8,7 +24,8 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * this class enables data calculation thread
+ * @author Winfried Brügmann
+ * this class enables data calculation thread for device AkkuMaster C4
  */
 public class AkkuMasterCalculationThread extends Thread {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
@@ -18,7 +35,9 @@ public class AkkuMasterCalculationThread extends Thread {
 	private final OpenSerialDataExplorer	application;
 
 	/**
-	 * 
+	 * constructor using the recordKey and recordSet for initialization
+	 * @param recordKey as String
+	 * @param recordSet as RecordSet
 	 */
 	public AkkuMasterCalculationThread(String recordKey, RecordSet recordsSet) {
 		this.recordKey = recordKey;
@@ -27,7 +46,10 @@ public class AkkuMasterCalculationThread extends Thread {
 	}
 
 	/**
+	 * constructor using the recordKey and recordSet for initialization, a thread name can be given
 	 * @param name
+	 * @param recordKey as String
+	 * @param recordSet as RecordSet
 	 */
 	public AkkuMasterCalculationThread(String name, String recordKey, RecordSet recordsSet) {
 		super(name);
