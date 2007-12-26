@@ -1,6 +1,19 @@
-/**
- * 
- */
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.io;
 
 import java.io.BufferedReader;
@@ -21,10 +34,12 @@ import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
+import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 
 
 /**
+ * @author Winfried Brügmann
  * Class to read and write comma separated value files
  */
 public class CSVReaderWriter {
@@ -62,8 +77,10 @@ public class CSVReaderWriter {
 	 */
 	public static RecordSet read(char separator, String filePath, RecordSet recordSet, boolean isRaw) throws Exception {
 		BufferedReader reader; // to read the data
-		String[] recordNames = null;
+		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+		String[] recordNames = device.getMeasurementNames();
 		int sizeRecords = 0;
+		boolean isDeviceName = true;
 		boolean isData = false;
 
 		try {
@@ -74,19 +91,28 @@ public class CSVReaderWriter {
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			while ((line = reader.readLine()) != null) {
-				if (!isData) {
+				if (isDeviceName) {
+					// check for device name in first line
+					if (!line.contains(""+separator) && OpenSerialDataExplorer.getInstance().getActiveDevice().getName().equals(line)) {
+						isDeviceName = false;
+					}
+					else {
+						throw new Exception("0"); // mismatch device name
+					}
+				}
+				else if (!isData) {
 					// first line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
 					String[] header = line.split(";");
 					sizeRecords = header.length - 1;
-					recordNames = recordSet.getRecordNames();
-					int countActive = 0;
+					int countNotMeasurement = 0;
 					for (String recordKey : recordNames) {
-						if (recordSet.get(recordKey).isActive())
-							++countActive;			// update count for raw
+						MeasurementType measurement = device.getMeasurementDefinition(recordKey);
+						if (!measurement.isCalculation())
+							++countNotMeasurement;			// update count for possible raw
 						if (!isRaw)
 							recordSet.get(recordKey).setDisplayable(true);	// all data available 
 					}
-					if (sizeRecords != countActive && isRaw || sizeRecords != recordNames.length && !isRaw) { // first simple check, but name must not match
+					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) { // first simple check, but name must not match
 						throw new Exception("1"); // mismatch data signature
 					}
 					else {
@@ -146,7 +172,9 @@ public class CSVReaderWriter {
 			throw e;
 		}
 		catch (Exception e) {
-			if (e.getMessage().startsWith("1"))
+			if (e.getMessage().startsWith("0"))
+				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät");
+			else if (e.getMessage().startsWith("1"))
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht der Messgrößensignatur des eingestellten Gerätes");
 			else
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
@@ -170,18 +198,23 @@ public class CSVReaderWriter {
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+			// write device name , manufacturer, and serial port string
+			writer.write(device.getName() + newLine);
+			
+			// write the measurements signature
 			String[] recordNames = device.getMeasurementNames();
 			for (int i = 0; i < recordNames.length; i++) {
-				Record record = recordSet.getRecord(recordNames[i]);
+				MeasurementType  measurement = device.getMeasurementDefinition(recordNames[i]);
 				log.finest("append " + recordNames[i]);
 				if (isRaw) {
-					if (record.isActive()) {// only use active records for writing raw data
-						sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	
+				//TODO use all records which have this attribute in XML
+					if (!measurement.isCalculation()) {// only use active records for writing raw data 
+						sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append(']').append(separator);	
 						log.finest("append " + recordNames[i]);
 					}
 				}
 				else {
-					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	
+					sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append(']').append(separator);	
 					log.finest("append " + recordNames[i]);
 				}
 			}
