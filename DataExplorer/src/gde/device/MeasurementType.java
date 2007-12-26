@@ -30,6 +30,7 @@ public class MeasurementType {
 	private final String				symbol;
 	private String							unit;
 	private boolean							isActive;
+	private boolean							isCalculation = false;
 	private DataCalculationType	dataCalculation;
 
 	/**
@@ -41,7 +42,10 @@ public class MeasurementType {
 		this.symbol = XMLUtils.getTextValue(element, "symbol");
 		this.unit = XMLUtils.getTextValue(element, "unit");
 		
-		this.isActive = XMLUtils.getBooleanValue(element, "isActive"); // optional element
+		if (XMLUtils.getTextValue(element, "isActive") != null)
+			this.isActive = XMLUtils.getBooleanValue(element, "isActive"); // optional element
+		else 
+			this.isCalculation = true;
 
 		this.dataCalculation = new DataCalculationType(); // optional element
 		NodeList timeBaseNodeList = element.getElementsByTagName("DataCalculation");
@@ -51,16 +55,20 @@ public class MeasurementType {
 		}
 	}
 
-	public MeasurementType(String name, String symbol, String unit, boolean isActive) {
+	public MeasurementType(String name, String symbol, String unit, boolean isActive, boolean isCalculation) {
 		this.name = name;
 		this.symbol = symbol;
 		this.unit = unit;
 		this.isActive = isActive;
+		this.isCalculation = isCalculation;
 		this.dataCalculation = new DataCalculationType();
 	}
 
 	public String toString() {
-		return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isActive = %b, %s", name, symbol, unit, isActive, dataCalculation.toString());
+		if (isCalculation)
+			return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isCalculation = %b, %s", name, symbol, unit, isCalculation, dataCalculation.toString());
+		else
+			return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isActive = %b, %s", name, symbol, unit, isActive, dataCalculation.toString());
 	}
 
 	/**
@@ -117,5 +125,12 @@ public class MeasurementType {
 	 */
 	public String getSymbol() {
 		return symbol;
+	}
+
+	/**
+	 * @return the isCalculation
+	 */
+	public boolean isCalculation() {
+		return isCalculation;
 	}
 }
