@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.data;
 
 import java.util.HashMap;
@@ -9,7 +25,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * Channel represents on channel (Kanal 1, Kanal 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
+ * @author Winfried Brügmann
+ * Channel class represents on channel (Kanal 1, Kanal 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
  */
 public class Channel extends HashMap<String, RecordSet> {
 	static final long											serialVersionUID	= 26031957;
@@ -21,7 +38,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	private final OpenSerialDataExplorer	application;
 
 	/**
-	 * Constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
+	 * constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
 	 * @param name
 	 * @param recordNames
 	 */
