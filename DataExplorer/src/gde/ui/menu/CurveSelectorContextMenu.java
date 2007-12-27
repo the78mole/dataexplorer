@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -390,11 +391,13 @@ public class CurveSelectorContextMenu {
 						axisEndManual.setSelection(true);
 						axisEndAuto.setSelection(false);
 						axisStarts0.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartpointZero(false);
+						Record record = recordSet.getRecord(recordNameKey);
+						record.setStartpointZero(false);
 						axisEndRound.setSelection(false);
-						recordSet.getRecord(recordNameKey).setRoundOut(false);
-						double[] newMinMax = axisEndValuesDialog.open();
-						recordSet.getRecord(recordNameKey).setStartEndDefined(true, newMinMax[0], newMinMax[1]);
+						record.setRoundOut(false);
+						double[] oldMinMax = {record.getMinDisplayValue(), record.getMaxDisplayValue()};
+						double[] newMinMax = axisEndValuesDialog.open(oldMinMax);
+						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
 						application.updateGraphicsWindow();
 					}
 				}
