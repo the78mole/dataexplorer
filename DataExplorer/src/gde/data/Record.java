@@ -391,4 +391,18 @@ public class Record extends Vector<Integer> {
 		return device;
 	}
 
+	/**
+	 * @return the maxDisplayValue
+	 */
+	public double getMaxDisplayValue() {
+		return maxDisplayValue;
+	}
+
+	/**
+	 * @return the minDisplayValue
+	 */
+	public double getMinDisplayValue() {
+		return minDisplayValue;
+	}
+
 }
