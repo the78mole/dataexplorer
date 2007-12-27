@@ -78,7 +78,7 @@ public class AnalogDisplay extends Composite {
 			int width = canvas.getSize().x;
 			int height = canvas.getSize().y;
 			log.finer("canvas size = " + width + " x " + height);
-			canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.jpg"));
+			canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
 			double actualValue = device.translateValue(recordKey, new Double(record.get(record.size() - 1) / 1000.0));
 			double maxValue =  device.translateValue(recordKey, new Double(record.getMaxValue()) / 1000.0);
