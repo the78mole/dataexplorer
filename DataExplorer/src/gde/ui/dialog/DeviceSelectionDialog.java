@@ -16,6 +16,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -190,9 +192,19 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.setSize(579, 592);
 			dialogShell.setSize(580, 592);
+			dialogShell.addFocusListener(new FocusAdapter() {
+				public void focusGained(FocusEvent evt) {
+					log.finest("dialogShell.focusGained, event=" + evt);
+					OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+						public void run() {
+							availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+						}
+					});
+				}
+			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.fine("dialogShell.widgetDisposed, event=" + evt);
+					log.finest("dialogShell.widgetDisposed, event=" + evt);
 					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
 						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
 						setupDevice();
