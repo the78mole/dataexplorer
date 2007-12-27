@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.ui;
 
 import org.eclipse.swt.SWT;
@@ -10,6 +26,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * @author Winfried Brügmann
+ * user interface status bar class, device, serial port, port activity, progress bar, messages
+ */
 public class StatusBar {
 	private Composite								statusComposite;
 	private Composite								connectionComposite;
@@ -20,6 +40,7 @@ public class StatusBar {
 	private CLabel									txButton;
 	private CLabel									rxButton;
 	private Composite								comComposite;
+	private CLabel									msgLabel;
 	private CLabel									activePortLabel;
 	private ProgressBar							progressBar;
 	private CLabel									activeDeviceLabel;
@@ -115,7 +136,20 @@ public class StatusBar {
 				progressBar.setSelection(0);
 				progressBar.setLayoutData(progressBarLData);
 			}
+			{
+				msgLabel = new CLabel(statusComposite, SWT.LEFT);
+				msgLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+			}
 		}
+	}
+
+	/**
+	 * method to set a message text to the message label of the status bar
+	 * @param message text
+	 */
+	public void setMessage(String text) {
+		msgLabel.setText(text);
 	}
 
 	/**

@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.utils;
 
 import java.util.logging.Level;
@@ -8,9 +24,9 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * this thread implementation calculates the slop of the height curve using linear regression
- * a time interval may be modified, intervals < 2 seconds may result in phase shifts near points of slope = 0
- * a point interval may be modified, but point interval must be modulo 2 and < interval
+ * @author Winfried Brügmann
+ * this thread implementation calculates the slop of the height curve using quasi linear regression
+ * none critical regarding time interval and no phase shift
  */
 public class QuasiLinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(this.getClass().getName());

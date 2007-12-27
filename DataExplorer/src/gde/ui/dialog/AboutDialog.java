@@ -1,4 +1,24 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.ui.dialog;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,20 +33,12 @@ import org.eclipse.swt.widgets.Text;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * @author Winfried Brügmann
+ * dialog class showing some info text with disclaimers, version , ...
+ */
 public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
+	private Logger log = Logger.getLogger(this.getClass().getName());
 
 	private Shell dialogShell;
 	private Text aboutText;
@@ -58,21 +70,12 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg"));
-
-			{
-				//Register as a resource user - SWTResourceManager will
-				//handle the obtaining and disposing of resources
-				SWTResourceManager.registerResourceUser(dialogShell);
-			}
-			
-
+			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
 			dialogShell.setSize(650, 430);
-			dialogShell.setBackgroundImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg"));
-			dialogShell.setText("OSDE - About");
-			//dialogShell.setBackground(osde.COLOR_LIGHT_GREY);
+			dialogShell.setText("About Dialog");
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
@@ -80,12 +83,13 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.left =  new FormAttachment(0, 1000, 20);
 				infoTextLData.top =  new FormAttachment(0, 1000, 111);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
-				infoText = new Text(dialogShell, SWT.MULTI | SWT.WRAP);
+				infoText = new Text(dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
 				infoText.setLayoutData(infoTextLData);
-				infoText.setText("Open Serial Data Explorer (OSDE) benutzt für die serielle Kommunikation die freie Implementierung des unter GPL stehenden RXTXComm Paketes und die grafische Benutzeroberfläche (GUI) basiert auf dem aus der Eclipse Welt kommenden Software Widged Toolkit (SWT)." 
-						+ System.getProperty("line.separator") + "Die Software OSDE wurde sorgfältig getestet. Trotzdem kann es durch Fehlbedienung der angeschlossenen Geräte zu beschädigungen kommen. Die Benutung von OSDE erfolgt deshalb auf eigenes Risiko, ein Schadensersatz wir in keinem Fall geleistet." 
-						+ System.getProperty("line.separator") + "Bei der Benutzung können dem Anwender Fehler auffallen oder Verbesserungsvorschläge einfallen. Über einen Mitteilung solcher Umstände bin ich dankbar. Eine umgehende Beseitigung von Fehlern oder das Einbauen von Vergesserungen kann aber nicht garantiert werden, da es sich hier um ein Freizeitprojekt handelt.");
-				//infoText.setBackground(OpenSerielDataExplorer.COLOR_VERY_LIGHT_GREY);
+				infoText.setText("Der OpenSerialDataExplorer ist ein Werkzeug zu aufnehmen, betrachten und auswerten von Daten aus Geräten, die über eine serielle Schnittstelle erreichbar sind. Geräte könne Datenlogger, Messgeräte, Ladegeräte oder ähnliches sein."
+						+ System.getProperty("line.separator") + "Open Serial Data Explorer benutzt für die serielle Kommunikation die freie Implementierung des unter GPL stehenden RXTXComm Paketes und die grafische Benutzeroberfläche (GUI) basiert auf dem aus der Eclipse Welt kommenden Software Widged Toolkit (SWT)." 
+						+ System.getProperty("line.separator") + "Die Software wurde sorgfältig getestet. Trotzdem könnte es durch Fehlbedienung der angeschlossenen Geräte zu beschädigungen kommen. Die Benutung erfolgt auf eigenes Risiko, ein Schadensersatz wir in keinem Fall geleistet." 
+						+ System.getProperty("line.separator") + "Bei der Benutzung können dem Anwender Fehler auffallen oder Verbesserungsvorschläge einfallen. Über einen Mitteilung solcher Umstände bin ich dankbar (winfried@bruegmaenner.de). Eine umgehende Beseitigung von Fehlern oder das Einbauen von Vergesserungen kann aber nicht garantiert werden, da es sich hier um ein reines Freizeitprojekt handelt.");
+				infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData versionLData = new FormData();
@@ -97,7 +101,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				version = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				version.setLayoutData(versionLData);
 				version.setText("Version 0.4");
-				version.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+				version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData okLData = new FormData();
@@ -111,7 +115,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				ok.setText("OK");
 				ok.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						System.out.println("ok.widgetSelected, event="+evt);
+						log.finest("ok.widgetSelected, event="+evt);
 						dialogShell.dispose();
 					}
 				});
@@ -127,7 +131,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutText.setLayoutData(aboutTextLData);
 				aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false));
 				aboutText.setText("Open Serial Data Explorer");
-				//aboutText.setBackground(OpenSerielDataExplorer.COLOR_LIGHT_GREY);
+				aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
@@ -138,7 +142,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 					display.sleep();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 	

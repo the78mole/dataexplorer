@@ -48,26 +48,23 @@ public class MenuBar {
 	private MenuItem											contentsMenuItem;
 	private Menu													helpMenu;
 	private MenuItem											helpMenuItem;
-	private MenuItem											debugLogMenuItem;
-	private MenuItem											serialDiagnosticMenuItem;
 	private MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
 	private MenuItem											recordCommentMenuItem;
-	private MenuItem											kurveSelectionMenuItem;
-	private Menu													windowMenu;
-	private MenuItem											windowMenuItem;
-	private MenuItem											editCommentsToolsMenuItem;
-	private Menu													toolsMenu, graphicsMenu;
-	private MenuItem											toolsMenuItem, graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	private MenuItem											curveSelectionMenuItem;
+	private Menu													viewMenu;
+	private MenuItem											viewMenuItem;
+	private Menu													graphicsMenu;
+	private MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveGraphicsTemplateItem, restoreGraphicsTemplateItem;
 	private MenuItem											csvExportMenuItem1, csvExportMenuItem2;
 	private MenuItem											nextDeviceMenuItem;
 	private MenuItem											prevDeviceMenuItem;
 	private MenuItem											selectDeviceMenuItem;
 	private Menu													deviceMenu;
 	private MenuItem											deviceMenuItem;
-	private MenuItem											copyTabelleBearbeitenMenuItem;
-	private MenuItem											copyGrafikBearbeitenMenuItem;
-	private Menu													bearbeitenMenu;
-	private MenuItem											bearbeitenMenuItem;
+	private MenuItem											copyTableMenuItem;
+	private MenuItem											copyGraphicMenuItem;
+	private Menu													editMenu;
+	private MenuItem											editMenuItem;
 	private MenuItem											exitMenuItem;
 	private MenuItem											preferencesFileMenuItem;
 	private Menu													exportMenu;
@@ -116,7 +113,8 @@ public class MenuBar {
 					openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("openFileMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for openFileMenuItem.widgetSelected
+							//TODO implement data file format and set ending as file open dialog filter 
+							application.openMessageDialog("Diese Implementierung fehlt noch :-( , benutze vorübergehend Datei->Import");
 						}
 					});
 				}
@@ -126,7 +124,8 @@ public class MenuBar {
 					saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for saveFileMenuItem.widgetSelected
+							//TODO implement data file format and set ending as file save dialog filter 
+							application.openMessageDialog("Diese Implementierung fehlt noch :-( , benutze vorübergehend Datei->Export");
 						}
 					});
 				}
@@ -141,6 +140,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("historyFileMenuItem.widgetSelected, event=" + evt);
 							//TODO add your code for historyFileMenuItem.widgetSelected
+							application.openMessageDialog("Diese Implementierung fehlt noch :-(, Einträge werden aber schon angehängt");
 						}
 					});
 					{
@@ -310,20 +310,21 @@ public class MenuBar {
 			}
 		}
 		{
-			bearbeitenMenuItem = new MenuItem(parent, SWT.CASCADE);
-			bearbeitenMenuItem.setText("Bearbeiten");
+			editMenuItem = new MenuItem(parent, SWT.CASCADE);
+			editMenuItem.setText("Bearbeiten");
+			editMenuItem.setEnabled(false);
 			{
-				bearbeitenMenu = new Menu(bearbeitenMenuItem);
-				bearbeitenMenuItem.setMenu(bearbeitenMenu);
+				editMenu = new Menu(editMenuItem);
+				editMenuItem.setMenu(editMenu);
 				{
-					copyGrafikBearbeitenMenuItem = new MenuItem(bearbeitenMenu, SWT.PUSH);
-					copyGrafikBearbeitenMenuItem.setText("Kopiere Grafikfenster");
-					copyGrafikBearbeitenMenuItem.setEnabled(false);
+					copyGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
+					copyGraphicMenuItem.setText("Kopiere Graphikfenster");
+					copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
 				}
 				{
-					copyTabelleBearbeitenMenuItem = new MenuItem(bearbeitenMenu, SWT.PUSH);
-					copyTabelleBearbeitenMenuItem.setText("Kopiere Tabelle");
-					copyTabelleBearbeitenMenuItem.setEnabled(false);
+					copyTableMenuItem = new MenuItem(editMenu, SWT.PUSH);
+					copyTableMenuItem.setText("Kopiere Tabelle");
+					copyTableMenuItem.setEnabled(false); //TODO enable after implementation
 				}
 			}
 		}
@@ -416,33 +417,14 @@ public class MenuBar {
 			}
 		}
 		{
-			toolsMenuItem = new MenuItem(parent, SWT.CASCADE);
-			toolsMenuItem.setText("Tools");
-			toolsMenuItem.setEnabled(false);
-			{
-				toolsMenu = new Menu(toolsMenuItem);
-				toolsMenuItem.setMenu(toolsMenu);
-				{
-					editCommentsToolsMenuItem = new MenuItem(toolsMenu, SWT.PUSH);
-					editCommentsToolsMenuItem.setText("Kommentartext");
-					editCommentsToolsMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("editCommentsToolsMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for editCommentsToolsMenuItem.widgetSelected
-						}
-					});
-				}
-			}
-		}
-		{
 			graphicsMenuItem = new MenuItem(parent, SWT.CASCADE);
-			graphicsMenuItem.setText("Graphik");
+			graphicsMenuItem.setText("Graphikvorlagen");
 			{
 				graphicsMenu = new Menu(graphicsMenuItem);
 				graphicsMenuItem.setMenu(graphicsMenu);
 				{
 					saveDefaultGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					saveDefaultGraphicsTemplateItem.setText("Grafikvorlage sichern");
+					saveDefaultGraphicsTemplateItem.setText("Graphikvorlage sichern");
 					saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
@@ -452,7 +434,7 @@ public class MenuBar {
 				}
 				{
 					saveGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					saveGraphicsTemplateItem.setText("Grafikvorlage sichern unter..");
+					saveGraphicsTemplateItem.setText("Graphikvorlage sichern unter..");
 					saveGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
@@ -469,7 +451,7 @@ public class MenuBar {
 				}
 				{
 					restoreGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					restoreGraphicsTemplateItem.setText("Grafikvorlage laden");
+					restoreGraphicsTemplateItem.setText("Graphikvorlage laden");
 					restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt);
@@ -490,14 +472,14 @@ public class MenuBar {
 			}
 		}
 		{
-			windowMenuItem = new MenuItem(parent, SWT.CASCADE);
-			windowMenuItem.setText("Ansicht");
+			viewMenuItem = new MenuItem(parent, SWT.CASCADE);
+			viewMenuItem.setText("Ansicht");
 			{
-				windowMenu = new Menu(windowMenuItem);
-				windowMenuItem.setMenu(windowMenu);
+				viewMenu = new Menu(viewMenuItem);
+				viewMenuItem.setMenu(viewMenu);
 				{
-					graphicTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
-					graphicTabMenuItem.setText("Grafikansicht");
+					graphicTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
+					graphicTabMenuItem.setText("Graphikansicht");
 					graphicTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("graphicTabMenuItem.widgetSelected, event=" + evt);
@@ -506,7 +488,7 @@ public class MenuBar {
 					});
 				}
 				{
-					dataTableTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
+					dataTableTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					dataTableTabMenuItem.setText("Tabellenansicht");
 					dataTableTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -516,7 +498,7 @@ public class MenuBar {
 					});
 				}
 				{
-					analogTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
+					analogTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					analogTabMenuItem.setText("Analoganzeige");
 					analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -526,7 +508,7 @@ public class MenuBar {
 					});
 				}
 				{
-					digitalTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
+					digitalTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					digitalTabMenuItem.setText("Zahlenanzeige");
 					digitalTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -536,7 +518,7 @@ public class MenuBar {
 					});
 				}
 				{
-					recordSetCommentTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
+					recordSetCommentTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					recordSetCommentTabMenuItem.setText("Datensatzkommentar");
 					recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -546,7 +528,7 @@ public class MenuBar {
 					});
 				}
 				{
-					compareTabMenuItem = new MenuItem(windowMenu, SWT.PUSH);
+					compareTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					compareTabMenuItem.setText("Kurvenvergleich");
 					compareTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -556,16 +538,16 @@ public class MenuBar {
 					});
 				}
 				{
-					new MenuItem(windowMenu, SWT.SEPARATOR);
+					new MenuItem(viewMenu, SWT.SEPARATOR);
 				}
 				{
-					kurveSelectionMenuItem = new MenuItem(windowMenu, SWT.CHECK);
-					kurveSelectionMenuItem.setText("Kurvenauswahl");
-					kurveSelectionMenuItem.setSelection(true);
-					kurveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
+					curveSelectionMenuItem = new MenuItem(viewMenu, SWT.CHECK);
+					curveSelectionMenuItem.setText("Kurvenauswahl");
+					curveSelectionMenuItem.setSelection(true);
+					curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt);
-							if (kurveSelectionMenuItem.getSelection()) {
+							if (curveSelectionMenuItem.getSelection()) {
 								application.setCurveSelectorEnabled(true);
 							}
 							else {
@@ -575,7 +557,7 @@ public class MenuBar {
 					});
 				}
 				{
-					recordCommentMenuItem = new MenuItem(windowMenu, SWT.CHECK);
+					recordCommentMenuItem = new MenuItem(viewMenu, SWT.CHECK);
 					recordCommentMenuItem.setText("Datensatzkommentar");
 					recordCommentMenuItem.setSelection(false);
 					recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
@@ -589,31 +571,6 @@ public class MenuBar {
 								application.setRecordCommentEnabled(false);
 								application.updateDisplayTab();
 							}
-						}
-					});
-				}
-				{
-					new MenuItem(windowMenu, SWT.SEPARATOR);
-				}
-				{
-					serialDiagnosticMenuItem = new MenuItem(windowMenu, SWT.PUSH);
-					serialDiagnosticMenuItem.setText("Schnittstellendiagnose");
-					serialDiagnosticMenuItem.setEnabled(false);
-					serialDiagnosticMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("serialDiagnosticMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for serialDiagnosticMenuItem.widgetSelected
-						}
-					});
-				}
-				{
-					debugLogMenuItem = new MenuItem(windowMenu, SWT.PUSH);
-					debugLogMenuItem.setText("Diagnoselog");
-					debugLogMenuItem.setEnabled(false);
-					debugLogMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("debugLogMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for debugLogMenuItem.widgetSelected
 						}
 					});
 				}
