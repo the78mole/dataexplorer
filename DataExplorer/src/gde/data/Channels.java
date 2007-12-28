@@ -157,4 +157,20 @@ public class Channels extends HashMap<Integer, Channel> {
 	public void setFileDescription(String fileDescription) {
 		this.fileDescription = fileDescription;
 	}
+	
+	/**
+	 * method checking all channels has saved record set
+	 * @return string array of record sets not saved, length == 0 for all record sets saved
+	 */
+	public String checkRecordSetsSaved() {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 1; i <= this.size(); i++) {
+			Channel channel = this.get(i);
+			for (String recordSetkey : channel.getRecordSetNames()) {
+				if (channel.get(recordSetkey)!= null && !channel.get(recordSetkey).isSaved())
+					sb.append(System.getProperty("line.separator")).append(channel.getName()).append(" -> ").append(channel.get(recordSetkey).getName());
+			}
+		}		
+		return sb.toString();
+	}
 }
