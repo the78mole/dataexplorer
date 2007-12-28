@@ -65,7 +65,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using existing device configuration
-	 * @param device configuration
+	 * @param deviceConfig device configuration
 	 * @throws NoSuchPortException 
 	 */
 	public AkkuMasterC4(DeviceConfiguration deviceConfig) throws NoSuchPortException {
@@ -129,8 +129,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to calculate values for inactive records
-	 * @return double with the adapted value
+	 * function to calculate values for inactive or to be calculated records
+	 * @param recordSet
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during cpturing only and the calculation will take place directly switch all to displayable

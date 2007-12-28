@@ -305,7 +305,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 *	[7] eingestellter Ladestrom
 	 *	[8] eingestellte Wartezeit bis Formieren wiederholt wird
 	 * @throws IOException 
-	 *@returns String[] containing described values
+	 * @return String[] containing described values
 	 */
 	public synchronized String[] getConfiguration(byte[] channel) throws IOException {
 		String[] configStrings = new String[9];
@@ -401,7 +401,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 *	[1] Anzahl einaestellter Wiederholunaen
 	 *  [2] tatsächlicher Ladestrom
 	 * @throws IOException 
-	 *@returns String[] containing described values
+	 * @return String[] containing described values
 	 */
 	public synchronized String[] getAdjustedValues(byte[] channel) throws IOException {
 		String[] adjustments = new String[3];

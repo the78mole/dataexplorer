@@ -112,7 +112,7 @@ public class AkkuMasterChannelTab {
 	 * constructor initialization of one channel tab
 	 * @param name
 	 * @param channel byte signature
-	 * @param serial port
+	 * @param serialPort
 	 * @param aCapacity
 	 * @param aCellCount
 	 * @param aAkkuTyp

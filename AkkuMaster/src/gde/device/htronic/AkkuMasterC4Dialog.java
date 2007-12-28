@@ -323,7 +323,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	/**
 	 * add current to discharge current sum
-	 * @param current
+	 * @param newCurrent
 	 */
 	public void addTotalDischargeCurrent(int newCurrent) {
 		totalDischargeCurrent = totalDischargeCurrent + newCurrent;
@@ -331,7 +331,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	/**
 	 * subtract current to discharge current sum
-	 * @param current
+	 * @param newCurrent
 	 */
 	public void subtractTotalDischargeCurrent(int newCurrent) {
 		totalDischargeCurrent = totalDischargeCurrent - newCurrent;
@@ -339,7 +339,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	/**
 	 * add current to charge current sum
-	 * @param current
+	 * @param newCurrent
 	 */
 	public void addTotalChargeCurrent(int newCurrent) {
 		totalChargeCurrent = totalChargeCurrent + newCurrent;
@@ -347,7 +347,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	/**
 	 * subtract current to charge current sum
-	 * @param current
+	 * @param newCurrent
 	 */
 	public void subtractTotalChargeCurrent(int newCurrent) {
 		totalChargeCurrent = totalChargeCurrent - newCurrent;

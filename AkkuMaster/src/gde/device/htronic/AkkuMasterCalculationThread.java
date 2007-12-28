@@ -39,9 +39,9 @@ public class AkkuMasterCalculationThread extends Thread {
 	 * @param recordKey as String
 	 * @param recordSet as RecordSet
 	 */
-	public AkkuMasterCalculationThread(String recordKey, RecordSet recordsSet) {
+	public AkkuMasterCalculationThread(String recordKey, RecordSet recordSet) {
 		this.recordKey = recordKey;
-		this.recordSet = recordsSet;
+		this.recordSet = recordSet;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
@@ -51,10 +51,10 @@ public class AkkuMasterCalculationThread extends Thread {
 	 * @param recordKey as String
 	 * @param recordSet as RecordSet
 	 */
-	public AkkuMasterCalculationThread(String name, String recordKey, RecordSet recordsSet) {
+	public AkkuMasterCalculationThread(String name, String recordKey, RecordSet recordSet) {
 		super(name);
 		this.recordKey = recordKey;
-		this.recordSet = recordsSet;
+		this.recordSet = recordSet;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
