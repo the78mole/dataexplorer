@@ -52,7 +52,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * @param iniFile
-	 * @param isDetailed
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchPortException 
@@ -69,7 +68,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using existing device configuration
-	 * @param device configuration
+	 * @param deviceConfig device configuration
 	 * @throws NoSuchPortException 
 	 */
 	public Picolario(DeviceConfiguration deviceConfig) throws NoSuchPortException {
@@ -259,8 +258,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to calculate values for inactive records
-	 * @return double with the adapted value
+	 * function to calculate values for inactive and to be calculated records
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable

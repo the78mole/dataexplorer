@@ -411,7 +411,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 *   2 = ertsenWertAbziehenButton.setSelection(true);
 	 *   4 = höheVerringernButton.setSelection(true);
 	 *   only 1 or 2 or 4 can returned
-	 * @return
+	 * @return integer of unit type
 	 */
 	public int getReduceHeightSelectionType() {
 		int selection = noAdaptioButton.getSelection() ? 1 : 0;
@@ -422,7 +422,7 @@ public class PicolarioDialog extends DeviceDialog {
 
 	/**
 	 * call this method, if reduceHeightSelectiontYpe is 4
-	 * @return
+	 * @return integer of dialog selected value
 	 */
 	public int getReduceHeightSelection() {
 		return new Integer(heightOffset.getText()).intValue();

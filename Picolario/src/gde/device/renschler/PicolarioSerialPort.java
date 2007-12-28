@@ -80,7 +80,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	/**
 	 * method to receive full set of Picolario data
 	 * @param datagramNumber
-	 * @return
+	 * @return hash map contining gathered data points (voltage and height in separate vector)
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
