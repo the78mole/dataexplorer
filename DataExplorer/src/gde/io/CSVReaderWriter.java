@@ -152,6 +152,7 @@ public class CSVReaderWriter {
 			}
 			// set time base in msec
 			recordSet.setTimeStep_ms(timeStep_ms);
+			recordSet.setSaved(true);
 			log.fine("timeStep_ms = " + timeStep_ms);
 
 			reader.close();
