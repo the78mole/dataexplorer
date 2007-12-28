@@ -52,29 +52,29 @@ public class AkkuMasterChannelTab {
 	private String												name;
 	private byte[]												channelSig;
 	private String[]											aCapacity;
-	private String[]											aZellenZahl;
+	private String[]											aCellCount;
 	private String[]											aAkkuTyp;
 	private String[]											aProgramm;
-	private String[]											aLadestromMilliA;
-	private String[]											aEntladeStromMilliA;
-	private String[]											aAnzahlWiederholungen;
-	private String[]											aWarteZeitMin;
+	private String[]											aChargeCurrent_mA;
+	private String[]											aDischargeCurrent_mA;
+	private String[]											aCycleCount;
+	private String[]											aWaitTime_Min;
 	private AkkuMasterC4SerialPort				serialPort;
 	private Channel												channel;
 	private Timer													timer;
 	private TimerTask											timerTask;
 
-	private CTabItem											kanal1Tab;
-	private Button												direktStartButton;
+	private CTabItem											channelTab;
+	private Button												captureOnlyButton;
 	private Group													programGroup;
-	private Group													dataGatherOnlyGroup;
+	private Group													captureOnlyGroup;
 	private CCombo												memoryNumberCombo;
 	private CCombo												capacityMilliAh;
 	private Group													akkuGroup;
 	private CCombo												numberCycles;
 	private Text													chargeCurrentText;
 	private Button												stopAuzeichnungButton;
-	private Button												startAufzeichnungButton;
+	private Button												startDataGatheringButton;
 	private CCombo												waitTimeMin;
 	private Text													memoryNumberText;
 	private Text													waitTimeMinText;
@@ -92,11 +92,11 @@ public class AkkuMasterChannelTab {
 	private CCombo												countCells;
 	private Text													countCellsText;
 	private Text													capacityText;
-	private Text													direktStartText;
+	private Text													captureOnlyText;
 	private Group													programCycleGroup;
 	private Button												programmButton;
-	private Composite											kanalKomposite;
-	private boolean												isDirectStart						= true;
+	private Composite											channelComposite;
+	private boolean												isCaptureOnly						= true;
 	private boolean												isCollectData						= false;
 	private RecordSet											recordSet;
 	private int														retryCounter						= 3;
@@ -114,29 +114,29 @@ public class AkkuMasterChannelTab {
 	 * @param channel byte signature
 	 * @param serial port
 	 * @param aCapacity
-	 * @param aZellenZahl
+	 * @param aCellCount
 	 * @param aAkkuTyp
 	 * @param aProgramm
-	 * @param aLadestromMilliA
-	 * @param aEntladeStromMilliA
-	 * @param aAnzahlWiederholungen
-	 * @param aWarteZeitMin
+	 * @param aChargeCurrent_mA
+	 * @param aDischargeCurrent_mA
+	 * @param aCycleCount
+	 * @param aWaitTime_Min
 	 */
-	public AkkuMasterChannelTab(AkkuMasterC4Dialog parent, String name, byte[] channelSig, AkkuMasterC4SerialPort serialPort, Channel channel, String[] aCapacity, String[] aZellenZahl,
-			String[] aAkkuTyp, String[] aProgramm, String[] aLadestromMilliA, String[] aEntladeStromMilliA, String[] aAnzahlWiederholungen, String[] aWarteZeitMin) {
+	public AkkuMasterChannelTab(AkkuMasterC4Dialog parent, String name, byte[] channelSig, AkkuMasterC4SerialPort serialPort, Channel channel, String[] aCapacity, String[] aCellCount,
+			String[] aAkkuTyp, String[] aProgramm, String[] aChargeCurrent_mA, String[] aDischargeCurrent_mA, String[] aCycleCount, String[] aWaitTime_Min) {
 		this.parent = parent;
 		this.name = name;
 		this.channelSig = channelSig;
 		this.serialPort = serialPort;
 		this.channel = channel;
 		this.aCapacity = aCapacity;
-		this.aZellenZahl = aZellenZahl;
+		this.aCellCount = aCellCount;
 		this.aAkkuTyp = aAkkuTyp;
 		this.aProgramm = aProgramm;
-		this.aLadestromMilliA = aLadestromMilliA;
-		this.aEntladeStromMilliA = aEntladeStromMilliA;
-		this.aAnzahlWiederholungen = aAnzahlWiederholungen;
-		this.aWarteZeitMin = aWarteZeitMin;
+		this.aChargeCurrent_mA = aChargeCurrent_mA;
+		this.aDischargeCurrent_mA = aDischargeCurrent_mA;
+		this.aCycleCount = aCycleCount;
+		this.aWaitTime_Min = aWaitTime_Min;
 		this.channels = Channels.getInstance();
 		this.application = OpenSerialDataExplorer.getInstance();
 	};
@@ -146,45 +146,45 @@ public class AkkuMasterChannelTab {
 	 */
 	public void addChannelTab(CTabFolder tabFolder) {
 		{
-			kanal1Tab = new CTabItem(tabFolder, SWT.NONE);
-			kanal1Tab.setText(name);
+			channelTab = new CTabItem(tabFolder, SWT.NONE);
+			channelTab.setText(name);
 			{
-				kanalKomposite = new Composite(tabFolder, SWT.NONE);
-				kanal1Tab.setControl(kanalKomposite);
-				kanalKomposite.setLayout(null);
+				channelComposite = new Composite(tabFolder, SWT.NONE);
+				channelTab.setControl(channelComposite);
+				channelComposite.setLayout(null);
 				{
-					dataGatherOnlyGroup = new Group(kanalKomposite, SWT.NONE);
-					dataGatherOnlyGroup.setLayout(null);
-					dataGatherOnlyGroup.setBounds(14, 8, 401, 82);
+					captureOnlyGroup = new Group(channelComposite, SWT.NONE);
+					captureOnlyGroup.setLayout(null);
+					captureOnlyGroup.setBounds(14, 8, 401, 82);
 					{
-						direktStartText = new Text(dataGatherOnlyGroup, SWT.MULTI | SWT.WRAP);
-						direktStartText.setText("Mit dieser Funktion kann ein am Ladegerät gestarteter Vorgang aufgenommen werden");
-						direktStartText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-						direktStartText.setBounds(51, 40, 315, 37);
+						captureOnlyText = new Text(captureOnlyGroup, SWT.MULTI | SWT.WRAP);
+						captureOnlyText.setText("Mit dieser Funktion kann ein am Ladegerät gestarteter Vorgang aufgenommen werden");
+						captureOnlyText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+						captureOnlyText.setBounds(51, 40, 315, 37);
 					}
 					{
-						direktStartButton = new Button(dataGatherOnlyGroup, SWT.RADIO | SWT.LEFT);
-						direktStartButton.setText("  Nur Datenaufnahme");
-						direktStartButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-						direktStartButton.setBounds(12, 15, 310, 22);
-						direktStartButton.addSelectionListener(new SelectionAdapter() {
+						captureOnlyButton = new Button(captureOnlyGroup, SWT.RADIO | SWT.LEFT);
+						captureOnlyButton.setText("  Nur Datenaufnahme");
+						captureOnlyButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+						captureOnlyButton.setBounds(12, 15, 310, 22);
+						captureOnlyButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("direktStartButton.widgetSelected, event=" + evt);
-								if (direktStartButton.getSelection()) {
+								log.finest("captureOnlyButton.widgetSelected, event=" + evt);
+								if (captureOnlyButton.getSelection()) {
 									try {
 										if (serialPort.isConnected()) {
 											updateAdjustedValues();
-											startAufzeichnungButton.setEnabled(true);
+											startDataGatheringButton.setEnabled(true);
 										}
 										else {
-											direktStartButton.setSelection(false);
+											captureOnlyButton.setSelection(false);
 											OpenSerialDataExplorer.getInstance().openMessageDialog("Erst den seriellen Port öffnen");
 										}
 									}
 									catch (IOException e) {
 										OpenSerialDataExplorer.getInstance().openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
 									}
-									isDirectStart = true;
+									isCaptureOnly = true;
 									programmButton.setSelection(false);
 								}
 							}
@@ -192,7 +192,7 @@ public class AkkuMasterChannelTab {
 					}
 				}
 				{
-					programGroup = new Group(kanalKomposite, SWT.NONE);
+					programGroup = new Group(channelComposite, SWT.NONE);
 					programGroup.setLayout(null);
 					programGroup.setBounds(12, 95, 403, 325);
 					{
@@ -207,7 +207,7 @@ public class AkkuMasterChannelTab {
 									try {
 										if (serialPort.isConnected()) {
 											updateAdjustedValues();
-											startAufzeichnungButton.setEnabled(true);
+											startDataGatheringButton.setEnabled(true);
 										}
 										else {
 											programmButton.setSelection(false);
@@ -217,8 +217,8 @@ public class AkkuMasterChannelTab {
 									catch (IOException e) {
 										OpenSerialDataExplorer.getInstance().openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
 									}
-									isDirectStart = false;
-									direktStartButton.setSelection(false);
+									isCaptureOnly = false;
+									captureOnlyButton.setSelection(false);
 								}
 							}
 						});
@@ -251,8 +251,8 @@ public class AkkuMasterChannelTab {
 						{
 							countCells = new CCombo(akkuGroup, SWT.NONE);
 							countCells.setBounds(130, 40, 105, 18);
-							countCells.setItems(aZellenZahl);
-							countCells.setText(aZellenZahl[3]);
+							countCells.setItems(aCellCount);
+							countCells.setText(aCellCount[3]);
 							countCells.setEditable(false);
 							countCells.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						}
@@ -318,8 +318,8 @@ public class AkkuMasterChannelTab {
 						{
 							chargeCurrent = new CCombo(programTypeGroup, SWT.NONE);
 							chargeCurrent.setBounds(12, 93, 105, 18);
-							chargeCurrent.setItems(aLadestromMilliA);
-							chargeCurrent.setText(aLadestromMilliA[5]);
+							chargeCurrent.setItems(aChargeCurrent_mA);
+							chargeCurrent.setText(aChargeCurrent_mA[5]);
 						}
 						{
 							dischargeCurrentText = new Text(programTypeGroup, SWT.NONE);
@@ -333,8 +333,8 @@ public class AkkuMasterChannelTab {
 						{
 							dischargeCurrent = new CCombo(programTypeGroup, SWT.NONE);
 							dischargeCurrent.setBounds(130, 93, 105, 18);
-							dischargeCurrent.setItems(aEntladeStromMilliA);
-							dischargeCurrent.setText(aEntladeStromMilliA[5]);
+							dischargeCurrent.setItems(aDischargeCurrent_mA);
+							dischargeCurrent.setText(aDischargeCurrent_mA[5]);
 						}
 						{
 							memoryNumberText = new Text(programTypeGroup, SWT.NONE);
@@ -371,7 +371,7 @@ public class AkkuMasterChannelTab {
 							numberCycles = new CCombo(programCycleGroup, SWT.NONE);
 							numberCycles.setBounds(12, 49, 89, 18);
 							numberCycles.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							numberCycles.setItems(aAnzahlWiederholungen);
+							numberCycles.setItems(aCycleCount);
 							numberCycles.select(0);
 						}
 						{
@@ -384,7 +384,7 @@ public class AkkuMasterChannelTab {
 						{
 							waitTimeMin = new CCombo(programCycleGroup, SWT.NONE);
 							waitTimeMin.setBounds(128, 49, 90, 18);
-							waitTimeMin.setItems(aWarteZeitMin);
+							waitTimeMin.setItems(aWaitTime_Min);
 							waitTimeMin.select(2);
 							waitTimeMin.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						}
@@ -406,22 +406,22 @@ public class AkkuMasterChannelTab {
 					}
 				}
 				{
-					startAufzeichnungButton = new Button(kanalKomposite, SWT.PUSH | SWT.CENTER);
-					startAufzeichnungButton.setBounds(12, 428, 190, 28);
-					startAufzeichnungButton.setText("S t a r t");
-					startAufzeichnungButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-					startAufzeichnungButton.setSelection(isCollectData);
-					startAufzeichnungButton.setEnabled(false);
-					startAufzeichnungButton.addSelectionListener(new SelectionAdapter() {
+					startDataGatheringButton = new Button(channelComposite, SWT.PUSH | SWT.CENTER);
+					startDataGatheringButton.setBounds(12, 428, 190, 28);
+					startDataGatheringButton.setText("S t a r t");
+					startDataGatheringButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					startDataGatheringButton.setSelection(isCollectData);
+					startDataGatheringButton.setEnabled(false);
+					startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("startAufzeichnungButton.widgetSelected, event=" + evt);
-							startAufzeichnungButton.setEnabled(false);
+							startDataGatheringButton.setEnabled(false);
 							stopAuzeichnungButton.setEnabled(true);
 							if (!isCollectData) {
 								isCollectData = true;
 
 								try {
-									if (isDirectStart) {
+									if (isCaptureOnly) {
 										updateAdjustedValues();
 									}
 									else {
@@ -443,7 +443,7 @@ public class AkkuMasterChannelTab {
 											application.openMessageDialog("Der für das Gerät erlaubte Gesammtstrom würde mit den angegebenen Werten für Entladestrom = " + dischargeCurrent_mA
 													+ " mA oder für den Ladestrom = " + chargeCurrent_mA + " mA überschritten, bitte korrigieren.");
 											isCollectData = false;
-											startAufzeichnungButton.setSelection(true);
+											startDataGatheringButton.setSelection(true);
 											return;
 										}
 										else {
@@ -558,7 +558,7 @@ public class AkkuMasterChannelTab {
 												}
 												else { // some error state
 													log.fine("canceling timer due to error");
-													if (!isDirectStart) try {
+													if (!isCaptureOnly) try {
 														serialPort.stop(channelSig);
 													}
 													catch (IOException e) {
@@ -585,7 +585,7 @@ public class AkkuMasterChannelTab {
 					});
 				}
 				{
-					stopAuzeichnungButton = new Button(kanalKomposite, SWT.PUSH | SWT.CENTER);
+					stopAuzeichnungButton = new Button(channelComposite, SWT.PUSH | SWT.CENTER);
 					stopAuzeichnungButton.setBounds(225, 428, 190, 28);
 					stopAuzeichnungButton.setText("S t o p");
 					stopAuzeichnungButton.setEnabled(false);
@@ -593,11 +593,11 @@ public class AkkuMasterChannelTab {
 					stopAuzeichnungButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("stopAuzeichnungButton.widgetSelected, event=" + evt);
-							startAufzeichnungButton.setEnabled(false);
-							direktStartButton.setSelection(false);
+							startDataGatheringButton.setEnabled(false);
+							captureOnlyButton.setSelection(false);
 							programmButton.setSelection(false);
 							stopAuzeichnungButton.setEnabled(false);
-							if (!isDirectStart) try {
+							if (!isCaptureOnly) try {
 								serialPort.stop(channelSig);
 							}
 							catch (IOException e) {
@@ -648,7 +648,10 @@ public class AkkuMasterChannelTab {
 		if (timer != null) timer.cancel();
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				startAufzeichnungButton.setSelection(false);
+				startDataGatheringButton.setEnabled(false);
+				captureOnlyButton.setSelection(false);
+				programmButton.setSelection(false);
+				stopAuzeichnungButton.setEnabled(false);
 			}
 		});
 	}

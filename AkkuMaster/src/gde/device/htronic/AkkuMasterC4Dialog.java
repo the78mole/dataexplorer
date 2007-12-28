@@ -41,34 +41,22 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
-/**
  * @author Winfried Brügmann
  * dialog class for device AkkuMaster C4
  */
 public class AkkuMasterC4Dialog extends DeviceDialog {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());
 
-	private CLabel									gesammtentladestromAnzeigeText;
-	private CLabel									gesammtladestromAnzeigeText;
-	private Text										gesammtEntladeStromText;
-	private Text										gesammtLadeStromText;
+	private CLabel									totalDischargeCurrentLabel;
+	private CLabel									totalChargeCurrentLabel;
+	private Text										totalDischargeCurrentText;
+	private Text										totalChareCurrentText;
 	private Text										totalChargeCurrentUnit;
 	private Text										totalDischargeCurrentUnit;
 	private Composite								statusComposite;
-	private Text										frontplattenvariante;
-	private Text										stromvariante;
-	private Text										datum;
+	private Text										versionFrontplateType;
+	private Text										versionCurrentType;
+	private Text										versionDate;
 	private Text										versionNumber;
 	private Composite								versionComposite;
 	private CTabItem								versionTabItem;
@@ -127,34 +115,34 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				tabFolder.setLayoutData(tabFolderLData);
 
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
-				String[] aZellenZahl = new String[] { "1 Zelle", "2 Zellen", "3 Zellen", "4 Zellen", "5 Zellen", "6 Zellen", "7 Zellen", "8 Zellen", "9 Zellen", "10 Zellen", "11 Zellen", "12 Zellen" };
-				String[] aAkkuTyp = new String[] { "0 NiCa", "1 NiMh", "2 Pb" };
+				String[] aCellCount = new String[] { "1 Zelle", "2 Zellen", "3 Zellen", "4 Zellen", "5 Zellen", "6 Zellen", "7 Zellen", "8 Zellen", "9 Zellen", "10 Zellen", "11 Zellen", "12 Zellen" };
+				String[] aAkkuType = new String[] { "0 NiCa", "1 NiMh", "2 Pb" };
 				String[] aProgramm = new String[] { "1 nur laden", "2 nur entladen", "3 entladen-laden", "4 laden-entladen-laden", "5 formieren", "6 überwintern", "7 auffrischen", "8 ermittle Kapazität",
 						"9 auffrischen" };
-				String[] aLadestromMilliA = new String[] { "50", "100", "150", "200", "250", "300", "400", "500", "750", "900", "1000", "1500", "2000" };
-				String[] aEntladeStromMilliA = aLadestromMilliA;
-				String[] aAnzahlWiederholungen = new String[] { "0", "1", "2", "3", "4", "5" };
-				String[] aWarteZeitMin = new String[] { "5", "10", "15", "20", "30", "60", "120" };
+				String[] aChargeCurrent_mA = new String[] { "50", "100", "150", "200", "250", "300", "400", "500", "750", "900", "1000", "1500", "2000" };
+				String[] aDischargeCurrent_mA = aChargeCurrent_mA;
+				String[] aCycleCount = new String[] { "0", "1", "2", "3", "4", "5" };
+				String[] aWaitTime_Min = new String[] { "5", "10", "15", "20", "30", "60", "120" };
 
 				///////////////////////////////////////////////////				
 				if (channel1Tab == null && numberChannels > 0)
-					channel1Tab = new AkkuMasterChannelTab(this, " Kanal 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
-							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel1Tab = new AkkuMasterChannelTab(this, " Kanal 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel1Tab.addChannelTab(tabFolder);
 
 				if (channel2Tab == null && numberChannels > 1)
-					channel2Tab = new AkkuMasterChannelTab(this, " Kanal 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
-							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel2Tab = new AkkuMasterChannelTab(this, " Kanal 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel2Tab.addChannelTab(tabFolder);
 
 				if (channel3Tab == null && numberChannels > 2)
-					channel3Tab = new AkkuMasterChannelTab(this, " Kanal 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
-							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel3Tab = new AkkuMasterChannelTab(this, " Kanal 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel3Tab.addChannelTab(tabFolder);
 
 				if (channel4Tab == null && numberChannels > 3)
-					channel4Tab = new AkkuMasterChannelTab(this, " Kanal 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aZellenZahl, aAkkuTyp, aProgramm, aLadestromMilliA,
-							aEntladeStromMilliA, aAnzahlWiederholungen, aWarteZeitMin);
+					channel4Tab = new AkkuMasterChannelTab(this, " Kanal 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel4Tab.addChannelTab(tabFolder);
 				///////////////////////////////////////////////////		
 
@@ -172,9 +160,9 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 									if (serialPort != null && serialPort.isConnected()) {
 										version = serialPort.getVersion();
 										versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
-										datum.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
-										stromvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
-										frontplattenvariante.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
+										versionDate.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
+										versionCurrentType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
+										versionFrontplateType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
 									}
 									else 
 										application.openMessageDialog("Erst den seriellen Port öffnen");
@@ -191,22 +179,22 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							versionNumber.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 						}
 						{
-							datum = new Text(versionComposite, SWT.NONE);
-							datum.setBounds(24, 111, 288, 30);
-							datum.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							datum.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionDate = new Text(versionComposite, SWT.NONE);
+							versionDate.setBounds(24, 111, 288, 30);
+							versionDate.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							versionDate.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 						}
 						{
-							stromvariante = new Text(versionComposite, SWT.NONE);
-							stromvariante.setBounds(24, 159, 288, 30);
-							stromvariante.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							stromvariante.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionCurrentType = new Text(versionComposite, SWT.NONE);
+							versionCurrentType.setBounds(24, 159, 288, 30);
+							versionCurrentType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							versionCurrentType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 						}
 						{
-							frontplattenvariante = new Text(versionComposite, SWT.NONE);
-							frontplattenvariante.setBounds(24, 212, 288, 30);
-							frontplattenvariante.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							frontplattenvariante.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionFrontplateType = new Text(versionComposite, SWT.NONE);
+							versionFrontplateType.setBounds(24, 212, 288, 30);
+							versionFrontplateType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							versionFrontplateType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 						}
 					}
 				}
@@ -225,63 +213,60 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				statusComposite.setLayout(StatusAnzeigeLayout);
 				statusComposite.setLayoutData(StatusAnzeigeLData);
 				{
-					FormData GesammtentladestromAnzeigeTextLData = new FormData();
-					GesammtentladestromAnzeigeTextLData.width = 50;
-					GesammtentladestromAnzeigeTextLData.height = 16;
-					GesammtentladestromAnzeigeTextLData.left = new FormAttachment(0, 1000, 235);
-					GesammtentladestromAnzeigeTextLData.top = new FormAttachment(0, 1000, 34);
-					gesammtentladestromAnzeigeText = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					gesammtentladestromAnzeigeText.setLayoutData(GesammtentladestromAnzeigeTextLData);
-					gesammtentladestromAnzeigeText.setText(new Double(totalDischargeCurrent).toString());
-					gesammtentladestromAnzeigeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					gesammtentladestromAnzeigeText.addPaintListener(new PaintListener() {
+					FormData totalDischargeCurrentTextLData = new FormData();
+					totalDischargeCurrentTextLData.width = 50;
+					totalDischargeCurrentTextLData.height = 16;
+					totalDischargeCurrentTextLData.left = new FormAttachment(0, 1000, 235);
+					totalDischargeCurrentTextLData.top = new FormAttachment(0, 1000, 34);
+					totalDischargeCurrentLabel = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
+					totalDischargeCurrentLabel.setLayoutData(totalDischargeCurrentTextLData);
+					totalDischargeCurrentLabel.setText(new Double(totalDischargeCurrent).toString());
+					totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					totalDischargeCurrentLabel.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							gesammtentladestromAnzeigeText.setText(new Integer(totalDischargeCurrent).toString());
+							totalDischargeCurrentLabel.setText(new Integer(totalDischargeCurrent).toString());
 						}
 					});
 				}
 				{
-					FormData GesammtladestromAnzeigeTextLData = new FormData();
-					GesammtladestromAnzeigeTextLData.width = 50;
-					GesammtladestromAnzeigeTextLData.height = 16;
-					GesammtladestromAnzeigeTextLData.left = new FormAttachment(0, 1000, 235);
-					GesammtladestromAnzeigeTextLData.top = new FormAttachment(0, 1000, 8);
-					gesammtladestromAnzeigeText = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					//gesammtladestromAnzeigeText = new Text(statusComposite, SWT.NONE);
-					gesammtladestromAnzeigeText.setLayoutData(GesammtladestromAnzeigeTextLData);
-					gesammtladestromAnzeigeText.setText(new Double(totalChargeCurrent).toString());
-					gesammtladestromAnzeigeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					gesammtladestromAnzeigeText.addPaintListener(new PaintListener() {
+					FormData totalChargeCurrentTextLData = new FormData();
+					totalChargeCurrentTextLData.width = 50;
+					totalChargeCurrentTextLData.height = 16;
+					totalChargeCurrentTextLData.left = new FormAttachment(0, 1000, 235);
+					totalChargeCurrentTextLData.top = new FormAttachment(0, 1000, 8);
+					totalChargeCurrentLabel = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
+					totalChargeCurrentLabel.setLayoutData(totalChargeCurrentTextLData);
+					totalChargeCurrentLabel.setText(new Double(totalChargeCurrent).toString());
+					totalChargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					totalChargeCurrentLabel.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							gesammtladestromAnzeigeText.setText(new Integer(totalChargeCurrent).toString());
+							totalChargeCurrentLabel.setText(new Integer(totalChargeCurrent).toString());
 						}
 					});
 				}
 				{
-					FormData GesammtstromTextLData = new FormData();
-					GesammtstromTextLData.width = 190;
-					GesammtstromTextLData.height = 20;
-					GesammtstromTextLData.left = new FormAttachment(0, 1000, 20);
-					GesammtstromTextLData.top = new FormAttachment(0, 1000, 10);
-					gesammtLadeStromText = new Text(statusComposite, SWT.NONE);
-					gesammtLadeStromText.setLayoutData(GesammtstromTextLData);
-					gesammtLadeStromText.setText("Gesammtladestrom       :");
-					gesammtLadeStromText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					gesammtLadeStromText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					FormData totalChargeCurrentTextLData1 = new FormData();
+					totalChargeCurrentTextLData1.width = 190;
+					totalChargeCurrentTextLData1.height = 20;
+					totalChargeCurrentTextLData1.left = new FormAttachment(0, 1000, 20);
+					totalChargeCurrentTextLData1.top = new FormAttachment(0, 1000, 10);
+					totalChareCurrentText = new Text(statusComposite, SWT.NONE);
+					totalChareCurrentText.setLayoutData(totalChargeCurrentTextLData1);
+					totalChareCurrentText.setText("Gesammtladestrom       :");
+					totalChareCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					totalChareCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 				}
 				{
-					FormData gesammtEntladeStromTextLData1 = new FormData();
-					gesammtEntladeStromTextLData1.width = 190;
-					gesammtEntladeStromTextLData1.height = 20;
-					gesammtEntladeStromTextLData1.left = new FormAttachment(0, 1000, 20);
-					//gesammtEntladeStromTextLData1.right = new FormAttachment(423, 1000, 0);
-					gesammtEntladeStromTextLData1.top = new FormAttachment(0, 1000, 35);
-					//gesammtEntladeStromTextLData1.bottom = new FormAttachment(455, 1000, 0);
-					gesammtEntladeStromText = new Text(statusComposite, SWT.NONE);
-					gesammtEntladeStromText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					gesammtEntladeStromText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-					gesammtEntladeStromText.setLayoutData(gesammtEntladeStromTextLData1);
-					gesammtEntladeStromText.setText("Gesammtentladestrom  :");
+					FormData totalDischargeCurrentTextLData1 = new FormData();
+					totalDischargeCurrentTextLData1.width = 190;
+					totalDischargeCurrentTextLData1.height = 20;
+					totalDischargeCurrentTextLData1.left = new FormAttachment(0, 1000, 20);
+					totalDischargeCurrentTextLData1.top = new FormAttachment(0, 1000, 35);
+					totalDischargeCurrentText = new Text(statusComposite, SWT.NONE);
+					totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					totalDischargeCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					totalDischargeCurrentText.setLayoutData(totalDischargeCurrentTextLData1);
+					totalDischargeCurrentText.setText("Gesammtentladestrom  :");
 				}
 				{
 					totalDischargeCurrentUnit = new Text(statusComposite, SWT.NONE);
@@ -342,11 +327,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void addTotalDischargeCurrent(int newCurrent) {
 		totalDischargeCurrent = totalDischargeCurrent + newCurrent;
-		//		OSDE.display.asyncExec(new Runnable() {
-		//			public void run() {
-		//				gesammtentladestromAnzeigeText.redraw();
-		//			}
-		//		});
 	}
 
 	/**
@@ -355,11 +335,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void subtractTotalDischargeCurrent(int newCurrent) {
 		totalDischargeCurrent = totalDischargeCurrent - newCurrent;
-		//		OSDE.display.asyncExec(new Runnable() {
-		//			public void run() {
-		//				gesammtentladestromAnzeigeText.redraw();
-		//			}
-		//		});
 	}
 
 	/**
@@ -368,11 +343,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void addTotalChargeCurrent(int newCurrent) {
 		totalChargeCurrent = totalChargeCurrent + newCurrent;
-		//		OSDE.display.asyncExec(new Runnable() {
-		//			public void run() {
-		//				gesammtladestromAnzeigeText.redraw();
-		//			}
-		//		});
 	}
 
 	/**
@@ -381,11 +351,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void subtractTotalChargeCurrent(int newCurrent) {
 		totalChargeCurrent = totalChargeCurrent - newCurrent;
-		//		OSDE.display.asyncExec(new Runnable() {
-		//			public void run() {
-		//				gesammtladestromAnzeigeText.redraw();
-		//			}
-		//		});
 	}
 
 	/**
