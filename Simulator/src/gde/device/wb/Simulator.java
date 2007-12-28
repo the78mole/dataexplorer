@@ -58,7 +58,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using existing device configuration
-	 * @param device configuration
+	 * @param deviceConfig device configuration
 	 * @throws NoSuchPortException 
 	 */
 	public Simulator(DeviceConfiguration deviceConfig) throws NoSuchPortException {
@@ -109,7 +109,6 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
-	 * @return double with the adapted value
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
