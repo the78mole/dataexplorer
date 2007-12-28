@@ -29,8 +29,8 @@ import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * This class contains utilities to draw curves and vertical scales
  * @author Winfried Brügmann
- * this class contains utilities to draw curves and vertical scales
  */
 public class CurveUtils {
 	private static Logger				log			= Logger.getLogger(CurveUtils.class.getName());

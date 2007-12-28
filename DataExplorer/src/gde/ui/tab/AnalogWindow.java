@@ -32,8 +32,8 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * Display window parent of analog displays
  * @author Winfried Brügmann
- * display window parent of analog displays
  */
 public class AnalogWindow {
 	private Logger													log	= Logger.getLogger(this.getClass().getName());

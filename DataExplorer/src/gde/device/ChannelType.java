@@ -23,8 +23,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * @author Winfried Brügmann
  * ChannelType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
+ * @author Winfried Brügmann
  */
 public class ChannelType extends Vector<MeasurementType> {
 	static final long							serialVersionUID	= 26031957L;

@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * @author Winfried Brügmann
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
+ * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
 	final static long											serialVersionUID		= 26031957;

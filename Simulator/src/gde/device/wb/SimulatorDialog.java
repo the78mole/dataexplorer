@@ -49,8 +49,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog sample for the simulator device 
  * @author Winfried Brügmann
- * dialog sample for the simulator device 
  */
 public class SimulatorDialog extends DeviceDialog {
 	private Logger												log										= Logger.getLogger(this.getClass().getName());

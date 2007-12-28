@@ -25,8 +25,8 @@ import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 
 /**
+ * Class to test akkuMaster C4 device serial port communication
  * @author Winfried Brügmann
- * class to test akkuMaster C4 device serial port communication
  */
 public class AkkuMasterC4Test {
 

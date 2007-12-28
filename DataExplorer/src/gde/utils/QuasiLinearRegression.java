@@ -24,9 +24,9 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * @author Winfried Brügmann
- * this thread implementation calculates the slop of the height curve using quasi linear regression
+ * This thread implementation calculates the slop of the height curve using quasi linear regression
  * none critical regarding time interval and no phase shift
+ * @author Winfried Brügmann
  */
 public class QuasiLinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(this.getClass().getName());

@@ -42,8 +42,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog class for the Picolariolog device of Uwe Renschler
  * @author Winfried Brügmann
- * dialog class for the Picolariolog device of Uwe Renschler
  */
 public class PicolarioDialog extends DeviceDialog {
 	private Logger										log										= Logger.getLogger(this.getClass().getName());

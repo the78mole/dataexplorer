@@ -19,9 +19,9 @@ package osde.device;
 import osde.data.RecordSet;
 
 /**
- * @author Winfried Brügmann
- * defines the interface for all device implementations, it also covers some interface methods from 
+ * Defines the interface for all device implementations, it also covers some interface methods from 
  * DeviceDialog as well as DeviceSerialPort
+ * @author Winfried Brügmann
  */
 public interface IDevice {
 	

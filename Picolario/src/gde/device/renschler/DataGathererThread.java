@@ -29,8 +29,8 @@ import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
 /**
+ * Thread implementation to gather data from Picolariolog device
  * @author Winfied Brügmann
- * thread implementation to gather data from Picolariolog device
  */
 public class DataGathererThread extends Thread {
 	private Logger									log							= Logger.getLogger(this.getClass().getName());

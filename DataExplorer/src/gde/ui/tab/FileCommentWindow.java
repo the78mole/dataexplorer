@@ -32,8 +32,8 @@ import org.eclipse.swt.widgets.Text;
 import osde.data.Channels;
 
 /**
+ * Class to enable a file comment
  * @author Winfried Brügmann
- * class to enable a file comment
  */
 public class FileCommentWindow {
 	private Logger					log	= Logger.getLogger(this.getClass().getName());

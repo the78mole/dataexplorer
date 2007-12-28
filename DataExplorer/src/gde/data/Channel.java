@@ -25,8 +25,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * @author Winfried Brügmann
  * Channel class represents on channel (Kanal 1, Kanal 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
+ * @author Winfried Brügmann
  */
 public class Channel extends HashMap<String, RecordSet> {
 	static final long											serialVersionUID	= 26031957;

@@ -22,8 +22,8 @@ import org.w3c.dom.NodeList;
 import osde.utils.XMLUtils;
 
 /**
- * @author Winfried Brügmann
  * MeasurementType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
+ * @author Winfried Brügmann
  */
 public class MeasurementType {
 	private final String				name;

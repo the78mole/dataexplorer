@@ -11,8 +11,8 @@ import osde.device.IDevice;
 import osde.ui.StatusBar;
 
 /**
- * @author Winfried Bruegmann
- *
+ * UniLog serial port implementation class, just copied from Sample projectS
+ * @author Winfried Brügmann
  */
 public class UniLogSerialPort extends DeviceSerialPort {
 

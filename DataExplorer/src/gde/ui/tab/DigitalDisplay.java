@@ -33,8 +33,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Child display class displaying digital active measurements
  * @author Winfried Brügmann
- * child display class displaying digital active measurements
  */
 public class DigitalDisplay extends Composite {
 	private Logger							log	= Logger.getLogger(this.getClass().getName());

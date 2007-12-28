@@ -37,10 +37,9 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 
-
 /**
- * @author Winfried Brügmann
  * Class to read and write comma separated value files
+ * @author Winfried Brügmann
  */
 public class CSVReaderWriter {
 	private static Logger					log			= Logger.getLogger(CSVReaderWriter.class.getName());

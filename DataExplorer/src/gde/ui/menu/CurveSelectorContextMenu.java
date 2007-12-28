@@ -40,8 +40,8 @@ import osde.ui.dialog.AxisEndValuesDialog;
 import osde.ui.tab.GraphicsWindow;
 
 /**
+ * Context menu class of the curve selection window acts as popup menu
  * @author Winfried Brügmann
- * context menu class of the curve selection window acts as popup menu
  */
 public class CurveSelectorContextMenu {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());

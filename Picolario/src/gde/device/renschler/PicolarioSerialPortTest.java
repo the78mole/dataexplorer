@@ -21,8 +21,8 @@ import osde.device.DeviceSerialPort;
 import gnu.io.SerialPort;
 
 /**
+ * Test class for PicolarioSerialPort
  * @author Winfried Brügmann
- * test class for PicolarioSerialPort
  */
 public class PicolarioSerialPortTest {
 

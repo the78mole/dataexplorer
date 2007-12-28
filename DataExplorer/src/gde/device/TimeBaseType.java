@@ -21,8 +21,8 @@ import org.w3c.dom.Element;
 import osde.utils.XMLUtils;
 
 /**
- * @author Winfried Brügmann
  * TimeBaseType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
+ * @author Winfried Brügmann
  */
 public class TimeBaseType {
 	private final String	name;

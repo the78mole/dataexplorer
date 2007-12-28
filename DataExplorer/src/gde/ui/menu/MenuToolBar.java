@@ -35,9 +35,9 @@ import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 
 /**
- * @author Winfried Brügmann
- * graphical menu tool bar class
+ * Graphical menu tool bar class
  * (future items are: scaling icons, ...)
+ * @author Winfried Brügmann
  */
 public class MenuToolBar {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());

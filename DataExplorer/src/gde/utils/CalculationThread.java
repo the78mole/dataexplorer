@@ -22,8 +22,8 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * This abstract thread implementation calculates the slop of the height curve using several algorithm
  * @author Winfried Brügmann
- * this abstract thread implementation calculates the slop of the height curve using several algorithm
  */
 public abstract class CalculationThread extends Thread {
 	protected Logger												log					= Logger.getLogger(this.getClass().getName());

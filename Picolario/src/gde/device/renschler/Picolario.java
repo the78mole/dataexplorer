@@ -38,8 +38,8 @@ import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
 /**
- * @author Winfried Brügmann
  * Picolariolog device main implementaion class
+ * @author Winfried Brügmann
  */
 public class Picolario extends DeviceConfiguration implements IDevice {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());

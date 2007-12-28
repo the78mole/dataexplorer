@@ -34,8 +34,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog class showing some info text with disclaimers, version , ...
  * @author Winfried Brügmann
- * dialog class showing some info text with disclaimers, version , ...
  */
 public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	private Logger log = Logger.getLogger(this.getClass().getName());

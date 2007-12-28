@@ -31,8 +31,8 @@ import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * Sample and test device implementation, scale adjustment, ...
  * @author Winfried Brügmann
- * sample and test device implementation, scale adjustment, ...
  */
 public class Simulator extends DeviceConfiguration implements IDevice {
 

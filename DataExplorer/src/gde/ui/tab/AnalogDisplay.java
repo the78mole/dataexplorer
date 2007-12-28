@@ -34,8 +34,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Child display class displaying analog active measurements
  * @author Winfried Brügmann
- * child display class displaying analog active measurements
  */
 public class AnalogDisplay extends Composite {
 	private Logger							log	= Logger.getLogger(this.getClass().getName());

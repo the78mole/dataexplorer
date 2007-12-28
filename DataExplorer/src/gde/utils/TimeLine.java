@@ -30,8 +30,8 @@ import org.eclipse.swt.graphics.Point;
 import osde.data.RecordSet;
 
 /**
+ * Utility class to draw time line with tick marks and numbers
  * @author Winfried Brügmann
- * utility class to draw time line with tick marks and numbers
  */
 public class TimeLine {
 	private Logger				log									= Logger.getLogger(this.getClass().getName());

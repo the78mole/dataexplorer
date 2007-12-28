@@ -24,11 +24,11 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * @author Winfried Brügmann
- * this thread implementation calculates the slop of the height curve using linear regression
+ * This thread implementation calculates the slop of the height curve using linear regression
  * a time interval may be modified, intervals < 2 seconds may result in phase shifts near points of slope = 0
  * a point interval may be modified, but point interval must be modulo 2 and < interval
  * good for calculating average slope between selected curve points
+ * @author Winfried Brügmann
  */
 public class LinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(RecordSet.class.getName());

@@ -38,8 +38,8 @@ import osde.log.LogFormatter;
 import osde.utils.XMLUtils;
 
 /**
- * @author Winfried Brügmann
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
+ * @author Winfried Brügmann
  */
 public class DeviceConfiguration {
 	private final static Logger									log												= Logger.getLogger(DeviceSerialPort.class.getName());

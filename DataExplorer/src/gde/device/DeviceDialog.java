@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @author Winfried Brügmann
  * DeviceDialog is the abstract class as parent for device dialog implementations
+ * @author Winfried Brügmann
  */
 public abstract class DeviceDialog extends Dialog{
 

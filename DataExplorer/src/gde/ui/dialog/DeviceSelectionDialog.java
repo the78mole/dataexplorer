@@ -65,8 +65,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog class to select the device to be used
  * @author Winfried Brügmann
- * dialog class to select the device to be used
  */
 public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private Logger																log							= Logger.getLogger(this.getClass().getName());

@@ -29,8 +29,8 @@ import osde.device.IDevice;
 import osde.ui.StatusBar;
 
 /**
+ * Dummy serial port implementation for the simulator device
  * @author Winfried Brügmann
- * dummy serial port implementation for the simulator device
  */
 public class SimulatorSerialPort extends DeviceSerialPort {
 

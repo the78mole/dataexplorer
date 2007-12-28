@@ -32,8 +32,8 @@ import osde.ui.SWTResourceManager;
 
 
 /**
+ * Class contains utility methods for drawing curves with scales right hand side and left hand side
  * @author Winfried Brügmann
- * class contains utility methods for drawing curves with scales right hand side and left hand side
  */
 public class GraphicsUtils {
 	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());

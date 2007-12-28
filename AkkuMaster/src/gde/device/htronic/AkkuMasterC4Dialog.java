@@ -41,8 +41,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * DSialog class for device AkkuMaster C4
  * @author Winfried Brügmann
- * dialog class for device AkkuMaster C4
  */
 public class AkkuMasterC4Dialog extends DeviceDialog {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());

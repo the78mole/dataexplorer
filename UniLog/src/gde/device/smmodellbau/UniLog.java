@@ -1,6 +1,3 @@
-/**
- * 
- */
 package osde.device.smmodellbau;
 
 import gnu.io.NoSuchPortException;
@@ -18,8 +15,8 @@ import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * UniLog default device implementation, just copied from Sample project
  * @author Winfried Bruegmann
- *
  */
 public class UniLog extends DeviceConfiguration implements IDevice {
 

@@ -17,8 +17,8 @@
 package osde.exception;
 
 /**
- * @author Winfried Brügmann
  * Application exception class
+ * @author Winfried Brügmann
  */
 public class TimeOutException extends Exception {
 	static final long serialVersionUID = 26031957;

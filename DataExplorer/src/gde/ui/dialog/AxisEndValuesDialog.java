@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog class to adjust the measurement scale end values
  * @author Winfried Brügmann
- * dialog class to adjust the measurement scale end values
  */
 public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	private Logger log = Logger.getLogger(this.getClass().getName());

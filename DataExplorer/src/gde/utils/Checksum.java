@@ -20,8 +20,8 @@ import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
 /**
- * @author Winfried Brügmann
  * checksum calculation utility class
+ * @author Winfried Brügmann
  */
 public class Checksum {
 

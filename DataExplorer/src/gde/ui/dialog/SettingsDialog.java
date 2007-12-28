@@ -45,8 +45,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+ * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
- * dialog class to adjust application wide properties
  */
 public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());

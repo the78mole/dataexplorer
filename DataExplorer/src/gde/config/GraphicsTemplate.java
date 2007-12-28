@@ -26,8 +26,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * @author Winfried Bruegmann 
- * class managing graphics visualization, store, restore
+ * CSlass managing graphics visualization, store, restore
+ * @author Winfried Brügmann 
  */
 public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;

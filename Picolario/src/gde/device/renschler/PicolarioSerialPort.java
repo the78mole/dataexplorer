@@ -33,8 +33,8 @@ import osde.ui.StatusBar;
 import osde.utils.Checksum;
 
 /**
+ * Serial communication implementation class for the Renschler Picolariolog device
  * @author Winfried Brügmann
- * serial communication implementation class for the Renschler Picolariolog device
  */
 public class PicolarioSerialPort extends DeviceSerialPort {
 	private Logger							log											= Logger.getLogger(this.getClass().getName());

@@ -34,8 +34,8 @@ import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * @author Winfried Brügmann
  * AkkuMaster C4 device class implementation
+ * @author Winfried Brügmann
  */
 public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	private Logger									log										= Logger.getLogger(this.getClass().getName());

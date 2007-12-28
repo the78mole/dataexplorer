@@ -21,8 +21,8 @@ import org.w3c.dom.Element;
 import osde.utils.XMLUtils;
 
 /**
- * @author Winfried Brügmann
  * TimeOutType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
+ * @author Winfried Brügmann
  */
 public class TimeOutType {
 	private final int	RTOCharDelayTime;

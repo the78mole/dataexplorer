@@ -28,8 +28,8 @@ import osde.device.DeviceSerialPort;
 import osde.ui.StatusBar;
 
 /**
+ * SSerial port implementation for AkkuMaster C4 device
  * @author Winfried Brügmann
- * serial port implementation for AkkuMaster C4 device
  */
 public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	private Logger							log															= Logger.getLogger(this.getClass().getName());

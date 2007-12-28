@@ -24,8 +24,8 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * This class enables data calculation thread for device AkkuMaster C4
  * @author Winfried Brügmann
- * this class enables data calculation thread for device AkkuMaster C4
  */
 public class AkkuMasterCalculationThread extends Thread {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());

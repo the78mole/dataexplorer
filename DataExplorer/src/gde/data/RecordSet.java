@@ -34,8 +34,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.DataToolBar;
 
 /**
- * @author Winfried Brügmann
  * DeviceRecords class holds all the data records for the configured measurement
+ * @author Winfried Brügmann
  */
 public class RecordSet extends HashMap<String, Record> {
 	private static final long							serialVersionUID			= 26031957;

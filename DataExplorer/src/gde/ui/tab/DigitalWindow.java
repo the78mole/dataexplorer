@@ -32,8 +32,8 @@ import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
+ * Display window parent of digital displays
  * @author Winfried Brügmann
- * display window parent of digital displays
  */
 public class DigitalWindow {
 	private Logger													log	= Logger.getLogger(this.getClass().getName());

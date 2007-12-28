@@ -53,8 +53,8 @@ import osde.utils.CurveUtils;
 import osde.utils.TimeLine;
 
 /**
+ * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
- * this class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  */
 public class GraphicsWindow {
 	private Logger												log											= Logger.getLogger(this.getClass().getName());

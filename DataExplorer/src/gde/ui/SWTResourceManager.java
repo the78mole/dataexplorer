@@ -47,8 +47,8 @@ import osde.utils.GraphicsUtils;
  */
 
 /**
- * @author Winfried Brügmann
  * Initial created by Jigloo plug-in, add some methods to cache additional image data created WB/27Dez2007
+ * @author Winfried Brügmann
  */
 public class SWTResourceManager {
 	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());

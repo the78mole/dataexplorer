@@ -42,8 +42,8 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * @author Winfried Brügmann
- * class implementation for one channel tab, this will be initialized according number of available channels
+  * Implementation for one channel tab, this will be initialized according number of available channels
+  * @author Winfried Brügmann
  */
 public class AkkuMasterChannelTab {
 	private Logger												log											= Logger.getLogger(this.getClass().getName());

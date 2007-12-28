@@ -27,8 +27,8 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * @author Winfried Brügmann
  * user interface status bar class, device, serial port, port activity, progress bar, messages
+ * @author Winfried Brügmann
  */
 public class StatusBar {
 	private Composite								statusComposite;
