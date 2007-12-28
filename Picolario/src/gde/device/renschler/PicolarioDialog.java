@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialdataExplorer.
+
+    OpenSerialdataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialdataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.renschler;
 
 import java.util.logging.Level;
@@ -26,17 +42,9 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * @author Winfried Brügmann
+ * dialog class for the Picolariolog device of Uwe Renschler
+ */
 public class PicolarioDialog extends DeviceDialog {
 	private Logger										log										= Logger.getLogger(this.getClass().getName());
 
@@ -144,7 +152,6 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					numberAvailableRecordSetsLabel = new CLabel(numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
-					//numberAvailableRecordSetsLabel.setText("0");
 					numberAvailableRecordSetsLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 					numberAvailableRecordSetsLabel.setBounds(255, 25, 29, 22);
 				}
@@ -249,6 +256,7 @@ public class PicolarioDialog extends DeviceDialog {
 							reduceByLastValueButton.setSelection(false);
 							reduceByDefinedValueButton.setSelection(false);
 							doSubtractFirst = false;
+							doSubtractLast = false;
 							doReduceHeight = false;
 							application.updateGraphicsWindow();
 						}
