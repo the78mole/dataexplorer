@@ -757,23 +757,25 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * method to setup new device, this might occur using this dialog or a menu item where device is switched 
+	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
-		if (!checkPortSelection()) {
-			if (settings.isGlobalSerialPort())
-				application.openSettingsDialog();
-			else
+		if (isDeviceChanged()) {
+			if (!checkPortSelection()) {
+				if (settings.isGlobalSerialPort())
+					application.openSettingsDialog();
+				else
+					application.setActiveDevice(open());
+			}
+			else if (settings.getActiveDevice().startsWith("---")) {
 				application.setActiveDevice(open());
+			}
+			activeDevice = this.getInstanceOfDevice();
+			application.setActiveDevice(activeDevice);
+			setupDataChannels(activeDevice);
+			application.updateDataTable();
+			application.updateDigitalWindow();
 		}
-		else if (settings.getActiveDevice().startsWith("---")) {
-			application.setActiveDevice(open());
-		}
-		activeDevice = this.getInstanceOfDevice();
-		application.setActiveDevice(activeDevice);
-		setupDataChannels(activeDevice);
-		application.updateDataTable();
-		application.updateDigitalWindow();
 	}
 
 	/**
@@ -892,4 +894,30 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public TreeMap<String, DeviceConfiguration> getDevices() {
 		return devices;
 	}
+	
+	/**
+	 * query if the device selection has changed
+	 * @return true if device selection changed
+	 */
+	public boolean isDeviceChanged() {
+		return (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice());
+	}
+	
+	/**
+	 * check for data which need to be saved
+	 */
+	public boolean checkDataSaved() {
+		boolean result = true;
+		String unsaved = Channels.getInstance().checkRecordSetsSaved();
+		if (unsaved.length() != 0) {
+			String msg = "Folgenden Datensätze sind nicht gesichert und gehen verloren" + unsaved.toString();
+			if (application.openYesNoMessageDialog(msg) == SWT.CANCEL) {
+				result = false;
+				log.fine("SWT.CANCEL");
+			}
+		}
+		return result;
+		
+	}
 }
+
