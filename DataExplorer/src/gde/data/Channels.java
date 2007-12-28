@@ -75,7 +75,7 @@ public class Channels extends HashMap<Integer, Channel> {
 
 	/**
 	 * switch the channel according selection and set applications active channel
-	 * @param channelText assuming p.e. "K1: Kanal 1"
+	 * @param channelName assuming p.e. "K1: Kanal 1"
 	 */
 	public synchronized void switchChannel(String channelName) {
 		this.switchChannel(new Integer(channelName.split(" ")[2]).intValue());
@@ -83,7 +83,7 @@ public class Channels extends HashMap<Integer, Channel> {
 
 	/**
 	 * switch the channel according selection and set applications active channel
-	 * @param channelText assuming p.e. "K1: Kanal 1"
+	 * @param channelNumber 1 -> "K1: Kanal 1"
 	 */
 	public synchronized void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);
@@ -105,7 +105,8 @@ public class Channels extends HashMap<Integer, Channel> {
 
 	/**
 	 * method to set the channel number for active channel displayed
-	 * @param activeNumber the channel number of the active channel
+	 * @param activeChannelNumber the channel number of the active channel
+	 * @param doRedrawRecordSet - flag to manage update
 	 */
 	public void setActiveChannelNumber(int activeChannelNumber, boolean doRedrawRecordSet) {
 		this.activeChannelNumber = activeChannelNumber;
@@ -129,7 +130,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	}
 
 	/**
-	 * @param activeChannelNumber the activeChannelNumber to set
+	 * @return activeChannel
 	 */
 	public Channel getActiveChannel() {
 		return this.get(activeChannelNumber);

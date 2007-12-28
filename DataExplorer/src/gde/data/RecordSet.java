@@ -88,8 +88,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
 	 * @param name for the records like "1) Laden" 
-	 * @param recordNames string array of the device supported records
 	 * @param timeStep_ms time in msec of device measures points
+	 * @param isRaw
+	 * @param isCompareSet
 	 */
 	public RecordSet(String name, int timeStep_ms, boolean isRaw, boolean isCompareSet) {
 		super();
@@ -122,8 +123,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * returns a specific data vector selected by given key data name
-	 * 
-	 * @param dataName
+	 * @param recordNameKey
 	 * @return Vector<Integer>
 	 */
 	public Record getRecord(String recordNameKey) {
@@ -132,7 +132,8 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * method to add a series of points to the associated records
-	 * @param in[] points, where the length must fit records.size()
+	 * @param points as int[], where the length must fit records.size()
+	 * @param doUpdate to manage display update
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) {
 		for (int i = 0; i < points.length; i++) {
@@ -306,7 +307,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * switch the record set according selection and set applications active channel
-	 * @param channelText assuming p.e. "1) Laden"
+	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public void switchRecordSet(String recordSetName) {
 		log.finest("entry - " + recordSetName);

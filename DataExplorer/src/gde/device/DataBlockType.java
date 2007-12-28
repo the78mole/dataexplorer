@@ -33,7 +33,7 @@ public class DataBlockType {
 
 	/**
 	 * constructs a DataBlock class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public DataBlockType(Element element) {
 		this.domElement = element;

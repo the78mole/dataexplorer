@@ -66,7 +66,7 @@ public interface IDevice {
 	public String getPort();
 	
 	/**
-	 * @param set a new port string for the device
+	 * @param newPort - set a new port string for the device
 	 */
 	public void setPort(String newPort);
 	
@@ -173,8 +173,7 @@ public interface IDevice {
 	public double reverseTranslateValue(String recordKey, double value);
 
 	/**
-	 * function to calculate values for inactive records
-	 * @return double with the adapted value
+	 * function to calculate values for inactive which need to be calculated records
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet);
 

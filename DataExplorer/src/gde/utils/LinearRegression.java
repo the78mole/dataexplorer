@@ -34,7 +34,7 @@ public class LinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(RecordSet.class.getName());
 
 	/**
-	 * @param dialog
+	 * default constructor
 	 */
 	public LinearRegression() {
 		super();

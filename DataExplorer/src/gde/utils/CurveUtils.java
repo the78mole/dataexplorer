@@ -39,7 +39,8 @@ public class CurveUtils {
 	/**
 	 * draws the data as graph using gives rectangle for display
 	 * all data point are multiplied with factor 1000 to avoid rounding errors for values below 1.0 (0.5 -> 0)
-	 * @param evt
+	 * @param record
+	 * @param gc
 	 * @param x0
 	 * @param y0
 	 * @param width

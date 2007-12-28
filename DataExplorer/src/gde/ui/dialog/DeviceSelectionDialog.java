@@ -780,8 +780,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	/**
 	 * this will setup empty channels for the device
-	 * @param parent
-	 * @return
+	 * @param activeDevice (IDevice is the abstract type)
 	 */
 	public void setupDataChannels(IDevice activeDevice) {
 		Channels channels = Channels.getInstance();

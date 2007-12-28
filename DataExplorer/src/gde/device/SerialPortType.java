@@ -41,7 +41,7 @@ public class SerialPortType {
 
 	/**
 	 * constructs a SerialPort class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public SerialPortType(Element element) {
 		this.domElement = element;

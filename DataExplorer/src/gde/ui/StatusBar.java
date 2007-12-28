@@ -146,7 +146,6 @@ public class StatusBar {
 
 	/**
 	 * method to set a message text to the message label of the status bar
-	 * @param message text
 	 */
 	public void setMessage(String text) {
 		msgLabel.setText(text);

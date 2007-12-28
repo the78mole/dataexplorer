@@ -33,7 +33,7 @@ public class ChannelType extends Vector<MeasurementType> {
 
 	/**
 	 * constructs a Channel class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public ChannelType(Element element) {
 		NodeList measurementNodeList = element.getElementsByTagName("Measurement");

@@ -94,12 +94,12 @@ public class TimeLine {
 
 	/**
 	 * draws the time line - requires to call preparation steps
-	 * @param evt
+	 * @param gc
 	 * @param x0
 	 * @param y0
 	 * @param width
 	 * @param maxNumber
-	 * @param factor to multiply scale numbers
+	 * @param scaleFactor - factor to multiply scale numbers
 	 * @param color
 	 */
 	public synchronized void drawTimeLine(GC gc, int x0, int y0, int width, int maxNumber, int scaleFactor, Color color) {

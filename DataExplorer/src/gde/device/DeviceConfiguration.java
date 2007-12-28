@@ -358,7 +358,7 @@ public class DeviceConfiguration {
 	/**
 	 * method to query the unit of measurement data by a given record key
 	 * @param recordKey
-	 * @return
+	 * @return dataUnit as string
 	 */
 	public String getDataUnit(String recordKey) {
 		return this.getMeasurementDefinition(recordKey.split("_")[0]).getUnit();

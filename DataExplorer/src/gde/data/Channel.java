@@ -39,8 +39,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
-	 * @param name
-	 * @param recordNames
+	 * @param channelNumber 1 -> K1: Kanal 1
 	 */
 	public Channel(int channelNumber) {
 		super(5);
@@ -53,8 +52,8 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * Constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
-	 * @param name
-	 * @param recordNames
+	 * @param channelNumber
+	 * @param newRecordSet
 	 */
 	public Channel(int channelNumber, RecordSet newRecordSet) {
 		super(5);
@@ -181,7 +180,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
-	 * @param activeRecordSet the activeRecordSet to set
+	 * @param recordSetKey of the activeRecordSet to set
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
 		this.activeRecordSet = this.get(recordSetKey);

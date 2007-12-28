@@ -40,7 +40,7 @@ public class GraphicsUtils {
 
 	/**
 	 * draws tick marks to a scale in vertical direction (plus 90 degrees)
-	 * @param evt PaintEvent
+	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
 	 * @param height in points where the ticks should be drawn
@@ -49,7 +49,8 @@ public class GraphicsUtils {
 	 * @param ticklength of the main ticks
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
-	 * @param direction direction of drawn scale
+	 * @param isPositionLeft position of to be drawn scale
+	 * @param df - decimal format
 	 */
 	public static void drawVerticalTickMarks(GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 

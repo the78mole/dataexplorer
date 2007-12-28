@@ -35,7 +35,7 @@ public class MeasurementType {
 
 	/**
 	 * constructs a Measurement class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public MeasurementType(Element element) {
 		this.name = XMLUtils.getTextValue(element, "name");

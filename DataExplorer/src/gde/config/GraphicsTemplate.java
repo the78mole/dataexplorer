@@ -44,8 +44,8 @@ public class GraphicsTemplate extends Properties {
 
 	/**
 	 * constructor using the application home path and the device signature as initialization parameter
-	 * @param full qualified application home path
-	 * @param device signature as String (Picolario_K1)
+	 * @param applHomePath - full qualified application home path
+	 * @param deviceSignature - device signature as String (Picolario_K1)
 	 */
 	public GraphicsTemplate(String applHomePath, String deviceSignature) {
 		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();

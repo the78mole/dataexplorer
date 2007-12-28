@@ -33,7 +33,7 @@ public class TimeBaseType {
 
 	/**
 	 * constructs a TimeBase class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public TimeBaseType(Element element) {
 		this.name = XMLUtils.getTextValue(element, "name");

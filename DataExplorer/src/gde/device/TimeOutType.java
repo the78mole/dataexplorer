@@ -32,7 +32,7 @@ public class TimeOutType {
 
 	/**
 	 * constructs a TimeOut class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public TimeOutType(Element element) {
 		this.RTOCharDelayTime = XMLUtils.getIntValue(element, "RTOCharDelayTime");

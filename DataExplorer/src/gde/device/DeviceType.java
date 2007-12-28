@@ -36,7 +36,7 @@ public class DeviceType {
 
 	/**
 	 * constructs a Device class using a XML DOM element
-	 * @param DOM element
+	 * @param element (DOM)
 	 */
 	public DeviceType(Element element) {
 		this.domElement = element;

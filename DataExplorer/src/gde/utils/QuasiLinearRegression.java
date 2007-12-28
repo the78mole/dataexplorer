@@ -32,7 +32,7 @@ public class QuasiLinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(this.getClass().getName());
 
 	/**
-	 * @param device
+	 * default constructor
 	 */
 	public QuasiLinearRegression() {
 		super();
