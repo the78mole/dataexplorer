@@ -66,6 +66,7 @@ public class GraphicsUtils {
 			}
 			else {
 				numberTicks = (int)deltaScale / 20;
+				if (numberTicks > 20) numberTicks = 20;
 			}
 		}
 
