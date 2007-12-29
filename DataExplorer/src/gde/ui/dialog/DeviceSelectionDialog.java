@@ -284,7 +284,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 													application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();
-												checkPortSelection();
+												//checkPortSelection();
 											}
 											else {
 												application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -313,7 +313,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 														application.getDeviceDialog().dispose();
 													}
 													updateDialogEntries();
-													checkPortSelection();
+													//checkPortSelection();
 												}
 											}
 											else {
