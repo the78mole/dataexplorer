@@ -198,37 +198,38 @@ public class CurveUtils {
 	private static double[] round(double minValue, double maxValue) {
 		double[] outValues = {0.0, 0.0};
 		
-		if (minValue < 0)
-			if (minValue > -10)
-				outValues[0] = (int) (minValue - 1);
-			else if (minValue < -50)
-				outValues[0] = minValue - (10 + (minValue % 10));
-			else
-				outValues[0] = minValue - (5 + (minValue % 5));
-		else	// minValue > 0 
+		if (minValue != 0) {
+			if (minValue < 0)
+				if (minValue > -10)
+					outValues[0] = (int) (minValue - 1);
+				else if (minValue < -50)
+					outValues[0] = minValue - (10 + (minValue % 10));
+				else
+					outValues[0] = minValue - (5 + (minValue % 5));
+			else // minValue > 0 
 			if (minValue < 10)
 				outValues[0] = (int) (minValue - 1);
-			else if  (minValue < 50)
+			else if (minValue < 50)
 				outValues[0] = minValue - (minValue % 10);
 			else
 				outValues[0] = minValue - (minValue % 5);
-
-			
-		if (maxValue < 0)
-			if (maxValue > -10)
-				outValues[1] = (int) (maxValue + 1);
-			else if (maxValue > -50)
-				outValues[1] = maxValue + 5 - (maxValue % 5);
-			else
-				outValues[1] = maxValue + 10 - (maxValue % 10);
-		else
-			if (maxValue < 10)
+		}
+		
+		if (maxValue != 0) {
+			if (maxValue < 0)
+				if (maxValue > -10)
+					outValues[1] = (int) (maxValue + 1);
+				else if (maxValue > -50)
+					outValues[1] = maxValue + 5 - (maxValue % 5);
+				else
+					outValues[1] = maxValue + 10 - (maxValue % 10);
+			else if (maxValue < 10)
 				outValues[1] = (int) (maxValue + 1);
 			else if (maxValue > 50)
 				outValues[1] = maxValue + 10 - (maxValue % 10);
 			else
 				outValues[1] = maxValue + 5 - (maxValue % 5);
-		
+		}
 		// enable scale value 0.0  -- algorithm must fit scale tick mark calculation
 		if(minValue < 0 && maxValue > 0) {
 			double deltaScale = outValues[1] - outValues[0];
