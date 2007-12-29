@@ -246,6 +246,7 @@ public class CSVReaderWriter {
 
 			writer.flush();
 			writer.close();
+			recordSet.setSaved(true);
 			log.fine("data line = " + sb.toString());
 		}
 		catch (UnsupportedEncodingException e) {
