@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -195,8 +196,7 @@ public class MenuBar {
 										}
 									}
 									catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
+										log.log(Level.SEVERE, e.getMessage(), e);
 									}
 								}
 							});
@@ -232,8 +232,7 @@ public class MenuBar {
 										}
 									}
 									catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
+										log.log(Level.SEVERE, e.getMessage(), e);
 									}
 								}
 							});
