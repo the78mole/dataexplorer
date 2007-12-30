@@ -89,21 +89,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		// do some calculation
 		return newValues;
 	}
-	
-	/**
-	 * function to query the data unit of a measurement
-	 * @return the dataUnit
-	 */
-	public String getDataUnit(String recordKey) {
-		String unit;
-		if (recordKey.equals(RecordSet.VOLTAGE)) 
-			unit = "V";
-		else
-			unit = "A";
-			
-		return unit;  // m/s, V, mAh
-	}
-	
+		
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
