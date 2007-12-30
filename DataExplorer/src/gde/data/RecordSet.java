@@ -240,8 +240,38 @@ public class RecordSet extends HashMap<String, Record> {
 			case 5: // erste Kurve
 				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 128)); //(SWT.COLOR_DARK_YELLOW));
 				break;
+			case 6: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 128, 0)); 
+				break;
+			case 7: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 128)); 
+				break;
+			case 8: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 255)); 
+				break;
+			case 9: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 0)); 
+				break;
+			case 10: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 255, 0, 128)); 
+				break;
+			case 11: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 64, 128)); 
+				break;
+			case 12: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 64, 128, 0)); 
+				break;
+			case 13: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 64)); 
+				break;
+			case 14: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 64, 0)); 
+				break;
+			case 15: // erste Kurve
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 64)); 
+				break;
 			default:
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 255, 0)); //(SWT.COLOR_GREEN));
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 128)); //(SWT.COLOR_GREEN));
 				break;
 			}
 			// set position defaults
