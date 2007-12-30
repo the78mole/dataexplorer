@@ -85,6 +85,23 @@ public class CurveSelectorContextMenu {
 			popupmenu.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("popupmenu DisposeListener " + evt);
+					//reset all selections
+					lineVisible.setSelection(false);
+					lineWidthMenuItem1.setSelection(false);
+					lineWidthMenuItem2.setSelection(false);
+					lineWidthMenuItem3.setSelection(false);
+					lineTypeMenuItem1.setSelection(false);
+					lineTypeMenuItem2.setSelection(false);
+					lineTypeMenuItem3.setSelection(false);
+					axisEndAuto.setSelection(false);
+					axisEndRound.setSelection(false);
+					axisStarts0.setSelection(false);
+					axisEndManual.setSelection(false);
+					axisNumberFormat0.setSelection(false);
+					axisNumberFormat1.setSelection(false);
+					axisNumberFormat2.setSelection(false);
+					axisPositionLeft.setSelection(false);
+					axisPositionRight.setSelection(false);
 				}
 			});
 
