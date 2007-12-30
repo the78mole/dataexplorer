@@ -72,10 +72,15 @@ public class CurveUtils {
 		}
 		if (record.isStartEndDefined()) {
 			yMinValueDisplay = record.getDefinedMinValue();
-			if (isRaw) yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
-
 			yMaxValueDisplay = record.getDefinedMaxValue();
-			if (isRaw) yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+			if (isRaw) {
+				yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
+				yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+			}
+			else {
+				yMinValue = yMinValueDisplay;
+				yMaxValue = yMaxValueDisplay;
+			}
 
 			if (log.isLoggable(Level.FINE)) log.fine("defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
 		}
