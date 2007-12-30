@@ -44,7 +44,8 @@ import osde.ui.dialog.DeviceSelectionDialog;
  * @author Winfried Brügmann
  */
 public class MenuBar {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	private Logger												log			= Logger.getLogger(this.getClass().getName());
+	private final String									fileSep	= System.getProperty("file.separator");
 
 	static Display												display;
 	static Shell													shell;
@@ -171,33 +172,8 @@ public class MenuBar {
 							csvImportMenuItem1.setText("CSV absolut");
 							csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									try {
-										log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
-										Channel channel = channels.getActiveChannel();
-										String fileSep = System.getProperty("file.separator");
-										Settings deviceSetting = Settings.getInstance();
-										String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
-										FileDialog csvFileDialog = application.openFileOpenDialog("Import CSV absolut", new String[] { "*.csv" }, path);
-										if (csvFileDialog.getFileName().length() > 4) {
-											String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
-											addSubHistoryMenuItem(csvFileDialog.getFileName());
-											String recordSetKey = "1) CSV Import";
-											if (channel.getActiveRecordSet() != null) {
-												recordSetKey = (channel.size() + 1) + ") CSV Import";
-											}
-											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), false, true));
-											channel.applyTemplate(recordSetKey);
-											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), false);
-											channel.setActiveRecordSet(recordSetKey);
-											channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-											//application.getGraphicsWindow().redrawGrahics();
-											application.updateDataTable();
-											application.updateDigitalWindowChilds();
-										}
-									}
-									catch (Exception e) {
-										log.log(Level.SEVERE, e.getMessage(), e);
-									}
+									log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
+									importFileCVS("Import CSV absolut", false, true);
 								}
 							});
 						}
@@ -206,34 +182,8 @@ public class MenuBar {
 							csvImportMenuItem2.setText("CSV raw");
 							csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									try {
-										log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
-										String fileSep = System.getProperty("file.separator");
-										Channel channel = channels.getActiveChannel();
-										Settings deviceSetting = Settings.getInstance();
-										String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
-										FileDialog csvFileDialog = application.openFileOpenDialog("Import CSV raw", new String[] { "*.csv" }, path);
-										if (csvFileDialog.getFileName().length() > 4) {
-											String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
-											addSubHistoryMenuItem(csvFileDialog.getFileName());
-											String recordSetKey = "1) CSV Import";
-											if (channel.getActiveRecordSet() != null) {
-												recordSetKey = (channel.size() + 1) + ") CSV Import";
-											}
-											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, true));
-											channel.applyTemplate(recordSetKey);
-											CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), true);
-											channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-											channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-											//application.getGraphicsWindow().redrawGrahics();
-											channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
-											application.updateDataTable();
-											application.updateDigitalWindowChilds();
-										}
-									}
-									catch (Exception e) {
-										log.log(Level.SEVERE, e.getMessage(), e);
-									}
+									log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
+									importFileCVS("Import CSV raw", true, true);
 								}
 							});
 						}
@@ -251,17 +201,7 @@ public class MenuBar {
 							csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
-									String fileSep = System.getProperty("file.separator");
-									Settings deviceSetting = Settings.getInstance();
-									String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
-									FileDialog csvFileDialog = application.openFileSaveDialog("Export CSV absolut", new String[] { "*.csv" }, path);
-									if (csvFileDialog.getFileName().length() > 4) {
-										Channel activeChannel = channels.getActiveChannel();
-										String recordSetKey = activeChannel.getActiveRecordSet().getName();
-										String csvFilePath = csvFileDialog.getFilterPath() + System.getProperty("file.separator") + csvFileDialog.getFileName();
-										addSubHistoryMenuItem(csvFileDialog.getFileName());
-										CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, false);
-									}
+									exportFileCVS("Export CSV absolut", false);
 								}
 							});
 						}
@@ -272,17 +212,7 @@ public class MenuBar {
 						csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
-								String fileSep = System.getProperty("file.separator");
-								Settings deviceSetting = Settings.getInstance();
-								String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
-								FileDialog csvFileDialog = application.openFileSaveDialog("Export CSV raw", new String[] { "*.csv" }, path);
-								if (csvFileDialog.getFileName().length() > 4) {
-									Channel activeChannel = channels.getActiveChannel();
-									String recordSetKey = activeChannel.getActiveRecordSet().getName();
-									String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
-									addSubHistoryMenuItem(csvFileDialog.getFileName());
-									CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, true);
-								}
+								exportFileCVS("Export CSV raw", true);
 							}
 						});
 					}
@@ -477,8 +407,7 @@ public class MenuBar {
 							log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
-							channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
-							application.updateGraphicsWindow();
+								channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
 							}
 						}
 					});
@@ -623,6 +552,7 @@ public class MenuBar {
 
 	/**
 	 * add history file to history menu
+	 * @param newFileName
 	 */
 	public void addSubHistoryMenuItem(String newFileName) {
 		MenuItem historyImportMenuItem = new MenuItem(fileHistoryMenu, SWT.PUSH);
@@ -633,6 +563,61 @@ public class MenuBar {
 				// TODO implement 
 			}
 		});
+	}
+
+	/**
+	 * handles the import of an CVS file
+	 * @param dialogName
+	 * @param isRaw
+	 * @param isFromFile
+	 */
+	private void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
+		String recordSetKey = "1) " + dialogName;
+		Channel channel = channels.getActiveChannel();
+		try {
+			String fileSep = System.getProperty("file.separator");
+			Settings deviceSetting = Settings.getInstance();
+			String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
+			FileDialog csvFileDialog = application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
+			if (csvFileDialog.getFileName().length() > 4) {
+				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+				addSubHistoryMenuItem(csvFileDialog.getFileName());
+				if (channel.getActiveRecordSet() != null) {
+					recordSetKey = (channel.size() + 1) + ") " + dialogName;
+				}
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), isRaw, isFromFile));
+				channel.applyTemplate(recordSetKey);
+				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), isRaw);
+				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
+				channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+				channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
+				application.updateDataTable();
+				application.updateDigitalWindowChilds();
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			if (channel.get(recordSetKey) != null && channel.get(recordSetKey).get(channel.get(recordSetKey).getActiveRecordNames()[0]).size() == 0)
+				channel.remove(recordSetKey);
+		}
+	}
+
+	/**
+	 * handles the export of an CVS file
+	 * @param dialogName
+	 * @param isRaw
+	 */
+	private void exportFileCVS(String dialogName, boolean isRaw) {
+		Settings deviceSetting = Settings.getInstance();
+		String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
+		FileDialog csvFileDialog = application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
+		if (csvFileDialog.getFileName().length() > 4) {
+			Channel activeChannel = channels.getActiveChannel();
+			String recordSetKey = activeChannel.getActiveRecordSet().getName();
+			String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+			addSubHistoryMenuItem(csvFileDialog.getFileName());
+			CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
+		}
 	}
 
 }
