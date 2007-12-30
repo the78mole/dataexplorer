@@ -19,11 +19,10 @@ package osde.ui.menu;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -82,29 +81,7 @@ public class CurveSelectorContextMenu {
 				public void menuHidden(MenuEvent evt) {
 				}
 			});
-			popupmenu.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent evt) {
-					log.finest("popupmenu DisposeListener " + evt);
-					//reset all selections
-					lineVisible.setSelection(false);
-					lineWidthMenuItem1.setSelection(false);
-					lineWidthMenuItem2.setSelection(false);
-					lineWidthMenuItem3.setSelection(false);
-					lineTypeMenuItem1.setSelection(false);
-					lineTypeMenuItem2.setSelection(false);
-					lineTypeMenuItem3.setSelection(false);
-					axisEndAuto.setSelection(false);
-					axisEndRound.setSelection(false);
-					axisStarts0.setSelection(false);
-					axisEndManual.setSelection(false);
-					axisNumberFormat0.setSelection(false);
-					axisNumberFormat1.setSelection(false);
-					axisNumberFormat2.setSelection(false);
-					axisPositionLeft.setSelection(false);
-					axisPositionRight.setSelection(false);
-				}
-			});
-
+			
 			lineVisible = new MenuItem(popupmenu, SWT.CHECK);
 			lineVisible.setText("Kurve sichtbar");
 			lineVisible.addListener(SWT.Selection, new Listener() {
@@ -134,10 +111,13 @@ public class CurveSelectorContextMenu {
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					if (selectedItem != null && !selectedItem.isDisposed()) {
 						String recordNameKey = selectedItem.getText();
-						Color color = new Color(Display.getCurrent(), application.openColorDialog());
-						selectedItem.setForeground(color);
-						recordSet.getRecord(recordNameKey).setColor(color);
-						application.updateGraphicsWindow();
+						RGB rgb = application.openColorDialog();
+						if (rgb != null) {
+							Color color = new Color(Display.getCurrent(), rgb);
+							selectedItem.setForeground(color);
+							recordSet.getRecord(recordNameKey).setColor(color);
+							application.updateGraphicsWindow();
+						}
 					}
 				}
 			});
@@ -333,13 +313,13 @@ public class CurveSelectorContextMenu {
 							axisStarts0.setSelection(false);
 							axisEndManual.setSelection(true);
 						}
-						else if (isStart0) {
+						if (isStart0) {
 							axisEndAuto.setSelection(false);
 							//axisEndRound.setSelection(false);
 							axisStarts0.setSelection(true);
 							axisEndManual.setSelection(false);
 						}
-						else if (isRounded) {
+						if (isRounded) {
 							axisEndAuto.setSelection(false);
 							axisEndRound.setSelection(true);
 							//axisStarts0.setSelection(false);
