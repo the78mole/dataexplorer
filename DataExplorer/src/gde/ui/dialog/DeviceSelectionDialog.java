@@ -122,7 +122,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private String																activeName;
 	private DeviceConfiguration										activeDeviceConfig;
 	private IDevice																activeDevice;
-	private String[]															recordNames;
 	private Vector<String>												availablePorts	= null;
 
 	public DeviceSelectionDialog(Shell parent, int style, final OpenSerialDataExplorer application) {
@@ -775,11 +774,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		// cleanup existing channels and record sets
 		channels.cleanup();
 
-		// buildup new structure
-		// sort record names according to ini file 
-		//this.recordNames = new String[activeDevice.getNumberRecords()]; //activeConfig.getChannel1().keySet().toArray(new String[activeConfig.getChannelCount()]);
-		this.recordNames = this.activeDeviceConfig.getMeasurementNames();
-		// set up the channels
+		// buildup new structure  - set up the channels
 		for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 			log.fine("setting up channels = " + i);
 			
