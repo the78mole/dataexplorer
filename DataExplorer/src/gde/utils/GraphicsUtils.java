@@ -121,7 +121,6 @@ public class GraphicsUtils {
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
 		// Determine string's dimensions
-		//FontMetrics fm = gc.getFontMetrics();
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
