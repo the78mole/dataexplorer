@@ -98,12 +98,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(String recordKey, double value) {
 		double newValue = 0.0;
+		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
 			// calculate voltage U = 2.5 + (byte3 - 45) * 0.0532
 			newValue = 2.5 + (value - 45.0) * 0.0532;
 		}
-		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
 			int firstValue = 0; // != 0 if first value must subtracted
 			double offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
@@ -149,7 +150,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
 			newValue = (value - firstValue) * factor - offset;
 		}
-		else if (recordKey.startsWith(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
 			double factor = 1.0; // != 1 if a unit translation is required
 			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
 			case 0: // Meter , Feet is default
@@ -172,11 +173,12 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(String recordKey, double value) {
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
 		double newValue = 0;
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
+		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
+		if (recordKey.startsWith(measurements[0])) { // 0=Spannung
 			// calculate voltage U = 2.5 + (value - 45) * 0.0532
 			newValue = (value - 2.5) / 0.0532 + 45.0;
 		}
-		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(measurements[1])) {  	// 1=Höhe
 			int firstValue = 0; // != 0 if first value must subtracted
 			double offset = 0; // != 0 if curve has an defined offset
 			double factor = 1.0; // != 1 if a unit translation is required
@@ -221,7 +223,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
 			newValue = (value + offset) / factor + firstValue;
 		}
-		else if (recordKey.startsWith(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
 			double factor = 1.0; // != 1 if a unit translation is required
 			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
 			case 0: // Meter , Feet is default
@@ -244,14 +246,15 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		String unit = "";
 		recordKey = recordKey.split("_")[0];
 		MeasurementType measurement = this.getMeasurementDefinition(recordKey);
+		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
 		//channel.get("Messgröße1");
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
+		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
 			unit = (String) measurement.getUnit();
 		}
-		else if (recordKey.startsWith(RecordSet.HEIGHT)) {
+		else if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
 			unit = dialog.getHeightDataUnit();
 		}
-		else if (recordKey.startsWith(RecordSet.SLOPE)) {
+		else if (recordKey.startsWith(measurements[2])) {	// 2=Steigung
 			unit = dialog.getHeightDataUnit() + "/" +  measurement.getUnit().split("/")[1];
 		}
 		return unit;
@@ -266,9 +269,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			for (String recordKey : recordSet.getRecordNames()) {
 				if (!recordSet.get(recordKey).isDisplayable()) {
 					// calculate the values required				
-					calculationThread = new QuasiLinearRegression();
-					//calculationThread = new LinearRegression(this);
-					calculationThread.setRecordSet(recordSet);
+					String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+					calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2]);
 					calculationThread.start();
 				}
 			}

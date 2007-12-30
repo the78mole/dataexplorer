@@ -45,9 +45,12 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	private final byte					readNumberRecordSets[]	= new byte[] { (byte) 0xAA, (byte) 0xAA };
 	private final byte					readRecordSets[]				= new byte[] { (byte) 0xAA, (byte) 0x00 };
 
-	public final static String	HEIGHT									= "Höhe";
-	public final static String	VOLTAGE									= "Spannung";
-
+	/**
+	 * PicolarioSerialPort constructor
+	 * @param deviceConfig
+	 * @param statusBar
+	 * @throws NoSuchPortException
+	 */
 	public PicolarioSerialPort(DeviceConfiguration deviceConfig, StatusBar statusBar) throws NoSuchPortException {
 		super(deviceConfig, statusBar);
 		this.statusBar = statusBar;
@@ -131,8 +134,10 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
-						System.err.println("write wrong checksum required");
-						//this.write(readNumberRecordSets); // use 0xAA, 0xAA as wrong checksum
+						log.warning("write wrong checksum required");
+						byte wrongChecksum = readBuffer[readBuffer.length - 1];
+						byte[] requestAgain = new byte[] {wrongChecksum, wrongChecksum};
+						this.write(requestAgain);
 					}
 				}
 				else {
@@ -154,8 +159,9 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 
-		data.put(HEIGHT, height);
-		data.put(VOLTAGE, voltage);
+		String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+		data.put(measurements[0], voltage);
+		data.put(measurements[1], height);
 		if (statusBar != null) {
 			statusBar.setSerialRxOff();
 			statusBar.setSerialTxOff();

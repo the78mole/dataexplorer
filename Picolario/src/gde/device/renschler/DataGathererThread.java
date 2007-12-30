@@ -51,7 +51,6 @@ public class DataGathererThread extends Thread {
 		this.device = device;
 		this.serialPort = serialPort;
 		this.datagramNumbers = datagramNumbers;
-		this.calculationThread = new QuasiLinearRegression();
 	}
 
 	/**
@@ -67,6 +66,7 @@ public class DataGathererThread extends Thread {
 			int progressBarMacroSteps = 100 / datagramNumbers.length;
 			statusBar.updateProgressbar(0);
 			Channel channel = Channels.getInstance().getActiveChannel();
+			String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
 			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
@@ -77,19 +77,19 @@ public class DataGathererThread extends Thread {
 				log.fine(recordSetKey + " created");
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
-				Vector<Integer> height = (Vector<Integer>)data.get(PicolarioSerialPort.HEIGHT);
-				Vector<Integer> voltage = (Vector<Integer>)data.get(PicolarioSerialPort.VOLTAGE);
+				Vector<Integer> voltage = (Vector<Integer>)data.get(measurements[0]); // 0=Spannung
+				Vector<Integer> height = (Vector<Integer>)data.get(measurements[1]);	// 1=Höhe
 
 				for (int i = 0; i < height.size(); i++) {
 					int[] points = new int[recordSet.size() - 1];
 					points[0] = voltage.get(i).intValue(); // Spannung, wie ausgelesen						
 					points[1] = height.get(i).intValue(); // Höhe, wie ausgelesen
-					//points[2] = 0; // Steigrate
+					//points[2] = 0; // Steigrate -> isCalculation
 
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				calculationThread.setRecordSet(channel.get(recordSetKey));
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2]);
 				calculationThread.start();
 
 				if (channel.getName().equals(Channels.getInstance().getActiveChannel().getName())) {

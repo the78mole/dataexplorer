@@ -20,6 +20,7 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -44,7 +46,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	private final AkkuMasterC4Dialog	dialog;
 	private final AkkuMasterC4SerialPort serialPort;
 	private final Channels channels;
-	private AkkuMasterCalculationThread	threadPower, threadEnergy;
+	private HashMap<String, AkkuMasterCalculationThread>	calculationThreads = new HashMap<String, AkkuMasterCalculationThread>();
 
 	/**
 	 * constructor using the device properties file for initialization
@@ -81,23 +83,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double translateValue(String recordKey, double value) {
-		double newValue = 0;
+		double newValue = value;
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			newValue = value;
-		}
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
 		return newValue;
 	}
@@ -107,23 +94,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double reverseTranslateValue(String recordKey, double value) {
-		double newValue = 0;
+		double newValue = value;
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(RecordSet.VOLTAGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CURRENT)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.CHARGE)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.POWER)) {
-			newValue = value;
-		}
-		else if (recordKey.startsWith(RecordSet.ENERGY)) {
-			newValue = value;
-		}
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
 		return newValue;
 	}
@@ -133,14 +105,19 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		// since there are measurement point every 10 seconds during cpturing only and the calculation will take place directly switch all to displayable
+		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isFromFile() && recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				threadPower = new AkkuMasterCalculationThread(RecordSet.POWER, channels.getActiveChannel().getActiveRecordSet());
-				threadPower.start();
-				threadEnergy = new AkkuMasterCalculationThread(RecordSet.ENERGY, channels.getActiveChannel().getActiveRecordSet());
-				threadEnergy.start();
+				String[] recordNames = this.getMeasurementNames();
+				for (String recordKey : recordNames) {
+					MeasurementType measurement = this.getMeasurementDefinition(recordKey);
+					if (measurement.isCalculation()) {
+						log.fine(recordKey);
+						calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, channels.getActiveChannel().getActiveRecordSet()));
+						calculationThreads.get(recordKey).start();
+					}
+				}
 			}
 			catch (RuntimeException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

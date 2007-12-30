@@ -64,20 +64,21 @@ public class AkkuMasterCalculationThread extends Thread {
 	public void run() {
 		log.fine("start data calculation for record = " + recordKey);
 		Record record = recordSet.get(recordKey);
+		String[] measurements = record.getDevice().getMeasurementNames(); // 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 		//		values[5] = new Integer(new Integer(values[2]).intValue() * new Integer(values[3]).intValue()).toString(); // Errechnete Leistung	[mW]
 		//		values[6] = new Integer(new Integer(values[2]).intValue() * new Integer(values[4]).intValue()).toString(); // Errechnete Energie	[mWh]
-		if (recordKey.equals(RecordSet.POWER)) {
-			Record recordVoltage = recordSet.get(RecordSet.VOLTAGE);
-			Record recordCurrent = recordSet.get(RecordSet.CURRENT);
+		if (recordKey.equals(measurements[3])) {									// 3=Leistung
+			Record recordVoltage = recordSet.get(measurements[0]);	// 0=Spannung
+			Record recordCurrent = recordSet.get(measurements[1]);	// 1=Strom
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 			}
 			record.setDisplayable(true);
 		}
-		else if (recordKey.equals(RecordSet.ENERGY)) {
-			Record recordVoltage = recordSet.get(RecordSet.VOLTAGE);
-			Record recordCharge = recordSet.get(RecordSet.CHARGE);
+		else if (recordKey.equals(measurements[4])) {							// 4=Energie
+			Record recordVoltage = recordSet.get(measurements[0]);	// 0=Spannung
+			Record recordCharge = recordSet.get(measurements[2]);		// 2=Ladung
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
@@ -85,7 +86,7 @@ public class AkkuMasterCalculationThread extends Thread {
 			record.setDisplayable(true);
 		}
 		else
-			log.warning("only supported records are " + RecordSet.POWER + ", " + RecordSet.ENERGY);
+			log.warning("only supported records are " + measurements[3] + ", " + measurements[4]);
 
 		//recordSet.updateDataTable();
 		application.updateGraphicsWindow();
