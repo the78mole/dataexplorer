@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
-import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
@@ -77,8 +76,9 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 		}
 		lastCurrent = yBound * 3000;
 
-		data.put(RecordSet.VOLTAGE, voltage);
-		data.put(RecordSet.CURRENT, current);
+		String[] measurements = deviceConfig.getMeasurementNames(); // 0=Spannung, 1=Strom
+		data.put(measurements[0], voltage);
+		data.put(measurements[1], current);
 		return data;
 	}
 

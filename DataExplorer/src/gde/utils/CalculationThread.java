@@ -31,13 +31,21 @@ public abstract class CalculationThread extends Thread {
 	protected static String									newLine			= System.getProperty("line.separator");
 
 	protected RecordSet											recordSet;
+	protected String												sourceRecordKey, targetRecordKey;
 	protected final OpenSerialDataExplorer	apllication;
 	protected boolean												threadStop	= false;
 
 	/**
-	 * 
+	 * constructor where calculation required parameters are given as parameter
+	 * @param recordSet
+	 * @param sourceRecordKey
+	 * @param targetRecordKey
 	 */
-	public CalculationThread() {
+	public CalculationThread(RecordSet recordSet, String sourceRecordKey, String targetRecordKey) {
+		super();
+		this.recordSet = recordSet;
+		this.sourceRecordKey = sourceRecordKey;
+		this.targetRecordKey = targetRecordKey;
 		this.apllication = OpenSerialDataExplorer.getInstance();
 	}
 
@@ -55,5 +63,19 @@ public abstract class CalculationThread extends Thread {
 
 	public void setThreadStop(boolean threadStop) {
 		this.threadStop = threadStop;
+	}
+
+	/**
+	 * @param sourceRecordKey the sourceRecordKey to set
+	 */
+	public void setSourceRecordKey(String sourceRecordKey) {
+		this.sourceRecordKey = sourceRecordKey;
+	}
+
+	/**
+	 * @param targetRecordKey the targetRecordKey to set
+	 */
+	public void setTargetRecordKey(String targetRecordKey) {
+		this.targetRecordKey = targetRecordKey;
 	}
 }

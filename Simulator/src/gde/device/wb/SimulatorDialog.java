@@ -341,8 +341,9 @@ public class SimulatorDialog extends DeviceDialog {
 										// build the point array according curves from record set
 										int[] points = new int[recordSet.size()];
 
-										Vector<Integer> voltage = (Vector<Integer>) data.get(RecordSet.VOLTAGE);
-										Vector<Integer> current = (Vector<Integer>) data.get(RecordSet.CURRENT);
+										String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Strom
+										Vector<Integer> voltage = (Vector<Integer>) data.get(measurements[0]);
+										Vector<Integer> current = (Vector<Integer>) data.get(measurements[1]);
 										Iterator<Integer> iterV = voltage.iterator();
 										Iterator<Integer> iterA = current.iterator();
 										while (iterV.hasNext()) {

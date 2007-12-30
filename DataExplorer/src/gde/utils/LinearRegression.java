@@ -34,24 +34,27 @@ public class LinearRegression extends CalculationThread {
 	private Logger	log	= Logger.getLogger(RecordSet.class.getName());
 
 	/**
-	 * default constructor
+	 * constructor where calculation required parameters are given as parameter
+	 * @param recordSet
+	 * @param sourceRecordKey
+	 * @param targetRecordKey
 	 */
-	public LinearRegression() {
-		super();
+	public LinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey) {
+		super(recordSet, sourceRecordKey, targetRecordKey);
 	}
 
 	/**
 	 * method which do the slope calculation on base of linear regression
 	 */
 	public void run() {
-		if (recordSet == null) {
-			log.severe("can not start slope calculation -> recordSet == null");
+		if (recordSet == null || sourceRecordKey == null || targetRecordKey == null) {
+			log.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
 			return;
 		}
-		log.fine("start data calculation for record = " + RecordSet.SLOPE);
+		log.fine("start data calculation for record = " + targetRecordKey);
 
-		Record record = recordSet.get(RecordSet.SLOPE);
-		Record recordHeight = recordSet.get(RecordSet.HEIGHT);
+		Record record = recordSet.get(targetRecordKey);
+		Record recordHeight = recordSet.get(sourceRecordKey);
 		int time_ms = 50;
 		int interval = 1000 / time_ms; // 1 sec / 0.05 sec 
 		int pointInterval = 6;
@@ -116,7 +119,7 @@ public class LinearRegression extends CalculationThread {
 		record.setDisplayable(true);
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-		log.fine("finished data calculation for record = " + RecordSet.SLOPE);
+		log.fine("finished data calculation for record = " + targetRecordKey);
 	}
 
 }

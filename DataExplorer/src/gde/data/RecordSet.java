@@ -57,15 +57,6 @@ public class RecordSet extends HashMap<String, Record> {
 	private int														maxSize								= 0;																						// number of data point * time step = total time
 	private double												maxValue							= -20000, minValue = 20000;										// min max value
 
-	// some constants definitions
-	public static final String						VOLTAGE								= "Spannung";
-	public static final String						HEIGHT								= "Höhe";
-	public static final String						SLOPE									= "Steigrate";
-	public static final String						CURRENT								= "Strom";
-	public static final String						CHARGE								= "Ladung";
-	public static final String						POWER									= "Leistung";
-	public static final String						ENERGY								= "Energie";
-
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
@@ -146,7 +137,6 @@ public class RecordSet extends HashMap<String, Record> {
 						application.updateGraphicsWindow();
 					}
 				});
-				//application.updateDigitalLabelText(new String[] { new Double(points[0] / 1000.0).toString(), new Integer(points[1]).toString() });
 				application.updateDigitalWindowChilds();
 			}
 		}
