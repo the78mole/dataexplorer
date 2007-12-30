@@ -342,19 +342,25 @@ public class GraphicsWindow {
 
 						TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
 						item.setForeground(record.getColor());
-						//item.setFont(font);
 						item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
 						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
-						if (record.isVisible()) {
-							item.setChecked(true);
-							item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
-							item.setData(WINDOW_TYPE, type);
+						if (record.isDisplayable()) {
+							if (record.isVisible()) {
+								item.setChecked(true);
+								item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
+								item.setData(WINDOW_TYPE, type);
+							}
+							else {
+								item.setChecked(false);
+								item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
+								item.setData(WINDOW_TYPE, type);
+							}
 						}
 						else {
 							item.setChecked(false);
 							item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
 							item.setData(WINDOW_TYPE, type);
-							if (!recordSet.get(record.getKeyName()).isDisplayable()) item.setGrayed(true);
+							item.dispose();
 						}
 					}
 				}
