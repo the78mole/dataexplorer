@@ -85,7 +85,6 @@ public class CSVReaderWriter {
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
-			StringBuffer sb = new StringBuffer();
 			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
@@ -115,20 +114,18 @@ public class CSVReaderWriter {
 						throw new Exception("1"); // mismatch data signature
 					}
 					else {
-						int match = 0;
+						int match = 0;  // check match of the measurement units
 						for (int i = 1; i < header.length; i++) {
-							if (header[i].trim().split(" ")[0].equals(recordNames[i - 1])) ++match;
+							String expectUnit = device.getMeasurementDefinition(recordNames[i - 1]).getUnit();
+							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
+							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
+							log.fine("inUint = " + inUnit + " - expectUnit = " + expectUnit);
+							if (inUnit.equals(expectUnit)) ++match;
 						}
 						if (match != header.length - 1) {
 							throw new Exception("2"); // mismatch data header
 						}
 					}
-					recordNames = new String[sizeRecords];
-					for (int i = 0; i < sizeRecords; i++) {
-						recordNames[i] = header[i + 1].trim().split(" ")[0];
-						sb.append(recordNames[i] + ", ");
-					}
-					log.fine(sb.toString());
 					isData = true;
 				}
 				else { // isData
@@ -141,9 +138,11 @@ public class CSVReaderWriter {
 					sb = new StringBuffer();
 					for (int i = 0; i < sizeRecords; i++) {
 						data = dataStr[i + 1].trim().replace(',', '.');
-						double dPoint = new Double(data).doubleValue() * 1000; // multiply by 1000 reduces rounding errors for small values
+						double tmpDoubleValue = new Double(data).doubleValue();
+						double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
 						int point = (int) dPoint;
 						sb.append(point + ", ");
+						log.fine("recordNames[" + i + "] = " + recordNames[i]);
 						recordSet.getRecord(recordNames[i]).add(point);
 					}
 					log.fine(sb.toString());
@@ -208,7 +207,7 @@ public class CSVReaderWriter {
 				log.finest("append " + recordNames[i]);
 				if (isRaw) {
 				//TODO use all records which have this attribute in XML
-					if (!measurement.isCalculation()) {// only use active records for writing raw data 
+					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
 						sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append(']').append(separator);	
 						log.finest("append " + recordNames[i]);
 					}
@@ -233,11 +232,11 @@ public class CSVReaderWriter {
 					Record record = recordSet.getRecord(recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (record.isActive())
-							sb.append(df3.format(new Double(record.get(i))/1000.0).replace(',', decimalSeparator)).append(separator);
+							sb.append(df3.format(new Double(record.get(i))/1000.0).replace(',', decimalSeparator).replace('.', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace(',', decimalSeparator)).append(separator);
+						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace(',', decimalSeparator).replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(newLine);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
