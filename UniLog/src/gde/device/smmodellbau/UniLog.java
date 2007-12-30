@@ -75,14 +75,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * function to query the data unit of a measurement
-	 * @return the dataUnit
-	 */
-	public String getDataUnit(String recordKey) {
-		return "?";  // m/s, V, mAh
-	}
-	
-	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
