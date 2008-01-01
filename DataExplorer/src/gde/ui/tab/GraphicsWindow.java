@@ -22,12 +22,17 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -48,10 +53,24 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.CurveUtils;
 import osde.utils.TimeLine;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
@@ -82,6 +101,15 @@ public class GraphicsWindow {
 	private final TimeLine								timeLine								= new TimeLine();
 	private final int											type;
 	private boolean												isCurveSelectorEnabled	= true;
+	
+	private int														downX = 0;
+	private int														upX = 0;
+	private int														lastEvtX = 0;
+	private int														downY = 0;
+	private int														upY = 0;
+	private int														lastEvtY = 0;
+	
+
 
 	public GraphicsWindow(TabFolder displayTab, int type, String name) {
 		this.displayTab = displayTab;
@@ -188,6 +216,77 @@ public class GraphicsWindow {
 				graphicCanvas = new Canvas(graphicSashForm, SWT.NONE);
 				FillLayout graphicCanvasLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				graphicCanvas.setLayout(graphicCanvasLayout);
+				graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
+					public void mouseMove(MouseEvent evt) {
+						log.finest("graphicCanvas.mouseMove = " + evt);
+						if (evt.stateMask == 524288) {
+							Canvas canvas = (Canvas) evt.widget;
+							//GC gc = new GC (canvas);
+							GC gc = SWTResourceManager.getGC(canvas);
+							gc.setLineWidth (1);
+							if (downX < evt.x && downY < evt.y) {
+								gc.drawRectangle(downX, downY, evt.x - downX, evt.y - downY);
+								canvas.redraw(downX + 1, downY + 1, evt.x - downX - 1, evt.y - downY - 1, false);
+								canvas.redraw(evt.x + 1, downY, lastEvtX - evt.x, lastEvtY + 1 - downY, false);
+								canvas.redraw(downX, evt.y + 1, lastEvtX + 1 - downX, lastEvtY - evt.y + 1, false);
+							}
+							else if (downX < evt.x && downY > evt.y) {
+								gc.drawRectangle(downX, evt.y, evt.x - downX, downY - evt.y);
+								canvas.redraw(downX + 1, evt.y + 1, evt.x - downX - 1, downY - evt.y - 1, false);
+								canvas.redraw(downX, lastEvtY, lastEvtX + 1 - downX, evt.y - lastEvtY, false);
+								canvas.redraw(evt.x + 1, evt.y, lastEvtX - evt.x, downY - evt.y + 1, false);
+							}
+							else if (downX > evt.x && downY < evt.y) {
+								gc.drawRectangle(evt.x, downY, downX - evt.x , evt.y - downY);
+								canvas.redraw(evt.x + 1, downY + 1, downX - evt.x - 1, evt.y - downY - 1, false);
+								canvas.redraw(lastEvtX, downY, evt.x - lastEvtX, lastEvtY - downY + 1, false);
+								canvas.redraw(lastEvtX, evt.y + 1, downX - lastEvtX + 1, lastEvtY - evt.y, false);
+							}
+							else if (downX > evt.x && downY > evt.y) {
+								gc.drawRectangle(evt.x, evt.y, downX - evt.x, downY - evt.y);
+								canvas.redraw(evt.x + 1, evt.y + 1, downX - evt.x - 1, downY - evt.y - 1, false);
+								canvas.redraw(lastEvtX, lastEvtY, downX - lastEvtX + 1, evt.y - lastEvtY, false);
+								canvas.redraw(lastEvtX, lastEvtY, evt.x - lastEvtX, downY - lastEvtY + 1, false);
+							}
+							lastEvtX = evt.x;
+							lastEvtY = evt.y;
+							//gc.dispose ();
+						}
+						//TODO add your code for graphicCanvas.mouseMove
+					}
+				});
+				graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
+					public void mouseExit(MouseEvent evt) {
+						System.out.println("graphicCanvas.mouseExit, event="+evt);
+						//TODO add your code for graphicCanvas.mouseExit
+					}
+					public void mouseEnter(MouseEvent evt) {
+						System.out.println("graphicCanvas.mouseEnter, event="+evt);
+						//TODO add your code for graphicCanvas.mouseEnter
+					}
+				});
+				graphicCanvas.addMouseListener(new MouseAdapter() {
+					public void mouseDown(MouseEvent evt) {
+						System.out.println("graphicCanvas.mouseDown, event="+evt);
+						downX = evt.x;
+						downY = evt.y;
+					}
+					public void mouseUp(MouseEvent evt) {
+						System.out.println("graphicCanvas.mouseUp, event="+evt);
+						upX = evt.x;
+						upY = evt.y;
+						RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+						if (recordSet!= null && downX < upX) { // zoom
+							if (downY < upY) 
+								channels.getActiveChannel().getActiveRecordSet().setZoomValues(downX, downY, upX, upY, true);
+							else
+								channels.getActiveChannel().getActiveRecordSet().setZoomValues(downX, upY, upX, downY, true);
+						}
+						else {
+							if (recordSet!= null) recordSet.setZoomed(false);
+						}
+					}
+				});
 				graphicCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 				graphicCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
@@ -293,6 +392,8 @@ public class GraphicsWindow {
 		gc.drawLine(xMax, y0, xMax, yMax);
 
 		// draw curves for each active record
+		recordSet.setCurveBounds(new Rectangle(x0, y0-height, width, height));
+		log.info("curve bounds = " + x0 + " " + (y0-height) + " " + width + " " + height);
 		for (String record : recordSet.getRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
 			log.fine("drawing record = " + actualRecord.getName());
