@@ -22,14 +22,17 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
@@ -101,6 +104,10 @@ public class SWTResourceManager {
 		}
 		resources.clear();
 	}
+	
+	public static Font getFont(FontData fd) {
+		return getFont(fd.getName(), fd.getHeight(), fd.getStyle(), false, false);
+	}
 
 	public static Font getFont(String name, int size, int style) {
 		return getFont(name, size, style, false, false);
@@ -140,7 +147,7 @@ public class SWTResourceManager {
 	
 	@SuppressWarnings("unchecked")
 	public static Image getImage(int x, int y) {
-		String key = x + "_" + y;
+		String key = "IMAGE:" + x + "_" + y;
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -155,12 +162,57 @@ public class SWTResourceManager {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static Image getRotatedImage(Image image, int style) {	
+		Image resultImg = null;
+		
+		// Use the image's data to create a rotated image's data
+		ImageData sd = image.getImageData();
+		boolean up = (style & SWT.UP) == SWT.UP;
+		String key = "IMAGE_DATA_VERTICAL:" + sd.width + "_" + sd.height + "_" + style;
+
+		try {
+			if (resources.containsKey(key)) {
+				resultImg = (Image) resources.get(key);
+			}
+			else {
+				ImageData dd = new ImageData(sd.height, sd.width, sd.depth, sd.palette);
+				// Determine which way to rotate, depending on up or down
+				int dx = 0, dy = 0;
+				// Run through the horizontal pixels
+				for (int sx = 0; sx < sd.width; sx++) {
+					// Run through the vertical pixels
+					for (int sy = 0; sy < sd.height; sy++) {
+						// Determine where to move pixel to in destination image data
+						dx = up ? sy : sd.height - sy - 1;
+						dy = up ? sd.width - sx - 1 : sx;
+
+						// Swap the x, y source data to y, x in the destination
+						dd.setPixel(dx, dy, sd.getPixel(sx, sy));
+					}
+				}
+				// Create the vertical image
+				Image vertical = new Image(Display.getDefault(), dd);
+				log.info("new image created = " + key);
+				if (vertical != null) {
+					resources.put(key, vertical);
+					resultImg = vertical;
+				}
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return resultImg;
+	}
+
+	@SuppressWarnings("unchecked")
 	public static Image getImage(ImageData imageData) {
-		String key = imageData.getClass().getCanonicalName() + "_" + imageData.width + "_" + imageData.height;
+		//sd.height, sd.width, sd.depth, sd.palette
+		String key = "IMAGE_DATA:" + imageData.height + "_" + imageData.width + "_" + imageData.depth;
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), imageData);
+			log.info("new image created = " + key);
 			if (img != null)
 				resources.put(key, img);
 			return img;
@@ -179,6 +231,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(url))
 				return (Image) resources.get(url);
 			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(url));
+			log.info("new image created = " + url);
 			if (img != null)
 				resources.put(url, img);
 			return img;
@@ -186,6 +239,16 @@ public class SWTResourceManager {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Color getColor(int swtColor) {
+		String name = "COLOR:" + swtColor;
+		if (resources.containsKey(name))
+			return (Color) resources.get(name);
+		Color color = Display.getDefault().getSystemColor(swtColor);
+		resources.put(name, color);
+		return color;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -206,6 +269,39 @@ public class SWTResourceManager {
 		Cursor cursor = new Cursor(Display.getDefault(), type);
 		resources.put(name, cursor);
 		return cursor;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static GC getGC(Image img) {
+		String name = "GC_IMAGE:" + img.hashCode();
+		if (resources.containsKey(name))
+			return (GC) resources.get(name);
+		GC gc = new GC(img);
+		log.info("new GC created = " + name);
+		resources.put(name, gc);
+		return gc;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static GC getGC(Display display) {
+		String name = "GC_IMAGE:" + display.hashCode();
+		if (resources.containsKey(name))
+			return (GC) resources.get(name);
+		GC gc = new GC(display);
+		log.info("new GC created = " + name);
+		resources.put(name, gc);
+		return gc;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static GC getGC(Canvas canvas) {
+		String name = "GC_CANVAS:" + canvas.hashCode();
+		if (resources.containsKey(name))
+			return (GC) resources.get(name);
+		GC gc = new GC(canvas);
+		log.info("new GC created = " + name);
+		resources.put(name, gc);
+		return gc;
 	}
 
 }

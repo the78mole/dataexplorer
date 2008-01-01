@@ -22,12 +22,12 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 import osde.data.RecordSet;
+import osde.ui.SWTResourceManager;
 
 /**
  * Utility class to draw time line with tick marks and numbers
@@ -177,10 +177,10 @@ public class TimeLine {
 			String numberStr = new Integer(numberInt).toString();
 			FontData[] fd = gc.getFont().getFontData();
 			if (isMod60 && actualInt != 0)	fd[0].setStyle(SWT.BOLD);
-			gc.setFont(new Font(gc.getDevice(), fd));
+			gc.setFont(SWTResourceManager.getFont(fd[0]));
 			GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			fd[0].setStyle(SWT.NORMAL);
-			gc.setFont(new Font(gc.getDevice(), fd));
+			gc.setFont(SWTResourceManager.getFont(fd[0]));
 		}
 	}
 
