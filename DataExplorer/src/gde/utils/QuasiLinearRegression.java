@@ -107,7 +107,7 @@ public class QuasiLinearRegression extends CalculationThread {
 			int slope = 0;
 			// ad point over pointInterval only
 			for (int i = 0; i < pointInterval; i++) { // 0,5 sec
-				slope = new Double(ssXY / ssXX).intValue(); // slope = ssXY / ssXX;
+				slope = new Double(ssXY / ssXX / 2).intValue(); // slope = ssXY / ssXX / 2; 2*0.5 = 1
 				record.add(slope * 1000);
 			}
 			counter = counter + pointInterval;
