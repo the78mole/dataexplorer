@@ -131,7 +131,7 @@ public class CSVReaderWriter {
 				else { // isData
 					// 0; 14,780;  0,598;  1,000;  8,838;  0,002
 					String[] dataStr = line.split("" + separator);
-					String data = dataStr[0].trim().replace(decimalSeparator, '.');
+					String data = dataStr[0].trim().replace(',', '.');
 					new_time_ms = (int)(new Double(data).doubleValue() * 1000);
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
