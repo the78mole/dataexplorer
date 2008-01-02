@@ -119,7 +119,7 @@ public class CSVReaderWriter {
 							String expectUnit = device.getMeasurementDefinition(recordNames[i - 1]).getUnit();
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
-							log.fine("inUint = " + inUnit + " - expectUnit = " + expectUnit);
+							log.fine("inUnit = " + inUnit + " - expectUnit = " + expectUnit);
 							if (inUnit.equals(expectUnit)) ++match;
 						}
 						if (match != header.length - 1) {
