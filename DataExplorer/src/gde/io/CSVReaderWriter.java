@@ -86,7 +86,6 @@ public class CSVReaderWriter {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
 			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
-			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			while ((line = reader.readLine()) != null) {
 				if (isDeviceName) {
