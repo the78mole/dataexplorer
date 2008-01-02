@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import osde.device.DataCalculationType;
@@ -51,11 +52,20 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean												isSaved								= false;																				// indicates if the record set is saved to file
 	private boolean												isRaw									= false;																				// indicates imported file with raw data, no translation at all
 	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
-
+	private Rectangle											curveBounds;
+	
 	//in compare set x min/max and y max (time) might be different
 	private boolean												isCompareSet					= false;
 	private int														maxSize								= 0;																						// number of data point * time step = total time
-	private double												maxValue							= -20000, minValue = 20000;										// min max value
+	private double												maxValue							= -20000;
+	private double												minValue 							= 20000;										// min max value
+	
+	//zooming
+	private boolean 											isZoomed;
+	private int														minZoomX;
+	private int														maxZoomX;
+	private int														minZoomY;
+	private int														maxZoomY;
 
 	/**
 	 * data buffers according the size of given names array, where
@@ -473,5 +483,64 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isCompareSet() {
 		return isCompareSet;
+	}
+
+	/**
+	 * set zooming values
+	 * @param minX
+	 * @param minY
+	 * @param maxX
+	 * @param maxY
+	 */
+	public void setZoomValues(int minX, int minY, int maxX, int maxY, boolean isZoomed) {
+		minZoomX = minX;
+		minZoomY = minY;
+		maxZoomX = maxX;
+		maxZoomY = maxY;
+		this.isZoomed = isZoomed;
+		log.fine(String.format("isZoomed = %b, minX = %d, minY = %d, maxX = %d, maxY = %d", isZoomed, minZoomX, minZoomY, maxZoomX, maxZoomY));
+	}
+
+	/**
+	 * get the values set to be used for zoomed display
+	 * @return zoom values minX, minY, maxX, maxY
+	 */
+	public int[] getZoomValues() {
+		int[] values = new int[4];
+		values[0] = minZoomX;
+		values[1] = minZoomY;
+		values[2] = maxZoomX;
+		values[3] = maxZoomY;
+		log.fine(String.format("isZoomed = %b, minX = %d, minY = %d, maxX = %d, maxY = %d", isZoomed, minZoomX, minZoomY, maxZoomX, maxZoomY));
+		return values;
+	}
+
+	/**
+	 * @return the isZoomed
+	 */
+	public boolean isZoomed() {
+		return isZoomed;
+	}
+
+	/**
+	 * @param isZoomed the isZoomed to set
+	 */
+	public void setZoomed(boolean isZoomed) {
+		this.isZoomed = isZoomed;
+	}
+
+	/**
+	 * @return the curveBounds, this is the area where curves are drawn
+	 */
+	public Rectangle getCurveBounds() {
+		return curveBounds;
+	}
+
+	/**
+	 * define the area where curves are drawn (clipping, image)
+	 * @param curveBounds the curveBounds to set
+	 */
+	public void setCurveBounds(Rectangle curveBounds) {
+		this.curveBounds = curveBounds;
 	}
 }

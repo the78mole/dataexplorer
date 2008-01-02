@@ -47,11 +47,11 @@ public class CurveUtils {
 	 * @param height
 	 * @param scaleWidthSpace
 	 */
-	public static void draw(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
+	public static double[] drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-
+		double[] yMinMax = new double[2];
 		if (log.isLoggable(Level.FINEST)) log.finest("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
-		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
+		if (record.isEmpty() && !record.isDisplayable()) return yMinMax; // nothing to display
 		boolean isCompareSet = record.getParent().isCompareSet();
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
 		log.fine("drawing record =" + recordName + " isCompareSet = " + isCompareSet);
@@ -130,7 +130,7 @@ public class CurveUtils {
 		DecimalFormat df = record.getDecimalFormat();
 		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		if (isPositionLeft) {
-			int xPos = x0 - positionNumber * scaleWidthSpace;
+			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0, xPos, y0 - height); //xPos = x0
 			if (log.isLoggable(Level.FINE)) log.fine("y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
@@ -146,11 +146,30 @@ public class CurveUtils {
 			GraphicsUtils.drawVerticalTickMarks(gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
 			GraphicsUtils.drawText(graphText, (int) (xPos + pt.x + 15), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
-		// draw the curve
+		yMinMax[0] = yMinValue;
+		yMinMax[1] = yMaxValue;
+		return yMinMax;
+	}
+
+	/**
+	 * method draw the curve using the given graphics context (GC)
+	 * @param gc
+	 * @param record
+	 * @param x0
+	 * @param y0
+	 * @param width
+	 * @param height
+	 * @param isCompareSet
+	 * @param yMinValue
+	 * @param yMaxValue
+	 */
+	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, double yMinValue, double yMaxValue) {
+		
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
-		gc.setClipping(x0, y0 - height, width, height);
+		log.info("clipping bounds = " + record.getParent().getCurveBounds().toString());
+		//gc.setClipping(record.getParent().getCurveBounds());
 		Integer[] intRecord = record.get();
 		int intRecordSize = intRecord.length;
 
@@ -195,7 +214,7 @@ public class CurveUtils {
 		}
 		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 	}
-
+	
 	/**
 	 * @param double array minValue, maxValue 
 	 * @return double array roundMinValue, roundMaxValue 

@@ -55,6 +55,11 @@ public class MenuToolBar {
 	private ToolItem											openToolItem;
 	private ToolItem											newToolItem;
 	private ToolBar												menuToolBar;
+	private ToolItem fitIntoItem;
+	private ToolItem resizeItem;
+	private ToolItem zoomWindowItem;
+	private ToolBar zoomToolBar;
+	private CoolItem zoomCoolItem;
 	private Composite											mainToolComposite;
 
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
@@ -64,6 +69,13 @@ public class MenuToolBar {
 
 	public void init() {
 		menuCoolBar = new CoolBar(this.application, SWT.NONE);
+
+		{
+//Register as a resource user - SWTResourceManager will
+//handle the obtaining and disposing of resources
+SWTResourceManager.registerResourceUser(menuCoolBar);
+		}
+
 		menuCoolBar.setSize(530, 191);
 		create();
 	}
@@ -245,6 +257,52 @@ public class MenuToolBar {
 				}
 			}
 
+		}
+		{
+			zoomCoolItem = new CoolItem(menuCoolBar, SWT.NONE);
+			zoomCoolItem.setText("coolItem1");
+			zoomCoolItem.setSize(60, 30);
+			{
+				zoomToolBar = new ToolBar(menuCoolBar, SWT.NONE);
+				zoomCoolItem.setControl(zoomToolBar);
+				zoomToolBar.setSize(60, 30);
+				{
+					zoomWindowItem = new ToolItem(zoomToolBar, SWT.NONE);
+					zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
+					zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
+					zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
+					zoomWindowItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("zoomWindowItem.widgetSelected, event="+evt);
+							application.setZoomMode(true);
+						}
+					});
+				}
+				{
+					resizeItem = new ToolItem(zoomToolBar, SWT.NONE);
+					resizeItem.setImage(SWTResourceManager.getImage("osde/resource/Resize.gif"));
+					resizeItem.setHotImage(SWTResourceManager.getImage("osde/resource/ResizeHot.gif"));
+					resizeItem.setToolTipText("Größe verändern");
+					resizeItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("resizeItem.widgetSelected, event="+evt);
+							//TODO add your code for resizeItem.widgetSelected
+						}
+					});
+				}
+				{
+					fitIntoItem = new ToolItem(zoomToolBar, SWT.NONE);
+					fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif"));
+					fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
+					fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
+					fitIntoItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("fitIntoItem.widgetSelected, event="+evt);
+							application.setZoomMode(false);
+						}
+					});
+				}
+			}
 		}
 	}
 
