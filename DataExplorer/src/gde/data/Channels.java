@@ -89,10 +89,10 @@ public class Channels extends HashMap<Integer, Channel> {
 		log.fine("switching to channel " + channelNumber);
 		if (channelNumber != this.getActiveChannelNumber()) {
 			this.setActiveChannelNumber(channelNumber);
-			application.getDataToolBar().updateChannelToolItems();
+			application.getMenuToolBar().updateChannelToolItems();
 			// set record set to the first
 			this.getActiveChannel().setActiveRecordSet(instance.getActiveChannel().getRecordSetNames()[0]);
-			application.getDataToolBar().updateRecordSetSelectCombo();
+			application.getMenuToolBar().updateRecordSetSelectCombo();
 			// update viewable
 			//application.getGraphicsWindow().redrawGrahics();
 			application.updateDataTable();

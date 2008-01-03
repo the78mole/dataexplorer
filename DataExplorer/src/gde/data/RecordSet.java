@@ -32,7 +32,7 @@ import osde.device.DataCalculationType;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.menu.DataToolBar;
+import osde.ui.menu.MenuToolBar;
 
 /**
  * DeviceRecords class holds all the data records for the configured measurement
@@ -344,19 +344,19 @@ public class RecordSet extends HashMap<String, Record> {
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				DataToolBar dataToolBar = application.getDataToolBar();
-				String[] recordSetNames = dataToolBar.updateRecordSetSelectCombo();
+				MenuToolBar menuToolBar = application.getMenuToolBar();
+				String[] recordSetNames = menuToolBar.updateRecordSetSelectCombo();
 				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
 				//application.getGraphicsWindow().redrawGrahics();
 				application.updateDataTable();
 				application.updateDigitalWindow();
 				for (int i = 0; i < recordSetNames.length; i++) {
 					if (recordSetNames[i].equals(recordSetKey)) {
-						dataToolBar.getRecordSelectCombo().select(i);
+						menuToolBar.getRecordSelectCombo().select(i);
 						log.fine("switching to record set " + recordSetKey + " - list position " + i);
 					}
 				}
-				dataToolBar.updateRecordToolItems();
+				menuToolBar.updateRecordToolItems();
 			}
 		});
 	}

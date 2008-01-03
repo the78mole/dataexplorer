@@ -786,10 +786,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		channels.setActiveChannelNumber(1); // set K1: Kanal1 as default after device switch
 
-		application.getDataToolBar().updateChannelSelector();
+		application.getMenuToolBar().updateChannelSelector();
 		application.updateGraphicsWindow();
 		application.updateDataTable();
-		application.getDataToolBar().updateRecordSetSelectCombo(); // clear
+		application.getMenuToolBar().updateRecordSetSelectCombo(); // clear
 
 		return;
 	}
