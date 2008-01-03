@@ -498,7 +498,7 @@ public class AkkuMasterChannelTab {
 															channel.applyTemplate(recordSetKey);
 															// switch the active record set if the current record set is child of active channel
 															if (channel.getName().equals(channels.getActiveChannel().getName())) {
-																application.getDataToolBar().addRecordSetName(recordSetKey);
+																application.getMenuToolBar().addRecordSetName(recordSetKey);
 																channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSetKey);
 															}
 															// update discharge / charge current display

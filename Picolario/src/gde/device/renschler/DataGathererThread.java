@@ -93,7 +93,7 @@ public class DataGathererThread extends Thread {
 				calculationThread.start();
 
 				if (channel.getName().equals(Channels.getInstance().getActiveChannel().getName())) {
-					application.getDataToolBar().addRecordSetName(recordSetKey);
+					application.getMenuToolBar().addRecordSetName(recordSetKey);
 					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
 				}
 
