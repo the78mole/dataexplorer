@@ -340,7 +340,7 @@ public class MenuToolBar {
 							if(log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event="+evt);
 							application.setZoomMode(false);
 							RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-							if (recordSet!= null) recordSet.setZoomed(false);
+							if (recordSet!= null) recordSet.setZoomLevel(0);
 							application.updateGraphicsWindow();
 						}
 					});

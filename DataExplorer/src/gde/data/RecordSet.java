@@ -61,7 +61,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private double												minValue 							= 20000;										// min max value
 	
 	//zooming
-	private boolean 											isZoomed = false;
+	private int 													zoomLevel 						= 0; // 0 == not zoomed
 
 	/**
 	 * data buffers according the size of given names array, where
@@ -485,14 +485,28 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the isZoomed
 	 */
 	public boolean isZoomed() {
-		return isZoomed;
+		return zoomLevel > 0;
 	}
 
 	/**
-	 * @param isZoomed the isZoomed to set
+	 * @return the the zoom level
 	 */
-	public void setZoomed(boolean isZoomed) {
-		this.isZoomed = isZoomed;
+	public int getZoomLevel() {
+		return zoomLevel;
+	}
+
+	/**
+	 * @param newZoomLevel
+	 */
+	public void setZoomLevel(int newZoomLevel) {
+		this.zoomLevel = newZoomLevel;
+		if (newZoomLevel == 0) {
+			//TODO clean all zoom record sets
+		}
+		else {
+			//TODO create new zoom record sets using startPoint, numberPoints, where startPoint defines also startTime
+			// if zoomLevel > 1 use newZoomLevel - 1 as source record set
+		}
 	}
 
 	/**
