@@ -37,8 +37,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
-import osde.utils.GraphicsUtils;
-
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
  * There are no restrictions on the use of this code.
@@ -54,7 +52,7 @@ import osde.utils.GraphicsUtils;
  * @author Winfried Brügmann
  */
 public class SWTResourceManager {
-	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());
+	private static Logger log = Logger.getLogger(SWTResourceManager.class.getName());
 
 	@SuppressWarnings("unchecked")
 	private static HashMap resources = new HashMap();
@@ -134,6 +132,7 @@ public class SWTResourceManager {
 			}
 		}
 		Font font = new Font(Display.getDefault(), fd);
+		log.info("new font created = " + fontName);
 		resources.put(fontName, font);
 		return font;
 	}
@@ -146,12 +145,13 @@ public class SWTResourceManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Image getImage(int x, int y) {
-		String key = "IMAGE:" + x + "_" + y;
+	public static Image getImage(int x, int y, String descriptor) {
+		String key = "IMAGE_"+ descriptor + ":" + x + "_" + y;
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
+			log.info("new image created = " + key);
 			if (img != null)
 				resources.put(key, img);
 			return img;
@@ -247,6 +247,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = Display.getDefault().getSystemColor(swtColor);
+		log.info("new color created = " + name);
 		resources.put(name, color);
 		return color;
 	}
@@ -257,6 +258,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = new Color(Display.getDefault(), red, green, blue);
+		log.info("new color created = " + name);
 		resources.put(name, color);
 		return color;
 	}
@@ -267,6 +269,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Cursor) resources.get(name);
 		Cursor cursor = new Cursor(Display.getDefault(), type);
+		log.info("new cursor created = " + name);
 		resources.put(name, cursor);
 		return cursor;
 	}
@@ -294,8 +297,8 @@ public class SWTResourceManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static GC getGC(Canvas canvas) {
-		String name = "GC_CANVAS:" + canvas.hashCode();
+	public static GC getGC(Canvas canvas, String descriptorKey) {
+		String name = "GC_CANVAS:" + descriptorKey;
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(canvas);

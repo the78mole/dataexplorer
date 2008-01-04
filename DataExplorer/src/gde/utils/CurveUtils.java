@@ -164,58 +164,69 @@ public class CurveUtils {
 	 * @param yMaxValue
 	 */
 	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, double yMinValue, double yMaxValue) {
-		
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("x0 = %d, y0 = %d, width = %d, height = %d, yMinValue = %.3f, yMaxValue = %.3f", x0, y0, width, height, yMinValue, yMaxValue));
+		if (log.isLoggable(Level.FINER)) log.finer("curve area bounds = " + record.getParent().getCurveBounds().toString());
+		//gc.setClipping(record.getParent().getCurveBounds());
+	
+		// set line properties according adjustment
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
-		log.info("clipping bounds = " + record.getParent().getCurveBounds().toString());
-		//gc.setClipping(record.getParent().getCurveBounds());
+		
+		// get the data points
 		Integer[] intRecord = record.get();
 		int intRecordSize = intRecord.length;
 
-		int i = 0;
+		// calculate time line adaption if record set is compare set, compare set max have different times for each record
 		int timeStep = record.getTimeStep_ms();
-		double adaptXMaxValue = isCompareSet ? (1.0 * (intRecordSize - 1) * record.getParent().getMaxSize() / intRecordSize * timeStep) : (1.0 * (intRecordSize - 1) * timeStep);
+		double adaptXMaxValue = isCompareSet ? (1.0 * intRecordSize * record.getParent().getMaxSize() / intRecordSize * timeStep) : (1.0 * intRecordSize * timeStep);
+		
+		// calculate scale factor to fit time into draw bounds
 		double factorX = (1.0 * width) / adaptXMaxValue;
 		double factorY = (1.0 * height) / (yMaxValue - yMinValue);
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("factorX = %.3f factorY = %.3f (yMaxValue - yMinValue) = %.3f", factorX, factorY, (yMaxValue - yMinValue)));
-		StringBuffer sb = new StringBuffer();
+		
+		StringBuffer sb = new StringBuffer(); // logging purpose
 		Point newPoint, oldPoint;
+		// calculate start point of the curve, which is the first oldPoint
 		oldPoint = new Point(x0, (int) (y0 - ((record.get(0) / 1000.0) - yMinValue) * factorY));
-		// scale existing points to draw area and connect the point
+		if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(oldPoint.toString());
+		
+		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
 		if (intRecord != null && record.size() > 1) {
-			// calculate xScale for curves with much to many data points
+			
+			// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
 			int xScale = 1;
-			if (intRecordSize > (width << 1)) {
-				xScale = intRecordSize / (width << 1);
+			if (intRecordSize > (width * 2)) {
+				xScale = intRecordSize / (width * 2);
 				factorX = factorX * xScale;
 			}
+			
 			for (int j = 0; j < intRecordSize; j = j + xScale) {
+				// get the value to be drawn
 				int intValue = intRecord[j];
-				int pointX = new Double((x0 + (timeStep * i++) * factorX)).intValue();
-
+				// calculate position in x-direction
+				int pointX = new Double((x0 + (timeStep * j) * factorX)).intValue();
+				// calculate position in y-direction, where the value has to be divided by 1000 (points == integer -> 1234 = 1.234), subtract the minimum value to start drawing at y0
 				double deltaY = (intValue / 1000.0) - yMinValue;
 				int pointY = new Double(y0 - (deltaY * factorY)).intValue();
-				if (log.isLoggable(Level.FINEST)) log.finest("(intValue / 1000.0) = " + (intValue / 1000.0) + " yMinValue = " + yMinValue + " factorY = " + factorY);
-
-				if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append("pointX = " + pointX + " -  pointY = " + pointY);
 
 				newPoint = new Point(pointX, pointY);
+				if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(newPoint.toString());
+
 				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-				//				else {
-				//					if (newPoint.x != oldPoint.x || newPoint.y != oldPoint.y) {
-				//						if (log.isLoggable(Level.FINE)) sb.append(lineSep).append("newPoint != oldPoint  ----------------------------------------");
-				//						gc.drawLine(veryOldPoint.x, veryOldPoint.y, oldPoint.x, oldPoint.y);
-				//						gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-				//						veryOldPoint = newPoint;
-				//					}
+				
+				// remember the last draw point for next drawLine operation
 				oldPoint = newPoint;
 			}
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.finest(sb.toString());
 	}
 	
 	/**
+	 * adapted rounding  
+	 * - a small number needs different rounding compared to a big number 0.05 -> 0.1, 529 -> 550
+	 * - a small value delta needs different rounding compared to a big delta 10 -> +-1, 200 +-10 
 	 * @param double array minValue, maxValue 
 	 * @return double array roundMinValue, roundMaxValue 
 	 */
