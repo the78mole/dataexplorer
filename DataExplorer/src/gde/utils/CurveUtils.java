@@ -202,11 +202,11 @@ public class CurveUtils {
 				factorX = factorX * xScale;
 			}
 			
-			for (int j = 0; j < intRecordSize; j = j + xScale) {
+			for (int i = 0, j = 0; j < intRecordSize; ++i, j = j + xScale) {
 				// get the value to be drawn
 				int intValue = intRecord[j];
 				// calculate position in x-direction
-				int pointX = new Double((x0 + (timeStep * j) * factorX)).intValue();
+				int pointX = new Double((x0 + (timeStep * i) * factorX)).intValue();
 				// calculate position in y-direction, where the value has to be divided by 1000 (points == integer -> 1234 = 1.234), subtract the minimum value to start drawing at y0
 				double deltaY = (intValue / 1000.0) - yMinValue;
 				int pointY = new Double(y0 - (deltaY * factorY)).intValue();
