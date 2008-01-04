@@ -174,6 +174,8 @@ public class CSVReaderWriter {
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät");
 			else if (e.getMessage().startsWith("1"))
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht der Messgrößensignatur des eingestellten Gerätes");
+			else if (e.getMessage().startsWith("2"))
+				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei hat ...");
 			else
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
 			throw e;
@@ -225,17 +227,20 @@ public class CSVReaderWriter {
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
-				sb.append((df2.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace(',', decimalSeparator)).append(separator).append(' ');
+				sb.append((df2.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (record.isActive())
-							sb.append(df3.format(new Double(record.get(i))/1000.0).replace(',', decimalSeparator).replace('.', decimalSeparator)).append(separator);
+							if (record.getParent().isRaw())
+								sb.append(df3.format(new Double(record.get(i))/1000.0).replace('.', decimalSeparator)).append(separator);
+							else
+								sb.append(df3.format(device.reverseTranslateValue(record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace(',', decimalSeparator).replace('.', decimalSeparator)).append(separator);
+						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(newLine);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
