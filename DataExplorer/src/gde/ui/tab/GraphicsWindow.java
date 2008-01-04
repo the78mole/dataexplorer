@@ -61,18 +61,6 @@ import osde.utils.TimeLine;
 
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
-/**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
@@ -104,10 +92,10 @@ public class GraphicsWindow {
 	private boolean												isCurveSelectorEnabled	= true;
 	
 	private int														xDown = 0;
-	private int														upX = 0;
+	private int														xUp = 0;
 	private int														xLast = 0;
 	private int														yDown = 0;
-	private int														upY = 0;
+	private int														yUp = 0;
 	private int														yLast = 0;
 	private Image 												curveArea;
 	private int														offSetX, offSetY;
@@ -223,126 +211,147 @@ public class GraphicsWindow {
 				graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 					public void mouseMove(MouseEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseMove = " + evt);
-						if (curveArea != null && isZoomMode) {
-							if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-								Canvas canvas = (Canvas) evt.widget;
-								Rectangle drawAreaBounds = curveArea.getBounds(); 
-								int minX = offSetX + 2;
-								int maxX = offSetX + drawAreaBounds.width - 2;
-								int minY = offSetY + 2;
-								int maxY = offSetY + drawAreaBounds.height - 2;
-								if (xDown < minX || xDown > maxX) {
-									xDown = xDown < minX ? minX : maxX;
-								}
-								if (yDown < minY || yDown > maxY) {
-									yDown = yDown < minY ? minY : maxY;
-								}
-								if (evt.x < minX || evt.x > maxX) {
-									evt.x = evt.x < minX ? minX : maxX;
-								}
-								if (evt.y < minY || evt.y > maxY) {
-									evt.y = evt.y < minY ? minY : maxY;
-								}
-								GC gc = SWTResourceManager.getGC(canvas);
-								gc.setLineWidth(1);
-								gc.setLineStyle(SWT.LINE_DASH);
-								if (log.isLoggable(Level.FINER)) log.finer(String.format("x_down = %d, evt.x = %d, x_last = %d  -  y_down = %d, evt.y = %d, y_last = %d", xDown, evt.x, xLast, yDown, evt.y, yLast));
-								try {
-									if (xDown < evt.x && yDown < evt.y) { //top left -> bottom right
-										if (xLast > evt.x && yLast >= yDown || yLast > evt.y && xLast >= xDown) {
-											gc.drawImage(curveArea, xDown-offSetX, yDown-offSetY, xLast - xDown + 1, yLast - yDown + 1, 
-																							xDown,         yDown,         xLast - xDown + 1, yLast - yDown + 1);
-										}
-										else
-											gc.drawImage(curveArea, xDown-offSetX, yDown-offSetY, evt.x - xDown + 1, evt.y - yDown + 1, 
-																							xDown,         yDown,         evt.x - xDown + 1, evt.y - yDown + 1);
-											
-										gc.drawRectangle(xDown, yDown, evt.x - xDown, evt.y - yDown);
-									}
-									if (xDown < evt.x && yDown > evt.y) { // bottom left -> top right
-										if (xLast > evt.x && yDown >= yLast || yLast != 0 && yLast < evt.y && xLast >= xDown) {
-											gc.drawImage(curveArea, xDown-offSetX, yLast-offSetY, xLast - xDown + 1, yDown - yLast + 1, 
-																							xDown,         yLast,         xLast - xDown + 1, yDown - yLast + 1);
-										}
-										else
-											gc.drawImage(curveArea, xDown-offSetX, evt.y-offSetY, evt.x - xDown + 1, yDown - evt.y + 1, 
-																							xDown,         evt.y,         evt.x - xDown + 1, yDown - evt.y + 1);
+						if (curveArea != null && isZoomMode && (evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+							Canvas canvas = (Canvas) evt.widget;
+							Rectangle drawAreaBounds = curveArea.getBounds();
+							// check mouse within drawArea
+							int minX = offSetX;
+							int maxX = offSetX + drawAreaBounds.width;
+							int minY = offSetY;
+							int maxY = offSetY + drawAreaBounds.height;
+							if (evt.x < minX || evt.x > maxX) {
+								evt.x = evt.x < minX ? minX : maxX;
+							}
+							if (evt.y < minY || evt.y > maxY) {
+								evt.y = evt.y < minY ? minY : maxY;
+							}
+							if (log.isLoggable(Level.INFO)) log.info(String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", xDown, evt.x, xLast, yDown, evt.y, yLast));
 
-										gc.drawRectangle(xDown, evt.y, evt.x - xDown, yDown - evt.y);
+							// get the graphics context and set the gc properties
+							GC gc = SWTResourceManager.getGC(canvas, "curveArea");
+							gc.setLineWidth(1);
+							gc.setLineStyle(SWT.LINE_DASH);
+							try {
+								if (xDown < evt.x && yDown < evt.y) { //top left -> bottom right
+									if (xLast > evt.x && yLast >= yDown || yLast > evt.y && xLast >= xDown) {
+										gc.drawImage(curveArea, xDown - offSetX, yDown - offSetY, xLast - xDown + 1, yLast - yDown + 1, xDown, yDown, xLast - xDown + 1, yLast - yDown + 1);
 									}
-									if (xDown > evt.x && yDown < evt.y) {	//top right -> left bottom
-										if (xLast != 0 && xLast < evt.x && yDown <= yLast || yLast > evt.y && xDown >= xLast) {
-											gc.drawImage(curveArea, xLast-offSetX, yDown-offSetY, xDown - xLast + 1, yLast - yDown + 1, 
-																							xLast,         yDown,         xDown - xLast + 1, yLast - yDown + 1);
-										}
-										else
-											gc.drawImage(curveArea, evt.x-offSetX, yDown-offSetY, xDown - evt.x + 1, evt.y - yDown + 1, 
-																							evt.x,         yDown,         xDown - evt.x + 1, evt.y - yDown + 1);
+									else
+										gc.drawImage(curveArea, xDown - offSetX, yDown - offSetY, evt.x - xDown + 1, evt.y - yDown + 1, xDown, yDown, evt.x - xDown + 1, evt.y - yDown + 1);
 
-										gc.drawRectangle(evt.x, yDown, xDown - evt.x, evt.y - yDown);
-									}
-									if (xDown > evt.x && yDown > evt.y) {	// bottom left -> top right
-										if (xLast != 0 && xLast < evt.x && yDown >= yLast || yLast != 0 && yLast < evt.y) {
-											gc.drawImage(curveArea, xLast-offSetX, yLast-offSetY, xDown - xLast + 1, yDown - yLast + 1, 
-																							xLast,         yLast,         xDown - xLast + 1, yDown - yLast + 1);
-										}
-										else
-											gc.drawImage(curveArea, evt.x-offSetX, evt.y-offSetY, xDown - evt.x + 1, yDown - evt.y + 1, 
-																							evt.x,         evt.y,         xDown - evt.x + 1, yDown - evt.y + 1);
-
-										gc.drawRectangle(evt.x, evt.y, xDown - evt.x, yDown - evt.y);
-									}
-									if (xDown <= evt.x + 5 && xDown >= evt.x - 5 && yLast != 0) {	// overlap x-direction
-										int delta = yLast - yDown > 0 ? yLast - yDown + 10: yDown - yLast + 10;
-										int top = yLast - yDown > 0 ? yDown + 5 : yLast - 5;
-										gc.drawImage(curveArea, xDown-5-offSetX, top-offSetY, 11, delta, 
-																						xDown-5,         top,         11, delta);
-									}
-									if (yDown <= evt.y + 5 && yDown >= evt.y - 5 && xLast != 0) {	// overlap x-direction
-										int delta = xLast - xDown > 0 ? xLast - xDown + 10 : xDown - xLast + 10;
-										int left = xLast - xDown > 0 ? xDown - 5 : xLast - 5;
-										gc.drawImage(curveArea, left-offSetX, yDown-5-offSetY, delta, 11, 
-																						left,         yDown-5,         delta, 11);
-									}
-									xLast = evt.x;
-									yLast = evt.y;
+									gc.drawRectangle(xDown, yDown, evt.x - xDown, evt.y - yDown);
 								}
-								catch (RuntimeException e) {
-									log.log(Level.WARNING, e.getMessage(), e);
+								if (xDown < evt.x && yDown > evt.y) { // bottom left -> top right
+									if (xLast > evt.x && yDown >= yLast || yLast != 0 && yLast < evt.y && xLast >= xDown) {
+										gc.drawImage(curveArea, xDown - offSetX, yLast - offSetY, xLast - xDown + 1, yDown - yLast + 1, xDown, yLast, xLast - xDown + 1, yDown - yLast + 1);
+									}
+									else
+										gc.drawImage(curveArea, xDown - offSetX, evt.y - offSetY, evt.x - xDown + 1, yDown - evt.y + 1, xDown, evt.y, evt.x - xDown + 1, yDown - evt.y + 1);
+
+									gc.drawRectangle(xDown, evt.y, evt.x - xDown, yDown - evt.y);
+								}
+								if (xDown > evt.x && yDown < evt.y) { //top right -> left bottom
+									if (xLast != 0 && xLast < evt.x && yDown <= yLast || yLast > evt.y && xDown >= xLast) {
+										gc.drawImage(curveArea, xLast - offSetX, yDown - offSetY, xDown - xLast + 1, yLast - yDown + 1, xLast, yDown, xDown - xLast + 1, yLast - yDown + 1);
+									}
+									else
+										gc.drawImage(curveArea, evt.x - offSetX, yDown - offSetY, xDown - evt.x + 1, evt.y - yDown + 1, evt.x, yDown, xDown - evt.x + 1, evt.y - yDown + 1);
+
+									gc.drawRectangle(evt.x, yDown, xDown - evt.x, evt.y - yDown);
+								}
+								if (xDown > evt.x && yDown > evt.y) { // bottom left -> top right
+									if (xLast != 0 && xLast < evt.x && yDown >= yLast || yLast != 0 && yLast < evt.y) {
+										gc.drawImage(curveArea, xLast - offSetX, yLast - offSetY, xDown - xLast + 1, yDown - yLast + 1, xLast, yLast, xDown - xLast + 1, yDown - yLast + 1);
+									}
+									else
+										gc.drawImage(curveArea, evt.x - offSetX, evt.y - offSetY, xDown - evt.x + 1, yDown - evt.y + 1, evt.x, evt.y, xDown - evt.x + 1, yDown - evt.y + 1);
+
+									gc.drawRectangle(evt.x, evt.y, xDown - evt.x, yDown - evt.y);
+								}
+								if (xDown < evt.x + 5 && xDown > evt.x - 5 && yLast != 0) { // overlap x-direction
+									int top = yLast - yDown > 0 ? yDown - 5 : yLast - 5;
+									top = top < minY ? minY : top;
+									int delta = yLast - yDown > 0 ? yLast - yDown + 10 : yDown - yLast + 10;
+									delta = (top + delta) > maxY ? (maxY - top) : delta;
+									gc.drawImage(curveArea, xDown - 5 - offSetX, top - offSetY, 11, delta, xDown - 5, top, 11, delta);
+								}
+								if (yDown < evt.y + 5 && yDown > evt.y - 5 && xLast != 0) { // overlap x-direction
+									int left = xLast - xDown > 0 ? xDown - 5 : xLast - 5;
+									left = left < minX ? minX : left;
+									int delta = xLast - xDown > 0 ? xLast - xDown + 10 : xDown - xLast + 10;
+									delta = (left + delta) > (maxX - left) ? maxX : delta;
+									gc.drawImage(curveArea, left - offSetX, yDown - 5 - offSetY, delta, 11, left, yDown - 5, delta, 11);
 								}
 							}
+							catch (RuntimeException e) {
+								log.log(Level.WARNING, "mouse pointer out of range");
+							}
+							xLast = evt.x;
+							yLast = evt.y;
 						}
 					}
 				});
 				graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseExit(MouseEvent evt) {
-						System.out.println("graphicCanvas.mouseExit, event="+evt);
-						//TODO add your code for graphicCanvas.mouseExit
+						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseExit, event="+evt);
+						application.setDefaultCursor();
 					}
 					public void mouseEnter(MouseEvent evt) {
-						System.out.println("graphicCanvas.mouseEnter, event="+evt);
-						//TODO add your code for graphicCanvas.mouseEnter
+						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseEnter, event="+evt);
+						if(isZoomMode) application.setCursor(SWT.CURSOR_CROSS);
 					}
 				});
 				graphicCanvas.addMouseListener(new MouseAdapter() {
 					public void mouseDown(MouseEvent evt) {
-						System.out.println("graphicCanvas.mouseDown, event="+evt);
-						xDown = evt.x;
-						yDown = evt.y;
+						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseDown, event="+evt);
+						if (curveArea != null) {
+							xDown = evt.x;
+							yDown = evt.y;
+							// get the draw area size
+							Rectangle drawAreaBounds = curveArea.getBounds();
+							int minX = offSetX;
+							int maxX = offSetX + drawAreaBounds.width;
+							int minY = offSetY;
+							int maxY = offSetY + drawAreaBounds.height;
+							if (xDown < minX || xDown > maxX) {
+								xDown = xDown < minX ? minX : maxX;
+							}
+							if (yDown < minY || yDown > maxY) {
+								yDown = yDown < minY ? minY : maxY;
+							}
+							if(log.isLoggable(Level.INFO)) log.info("xDown = " + xDown + " yDown = " + yDown);
+						}
 					}
 					public void mouseUp(MouseEvent evt) {
-						System.out.println("graphicCanvas.mouseUp, event="+evt);
-						upX = evt.x;
-						upY = evt.y;
+						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseUp, event="+evt);
 						RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-						if (recordSet!= null && xDown < upX) { // zoom
-							if (yDown < upY) 
-								channels.getActiveChannel().getActiveRecordSet().setZoomValues(xDown, yDown, upX, upY, true);
-							else
-								channels.getActiveChannel().getActiveRecordSet().setZoomValues(xDown, upY, upX, yDown, true);
-						}
-						else {
-							if (recordSet!= null) recordSet.setZoomed(false);
+						if (curveArea != null && recordSet != null) {
+							xUp = evt.x;
+							yUp = evt.y;
+							// get the draw area size and check or correct 
+							Rectangle drawAreaBounds = curveArea.getBounds();
+							int minX = offSetX;
+							int maxX = offSetX + drawAreaBounds.width;
+							int minY = offSetY;
+							int maxY = offSetY + drawAreaBounds.height;
+							if (xUp < minX || xUp > maxX) {
+								xUp = xUp < minX ? minX : maxX;
+							}
+							if (yUp < minY || yUp > maxY) {
+								yUp = yUp < minY ? minY : maxY;
+							}
+							if(log.isLoggable(Level.INFO)) log.info("xUp = " + xUp + " yUp = " + yUp);
+
+							if (isZoomMode) {
+								// sort the zoom values
+								int xStart = ((xDown < xUp ? xDown : xUp) - offSetX) * 100 / drawAreaBounds.width;
+								int xEnd = ((xDown > xUp ? xDown : xUp) - offSetX) * 100 / drawAreaBounds.width;
+								int yMin = (drawAreaBounds.height - ((yDown > yUp ? yDown : yUp) - offSetY)) * 100 / drawAreaBounds.height;
+								int yMax = (drawAreaBounds.height - ((yDown < yUp ? yDown : yUp) - offSetY)) * 100 / drawAreaBounds.height;
+								if (log.isLoggable(Level.INFO)) log.info(String.format("xStart = %d, xEnd = %d, yMin = %d, yMax = %d", xStart, xEnd, yMin, yMax));
+								//channels.getActiveChannel().getActiveRecordSet().setZoomValues(xStart, xEnd, yMin, yMax);
+								//graphicCanvas.redraw();
+							}
 						}
 					}
 				});
@@ -441,15 +450,15 @@ public class GraphicsWindow {
 		yMax = y0 - height;
 		if (log.isLoggable(Level.FINE)) log.fine("draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth);
 
-		// draw x coordinate		
-		timeLine.drawTimeLine(gc, x0, y0, fitTimeWidth, maxTime, scaleFactor, OpenSerialDataExplorer.COLOR_BLACK);
+		// draw x coordinate	- time scale
+		timeLine.drawTimeLine(gc, x0, y0, fitTimeWidth, 0, maxTime, scaleFactor, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw curves for each active record
 		recordSet.setCurveBounds(new Rectangle(x0, y0-height, width, height));
 		log.fine("curve bounds = " + x0 + " " + (y0-height) + " " + width + " " + height);
 		
 		// get the image and prepare GC
-		curveArea = SWTResourceManager.getImage(width, height);
+		curveArea = SWTResourceManager.getImage(width, height, recordSet.isZoomed() ? "ZOOM" : "NORMAL"); // TODO check if this can be used for cache normal window
 		GC imgGC = SWTResourceManager.getGC(curveArea);
 		imgGC.setBackground(gc.getBackground());
 		imgGC.fillRectangle(curveArea.getBounds());

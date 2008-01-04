@@ -61,11 +61,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private double												minValue 							= 20000;										// min max value
 	
 	//zooming
-	private boolean 											isZoomed;
-	private int														minZoomX;
-	private int														maxZoomX;
-	private int														minZoomY;
-	private int														maxZoomY;
+	private boolean 											isZoomed = false;
 
 	/**
 	 * data buffers according the size of given names array, where
@@ -483,36 +479,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isCompareSet() {
 		return isCompareSet;
-	}
-
-	/**
-	 * set zooming values
-	 * @param minX
-	 * @param minY
-	 * @param maxX
-	 * @param maxY
-	 */
-	public void setZoomValues(int minX, int minY, int maxX, int maxY, boolean isZoomed) {
-		minZoomX = minX;
-		minZoomY = minY;
-		maxZoomX = maxX;
-		maxZoomY = maxY;
-		this.isZoomed = isZoomed;
-		log.fine(String.format("isZoomed = %b, minX = %d, minY = %d, maxX = %d, maxY = %d", isZoomed, minZoomX, minZoomY, maxZoomX, maxZoomY));
-	}
-
-	/**
-	 * get the values set to be used for zoomed display
-	 * @return zoom values minX, minY, maxX, maxY
-	 */
-	public int[] getZoomValues() {
-		int[] values = new int[4];
-		values[0] = minZoomX;
-		values[1] = minZoomY;
-		values[2] = maxZoomX;
-		values[3] = maxZoomY;
-		log.fine(String.format("isZoomed = %b, minX = %d, minY = %d, maxX = %d, maxY = %d", isZoomed, minZoomX, minZoomY, maxZoomX, maxZoomY));
-		return values;
 	}
 
 	/**
