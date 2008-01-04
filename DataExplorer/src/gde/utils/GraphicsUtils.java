@@ -121,7 +121,7 @@ public class GraphicsUtils {
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
-		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
+		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y, string);
 
 		// Create a GC so we can draw the image
 		GC stringGc = SWTResourceManager.getGC(stringImage);
