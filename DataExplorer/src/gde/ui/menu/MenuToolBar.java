@@ -312,7 +312,7 @@ public class MenuToolBar {
 					zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
 					zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("zoomWindowItem.widgetSelected, event="+evt);
+							if(log.isLoggable(Level.FINEST)) log.finest("zoomWindowItem.widgetSelected, event="+evt);
 							application.setZoomMode(true);
 						}
 					});
@@ -324,7 +324,7 @@ public class MenuToolBar {
 					resizeItem.setToolTipText("Größe verändern");
 					resizeItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("resizeItem.widgetSelected, event="+evt);
+							if(log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event="+evt);
 							//TODO add your code for resizeItem.widgetSelected
 							application.openMessageDialog("Entschuldigung, diese Methode ist noch nicht implementiert! ");
 						}
@@ -337,8 +337,11 @@ public class MenuToolBar {
 					fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
 					fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("fitIntoItem.widgetSelected, event="+evt);
+							if(log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event="+evt);
 							application.setZoomMode(false);
+							RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+							if (recordSet!= null) recordSet.setZoomed(false);
+							application.updateGraphicsWindow();
 						}
 					});
 				}
