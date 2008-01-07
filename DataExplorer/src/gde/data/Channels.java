@@ -87,14 +87,16 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public synchronized void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);
+		// clean active record set before switch to the other
+		this.getActiveChannel().getActiveRecordSet().resetAllModes();
+		
 		if (channelNumber != this.getActiveChannelNumber()) {
 			this.setActiveChannelNumber(channelNumber);
 			application.getMenuToolBar().updateChannelToolItems();
 			// set record set to the first
 			this.getActiveChannel().setActiveRecordSet(instance.getActiveChannel().getRecordSetNames()[0]);
-			application.getMenuToolBar().updateRecordSetSelectCombo();
 			// update viewable
-			//application.getGraphicsWindow().redrawGrahics();
+			application.getMenuToolBar().updateRecordSetSelectCombo();
 			application.updateDataTable();
 			application.updateDigitalWindowChilds();
 		}

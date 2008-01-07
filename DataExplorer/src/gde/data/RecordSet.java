@@ -17,6 +17,7 @@
 package osde.data;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +63,13 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	//zooming
 	private int 													zoomLevel 						= 0; // 0 == not zoomed
+	private boolean 											isZoomMode = false;
+
+	
+	// measure
+	private boolean 											isMeasurementMode = false;
+	private boolean 											isDeltaMeasurementMode = false;
+	private String 												recordKeyMeasurement;
 
 	/**
 	 * data buffers according the size of given names array, where
@@ -137,15 +145,33 @@ public class RecordSet extends HashMap<String, Record> {
 			this.getRecord(recordNames[i]).add((new Integer(points[i])).intValue());
 		}
 		if (doUpdate) {
-			if (isChildOfActiveChannel()) {
+			if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
 				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						application.updateGraphicsWindow();
 					}
 				});
+				application.updateDataTable();
 				application.updateDigitalWindowChilds();
 			}
 		}
+	}
+	
+	/**
+	 * get all calculated and formated data points of a given index
+	 * @param index of the data points
+	 * @param df decimal formatting information
+	 * @return string array including time
+	 */
+	public String[] getDataPoints(int index, DecimalFormat df) {
+		IDevice device = this.get(this.recordNames[0]).getDevice();
+		String[] values = new String[this.size() + 1];
+		values[0] = df.format(new Double(index * this.getTimeStep_ms() / 1000.0));
+		for (int i = 1; i < values.length; i++) {
+			Record record = this.getRecord(this.recordNames[i-1]);
+			values[i] = df.format(new Double(device.translateValue(record.getName(), record.get(index) / 1000.0)));
+		}
+		return values;
 	}
 
 	public int getTimeStep_ms() {
@@ -337,6 +363,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void switchRecordSet(String recordSetName) {
 		log.finest("entry - " + recordSetName);
+		this.resetAllModes();
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
@@ -523,4 +550,93 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setCurveBounds(Rectangle curveBounds) {
 		this.curveBounds = curveBounds;
 	}
+
+	/**
+	 * @param isMeasurementMode the boolean value to set
+	 * @param recordKey the key which record should be measured
+	 */
+	public void setMeasurementMode(boolean isMeasurementMode, String recordKey) {
+		this.isMeasurementMode = isMeasurementMode;
+		this.recordKeyMeasurement = recordKey;
+		if (isMeasurementMode) {
+			this.isZoomMode = false;
+			this.isDeltaMeasurementMode = false;
+		}
+	}
+
+	/**
+	 * @param isDeltaMeasurementMode the boolean value to set
+	 * @param recordKey the key which record should be measured
+	 */
+	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode, String recordKey) {
+		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
+		this.recordKeyMeasurement = recordKey;
+		if (isMeasurementMode) {
+			this.isZoomMode = false;
+			this.isMeasurementMode = false;
+		}
+	}
+	/**
+	 * @return the isMeasurementMode
+	 */
+	public boolean isMeasurementMode() {
+		return isMeasurementMode;
+	}
+
+	/**
+	 * @param isMeasurementMode the isMeasurementMode to set
+	 */
+	public void setMeasurementMode(boolean isMeasurementMode) {
+		this.isMeasurementMode = isMeasurementMode;
+	}
+
+	/**
+	 * @return the isDeltaMeasurementMode
+	 */
+	public boolean isDeltaMeasurementMode() {
+		return isDeltaMeasurementMode;
+	}
+
+	/**
+	 * @param isDeltaMeasurementMode the isDeltaMeasurementMode to set
+	 */
+	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode) {
+		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
+	}
+
+	/**
+	 * @return the isZoomMode
+	 */
+	public boolean isZoomMode() {
+		return isZoomMode;
+	}
+
+	/**
+	 * set the mouse tracker in graphics window active for zoom window selection
+	 * @param isZoomMode the isZoomMode to set
+	 */
+	public void setZoomMode(boolean isZoomMode) {
+		this.isZoomMode = isZoomMode;
+		if (isZoomMode) {
+			this.isMeasurementMode = false;
+			this.isDeltaMeasurementMode = false;
+		}
+	}
+
+	/**
+	 * @return the recordKeyMeasurement
+	 */
+	public String getRecordKeyMeasurement() {
+		return recordKeyMeasurement;
+	}
+	
+	/**
+	 * reset all context adjusted modes to default values
+	 */
+	public void resetAllModes() {
+		this.isZoomMode = false;
+		this.isMeasurementMode = false;
+		this.isDeltaMeasurementMode = false;
+	}
+	
 }

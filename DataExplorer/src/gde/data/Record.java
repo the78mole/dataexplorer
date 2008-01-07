@@ -17,12 +17,15 @@
 package osde.data;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
@@ -51,6 +54,7 @@ public class Record extends Vector<Integer> {
 	private boolean							isActive;
 	private boolean							isDisplayable;
 	private DecimalFormat				df;
+	private SimpleDateFormat		dateFormat						= new SimpleDateFormat("HH:mm:ss:SSS");
 
 	//TODO to be set by loaded graphic template
 	private boolean							isVisible							= true;
@@ -62,9 +66,15 @@ public class Record extends Vector<Integer> {
 	private boolean							isStartpointZero			= false;
 	private boolean							isStartEndDefined			= false;
 	private int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
-	private double							maxDisplayValue				= maxValue;																		// overwrite calculated boundaries
-	private double							minDisplayValue				= minValue;
+	private double							maxScaleValue					= maxValue;																		// overwrite calculated boundaries
+	private double							minScaleValue					= minValue;
 
+	private double							displayScaleFactorTime;
+	private double							displayScaleFactorValue;
+	private double							minDisplayValue;									// min value in device units, correspond to draw area
+	private double							maxDisplayValue;									// max value in device units, correspond to draw area
+
+	
 	private final IDevice				device;																															// record need to know its device to calculate data from raw
 
 	public final static String	IS_ACTIVE							= "_isActive";																// active means this measurement can be red from device, other wise its calculated
@@ -129,8 +139,8 @@ public class Record extends Vector<Integer> {
 		this.isRoundOut = record.isRoundOut;
 		this.isStartpointZero = record.isStartpointZero;
 		this.numberFormat = record.numberFormat;
-		this.maxDisplayValue = record.maxDisplayValue;
-		this.minDisplayValue = record.minDisplayValue;
+		this.maxScaleValue = record.maxScaleValue;
+		this.minScaleValue = record.minScaleValue;
 		this.device = record.device;
 	}
 
@@ -241,27 +251,27 @@ public class Record extends Vector<Integer> {
 	/**
 	 * sets the min-max values as displayed 4.0 - 200.5
 	 * @param isStartEndDefined
-	 * @param newMinDisplayValue
-	 * @param newMaxDisplayValue
+	 * @param newMinScaleValue
+	 * @param newMaxScaleValue
 	 */
-	public void setStartEndDefined(boolean isStartEndDefined, double newMinDisplayValue, double newMaxDisplayValue) {
+	public void setStartEndDefined(boolean isStartEndDefined, double newMinScaleValue, double newMaxScaleValue) {
 		this.isStartEndDefined = isStartEndDefined;
 		if (isStartEndDefined) {
-			this.maxDisplayValue = newMaxDisplayValue;
-			this.minDisplayValue = newMinDisplayValue;
+			this.maxScaleValue = newMaxScaleValue;
+			this.minScaleValue = newMinScaleValue;
 		}
 		else {
-			this.maxDisplayValue = maxValue;
-			this.minDisplayValue = minValue;
+			this.maxScaleValue = maxValue;
+			this.minScaleValue = minValue;
 		}
 	}
 
-	public void setMinDisplayValue(double newMinDisplayValue) {
-		this.minDisplayValue = newMinDisplayValue;
+	public void setMinScaleValue(double newMinScaleValue) {
+		this.minScaleValue = newMinScaleValue;
 	}
 
-	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		this.maxDisplayValue = newMaxDisplayValue;
+	public void setMaxScaleValue(double newMaxScaleValue) {
+		this.maxScaleValue = newMaxScaleValue;
 	}
 
 	public int getLineWidth() {
@@ -338,14 +348,14 @@ public class Record extends Vector<Integer> {
 	 * @return the newMaxValue
 	 */
 	public double getDefinedMaxValue() {
-		return maxDisplayValue;
+		return maxScaleValue;
 	}
 
 	/**
 	 * @return the newMinValue
 	 */
 	public double getDefinedMinValue() {
-		return minDisplayValue;
+		return minScaleValue;
 	}
 
 	/**
@@ -390,12 +400,131 @@ public class Record extends Vector<Integer> {
 	public IDevice getDevice() {
 		return device;
 	}
+	
+	/**
+	 * method to query time and value for display at a given index
+	 * @param index
+	 * @param scaledIndex (may differ from index if display width << number of points)
+	 * @param xDisplayO
+	 * @param xDisplayOffset
+	 * @param yDisplayOffset
+	 * @return point time, value
+	 */
+	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
+		Point returnPoint = new Point(0,0);
+		returnPoint.x = new Double((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
+		returnPoint.y = new Double(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		return returnPoint;
+	}
 
 	/**
-	 * @return the maxDisplayValue
+	 * query time and value from a display (mouse) position captured point 
+	 * @param xPos
+	 * @param drawAreaBounds
+	 * @param offSetY
+	 * @return string array time, value, displays yPos
 	 */
-	public double getMaxDisplayValue() {
-		return maxDisplayValue;
+	public int getDisplayDataPoint(int xPos, Rectangle drawAreaBounds, int offSetY) {
+		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
+		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		return pointY;
+	}
+	
+	/**
+	 * get the value corresponding the display point (needs translate)
+	 * @param yPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	public String getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
+		return df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+	}
+
+	/**
+	 * get the value corresponding the display point (needs translate)
+	 * @param deltaPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
+		return df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+	}
+
+	/**
+	 * get the formatted time at given position
+	 * @param xPos of the display point
+	 * @return string of time value in simple date format HH:ss:mm:SSS
+	 */
+	public String getDisplayPointTime(int xPos) {
+		return dateFormat.format(xPos * this.getTimeStep_ms());
+	}
+	
+	/**
+	 * get the slope value of two given points, unit depends on device configuration
+	 * @param xPos of the display point
+	 * @return string of value
+	 */
+	public String getSlopeValue(int xPos) {
+		return dateFormat.format(xPos * this.getTimeStep_ms());
+	}
+	
+	/**
+	 * @return the maxScaleValue
+	 */
+	public double getMaxScaleValue() {
+		return maxScaleValue;
+	}
+
+	/**
+	 * @return the minScaleValue
+	 */
+	public double getMinScaleValue() {
+		return minScaleValue;
+	}
+
+	/**
+	 * @return the displayScaleFactorTime
+	 */
+	public double getDisplayScaleFactorTime() {
+		return displayScaleFactorTime;
+	}
+
+	/**
+	 * @param displayScaleFactorTime the displayScaleFactorTime to set
+	 */
+	public void setDisplayScaleFactorTime(double displayScaleFactorTime) {
+		this.displayScaleFactorTime = displayScaleFactorTime;
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", displayScaleFactorTime));
+	}
+
+	/**
+	 * @return the displayScaleFactorValue
+	 */
+	public double getDisplayScaleFactorValue() {
+		return displayScaleFactorValue;
+	}
+
+	/**
+	 * @param displayScaleFactorValue the displayScaleFactorValue to set
+	 */
+	public void setDisplayScaleFactorValue(int drawAreaHeight) {
+		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
+
+	}
+
+	/**
+	 * @param minDisplayValue the minDisplayValue to set
+	 */
+	public void setMinDisplayValue(double minDisplayValue) {
+		this.minDisplayValue = minDisplayValue;
+	}
+
+	/**
+	 * @param maxDisplayValue the maxDisplayValue to set
+	 */
+	public void setMaxDisplayValue(double maxDisplayValue) {
+		this.maxDisplayValue = maxDisplayValue;
 	}
 
 	/**
@@ -403,6 +532,13 @@ public class Record extends Vector<Integer> {
 	 */
 	public double getMinDisplayValue() {
 		return minDisplayValue;
+	}
+
+	/**
+	 * @return the maxDisplayValue
+	 */
+	public double getMaxDisplayValue() {
+		return maxDisplayValue;
 	}
 
 }
