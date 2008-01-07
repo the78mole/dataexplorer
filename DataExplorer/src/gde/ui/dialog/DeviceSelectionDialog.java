@@ -760,7 +760,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			activeDevice = this.getInstanceOfDevice();
 			application.setActiveDevice(activeDevice);
 			setupDataChannels(activeDevice);
-			application.updateDataTable();
+			application.setupDataTableHeader();
 			application.updateDigitalWindow();
 		}
 	}
