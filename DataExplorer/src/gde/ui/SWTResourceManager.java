@@ -145,8 +145,8 @@ public class SWTResourceManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static Image getImage(int x, int y, String descriptor) {
-		String key = "IMAGE_"+ descriptor + ":" + x + "_" + y;
+	public static Image getImage(int x, int y) {
+		String key = "IMAGE:" + x + "_" + y;
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -162,13 +162,13 @@ public class SWTResourceManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Image getRotatedImage(Image image, int style) {	
+	public static Image getRotatedImage(Image image, int style, String imgKey) {	
 		Image resultImg = null;
 		
 		// Use the image's data to create a rotated image's data
 		ImageData sd = image.getImageData();
 		boolean up = (style & SWT.UP) == SWT.UP;
-		String key = "IMAGE_DATA_VERTICAL:" + sd.width + "_" + sd.height + "_" + style;
+		String key = "IMAGE:" + sd.width + "_" + sd.height + "_" + style + "_" + imgKey;
 
 		try {
 			if (resources.containsKey(key)) {
