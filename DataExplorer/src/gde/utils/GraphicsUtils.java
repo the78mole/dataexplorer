@@ -55,14 +55,29 @@ public class GraphicsUtils {
 		int numberTicks = 10;
 		double deltaScale = (endNumber - startNumber);
 		if (startNumber < 0 && endNumber > 0) {
-			if (deltaScale < 100) {
-				numberTicks = (int)deltaScale / 5;
+			if (deltaScale < 1) {
+				numberTicks = (int)(deltaScale * 20 / 1);
 			}
-			else if (deltaScale >= 100 && deltaScale <= 300) { //part below 0
-				numberTicks = (int)deltaScale / 10;
+			else if (deltaScale < 2) {
+				numberTicks = (int)(deltaScale+0.5) * 10 / 1;
+			}
+			else if (deltaScale < 5) {
+				numberTicks = (int)(deltaScale+1) * 5 / 1;
+			}
+			else if (deltaScale < 10) {
+				numberTicks = (int)(deltaScale * 2);
+			}
+			else if (deltaScale < 50) {
+				numberTicks = (int)(deltaScale/2.5);
+			}
+			else if (deltaScale < 100) {
+				numberTicks = (int)(deltaScale / 5);
+			}
+			else if (deltaScale < 300) {
+				numberTicks = (int)(deltaScale / 10);
 			}
 			else {
-				numberTicks = (int)deltaScale / 20;
+				numberTicks = (int)(deltaScale / 20);
 				if (numberTicks > 20) numberTicks = 20;
 			}
 		}
@@ -121,7 +136,7 @@ public class GraphicsUtils {
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
-		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y, string);
+		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
 
 		// Create a GC so we can draw the image
 		GC stringGc = SWTResourceManager.getGC(stringImage);
@@ -131,7 +146,9 @@ public class GraphicsUtils {
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
 
-		// Draw the text onto the image
+		// clear the image
+		stringGc.fillRectangle(0, 0, pt.x, pt.y);
+		// draw the text onto the image
 		stringGc.drawText(string, 0, 0);
 
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
@@ -141,7 +158,7 @@ public class GraphicsUtils {
 		}
 		else {
 			// Draw the image vertically onto the original GC
-			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style);
+			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string);
 		}
 	}
 
@@ -161,12 +178,12 @@ public class GraphicsUtils {
 	 *          Note: Only one of the style UP or DOWN may be specified.
 	 *          </p>
 	 */
-	public static void drawVerticalImage(Image image, int x, int y, GC gc, int style) {
+	public static void drawVerticalImage(Image image, int x, int y, GC gc, int style, String imgKey) {
 		// Get the current display
 		Display display = Display.getCurrent();
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
 		// Draw the vertical image onto the original GC
-		gc.drawImage(SWTResourceManager.getRotatedImage(image, style), x, y);
+		gc.drawImage(SWTResourceManager.getRotatedImage(image, style, imgKey), x, y);
 	}
 }
