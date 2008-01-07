@@ -53,7 +53,7 @@ public class StatusBar {
 		{
 			activeDeviceLabel = new CLabel(statusComposite, SWT.NONE);
 			RowData activeDeviceLabelLData = new RowData();
-			activeDeviceLabelLData.width = 180;
+			activeDeviceLabelLData.width = 150;
 			activeDeviceLabelLData.height = 23;
 			activeDeviceLabel.setLayoutData(activeDeviceLabelLData);
 			activeDeviceLabel.setText("aktives Gerät");
@@ -87,48 +87,47 @@ public class StatusBar {
 				{
 					portButton = new CLabel(comComposite, SWT.NONE);
 					portButton.setBounds(2,2, 50, 20);
-					//portButton.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					portButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
 					portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 				}
 				{
-					conText = new Text(comComposite, SWT.CENTER);
-					conText.setText("CON ");
+					conText = new Text(comComposite, SWT.LEFT);
+					conText.setText("CON");
 					conText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 					conText.setEditable(false);
 					conText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					rxButton = new CLabel(comComposite, SWT.NONE);
+					rxButton = new CLabel(comComposite, SWT.CENTER);
 					rxButton.setBounds(2,2, 50, 20);
 					rxButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
 					rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 				}
 				{
-					rxText = new Text(comComposite, SWT.CENTER);
+					rxText = new Text(comComposite, SWT.LEFT);
 					rxText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					rxText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 					rxText.setEditable(false);
-					rxText.setText("RX ");
+					rxText.setText("RX");
 				}
 				{
-					txButton = new CLabel(comComposite, SWT.NONE);
+					txButton = new CLabel(comComposite, SWT.CENTER);
 					txButton.setBounds(2,2, 50, 20);
 					txButton.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 				}
 				{
-					txText = new Text(comComposite, SWT.CENTER);
+					txText = new Text(comComposite, SWT.LEFT);
 					txText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					txText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 					txText.setEditable(false);
-					txText.setText("TX ");
+					txText.setText("TX");
 				}
 				comComposite.pack();
 			}
 			{
 				RowData progressBarLData = new RowData();
-				progressBarLData.width = 350;
+				progressBarLData.width = 250;
 				progressBarLData.height = 20;
 				progressBar = new ProgressBar(statusComposite, SWT.NONE);
 				progressBar.setMinimum(0);
@@ -137,9 +136,14 @@ public class StatusBar {
 				progressBar.setLayoutData(progressBarLData);
 			}
 			{
-				msgLabel = new CLabel(statusComposite, SWT.LEFT);
+				msgLabel = new CLabel(statusComposite, SWT.LEFT | SWT.BORDER | SWT.BOLD);
+//				RowData text1LData = new RowData();
+//				text1LData.width = 150;
+//				text1LData.height = 20;
+//				msgLabel.setLayoutData(text1LData);
 				msgLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+				msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+				//msgLabel.layout();
 			}
 		}
 	}
@@ -148,7 +152,15 @@ public class StatusBar {
 	 * method to set a message text to the message label of the status bar
 	 */
 	public void setMessage(String text) {
+		if (text.length() > 5 && text.length() < 30)
+			msgLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		else if (text.length() > 30)
+			msgLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		else 
+			msgLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND));
+		
 		msgLabel.setText(text);
+		msgLabel.pack(true);
 	}
 
 	/**
