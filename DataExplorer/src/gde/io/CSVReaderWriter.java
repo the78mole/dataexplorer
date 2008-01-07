@@ -90,7 +90,7 @@ public class CSVReaderWriter {
 			while ((line = reader.readLine()) != null) {
 				if (isDeviceName) {
 					// check for device name in first line
-					if (!line.contains(""+separator) && OpenSerialDataExplorer.getInstance().getActiveDevice().getName().equals(line)) {
+					if (OpenSerialDataExplorer.getInstance().getActiveDevice().getName().equals(line.replace(separator, ' ').trim())) {
 						isDeviceName = false;
 					}
 					else {
@@ -119,7 +119,7 @@ public class CSVReaderWriter {
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
 							log.fine("inUnit = " + inUnit + " - expectUnit = " + expectUnit);
-							if (inUnit.equals(expectUnit)) ++match;
+							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
 						}
 						if (match != header.length - 1) {
 							throw new Exception("2"); // mismatch data header
@@ -209,7 +209,7 @@ public class CSVReaderWriter {
 				if (isRaw) {
 				//TODO use all records which have this attribute in XML
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
-						sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append(']').append(separator);	
+						sb.append(measurement.getName()).append(" [---]").append(separator);	
 						log.finest("append " + recordNames[i]);
 					}
 				}
