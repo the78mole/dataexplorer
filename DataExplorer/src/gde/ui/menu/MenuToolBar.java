@@ -122,13 +122,13 @@ public class MenuToolBar {
 	public void create() {
 		{ // begin file cool item
 			menuCoolItem = new CoolItem(coolBar, SWT.NONE);
-			menuCoolItem.setSize(120, 29);
-			menuCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(120, 29));
-			menuCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(120, 29));
+			menuCoolItem.setSize(116, 29);
+			menuCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(116, 29));
+			menuCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(116, 29));
 			{ // begin file tool bar
 				fileToolBar = new ToolBar(coolBar, SWT.NONE);
 				menuCoolItem.setControl(fileToolBar);
-				fileToolBar.setSize(120, 30);
+				fileToolBar.setSize(116, 29);
 				{
 					newToolItem = new ToolItem(fileToolBar, SWT.PUSH);
 					newToolItem.setToolTipText("Löscht die aktuellen Aufzeichnungen und legt einen leeren Datensatz an");
@@ -193,6 +193,7 @@ public class MenuToolBar {
 			{  // begin device tool bar
 				deviceToolBar = new ToolBar(coolBar, SWT.NONE);
 				deviceCoolItem.setControl(deviceToolBar);
+				deviceToolBar.setSize(120, 29);
 				{
 					deviceSelectToolItem = new ToolItem(deviceToolBar, SWT.NONE);
 					deviceSelectToolItem.setToolTipText("Geräteauswahl mit Einstellungen");
@@ -212,7 +213,6 @@ public class MenuToolBar {
 					prevDeviceToolItem = new ToolItem(deviceToolBar, SWT.NONE);
 					prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
 					prevDeviceToolItem.setToolTipText("Schalte zum verhergehenden Gerät");
-					//prevDeviceToolItem.setWidth(20);
 					prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
 					prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -304,7 +304,7 @@ public class MenuToolBar {
 			{ // begin zoom tool bar
 				zoomToolBar = new ToolBar(coolBar, SWT.NONE);
 				zoomCoolItem.setControl(zoomToolBar);
-				zoomToolBar.setSize(90, 30);
+				zoomToolBar.setSize(90, 29);
 				{
 					zoomWindowItem = new ToolItem(zoomToolBar, SWT.NONE);
 					zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
@@ -350,13 +350,13 @@ public class MenuToolBar {
 		
 		{ // begin port cool item
 			portCoolItem = new CoolItem(coolBar, SWT.NONE);
-			portCoolItem.setSize(130, 29);
-			portCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(130, 29));
-			portCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(130, 29));
+			portCoolItem.setSize(129, 29);
+			portCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(129, 29));
+			portCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(129, 29));
 			{
 				portToolBar = new ToolBar(coolBar, SWT.NONE);
 				portCoolItem.setControl(portToolBar);
-				portToolBar.setSize(130, 29);
+				portToolBar.setSize(129, 29);
 				{
 					portOpenCloseItem = new ToolItem(portToolBar, SWT.NONE);
 					portOpenCloseItem.setToolTipText("Seriellen Port Öffnen, um eine Datenaufnahme zu ermöglichen");
@@ -375,12 +375,12 @@ public class MenuToolBar {
 		
 		{ // begin data cool item (channel select, record select)
 			dataCoolItem = new CoolItem(coolBar, SWT.NONE);
-			dataCoolItem.setSize(545, 29);
-			dataCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(545, 29));
-			dataCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(545, 29));
+			dataCoolItem.setSize(551, 29);
+			dataCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(551, 29));
+			dataCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(551, 29));
 			{
 				dataBarComposite = new Composite(coolBar, SWT.NONE);
-				Point connectSize = dataBarComposite.computeSize(545, 29);
+				Point connectSize = dataBarComposite.computeSize(551, 29);
 				Point connectCoolSize = dataBarComposite.computeSize(connectSize.x, connectSize.y);
 				dataCoolItem.setSize(connectCoolSize);
 				dataCoolItem.setMinimumSize(connectCoolSize);
@@ -459,7 +459,7 @@ public class MenuToolBar {
 				}
 				{
 					RowData composite2LData = new RowData();
-					composite2LData.width = 244;
+					composite2LData.width = 250;
 					composite2LData.height = 23;
 					recordSelectComposite = new Composite(dataBarComposite, SWT.NONE);
 					RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -587,7 +587,7 @@ public class MenuToolBar {
 					});
 				}
 			}
-		}
+		} // end record cool item
 	}
 	
 	/**
