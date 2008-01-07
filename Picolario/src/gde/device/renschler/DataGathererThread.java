@@ -92,10 +92,9 @@ public class DataGathererThread extends Thread {
 				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2]);
 				calculationThread.start();
 
-				if (channel.getName().equals(Channels.getInstance().getActiveChannel().getName())) {
-					application.getMenuToolBar().addRecordSetName(recordSetKey);
+				application.getMenuToolBar().addRecordSetName(recordSetKey);
+				if (channel.getRecordSetNames().length <= 1 || device.getDialog().isDoSwtichRecordSet())
 					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-				}
 
 				// update the progress bar reading one after the other only
 				statusBar.updateProgressbar(progressBarMacroSteps * (j + 1));

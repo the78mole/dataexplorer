@@ -67,12 +67,14 @@ public class PicolarioDialog extends DeviceDialog {
 	private int												heightUnitSelection		= 0;																						// Feet 0, Meter 1
 	private int												heightOffsetSelection	= 7;																						// represents the offset the measurment should be modified
 	private double										heightOffsetValue			= 100;																					// represents the offset value
+	private boolean 									doSwtichRecordSet = false;
 
 	private Group											readDataGroup3;
 	private Button										readSingle;
 	private Button										stopButton;
 	private CLabel										alreadyRedLabel;
-	private Button reduceByLastValueButton;
+	private Button										switchRecordSetButton;
+	private Button										reduceByLastValueButton;
 	private Button										readAllRecords;
 	private CLabel										numberRedTelegramLabel;
 	private CCombo										recordSetSelectCombo;
@@ -104,7 +106,7 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(344, 431);
+			dialogShell.setSize(344, 478);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
@@ -160,17 +162,17 @@ public class PicolarioDialog extends DeviceDialog {
 				readDataGroup3 = new Group(dialogShell, SWT.NONE);
 				readDataGroup3.setLayout(null);
 				FormData auslesenGroupLData = new FormData();
-				auslesenGroupLData.width = 308;
-				auslesenGroupLData.height = 132;
-				auslesenGroupLData.left = new FormAttachment(0, 1000, 12);
-				auslesenGroupLData.right = new FormAttachment(1000, 1000, -12);
-				auslesenGroupLData.bottom = new FormAttachment(1000, 1000, -12);
+				auslesenGroupLData.width = 306;
+				auslesenGroupLData.height = 177;
+				auslesenGroupLData.left =  new FormAttachment(0, 1000, 12);
+				auslesenGroupLData.right =  new FormAttachment(1000, 1000, -12);
+				auslesenGroupLData.bottom =  new FormAttachment(1000, 1000, -17);
 				readDataGroup3.setLayoutData(auslesenGroupLData);
 				readDataGroup3.setText("3. Aufzeichnungen auslesen");
 				{
 					readSingle = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
 					readSingle.setText("angewählte Aufzeichnungen auslesen");
-					readSingle.setBounds(8, 21, 236, 25);
+					readSingle.setBounds(8, 54, 236, 25);
 					readSingle.setEnabled(false);
 					readSingle.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -187,7 +189,7 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					readAllRecords = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					readAllRecords.setBounds(8, 55, 292, 25);
+					readAllRecords.setBounds(8, 88, 292, 25);
 					readAllRecords.setText("alle Aufzeichnungen hintereinander auslesen");
 					readAllRecords.setEnabled(false);
 					readAllRecords.addSelectionListener(new SelectionAdapter() {
@@ -207,28 +209,40 @@ public class PicolarioDialog extends DeviceDialog {
 				{
 					recordSetSelectCombo = new CCombo(readDataGroup3, SWT.BORDER | SWT.RIGHT);
 					recordSetSelectCombo.setText("0");
-					recordSetSelectCombo.setBounds(252, 23, 45, 22);
+					recordSetSelectCombo.setBounds(252, 56, 45, 22);
 				}
 				{
 					numberRedTelegramLabel = new CLabel(readDataGroup3, SWT.NONE);
-					numberRedTelegramLabel.setBounds(10, 86, 234, 26);
+					numberRedTelegramLabel.setBounds(10, 119, 234, 26);
 					numberRedTelegramLabel.setText("Anzahl ausgelesener Telegramme :");
 					numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
 				}
 				{
 					alreadyRedLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					alreadyRedLabel.setBounds(244, 86, 56, 26);
+					alreadyRedLabel.setBounds(244, 119, 56, 26);
 					alreadyRedLabel.setText(redDatagrams);
 				}
 				{
 					stopButton = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
 					stopButton.setText("S T O P");
 					stopButton.setEnabled(false);
-					stopButton.setBounds(78, 118, 150, 25);
+					stopButton.setBounds(78, 151, 150, 25);
 					stopButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("stopButton.widgetSelected, event=" + evt);
 							gatherThread.setThreadStop(true);
+						}
+					});
+				}
+				{
+					switchRecordSetButton = new Button(readDataGroup3, SWT.CHECK | SWT.CENTER);
+					switchRecordSetButton.setBounds(12, 25, 288, 17);
+					switchRecordSetButton.setText("am Ende den aktuellen Datensatz anzeigen");
+					switchRecordSetButton.setSelection(doSwtichRecordSet);
+					switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("switchRecordSetButton.widgetSelected, event="+evt);
+							doSwtichRecordSet = switchRecordSetButton.getSelection();
 						}
 					});
 				}
@@ -522,5 +536,12 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public boolean isDoSubtractLast() {
 		return doSubtractLast;
+	}
+
+	/**
+	 * @return the doSwtichRecordSet
+	 */
+	public boolean isDoSwtichRecordSet() {
+		return doSwtichRecordSet;
 	}
 }
