@@ -562,7 +562,7 @@ public class AkkuMasterChannelTab {
 														serialPort.stop(channelSig);
 													}
 													catch (IOException e) {
-														e.printStackTrace();
+														log.log(Level.SEVERE, e.getMessage(), e);
 													}
 													isCollectData = false;
 													stopTimer();
@@ -570,7 +570,11 @@ public class AkkuMasterChannelTab {
 												}
 											}
 											catch (IOException e) {
-												e.printStackTrace();
+												log.log(Level.SEVERE, e.getMessage(), e);
+												isCollectData = false;
+												stopTimer();
+												if (!parent.isDisposed())
+													application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
 											}
 										}
 									};
