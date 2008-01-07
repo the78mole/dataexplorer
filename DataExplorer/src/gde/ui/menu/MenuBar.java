@@ -586,10 +586,10 @@ public class MenuBar {
 					recordSetKey = (channel.size() + 1) + ") " + dialogName;
 				}
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), isRaw, isFromFile));
-				channel.applyTemplate(recordSetKey);
 				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), isRaw);
 				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
 				channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+				channel.applyTemplate(recordSetKey);
 				channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
 				application.updateDataTable();
 				application.updateDigitalWindowChilds();

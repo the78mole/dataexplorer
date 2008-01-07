@@ -47,8 +47,8 @@ public class TimeLine {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
 		int numberOfPoints = (recordSet.getMaxSize() == 0) ? recordSet.getRecord(recordSet.getRecordNames()[0]).size() : recordSet.getMaxSize();
 		if (log.isLoggable(Level.FINE)) log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms());
-		long totalTime_msec = recordSet.getTimeStep_ms() * numberOfPoints / 100;
-		long totalTime_sec = recordSet.getTimeStep_ms() * numberOfPoints / 1000;
+		long totalTime_msec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 100;
+		long totalTime_sec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000;
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		if (log.isLoggable(Level.FINE)) log.fine("totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec);
@@ -139,7 +139,9 @@ public class TimeLine {
 	 * @param gap distance between ticks and the number scale
 	 */
 	private void drawHorizontalTickMarks(GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int ticklength, int miniticks, int gap) {
-
+		// adapt x0 and width, measurement scales are outside the draw area
+		x0 = x0 -1;
+		width = width + 1;
 		double numberTicks;
 		int timeDelta = endTimeValue - startTimeValue;
 		
