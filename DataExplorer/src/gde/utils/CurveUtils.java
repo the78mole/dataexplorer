@@ -47,11 +47,11 @@ public class CurveUtils {
 	 * @param height
 	 * @param scaleWidthSpace
 	 */
-	public static double[] drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
+	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-		double[] yMinMax = new double[2];
+
 		if (log.isLoggable(Level.FINEST)) log.finest("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
-		if (record.isEmpty() && !record.isDisplayable()) return yMinMax; // nothing to display
+		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
 		boolean isCompareSet = record.getParent().isCompareSet();
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
 		log.fine("drawing record =" + recordName + " isCompareSet = " + isCompareSet);
@@ -111,8 +111,9 @@ public class CurveUtils {
 				if (log.isLoggable(Level.FINE)) log.fine("start 0 yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
 			}
 		}
-		record.setMinDisplayValue(yMinValueDisplay);
-		record.setMaxDisplayValue(yMaxValueDisplay);
+		record.setMinScaleValue(yMinValueDisplay);
+		record.setMaxScaleValue(yMaxValueDisplay);
+		if (log.isLoggable(Level.FINE)) log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
 		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getDataUnit(recordName) + "]";
 
 		// adapt number space calculation to real displayed max number
@@ -146,9 +147,10 @@ public class CurveUtils {
 			GraphicsUtils.drawVerticalTickMarks(gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
 			GraphicsUtils.drawText(graphText, (int) (xPos + pt.x + 15), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
-		yMinMax[0] = yMinValue;
-		yMinMax[1] = yMaxValue;
-		return yMinMax;
+		
+		// set the values corresponding to the display area of this curve
+		record.setMinDisplayValue(yMinValue);
+		record.setMaxDisplayValue(yMaxValue);
 	}
 
 	/**
@@ -163,8 +165,8 @@ public class CurveUtils {
 	 * @param yMinValue
 	 * @param yMaxValue
 	 */
-	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, double yMinValue, double yMaxValue) {
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("x0 = %d, y0 = %d, width = %d, height = %d, yMinValue = %.3f, yMaxValue = %.3f", x0, y0, width, height, yMinValue, yMaxValue));
+	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height));
 		if (log.isLoggable(Level.FINER)) log.finer("curve area bounds = " + record.getParent().getCurveBounds().toString());
 		//gc.setClipping(record.getParent().getCurveBounds());
 	
@@ -173,54 +175,43 @@ public class CurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 		
-		// get the data points
-		Integer[] intRecord = record.get();
-		int intRecordSize = intRecord.length;
+		// get the data points size
+		int recordSize = record.size();
 
-		// calculate time line adaption if record set is compare set, compare set max have different times for each record
+		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
 		int timeStep = record.getTimeStep_ms();
-		double adaptXMaxValue = isCompareSet ? (1.0 * intRecordSize * record.getParent().getMaxSize() / intRecordSize * timeStep) : (1.0 * intRecordSize * timeStep);
+		double adaptXMaxValue = isCompareSet ? (1.0 * (recordSize - 1) * record.getParent().getMaxSize() / (recordSize - 1) * timeStep) : (1.0 * (recordSize - 1) * timeStep);
 		
 		// calculate scale factor to fit time into draw bounds
 		double factorX = (1.0 * width) / adaptXMaxValue;
-		double factorY = (1.0 * height) / (yMaxValue - yMinValue);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("factorX = %.3f factorY = %.3f (yMaxValue - yMinValue) = %.3f", factorX, factorY, (yMaxValue - yMinValue)));
+		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
+		int xScale = 1;
+		if (recordSize > (width * 2)) {
+			xScale = recordSize / (width * 2);
+			factorX = factorX * xScale;
+		}
+		record.setDisplayScaleFactorTime(factorX);
+		record.setDisplayScaleFactorValue(height);
 		
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		Point newPoint, oldPoint;
+		
 		// calculate start point of the curve, which is the first oldPoint
-		oldPoint = new Point(x0, (int) (y0 - ((record.get(0) / 1000.0) - yMinValue) * factorY));
-		if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(oldPoint.toString());
+		oldPoint = record.getDisplayPoint(0, 0, x0, y0);
+		if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(oldPoint.toString());
 		
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		if (intRecord != null && record.size() > 1) {
-			
-			// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
-			int xScale = 1;
-			if (intRecordSize > (width * 2)) {
-				xScale = intRecordSize / (width * 2);
-				factorX = factorX * xScale;
-			}
-			
-			for (int i = 0, j = 0; j < intRecordSize; ++i, j = j + xScale) {
-				// get the value to be drawn
-				int intValue = intRecord[j];
-				// calculate position in x-direction
-				int pointX = new Double((x0 + (timeStep * i) * factorX)).intValue();
-				// calculate position in y-direction, where the value has to be divided by 1000 (points == integer -> 1234 = 1.234), subtract the minimum value to start drawing at y0
-				double deltaY = (intValue / 1000.0) - yMinValue;
-				int pointY = new Double(y0 - (deltaY * factorY)).intValue();
+		for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScale) {
+			// get the point to be drawn
+			newPoint = record.getDisplayPoint(i, j, x0, y0);
+			if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(newPoint.toString());
 
-				newPoint = new Point(pointX, pointY);
-				if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(newPoint.toString());
+			gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 
-				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-				
-				// remember the last draw point for next drawLine operation
-				oldPoint = newPoint;
-			}
+			// remember the last draw point for next drawLine operation
+			oldPoint = newPoint;
 		}
-		if (log.isLoggable(Level.FINEST)) log.finest(sb.toString());
+		if (log.isLoggable(Level.INFO)) log.finest(sb.toString());
 	}
 	
 	/**
@@ -234,45 +225,97 @@ public class CurveUtils {
 		double[] outValues = {0.0, 0.0};
 		
 		if (minValue != 0) {
-			if (minValue < 0)
-				if (minValue > -10)
+			if (minValue < 0) {
+				if (minValue > -1)
+					outValues[0] = minValue - (0.1 + (minValue - 0.1) % 0.1);
+				else if (minValue > -2.5)
+					outValues[0] = minValue - (0.25 + (minValue - 0.25) % 0.25);
+				else if (minValue > -5)
+					outValues[0] = minValue - (0.5 + (minValue - 0.5) % 0.5);
+				else if (minValue > -10)
 					outValues[0] = (int) (minValue - 1);
 				else if (minValue < -50)
 					outValues[0] = minValue - (10 + (minValue % 10));
 				else
 					outValues[0] = minValue - (5 + (minValue % 5));
-			else // minValue > 0 
-			if (minValue < 10)
-				outValues[0] = (int) (minValue - 1);
-			else if (minValue < 50)
-				outValues[0] = minValue - (minValue % 10);
-			else
-				outValues[0] = minValue - (minValue % 5);
+			}
+			else {// minValue > 0 
+				if (minValue < 1)
+					outValues[0] = minValue - (0.1 + (minValue - 0.1) % 0.1);
+				else if (minValue < 2.5)
+					outValues[0] = minValue - (0.25 + (minValue - 0.25) % 0.25);
+				else if (minValue < 5)
+					outValues[0] = minValue - (0.5 + (minValue - 0.5) % 0.5);
+				else if (minValue < 10)
+					outValues[0] = (int) (minValue - 1);
+				else if (minValue < 50)
+					outValues[0] = minValue - (minValue % 10);
+				else
+					outValues[0] = minValue - (minValue % 5);
+			}
 		}
 		
 		if (maxValue != 0) {
-			if (maxValue < 0)
-				if (maxValue > -10)
+			if (maxValue < 0) {
+				if (maxValue > -1)
+					outValues[1] = maxValue + (0.1 - (maxValue - 0.1) % 0.1);
+				else if (maxValue > -2.5)
+					outValues[1] = maxValue + (0.25 - (maxValue - 0.25) % 0.25);
+				else if (maxValue > -5)
+					outValues[1] = maxValue + (0.5 - (maxValue - 0.5) % 0.5);
+				else if (maxValue > -10)
 					outValues[1] = (int) (maxValue + 1);
 				else if (maxValue > -50)
 					outValues[1] = maxValue + 5 - (maxValue % 5);
 				else
 					outValues[1] = maxValue + 10 - (maxValue % 10);
-			else if (maxValue < 10)
-				outValues[1] = (int) (maxValue + 1);
-			else if (maxValue > 50)
-				outValues[1] = maxValue + 10 - (maxValue % 10);
-			else
-				outValues[1] = maxValue + 5 - (maxValue % 5);
+			}
+			else {
+				if (maxValue < 1)
+					outValues[1] = maxValue + (0.1 - (maxValue + 0.1) % 0.1);
+				else if (maxValue < 2.5)
+					outValues[1] = maxValue + (0.25 - (maxValue + 0.25) % 0.25);
+				else if (maxValue < 5)
+					outValues[1] = maxValue + (0.5 - (maxValue + 0.5) % 0.5);
+				else if (maxValue < 10)
+					outValues[1] = (int) (maxValue + 1);
+				else if (maxValue > 50)
+					outValues[1] = maxValue + 10 - (maxValue % 10);
+				else
+					outValues[1] = maxValue + 5 - (maxValue % 5);
+			}
 		}
+		
 		// enable scale value 0.0  -- algorithm must fit scale tick mark calculation
 		if(minValue < 0 && maxValue > 0) {
 			double deltaScale = outValues[1] - outValues[0];
-			if (deltaScale < 100) {
+			if (deltaScale < 2) {
+				//numberTicks = (int)(deltaScale+0.5) * 10 / 1;
+				outValues[0] = outValues[0] - (0.05 + outValues[0] % 0.1);
+				outValues[1] = outValues[1] + (outValues[1] % 0.5);
+			}
+			else if (deltaScale < 5) {
+				//numberTicks = (int)(deltaScale+1) * 5 / 1;
+				outValues[0] = outValues[0] - (0.2 + outValues[0] % 0.2);
+				outValues[1] = outValues[1] + (outValues[1] % 0.2);
+			}
+			else if (deltaScale < 10) {
+				//numberTicks = (int)deltaScale;
+				outValues[0] = outValues[0] - (0.5 + outValues[0] % 0.5);
+				outValues[1] = outValues[1] + (outValues[1] % 0.5);
+			}
+			else if (deltaScale < 50) {
+				//numberTicks = (int)deltaScale;
+				outValues[0] = outValues[0] - (2.5 + outValues[0] % 2.5);
+				outValues[1] = outValues[1] + (outValues[1] % 2.5);
+			}
+			else if (deltaScale < 100) {
+				//numberTicks = (int)(deltaScale / 5);
 				outValues[0] = outValues[0] - (5 + (outValues[0] % 5));
 				outValues[1] = outValues[1] + (outValues[1] % 5);
 			}		
-			else if (deltaScale >= 100 && deltaScale <= 300) { 
+			else if (deltaScale < 300) { 
+				//numberTicks = (int)(deltaScale / 20);
 				outValues[0] = outValues[0] - (10 + (outValues[0] % 10));
 				outValues[1] = outValues[1] + (outValues[1] % 10);
 			}	

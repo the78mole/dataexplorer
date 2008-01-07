@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -52,6 +54,7 @@ public class CurveSelectorContextMenu {
 	private MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
 	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2;
 	private MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
+	private MenuItem 											measure, deltaMeasure;
 
 	private RecordSet											recordSet;
 	private final OpenSerialDataExplorer	application;
@@ -75,6 +78,10 @@ public class CurveSelectorContextMenu {
 							String recordNameKey = selectedItem.getText();
 							lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
 							if (type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
+
+							// clean measurement selections
+							measure.setSelection(false);
+							deltaMeasure.setSelection(false);
 						}
 				}
 
@@ -412,7 +419,7 @@ public class CurveSelectorContextMenu {
 						record.setStartpointZero(false);
 						axisEndRound.setSelection(false);
 						record.setRoundOut(false);
-						double[] oldMinMax = {record.getMinDisplayValue(), record.getMaxDisplayValue()};
+						double[] oldMinMax = {record.getMinScaleValue(), record.getMaxScaleValue()};
 						double[] newMinMax = axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
 						application.updateGraphicsWindow();
@@ -548,6 +555,38 @@ public class CurveSelectorContextMenu {
 				}
 			});
 
+			new MenuItem(popupmenu, SWT.SEPARATOR);
+			
+			measure = new MenuItem(popupmenu, SWT.CHECK);
+			measure.setText("Kurvenpunkt messen");
+			measure.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					log.finest("measure.widgetSelected, event=" + evt);
+					if (measure.getSelection() == true) {
+						deltaMeasure.setSelection(false);
+						application.setMeasurementActive(true, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+					}
+					else {
+						application.setMeasurementActive(false, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+					}
+				}
+			});
+			deltaMeasure = new MenuItem(popupmenu, SWT.CHECK);
+			deltaMeasure.setText("Punktdifferenz messen");
+			deltaMeasure.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					log.finest("deltaMeasure.widgetSelected, event=" + evt);
+					if (deltaMeasure.getSelection() == true) {
+						measure.setSelection(false);
+						application.setDeltaMeasurementActive(true, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+					}
+					else {
+						application.setDeltaMeasurementActive(false, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+					}
+				}
+			});
+
+			
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			copyCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
