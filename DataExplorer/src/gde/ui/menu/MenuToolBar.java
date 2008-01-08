@@ -47,19 +47,6 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Graphical menu tool bar class
  * (future items are: scaling icons, ...)
@@ -88,7 +75,7 @@ public class MenuToolBar {
 	private ToolItem											newToolItem;
 	private ToolBar												fileToolBar;
 	private ToolItem											fitIntoItem;
-	private ToolItem											resizeItem;
+	private ToolItem											panItem;
 	private ToolItem											zoomWindowItem;
 	private ToolBar												zoomToolBar;
 	private CoolItem											zoomCoolItem;
@@ -318,11 +305,11 @@ public class MenuToolBar {
 					});
 				}
 				{
-					resizeItem = new ToolItem(zoomToolBar, SWT.NONE);
-					resizeItem.setImage(SWTResourceManager.getImage("osde/resource/Resize.gif"));
-					resizeItem.setHotImage(SWTResourceManager.getImage("osde/resource/ResizeHot.gif"));
-					resizeItem.setToolTipText("Größe verändern");
-					resizeItem.addSelectionListener(new SelectionAdapter() {
+					panItem = new ToolItem(zoomToolBar, SWT.NONE);
+					panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif"));
+					panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
+					panItem.setToolTipText("Verschieben");
+					panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if(log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event="+evt);
 							//TODO add your code for resizeItem.widgetSelected
