@@ -47,6 +47,19 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Graphical menu tool bar class
  * (future items are: scaling icons, ...)
@@ -54,15 +67,15 @@ import osde.ui.dialog.DeviceSelectionDialog;
  */
 public class MenuToolBar {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
-	
-	private Point	size;
-	private Composite recordSelectComposite;
-	private Composite channelSelectComposite;
-	private CoolItem dataCoolItem;
-	private ToolBar portToolBar;
-	private CoolItem portCoolItem;
-	private ToolBar deviceToolBar;
-	private CoolItem deviceCoolItem;
+
+	private Point													size;
+	private Composite											recordSelectComposite;
+	private Composite											channelSelectComposite;
+	private CoolItem											dataCoolItem;
+	private ToolBar												portToolBar;
+	private CoolItem											portCoolItem;
+	private ToolBar												deviceToolBar;
+	private CoolItem											deviceCoolItem;
 
 	private CoolBar												coolBar;
 	private CoolItem											menuCoolItem;
@@ -80,8 +93,8 @@ public class MenuToolBar {
 	private ToolItem											zoomWindowItem;
 	private ToolBar												zoomToolBar;
 	private CoolItem											zoomCoolItem;
-	
-	private ToolItem portOpenCloseItem;
+
+	private ToolItem											portOpenCloseItem;
 	private Composite											dataBarComposite;
 	private ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, deleteRecord, editRecord;
 	private CCombo												channelSelectCombo, recordSelectCombo;
@@ -92,8 +105,6 @@ public class MenuToolBar {
 	private final OpenSerialDataExplorer	application;
 	private final Channels								channels;
 
-
-
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
 		this.application = parent;
 		this.coolBar = menuCoolBar;
@@ -103,7 +114,7 @@ public class MenuToolBar {
 	public void init() {
 		coolBar = new CoolBar(this.application, SWT.NONE);
 		SWTResourceManager.registerResourceUser(coolBar);
-		coolBar.setSize(796, 100);
+		coolBar.setSize(800, 100);
 		create();
 	}
 
@@ -173,14 +184,15 @@ public class MenuToolBar {
 			menuCoolItem.setSize(size);
 			menuCoolItem.setPreferredSize(size);
 			menuCoolItem.setMinimumSize(size);
+			log.info("fileToolBar.size = " + size);
 		} // end file cool item
-		
+
 		{ // begin device cool item
 			deviceCoolItem = new CoolItem(coolBar, SWT.NONE);
-			{  // begin device tool bar
+			{ // begin device tool bar
 				deviceToolBar = new ToolBar(coolBar, SWT.NONE);
 				deviceCoolItem.setControl(deviceToolBar);
-				deviceToolBar.setSize(120, 29);
+				//deviceToolBar.setSize(120, 29);
 				{
 					deviceSelectToolItem = new ToolItem(deviceToolBar, SWT.NONE);
 					deviceSelectToolItem.setToolTipText("Geräteauswahl mit Einstellungen");
@@ -281,7 +293,7 @@ public class MenuToolBar {
 						}
 					});
 				}
-			}  // end device tool bar
+			} // end device tool bar
 			deviceToolBar.pack();
 			size = deviceToolBar.getSize();
 			deviceCoolItem.setSize(size);
@@ -301,7 +313,7 @@ public class MenuToolBar {
 					zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
 					zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if(log.isLoggable(Level.FINEST)) log.finest("zoomWindowItem.widgetSelected, event="+evt);
+							if (log.isLoggable(Level.FINEST)) log.finest("zoomWindowItem.widgetSelected, event=" + evt);
 							application.setZoomMode(true);
 						}
 					});
@@ -313,7 +325,7 @@ public class MenuToolBar {
 					panItem.setToolTipText("Verschieben");
 					panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if(log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event="+evt);
+							if (log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event=" + evt);
 							//TODO add your code for resizeItem.widgetSelected
 							application.openMessageDialog("Entschuldigung, diese Methode ist noch nicht implementiert! ");
 						}
@@ -326,22 +338,22 @@ public class MenuToolBar {
 					fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
 					fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if(log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event="+evt);
+							if (log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event=" + evt);
 							application.setZoomMode(false);
 							RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-							if (recordSet!= null) recordSet.setZoomLevel(0);
+							if (recordSet != null) recordSet.setZoomLevel(0);
 							application.updateGraphicsWindow();
 						}
 					});
 				}
-			}  // end zoom tool bar
+			} // end zoom tool bar
 			zoomToolBar.pack();
 			size = zoomToolBar.getSize();
 			zoomCoolItem.setSize(size);
 			zoomCoolItem.setPreferredSize(size);
 			zoomCoolItem.setMinimumSize(size);
 		} // end zoom cool item
-		
+
 		{ // begin port cool item
 			portCoolItem = new CoolItem(coolBar, SWT.NONE);
 			{
@@ -368,28 +380,29 @@ public class MenuToolBar {
 			portCoolItem.setPreferredSize(size);
 			portCoolItem.setMinimumSize(size);
 		} // end port cool item
-		
+
 		{ // begin data cool item (channel select, record select)
 			dataCoolItem = new CoolItem(coolBar, SWT.NONE);
 			{
 				dataBarComposite = new Composite(coolBar, SWT.NONE);
 				RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				dataBarComposite.setLayout(composite1Layout1);
+				dataCoolItem.setControl(dataBarComposite);
 				{
 					channelSelectComposite = new Composite(dataBarComposite, SWT.NONE);
 					RowData composite1LData = new RowData();
-					composite1LData.width = 104;
-					composite1LData.height = 23;
+					composite1LData.width = 110;
+					composite1LData.height = 24;
 					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					channelSelectComposite.setLayout(composite1Layout);
 					channelSelectComposite.setLayoutData(composite1LData);
 					{
-						channelSelectCombo = new CCombo(channelSelectComposite, SWT.FLAT | SWT.BORDER);
+						channelSelectCombo = new CCombo(channelSelectComposite, SWT.BORDER);
 						channelSelectCombo.setItems(new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 						channelSelectCombo.select(0); // kanalCombo.setText("K1: Kanal 1");
 						channelSelectCombo.setToolTipText("Wählen Sie einen Kanal aus der angezeigt werden soll");
 						RowData channelSelectComboLData = new RowData();
-						channelSelectComboLData.width = 240;
+						channelSelectComboLData.width = 100;
 						channelSelectComboLData.height = 18;
 						channelSelectCombo.setLayoutData(channelSelectComboLData);
 						channelSelectCombo.setEditable(false);
@@ -401,198 +414,199 @@ public class MenuToolBar {
 							}
 						});
 					}
-				{
-					channelToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
 					{
-						prevChannel = new ToolItem(channelToolBar, SWT.NONE);
-						prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-						prevChannel.setToolTipText("Kanal zurück");
-						prevChannel.setEnabled(false);
-						prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-						prevChannel.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("prevChannel.widgetSelected, event=" + evt);
-								int selectionIndex = channelSelectCombo.getSelectionIndex();
-								if (selectionIndex > 0) channelSelectCombo.select(selectionIndex - 1);
-								if (selectionIndex == 1) prevChannel.setEnabled(false);
-								selectionIndex = channelSelectCombo.getSelectionIndex();
-								nextChannel.setEnabled(true);
-								channels.switchChannel(channelSelectCombo.getText());
-							}
-						});
-					}
-					{
-						nextChannel = new ToolItem(channelToolBar, SWT.NONE);
-						nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-						nextChannel.setToolTipText("Kanal vor");
-						nextChannel.setEnabled(false);
-						nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-						nextChannel.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("nextChannel.widgetSelected, event=" + evt);
-								int selectionIndex = channelSelectCombo.getSelectionIndex();
-								int maxIndex = channelSelectCombo.getItemCount() - 1;
-								if (maxIndex <= 0) {
-									nextChannel.setEnabled(false);
-									prevChannel.setEnabled(false);
+						channelToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
+						{
+							prevChannel = new ToolItem(channelToolBar, SWT.NONE);
+							prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
+							prevChannel.setToolTipText("Kanal zurück");
+							prevChannel.setEnabled(false);
+							prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							prevChannel.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("prevChannel.widgetSelected, event=" + evt);
+									int selectionIndex = channelSelectCombo.getSelectionIndex();
+									if (selectionIndex > 0) channelSelectCombo.select(selectionIndex - 1);
+									if (selectionIndex == 1) prevChannel.setEnabled(false);
+									selectionIndex = channelSelectCombo.getSelectionIndex();
+									nextChannel.setEnabled(true);
+									channels.switchChannel(channelSelectCombo.getText());
 								}
-								else {
-									if (selectionIndex < maxIndex) channelSelectCombo.select(selectionIndex + 1);
-									if (selectionIndex == maxIndex - 1) nextChannel.setEnabled(false);
-									prevChannel.setEnabled(true);
-								}
-								channels.switchChannel(channelSelectCombo.getText());
-							}
-						});
-					}
-				}
-				channelToolBar.pack();
-				{
-					RowData composite2LData = new RowData();
-					composite2LData.width = 250;
-					composite2LData.height = 23;
-					recordSelectComposite = new Composite(dataBarComposite, SWT.NONE);
-					RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					recordSelectComposite.setLayout(composite2Layout);
-					recordSelectComposite.setLayoutData(composite2LData);
-					{
-						recordSelectCombo = new CCombo(recordSelectComposite, SWT.FLAT | SWT.BORDER);
-						FormLayout aufnahmeComboLayout = new FormLayout();
-						recordSelectCombo.setLayout(aufnahmeComboLayout);
-						recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
-						recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
-						recordSelectCombo.setTextLimit(30);
-						RowData recordSelectComboLData = new RowData();
-						recordSelectComboLData.width = 240;
-						recordSelectComboLData.height = 18;
-						recordSelectCombo.setLayoutData(recordSelectComboLData);
-						recordSelectCombo.setEditable(false);
-						recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-						recordSelectCombo.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("recordSelectCombo.widgetSelected, event=" + evt);
-								channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
-							}
-						});
-						recordSelectCombo.addKeyListener(new KeyAdapter() {
-							public void keyPressed(KeyEvent evt) {
-								log.finest("recordSelectCombo.keyPressed, event=" + evt);
-								if (evt.character == SWT.CR) {
-									Channel activeChannel = channels.getActiveChannel();
-									String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
-									String newRecordSetName = recordSelectCombo.getText();
-									log.fine("newRecordSetName = " + newRecordSetName);
-									String[] recordSetNames = recordSelectCombo.getItems();
-									for (int i = 0; i < recordSetNames.length; i++) {
-										if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
+							});
+						}
+						{
+							nextChannel = new ToolItem(channelToolBar, SWT.NONE);
+							nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
+							nextChannel.setToolTipText("Kanal vor");
+							nextChannel.setEnabled(false);
+							nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							nextChannel.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("nextChannel.widgetSelected, event=" + evt);
+									int selectionIndex = channelSelectCombo.getSelectionIndex();
+									int maxIndex = channelSelectCombo.getItemCount() - 1;
+									if (maxIndex <= 0) {
+										nextChannel.setEnabled(false);
+										prevChannel.setEnabled(false);
 									}
-									recordSelectCombo.setEditable(false);
-									recordSelectCombo.setItems(recordSetNames);
-									RecordSet recordSet = channels.getActiveChannel().get(oldRecordSetName);
-									recordSet.setName(newRecordSetName);
-									activeChannel.put(newRecordSetName, recordSet);
-									activeChannel.remove(oldRecordSetName);
-									activeChannel.getRecordSetNames();
-									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(newRecordSetName);
+									else {
+										if (selectionIndex < maxIndex) channelSelectCombo.select(selectionIndex + 1);
+										if (selectionIndex == maxIndex - 1) nextChannel.setEnabled(false);
+										prevChannel.setEnabled(true);
+									}
+									channels.switchChannel(channelSelectCombo.getText());
 								}
-							}
-						});
-					}
-				}
-				{
-					recordToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
-					{
-						prevRecord = new ToolItem(recordToolBar, SWT.NONE);
-						prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-						prevRecord.setToolTipText("vorhergehender Datensatz");
-						prevRecord.setEnabled(false);
-						prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-						prevRecord.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("prevRecord.widgetSelected, event=" + evt);
-								int selectionIndex = recordSelectCombo.getSelectionIndex();
-								if (selectionIndex > 0) recordSelectCombo.select(selectionIndex - 1);
-								if (selectionIndex == 1) prevRecord.setEnabled(false);
-								nextRecord.setEnabled(true);
-								channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
-							}
-						});
-					}
-					{
-						nextRecord = new ToolItem(recordToolBar, SWT.NONE);
-						nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-						nextRecord.setToolTipText("nächster Datensatz");
-						nextRecord.setEnabled(false);
-						nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-						nextRecord.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.finest("nextRecord.widgetSelected, event=" + evt);
-								int selectionIndex = recordSelectCombo.getSelectionIndex();
-								int maxIndex = recordSelectCombo.getItemCount() - 1;
-								if (maxIndex <= 0) {
-									nextRecord.setEnabled(false);
-									prevRecord.setEnabled(false);
-								}
-								else {
-									if (selectionIndex < maxIndex) recordSelectCombo.select(selectionIndex + 1);
-									if (selectionIndex == maxIndex - 1) nextRecord.setEnabled(false);
-									prevRecord.setEnabled(true);
-								}
-								channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
-							}
-						});
-					}
-					recordToolBar.pack();
-				}
-				{
-					separator = new ToolItem(recordToolBar, SWT.SEPARATOR);
-				}
-				{
-					deleteRecord = new ToolItem(recordToolBar, SWT.NONE);
-					deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
-					deleteRecord.setToolTipText("löscht den aktiven Datensatz");
-					deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
-					deleteRecord.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("deleteAufnahme.widgetSelected, event=" + evt);
-							String deleteRecordSetName = channels.getActiveChannel().getActiveRecordSet().getName();
-							channels.getActiveChannel().get(deleteRecordSetName).clear();
-							channels.getActiveChannel().remove(deleteRecordSetName);
-							log.fine("deleted " + deleteRecordSetName);
-							updateRecordSetSelectCombo();
+							});
 						}
-					});
-				}
-				{
-					editRecord = new ToolItem(recordToolBar, SWT.NONE);
-					editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
-					editRecord.setToolTipText("umbenennen des aktiven Datensatznamen");
-					editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
-					editRecord.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("editAufnahme.widgetSelected, event=" + evt);
-							recordSelectCombo.setEditable(true);
-							recordSelectCombo.setFocus();
-							// begin here text can be edited
+					}
+					channelToolBar.pack();
+					{
+						RowData composite2LData = new RowData();
+						composite2LData.width = 250;
+						composite2LData.height = 24;
+						recordSelectComposite = new Composite(dataBarComposite, SWT.NONE);
+						RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						recordSelectComposite.setLayout(composite2Layout);
+						recordSelectComposite.setLayoutData(composite2LData);
+						{
+							recordSelectCombo = new CCombo(recordSelectComposite, SWT.BORDER);
+							FormLayout aufnahmeComboLayout = new FormLayout();
+							recordSelectCombo.setLayout(aufnahmeComboLayout);
+							recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
+							recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
+							recordSelectCombo.setTextLimit(30);
+							RowData recordSelectComboLData = new RowData();
+							recordSelectComboLData.width = 240;
+							recordSelectComboLData.height = 18;
+							recordSelectCombo.setLayoutData(recordSelectComboLData);
+							recordSelectCombo.setEditable(false);
+							recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							recordSelectCombo.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("recordSelectCombo.widgetSelected, event=" + evt);
+									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+								}
+							});
+							recordSelectCombo.addKeyListener(new KeyAdapter() {
+								public void keyPressed(KeyEvent evt) {
+									log.finest("recordSelectCombo.keyPressed, event=" + evt);
+									if (evt.character == SWT.CR) {
+										Channel activeChannel = channels.getActiveChannel();
+										String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
+										String newRecordSetName = recordSelectCombo.getText();
+										log.fine("newRecordSetName = " + newRecordSetName);
+										String[] recordSetNames = recordSelectCombo.getItems();
+										for (int i = 0; i < recordSetNames.length; i++) {
+											if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
+										}
+										recordSelectCombo.setEditable(false);
+										recordSelectCombo.setItems(recordSetNames);
+										RecordSet recordSet = channels.getActiveChannel().get(oldRecordSetName);
+										recordSet.setName(newRecordSetName);
+										activeChannel.put(newRecordSetName, recordSet);
+										activeChannel.remove(oldRecordSetName);
+										activeChannel.getRecordSetNames();
+										channels.getActiveChannel().getActiveRecordSet().switchRecordSet(newRecordSetName);
+									}
+								}
+							});
 						}
-					});
+						recordSelectComposite.pack();
+					}
+					{
+						recordToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
+						{
+							prevRecord = new ToolItem(recordToolBar, SWT.NONE);
+							prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
+							prevRecord.setToolTipText("vorhergehender Datensatz");
+							prevRecord.setEnabled(false);
+							prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							prevRecord.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("prevRecord.widgetSelected, event=" + evt);
+									int selectionIndex = recordSelectCombo.getSelectionIndex();
+									if (selectionIndex > 0) recordSelectCombo.select(selectionIndex - 1);
+									if (selectionIndex == 1) prevRecord.setEnabled(false);
+									nextRecord.setEnabled(true);
+									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+								}
+							});
+						}
+						{
+							nextRecord = new ToolItem(recordToolBar, SWT.NONE);
+							nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
+							nextRecord.setToolTipText("nächster Datensatz");
+							nextRecord.setEnabled(false);
+							nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							nextRecord.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("nextRecord.widgetSelected, event=" + evt);
+									int selectionIndex = recordSelectCombo.getSelectionIndex();
+									int maxIndex = recordSelectCombo.getItemCount() - 1;
+									if (maxIndex <= 0) {
+										nextRecord.setEnabled(false);
+										prevRecord.setEnabled(false);
+									}
+									else {
+										if (selectionIndex < maxIndex) recordSelectCombo.select(selectionIndex + 1);
+										if (selectionIndex == maxIndex - 1) nextRecord.setEnabled(false);
+										prevRecord.setEnabled(true);
+									}
+									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+								}
+							});
+						}
+						recordToolBar.pack();
+					}
+					{
+						separator = new ToolItem(recordToolBar, SWT.SEPARATOR);
+					}
+					{
+						deleteRecord = new ToolItem(recordToolBar, SWT.NONE);
+						deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
+						deleteRecord.setToolTipText("löscht den aktiven Datensatz");
+						deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
+						deleteRecord.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.finest("deleteAufnahme.widgetSelected, event=" + evt);
+								String deleteRecordSetName = channels.getActiveChannel().getActiveRecordSet().getName();
+								channels.getActiveChannel().get(deleteRecordSetName).clear();
+								channels.getActiveChannel().remove(deleteRecordSetName);
+								log.fine("deleted " + deleteRecordSetName);
+								updateRecordSetSelectCombo();
+							}
+						});
+					}
+					{
+						editRecord = new ToolItem(recordToolBar, SWT.NONE);
+						editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
+						editRecord.setToolTipText("umbenennen des aktiven Datensatznamen");
+						editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
+						editRecord.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.finest("editAufnahme.widgetSelected, event=" + evt);
+								recordSelectCombo.setEditable(true);
+								recordSelectCombo.setFocus();
+								// begin here text can be edited
+							}
+						});
+					}
+					channelSelectComposite.pack();
 				}
-				}
-				size = dataBarComposite.computeSize(SWT.NONE, SWT.NONE);
-				size = dataBarComposite.computeSize(size.x, size.y);
-				dataCoolItem.setSize(size);
-				dataCoolItem.setMinimumSize(size);
-				dataCoolItem.setPreferredSize(size);
-				dataCoolItem.setControl(dataBarComposite);
 			}
 			dataBarComposite.pack();
+			int height = size.y;
 			size = dataBarComposite.getSize();
+			log.info("pre dataBarComposite.size = " + size);
+			dataBarComposite.setSize(size.x, height);
+			size = dataBarComposite.getSize();
+			log.info("post dataBarComposite.size = " + size);
 			dataCoolItem.setSize(size);
 			dataCoolItem.setPreferredSize(size);
 			dataCoolItem.setMinimumSize(size);
 		} // end record cool item
 	}
-	
+
 	/**
 	 * method toggle open close serial port
 	 */
@@ -767,10 +781,11 @@ public class MenuToolBar {
 		return recordSelectCombo;
 	}
 
+	@SuppressWarnings("unused")
 	private void initGUI() {
 		try {
 			{
-				application.setSize(796, 183);
+				application.setSize(800, 200);
 			}
 		}
 		catch (Exception e) {
