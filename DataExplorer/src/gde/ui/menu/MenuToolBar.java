@@ -55,6 +55,7 @@ import osde.ui.dialog.DeviceSelectionDialog;
 public class MenuToolBar {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
 	
+	private Point	size;
 	private Composite recordSelectComposite;
 	private Composite channelSelectComposite;
 	private CoolItem dataCoolItem;
@@ -109,13 +110,10 @@ public class MenuToolBar {
 	public void create() {
 		{ // begin file cool item
 			menuCoolItem = new CoolItem(coolBar, SWT.NONE);
-			menuCoolItem.setSize(116, 29);
-			menuCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(116, 29));
-			menuCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(116, 29));
 			{ // begin file tool bar
 				fileToolBar = new ToolBar(coolBar, SWT.NONE);
 				menuCoolItem.setControl(fileToolBar);
-				fileToolBar.setSize(116, 29);
+				//fileToolBar.setSize(116, 29);
 				{
 					newToolItem = new ToolItem(fileToolBar, SWT.PUSH);
 					newToolItem.setToolTipText("Löscht die aktuellen Aufzeichnungen und legt einen leeren Datensatz an");
@@ -170,13 +168,15 @@ public class MenuToolBar {
 					});
 				}
 			} // end file tool bar
+			fileToolBar.pack();
+			size = fileToolBar.getSize();
+			menuCoolItem.setSize(size);
+			menuCoolItem.setPreferredSize(size);
+			menuCoolItem.setMinimumSize(size);
 		} // end file cool item
 		
 		{ // begin device cool item
 			deviceCoolItem = new CoolItem(coolBar, SWT.NONE);
-			deviceCoolItem.setSize(120, 29);
-			deviceCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(120, 29));
-			deviceCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(120, 29));
 			{  // begin device tool bar
 				deviceToolBar = new ToolBar(coolBar, SWT.NONE);
 				deviceCoolItem.setControl(deviceToolBar);
@@ -282,16 +282,18 @@ public class MenuToolBar {
 					});
 				}
 			}  // end device tool bar
+			deviceToolBar.pack();
+			size = deviceToolBar.getSize();
+			deviceCoolItem.setSize(size);
+			deviceCoolItem.setPreferredSize(size);
+			deviceCoolItem.setMinimumSize(size);
 		} // end device cool item
 		{ // begin zoom cool item
 			zoomCoolItem = new CoolItem(coolBar, SWT.NONE);
-			zoomCoolItem.setSize(90, 29);
-			zoomCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(90, 29));
-			zoomCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(90, 29));
 			{ // begin zoom tool bar
 				zoomToolBar = new ToolBar(coolBar, SWT.NONE);
 				zoomCoolItem.setControl(zoomToolBar);
-				zoomToolBar.setSize(90, 29);
+				//zoomToolBar.setSize(90, 29);
 				{
 					zoomWindowItem = new ToolItem(zoomToolBar, SWT.NONE);
 					zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
@@ -333,17 +335,19 @@ public class MenuToolBar {
 					});
 				}
 			}  // end zoom tool bar
+			zoomToolBar.pack();
+			size = zoomToolBar.getSize();
+			zoomCoolItem.setSize(size);
+			zoomCoolItem.setPreferredSize(size);
+			zoomCoolItem.setMinimumSize(size);
 		} // end zoom cool item
 		
 		{ // begin port cool item
 			portCoolItem = new CoolItem(coolBar, SWT.NONE);
-			portCoolItem.setSize(129, 29);
-			portCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(129, 29));
-			portCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(129, 29));
 			{
 				portToolBar = new ToolBar(coolBar, SWT.NONE);
 				portCoolItem.setControl(portToolBar);
-				portToolBar.setSize(129, 29);
+				//portToolBar.setSize(129, 29);
 				{
 					portOpenCloseItem = new ToolItem(portToolBar, SWT.NONE);
 					portOpenCloseItem.setToolTipText("Seriellen Port Öffnen, um eine Datenaufnahme zu ermöglichen");
@@ -358,28 +362,24 @@ public class MenuToolBar {
 					});
 				}
 			}
+			portToolBar.pack();
+			size = portToolBar.getSize();
+			portCoolItem.setSize(size);
+			portCoolItem.setPreferredSize(size);
+			portCoolItem.setMinimumSize(size);
 		} // end port cool item
 		
 		{ // begin data cool item (channel select, record select)
 			dataCoolItem = new CoolItem(coolBar, SWT.NONE);
-			dataCoolItem.setSize(551, 29);
-			dataCoolItem.setPreferredSize(new org.eclipse.swt.graphics.Point(551, 29));
-			dataCoolItem.setMinimumSize(new org.eclipse.swt.graphics.Point(551, 29));
 			{
 				dataBarComposite = new Composite(coolBar, SWT.NONE);
-				Point connectSize = dataBarComposite.computeSize(551, 29);
-				Point connectCoolSize = dataBarComposite.computeSize(connectSize.x, connectSize.y);
-				dataCoolItem.setSize(connectCoolSize);
-				dataCoolItem.setMinimumSize(connectCoolSize);
-				dataCoolItem.setPreferredSize(connectCoolSize);
-				dataCoolItem.setControl(dataBarComposite);
 				RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				dataBarComposite.setLayout(composite1Layout1);
 				{
+					channelSelectComposite = new Composite(dataBarComposite, SWT.NONE);
 					RowData composite1LData = new RowData();
 					composite1LData.width = 104;
 					composite1LData.height = 23;
-					channelSelectComposite = new Composite(dataBarComposite, SWT.NONE);
 					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					channelSelectComposite.setLayout(composite1Layout);
 					channelSelectComposite.setLayoutData(composite1LData);
@@ -388,6 +388,10 @@ public class MenuToolBar {
 						channelSelectCombo.setItems(new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 						channelSelectCombo.select(0); // kanalCombo.setText("K1: Kanal 1");
 						channelSelectCombo.setToolTipText("Wählen Sie einen Kanal aus der angezeigt werden soll");
+						RowData channelSelectComboLData = new RowData();
+						channelSelectComboLData.width = 240;
+						channelSelectComboLData.height = 18;
+						channelSelectCombo.setLayoutData(channelSelectComboLData);
 						channelSelectCombo.setEditable(false);
 						channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						channelSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -397,8 +401,6 @@ public class MenuToolBar {
 							}
 						});
 					}
-				}
-
 				{
 					channelToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
 					{
@@ -444,6 +446,7 @@ public class MenuToolBar {
 						});
 					}
 				}
+				channelToolBar.pack();
 				{
 					RowData composite2LData = new RowData();
 					composite2LData.width = 250;
@@ -459,10 +462,10 @@ public class MenuToolBar {
 						recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
 						recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
 						recordSelectCombo.setTextLimit(30);
-						RowData aufnahmeComboLData = new RowData();
-						aufnahmeComboLData.width = 240;
-						aufnahmeComboLData.height = 18;
-						recordSelectCombo.setLayoutData(aufnahmeComboLData);
+						RowData recordSelectComboLData = new RowData();
+						recordSelectComboLData.width = 240;
+						recordSelectComboLData.height = 18;
+						recordSelectCombo.setLayoutData(recordSelectComboLData);
 						recordSelectCombo.setEditable(false);
 						recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						recordSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -539,6 +542,7 @@ public class MenuToolBar {
 							}
 						});
 					}
+					recordToolBar.pack();
 				}
 				{
 					separator = new ToolItem(recordToolBar, SWT.SEPARATOR);
@@ -573,7 +577,19 @@ public class MenuToolBar {
 						}
 					});
 				}
+				}
+				size = dataBarComposite.computeSize(SWT.NONE, SWT.NONE);
+				size = dataBarComposite.computeSize(size.x, size.y);
+				dataCoolItem.setSize(size);
+				dataCoolItem.setMinimumSize(size);
+				dataCoolItem.setPreferredSize(size);
+				dataCoolItem.setControl(dataBarComposite);
 			}
+			dataBarComposite.pack();
+			size = dataBarComposite.getSize();
+			dataCoolItem.setSize(size);
+			dataCoolItem.setPreferredSize(size);
+			dataCoolItem.setMinimumSize(size);
 		} // end record cool item
 	}
 	
@@ -749,6 +765,17 @@ public class MenuToolBar {
 
 	public CCombo getRecordSelectCombo() {
 		return recordSelectCombo;
+	}
+
+	private void initGUI() {
+		try {
+			{
+				application.setSize(796, 183);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
