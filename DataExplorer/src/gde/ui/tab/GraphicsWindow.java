@@ -336,7 +336,7 @@ public class GraphicsWindow {
 									if (recordSet.isDeltaMeasurementMode()) {
 										StringBuilder sb = new StringBuilder();
 										sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, drawAreaBounds)).append(" ").append(record.getUnit());
-										sb.append(" - Steigung = ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure + offSetX, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
+										sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure + offSetX, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
 										application.setStatusMessage(sb.toString());
 									}
 									else {
@@ -759,7 +759,7 @@ public class GraphicsWindow {
 
 			StringBuilder sb = new StringBuilder();
 			sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, drawAreaBounds)).append(" ").append(record.getUnit());
-			sb.append(" - Steigung = ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
+			sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
 			application.setStatusMessage(sb.toString());
 		}
 	}
