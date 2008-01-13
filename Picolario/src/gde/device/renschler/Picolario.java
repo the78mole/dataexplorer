@@ -34,6 +34,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.tab.GraphicsWindow;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
@@ -117,37 +118,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				factor = 1.0;
 				break;
 			}
+			RecordSet recordSet = application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 			if (dialog.isDoSubtractFirst()) {
-				try { // use exception handling instead of transfer graphicsWindow type
-					firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
-				}
-				catch (NullPointerException e) {
-					firstValue = application.getCompareSet().get(recordKey).get(0).intValue() / 1000;
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
+				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
 			}
 			else if (dialog.isDoSubtractLast()) {
-				try { // use exception handling instead of transfer graphicsWindow type
-					Record record = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey);
-					firstValue = record.get(record.size()-1).intValue() / 1000;
-				}
-				catch (NullPointerException e) {
-					Record record = application.getCompareSet().get(recordKey);
-					firstValue = record.get(record.size()-1).intValue() / 1000;
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
+				Record record = recordSet.getRecord(recordKey);
+				firstValue = record.getLast().intValue() / 1000;
 			}
 			else if (dialog.isDoReduceHeight()) {
 				offset = dialog.getHeightOffsetValue();
-				if (log.isLoggable(Level.FINER)) log.finer("dialog.isDoReduceHeight() == true -> value = " + offset);
 			}
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("firstValue = %d, offset = %f, factor = %f", firstValue, offset, factor));
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("doSubtractFirst = %s, doReduceHeight = %s", dialog.isDoSubtractFirst(), dialog.isDoReduceHeight()));
-			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
+			if (log.isLoggable(Level.FINER)) log.finer("value = " + value + " firstValue = " + firstValue + " factor = " + factor + " offset = " + offset);
 			newValue = (value - firstValue) * factor - offset;
 		}
 		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
@@ -193,34 +175,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				factor = 1.0;
 				break;
 			}
+			RecordSet recordSet = application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 			if (dialog.isDoSubtractFirst()) {
-				try { // use exception handling instead of transfer graphicsWindow type
-					firstValue = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey).get(0).intValue() / 1000;
-				}
-				catch (NullPointerException e) {
-					firstValue = application.getCompareSet().get(recordKey).get(0).intValue() / 1000;
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
+				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
 			}
 			else if (dialog.isDoSubtractLast()) {
-				try { // use exception handling instead of transfer graphicsWindow type
-					Record record = channels.getActiveChannel().getActiveRecordSet().getRecord(recordKey);
-					firstValue = record.get(record.size()-1).intValue() / 1000;
-				}
-				catch (NullPointerException e) {
-					Record record = application.getCompareSet().get(recordKey);
-					firstValue = record.get(record.size()-1).intValue() / 1000;
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
+				Record record = recordSet.getRecord(recordKey);
+				firstValue = record.getLast().intValue() / 1000;
 			}
 			else if (dialog.isDoReduceHeight()) {
 				offset = dialog.getHeightOffsetValue();
 			}
-			// ((height.get(i).intValue() - firstValue) * 1000 * multiplyValue / devideValue - subtractValue); // Höhe [m]
+			if (log.isLoggable(Level.FINER)) log.finer("value = " + value + " offset = " + offset + " factor = " + factor + " firstValue = " + firstValue);
 			newValue = (value + offset) / factor + firstValue;
 		}
 		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
