@@ -88,7 +88,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	public synchronized void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);
 		// clean active record set before switch to the other
-		this.getActiveChannel().getActiveRecordSet().resetAllModes();
+		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) recordSet.resetAllModes();
 		
 		if (channelNumber != this.getActiveChannelNumber()) {
 			this.setActiveChannelNumber(channelNumber);

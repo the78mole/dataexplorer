@@ -118,11 +118,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				template.setProperty(recordName + Record.IS_ROUND_OUT, new Boolean(record.isRoundOut()).toString());
 				template.setProperty(recordName + Record.IS_START_POINT_ZERO, new Boolean(record.isStartpointZero()).toString());
 				template.setProperty(recordName + Record.NUMBER_FORMAT, new Integer(record.getNumberFormat()).toString());
-				//template.setProperty(recordName + Record.MAX_VALUE, new Double(record.getMaxValue()).toString());
-				//template.setProperty(recordName + Record.MIN_VALUE, new Double(record.getMinValue()).toString());
 				template.setProperty(recordName + Record.IS_START_END_DEFINED, new Boolean(record.isStartEndDefined()).toString());
-				template.setProperty(recordName + Record.DEFINED_MAX_VALUE, new Double(record.getDefinedMaxValue()).toString());
-				template.setProperty(recordName + Record.DEFINED_MIN_VALUE, new Double(record.getDefinedMinValue()).toString());
+				template.setProperty(recordName + Record.DEFINED_MAX_VALUE, new Double(record.getMaxScaleValue()).toString());
+				template.setProperty(recordName + Record.DEFINED_MIN_VALUE, new Double(record.getMinScaleValue()).toString());
 			}
 			template.store();
 			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + fileSep + this.getActiveRecordSet().getName() + this.name);
@@ -137,7 +135,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 		if (template != null) template.load();
 
-		if (template.isAvailable()) {
+		if (template.isAvailable()&& recordSet != null) {
 			for (String recordName : recordSet.getRecordNames()) {
 				Record record = recordSet.get(recordName);
 				record.setVisible(new Boolean(template.getProperty(recordName + Record.IS_VISIBLE)).booleanValue());
@@ -154,11 +152,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				record.setStartEndDefined(new Boolean(template.getProperty(recordName + Record.IS_START_END_DEFINED)).booleanValue(), new Double(template.getProperty(recordName + Record.DEFINED_MIN_VALUE))
 						.doubleValue(), new Double(template.getProperty(recordName + Record.DEFINED_MAX_VALUE)).doubleValue());
 				record.setNumberFormat(new Integer(template.getProperty(recordName + Record.NUMBER_FORMAT)).intValue());
-				//record.setMaxValue(new Double(template.getProperty(recordName + Record.DEFINED_MAX_VALUE)).intValue());
-				//record.setMinValue(new Double(template.getProperty(recordName + Record.DEFINED_MIN_VALUE)).intValue());
 			}
 			log.fine("applied graphics template file " + template.getCurrentFilePath());
-			if (recordSet.equals(this.getActiveRecordSet().getName())) application.updateGraphicsWindow();
+			if (recordSet.equals(this.getActiveRecordSet())) application.updateGraphicsWindow();
 		}
 	}
 	
