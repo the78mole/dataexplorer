@@ -375,7 +375,7 @@ public class GraphicsWindow {
 
 									StringBuilder sb = new StringBuilder();
 									sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, drawAreaBounds)).append(" ").append(record.getUnit());
-									sb.append(" - Steigung = ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure- offSetX, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
+									sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure- offSetX, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
 									application.setStatusMessage(sb.toString());
 									gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 								}
@@ -471,11 +471,13 @@ public class GraphicsWindow {
 								isMouseMeasure = false;
 								xPosMeasure = xPosMeasure - offSetX;
 								log.fine("isMouseMeasure = false");
+								application.setStatusMessage("");
 							}
 							else if (isMouseDeltaMeasure) {
 								isMouseDeltaMeasure = false;
 								xPosDelta = xPosDelta - offSetX;
 								log.fine("isMouseDeltaMeasure = false");
+								application.setStatusMessage("");
 							}
 						}
 					}
