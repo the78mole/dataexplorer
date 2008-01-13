@@ -34,10 +34,17 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class TimeLine {
-	private Logger				log									= Logger.getLogger(this.getClass().getName());
+	private final static Logger	log									= Logger.getLogger(TimeLine.class.getName());
 
-	private static String	timeLineText				= "Zeit   t   [min]";
-	private boolean				isTimeLinePrepared	= false;
+	public final static int			TIME_LINE_MSEC			= 0;
+	public final static int			TIME_LINE_SEC				= 1;
+	public final static int			TIME_LINE_SEC_MIN		= 2;
+	public final static int			TIME_LINE_MIN				= 3;
+	public final static int			TIME_LINE_MIN_HRS		= 4;
+	public final static int			TIME_LINE_HRS				= 5;
+
+	private static String				timeLineText				= "Zeit   t   [min]";
+	private boolean							isTimeLinePrepared	= false;
 
 	/**
 	 * calculates the maximum time number to be displayed and the scale number factor
@@ -45,8 +52,11 @@ public class TimeLine {
 	 */
 	public synchronized int[] getScaleMaxTimeNumber(RecordSet recordSet) {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
-		int numberOfPoints = (recordSet.getMaxSize() == 0) ? recordSet.getRecord(recordSet.getRecordNames()[0]).size() : recordSet.getMaxSize();
+		int format = TIME_LINE_MSEC; // the time format type 
+		
+		int numberOfPoints = recordSet.getSize();
 		if (log.isLoggable(Level.FINE)) log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms());
+
 		long totalTime_msec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 100;
 		long totalTime_sec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000;
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
@@ -57,39 +67,46 @@ public class TimeLine {
 		if (totalTime_std > 5) {
 			maxTimeNumber = (int) totalTime_std;
 			timeLineText = "Zeit   t   [Std]";
+			format = TIME_LINE_HRS;
 		}
 		else if (totalTime_min > 60) {
 			maxTimeNumber = (int) totalTime_min;
 			timeLineText = "Zeit   t   [min, Std]";
+			format = TIME_LINE_MIN_HRS;
 		}
 		else if (totalTime_min > 10) {
 			maxTimeNumber = (int) totalTime_min;
 			timeLineText = "Zeit   t   [min]";
+			format = TIME_LINE_MIN;
 		}
 		else if (totalTime_sec > 60) {
 			maxTimeNumber = (int) totalTime_sec;
 			timeLineText = "Zeit   t   [sek, min]";
+			format = TIME_LINE_SEC_MIN;
 		}
 		else if (totalTime_sec > 10) {
 			maxTimeNumber = (int) totalTime_sec;
 			timeLineText = "Zeit   t   [sec]";
+			format = TIME_LINE_SEC;
 		}
 		else if (totalTime_sec > 1) {
 			maxTimeNumber = (int) totalTime_msec;
 			timeLineText = "Zeit   t   [sec]";
 			factor = 100;
+			format = TIME_LINE_SEC;
 		}
 		else {
 			maxTimeNumber = (int) totalTime_msec;
 			timeLineText = "Zeit   t   [msec]";
 			factor = 1000;
+			format = TIME_LINE_MSEC;
 		}
 		if (log.isLoggable(Level.FINE)) log.fine(timeLineText + "  " + maxTimeNumber);
 
 		isTimeLinePrepared = true;
 
 		if (log.isLoggable(Level.FINE)) log.fine("timeLineText = " + timeLineText + " maxTimeNumber = " + maxTimeNumber + " factor = " + factor);
-		return new int[] { maxTimeNumber, factor };
+		return new int[] { maxTimeNumber, factor, format };
 	}
 
 	/**
@@ -100,7 +117,7 @@ public class TimeLine {
 	 * @param x0 start point in x vertical direction
 	 * @param width in points where the ticks should be drawn
 	 * @param startTimeValue  the time value where the scale should start to count
-	 * @param endTimeValue
+	 * @param endTimeValue depends on the time gap and the unit calculated from the gap
 	 * @param scaleFactor - factor to multiply scale numbers
 	 * @param color
 	 */
@@ -143,6 +160,7 @@ public class TimeLine {
 		x0 = x0 -1;
 		width = width + 1;
 		double numberTicks;
+		int offset = (startTimeValue != 0) ? 5 - startTimeValue % 5 : 0;
 		int timeDelta = endTimeValue - startTimeValue;
 		
 		// calculate a scale factor, a big time difference would have to much ticks
@@ -170,7 +188,7 @@ public class TimeLine {
 		for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
 			
 			//draw the main scale ticks, length = 5 and gap to scale = 2
-			double xTickPosition = x0 + i * deltaTick;
+			double xTickPosition = offset + x0 + i * deltaTick;
 			int intXTickPosition = new Double(xTickPosition).intValue();
 			gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
 
@@ -185,7 +203,7 @@ public class TimeLine {
 				}
 			}
 			//draw values to the scale	
-			int timeValue = startTimeValue + i * 100 / scaleFactor; 
+			int timeValue = startTimeValue + offset + i * 100 / scaleFactor; 
 			
 			// prepare to make every minute or hour to bold
 			boolean isMod60 = (timeValue % 60) == 0;
@@ -205,6 +223,36 @@ public class TimeLine {
 				gc.setFont(SWTResourceManager.getFont(fd[0]));
 			}
 		}
+	}
+
+	/**
+	 * converts a given time in m_sec into time format used for time scale 
+	 * @return converted time value
+	 */
+	public static int convertTimeInFormatNumber(long time_ms, int timeFormat) {
+		long time_sec = time_ms / 1000;
+		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
+		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
+		if (log.isLoggable(Level.FINE)) log.fine("time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms);
+		int result;
+
+		switch (timeFormat) {
+		case TIME_LINE_HRS:		
+			result = new Long(time_std).intValue();
+			break;
+		case TIME_LINE_MIN_HRS:	
+		case TIME_LINE_MIN:		
+			result = new Long(time_min).intValue();
+			break;
+		case TIME_LINE_SEC_MIN:			
+		case TIME_LINE_SEC:		
+			result = new Long(time_sec).intValue();
+			break;
+		default: // TIME_LINE_MSEC
+			result = new Long(time_ms).intValue();
+			break;
+		}
+		return result;
 	}
 
 }

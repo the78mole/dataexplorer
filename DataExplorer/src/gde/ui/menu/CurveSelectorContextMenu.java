@@ -75,13 +75,30 @@ public class CurveSelectorContextMenu {
 						if (selectedItem != null && !selectedItem.isDisposed()) {
 							int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
 							recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+							
+							if (recordSet != null) setAllEnabled(true);
+							else setAllEnabled(false);
+							
+							
 							String recordNameKey = selectedItem.getText();
 							lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
 							if (type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
 
+							// check zoom mode
+							if (recordSet.isZoomMode()) {
+								axisEndValues.setEnabled(false);
+								axisEndValues.setText("Zoommode aktiv");
+							}
+							else {
+								axisEndValues.setEnabled(true);
+								axisEndValues.setText("Achsen-Endwerte");
+							}
+							
 							// clean measurement selections
 							measure.setSelection(false);
+							recordSet.setDeltaMeasurementMode(false, recordNameKey);
 							deltaMeasure.setSelection(false);
+							recordSet.setDeltaMeasurementMode(false, recordNameKey);
 						}
 				}
 
@@ -314,6 +331,10 @@ public class CurveSelectorContextMenu {
 						boolean isRounded = recordSet.getRecord(recordNameKey).isRoundOut();
 						boolean isStart0 = recordSet.getRecord(recordNameKey).isStartpointZero();
 						boolean isManual = recordSet.getRecord(recordNameKey).isStartEndDefined();
+						axisEndAuto.setSelection(true);
+						axisEndRound.setSelection(false);
+						axisStarts0.setSelection(false);
+						axisEndManual.setSelection(false);
 						if (isManual) {
 							axisEndAuto.setSelection(false);
 							axisEndRound.setSelection(false);
@@ -332,8 +353,6 @@ public class CurveSelectorContextMenu {
 							//axisStarts0.setSelection(false);
 							axisEndManual.setSelection(false);
 						}
-						//					else
-						//						axisEndAuto.setSelection(true);
 					}
 				}
 
@@ -614,7 +633,7 @@ public class CurveSelectorContextMenu {
 							String recordkey = newRecordKey + "_" + compareSet.size();
 							compareSet.addRecordName(recordkey);
 							compareSet.put(recordkey, recordSet.get(newRecordKey).clone());
-							int maxRecordSize = compareSet.getMaxSize();
+							int maxRecordSize = compareSet.getSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
 							log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
@@ -622,8 +641,8 @@ public class CurveSelectorContextMenu {
 								if (compareSet.get(recordKey).size() > maxRecordSize) {
 									compareSet.setMaxSize(compareSet.get(recordKey).size());
 								}
-								double newMinValue = compareSet.get(recordKey).getDefinedMinValue();
-								double newMaxValue = compareSet.get(recordKey).getDefinedMaxValue();
+								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
+								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
 								log.fine(String.format("scale values from record to be added min=%.3f max=%.3f", newMinValue, newMaxValue));
 
 								if (newMinValue < oldMinValue) {
@@ -657,5 +676,19 @@ public class CurveSelectorContextMenu {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void setAllEnabled(boolean enabled) {
+		lineVisible.setEnabled(enabled);
+		lineColor.setEnabled(enabled);
+		lineWidth.setEnabled(enabled);
+		lineType.setEnabled(enabled);
+		axisEndValues.setEnabled(enabled);
+		axisNumberFormat.setEnabled(enabled);
+		axisPosition.setEnabled(enabled);
+		measure.setEnabled(enabled);
+		deltaMeasure.setEnabled(enabled);
+		copyCurveCompare.setEnabled(enabled);
+		cleanCurveCompare.setEnabled(enabled);
 	}
 }

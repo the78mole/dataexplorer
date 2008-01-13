@@ -50,7 +50,7 @@ public class CurveUtils {
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 
-		if (log.isLoggable(Level.FINEST)) log.finest("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
+		if (log.isLoggable(Level.FINER)) log.finer("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
 		boolean isCompareSet = record.getParent().isCompareSet();
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
@@ -71,8 +71,8 @@ public class CurveUtils {
 			yMaxValueDisplay = yMaxValue = new Double(yMaxValue + 1).intValue();
 		}
 		if (record.isStartEndDefined()) {
-			yMinValueDisplay = record.getDefinedMinValue();
-			yMaxValueDisplay = record.getDefinedMaxValue();
+			yMinValueDisplay = record.getMinScaleValue();
+			yMaxValueDisplay = record.getMaxScaleValue();
 			if (isRaw) {
 				yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
 				yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
@@ -166,8 +166,8 @@ public class CurveUtils {
 	 * @param yMaxValue
 	 */
 	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height));
-		if (log.isLoggable(Level.FINER)) log.finer("curve area bounds = " + record.getParent().getCurveBounds().toString());
+		if (log.isLoggable(Level.FINE)) log.fine(String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height));
+		if (log.isLoggable(Level.FINE)) log.fine("curve area bounds = " + record.getParent().getDrawAreaBounds().toString());
 		//gc.setClipping(record.getParent().getCurveBounds());
 	
 		// set line properties according adjustment
@@ -180,7 +180,7 @@ public class CurveUtils {
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
 		int timeStep = record.getTimeStep_ms();
-		double adaptXMaxValue = isCompareSet ? (1.0 * (recordSize - 1) * record.getParent().getMaxSize() / (recordSize - 1) * timeStep) : (1.0 * (recordSize - 1) * timeStep);
+		double adaptXMaxValue = (record.getParent().getSize() - 1) * timeStep;
 		
 		// calculate scale factor to fit time into draw bounds
 		double factorX = (1.0 * width) / adaptXMaxValue;
@@ -272,7 +272,7 @@ public class CurveUtils {
 			}
 			else {
 				if (maxValue < 1)
-					outValues[1] = maxValue + (0.1 - (maxValue + 0.1) % 0.1);
+					outValues[1] = maxValue + (0.1 - (((maxValue + 0.1) * 10) % 1)/10);
 				else if (maxValue < 2.5)
 					outValues[1] = maxValue + (0.25 - (maxValue + 0.25) % 0.25);
 				else if (maxValue < 5)

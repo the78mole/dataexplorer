@@ -53,7 +53,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean												isSaved								= false;																				// indicates if the record set is saved to file
 	private boolean												isRaw									= false;																				// indicates imported file with raw data, no translation at all
 	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
-	private Rectangle											curveBounds;
+	private Rectangle											drawAreaBounds;
 	
 	//in compare set x min/max and y max (time) might be different
 	private boolean												isCompareSet					= false;
@@ -64,6 +64,8 @@ public class RecordSet extends HashMap<String, Record> {
 	//zooming
 	private int 													zoomLevel 						= 0; // 0 == not zoomed
 	private boolean 											isZoomMode = false;
+	private int														recordZoomOffset;
+	private int														recordZoomSize;
 
 	
 	// measure
@@ -460,10 +462,19 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the maxSize
+	 * query the size of record set for time unit calculation
+	 * - compare set not zoomed will return the size of the largest record
+	 * - normal record set will return the size of the data vector
+	 * - zoomed set will return size of zoomOffset + zoomWith
+	 * @return the size of data point to calculate the time unit
 	 */
-	public int getMaxSize() {
-		return maxSize;
+	public int getSize() {
+		if (this.isZoomMode)
+			return this.recordZoomOffset + this.recordZoomSize;
+		else if (this.isCompareSet)
+			return maxSize;
+		else
+			return this.get(this.recordNames[0]).realSize();
 	}
 
 	/**
@@ -509,13 +520,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the isZoomed
-	 */
-	public boolean isZoomed() {
-		return zoomLevel > 0;
-	}
-
-	/**
 	 * @return the the zoom level
 	 */
 	public int getZoomLevel() {
@@ -528,27 +532,23 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setZoomLevel(int newZoomLevel) {
 		this.zoomLevel = newZoomLevel;
 		if (newZoomLevel == 0) {
-			//TODO clean all zoom record sets
-		}
-		else {
-			//TODO create new zoom record sets using startPoint, numberPoints, where startPoint defines also startTime
-			// if zoomLevel > 1 use newZoomLevel - 1 as source record set
+			this.resetAllModes();
 		}
 	}
 
 	/**
 	 * @return the curveBounds, this is the area where curves are drawn
 	 */
-	public Rectangle getCurveBounds() {
-		return curveBounds;
+	public Rectangle getDrawAreaBounds() {
+		return drawAreaBounds;
 	}
 
 	/**
 	 * define the area where curves are drawn (clipping, image)
-	 * @param curveBounds the curveBounds to set
+	 * @param drawAreaBounds the curveBounds to set
 	 */
-	public void setCurveBounds(Rectangle curveBounds) {
-		this.curveBounds = curveBounds;
+	public void setDrawAreaBounds(Rectangle drawAreaBounds) {
+		this.drawAreaBounds = drawAreaBounds;
 	}
 
 	/**
@@ -617,10 +617,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setZoomMode(boolean isZoomMode) {
 		this.isZoomMode = isZoomMode;
-		if (isZoomMode) {
-			this.isMeasurementMode = false;
-			this.isDeltaMeasurementMode = false;
-		}
 	}
 
 	/**
@@ -637,6 +633,65 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isZoomMode = false;
 		this.isMeasurementMode = false;
 		this.isDeltaMeasurementMode = false;
+		this.recordZoomSize = this.get(this.recordNames[0]).size();
+	}
+
+	/**
+	 * @param zoomBounds, where the start point offset is x,y and the area is width, height
+	 */
+	public void setZoomOffsetAndWidth(Rectangle zoomBounds) {
+		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x);
+		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
+		// iterate childs and set min/max values
+		for (int i = 0; i < this.recordNames.length; i++) {
+			Record record = this.get(this.recordNames[i]);
+			double minZoomScaleValue = record.getDisplayPointValue(zoomBounds.y, this.drawAreaBounds);
+			double maxZoomScaleValue = record.getDisplayPointValue(zoomBounds.height + zoomBounds.y, this.drawAreaBounds);
+			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
+		}
 	}
 	
+	public int getRecordZoomOffset() {
+		return this.recordZoomOffset;
+	}
+
+	public int getRecordZoomSize() {
+		return this.recordZoomSize;
+	}
+	
+	/**
+	 * calculate index in data vector from given display point
+	 * @param xPos
+	 * @param drawAreaBounds
+	 * @return position integer value
+	 */
+	public int getPointIndexFromDisplayPoint(int xPos) {
+		return new Double(1.0 * xPos * this.get(this.recordNames[0]).realSize() / this.drawAreaBounds.width).intValue();
+	}
+	
+	/**
+	 * get the formatted time at given position
+	 * @param xPos of the display point
+	 * @param drawAreaBounds
+	 * @return string of time value in simple date format HH:ss:mm:SSS
+	 */
+	public String getDisplayPointTime(int xPos) {
+		String time = "0";
+		long time_ms = this.getPointIndexFromDisplayPoint(xPos) * this.getTimeStep_ms();
+		if (time_ms >= 0)
+		{
+			long	lSeconds = time_ms / 1000;
+			time_ms %= 1000;
+			long	lMinutes = lSeconds / 60;
+			lSeconds %= 60;
+			long	lHours = lMinutes / 60;
+			lMinutes %= 60;
+			time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, time_ms);
+		}
+		return time;
+	}
+
+	public int getStartTime() {
+		return this.isZoomMode ? this.recordZoomOffset * this.timeStep_ms : 0;
+	}
 }

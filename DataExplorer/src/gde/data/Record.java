@@ -17,7 +17,6 @@
 package osde.data;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,15 +45,14 @@ public class Record extends Vector<Integer> {
 	private double							factor								= 1.0;																				// offset + factor * x
 	private double							offset								= 0;																					// offset + factor * x
 	private boolean							isEmpty								= true;
-	private int									maxValue							= -20000;																			// max value of the curve
-	private int									minValue							= 20000;																			// min value of the curve
+	private int									maxValue							= Integer.MIN_VALUE;		 										  // max value of the curve
+	private int									minValue							= Integer.MAX_VALUE;													// min value of the curve
 
 	private RecordSet						parent;
 	private String							keyName;
 	private boolean							isActive;
 	private boolean							isDisplayable;
 	private DecimalFormat				df;
-	private SimpleDateFormat		dateFormat						= new SimpleDateFormat("HH:mm:ss:SSS");
 
 	//TODO to be set by loaded graphic template
 	private boolean							isVisible							= true;
@@ -68,6 +66,8 @@ public class Record extends Vector<Integer> {
 	private int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
 	private double							maxScaleValue					= maxValue;																		// overwrite calculated boundaries
 	private double							minScaleValue					= minValue;
+	private double							maxZoomScaleValue		= maxScaleValue;
+	private double							minZoomScaleValue		= minScaleValue;
 
 	private double							displayScaleFactorTime;
 	private double							displayScaleFactorValue;
@@ -168,14 +168,6 @@ public class Record extends Vector<Integer> {
 		this.add(new Integer(point));
 	}
 
-	public Integer[] get() {
-		return (Integer[]) this.toArray(new Integer[2]);
-	}
-
-	public Integer get(int position) {
-		return this.elementAt(position).intValue();
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -205,13 +197,59 @@ public class Record extends Vector<Integer> {
 	}
 
 	public int getMaxValue() {
-		return maxValue;
+			return maxValue;
 	}
 
 	public int getMinValue() {
-		return minValue;
+			return minValue;
 	}
 
+	/**
+	 * overwrites size method for zoom mode
+	 */
+	public int size() {
+		return this.parent.isZoomMode() ? this.parent.getRecordZoomSize() : super.size();
+	}
+	
+	/**
+	 * time calculation needs always the real size of the record
+	 * @return real vector size 
+	 */
+	public int realSize() {
+		return super.size();
+	}
+	
+	public Integer getFirst() {
+		return super.get(0);
+	}
+	
+	public Integer getLast() {
+		return super.get(super.size()-1);
+	}
+
+	/**
+	 * overwrites vector get(int index) to enable zoom
+	 * @param index
+	 */
+	public Integer get(int index) {
+		if(parent.isZoomMode()) {
+			return super.get(index + parent.getRecordZoomOffset());
+		}
+		else
+			return super.get(index);
+	}
+	
+	/**
+	 * overwrites vector elementAt(int index) to enable zoom
+	 * @param index
+	 */
+	public Integer elementAt(int index) {
+		if(parent.isZoomMode())
+			return super.elementAt(index + parent.getRecordZoomOffset());
+		else
+			return super.elementAt(index);
+	}
+	
 	public boolean isPositionLeft() {
 		return isPositionLeft;
 	}
@@ -229,7 +267,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isRoundOut() {
-		return isRoundOut;
+		return parent.isZoomMode() ? false : isRoundOut;
 	}
 
 	public void setRoundOut(boolean isRoundOut) {
@@ -237,7 +275,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isStartpointZero() {
-		return isStartpointZero;
+		return parent.isZoomMode() ? false : isStartpointZero;
 	}
 
 	public void setStartpointZero(boolean isStartpointZero) {
@@ -245,7 +283,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isStartEndDefined() {
-		return isStartEndDefined;
+		return parent.isZoomMode() ? true : isStartEndDefined;
 	}
 
 	/**
@@ -261,17 +299,23 @@ public class Record extends Vector<Integer> {
 			this.minScaleValue = newMinScaleValue;
 		}
 		else {
-			this.maxScaleValue = maxValue;
-			this.minScaleValue = minValue;
+			this.maxScaleValue = device.translateValue(this.name, maxValue/1000);
+			this.minScaleValue = device.translateValue(this.name, minValue/1000);
 		}
 	}
 
 	public void setMinScaleValue(double newMinScaleValue) {
-		this.minScaleValue = newMinScaleValue;
+		if (parent.isZoomMode())
+			this.minZoomScaleValue = newMinScaleValue;
+		else
+			this.minScaleValue = newMinScaleValue;
 	}
 
 	public void setMaxScaleValue(double newMaxScaleValue) {
-		this.maxScaleValue = newMaxScaleValue;
+		if (parent.isZoomMode())
+			this.maxZoomScaleValue = newMaxScaleValue;
+		else
+			this.maxScaleValue = newMaxScaleValue;
 	}
 
 	public int getLineWidth() {
@@ -345,31 +389,17 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * @return the newMaxValue
+	 * @return the maxScaleValue
 	 */
-	public double getDefinedMaxValue() {
-		return maxScaleValue;
+	public double getMaxScaleValue() {
+		return parent.isZoomMode() ? this.maxZoomScaleValue : this.maxScaleValue;
 	}
 
 	/**
-	 * @return the newMinValue
+	 * @return the minScaleValue
 	 */
-	public double getDefinedMinValue() {
-		return minScaleValue;
-	}
-
-	/**
-	 * @param maxValue the maxValue to set
-	 */
-	public void setMaxValue(int maxValue) {
-		this.maxValue = maxValue;
-	}
-
-	/**
-	 * @param minValue the minValue to set
-	 */
-	public void setMinValue(int minValue) {
-		this.minValue = minValue;
+	public double getMinScaleValue() {
+		return parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
 	public int getTimeStep_ms() {
@@ -418,13 +448,13 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * query time and value from a display (mouse) position captured point 
+	 * query data value (not translated in device units) from a display position point 
 	 * @param xPos
 	 * @param drawAreaBounds
 	 * @param offSetY
-	 * @return string array time, value, displays yPos
+	 * @return displays yPos in pixel
 	 */
-	public int getDisplayDataPoint(int xPos, Rectangle drawAreaBounds, int offSetY) {
+	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return pointY;
@@ -436,8 +466,18 @@ public class Record extends Vector<Integer> {
 	 * @param drawAreaBounds
 	 * @return formated value
 	 */
-	public String getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
+	public String getDisplayPointValueString(int yPos, Rectangle drawAreaBounds) {
 		return df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+	}
+
+	/**
+	 * get the value corresponding the display point (needs translate)
+	 * @param yPos
+	 * @param drawAreaBounds
+	 * @return formated value
+	 */
+	public double getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
+		return this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
 	}
 
 	/**
@@ -449,39 +489,21 @@ public class Record extends Vector<Integer> {
 	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
 		return df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
 	}
-
-	/**
-	 * get the formatted time at given position
-	 * @param xPos of the display point
-	 * @return string of time value in simple date format HH:ss:mm:SSS
-	 */
-	public String getDisplayPointTime(int xPos) {
-		return dateFormat.format(xPos * this.getTimeStep_ms());
-	}
 	
 	/**
 	 * get the slope value of two given points, unit depends on device configuration
-	 * @param xPos of the display point
+	 * @param points describing the time difference (x) as well as the measurement difference (y)
+	 * @param drawAreaBounds
 	 * @return string of value
 	 */
-	public String getSlopeValue(int xPos) {
-		return dateFormat.format(xPos * this.getTimeStep_ms());
+	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
+		log.info("" + points.toString());
+		double measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
+		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
+		log.info("measureDelta = " + measureDelta + " timeDelta = " + timeDelta);
+		return df.format(measureDelta / timeDelta);
 	}
 	
-	/**
-	 * @return the maxScaleValue
-	 */
-	public double getMaxScaleValue() {
-		return maxScaleValue;
-	}
-
-	/**
-	 * @return the minScaleValue
-	 */
-	public double getMinScaleValue() {
-		return minScaleValue;
-	}
-
 	/**
 	 * @return the displayScaleFactorTime
 	 */
@@ -541,4 +563,14 @@ public class Record extends Vector<Integer> {
 		return maxDisplayValue;
 	}
 
+	/**
+	 * set min and max scale values for zoomed mode
+	 * @param minZoomScaleValue
+	 * @param maxZoomScaleValue
+	 */
+	public void setMinMaxZoomScaleValues(double minZoomScaleValue, double maxZoomScaleValue) {
+		this.minZoomScaleValue				= minZoomScaleValue;
+		this.maxZoomScaleValue				= maxZoomScaleValue;
+		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + minScaleValue + "/"  + minZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + maxScaleValue + "/"  + maxZoomScaleValue);
+	}
 }
