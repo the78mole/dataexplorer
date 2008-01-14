@@ -41,31 +41,13 @@ public class StatusBar {
 	private CLabel									rxButton;
 	private Composite								comComposite;
 	private CLabel									msgLabel;
-	private CLabel									activePortLabel;
 	private ProgressBar							progressBar;
-	private CLabel									activeDeviceLabel;
 
 	public StatusBar(OpenSerialDataExplorer application, Composite statusComposite) {
 		this.statusComposite = statusComposite;
 	}
 
 	public void create() {
-		{
-			activeDeviceLabel = new CLabel(statusComposite, SWT.NONE);
-			RowData activeDeviceLabelLData = new RowData();
-			activeDeviceLabelLData.width = 150;
-			activeDeviceLabelLData.height = 23;
-			activeDeviceLabel.setLayoutData(activeDeviceLabelLData);
-			activeDeviceLabel.setText("aktives Gerät");
-		}
-		{
-			activePortLabel = new CLabel(statusComposite, SWT.NONE);
-			RowData activePortLData = new RowData();
-			activePortLData.width = 80;
-			activePortLData.height = 23;
-			activePortLabel.setText("comport");
-			activePortLabel.setLayoutData(activePortLData);
-		}
 		{
 			connectionComposite = new Composite(statusComposite, SWT.NONE);
 			RowData composite2LData = new RowData();
@@ -137,13 +119,8 @@ public class StatusBar {
 			}
 			{
 				msgLabel = new CLabel(statusComposite, SWT.LEFT | SWT.BORDER | SWT.BOLD);
-//				RowData text1LData = new RowData();
-//				text1LData.width = 150;
-//				text1LData.height = 20;
-//				msgLabel.setLayoutData(text1LData);
 				msgLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
-				//msgLabel.layout();
 			}
 		}
 	}
@@ -163,27 +140,8 @@ public class StatusBar {
 		msgLabel.pack(true);
 	}
 
-	/**
-	 * update device name and com port activated
-	 * @param activeName
-	 * @param activePort
-	 */
-	public void updateDevicePort(String activeName, String activePort) {
-		activeDeviceLabel.setText(activeName);
-		activePortLabel.setText(activePort);
-		statusComposite.layout(true);
-	}
-
-	public CLabel getActiveDeviceLabel() {
-		return activeDeviceLabel;
-	}
-
 	public ProgressBar getProgressBar() {
 		return progressBar;
-	}
-
-	public CLabel getPortLabel() {
-		return activePortLabel;
 	}
 
 	/**

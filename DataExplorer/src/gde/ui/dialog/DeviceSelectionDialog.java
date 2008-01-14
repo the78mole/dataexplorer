@@ -434,7 +434,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											log.finest("portSelectCombo.widgetSelected, event=" + evt);
 											activeDeviceConfig.setPort(portSelectCombo.getText());
 											if (checkPortSelection()) {
-												application.getStatusBar().updateDevicePort(activeDeviceConfig.getName(), activeDeviceConfig.getPort());
+												application.getShell().setText(OpenSerialDataExplorer.APPLICATION_NAME + "  -  " + activeDeviceConfig.getName() + "  -  " + activeDeviceConfig.getPort());
 											}
 										}
 									});
