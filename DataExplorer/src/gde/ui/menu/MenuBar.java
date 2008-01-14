@@ -591,7 +591,7 @@ public class MenuBar {
 				channel.getActiveRecordSet().switchRecordSet(recordSetKey);
 				channel.applyTemplate(recordSetKey);
 				channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
-				application.updateDataTable();
+				//application.updateDataTable();
 				application.updateDigitalWindowChilds();
 			}
 		}
