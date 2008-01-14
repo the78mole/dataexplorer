@@ -86,11 +86,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param channelNumber 1 -> "K1: Kanal 1"
 	 */
 	public synchronized void switchChannel(int channelNumber) {
-		log.fine("switching to channel " + channelNumber);
-		// clean active record set before switch to the other
-		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) recordSet.resetAllModes();
-		
+		log.fine("switching to channel " + channelNumber);		
 		if (channelNumber != this.getActiveChannelNumber()) {
 			this.setActiveChannelNumber(channelNumber);
 			application.getMenuToolBar().updateChannelToolItems();

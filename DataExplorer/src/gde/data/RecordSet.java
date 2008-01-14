@@ -68,9 +68,9 @@ public class RecordSet extends HashMap<String, Record> {
 	private int														recordZoomSize;
 
 	
-	// measure
-	private boolean 											isMeasurementMode = false;
-	private boolean 											isDeltaMeasurementMode = false;
+	// measurement
+	//private boolean 											isMeasurementMode = false;
+	//private boolean 											isDeltaMeasurementMode = false;
 	private String 												recordKeyMeasurement;
 
 	/**
@@ -365,7 +365,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void switchRecordSet(String recordSetName) {
 		log.finest("entry - " + recordSetName);
-		this.resetAllModes();
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
@@ -527,16 +526,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param newZoomLevel
-	 */
-	public void setZoomLevel(int newZoomLevel) {
-		this.zoomLevel = newZoomLevel;
-		if (newZoomLevel == 0) {
-			this.resetAllModes();
-		}
-	}
-
-	/**
 	 * @return the curveBounds, this is the area where curves are drawn
 	 */
 	public Rectangle getDrawAreaBounds() {
@@ -552,56 +541,55 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param isMeasurementMode the boolean value to set
 	 * @param recordKey the key which record should be measured
+	 * @param enabled the boolean value to set
 	 */
-	public void setMeasurementMode(boolean isMeasurementMode, String recordKey) {
-		this.isMeasurementMode = isMeasurementMode;
-		this.recordKeyMeasurement = recordKey;
-		if (isMeasurementMode) {
-			this.isZoomMode = false;
-			this.isDeltaMeasurementMode = false;
+	public void setMeasurementMode(String recordKey, boolean enabled) {
+		Record record = this.get(recordKey);
+		record.setMeasurementMode(enabled);
+		if (enabled) {
+			Record oldRecord = this.get(this.recordKeyMeasurement);
+			if (oldRecord != null) {
+				oldRecord.setMeasurementMode(false);
+				oldRecord.setDeltaMeasurementMode(false);
+			}
+			this.recordKeyMeasurement = recordKey;
+			record.setDeltaMeasurementMode(false);
 		}
 	}
 
 	/**
-	 * @param isDeltaMeasurementMode the boolean value to set
 	 * @param recordKey the key which record should be measured
+	 * @param enabled the boolean value to set
 	 */
-	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode, String recordKey) {
-		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
-		this.recordKeyMeasurement = recordKey;
-		if (isMeasurementMode) {
-			this.isZoomMode = false;
-			this.isMeasurementMode = false;
+	public void setDeltaMeasurementMode(String recordKey, boolean enabled) {
+		Record record = this.get(recordKey);
+		record.setDeltaMeasurementMode(enabled);
+		if (enabled) {
+			Record oldRecord = this.get(this.recordKeyMeasurement);
+			if (oldRecord != null) {
+				oldRecord.setMeasurementMode(false);
+				oldRecord.setDeltaMeasurementMode(false);
+			}
+			this.recordKeyMeasurement = recordKey;
+			record.setMeasurementMode(false);
 		}
 	}
+	
 	/**
+	 * @param recordKey the key which record should be measured
 	 * @return the isMeasurementMode
 	 */
-	public boolean isMeasurementMode() {
-		return isMeasurementMode;
+	public boolean isMeasurementMode(String recordKey) {
+		return this.get(recordKey).isMeasurementMode();
 	}
 
 	/**
-	 * @param isMeasurementMode the isMeasurementMode to set
-	 */
-	public void setMeasurementMode(boolean isMeasurementMode) {
-		this.isMeasurementMode = isMeasurementMode;
-	}
-
-	/**
+	 * @param recordKey the key which record should be measured
 	 * @return the isDeltaMeasurementMode
 	 */
-	public boolean isDeltaMeasurementMode() {
-		return isDeltaMeasurementMode;
-	}
-
-	/**
-	 * @param isDeltaMeasurementMode the isDeltaMeasurementMode to set
-	 */
-	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode) {
-		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
+	public boolean isDeltaMeasurementMode(String recordKey) {
+		return this.get(recordKey).isDeltaMeasurementMode();
 	}
 
 	/**
@@ -626,16 +614,6 @@ public class RecordSet extends HashMap<String, Record> {
 		return recordKeyMeasurement;
 	}
 	
-	/**
-	 * reset all context adjusted modes to default values
-	 */
-	public void resetAllModes() {
-		this.isZoomMode = false;
-		this.isMeasurementMode = false;
-		this.isDeltaMeasurementMode = false;
-		this.recordZoomSize = this.get(this.recordNames[0]).size();
-	}
-
 	/**
 	 * @param zoomBounds, where the start point offset is x,y and the area is width, height
 	 */

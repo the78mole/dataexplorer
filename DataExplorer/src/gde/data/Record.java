@@ -74,6 +74,9 @@ public class Record extends Vector<Integer> {
 	private double							minDisplayValue;									// min value in device units, correspond to draw area
 	private double							maxDisplayValue;									// max value in device units, correspond to draw area
 
+	// measurement
+	private boolean							isMeasurementMode				= false;
+	private boolean							isDeltaMeasurementMode	= false;
 	
 	private final IDevice				device;																															// record need to know its device to calculate data from raw
 
@@ -450,13 +453,15 @@ public class Record extends Vector<Integer> {
 	/**
 	 * query data value (not translated in device units) from a display position point 
 	 * @param xPos
-	 * @param drawAreaBounds
 	 * @param offSetY
+	 * @param drawAreaBounds
 	 * @return displays yPos in pixel
 	 */
-	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
+	public int getDisplayPointDataValue(int xPos, int offSetY, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		pointY = pointY < 0 ? 0 : pointY;
+		pointY = pointY > drawAreaBounds.height ? drawAreaBounds.height : pointY;
 		return pointY;
 	}
 	
@@ -572,5 +577,33 @@ public class Record extends Vector<Integer> {
 		this.minZoomScaleValue				= minZoomScaleValue;
 		this.maxZoomScaleValue				= maxZoomScaleValue;
 		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + minScaleValue + "/"  + minZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + maxScaleValue + "/"  + maxZoomScaleValue);
+	}
+
+	/**
+	 * @return the isMeasurementMode
+	 */
+	public boolean isMeasurementMode() {
+		return isMeasurementMode;
+	}
+
+	/**
+	 * @param isMeasurementMode the isMeasurementMode to set
+	 */
+	public void setMeasurementMode(boolean isMeasurementMode) {
+		this.isMeasurementMode = isMeasurementMode;
+	}
+
+	/**
+	 * @return the isDeltaMeasurementMode
+	 */
+	public boolean isDeltaMeasurementMode() {
+		return isDeltaMeasurementMode;
+	}
+
+	/**
+	 * @param isDeltaMeasurementMode the isDeltaMeasurementMode to set
+	 */
+	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode) {
+		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
 	}
 }

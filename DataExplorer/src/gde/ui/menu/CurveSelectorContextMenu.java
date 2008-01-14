@@ -70,16 +70,15 @@ public class CurveSelectorContextMenu {
 		try {
 			popupmenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
-						log.finest("popupmenu MenuListener " + evt);
-						TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-						if (selectedItem != null && !selectedItem.isDisposed()) {
-							int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-							recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-							
-							if (recordSet != null) setAllEnabled(true);
-							else setAllEnabled(false);
-							
-							
+					log.finest("popupmenu MenuListener " + evt);
+					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
+						recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+
+						if (recordSet != null) {
+							setAllEnabled(true);
+
 							String recordNameKey = selectedItem.getText();
 							lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
 							if (type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
@@ -94,12 +93,13 @@ public class CurveSelectorContextMenu {
 								axisEndValues.setText("Achsen-Endwerte");
 							}
 							
-							// clean measurement selections
-							measure.setSelection(false);
-							recordSet.setDeltaMeasurementMode(false, recordNameKey);
-							deltaMeasure.setSelection(false);
-							recordSet.setDeltaMeasurementMode(false, recordNameKey);
+							// check measurement selections
+							measure.setSelection(recordSet.isMeasurementMode(recordNameKey));
+							deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
 						}
+						else
+							setAllEnabled(false);
+					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
@@ -582,11 +582,10 @@ public class CurveSelectorContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					log.finest("measure.widgetSelected, event=" + evt);
 					if (measure.getSelection() == true) {
-						deltaMeasure.setSelection(false);
-						application.setMeasurementActive(true, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						application.setMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), true);
 					}
 					else {
-						application.setMeasurementActive(false, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						application.setMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), false);
 					}
 				}
 			});
@@ -596,11 +595,10 @@ public class CurveSelectorContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					log.finest("deltaMeasure.widgetSelected, event=" + evt);
 					if (deltaMeasure.getSelection() == true) {
-						measure.setSelection(false);
-						application.setDeltaMeasurementActive(true, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						application.setDeltaMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), true);
 					}
 					else {
-						application.setDeltaMeasurementActive(false, (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						application.setDeltaMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), false);
 					}
 				}
 			});

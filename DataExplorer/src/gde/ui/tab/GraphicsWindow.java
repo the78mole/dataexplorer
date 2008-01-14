@@ -70,6 +70,12 @@ public class GraphicsWindow {
 	public static final int								TYPE_NORMAL							= 0;
 	public static final int								TYPE_COMPARE						= 1;
 	public static final String						WINDOW_TYPE							= "window_type";
+	
+	public final static int								MODE_RESET							= 0;
+	public final static int								MODE_ZOOM								= 1;
+	public final static int								MODE_MEASURE						= 2;
+	public final static int								MODE_MEASURE_DELTA			= 3;
+	
 
 	private final TabFolder								displayTab;
 	private SashForm											graphicSashForm;
@@ -309,7 +315,7 @@ public class GraphicsWindow {
 
 									Record record = recordSet.getRecord(recordSet.getRecordKeyMeasurement());
 
-									if (recordSet.isDeltaMeasurementMode()) {
+									if (isMouseDeltaMeasure) {
 										// clear old delta measure lines
 										left = (xPosDelta - 2) < minX ? minX : xPosDelta - 2;
 										width = (left + 5) > maxX ? maxX - xPosDelta + 2 + 1 : 5;
@@ -321,7 +327,7 @@ public class GraphicsWindow {
 										gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 										gc.drawLine(xPosDelta + offSetX, offSetY, xPosDelta + offSetX, drawAreaBounds.height + offSetY - 1);
 
-										yPosDelta = record.getDisplayPointDataValue(xPosDelta, drawAreaBounds);
+										yPosDelta = record.getDisplayPointDataValue(xPosDelta, offSetY, drawAreaBounds);
 										gc.drawLine(offSetX, yPosDelta + offSetY, offSetX + drawAreaBounds.width - 1, yPosDelta + offSetY);
 
 										gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -330,10 +336,10 @@ public class GraphicsWindow {
 									xPosMeasure = evt.x;
 									gc.drawLine(xPosMeasure, offSetY, xPosMeasure, drawAreaBounds.height + offSetY);
 
-									yPosMeasure = record.getDisplayPointDataValue(xPosMeasure - offSetX, drawAreaBounds);
+									yPosMeasure = record.getDisplayPointDataValue(xPosMeasure - offSetX, offSetY, drawAreaBounds);
 									gc.drawLine(offSetX, yPosMeasure + offSetY, offSetX + drawAreaBounds.width - 1, yPosMeasure + offSetY);
 
-									if (recordSet.isDeltaMeasurementMode()) {
+									if (isMouseDeltaMeasure) {
 										StringBuilder sb = new StringBuilder();
 										sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, drawAreaBounds)).append(" ").append(record.getUnit());
 										sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure + offSetX, yPosMeasure - yPosDelta), drawAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
@@ -362,7 +368,7 @@ public class GraphicsWindow {
 									gc.drawLine(xPosMeasure + offSetX, offSetY, xPosMeasure + offSetX, drawAreaBounds.height + offSetY);
 
 									Record record = recordSet.getRecord(recordSet.getRecordKeyMeasurement());
-									yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, drawAreaBounds);
+									yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, offSetY, drawAreaBounds);
 									gc.drawLine(offSetX, yPosMeasure + offSetY, offSetX + drawAreaBounds.width - 1, yPosMeasure + offSetY);
 
 									// update the new delta position
@@ -370,7 +376,7 @@ public class GraphicsWindow {
 									gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 									gc.drawLine(xPosDelta, offSetY, xPosDelta, drawAreaBounds.height + offSetY - 1);
 
-									yPosDelta = record.getDisplayPointDataValue(xPosDelta - offSetX, drawAreaBounds);
+									yPosDelta = record.getDisplayPointDataValue(xPosDelta - offSetX, offSetY, drawAreaBounds);
 									gc.drawLine(offSetX, yPosDelta + offSetY, offSetX + drawAreaBounds.width - 1, yPosDelta + offSetY);
 
 									StringBuilder sb = new StringBuilder();
@@ -422,11 +428,11 @@ public class GraphicsWindow {
 							}
 							if(log.isLoggable(Level.FINE)) log.fine("xDown = " + xDown + " yDown = " + yDown);
 							
-							if (recordSet.isMeasurementMode() || recordSet.isDeltaMeasurementMode() && xPosMeasure + offSetX + 1 >= xDown && xPosMeasure + offSetX - 1 <= xDown) {
+							if (isMouseMeasure || isMouseDeltaMeasure && xPosMeasure + offSetX + 1 >= xDown && xPosMeasure + offSetX - 1 <= xDown) {
 								isMouseMeasure = true;
 								log.fine("isMouseMeasure = true");
 							}
-							else if (recordSet.isDeltaMeasurementMode() && xPosDelta + offSetX + 1 >= xDown && xPosDelta + offSetX - 1 <= xDown) {
+							else if (isMouseDeltaMeasure && xPosDelta + offSetX + 1 >= xDown && xPosDelta + offSetX - 1 <= xDown) {
 								isMouseDeltaMeasure = true;
 								log.fine("isMouseDeltaMeasure = true");
 							}
@@ -704,58 +710,51 @@ public class GraphicsWindow {
 	}
 
 	/**
-	 * @param evt
-	 * @param recordSet
-	 * @param record
+	 * draw the start pointer for measurement modes
+	 * @param mode
 	 */
-	public void drawMeasurePointer() {
-		RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-		Record record = recordSet.get(recordSet.getRecordKeyMeasurement());
+	public void drawMeasurePointer(int mode) {
+		this.setModeState(mode); // cleans old pointer if required
 		
-		Rectangle drawAreaBounds = curveArea.getBounds();
+		// get the record set to work with
+		boolean isGraphicsWindow = this.type == GraphicsWindow.TYPE_NORMAL;
+		RecordSet recordSet = isGraphicsWindow ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+		String measureRecordKey = recordSet.getRecordKeyMeasurement();
+		Record record = recordSet.get(measureRecordKey);
+		
 		// get the graphics context and set the gc properties
+		Rectangle drawAreaBounds = curveArea.getBounds();
 		GC gc = SWTResourceManager.getGC(graphicCanvas, "curveArea_" + this.type);
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_DASH);
 		
-		// clean old measurement pointer
-		if (xPosMeasure != 0) {
-			gc.drawImage(curveArea, xPosMeasure, 0, 1, drawAreaBounds.height, xPosMeasure + offSetX, offSetY, 1, drawAreaBounds.height);
-			gc.drawImage(curveArea, 0, yPosMeasure, drawAreaBounds.width, 1, offSetX, yPosMeasure + offSetY, drawAreaBounds.width, 1);
-		}
-		if (xPosDelta != 0) {
-			gc.drawImage(curveArea, xPosDelta, 0, 1, drawAreaBounds.height, xPosDelta + offSetX, offSetY, 1, drawAreaBounds.height);
-			gc.drawImage(curveArea, 0, yPosDelta, drawAreaBounds.width, 1, offSetX, yPosDelta + offSetY, drawAreaBounds.width, 1);
-		}
-		
-		if (recordSet.isMeasurementMode()) {
-			// check mouse within drawArea
+		if (isMouseMeasure) {
 			xPosMeasure = drawAreaBounds.width / 4;
 			log.fine("xPosMeasure = " + xPosMeasure);
 
+			// measure position
 			gc.drawLine(xPosMeasure + offSetX, 0 + offSetY, xPosMeasure + offSetX, drawAreaBounds.height + offSetY);
 
-			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, drawAreaBounds);
+			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, offSetY, drawAreaBounds);
 			gc.drawLine(offSetX, yPosMeasure + offSetY, offSetX + drawAreaBounds.width - 1, yPosMeasure + offSetY);
 
 			application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, drawAreaBounds) + " " + record.getUnit() + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
 		}
-		else if (recordSet.isDeltaMeasurementMode()) {
-			// check mouse within drawArea
+		else if (isMouseDeltaMeasure) {
 			xPosMeasure = drawAreaBounds.width / 4;
 			xPosDelta = drawAreaBounds.width / 3 * 2;
 
 			// measure position
 			gc.drawLine(xPosMeasure + offSetX, 0 + offSetY, xPosMeasure + offSetX, drawAreaBounds.height + offSetY);
 
-			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, drawAreaBounds);
+			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, offSetY, drawAreaBounds);
 			gc.drawLine(offSetX, yPosMeasure + offSetY, offSetX + drawAreaBounds.width - 1, yPosMeasure + offSetY);
 			
 			// delta position
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			gc.drawLine(xPosDelta + offSetX, 0 + offSetY, xPosDelta + offSetX, drawAreaBounds.height + offSetY);
 			
-			yPosDelta = record.getDisplayPointDataValue(xPosDelta, drawAreaBounds);
+			yPosDelta = record.getDisplayPointDataValue(xPosDelta, offSetY, drawAreaBounds);
 			gc.drawLine(offSetX, yPosDelta + offSetY, offSetX + drawAreaBounds.width - 1, yPosDelta + offSetY);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
@@ -767,16 +766,70 @@ public class GraphicsWindow {
 	}
 
 	/**
-	 * @return the type
+	 * clean (old) measurement pointer - check pointer in curve area
+	 * @param drawAreaBounds
+	 * @param gc
+	 */
+	private void cleanMeasurementPointer() {
+		Rectangle drawAreaBounds = curveArea.getBounds();
+		// get the graphics context and set the gc properties
+		GC gc = SWTResourceManager.getGC(graphicCanvas, "curveArea_" + this.type);
+		// clean old measurement pointer - check pointer in curve area
+		if ((xPosMeasure != 0 && (xPosMeasure < offSetX || xPosMeasure > offSetX + drawAreaBounds.width))
+				|| (yPosMeasure != 0 && (yPosMeasure < offSetY || yPosMeasure > offSetY + drawAreaBounds.height))
+				|| (xPosDelta != 0 && (xPosDelta < offSetX || xPosDelta > offSetX + drawAreaBounds.width))
+				|| (yPosDelta != 0 && (yPosDelta < offSetY || yPosDelta > offSetY + drawAreaBounds.height))	) {
+			this.redrawGrahics();
+			xPosMeasure = xPosDelta = 0;
+		}
+		else {
+			if (xPosMeasure > 0) {
+				gc.drawImage(curveArea, xPosMeasure, 0, 1, drawAreaBounds.height, xPosMeasure + offSetX, offSetY, 1, drawAreaBounds.height);
+				gc.drawImage(curveArea, 0, yPosMeasure, drawAreaBounds.width, 1, offSetX, yPosMeasure + offSetY, drawAreaBounds.width, 1);
+			}
+			if (xPosDelta > 0) {
+				gc.drawImage(curveArea, xPosDelta, 0, 1, drawAreaBounds.height, xPosDelta + offSetX, offSetY, 1, drawAreaBounds.height);
+				gc.drawImage(curveArea, 0, yPosDelta, drawAreaBounds.width, 1, offSetX, yPosDelta + offSetY, drawAreaBounds.width, 1);
+			}
+		}
+	}
+
+	/**
+	 * query the graphics window type
+	 * @return the type TYPE_NORMALE | TYPE_COMPARE
 	 */
 	public int getType() {
 		return type;
 	}
 
 	/**
-	 * @param isZoomMouse the isZoomMouse to set
+	 * switch graphics window mouse mode
+	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
-	public void setZoomMouse(boolean isZoomMouse) {
-		this.isZoomMouse = isZoomMouse;
+	public void setModeState(int mode) {
+		this.cleanMeasurementPointer();
+		switch (mode) {
+		case MODE_ZOOM:
+			this.isZoomMouse = true;
+			this.isMouseMeasure = false;
+			this.isMouseDeltaMeasure = false;
+			break;
+		case MODE_MEASURE:
+			this.isZoomMouse = false;
+			this.isMouseMeasure = true;
+			this.isMouseDeltaMeasure = false;
+			break;
+		case MODE_MEASURE_DELTA:
+			this.isZoomMouse = false;
+			this.isMouseMeasure = false;
+			this.isMouseDeltaMeasure = true;
+			break;
+		case MODE_RESET:
+		default:
+			this.isZoomMouse = false;
+			this.isMouseMeasure = false;
+			this.isMouseDeltaMeasure = false;
+			break;
+		}
 	}
 }
