@@ -179,7 +179,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			catch (Exception e) {
 				// ignore exception, but write to std out
-				log.warning(e.getMessage());
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 		return activeDeviceConfig;
@@ -434,7 +434,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											log.finest("portSelectCombo.widgetSelected, event=" + evt);
 											activeDeviceConfig.setPort(portSelectCombo.getText());
 											if (checkPortSelection()) {
-												application.getShell().setText(OpenSerialDataExplorer.APPLICATION_NAME + "  -  " + activeDeviceConfig.getName() + "  -  " + activeDeviceConfig.getPort());
+												application.updateTitleBar(activeDeviceConfig.getName(), activeDeviceConfig.getPort());
 											}
 										}
 									});
@@ -778,13 +778,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 			log.fine("setting up channels = " + i);
 			
-			Channel newChannel = new Channel(i);
+			Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelType(i));
 			// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 			channels.put(new Integer(i), newChannel);
 			// do not call channel.applyTemplate here, there are no record sets
 		}
 
-		channels.setActiveChannelNumber(1); // set K1: Kanal1 as default after device switch
+		channels.setActiveChannelNumber(1); // set " 1 : Ausgang" as default after device switch
 
 		application.getMenuToolBar().updateChannelSelector();
 		application.updateGraphicsWindow();
