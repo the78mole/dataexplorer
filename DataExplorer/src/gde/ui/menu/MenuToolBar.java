@@ -375,18 +375,18 @@ public class MenuToolBar {
 				{
 					channelSelectComposite = new Composite(dataBarComposite, SWT.NONE);
 					RowData composite1LData = new RowData();
-					composite1LData.width = 110;
+					composite1LData.width = 150;
 					composite1LData.height = 24;
 					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					channelSelectComposite.setLayout(composite1Layout);
 					channelSelectComposite.setLayoutData(composite1LData);
 					{
-						channelSelectCombo = new CCombo(channelSelectComposite, SWT.BORDER);
-						channelSelectCombo.setItems(new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
-						channelSelectCombo.select(0); // kanalCombo.setText("K1: Kanal 1");
-						channelSelectCombo.setToolTipText("Wählen Sie einen Kanal aus der angezeigt werden soll");
+						channelSelectCombo = new CCombo(channelSelectComposite, SWT.BORDER | SWT.LEFT);
+						channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" });
+						channelSelectCombo.select(0);
+						channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/Konfiguration aus der angezeigt werden soll");
 						RowData channelSelectComboLData = new RowData();
-						channelSelectComboLData.width = 100;
+						channelSelectComboLData.width = 140;
 						channelSelectComboLData.height = 18;
 						channelSelectCombo.setLayoutData(channelSelectComboLData);
 						channelSelectCombo.setEditable(false);
@@ -403,7 +403,7 @@ public class MenuToolBar {
 						{
 							prevChannel = new ToolItem(channelToolBar, SWT.NONE);
 							prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-							prevChannel.setToolTipText("Kanal zurück");
+							prevChannel.setToolTipText("Ausgang/Konfiguration zurück");
 							prevChannel.setEnabled(false);
 							prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
 							prevChannel.addSelectionListener(new SelectionAdapter() {
@@ -421,7 +421,7 @@ public class MenuToolBar {
 						{
 							nextChannel = new ToolItem(channelToolBar, SWT.NONE);
 							nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-							nextChannel.setToolTipText("Kanal vor");
+							nextChannel.setToolTipText("Ausgang/Konfiguration vor");
 							nextChannel.setEnabled(false);
 							nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
 							nextChannel.addSelectionListener(new SelectionAdapter() {
@@ -640,7 +640,7 @@ public class MenuToolBar {
 		if (channels.size() > 0) {
 			String[] channelNames = new String[channels.size()];
 			for (int i = 0; i < channelNames.length; i++) {
-				channelNames[i] = "K" + (i + 1) + ": Kanal " + (i + 1);
+				channelNames[i] = channels.get(i+1).getName();
 			}
 			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}

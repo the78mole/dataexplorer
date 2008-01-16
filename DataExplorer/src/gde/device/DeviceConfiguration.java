@@ -193,7 +193,7 @@ public class DeviceConfiguration {
 		for (int i = 1; i <= channels.size(); ++i) {
 			this.channels.put(i, channels.get(i));
 		}
-		this.masurementNames = getChannelType(1).getMeasurementNames().toArray(new String[1]);
+		this.masurementNames = getChannel(1).getMeasurementNames().toArray(new String[1]);
 
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 	}
@@ -254,7 +254,7 @@ public class DeviceConfiguration {
 	/**
 	 * @return the channel 1 to n
 	 */
-	public ChannelType getChannelType(int number) {
+	public ChannelType getChannel(int number) {
 		return channels.get(number);
 	}
 
@@ -371,6 +371,30 @@ public class DeviceConfiguration {
 		return channels.size();
 	}
 
+	/**
+	 * @return the channel name
+	 */
+	public String getChannelName(int channelNumber) {
+		return channels.get(channelNumber).getName();
+	}
+
+	/**
+	 * @param channelName - size should not exceed 15 char length
+	 * @param channelNumber
+	 * @return the channel name
+	 */
+	public void setChannelName(String channelName, int channelNumber) {
+		this.isChangePropery = true;
+		channels.get(channelNumber).setName(channelName);
+	}
+
+	/**
+	 * @return the channel type
+	 */
+	public int getChannelType(int channelNumber) {
+		return channels.get(channelNumber).getType();
+	}
+	
 	/**
 	 * @return the number of measurements of a channel
 	 */

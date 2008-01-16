@@ -26,19 +26,35 @@ import osde.utils.XMLUtils;
  * @author Winfried Brügmann
  */
 public class SerialPortType {
-	private String				port;
-	private final int			baudeRate;
-	private final int			dataBits;
-	private final int			parity;
-	private final int			stopBits;
-	private final int			flowControlMode;
-	private final boolean	isRTS;
-	private final boolean	isDTS;
+	private String						port;
+	private final int					baudeRate;
+	private final int					dataBits;
+	private final int					parity;
+	private final int					stopBits;
+	private final int					flowControlMode;
+	private final boolean			isRTS;
+	private final boolean			isDTS;
 	private final TimeOutType	timeOut;
 	private DataBlockType			dataBlock;
 
-	private Element				domElement;
+	private Element						domElement;
 
+	public final static int		PARITY_NONE							= 0;
+	public final static int		PARITY_ODD							= 1;
+	public final static int		PARITY_EVEN							= 2;
+	public final static int		PARITY_MARK							= 3;
+	public final static int		PARITY_SPACE						= 4;
+
+	public final static int		FLOWCONTROL_NONE				= 0;
+	public final static int		FLOWCONTROL_RTSCTS_IN		= 1;
+	public final static int		FLOWCONTROL_RTSCTS_OUT	= 2;
+	public final static int		FLOWCONTROL_XONXOFF_IN	= 4;
+	public final static int		FLOWCONTROL_XONXOFF_OUT	= 8;
+
+	public final static int		STOPBITS_1							= 1;
+	public final static int		STOPBITS_2							= 2;
+	public final static int		STOPBITS_1_5						= 3;
+	
 	/**
 	 * constructs a SerialPort class using a XML DOM element
 	 * @param element (DOM)
@@ -48,9 +64,9 @@ public class SerialPortType {
 		this.port = XMLUtils.getTextValue(element, "port");
 		this.baudeRate = XMLUtils.getIntValue(element, "baudeRate");
 		this.dataBits = XMLUtils.getIntValue(element, "dataBits");
-		this.parity = XMLUtils.getIntValue(element, "parity");
-		this.stopBits = XMLUtils.getIntValue(element, "stopBits");
-		this.flowControlMode = XMLUtils.getIntValue(element, "flowControlMode");
+		this.parity = getParity(XMLUtils.getTextValue(element, "parity"));
+		this.stopBits = getStopBits(XMLUtils.getTextValue(element, "stopBits"));
+		this.flowControlMode = getFlowControlMode(XMLUtils.getTextValue(element, "flowControlMode"));
 		this.isRTS = XMLUtils.getBooleanValue(element, "isRTS");
 		this.isDTS = XMLUtils.getBooleanValue(element, "isDTS");
 
@@ -205,5 +221,33 @@ public class SerialPortType {
 	 */
 	public TimeOutType getTimeOut() {
 		return timeOut;
+	}
+	
+	private int getParity(String key) {
+		int result = PARITY_NONE;
+		if (key.equals("PARITY_NONE")) result = PARITY_NONE;
+		else if (key.equals("PARITY_ODD")) result = PARITY_ODD;
+		else if (key.equals("PARITY_EVEN")) result = PARITY_EVEN;
+		else if (key.equals("PARITY_MARK")) result = PARITY_MARK;
+		else if (key.equals("PARITY_SPACE")) result = PARITY_SPACE;
+		return result;
+	}
+	
+	private int getStopBits( String key) {
+		int result = STOPBITS_1;
+		if (key.equals("STOPBITS_1")) result = STOPBITS_1;
+		else if (key.equals("STOPBITS_2")) result = STOPBITS_2;
+		else if (key.equals("STOPBITS_1_5")) result = STOPBITS_1_5;
+		return result;
+	}
+	
+	private int getFlowControlMode(String key) {
+		int result = FLOWCONTROL_NONE;
+		if (key.equals("FLOWCONTROL_NONE")) result = FLOWCONTROL_NONE;
+		else if (key.equals("FLOWCONTROL_RTSCTS_IN")) result = FLOWCONTROL_RTSCTS_IN;
+		else if (key.equals("FLOWCONTROL_RTSCTS_OUT")) result = FLOWCONTROL_RTSCTS_OUT;
+		else if (key.equals("FLOWCONTROL_XONXOFF_IN")) result = FLOWCONTROL_XONXOFF_IN;
+		else if (key.equals("FLOWCONTROL_XONXOFF_OUT")) result = FLOWCONTROL_XONXOFF_OUT;
+		return result;
 	}
 }

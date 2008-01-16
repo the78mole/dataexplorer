@@ -29,6 +29,11 @@ import org.w3c.dom.NodeList;
 public class ChannelType extends Vector<MeasurementType> {
 	static final long							serialVersionUID	= 26031957L;
 
+	public final static int				TYPE_OUTLET				= 0;
+	public final static int				TYPE_CONFIG				= 1;
+
+	private String								name;
+	private final int							type;
 	private final Vector<String>	measurementNames	= new Vector<String>();
 
 	/**
@@ -36,6 +41,8 @@ public class ChannelType extends Vector<MeasurementType> {
 	 * @param element (DOM)
 	 */
 	public ChannelType(Element element) {
+		this.name = element.getAttributes().getNamedItem("name").getNodeValue();
+		this.type = getChannelType(element.getAttributes().getNamedItem("type").getNodeValue());
 		NodeList measurementNodeList = element.getElementsByTagName("Measurement");
 		if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
 			for (int i = 0; i < measurementNodeList.getLength(); i++) {
@@ -47,12 +54,16 @@ public class ChannelType extends Vector<MeasurementType> {
 		}
 	}
 
-	public ChannelType(MeasurementType measurement) {
+	public ChannelType(String name, int type, MeasurementType measurement) {
+		this.name = name;
+		this.type = type;
 		this.add(measurement);
 		measurementNames.add(measurement.getName());
 	}
 
-	public ChannelType(Vector<MeasurementType> measurements) {
+	public ChannelType(String name, int type, Vector<MeasurementType> measurements) {
+		this.name = name;
+		this.type = type;
 		for (Iterator<MeasurementType> iterator = measurements.iterator(); iterator.hasNext();) {
 			MeasurementType meas = iterator.next();
 			this.add(meas);
@@ -74,5 +85,34 @@ public class ChannelType extends Vector<MeasurementType> {
 	 */
 	public Vector<String> getMeasurementNames() {
 		return measurementNames;
+	}
+
+	private int getChannelType(String key) {
+		int result = 0;
+		if (key.equals("TYPE_OUTLET"))
+			result = TYPE_OUTLET;
+		else if (key.equals("TYPE_CONFIG")) result = TYPE_CONFIG;
+		return result;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return type;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

@@ -126,22 +126,22 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				///////////////////////////////////////////////////				
 				if (channel1Tab == null && numberChannels > 0)
-					channel1Tab = new AkkuMasterChannelTab(this, " Kanal 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+					channel1Tab = new AkkuMasterChannelTab(this, " Ausgang 1 ", AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel1Tab.addChannelTab(tabFolder);
 
 				if (channel2Tab == null && numberChannels > 1)
-					channel2Tab = new AkkuMasterChannelTab(this, " Kanal 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+					channel2Tab = new AkkuMasterChannelTab(this, " Ausgang 2 ", AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel2Tab.addChannelTab(tabFolder);
 
 				if (channel3Tab == null && numberChannels > 2)
-					channel3Tab = new AkkuMasterChannelTab(this, " Kanal 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+					channel3Tab = new AkkuMasterChannelTab(this, " Ausgang 3 ", AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel3Tab.addChannelTab(tabFolder);
 
 				if (channel4Tab == null && numberChannels > 3)
-					channel4Tab = new AkkuMasterChannelTab(this, " Kanal 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
+					channel4Tab = new AkkuMasterChannelTab(this, " Ausgang 4 ", AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel4Tab.addChannelTab(tabFolder);
 				///////////////////////////////////////////////////		
@@ -315,10 +315,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			channel4Tab.stopTimer();
 			dialogShell.dispose();
 		}
-	}
-
-	public CTabFolder getTabFolderKanal1(Composite parent) {
-		return tabFolder;
 	}
 
 	/**

@@ -75,15 +75,15 @@ public class Channels extends HashMap<Integer, Channel> {
 
 	/**
 	 * switch the channel according selection and set applications active channel
-	 * @param channelName assuming p.e. "K1: Kanal 1"
+	 * @param channelName assuming p.e. " 1 : Ausgang"
 	 */
 	public synchronized void switchChannel(String channelName) {
-		this.switchChannel(new Integer(channelName.split(" ")[2]).intValue());
+		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue());
 	}
 
 	/**
 	 * switch the channel according selection and set applications active channel
-	 * @param channelNumber 1 -> "K1: Kanal 1"
+	 * @param channelNumber 1 -> " 1 : Ausgang"
 	 */
 	public synchronized void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);		

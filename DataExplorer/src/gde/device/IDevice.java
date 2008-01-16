@@ -109,6 +109,24 @@ public interface IDevice {
 	 * @return the channel count
 	 */
 	public int getChannelCount();
+
+	/**
+	 * @param channelNumber
+	 * @return the channel name
+	 */
+	public String getChannelName(int channelNumber);
+	
+	/**
+	 * @param channelName - size should not exceed 15 char length
+	 * @param channelNumber
+	 */
+	public void setChannelName(String channelName, int channelNumber);
+
+	/**
+	 * @param channelNumber
+	 * @return the channel type
+	 */
+	public int getChannelType(int channelNumber);
 	
 	/**
 	 * @return the number of measurements of a channel

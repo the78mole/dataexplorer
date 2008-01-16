@@ -25,39 +25,43 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * Channel class represents on channel (Kanal 1, Kanal 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
+ * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
  * @author Winfried Brügmann
  */
 public class Channel extends HashMap<String, RecordSet> {
 	static final long											serialVersionUID	= 26031957;
 	private Logger												log								= Logger.getLogger(this.getClass().getName());
+	
 	private String												fileSep = System.getProperty("file.separator");
-	private String												name;																														// K1: Kanal1
+	private final String									name;																														// 1: Ausgang
+	private final int											type;
 	private GraphicsTemplate							template;																												// graphics template holds view configuration
 	private RecordSet											activeRecordSet;
 	private final OpenSerialDataExplorer	application;
 
 	/**
-	 * constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
-	 * @param channelNumber 1 -> K1: Kanal 1
+	 * constructor, where channelNumber is used to calculate the name of the channel 1: Ausgang
+	 * @param channelNumber 1 -> " 1 : Ausgang"
 	 */
-	public Channel(int channelNumber) {
+	public Channel(int channelNumber, String channelName, int channelType) {
 		super(5);
-		this.name = "K" + channelNumber + ": Kanal " + channelNumber;
-
+		this.name = " " + channelNumber + " : " + channelName;
+		this.type = channelType;
+		
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = application.getDevice().getName() + "_" + this.name.split(":")[0];
+		String filename = application.getDevice().getName() + "_" + this.name.split(":")[0].trim();
 		this.template = new GraphicsTemplate(Settings.getInstance().getApplHomePath(), filename);
 	}
 
 	/**
-	 * Constructor, where channelNumber is used to calculate the name of the channel K1: Kanal1
+	 * Constructor, where channelNumber is used to calculate the name of the channel K1: type
 	 * @param channelNumber
 	 * @param newRecordSet
 	 */
-	public Channel(int channelNumber, RecordSet newRecordSet) {
+	public Channel(int channelNumber, String channelName, int channelType, RecordSet newRecordSet) {
 		super(5);
-		this.name = "K" + channelNumber + ": Kanal " + channelNumber;
+		this.name = " " + channelNumber + " : " + channelName;
+		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);
 
 		this.application = OpenSerialDataExplorer.getInstance();
@@ -81,7 +85,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
-	 * get the name of the channel "K1: Kanal1"
+	 * get the name of the channel " 1: Ausgang"
 	 * @return String
 	 */
 	public String getName() {
@@ -180,5 +184,12 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
 		this.activeRecordSet = this.get(recordSetKey);
+	}
+
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return type;
 	}
 }

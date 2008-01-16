@@ -38,7 +38,7 @@ public class DataBlockType {
 	public DataBlockType(Element element) {
 		this.domElement = element;
 		this.size = XMLUtils.getIntValue(element, "size");
-		this.checkSumType = XMLUtils.getTextValue(element, "checkSumType");
+		this.checkSumType = XMLUtils.getTextValue(element, "checkSum");
 		this.endingByte = XMLUtils.getByteValue(element, "endingByte");
 	}
 

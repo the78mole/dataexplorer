@@ -56,25 +56,25 @@ public class AkkuMasterC4Test {
 					try {
 						akkuMaster.print(akkuMaster.getData(AkkuMasterC4SerialPort.channel_1, 0, null));
 						
-//						System.out.println("Kanal 1");
+//						System.out.println("Ausgang 1");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_1));
 //						akkuMaster.print(akkuMaster.getAdjustedValues(AkkuMasterC4SerialPort.channel_1));
 //						akkuMaster.print(akkuMaster.getMeasuredValues(AkkuMasterC4SerialPort.channel_1));
 //						System.out.println();
 //
-//						System.out.println("Kanal 2");
+//						System.out.println("Ausgang 2");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_2));
 //						akkuMaster.print(akkuMaster.getAdjustedValues(AkkuMasterC4SerialPort.channel_2));
 //						akkuMaster.print(akkuMaster.getMeasuredValues(AkkuMasterC4SerialPort.channel_2));
 //						System.out.println();
 //
-//						System.out.println("Kanal 3");
+//						System.out.println("Ausgang 3");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_3));
 //						akkuMaster.print(akkuMaster.getAdjustedValues(AkkuMasterC4SerialPort.channel_3));
 //						akkuMaster.print(akkuMaster.getMeasuredValues(AkkuMasterC4SerialPort.channel_3));
 //						System.out.println();
 //
-//						System.out.println("Kanal 4");
+//						System.out.println("Ausgang 4");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_4));
 //						akkuMaster.print(akkuMaster.getAdjustedValues(AkkuMasterC4SerialPort.channel_4));
 //						akkuMaster.print(akkuMaster.getMeasuredValues(AkkuMasterC4SerialPort.channel_4));
