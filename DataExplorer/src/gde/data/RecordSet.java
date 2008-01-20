@@ -599,7 +599,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the isMeasurementMode
 	 */
 	public boolean isMeasurementMode(String recordKey) {
-		return this.get(recordKey).isMeasurementMode();
+		return this.get(recordKey) != null ? this.get(recordKey).isMeasurementMode() : false;
 	}
 
 	/**
@@ -607,7 +607,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the isDeltaMeasurementMode
 	 */
 	public boolean isDeltaMeasurementMode(String recordKey) {
-		return this.get(recordKey).isDeltaMeasurementMode();
+		return this.get(recordKey) != null ? this.get(recordKey).isDeltaMeasurementMode() : false;
 	}
 
 	/**

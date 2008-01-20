@@ -490,7 +490,10 @@ public class GraphicsWindow {
 		if (recordSet != null) {
 			// draw curves
 			drawCurves(recordSet, maxX, maxY);
-		}
+			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
+				drawMeasurePointer(MODE_MEASURE, true);
+			}
+		}	
 	}
 
 	/**
@@ -676,8 +679,9 @@ public class GraphicsWindow {
 	/**
 	 * draw the start pointer for measurement modes
 	 * @param mode
+	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(int mode) {
+	public void drawMeasurePointer(int mode, boolean isRefresh) {
 		this.setModeState(mode); // cleans old pointer if required
 		
 		// get the record set to work with
@@ -693,7 +697,7 @@ public class GraphicsWindow {
 		
 		if (recordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
-			xPosMeasure = curveAreaBounds.width / 4;
+			xPosMeasure = isRefresh ? xPosMeasure : curveAreaBounds.width / 4;
 			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
 			log.fine("initial xPosMeasure = " + xPosMeasure + " yPosMeasure = " + yPosMeasure);
 
@@ -703,7 +707,7 @@ public class GraphicsWindow {
 			application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " " + record.getDevice().getDataUnit(measureRecordKey) + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-			xPosMeasure = curveAreaBounds.width / 4;
+			xPosMeasure = isRefresh ? xPosMeasure : curveAreaBounds.width / 4;
 			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
 
 			// measure position
@@ -711,7 +715,7 @@ public class GraphicsWindow {
 			drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
 			
 			// delta position
-			xPosDelta = curveAreaBounds.width / 3 * 2;
+			xPosDelta = isRefresh ? xPosDelta : curveAreaBounds.width / 3 * 2;
 			yPosDelta = record.getDisplayPointDataValue(xPosDelta, curveAreaBounds);
 			
 			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
