@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.StatusBar;
 
 /**
  * This thread implementation calculates the slop of the height curve using quasi linear regression
@@ -54,17 +55,23 @@ public class QuasiLinearRegression extends CalculationThread {
 
 		Record record = recordSet.get(targetRecordKey);
 		Record recordHeight = recordSet.get(sourceRecordKey);
+		StatusBar statusBar = application.getStatusBar();
+		statusBar.setMessageAsync(statusMessage);
 
-		int time_ms = 50;
-		int interval = 4000 / time_ms; // 1 sec / 0.05 sec 
-		int pointInterval = 4;
+		int time_ms = recordSet.getTimeStep_ms();
+		int interval = 4000 / time_ms; // 1 sec / 0.05 sec -> 20 points/sec -> 4000/50 -> 8 sec interval time
+		int pointInterval = 2;
 
 		int modCounter = ((recordHeight.size() - (recordHeight.size() % interval)) - (interval - pointInterval)) / pointInterval;
 		// fill mod interval + pontInterval / 2
 		int counter = (recordHeight.size() % interval) + (pointInterval / 2);
-		for (int i = 0; i < counter; i++) { // 0,5 sec
+		int padding = interval / 2 - pointInterval;
+		// padding data points which does not fit into interval
+		for (int i = 0; i < counter+padding; i++) { // 0,5 sec
 			record.add(0);
 		}
+		// prepare progress status
+		int progInterval = maxCalcProgressPercent / modCounter;
 
 		// calculate avg x
 		double avgX = 0; //(interval-1) * time_ms / 1000.0 / interval; // 9 * 0.05 / 10; --> 0,05 
@@ -114,14 +121,17 @@ public class QuasiLinearRegression extends CalculationThread {
 
 			if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
 			--modCounter;
+			statusBar.setProgressAsync(maxCalcProgressPercent - modCounter * progInterval);
 		}
-		// fill the rest of the curve to make equal lenght
-		for (int i = counter - pointInterval; i < recordHeight.size(); i++) {
+		// pad the rest of the curve to make equal size
+		for (int i = record.size()-1; i < recordHeight.size(); i++) {
 			record.add(0);
 		}
 		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
+		statusBar.setProgressAsync(maxCalcProgressPercent);
+		statusBar.setMessageAsync("");
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
 		log.fine("finished data calculation for record = " + targetRecordKey);

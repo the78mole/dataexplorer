@@ -36,6 +36,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.StatusBar;
 
 /**
  * Class to read and write comma separated value files
@@ -76,6 +77,7 @@ public class CSVReaderWriter {
 	 */
 	public static RecordSet read(char separator, String filePath, RecordSet recordSet, boolean isRaw) throws Exception {
 		BufferedReader reader; // to read the data
+		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 		String[] recordNames = device.getMeasurementNames();
 		int sizeRecords = 0;
@@ -83,6 +85,8 @@ public class CSVReaderWriter {
 		boolean isData = false;
 
 		try {
+			statusBar.setMessage("Lese CVS Datei " + filePath);
+			
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
 			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
@@ -153,6 +157,7 @@ public class CSVReaderWriter {
 			log.fine("timeStep_ms = " + timeStep_ms);
 
 			reader.close();
+			statusBar.setProgress(10);
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -180,6 +185,9 @@ public class CSVReaderWriter {
 				OpenSerialDataExplorer.getInstance().openMessageDialog("Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
 			throw e;
 		}
+		finally {
+			statusBar.setMessage("");
+		}
 		return recordSet;
 	}
 
@@ -188,7 +196,9 @@ public class CSVReaderWriter {
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) {
 		BufferedWriter writer;
+		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		try {
+			statusBar.setMessage("Lese CVS Datei " + filePath);
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8 for Linux
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
@@ -224,6 +234,7 @@ public class CSVReaderWriter {
 
 			// write data
 			int recordEntries = recordSet.getRecord(recordSet.getRecordNames()[0]).size();
+			int stausIncrement = recordEntries/100;
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
@@ -245,12 +256,14 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(newLine);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
 				writer.write(sb.toString());
+				statusBar.setProgress(stausIncrement * i);
 			}
 
 			writer.flush();
 			writer.close();
 			recordSet.setSaved(true);
 			log.fine("data line = " + sb.toString());
+			statusBar.setProgress(100);
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -267,6 +280,9 @@ public class CSVReaderWriter {
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			OpenSerialDataExplorer.getInstance().openMessageDialog("Die kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
+		}
+		finally {
+			statusBar.setMessage("");
 		}
 
 	}

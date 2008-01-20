@@ -32,7 +32,9 @@ public abstract class CalculationThread extends Thread {
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;
-	protected final OpenSerialDataExplorer	apllication;
+	protected String												statusMessage = "";
+	protected	int														maxCalcProgressPercent = 0;
+	protected final OpenSerialDataExplorer	application;
 	protected boolean												threadStop	= false;
 
 	/**
@@ -46,7 +48,7 @@ public abstract class CalculationThread extends Thread {
 		this.recordSet = recordSet;
 		this.sourceRecordKey = sourceRecordKey;
 		this.targetRecordKey = targetRecordKey;
-		this.apllication = OpenSerialDataExplorer.getInstance();
+		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	/**
@@ -77,5 +79,26 @@ public abstract class CalculationThread extends Thread {
 	 */
 	public void setTargetRecordKey(String targetRecordKey) {
 		this.targetRecordKey = targetRecordKey;
+	}
+
+	/**
+	 * @return the statusMessage
+	 */
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+
+	/**
+	 * @param statusMessage the statusMessage to set
+	 */
+	public void setStatusMessage(String statusMessage) {
+		this.statusMessage = statusMessage;
+	}
+
+	/**
+	 * @param maxCalcProgressPercent the maxCalcProgressPercent to set
+	 */
+	public void setMaxCalcProgressPercent(int maxCalcProgressPercent) {
+		this.maxCalcProgressPercent = maxCalcProgressPercent;
 	}
 }

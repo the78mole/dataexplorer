@@ -243,6 +243,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					// calculate the values required				
 					String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
 					calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2]);
+					calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
+					calculationThread.setMaxCalcProgressPercent(20);
 					calculationThread.start();
 				}
 			}

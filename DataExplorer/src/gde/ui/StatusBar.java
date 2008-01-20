@@ -118,9 +118,10 @@ public class StatusBar {
 				progressBar.setLayoutData(progressBarLData);
 			}
 			{
-				msgLabel = new CLabel(statusComposite, SWT.LEFT | SWT.BORDER | SWT.BOLD);
-				msgLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+				msgLabel = new CLabel(statusComposite, SWT.LEFT);
+				//msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+				//msgLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+
 			}
 		}
 	}
@@ -128,21 +129,38 @@ public class StatusBar {
 	/**
 	 * method to set a message text to the message label of the status bar
 	 */
-	public void setMessage(String text) {
-		if (text.length() > 5 && text.length() < 30)
-			msgLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-		else if (text.length() > 30)
-			msgLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
-		else 
-			msgLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND));
-		
-		msgLabel.setText(text);
+	public void setMessage(final String text) {
+		if (text.length() > 5) msgLabel.setText("   " + text + "   ");
+		else msgLabel.setText(text);
 		msgLabel.pack(true);
 	}
-
-	public ProgressBar getProgressBar() {
-		return progressBar;
+	
+	/**
+	 * method to set a message text to the message label of the status bar
+	 */
+	public void setMessageAsync(final String text) {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (text.length() > 5) msgLabel.setText("   " + text + "   ");
+				else msgLabel.setText(text);
+				msgLabel.pack(true);
+			}
+		});
 	}
+
+
+	public void setProgress(final int precent) {
+		progressBar.setSelection(precent);
+	}
+	
+	public void setProgressAsync(final int precent) {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				progressBar.setSelection(precent);
+			}
+		});
+	}
+
 
 	/**
 	 * set the serial com port rx light on
