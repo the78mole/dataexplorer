@@ -644,7 +644,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.setZoomMode(false);
 		this.setMeasurementMode(this.recordKeyMeasurement, false);
 		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
-		if(application != null) application.setDefaultCursor();
 	}
 	
 	/**
