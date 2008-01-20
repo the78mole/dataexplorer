@@ -49,7 +49,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public GraphicsTemplate(String applHomePath, String deviceSignature) {
 		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
-		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATE_EXTENSION.substring(Settings.GRAPHICS_TEMPLATE_EXTENSION.length() - 4);
+		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		log.fine("graphics template file is " + this.templateFilePath);
 	}

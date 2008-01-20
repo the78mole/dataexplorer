@@ -383,7 +383,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
 							log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath());
-							FileDialog fileDialog = application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATE_EXTENSION }, Settings.getInstance()
+							FileDialog fileDialog = application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
 									.getGraphicsTemplatePath());
 							Channel activeChannel = channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
@@ -400,7 +400,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt);
 							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
-							FileDialog fileDialog = application.openFileOpenDialog("Lade GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATE_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath());
+							FileDialog fileDialog = application.openFileOpenDialog("Lade GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath());
 							Channel activeChannel = channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(fileDialog.getFileName());
