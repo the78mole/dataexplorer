@@ -197,11 +197,16 @@ public class CurveUtils {
 		record.setDisplayScaleFactorValue(height-1);
 		
 		StringBuffer sb = new StringBuffer(); // logging purpose
-		Point newPoint, oldPoint;
+		Point newPoint, oldPoint = new Point(0,0);
 		
-		// calculate start point of the curve, which is the first oldPoint
-		oldPoint = record.getDisplayPoint(0, 0, x0, y0);
-		if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(oldPoint.toString());
+		try {
+			// calculate start point of the curve, which is the first oldPoint
+			oldPoint = record.getDisplayPoint(0, 0, x0, y0);
+			if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(oldPoint.toString());
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?");
+		}
 		
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
