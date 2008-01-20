@@ -34,7 +34,6 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.tab.GraphicsWindow;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
