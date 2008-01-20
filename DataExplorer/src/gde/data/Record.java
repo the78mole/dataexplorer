@@ -446,22 +446,22 @@ public class Record extends Vector<Integer> {
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
 		returnPoint.x = new Double((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
-		returnPoint.y = new Double(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		returnPoint.y = new Double(yDisplayOffset - 1 - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}
 
 	/**
 	 * query data value (not translated in device units) from a display position point 
 	 * @param xPos
-	 * @param offSetY
 	 * @param drawAreaBounds
 	 * @return displays yPos in pixel
 	 */
-	public int getDisplayPointDataValue(int xPos, int offSetY, Rectangle drawAreaBounds) {
+	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
-		pointY = pointY > drawAreaBounds.height ? drawAreaBounds.height : pointY;
+		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height-1 : pointY;
+		if (log.isLoggable(Level.FINER))log.finer("pointY = " + pointY);
 		return pointY;
 	}
 	
@@ -472,7 +472,10 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public String getDisplayPointValueString(int yPos, Rectangle drawAreaBounds) {
-		return df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		if(parent.isZoomMode())
+			return df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		else
+			return df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 	}
 
 	/**
@@ -482,7 +485,10 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public double getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
-		return this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
+		if(parent.isZoomMode())
+			return this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
+		else
+			return this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
 	}
 
 	/**
@@ -492,7 +498,10 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
-		return df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+		if(parent.isZoomMode())
+			return df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
+		else
+			return df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
 	}
 	
 	/**
@@ -502,10 +511,14 @@ public class Record extends Vector<Integer> {
 	 * @return string of value
 	 */
 	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
-		log.info("" + points.toString());
-		double measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
+		if(log.isLoggable(Level.FINE)) log.fine("" + points.toString());
+		double measureDelta;
+		if(parent.isZoomMode())
+			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
+		else
+			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
-		log.info("measureDelta = " + measureDelta + " timeDelta = " + timeDelta);
+		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta);
 		return df.format(measureDelta / timeDelta);
 	}
 	

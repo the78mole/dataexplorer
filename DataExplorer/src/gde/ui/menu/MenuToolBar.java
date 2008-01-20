@@ -46,6 +46,7 @@ import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
+import osde.ui.tab.GraphicsWindow;
 
 /**
  * Graphical menu tool bar class
@@ -301,7 +302,7 @@ public class MenuToolBar {
 					zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.finest("zoomWindowItem.widgetSelected, event=" + evt);
-							application.setZoomMode(true);
+							application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
 						}
 					});
 				}
@@ -313,8 +314,7 @@ public class MenuToolBar {
 					panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event=" + evt);
-							//TODO add your code for resizeItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, diese Methode ist noch nicht implementiert! ");
+							application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
 						}
 					});
 				}
@@ -326,7 +326,7 @@ public class MenuToolBar {
 					fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event=" + evt);
-							application.setZoomMode(false);
+							application.setGraphicsMode(GraphicsWindow.MODE_RESET ,false);
 						}
 					});
 				}

@@ -125,6 +125,8 @@ public class CurveUtils {
 		int miniticks = 3;
 
 		// prepare axis position
+		gc.setLineWidth(1);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
 		log.fine(recordName + " positionNumber = " + positionNumber);
@@ -181,6 +183,7 @@ public class CurveUtils {
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
 		int timeStep = record.getTimeStep_ms();
 		double adaptXMaxValue = isCompareSet ? (1.0 * (recordSize - 1) * record.getParent().getSize() / (recordSize - 1) * timeStep) : (1.0 * (recordSize - 1) * timeStep);
+		if (log.isLoggable(Level.FINE)) log.fine("recordSize = " + recordSize + " adaptXMaxValue = " + adaptXMaxValue);
 		
 		// calculate scale factor to fit time into draw bounds
 		double factorX = (1.0 * width) / adaptXMaxValue;
@@ -191,7 +194,7 @@ public class CurveUtils {
 			factorX = factorX * xScale;
 		}
 		record.setDisplayScaleFactorTime(factorX);
-		record.setDisplayScaleFactorValue(height);
+		record.setDisplayScaleFactorValue(height-1);
 		
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		Point newPoint, oldPoint;
@@ -200,16 +203,21 @@ public class CurveUtils {
 		oldPoint = record.getDisplayPoint(0, 0, x0, y0);
 		if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(oldPoint.toString());
 		
-		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScale) {
-			// get the point to be drawn
-			newPoint = record.getDisplayPoint(i, j, x0, y0);
-			if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(newPoint.toString());
+		try {
+			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
+			for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScale) {
+				// get the point to be drawn
+				newPoint = record.getDisplayPoint(i, j, x0, y0);
+				if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(newPoint.toString());
 
-			gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 
-			// remember the last draw point for next drawLine operation
-			oldPoint = newPoint;
+				// remember the last draw point for next drawLine operation
+				oldPoint = newPoint;
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?");
 		}
 		if (log.isLoggable(Level.INFO)) log.finest(sb.toString());
 	}

@@ -120,14 +120,17 @@ public class TimeLine {
 	 * @param endTimeValue depends on the time gap and the unit calculated from the gap
 	 * @param scaleFactor - factor to multiply scale numbers
 	 * @param color
+	 * @return position, where the time line text is drawn
 	 */
 	public synchronized void drawTimeLine(GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, Color color) {
 		if (isTimeLinePrepared == false) {
 			log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first");
-			return;
+			return ;
 		}
 
 		// set the line color and draw a horizontal time line
+		gc.setLineWidth(1);
+		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
 		gc.drawLine(x0, y0, x0 + width, y0);
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, scaleFactor));
@@ -156,27 +159,28 @@ public class TimeLine {
 	 * @param gap distance between ticks and the number scale
 	 */
 	private void drawHorizontalTickMarks(GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int ticklength, int miniticks, int gap) {
-		// adapt x0 and width, measurement scales are outside the draw area
-		x0 = x0 -1;
+		// adapt x0 and width, measurement scales are outside the curve draw area
+		x0 = x0 - 1;
 		width = width + 1;
 		double numberTicks;
-		int offset = (startTimeValue != 0) ? 5 - startTimeValue % 5 : 0;
+		//int offset = (startTimeValue != 0) ? 10 - startTimeValue % 10 : 0;
 		int timeDelta = endTimeValue - startTimeValue;
+		if (log.isLoggable(Level.FINE)) log.fine("timeDelta = " + timeDelta + " startTime = " + startTimeValue + " endTime = " + endTimeValue);
 		
 		// calculate a scale factor, a big time difference would have to much ticks
 		if (timeDelta >= 0 && timeDelta < 100 && scaleFactor == 1000) {
 			numberTicks = timeDelta ; // every 1'th units one tick
 			scaleFactor = scaleFactor/10;
-			if (log.isLoggable(Level.FINE)) log.fine("0 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			if (log.isLoggable(Level.FINER)) log.fine("0 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
 		}
 		else if (timeDelta >= 10 && timeDelta < 60 && scaleFactor == 10) {
 			numberTicks = timeDelta / 5.0; // every 5 th units one tick
 			scaleFactor = scaleFactor * 2;
-			if (log.isLoggable(Level.FINE)) log.fine("1 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			if (log.isLoggable(Level.FINER)) log.fine("1 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
 		}
 		else {
 			numberTicks = timeDelta / 10.0; // every 10th units one tick
-			if (log.isLoggable(Level.FINE)) log.fine("2 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			if (log.isLoggable(Level.FINER)) log.fine("2 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
 		}
 		
 		double deltaTick = 1.0 * width / numberTicks;
@@ -188,7 +192,7 @@ public class TimeLine {
 		for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
 			
 			//draw the main scale ticks, length = 5 and gap to scale = 2
-			double xTickPosition = offset + x0 + i * deltaTick;
+			double xTickPosition = x0 + i * deltaTick;
 			int intXTickPosition = new Double(xTickPosition).intValue();
 			gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
 
@@ -203,7 +207,7 @@ public class TimeLine {
 				}
 			}
 			//draw values to the scale	
-			int timeValue = startTimeValue + offset + i * 100 / scaleFactor; 
+			int timeValue = i * 100 / scaleFactor; 
 			
 			// prepare to make every minute or hour to bold
 			boolean isMod60 = (timeValue % 60) == 0;
@@ -253,6 +257,32 @@ public class TimeLine {
 			break;
 		}
 		return result;
+	}
+
+	/**
+	 * get the formatted time of time value in m_sec, if hours are 0 or minutes are 0 the string will be cut of
+	 * @param millis
+	 * @return string of time value in simple date format HH:mm:ss:SSS
+	 */
+	public static String getFomatedTime(int milliSeconds) {
+		String time = "0";
+		if (milliSeconds >= 0)
+		{
+			long	lSeconds = milliSeconds / 1000;
+			milliSeconds %= 1000;
+			long	lMinutes = lSeconds / 60;
+			lSeconds %= 60;
+			long	lHours = lMinutes / 60;
+			lMinutes %= 60;
+			
+			if (lMinutes == 0 && lHours == 0)
+				time = String.format("%02d:%03d [ss:SSS]", lSeconds, milliSeconds);
+			else if (lHours == 0)
+				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, milliSeconds);
+			else
+				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, milliSeconds);
+		}
+		return time;
 	}
 
 }

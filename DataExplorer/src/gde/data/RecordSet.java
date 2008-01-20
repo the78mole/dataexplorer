@@ -34,6 +34,7 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.MenuToolBar;
+import osde.utils.TimeLine;
 
 /**
  * DeviceRecords class holds all the data records for the configured measurement
@@ -66,13 +67,10 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean 											isZoomMode = false;
 	private int														recordZoomOffset;
 	private int														recordZoomSize;
-
 	
 	// measurement
-	//private boolean 											isMeasurementMode = false;
-	//private boolean 											isDeltaMeasurementMode = false;
 	private String 												recordKeyMeasurement;
-
+	
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
@@ -171,7 +169,14 @@ public class RecordSet extends HashMap<String, Record> {
 		values[0] = df.format(new Double(index * this.getTimeStep_ms() / 1000.0));
 		for (int i = 1; i < values.length; i++) {
 			Record record = this.getRecord(this.recordNames[i-1]);
-			values[i] = df.format(new Double(device.translateValue(record.getName(), record.get(index) / 1000.0)));
+			int indexValue = 0;
+			try {
+				indexValue = record.get(index);
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage() + " - data calcualtion failed ?");
+			}
+			values[i] = df.format(new Double(device.translateValue(record.getName(), indexValue / 1000.0)));
 		}
 		return values;
 	}
@@ -211,6 +216,9 @@ public class RecordSet extends HashMap<String, Record> {
 		return activeRecords.toArray(new String[1]);
 	}
 
+	/**
+	 *	clear the record set compare view 
+	 */
 	public void clear() {
 		super.clear();
 		recordNames = new String[0];
@@ -218,6 +226,7 @@ public class RecordSet extends HashMap<String, Record> {
 		maxSize = 0;
 		maxValue = -20000;
 		minValue = 20000;
+		this.reset();
 	}
 
 	public String getName() {
@@ -365,6 +374,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void switchRecordSet(String recordSetName) {
 		log.finest("entry - " + recordSetName);
+		//reset old record set before switching
+		this.reset();
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
@@ -468,15 +479,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the size of data point to calculate the time unit
 	 */
 	public int getSize() {
-		if (this.isZoomMode)
-			return this.recordZoomOffset + this.recordZoomSize;
-		else if (this.isCompareSet)
-			return maxSize;
+		if (this.isCompareSet)
+			return this.isZoomMode ? this.recordZoomSize : maxSize;
 		else
-			return this.get(this.recordNames[0]).realSize();
+			return this.get(this.recordNames[0]).size();
 	}
 
 	/**
+	 * set maximum size of data points of a compare set
 	 * @param maxSize the maxSize to set
 	 */
 	public void setMaxSize(int maxSize) {
@@ -484,6 +494,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * query maximum display scale value of a compare set
 	 * @return the maxValue
 	 */
 	public double getMaxValue() {
@@ -491,6 +502,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * set maximum display scale value of a compare set
 	 * @param maxValue the maxValue to set
 	 */
 	public void setMaxValue(double maxValue) {
@@ -498,6 +510,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * query minimum display scale value of a compare set
 	 * @return the minValue
 	 */
 	public double getMinValue() {
@@ -505,6 +518,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * set minimum display scale value of a compare set
 	 * @param minValue the minValue to set
 	 */
 	public void setMinValue(double minValue) {
@@ -546,15 +560,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setMeasurementMode(String recordKey, boolean enabled) {
 		Record record = this.get(recordKey);
-		record.setMeasurementMode(enabled);
-		if (enabled) {
-			Record oldRecord = this.get(this.recordKeyMeasurement);
-			if (oldRecord != null) {
-				oldRecord.setMeasurementMode(false);
-				oldRecord.setDeltaMeasurementMode(false);
+		if (record != null) {
+			record.setMeasurementMode(enabled);
+			if (enabled) {
+				Record oldRecord = this.get(this.recordKeyMeasurement);
+				if (oldRecord != null && !oldRecord.equals(record)) {
+					oldRecord.setMeasurementMode(false);
+					oldRecord.setDeltaMeasurementMode(false);
+				}
+				this.recordKeyMeasurement = recordKey;
+				record.setDeltaMeasurementMode(false);
 			}
-			this.recordKeyMeasurement = recordKey;
-			record.setDeltaMeasurementMode(false);
 		}
 	}
 
@@ -564,15 +580,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setDeltaMeasurementMode(String recordKey, boolean enabled) {
 		Record record = this.get(recordKey);
-		record.setDeltaMeasurementMode(enabled);
-		if (enabled) {
-			Record oldRecord = this.get(this.recordKeyMeasurement);
-			if (oldRecord != null) {
-				oldRecord.setMeasurementMode(false);
-				oldRecord.setDeltaMeasurementMode(false);
+		if (record != null) {
+			record.setDeltaMeasurementMode(enabled);
+			if (enabled) {
+				Record oldRecord = this.get(this.recordKeyMeasurement);
+				if (oldRecord != null && !oldRecord.equals(record)) {
+					oldRecord.setMeasurementMode(false);
+					oldRecord.setDeltaMeasurementMode(false);
+				}
+				this.recordKeyMeasurement = recordKey;
+				record.setMeasurementMode(false);
 			}
-			this.recordKeyMeasurement = recordKey;
-			record.setMeasurementMode(false);
 		}
 	}
 	
@@ -604,9 +622,31 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isZoomMode the isZoomMode to set
 	 */
 	public void setZoomMode(boolean isZoomMode) {
+		if (!this.isZoomMode) {
+			this.recordZoomOffset = 0;
+			
+			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
+				this.recordZoomSize = this.get(this.recordNames[0]).realSize();
+				// iterate children and reset min/max values
+				for (int i = 0; i < this.recordNames.length; i++) {
+					Record record = this.get(this.recordNames[i]);
+					record.setMinMaxZoomScaleValues(record.getMinScaleValue(), record.getMaxScaleValue());
+				}
+			}
+		}
 		this.isZoomMode = isZoomMode;
 	}
 
+	/**
+	 * reset the record set in viewpoint of measurement and zooming
+	 */
+	public void reset() {
+		this.setZoomMode(false);
+		this.setMeasurementMode(this.recordKeyMeasurement, false);
+		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
+		if(application != null) application.setDefaultCursor();
+	}
+	
 	/**
 	 * @return the recordKeyMeasurement
 	 */
@@ -618,9 +658,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomBounds, where the start point offset is x,y and the area is width, height
 	 */
 	public void setZoomOffsetAndWidth(Rectangle zoomBounds) {
-		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x);
+		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
 		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
-		// iterate childs and set min/max values
+		// iterate children and set min/max values
 		for (int i = 0; i < this.recordNames.length; i++) {
 			Record record = this.get(this.recordNames[i]);
 			double minZoomScaleValue = record.getDisplayPointValue(zoomBounds.y, this.drawAreaBounds);
@@ -644,32 +684,45 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return position integer value
 	 */
 	public int getPointIndexFromDisplayPoint(int xPos) {
-		return new Double(1.0 * xPos * this.get(this.recordNames[0]).realSize() / this.drawAreaBounds.width).intValue();
+		return new Double(1.0 * xPos * this.get(this.recordNames[0]).size() / this.drawAreaBounds.width).intValue();
 	}
 	
 	/**
 	 * get the formatted time at given position
 	 * @param xPos of the display point
-	 * @param drawAreaBounds
 	 * @return string of time value in simple date format HH:ss:mm:SSS
 	 */
 	public String getDisplayPointTime(int xPos) {
-		String time = "0";
-		long time_ms = this.getPointIndexFromDisplayPoint(xPos) * this.getTimeStep_ms();
-		if (time_ms >= 0)
-		{
-			long	lSeconds = time_ms / 1000;
-			time_ms %= 1000;
-			long	lMinutes = lSeconds / 60;
-			lSeconds %= 60;
-			long	lHours = lMinutes / 60;
-			lMinutes %= 60;
-			time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, time_ms);
-		}
-		return time;
+		return TimeLine.getFomatedTime((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms());
 	}
 
 	public int getStartTime() {
 		return this.isZoomMode ? this.recordZoomOffset * this.timeStep_ms : 0;
+	}
+
+	/**
+	 * @return the isPanMode
+	 */
+	public boolean isPanMode() {
+		return this.recordZoomOffset != 0 || this.isZoomMode;
+	}
+	
+	public void shift(int xPercent, int yPercent) {
+		int xShift = new Double(1.0 * this.recordZoomSize * xPercent / 100).intValue(); 
+		if (this.recordZoomOffset + xShift <= 0)
+			this.recordZoomOffset = 0;
+		else if(this.recordZoomOffset + this.recordZoomSize + xShift > this.get(this.recordNames[0]).realSize())
+			this.recordZoomOffset = this.get(this.recordNames[0]).realSize() - this.recordZoomSize;
+		else
+			this.recordZoomOffset = this.recordZoomOffset + xShift;
+		
+		// iterate children and set min/max values
+		for (int i = 0; i < this.recordNames.length; i++) {
+			Record record = this.get(this.recordNames[i]);
+			double yShift = (record.getMaxScaleValue() - record.getMinScaleValue()) * yPercent / 100;
+			double minZoomScaleValue = record.getMinScaleValue() + yShift;
+			double maxZoomScaleValue = record.getMaxScaleValue() + yShift;
+			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
+		}
 	}
 }
