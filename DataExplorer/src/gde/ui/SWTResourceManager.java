@@ -275,6 +275,24 @@ public class SWTResourceManager {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static Cursor getCursor(String url) {
+		try {
+			url = url.replace('\\', '/');
+			if (url.startsWith("/")) url = url.substring(1);
+			if (resources.containsKey(url)) return (Cursor) resources.get(url);
+			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(url));
+			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);
+			log.info("new cursor created = " + url);
+			resources.put(url, cursor);
+			return cursor;
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	public static GC getGC(Image img) {
 		String name = "GC_IMAGE:" + img.hashCode();
 		if (resources.containsKey(name))
