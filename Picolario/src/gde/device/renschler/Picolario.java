@@ -120,7 +120,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			// get the record set to be used
 			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
+			//if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
+			if (recordKey.substring(recordKey.length()-2).startsWith("_")) recordSet = application.getCompareSet();
 			
 			if (dialog.isDoSubtractFirst()) {
 				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
@@ -180,7 +181,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			// get the record set to be used
 			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
+			//if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
+			if (recordKey.substring(recordKey.length()-2).startsWith("_")) recordSet = application.getCompareSet();
 			
 			if (dialog.isDoSubtractFirst()) {
 				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
