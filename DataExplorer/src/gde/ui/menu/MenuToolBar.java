@@ -384,7 +384,7 @@ public class MenuToolBar {
 						channelSelectCombo = new CCombo(channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" });
 						channelSelectCombo.select(0);
-						channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/Konfiguration aus der angezeigt werden soll");
+						channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/eine Konfiguration aus der angezeigt werden soll");
 						RowData channelSelectComboLData = new RowData();
 						channelSelectComboLData.width = 140;
 						channelSelectComboLData.height = 18;
