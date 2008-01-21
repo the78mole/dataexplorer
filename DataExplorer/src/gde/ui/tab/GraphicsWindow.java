@@ -371,7 +371,7 @@ public class GraphicsWindow {
 									graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif"));
 								}
 								else {
-									graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+									graphicCanvas.setCursor(application.getCursor());
 								}
 							}
 							else if (isZoomMouse && !isPanMouse) {
@@ -381,7 +381,7 @@ public class GraphicsWindow {
 								graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/Hand.gif"));
 							}
 							else {
-								graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+								graphicCanvas.setCursor(application.getCursor());
 							}
 						}
 					}
@@ -389,7 +389,7 @@ public class GraphicsWindow {
 				graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseExit(MouseEvent evt) {
 						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseExit, event="+evt);
-						graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+						graphicCanvas.setCursor(application.getCursor());
 					}
 				});
 				graphicCanvas.addMouseListener(new MouseAdapter() {
