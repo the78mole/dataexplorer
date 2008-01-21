@@ -40,6 +40,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	private Logger							log											= Logger.getLogger(this.getClass().getName());
 
 	private StatusBar						statusBar;
+	private boolean 						isTransmitFinished = false;
 
 	// Datentyp Kommando Beschreibung
 	private final byte					readNumberRecordSets[]	= new byte[] { (byte) 0xAA, (byte) 0xAA };
@@ -91,14 +92,12 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();
-		boolean isTransmitFinished = false;
 		boolean isGoodPackage = true;
 		byte[] readBuffer;
 		int numberRed = 0;
 		byte[] readRecordSetsWithNumber = new byte[] { readRecordSets[0], (byte) datagramNumber, readRecordSets[0], (byte) datagramNumber };
 		write(readRecordSetsWithNumber);
-		//		Thread.sleep(30);
-		//		this.write(readRecordSetsWithNumber);
+		isTransmitFinished = false;
 
 		try {
 			Thread.sleep(20); // wait for 20 ms since it makes no sense to check receive buffer earlier
@@ -204,5 +203,12 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 */
 	private boolean verifyChecksum(final byte[] readBuffer) {
 		return readBuffer[readBuffer.length-1] == Checksum.XOR(readBuffer);
+	}
+
+	/**
+	 * @param isTransmitFinished the isTransmitFinished to set
+	 */
+	public void setTransmitFinished(boolean isTransmitFinished) {
+		this.isTransmitFinished = isTransmitFinished;
 	}
 }

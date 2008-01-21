@@ -24,7 +24,6 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.StatusBar;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
@@ -35,13 +34,14 @@ import osde.utils.QuasiLinearRegression;
 public class DataGathererThread extends Thread {
 	private Logger									log							= Logger.getLogger(this.getClass().getName());
 
-	private OpenSerialDataExplorer	application;
-	private String[]								datagramNumbers;
-	private final String						RECORD_SET_NAME	= ") Flugaufzeichnung";
-	private PicolarioSerialPort			serialPort;
-	private Picolario								device;
-	private CalculationThread				calculationThread;
-	private boolean									threadStop			= false;
+	private OpenSerialDataExplorer		application;
+	private String[]									datagramNumbers;
+	private final String							RECORD_SET_NAME	= ") Flugaufzeichnung";
+	private final PicolarioSerialPort	serialPort;
+	private final PicolarioDialog			dialog;
+	private final Picolario						device;
+	private CalculationThread					calculationThread;
+	private boolean										threadStop			= false;
 
 	/**
 	 * 
@@ -50,6 +50,7 @@ public class DataGathererThread extends Thread {
 		this.application = application;
 		this.device = device;
 		this.serialPort = serialPort;
+		this.dialog = device.getDialog();
 		this.datagramNumbers = datagramNumbers;
 	}
 
@@ -62,15 +63,14 @@ public class DataGathererThread extends Thread {
 	public void run() {
 		try {
 			log.fine("entry data gatherer");
-			StatusBar statusBar = application.getStatusBar();
-			int progressBarMacroSteps = 100 / datagramNumbers.length;
-			statusBar.updateProgressbar(0);
 			Channel channel = Channels.getInstance().getActiveChannel();
 			String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
+			dialog.resetDataSetsLabel();
 			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
-				device.getDialog().resetTelegramLabel();
+				dialog.resetTelegramLabel();
+				dialog.setAlreadyRedDataSets(datagramNumbers[j]);
 				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), device);
 				recordSetKey = (channel.size() + 1) + RECORD_SET_NAME;
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
@@ -93,15 +93,14 @@ public class DataGathererThread extends Thread {
 				calculationThread.start();
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);
-				if (channel.getRecordSetNames().length <= 1 || device.getDialog().isDoSwtichRecordSet())
+				if (channel.getRecordSetNames().length <= 1 || dialog.isDoSwtichRecordSet())
 					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
 
 				// update the progress bar reading one after the other only
-				statusBar.updateProgressbar(progressBarMacroSteps * (j + 1));
 				channel.get(recordSetKey).setAllDisplayable();
 				channel.applyTemplate(recordSetKey);
 			}// end for
-			device.getDialog().enableReadButtons();
+			dialog.enableReadButtons();
 			log.fine("exit data gatherer");
 
 		}
@@ -113,6 +112,7 @@ public class DataGathererThread extends Thread {
 
 	public void setThreadStop(boolean threadStop) {
 		this.threadStop = threadStop;
+		this.serialPort.setTransmitFinished(true);
 	}
 
 }
