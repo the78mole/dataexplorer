@@ -586,6 +586,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						application.setMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), false);
+						application.setStatusMessage("");
 					}
 				}
 			});
@@ -599,6 +600,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						application.setDeltaMeasurementActive((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME), false);
+						application.setStatusMessage("");
 					}
 				}
 			});

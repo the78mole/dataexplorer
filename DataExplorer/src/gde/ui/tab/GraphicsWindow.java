@@ -437,11 +437,11 @@ public class GraphicsWindow {
 							}
 							else if (isLeftMouseMeasure) {
 								isLeftMouseMeasure = false;
-								application.setStatusMessage("");
+								//application.setStatusMessage("");
 							}
 							else if (isRightMouseMeasure) {
 								isRightMouseMeasure = false;
-								application.setStatusMessage("");
+								//application.setStatusMessage("");
 							}
 							if(log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + isLeftMouseMeasure + " isMouseDeltaMeasure = " + isRightMouseMeasure);
 						}
@@ -844,6 +844,7 @@ public class GraphicsWindow {
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
+			application.setStatusMessage("");
 			break;
 		}
 	}
