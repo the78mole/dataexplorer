@@ -404,9 +404,11 @@ public class GraphicsWindow {
 							
 							if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey)) && xPosMeasure + 1 >= xDown && xPosMeasure - 1 <= xDown) { // snap mouse pointer
 								isLeftMouseMeasure = true;
+								isRightMouseMeasure = false;
 							}
 							else if(measureRecordKey != null && recordSet.isDeltaMeasurementMode(measureRecordKey) && xPosDelta + 1 >= xDown && xPosDelta - 1 <= xDown) { // snap mouse pointer
 								isRightMouseMeasure = true;
+								isLeftMouseMeasure = false;
 							}
 							else {
 								isLeftMouseMeasure = false;
