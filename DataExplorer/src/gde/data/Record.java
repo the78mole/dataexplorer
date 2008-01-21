@@ -458,6 +458,8 @@ public class Record extends Vector<Integer> {
 	 */
 	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
+		scaledIndex = parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - parent.getRecordZoomOffset() -1 : scaledIndex;
+		if (log.isLoggable(Level.FINER))log.finer("scaledIndex = " + scaledIndex);
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
 		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height-1 : pointY;
