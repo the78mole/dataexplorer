@@ -167,64 +167,66 @@ public class TimeLine {
 		int timeDelta = endTimeValue - startTimeValue;
 		if (log.isLoggable(Level.FINE)) log.fine("timeDelta = " + timeDelta + " startTime = " + startTimeValue + " endTime = " + endTimeValue);
 		
-		// calculate a scale factor, a big time difference would have to much ticks
-		if (timeDelta >= 0 && timeDelta < 100 && scaleFactor == 1000) {
-			numberTicks = timeDelta ; // every 1'th units one tick
-			scaleFactor = scaleFactor/10;
-			if (log.isLoggable(Level.FINER)) log.fine("0 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
-		}
-		else if (timeDelta >= 10 && timeDelta < 60 && scaleFactor == 10) {
-			numberTicks = timeDelta / 5.0; // every 5 th units one tick
-			scaleFactor = scaleFactor * 2;
-			if (log.isLoggable(Level.FINER)) log.fine("1 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
-		}
-		else {
-			numberTicks = timeDelta / 10.0; // every 10th units one tick
-			if (log.isLoggable(Level.FINER)) log.fine("2 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
-		}
-		
-		double deltaTick = 1.0 * width / numberTicks;
-		miniticks++;
-		
-		// calculate the space required to draw the time values
-		Point pt = gc.textExtent("00");
-		
-		for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
-			
-			//draw the main scale ticks, length = 5 and gap to scale = 2
-			double xTickPosition = x0 + i * deltaTick;
-			int intXTickPosition = new Double(xTickPosition).intValue();
-			gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
+		if (timeDelta > 0) {
+			// calculate a scale factor, a big time difference would have to much ticks
+			if (timeDelta >= 0 && timeDelta < 100 && scaleFactor == 1000) {
+				numberTicks = timeDelta; // every 1'th units one tick
+				scaleFactor = scaleFactor / 10;
+				if (log.isLoggable(Level.FINER)) log.fine("0 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			}
+			else if (timeDelta >= 10 && timeDelta < 60 && scaleFactor == 10) {
+				numberTicks = timeDelta / 5.0; // every 5 th units one tick
+				scaleFactor = scaleFactor * 2;
+				if (log.isLoggable(Level.FINER)) log.fine("1 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			}
+			else {
+				numberTicks = timeDelta / 10.0; // every 10th units one tick
+				if (log.isLoggable(Level.FINER)) log.fine("2 numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			}
 
-			//draw the sub ticks to the scale according number of miniTicks
-			double deltaPosMini = deltaTick / miniticks;
-			for (int j = 1; j < miniticks && i < numberTicks; j++) {
-				double xMiniTickPos = (xTickPosition + j * deltaPosMini);
-				int intMiniTickPos = new Double(xMiniTickPos).intValue();
-				if (log.isLoggable(Level.FINEST)) log.finest("intXTickPosition=" + intXTickPosition + ", width=" + width);
-				if (intMiniTickPos < (x0 + width)) {
-					gc.drawLine(intMiniTickPos, y0, intMiniTickPos, y0 + ticklength / 2);
+			double deltaTick = 1.0 * width / numberTicks;
+			miniticks++;
+
+			// calculate the space required to draw the time values
+			Point pt = gc.textExtent("00");
+
+			for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
+
+				//draw the main scale ticks, length = 5 and gap to scale = 2
+				double xTickPosition = x0 + i * deltaTick;
+				int intXTickPosition = new Double(xTickPosition).intValue();
+				gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
+
+				//draw the sub ticks to the scale according number of miniTicks
+				double deltaPosMini = deltaTick / miniticks;
+				for (int j = 1; j < miniticks && i < numberTicks; j++) {
+					double xMiniTickPos = (xTickPosition + j * deltaPosMini);
+					int intMiniTickPos = new Double(xMiniTickPos).intValue();
+					if (log.isLoggable(Level.FINEST)) log.finest("intXTickPosition=" + intXTickPosition + ", width=" + width);
+					if (intMiniTickPos < (x0 + width)) {
+						gc.drawLine(intMiniTickPos, y0, intMiniTickPos, y0 + ticklength / 2);
+					}
 				}
-			}
-			//draw values to the scale	
-			int timeValue = i * 100 / scaleFactor; 
-			
-			// prepare to make every minute or hour to bold
-			boolean isMod60 = (timeValue % 60) == 0;
-			int timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60;  // minute, hour
-			if (log.isLoggable(Level.FINER)) log.finer("timeValue = " + timeValue + ", timeValue60 = " + timeValue60);
-			
-			String numberStr = new Integer(timeValue60).toString();
-			FontData[] fd = gc.getFont().getFontData();
-			if (isMod60 && timeValue != 0)	{
-				fd[0].setStyle(SWT.BOLD);
-				gc.setFont(SWTResourceManager.getFont(fd[0]));
-			}
-			
-			GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
-			if (isMod60 && timeValue != 0)	{ // reset font style
-				fd[0].setStyle(SWT.NORMAL);
-				gc.setFont(SWTResourceManager.getFont(fd[0]));
+				//draw values to the scale	
+				int timeValue = i * 100 / scaleFactor;
+
+				// prepare to make every minute or hour to bold
+				boolean isMod60 = (timeValue % 60) == 0;
+				int timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
+				if (log.isLoggable(Level.FINER)) log.finer("timeValue = " + timeValue + ", timeValue60 = " + timeValue60);
+
+				String numberStr = new Integer(timeValue60).toString();
+				FontData[] fd = gc.getFont().getFontData();
+				if (isMod60 && timeValue != 0) {
+					fd[0].setStyle(SWT.BOLD);
+					gc.setFont(SWTResourceManager.getFont(fd[0]));
+				}
+
+				GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+				if (isMod60 && timeValue != 0) { // reset font style
+					fd[0].setStyle(SWT.NORMAL);
+					gc.setFont(SWTResourceManager.getFont(fd[0]));
+				}
 			}
 		}
 	}
