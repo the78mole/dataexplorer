@@ -78,7 +78,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param channelName assuming p.e. " 1 : Ausgang"
 	 */
 	public synchronized void switchChannel(String channelName) {
-		this.getActiveChannel().getActiveRecordSet().reset();
+		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) recordSet.reset();
 		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue());
 	}
 
@@ -88,7 +89,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public synchronized void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);		
-		this.getActiveChannel().getActiveRecordSet().reset();
+		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) recordSet.reset();
 		if (channelNumber != this.getActiveChannelNumber()) {
 			this.setActiveChannelNumber(channelNumber);
 			application.getMenuToolBar().updateChannelToolItems();
