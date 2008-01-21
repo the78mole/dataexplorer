@@ -382,9 +382,8 @@ public class RecordSet extends HashMap<String, Record> {
 				MenuToolBar menuToolBar = application.getMenuToolBar();
 				String[] recordSetNames = menuToolBar.updateRecordSetSelectCombo();
 				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-				//application.getGraphicsWindow().redrawGrahics();
 				application.updateDataTable();
-				application.updateDigitalWindow();
+				application.updateDigitalWindowChilds();
 				for (int i = 0; i < recordSetNames.length; i++) {
 					if (recordSetNames[i].equals(recordSetKey)) {
 						menuToolBar.getRecordSelectCombo().select(i);
