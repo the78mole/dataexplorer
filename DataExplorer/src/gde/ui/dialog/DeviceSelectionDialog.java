@@ -709,9 +709,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 			// com port adjustments group
 			baudeSelectLabel.setText(new Integer(activeDeviceConfig.getBaudeRate()).toString());
-			stopBitsSelectLabel.setText(new Integer(activeDeviceConfig.getDataBits()).toString());
-			paritySelectLabel.setText(new Integer(activeDeviceConfig.getParity()).toString());
 			dataBitsSelectLabel.setText(new Integer(activeDeviceConfig.getDataBits()).toString());
+			stopBitsSelectLabel.setText(new Integer(activeDeviceConfig.getStopBits()).toString());
+			paritySelectLabel.setText(new Integer(activeDeviceConfig.getParity()).toString());
 			flowControlSelectLabel.setText(new Integer(activeDeviceConfig.getFlowCtrlMode()).toString());
 			dtrCheckBox.setSelection(activeDeviceConfig.isDTR());
 			rtsCheckBox.setSelection(activeDeviceConfig.isRTS());

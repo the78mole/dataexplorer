@@ -33,7 +33,7 @@ public class SerialPortType {
 	private final int					stopBits;
 	private final int					flowControlMode;
 	private final boolean			isRTS;
-	private final boolean			isDTS;
+	private final boolean			isDTR;
 	private final TimeOutType	timeOut;
 	private DataBlockType			dataBlock;
 
@@ -68,7 +68,7 @@ public class SerialPortType {
 		this.stopBits = getStopBits(XMLUtils.getTextValue(element, "stopBits"));
 		this.flowControlMode = getFlowControlMode(XMLUtils.getTextValue(element, "flowControlMode"));
 		this.isRTS = XMLUtils.getBooleanValue(element, "isRTS");
-		this.isDTS = XMLUtils.getBooleanValue(element, "isDTS");
+		this.isDTR = XMLUtils.getBooleanValue(element, "isDTR");
 
 		TimeOutType to = new TimeOutType(); // optional element
 		NodeList timeOutNodeList = element.getElementsByTagName("TimeOut");
@@ -102,7 +102,7 @@ public class SerialPortType {
 		this.stopBits = stopBits;
 		this.flowControlMode = flowControlMode;
 		this.isRTS = isRTS;
-		this.isDTS = isDTS;
+		this.isDTR = isDTS;
 		this.timeOut = new TimeOutType();
 		this.dataBlock = new DataBlockType();
 	}
@@ -115,7 +115,7 @@ public class SerialPortType {
 		this.stopBits = stopBits;
 		this.flowControlMode = flowControlMode;
 		this.isRTS = isRTS;
-		this.isDTS = isDTS;
+		this.isDTR = isDTS;
 		this.timeOut = new TimeOutType();
 		this.dataBlock = dataBlock;
 	}
@@ -128,14 +128,14 @@ public class SerialPortType {
 		this.stopBits = stopBits;
 		this.flowControlMode = flowControlMode;
 		this.isRTS = isRTS;
-		this.isDTS = isDTS;
+		this.isDTR = isDTS;
 		this.timeOut = timeOut;
 		this.dataBlock = dataBlock;
 	}
 
 	public String toString() {
 		return String.format("<SerialPort> port = %s, baudeRate = %d, dataBits = %d, parity = %d, stopBits = %d, flowControlMode = %d, isRTS = %s, isDTS = %s, %s, %s", port, baudeRate, dataBits, parity,
-				stopBits, flowControlMode, isRTS, isDTS, dataBlock.toString(), timeOut.toString());
+				stopBits, flowControlMode, isRTS, isDTR, dataBlock.toString(), timeOut.toString());
 	}
 
 	/**
@@ -212,8 +212,8 @@ public class SerialPortType {
 	/**
 	 * @return the isDTS
 	 */
-	public boolean isDTS() {
-		return isDTS;
+	public boolean isDTR() {
+		return isDTR;
 	}
 
 	/**

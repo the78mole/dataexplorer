@@ -348,7 +348,7 @@ public class DeviceConfiguration {
 	}
 
 	public boolean isDTR() {
-		return this.serialPort.isDTS();
+		return this.serialPort.isDTR();
 	}
 
 	public boolean isRTS() {
