@@ -172,7 +172,7 @@ public class MenuToolBar {
 			menuCoolItem.setSize(size);
 			menuCoolItem.setPreferredSize(size);
 			menuCoolItem.setMinimumSize(size);
-			log.info("fileToolBar.size = " + size);
+			log.fine("fileToolBar.size = " + size);
 		} // end file cool item
 
 		{ // begin device cool item
@@ -581,10 +581,10 @@ public class MenuToolBar {
 			dataBarComposite.pack();
 			int height = size.y;
 			size = dataBarComposite.getSize();
-			log.info("pre dataBarComposite.size = " + size);
+			log.fine("pre dataBarComposite.size = " + size);
 			dataBarComposite.setSize(size.x, height);
 			size = dataBarComposite.getSize();
-			log.info("post dataBarComposite.size = " + size);
+			log.fine("post dataBarComposite.size = " + size);
 			dataCoolItem.setSize(size);
 			dataCoolItem.setPreferredSize(size);
 			dataCoolItem.setMinimumSize(size);
