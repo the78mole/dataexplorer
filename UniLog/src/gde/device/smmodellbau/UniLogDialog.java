@@ -37,8 +37,8 @@ import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.device.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 
-import com.cloudgarden.resource.SWTResourceManager;
 
 /**
 * This code was edited or generated using CloudGarden's Jigloo

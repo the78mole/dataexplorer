@@ -146,7 +146,7 @@ public class Checksum {
 	}
 
 	/**
-	 * calculate XOR bit operation
+	 * calculate AND bit operation
 	 * @param b byte array to compute
 	 * @return 8-bit result
 	 */
@@ -157,4 +157,19 @@ public class Checksum {
 		}
 		return (byte) value;
 	}
+	
+	/**
+	 * calculate ADD operation
+	 * @param b byte array to compute
+	 * @param len length of checksum if part of the byte array
+	 * @return 16-bit result
+	 */
+	public static int ADD(byte[] b, int len) {
+		int value = b[0] & 0xFF;
+		for (int i = 1; i < b.length - len; i++) {
+			value = value  + (b[i] & 0xFF);
+		}
+		return value;
+	}
+
 }
