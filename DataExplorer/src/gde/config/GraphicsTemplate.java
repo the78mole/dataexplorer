@@ -18,11 +18,10 @@ package osde.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -80,13 +79,10 @@ public class GraphicsTemplate extends Properties {
 			log.fine("template file successful loaded " + currentFileFilePath);
 		}
 		catch (InvalidPropertiesFormatException e) {
-			log.severe(e.getMessage());
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		catch (FileNotFoundException e) {
-			log.info(e.getMessage());
-		}
-		catch (IOException e) {
-			log.warning(e.getMessage());
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 	}
 
@@ -107,13 +103,10 @@ public class GraphicsTemplate extends Properties {
 			newFileName = null;
 		}
 		catch (InvalidPropertiesFormatException e) {
-			log.severe(e.getMessage());
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		catch (FileNotFoundException e) {
-			log.info(e.getMessage());
-		}
-		catch (IOException e) {
-			log.warning(e.getMessage());
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 	}
 
