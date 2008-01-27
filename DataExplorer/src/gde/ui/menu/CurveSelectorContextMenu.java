@@ -25,7 +25,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -47,7 +46,7 @@ import osde.ui.tab.GraphicsWindow;
 public class CurveSelectorContextMenu {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
 
-	private Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu;
+	private Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu;
 	private MenuItem											lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	private MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
 	private MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
@@ -55,6 +54,7 @@ public class CurveSelectorContextMenu {
 	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2;
 	private MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
 	private MenuItem 											measure, deltaMeasure;
+	private MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60, timeGridLineStyle;
 
 	private RecordSet											recordSet;
 	private final OpenSerialDataExplorer	application;
@@ -137,7 +137,7 @@ public class CurveSelectorContextMenu {
 						String recordNameKey = selectedItem.getText();
 						RGB rgb = application.openColorDialog();
 						if (rgb != null) {
-							Color color = new Color(Display.getCurrent(), rgb);
+							Color color = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
 							selectedItem.setForeground(color);
 							recordSet.getRecord(recordNameKey).setColor(color);
 							application.updateGraphicsWindow();
@@ -575,6 +575,106 @@ public class CurveSelectorContextMenu {
 			});
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
+
+			timeGrid = new MenuItem(popupmenu, SWT.CASCADE);
+			timeGrid.setText("Zeit-Grid(vertical)");
+			timeGridMenu = new Menu(timeGrid);
+			timeGrid.setMenu(timeGridMenu);
+			timeGridMenu.addMenuListener(new MenuListener() {
+				public void menuShown(MenuEvent evt) {
+					log.finest("timeGridMenu MenuListener " + evt);
+					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						int gridType = recordSet.getGridType();
+						switch (gridType) {
+						case RecordSet.TIME_GRID_MAIN:
+							timeGridOff.setSelection(false);
+							timeGridMain.setSelection(true);
+							timeGridMod60.setSelection(false);
+							break;
+						case RecordSet.TIME_GRID_MOD60:
+							timeGridOff.setSelection(false);
+							timeGridMain.setSelection(false);
+							timeGridMod60.setSelection(true);
+							break;
+						case RecordSet.TIME_GRID_NONE:
+						default:
+							timeGridOff.setSelection(true);
+							timeGridMain.setSelection(false);
+							timeGridMod60.setSelection(false);
+							break;
+						}
+					}
+				}
+				public void menuHidden(MenuEvent evt) {
+				}
+			});
+
+			timeGridOff = new MenuItem(timeGridMenu, SWT.CHECK);
+			timeGridOff.setText("aus");
+			timeGridOff.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("timeGridOff Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setGridType(RecordSet.TIME_GRID_NONE);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			timeGridMain = new MenuItem(timeGridMenu, SWT.CHECK);
+			timeGridMain.setText("jede Zeitmarke");
+			timeGridMain.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("timeGridMain Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setGridType(RecordSet.TIME_GRID_MAIN);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			timeGridMod60 = new MenuItem(timeGridMenu, SWT.CHECK);
+			timeGridMod60.setText("jede Zeitmarke mod 60");
+			timeGridMod60.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("timeGridMod60 Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setGridType(RecordSet.TIME_GRID_MOD60);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			timeGridColor = new MenuItem(timeGridMenu, SWT.PUSH);
+			timeGridColor.setText("Linienfarbe");
+			timeGridColor.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("timeGridColor Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						RGB rgb = application.openColorDialog();
+						if (rgb != null) {
+							recordSet.setColorTimeGrid(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							application.updateGraphicsWindow();
+						}
+					}
+				}
+			});
+			timeGridLineStyle = new MenuItem(timeGridMenu, SWT.PUSH);
+			timeGridLineStyle.setText("Linientype");
+			timeGridLineStyle.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("timeGridLineStyle Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setGridType(RecordSet.TIME_GRID_MOD60);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+
+			new MenuItem(popupmenu, SWT.SEPARATOR);
 			
 			measure = new MenuItem(popupmenu, SWT.CHECK);
 			measure.setText("Kurvenpunkt messen");
@@ -686,6 +786,7 @@ public class CurveSelectorContextMenu {
 		axisEndValues.setEnabled(enabled);
 		axisNumberFormat.setEnabled(enabled);
 		axisPosition.setEnabled(enabled);
+		timeGrid.setEnabled(enabled);
 		measure.setEnabled(enabled);
 		deltaMeasure.setEnabled(enabled);
 		copyCurveCompare.setEnabled(enabled);

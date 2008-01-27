@@ -570,12 +570,13 @@ public class GraphicsWindow {
 		curveAreaGC.setBackground(canvasGC.getBackground());
 		curveAreaGC.fillRectangle(curveArea.getBounds());
 		
-		// draw clipping bounding 
+		// draw draw area bounding 
 		curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 		curveAreaGC.drawLine(0, 0, width, 0);
 		curveAreaGC.drawLine(0, 0, 0, height-1);
 		curveAreaGC.drawLine(width-1, 0, width-1, height-1);
 
+		// draw each record
 		for (String record : recordSet.getRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
 			log.fine("drawing record = " + actualRecord.getName());
@@ -584,7 +585,16 @@ public class GraphicsWindow {
 				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet());
 			}
 		}
+		// check for activated time grid
+		if (recordSet.getGridType() > 0) {
+			curveAreaGC.setForeground(recordSet.getColorTimeGrid());
+			curveAreaGC.setLineStyle(recordSet.getLineStyleTimeGrid());
+			for (Integer x : recordSet.getTimeGrid()) {
+				curveAreaGC.drawLine(x-offSetX, 0, x-offSetX, height-1);
+			}
+		}
 		canvasGC.drawImage(curveArea, offSetX = x0, offSetY = y0-height);
+		
 
 		if (startTime != 0) { // scaled window 
 			String strStartTime = "Ausschnittsbeginn bei " + TimeLine.getFomatedTime(recordSet.getStartTime());
@@ -597,7 +607,7 @@ public class GraphicsWindow {
 	/**
 	 * redraws the graphics canvas as well as the curve selector table
 	 */
-	public void redrawGrahics() {
+	public void redrawGraphics() {
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				updateCurveSelectorTable();
@@ -786,7 +796,7 @@ public class GraphicsWindow {
 				|| (yPosMeasure != 0 && (yPosMeasure < offSetY || yPosMeasure > offSetY + curveAreaBounds.height))
 				|| (xPosDelta != 0 && (xPosDelta < offSetX || xPosDelta > offSetX + curveAreaBounds.width))
 				|| (yPosDelta != 0 && (yPosDelta < offSetY || yPosDelta > offSetY + curveAreaBounds.height))	) {
-			this.redrawGrahics();
+			this.redrawGraphics();
 			xPosMeasure = xPosDelta = 0;
 		}
 		else {

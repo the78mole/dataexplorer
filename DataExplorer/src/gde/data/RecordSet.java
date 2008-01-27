@@ -25,6 +25,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -70,6 +71,17 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	// measurement
 	private String 												recordKeyMeasurement;
+	
+	public static final String						TIME_GRID_STATE				= "RecordSet_timeGridState";
+	public static final String						TIME_GRID_COLOR				= "RecordSet_timeGridColor";
+	public static final String						TIME_GRID_LINE_SYSLE	= "RecordSet_timeGridLineStyle";
+	public static final int								TIME_GRID_NONE				= 0;																						// no time grid
+	public static final int								TIME_GRID_MAIN				= 1;																						// each main tickmark
+	public static final int								TIME_GRID_MOD60				= 2;																						// each mod60 tickmark
+	private int														gridType							= TIME_GRID_NONE;
+	private Vector<Integer>								timeGrid 							= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
+	private Color													colorTimeGrid					= OpenSerialDataExplorer.COLOR_GREY;
+	private int														lineStyleTimeGrid			= new Integer(SWT.LINE_DOT);
 	
 	/**
 	 * data buffers according the size of given names array, where
@@ -722,5 +734,61 @@ public class RecordSet extends HashMap<String, Record> {
 			double maxZoomScaleValue = record.getMaxScaleValue() + yShift;
 			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
 		}
+	}
+
+	/**
+	 * @return the gridType
+	 */
+	public int getGridType() {
+		return gridType;
+	}
+
+	/**
+	 * @param gridType the gridType to set
+	 */
+	public void setGridType(int gridType) {
+		this.gridType = gridType;
+	}
+
+	/**
+	 * @return the timeGrid
+	 */
+	public Vector<Integer> getTimeGrid() {
+		return timeGrid;
+	}
+
+	/**
+	 * @param timeGrid the timeGrid to set
+	 */
+	public void setTimeGrid(Vector<Integer> timeGrid) {
+		this.timeGrid = timeGrid;
+	}
+
+	/**
+	 * @return the colorTimeGrid
+	 */
+	public Color getColorTimeGrid() {
+		return colorTimeGrid;
+	}
+
+	/**
+	 * @param colorTimeGrid the colorTimeGrid to set
+	 */
+	public void setColorTimeGrid(Color colorTimeGrid) {
+		this.colorTimeGrid = colorTimeGrid;
+	}
+
+	/**
+	 * @return the lineStyleTimeGrid
+	 */
+	public int getLineStyleTimeGrid() {
+		return lineStyleTimeGrid;
+	}
+
+	/**
+	 * @param lineStyleTimeGrid the lineStyleTimeGrid to set
+	 */
+	public void setLineStyleTimeGrid(int lineStyleTimeGrid) {
+		this.lineStyleTimeGrid = lineStyleTimeGrid;
 	}
 }
