@@ -413,6 +413,7 @@ public class PicolarioDialog extends DeviceDialog {
 								break;
 							}
 							application.updateGraphicsWindow();
+							application.updateDigitalWindowChilds();
 							application.updateDataTable();
 						}
 					});
