@@ -1,20 +1,17 @@
 package osde.device.smmodellbau;
 
 import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.TooManyListenersException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
-import osde.exception.CheckSumMissmatchExcption;
+import osde.exception.CheckSumMissmatchException;
 import osde.ui.StatusBar;
 import osde.utils.Checksum;
 
@@ -25,48 +22,35 @@ import osde.utils.Checksum;
 public class UniLogSerialPort extends DeviceSerialPort {
 	private static Logger					log											= Logger.getLogger(UniLogSerialPort.class.getName());
 
-	private final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };																																															// 'T' auf die Bereitschaft vom UniLog warten
-	private final static byte[]		COMMAND_RESET						= { 0x72 };																																															// 'r' "Reset" zum UniLog schicken (damit sendet der UniLog die Daten von Anfang an)
-	private final static byte[]		COMMAND_READ_DATA				= { 0x6C };																																															// 'l' "Lesen" zum UniLog schicken (der UniLog schickt dann einen Datensatz)
-	private final static byte[]		COMMAND_REPEAT					= { 0x77 };																																															// 'w' "Wiederholen": UniLog schickt den selben Datensatz nochmal
-	private final static byte[]		COMMAND_PREPARE_DELETE	= { 0x78, 0x79, 0x31 };																																									// "xy1"
+	public final static String 		NUMBER_RECORD						= "number_record";
+	public final static String 		TIME_MILLI_SEC					= "time_ms";
+	
+	private final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
+	private final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
+	private final static byte[]		COMMAND_READ_DATA				= { 0x6C };		// 'l' UniLog read request, answer is one data set (telegram)
+	private final static byte[]		COMMAND_REPEAT					= { 0x77 };		// 'w' repeat data transmission, UniLog re-send same data set (telegram)
 	private final static byte[]		COMMAND_DELETE					= { (byte) 0xC0, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 };
 	private final static byte[]		COMMAND_QUERY_CONFIG		= { (byte) 0xC0, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	private final static byte[]		COMMAND_PREPARE_SET_CONFIG = { 0x78, 0x79, (byte)0xA7 }; // "xyz"
-	private static byte[]					COMMAND_SET_CONFIG 			= { (byte)0xC0 , 0x03, 0x02 };
+	private final static byte[]		COMMAND_LIVE_VALUES			= { 0x76 };		// 'v' query UniLog live values
+	private final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
+	private final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
 
-	private final static byte			DATA_STATE_WAITING			= 0x57;																																																	// 'W' heisst UniLog ist da, muss aber noch den Flash absuchen nach dem Speicherende
-	private final static byte			DATA_STATE_READY				= 0x46;																																																	// 'F' heisst UniLog ist fertig zum Datensenden
-	private final static byte			DATA_STATE_DELETED			= 0x6A;																																																	// 'j' "Speicher im UniLog gelöscht."
+	@SuppressWarnings("unused")
+	private final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
+	@SuppressWarnings("unused")
+	private final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
+	
+	private final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
+	private final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
+	private final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
 
-	private final static int			WERTESAETZE_MAX					= 25920;
-	private final static int			DATENSATZ_BYTES					= 24;																																																		//TODO exchange with deviceConfig.get()
-
-	public final static int				A1_MODUS_TEMPERATUR			= 0;
-	public final static int				A1_MODUS_MILLIVOLT			= 1;
-	public final static int				A1_MODUS_PITOT_250			= 2;
-	public final static int				A1_MODUS_PITOT_450			= 3;
-
-	private String								unilogVersion;
-	private int 									timeIntervalPosition = 0;
-	private int										memoryUsed;
-	private String								memoryUsedPercent;
-	private boolean								isMotorPole							= false;
-	private boolean								isPropBlade							= false;
-	private int										countMotorPole					= 0;
-	private int										countPropBlade					= 0;
-	private boolean								isAutoStartCurrent			= false;
-	private int										currentAutoStart				= 0;
-	private boolean								isAutStartRx						= false;
-	private boolean								isRxOn									= false;
-	private boolean								isImpulseAutoStartTime					= false;
-	private int										impulseAutoStartTime_sec				= 0;
-	private int										currentSensorPosition;
-	private int										serialNumber;
-	private int										modusA1Position;
-	private boolean								isLimiter								= false;
-	private int										limiter									= 0;
-	private double								gearRatio;
+	private final static int			DATENSATZ_BYTES					= 24;			//TODO exchange with deviceConfig.get()
+	
+	private boolean 							isLoggingActive 				= false;
+	private boolean								isLiveViewEnabled				= false;
+	private boolean 							isTransmitFinished			= false;
+	
+	private int 									reveiceErrors 					= 0;
 
 	/**
 	 * constructor of default implementation
@@ -84,123 +68,341 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog) throws IOException {
-		// TODO add some sample code here
-		return null;
+	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device) throws IOException {
+		Vector<Integer> numRecordSet = new Vector<Integer>();
+		Vector<Integer> time_ms = new Vector<Integer>();
+		
+		String[] measurements = device.getMeasurementNames(); 
+		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+		// *** power/drive *** group
+		Vector<Integer> voltageReceiver = new Vector<Integer>();
+		Vector<Integer> voltage = new Vector<Integer>();
+		Vector<Integer> current = new Vector<Integer>();
+		// capacity, power, energy, votagePerCell
+		Vector<Integer> revolutionSpeed = new Vector<Integer>();
+		// efficiency
+		
+		// *** dynamic *** group
+		Vector<Integer> height = new Vector<Integer>();
+		// slope
+
+		// *** A1 - A2 - A3 **** group
+		// A1 Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
+		// A2 Modus == 0 -> external temperature sensor; A2 Modus != 0 -> impulse time length
+		// A3 Modus == 0 -> external temperature sensor; A3 Modus != 0 -> internal temperature
+		Vector<Integer> aModus = new Vector<Integer>();
+		Vector<Integer> a1Value = new Vector<Integer>();
+		Vector<Integer> a2Value = new Vector<Integer>();
+		Vector<Integer> a3Value = new Vector<Integer>();
+		
+		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
+		
+		StringBuilder sb;
+		String lineSep = System.getProperty("line.separator");
+		UniLogDialog dialog = (UniLogDialog)device.getDialog();
+		byte[] readBuffer = new byte[DATENSATZ_BYTES];
+		
+		try {
+			this.open();
+			reveiceErrors = 0;
+
+			// check data ready for read operation
+			if (this.waitDataReady(5)) {
+				// query config to have actual values -> get number of entries to calculate percentage and progress bar
+				this.write(COMMAND_QUERY_CONFIG);
+				readBuffer = this.read(DATENSATZ_BYTES, 5);
+				verifyChecksum(readBuffer);
+				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
+				log.fine("memoryUsed = " + memoryUsed);
+				double progressFactor = 100.0 / memoryUsed;
+				log.fine("progressFactor = " + progressFactor);
+
+				// reset data and prepare for read
+				this.write(COMMAND_RESET);
+
+				if (application != null) dialog.setReadDataProgressBar(0);
+				int tmpValue = 0;
+				int counter = 0;
+				while (!isTransmitFinished && memoryUsed > 0) {
+					--memoryUsed;
+					sb = new StringBuilder();
+					readBuffer = readSingleTelegramm();
+											
+					tmpValue = ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
+					if (log.isLoggable(Level.FINER)) sb.append("time_ms = " + tmpValue).append(lineSep);
+					time_ms.add(tmpValue);
+
+					// number record set
+					tmpValue = (readBuffer[5] & 0xF8) / 8 + 1;
+					if (log.isLoggable(Level.FINER)) sb.append("number record set = " + tmpValue).append(lineSep);
+					numRecordSet.add(tmpValue);
+
+					// voltageReceiver *** power/drive *** group
+					tmpValue = (((readBuffer[7] & 0xFF) << 8) + (readBuffer[6] & 0xFF)) & 0x0FFF;
+					voltageReceiver.add(tmpValue * 10);
+					if (log.isLoggable(Level.FINER)) sb.append("voltageReceiver [mV] = " + tmpValue).append(lineSep);
+
+					// voltage *** power/drive *** group
+					tmpValue = (((readBuffer[9] & 0xFF) << 8) + (readBuffer[8] & 0xFF));
+					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+					voltage.add(tmpValue * 10);
+					if (log.isLoggable(Level.FINER)) sb.append("voltage [mV] = " + tmpValue).append(lineSep);
+
+					// current *** power/drive *** group - asymmetric for 400 A sensor 
+					tmpValue = (((readBuffer[11] & 0xFF) << 8) + (readBuffer[10] & 0xFF));
+					if (tmpValue > 55536) tmpValue = -65536;
+					current.add(tmpValue * 10);
+					if (log.isLoggable(Level.FINER)) sb.append("current [mA] = " + tmpValue).append(lineSep);
+
+					// revolution speed *** power/drive *** group
+					tmpValue = (((readBuffer[13] & 0xFF) << 8) + (readBuffer[12] & 0xFF));
+					if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
+					revolutionSpeed.add(tmpValue * 10);
+					if (log.isLoggable(Level.FINER)) sb.append("revolution speed [1000/min] = " + tmpValue).append(lineSep);
+
+					// height *** power/drive *** group
+					tmpValue = (((readBuffer[15] & 0xFF) << 8) + (readBuffer[14] & 0xFF)) + 20000;
+					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+					height.add(tmpValue * 100);
+					if (log.isLoggable(Level.FINER)) sb.append("height [mm] = " + tmpValue).append(lineSep);
+
+					// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
+					int a1Modus = (readBuffer[7] & 0xF0) >> 4; // 11110000
+					aModus.add(a1Modus);
+					if (log.isLoggable(Level.FINER)) sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
+					tmpValue = (((readBuffer[17] & 0xFF) << 8) + (readBuffer[16] & 0xFF));
+					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+					a1Value.add(tmpValue * 100);
+					if (log.isLoggable(Level.FINER)) sb.append("a1Value [1/1000] = " + tmpValue).append(lineSep);
+
+					// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
+					int a2Modus = (readBuffer[4] & 0x30); // 00110000
+					aModus.add(a2Modus);
+					if (log.isLoggable(Level.FINER)) sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
+					if (a2Modus == 0) {//
+						tmpValue = (((readBuffer[19] & 0xEF) << 8) + (readBuffer[18] & 0xFF));
+						if (tmpValue > 32768) tmpValue = (tmpValue - 65536) * 100;
+						if (log.isLoggable(Level.FINER)) sb.append("a2Value [1/1000] = " + tmpValue).append(lineSep);
+					}
+					else {
+						tmpValue = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[18] & 0xFF)) * 1000;
+						if (log.isLoggable(Level.FINER)) sb.append("impulseTime [us]= " + tmpValue).append(lineSep);
+					}
+					a2Value.add(tmpValue);
+
+					// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
+					int a3Modus = (readBuffer[4] & 0xC0); // 11000000
+					if (log.isLoggable(Level.FINER)) sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
+					tmpValue = (((readBuffer[21] & 0xEF) << 8) + (readBuffer[20] & 0xFF));
+					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+					a3Value.add(tmpValue * 100);
+					if (log.isLoggable(Level.FINER)) {
+						if (a3Modus == 0) {
+							sb.append("a3Value [1/1000] = " + tmpValue).append(lineSep);
+						}
+						else {
+							sb.append("tempIntern [1/1000] = " + tmpValue).append(lineSep);
+						}
+					}
+					++counter;
+					if (application != null) {
+						dialog.setReadDataProgressBar(new Double(counter * progressFactor).intValue());
+						dialog.updateDataGatherProgress(counter, reveiceErrors);
+					}
+
+					if (log.isLoggable(Level.FINER)) { 
+						sb.append("counter = " + counter + " progress = " + new Double(counter * progressFactor).intValue()).append(lineSep);
+						sb.append("--- end data record ---");
+						log.fine(sb.toString());
+					}
+				}
+				
+				// store collected data into hash map
+				dataCollection.put(NUMBER_RECORD, numRecordSet);
+				dataCollection.put(TIME_MILLI_SEC, time_ms);	
+				dataCollection.put(measurements[0], voltageReceiver);				//0=voltageReceiver
+				dataCollection.put(measurements[1], voltage);								//1=voltage
+				dataCollection.put(measurements[2], current);								//2=current
+				dataCollection.put(measurements[7], revolutionSpeed);				//7=revolutionSpeed
+				dataCollection.put(measurements[9], height);								//9=height
+				dataCollection.put(measurements[11], a1Value);							//11=a1Value
+				dataCollection.put(measurements[12], a2Value);							//12=a2Value
+				dataCollection.put(measurements[13], a3Value);							//13=a3Value
+			}
+			else
+				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			//throw e;
+		}
+		finally {
+			this.close();
+			if (statusBar != null) {
+				statusBar.setSerialRxOff();
+				statusBar.setSerialTxOff();
+			}
+		}
+		return dataCollection;
 	}
 
-	//
-	public void setConfiguration() throws Exception {
-		int checkSum = 0;		
+	/**
+	 * read a single telegram to enable live view of measurements
+	 * @return raw byte array of received data
+	 * @throws Exception
+	 */
+	public synchronized byte[] readSingleTelegramm() throws Exception {
+		byte[] readBuffer = new byte[DATENSATZ_BYTES];
+		
+		try {
+			this.write(COMMAND_READ_DATA);
+			readBuffer = this.read(DATENSATZ_BYTES, 5);
+			
+			// give it another try
+			if (!isChecksumOK(readBuffer)) {
+				++reveiceErrors;
+				this.write(COMMAND_REPEAT);
+				readBuffer = this.read(DATENSATZ_BYTES, 5);
+				verifyChecksum(readBuffer); // throws exception if checksum miss match
+			}
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		
+		return readBuffer;
+	}
+	
+	/**
+	 * enable live data view, another timer loop must gather the data, this is the switch on only
+	 * @return
+	 * @throws Exception
+	 */
+	public synchronized boolean startLiveView() throws Exception {
+		isLiveViewEnabled = false;
 		try {
 			this.open();
 			// check device connected
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
 				if (this.checkDataReady()) {
-					this.write(COMMAND_PREPARE_SET_CONFIG);
-					checkSum = checkSum + 0x03 + 0x02;
 
-/*
-    If IsNull(Speicherrate_Box.Value) Then
-        Speicherrate_Box.Value = 2
-    End If
-    Ser.WriteHex = Speicherrate_Box.Value
-    Checksumme = Checksumme + Speicherrate_Box.Value
-    
-    If IsNull(Blattzahl_Auswahl.Value) Then
-        Blattzahl_Auswahl.Value = 2
-    End If
-    If Option_Pole.Value = True Then
-        Ser.WriteHex = CInt(Blattzahl_Auswahl.Value) Or &H80
-        Checksumme = Checksumme + (CInt(Blattzahl_Auswahl.Value) Or &H80)
-    Else
-        Ser.WriteHex = Blattzahl_Auswahl.Value
-        Checksumme = Checksumme + Blattzahl_Auswahl.Value
-    End If
-    
-    If IsNull(CheckBox_Autostart.Value) Then
-        CheckBox_Autostart.Value = False
-    End If
-    If CheckBox_Autostart.Value = True Then
-        Ser.WriteHex = CInt(Autostart_Strom_Box.Value) Or &H80
-        Checksumme = Checksumme + (CInt(Autostart_Strom_Box.Value) Or &H80)
-    Else
-        Ser.WriteHex = Autostart_Strom_Box
-        Checksumme = Checksumme + Autostart_Strom_Box
-    End If
-    
-    If IsNull(CheckBox_Empfaengersteuerung.Value) Then
-        CheckBox_Empfaengersteuerung.Value = False
-    End If
-    If CheckBox_Empfaengersteuerung.Value = True Then
-        If Startimpuls_Box.Text = "Rx an" Then
-            Ser.WriteHex = &H80
-            Checksumme = Checksumme + &H80
-        Else
-            Ser.WriteHex = (CInt(Startimpuls_Box.Value) Or &H80) + 11
-            Checksumme = Checksumme + (CInt(Startimpuls_Box.Value) Or &H80) + 11
-        End If
-    Else
-        If Startimpuls_Box.Text = "Rx an" Then
-            Ser.WriteHex = 0
-            Checksumme = Checksumme + 0
-        Else
-            Ser.WriteHex = (Startimpuls_Box + 11)
-            Checksumme = Checksumme + (Startimpuls_Box + 11)
-        End If
-    End If
-   
-    Autostart_Zeit_Box = Autostart_Zeit_Box - Autostart_Zeit_Box Mod 5
-    If IsNull(CheckBox_Autostart_s.Value) Then
-        CheckBox_Autostart_s.Value = False
-    End If
-    If CheckBox_Autostart_s.Value = True Then
-        Ser.WriteHex = CInt(Autostart_Zeit_Box.Value) Or &H80
-        Checksumme = Checksumme + (CInt(Autostart_Zeit_Box.Value) Or &H80)
-    Else
-        Ser.WriteHex = Autostart_Zeit_Box
-        Checksumme = Checksumme + Autostart_Zeit_Box
-    End If
+					this.write(COMMAND_LIVE_VALUES);
+					
+					// ??
+					byte[] readBuffer = this.read(1, 2);
+					if (readBuffer[0] != DATA_STATE_OK) isLiveViewEnabled = true;
+					
+				}
+				else
+					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+			}
+			else
+				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		// closing port must be submitted by other means
+		//finally {
+		//	this.close();
+		//}
+		return isLiveViewEnabled;
+	}
+	
+	/**
+	 * start logging of UniLog
+	 * @return true if logging is enabled
+	 * @throws Exception
+	 */
+	public synchronized boolean startLogging() throws Exception {
+		try {
+			if (!isLoggingActive) {
+				this.open();
+				// check device connected
+				if (this.checkConnectionStatus()) {
+					// check data ready for read operation
+					if (this.checkDataReady()) {
 
-    Ser.WriteHex = (CInt(Stromsensor_Box.Value))
-    Checksumme = Checksumme + (CInt(Stromsensor_Box.Value))
-       
-    Ser.WriteHex = (CInt(A1_Modus_Box.Value))
-    Checksumme = Checksumme + (CInt(A1_Modus_Box.Value))
-       
-    If IsNull(CheckBox_Limiter.Value) Then
-        CheckBox_Limiter.Value = False
-    End If
-    If CheckBox_Limiter.Value = True Then
-        Ser.WriteHex = CInt((Limiter_Wert_Box.Value And &HFF00) / 256) Or &H80
-        Ser.WriteHex = CInt(Limiter_Wert_Box.Value And &HFF)
-        Checksumme = Checksumme + (CInt((Limiter_Wert_Box.Value And &HFF00) / 256) Or &H80) + CInt(Limiter_Wert_Box.Value And &HFF)
-    Else
-        Ser.WriteHex = CInt((Limiter_Wert_Box.Value And &HFF00) / 256)
-        Ser.WriteHex = Limiter_Wert_Box.Value And &HFF
-        Checksumme = Checksumme + CInt((Limiter_Wert_Box.Value And &HFF00) / 256) + (Limiter_Wert_Box.Value And &HFF)
-    End If
-    
-    If IsNull(Getriebe_Faktor_Box.Value) Then
-        Getriebe_Faktor_Box.Value = 10
-    End If
-    Ser.WriteHex = Getriebe_Faktor_Auswahl.Value
-    Checksumme = Checksumme + Getriebe_Faktor_Auswahl.Value
-    
-    Ser.WriteHex = &H0                  'Platzhalter für Erweiterungen
-    
-    Checksumme = Checksumme Mod 256     'ist nur ein Byte im UniLog
-    Ser.WriteHex = Checksumme
-    
-    If (Ser.ReadLine = "j") Then
-        Status_Box.Value = "Einstellungen gesetzt."
-        Einstellungen_setzen.BackColor = &HFFFFC0
-    Else
-        Status_Box.Value = "Fehler beim Übertragen."
-    End If
+						this.write(COMMAND_START_LOGGING);
+						byte[] readBuffer = this.read(1, 2);
+						if (readBuffer[0] != DATA_STATE_OK) isLoggingActive = true;
 
- */					
+					}
+					else
+						throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+				}
+				else
+					throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			this.close();
+		}
+		return isLoggingActive;
+	}
+	
+	/**
+	 * stop logging activity of UniLog
+	 * @return true if logging is disabled
+	 * @throws Exception
+	 */
+	public synchronized boolean stopLogging() throws Exception {
+		try {
+			if (isLoggingActive) {
+				this.open();
+				// check device connected
+				if (this.checkConnectionStatus()) {
+					// check data ready for read operation
+					if (this.checkDataReady()) {
+
+						this.write(COMMAND_STOP_LOGGING);
+						byte[] readBuffer = this.read(1, 2);
+						if (readBuffer[0] != DATA_STATE_OK) isLoggingActive = false;
+
+					}
+					else
+						throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+				}
+				else
+					throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			this.close();
+		}
+		return !isLoggingActive;
+	}
+	
+	/**
+	 * clears the flash memory of UniLog
+	 * @return true for successful operation
+	 * @throws Exception
+	 */
+	public synchronized boolean clearMemory() throws Exception {
+		boolean success = false;
+		try {
+			this.open();
+			// check device connected
+			if (this.checkConnectionStatus()) {
+				// check data ready for read operation
+				if (this.checkDataReady()) {
+					//this.write(COMMAND_PREPARE_DELETE);
+
+					this.write(COMMAND_DELETE);
+					byte[] readBuffer = this.read(1, 2);
+					if (readBuffer[0] != DATA_STATE_OK) success = true;
+					
 				}
 				else
 					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
@@ -215,15 +417,52 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		finally {
 			this.close();
 		}
+		return success;
+	}
+	/**
+	 * set UniLog configuration with new values
+	 * @param updateBuffer, byte array to be written
+	 * @return true | false for state of the operation
+	 * @throws Exception
+	 */
+	public synchronized boolean setConfiguration(byte[] updateBuffer) throws Exception {
+		boolean success = false;
+		try {
+			this.open();
+			// check device connected
+			if (this.checkConnectionStatus()) {
+				// check data ready for read operation
+				if (this.checkDataReady()) {
+					//this.write(COMMAND_PREPARE_SET_CONFIG);
+
+					this.write(updateBuffer);
+					byte[] readBuffer = this.read(1, 2);
+					if (readBuffer[0] == DATA_STATE_OK) success = true;
+					
+				}
+				else
+					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+			}
+			else
+				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			this.close();
+		}
+		return success;
 	}
 	
 	/**
 	 * query the configuration information from UniLog
+	 * @return byte array containing the configuration information 
 	 * @throws Exception
 	 */
-	public void readConfiguration() throws Exception {
-		int checkSum = 0;
-		int checkSumLast2Bytes = 0;
+	public synchronized byte[] readConfiguration() throws Exception {
+		byte[] readBuffer = new byte[DATENSATZ_BYTES];
 		try {
 			this.open();
 
@@ -233,87 +472,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_CONFIG);
-					byte[] readBuffer = this.read(24, 5);
+					readBuffer = this.read(DATENSATZ_BYTES, 5);
 
-					// verify checksum
-					checkSum = Checksum.ADD(readBuffer, 2) + 1;
-					log.finer("checkSum = " + checkSum);
-					checkSumLast2Bytes = getCheckSum(readBuffer);
-					log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes);
-
-					if (checkSum == checkSumLast2Bytes) {
-						// valid data set -> set values
-						memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-						log.finer("memoryUsed = " + memoryUsed);
-
-						unilogVersion = String.format("%.2f", new Double(readBuffer[8] & 0xFF) / 100);
-						log.finer("unilogVersion = " + unilogVersion);
-
-						int memoryDeleted = readBuffer[9] & 0xFF;
-						int tmpMemoryUsed = 0;
-						if (memoryDeleted > 0)
-							tmpMemoryUsed = 0;
-						else
-							tmpMemoryUsed = memoryUsed;
-						memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / WERTESAETZE_MAX);
-						log.finer("memoryUsedPercent = " + memoryUsedPercent);
-
-						timeIntervalPosition = readBuffer[10] & 0xFF;
-						log.finer("timeIntervalPosition = " + timeIntervalPosition + " timeInterval = " );
-
-						if ((readBuffer[11] & 0x80) == 0) {
-							isPropBlade = true;
-							countPropBlade = readBuffer[11] & 0x7F;
-						}
-						else {
-							isMotorPole = true;
-							countMotorPole = (readBuffer[11] & 0x7F) * 2;
-						}
-						log.finer("isPropBlade = " + isPropBlade + " countPropBlade = " + countPropBlade);
-						log.finer("isMotorPole = " + isMotorPole + " countMotorPole = " + countMotorPole);
-
-						if ((readBuffer[12] & 0x80) != 0) {
-							isAutoStartCurrent = true;
-							currentAutoStart = readBuffer[12] & 0x7F;
-						}
-						log.finer("isAutoStartCurrent = " + isAutoStartCurrent + " currentAutoStart = " + currentAutoStart);
-
-						int rxAutoStart_us = 0;
-						if ((readBuffer[13] & 0x80) != 0) {
-							isAutStartRx = true;
-							if ((readBuffer[13] & 0x7F) == 0)
-								isRxOn = true;
-							else
-								rxAutoStart_us = (readBuffer[13] & 0x7F) * 1000; // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
-						}
-						log.finer("isAutStartRx = " + isAutStartRx + " isRxOn = " + isRxOn + " rxAutoStart_us = " + rxAutoStart_us);
-
-						if ((readBuffer[14] & 0x80) != 0) {
-							isImpulseAutoStartTime = true;
-							impulseAutoStartTime_sec = readBuffer[14] & 0x7F;
-						}
-						log.finer("isAutoStartTime = " + isImpulseAutoStartTime + " timeAutoStart_sec = " + impulseAutoStartTime_sec);
-
-						currentSensorPosition = readBuffer[15] & 0xFF;
-						log.finer("currentSensor = " + currentSensorPosition);
-
-						serialNumber = ((readBuffer[16] & 0xFF) << 8) + (readBuffer[17] & 0xFF);
-						log.finer("serialNumber = " + serialNumber);
-
-						modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
-						log.finer("modusA1 = " + modusA1Position);
-
-						if ((readBuffer[19] & 0x80) != 0) {
-							isLimiter = true;
-							limiter = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[20] & 0xFF)) & 0x7FFF;
-						}
-						log.finer("isLimiter = " + isLimiter + " limiter = " + limiter);
-
-						gearRatio = (readBuffer[21] & 0xFF) / 10.0;
-						log.finer(String.format("gearRatio = %.1f", gearRatio));
-					}
-					else
-						throw new CheckSumMissmatchExcption("Die Checksumme ist fehlerhaft - " + checkSum + " / " + checkSumLast2Bytes);
+					verifyChecksum(readBuffer); // valid data set -> set values
+					
 				}
 				else
 					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
@@ -328,6 +490,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		finally {
 			this.close();
 		}
+		return readBuffer;
 	}
 
 	/**
@@ -335,7 +498,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true/false
 	 * @throws IOException
 	 */
-	public boolean checkConnectionStatus() throws IOException {
+	public synchronized boolean checkConnectionStatus() throws IOException {
 		boolean isConnect = false;
 
 		this.write(COMMAND_QUERY_STATE);
@@ -354,14 +517,14 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean checkDataReady() throws Exception {
+	public synchronized boolean checkDataReady() throws Exception {
 		boolean isReady = false;
 
 		this.write(COMMAND_QUERY_STATE); 
 
 		byte[] buffer = this.read(1, 2);
 
-		if ((buffer[0] & DATA_STATE_READY) == DATA_STATE_READY) { 
+		if (buffer[0] == DATA_STATE_READY) { 
 			isReady = true;
 		}
 
@@ -369,283 +532,66 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	}
 
 	/**
+	 * loop while writing status request until data state signaled as ready
+	 * @param timeout in seconds
+	 * @return true if UniLog signals data ready for transmission
+	 * @throws Exception
+	 */
+	public synchronized boolean waitDataReady(int timeout) throws Exception {
+		boolean isReady = false;
+		int retryCount = timeout * 2;
+		
+		while (!isReady && retryCount > 0) {
+			this.write(COMMAND_QUERY_STATE); 
+			byte[] buffer = this.read(1, 2);
+			if (buffer[0] == DATA_STATE_READY) { 
+				isReady = true;
+			}
+			Thread.sleep(500);
+			--retryCount;
+		}
+		return isReady;
+	}
+
+	/**
+	 * verify the check sum
 	 * @param readBuffer
-	 * @return
+	 * @throws CheckSumMissmatchException 
 	 */
-	private int getCheckSum(byte[] readBuffer) {
-		return ((readBuffer[DATENSATZ_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATENSATZ_BYTES - 1] & 0xFF);
+	private void verifyChecksum(byte[] readBuffer) throws CheckSumMissmatchException {
+		int checkSum = 0;
+		int checkSumLast2Bytes = 0;
+		checkSum = Checksum.ADD(readBuffer, 2) + 1;
+		log.finer("checkSum = " + checkSum);
+		checkSumLast2Bytes = ((readBuffer[DATENSATZ_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATENSATZ_BYTES - 1] & 0xFF);
+		log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes);
+		
+		if (checkSum != checkSumLast2Bytes)
+			throw new CheckSumMissmatchException("Die Checksumme ist fehlerhaft - " + checkSum + " / " + checkSumLast2Bytes);
+	}
+	
+	/**
+	 * verify the check sum
+	 * @param readBuffer
+	 * @return true for checksum match
+	 * @throws CheckSumMissmatchException 
+	 */
+	private boolean isChecksumOK(byte[] readBuffer) throws CheckSumMissmatchException {
+		int checkSum = 0;
+		int checkSumLast2Bytes = 0;
+		checkSum = Checksum.ADD(readBuffer, 2) + 1;
+		log.finer("checkSum = " + checkSum);
+		checkSumLast2Bytes = ((readBuffer[DATENSATZ_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATENSATZ_BYTES - 1] & 0xFF);
+		log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes);
+
+		return (checkSum == checkSumLast2Bytes);
+	}
+	
+	/**
+	 * @param isTransmitFinished the isTransmitFinished to set
+	 */
+	public void setTransmitFinished(boolean isTransmitFinished) {
+		this.isTransmitFinished = isTransmitFinished;
 	}
 
-	/**
-	 * @return the memoryUsed
-	 */
-	public int getMemoryUsed() {
-		return memoryUsed;
-	}
-
-	/**
-	 * @param memoryUsed the memoryUsed to set
-	 */
-	public void setMemoryUsed(int memoryUsed) {
-		this.memoryUsed = memoryUsed;
-	}
-
-	/**
-	 * @return the memoryUsedPercent
-	 */
-	public String getMemoryUsedPercent() {
-		return memoryUsedPercent;
-	}
-
-	/**
-	 * @param memoryUsedPercent the memoryUsedPercent to set
-	 */
-	public void setMemoryUsedPercent(String memoryUsedPercent) {
-		this.memoryUsedPercent = memoryUsedPercent;
-	}
-
-	/**
-	 * @return the isMotorPole
-	 */
-	public boolean isMotorPole() {
-		return isMotorPole;
-	}
-
-	/**
-	 * @param isMotorPole the isMotorPole to set
-	 */
-	public void setMotorPole(boolean isMotorPole) {
-		this.isMotorPole = isMotorPole;
-	}
-
-	/**
-	 * @return the isPropBlade
-	 */
-	public boolean isPropBlade() {
-		return isPropBlade;
-	}
-
-	/**
-	 * @param isPropBlade the isPropBlade to set
-	 */
-	public void setPropBlade(boolean isPropBlade) {
-		this.isPropBlade = isPropBlade;
-	}
-
-	/**
-	 * @return the countMotorPole
-	 */
-	public int getCountMotorPole() {
-		return countMotorPole;
-	}
-
-	/**
-	 * @param countMotorPole the countMotorPole to set
-	 */
-	public void setCountMotorPole(int countMotorPole) {
-		this.countMotorPole = countMotorPole;
-	}
-
-	/**
-	 * @return the countPropBlade
-	 */
-	public int getCountPropBlade() {
-		return countPropBlade;
-	}
-
-	/**
-	 * @param countPropBlade the countPropBlade to set
-	 */
-	public void setCountPropBlade(int countPropBlade) {
-		this.countPropBlade = countPropBlade;
-	}
-
-	/**
-	 * @return the isAutoStartCurrent
-	 */
-	public boolean isAutoStartCurrent() {
-		return isAutoStartCurrent;
-	}
-
-	/**
-	 * @param isAutoStartCurrent the isAutoStartCurrent to set
-	 */
-	public void setAutoStartCurrent(boolean isAutoStartCurrent) {
-		this.isAutoStartCurrent = isAutoStartCurrent;
-	}
-
-	/**
-	 * @return the currentAutoStart
-	 */
-	public int getCurrentAutoStart() {
-		return currentAutoStart;
-	}
-
-	/**
-	 * @param currentAutoStart the currentAutoStart to set
-	 */
-	public void setCurrentAutoStart(int currentAutoStart) {
-		this.currentAutoStart = currentAutoStart;
-	}
-
-	/**
-	 * @return the isAutStartRx
-	 */
-	public boolean isAutStartRx() {
-		return isAutStartRx;
-	}
-
-	/**
-	 * @param isAutStartRx the isAutStartRx to set
-	 */
-	public void setAutStartRx(boolean isAutStartRx) {
-		this.isAutStartRx = isAutStartRx;
-	}
-
-	/**
-	 * @return the isRxOn
-	 */
-	public boolean isRxOn() {
-		return isRxOn;
-	}
-
-	/**
-	 * @param isRxOn the isRxOn to set
-	 */
-	public void setRxOn(boolean isRxOn) {
-		this.isRxOn = isRxOn;
-	}
-
-	/**
-	 * @return the isAutoStartTime
-	 */
-	public boolean isImpulseAutoStartTime() {
-		return isImpulseAutoStartTime;
-	}
-
-	/**
-	 * @param isAutoStartTime the isAutoStartTime to set
-	 */
-	public void setImpulseAutoStartTime(boolean isAutoStartTime) {
-		this.isImpulseAutoStartTime = isAutoStartTime;
-	}
-
-	/**
-	 * @return the timeAutoStart_sec
-	 */
-	public int getImpulseAutoStartTime_sec() {
-		return impulseAutoStartTime_sec;
-	}
-
-	/**
-	 * @param timeAutoStart_sec the timeAutoStart_sec to set
-	 */
-	public void setImpulseAutoStartTime_sec(int timeAutoStart_sec) {
-		this.impulseAutoStartTime_sec = timeAutoStart_sec;
-	}
-
-	/**
-	 * @return the currentSensor
-	 */
-	public int getCurrentSensorPosition() {
-		return currentSensorPosition;
-	}
-
-	/**
-	 * @param currentSensor the currentSensor to set
-	 */
-	public void setCurrentSensorPosition(int currentSensor) {
-		this.currentSensorPosition = currentSensor;
-	}
-
-	/**
-	 * @return the serialNumber
-	 */
-	public int getSerialNumber() {
-		return serialNumber;
-	}
-
-	/**
-	 * @param serialNumber the serialNumber to set
-	 */
-	public void setSerialNumber(int serialNumber) {
-		this.serialNumber = serialNumber;
-	}
-
-	/**
-	 * @return the modusA1
-	 */
-	public int getModusA1Position() {
-		return modusA1Position;
-	}
-
-	/**
-	 * @param modusA1 the modusA1 to set
-	 */
-	public void setModusA1Position(int modusA1) {
-		this.modusA1Position = modusA1;
-	}
-
-	/**
-	 * @return the isLimiter
-	 */
-	public boolean isLimiter() {
-		return isLimiter;
-	}
-
-	/**
-	 * @param isLimiter the isLimiter to set
-	 */
-	public void setLimiter(boolean isLimiter) {
-		this.isLimiter = isLimiter;
-	}
-
-	/**
-	 * @return the limiter
-	 */
-	public int getLimiter() {
-		return limiter;
-	}
-
-	/**
-	 * @param limiter the limiter to set
-	 */
-	public void setLimiter(int limiter) {
-		this.limiter = limiter;
-	}
-
-	/**
-	 * @return the gearRatio
-	 */
-	public double getGearRatio() {
-		return gearRatio;
-	}
-
-	/**
-	 * @param gearRatio the gearRatio to set
-	 */
-	public void setGearRatio(double gearRatio) {
-		this.gearRatio = gearRatio;
-	}
-
-	/**
-	 * @return the unilogVersion
-	 */
-	public String getUnilogVersion() {
-		return unilogVersion;
-	}
-
-	/**
-	 * @return the timeIntervalPosition
-	 */
-	public int getTimeIntervalPosition() {
-		return timeIntervalPosition;
-	}
-
-	/**
-	 * @param timeIntervalPosition the timeIntervalPosition to set
-	 */
-	public void setTimeIntervalPosition(int timeIntervalPosition) {
-		this.timeIntervalPosition = timeIntervalPosition;
-	}
 }

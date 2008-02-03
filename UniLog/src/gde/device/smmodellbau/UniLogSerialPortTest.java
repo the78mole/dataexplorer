@@ -12,33 +12,36 @@ import osde.log.LogFormatter;
 
 public class UniLogSerialPortTest {
 
-	static UniLogSerialPort	unilog;
+	//private static UniLog device;
+	private static UniLog device;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		DeviceConfiguration deviceConfig;
 		boolean isUniLogPortAvailable = false;
+		DeviceConfiguration deviceConfig;
+		UniLogSerialPort serialPort = null;
+		
 		UniLogSerialPortTest.initLogger();
 		try {
 			deviceConfig = new DeviceConfiguration("c:\\Documents and Settings\\brueg\\Application Data\\OpenSerialDataExplorer\\Devices\\UniLog.xml");
-			unilog = new UniLogSerialPort(deviceConfig, null);
+			device = new UniLog(deviceConfig);
 			Vector<String> ports = DeviceSerialPort.listConfiguredSerialPorts();
 			for (String string : ports) {
 				System.out.println("found port available = " + string);
 				if (deviceConfig.getPort().equals(string)) isUniLogPortAvailable = true;
 			}
 			if (isUniLogPortAvailable) {
-				//unilog.open();
+				serialPort = device.getSerialPort();
+				//serialPort.open();
 				//System.out.println("port is open");
-				//System.out.println("connect status = " + unilog.checkConnectionStatus());
-				//System.out.println("data    status = " + unilog.checkDataReady());
+				//System.out.println("connect status = " + serialPort.checkConnectionStatus());
+				//System.out.println("data    status = " + serialPort.checkDataReady());
 				//System.out.println("checkSum = " + last2bytes);
+				//serialPort.waitDataReady(5);
 				
-				//read UniLog version
-				//unilog.readVersion();
-				
+				serialPort.getData(null, 0, device);
 				
 			}
 			else {
@@ -50,8 +53,8 @@ public class UniLogSerialPortTest {
 			e.printStackTrace();
 		}
 		finally {
-			if (unilog != null && unilog.isConnected()) {
-				unilog.close();
+			if (serialPort != null && serialPort.isConnected()) {
+				serialPort.close();
 				System.out.println("port is closed");
 			}
 			else {
@@ -69,10 +72,10 @@ public class UniLogSerialPortTest {
 		ch.setLevel(Level.ALL);
 		rootLogger.addHandler(ch);
 		// set logging levels
-		rootLogger.setLevel(Level.INFO);
+		rootLogger.setLevel(Level.FINER);
 		// set individual log levels
 		Logger logger = Logger.getLogger("osde.device.DeviceSerialPort");
-    logger.setLevel(Level.FINER);
+    logger.setLevel(Level.FINE);
     logger.setUseParentHandlers(true);
 
 	}

@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.xml.sax.SAXException;
 
 import osde.data.RecordSet;
@@ -36,8 +38,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new UniLogSerialPort(this, application.getStatusBar());
-		this.dialog = new UniLogDialog(this.application.getShell(), this);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, application.getStatusBar()) : new UniLogSerialPort(this, null);
+		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
 	/**
@@ -48,8 +50,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(DeviceConfiguration deviceConfig) throws NoSuchPortException {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new UniLogSerialPort(this, application.getStatusBar());
-		this.dialog = new UniLogDialog(this.application.getShell(), this);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, application.getStatusBar()) : new UniLogSerialPort(this, null);
+		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
 	/**
