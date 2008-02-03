@@ -32,6 +32,7 @@ public abstract class CalculationThread extends Thread {
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;
+	protected int														calcInterval_sec = 10;
 	protected String												statusMessage = "";
 	protected	int														maxCalcProgressPercent = 0;
 	protected final OpenSerialDataExplorer	application;
@@ -43,11 +44,12 @@ public abstract class CalculationThread extends Thread {
 	 * @param sourceRecordKey
 	 * @param targetRecordKey
 	 */
-	public CalculationThread(RecordSet recordSet, String sourceRecordKey, String targetRecordKey) {
+	public CalculationThread(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
 		super();
 		this.recordSet = recordSet;
 		this.sourceRecordKey = sourceRecordKey;
 		this.targetRecordKey = targetRecordKey;
+		this.calcInterval_sec = calcInterval_sec;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
@@ -100,5 +102,19 @@ public abstract class CalculationThread extends Thread {
 	 */
 	public void setMaxCalcProgressPercent(int maxCalcProgressPercent) {
 		this.maxCalcProgressPercent = maxCalcProgressPercent;
+	}
+
+	/**
+	 * @return the calcInterval_sec
+	 */
+	public int getCalcInterval_sec() {
+		return calcInterval_sec;
+	}
+
+	/**
+	 * @param calcInterval_sec the calcInterval_sec to set
+	 */
+	public void setCalcInterval_sec(int calcInterval_sec) {
+		this.calcInterval_sec = calcInterval_sec;
 	}
 }

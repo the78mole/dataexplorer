@@ -39,8 +39,8 @@ public class LinearRegression extends CalculationThread {
 	 * @param sourceRecordKey
 	 * @param targetRecordKey
 	 */
-	public LinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey) {
-		super(recordSet, sourceRecordKey, targetRecordKey);
+	public LinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
+		super(recordSet, sourceRecordKey, targetRecordKey, calcInterval_sec);
 	}
 
 	/**

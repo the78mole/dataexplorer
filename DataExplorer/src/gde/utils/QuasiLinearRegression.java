@@ -38,8 +38,8 @@ public class QuasiLinearRegression extends CalculationThread {
 	 * @param sourceRecordKey
 	 * @param targetRecordKey
 	 */
-	public QuasiLinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey) {
-		super(recordSet, sourceRecordKey, targetRecordKey);
+	public QuasiLinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
+		super(recordSet, sourceRecordKey, targetRecordKey, calcInterval_sec);
 	}
 
 
@@ -59,7 +59,7 @@ public class QuasiLinearRegression extends CalculationThread {
 		statusBar.setMessageAsync(statusMessage);
 
 		int time_ms = recordSet.getTimeStep_ms();
-		int interval = 4000 / time_ms; // 1 sec / 0.05 sec -> 20 points/sec -> 4000/50 -> 8 sec interval time
+		int interval = calcInterval_sec; // 4000 / time_ms; // 1 sec / 0.05 sec -> 20 points/sec -> 4000/50 -> 8 sec interval time
 		int pointInterval = 2;
 
 		int modCounter = ((recordHeight.size() - (recordHeight.size() % interval)) - (interval - pointInterval)) / pointInterval;

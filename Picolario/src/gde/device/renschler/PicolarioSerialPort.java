@@ -39,7 +39,6 @@ import osde.utils.Checksum;
 public class PicolarioSerialPort extends DeviceSerialPort {
 	private Logger							log											= Logger.getLogger(this.getClass().getName());
 
-	private StatusBar						statusBar;
 	private boolean 						isTransmitFinished = false;
 
 	// Datentyp Kommando Beschreibung
@@ -54,7 +53,6 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 */
 	public PicolarioSerialPort(DeviceConfiguration deviceConfig, StatusBar statusBar) throws NoSuchPortException {
 		super(deviceConfig, statusBar);
-		this.statusBar = statusBar;
 	}
 
 	/**

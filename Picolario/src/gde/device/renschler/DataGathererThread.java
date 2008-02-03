@@ -18,6 +18,7 @@ package osde.device.renschler;
 
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channel;
@@ -89,7 +90,7 @@ public class DataGathererThread extends Thread {
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2]);
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 8);
 				calculationThread.start();
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);
@@ -105,8 +106,8 @@ public class DataGathererThread extends Thread {
 
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port");
+			log.log(Level.SEVERE, e.getMessage(), e);
+			application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !");
 		}
 	} // end of run()
 
