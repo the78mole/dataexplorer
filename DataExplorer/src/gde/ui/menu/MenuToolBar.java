@@ -740,21 +740,25 @@ public class MenuToolBar {
 		}
 	}
 
-	public void setPortConnected(boolean isOpenStatus) {
-		if (isOpenStatus) {
-			portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
-			portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
-			portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
-			//portOpenCloseLabel.setText("Port schliessen");
-		}
-		else {
-			if (!application.isDisposed()) {
-				portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-				portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
-				portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
-				//portOpenCloseLabel.setText("Port öffnen         ");
+	public void setPortConnected(final boolean isOpenStatus) {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (isOpenStatus) {
+					portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
+					portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
+					portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
+					//portOpenCloseLabel.setText("Port schliessen");
+				}
+				else {
+					if (!application.isDisposed()) {
+						portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
+						portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
+						portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
+						//portOpenCloseLabel.setText("Port öffnen         ");
+					}
+				}
 			}
-		}
+		});
 	}
 
 	public CCombo getChannelSelectCombo() {
