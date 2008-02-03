@@ -26,8 +26,8 @@ import osde.utils.XMLUtils;
  * @author Winfried Brügmann
  */
 public class MeasurementType {
-	private final String				name;
-	private final String				symbol;
+	private String							name;
+	private String							symbol;
 	private String							unit;
 	private boolean							isActive;
 	private boolean							isCalculation = false;
@@ -61,7 +61,7 @@ public class MeasurementType {
 		this.unit = unit;
 		this.isActive = isActive;
 		this.isCalculation = isCalculation;
-		this.dataCalculation = new DataCalculationType();
+		this.dataCalculation = null;
 	}
 
 	public String toString() {
@@ -132,5 +132,19 @@ public class MeasurementType {
 	 */
 	public boolean isCalculation() {
 		return isCalculation;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param symbol the symbol to set
+	 */
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 }

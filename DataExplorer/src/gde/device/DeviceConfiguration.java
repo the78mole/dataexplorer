@@ -429,7 +429,7 @@ public class DeviceConfiguration {
 	 * @return the offset
 	 */
 	public double getOffset(String recordKey) {
-		return this.getMeasurementDefinition(recordKey).getDataCalculation().getOffset();
+		return (Double)(this.getMeasurementDefinition(recordKey).getDataCalculation().getOffset());
 	}
 
 	/**
@@ -443,7 +443,7 @@ public class DeviceConfiguration {
 	 * @return the factor
 	 */
 	public double getFactor(String recordKey) {
-		return getMeasurementDefinition(recordKey).getDataCalculation().getFactor();
+		return (Double)(this.getMeasurementDefinition(recordKey).getDataCalculation().getFactor());
 	}
 
 	/**
