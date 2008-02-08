@@ -64,7 +64,7 @@ public class AkkuMasterCalculationThread extends Thread {
 	public void run() {
 		log.fine("start data calculation for record = " + recordKey);
 		Record record = recordSet.get(recordKey);
-		String[] measurements = record.getDevice().getMeasurementNames(); // 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+		String[] measurements = record.getDevice().getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 		//		values[5] = new Integer(new Integer(values[2]).intValue() * new Integer(values[3]).intValue()).toString(); // Errechnete Leistung	[mW]
 		//		values[6] = new Integer(new Integer(values[2]).intValue() * new Integer(values[4]).intValue()).toString(); // Errechnete Energie	[mWh]
 		if (recordKey.equals(measurements[3])) {									// 3=Leistung

@@ -83,6 +83,7 @@ public class AnalogDisplay extends Composite {
 	private void tachoPaintControl(PaintEvent evt) {
 		log.finest("tacho.paintControl, event=" + evt);
 		RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
+		final String channelConfigKey = activeRecordSet.getChannelName();
 		if (activeRecordSet != null) {
 			Record record = activeRecordSet.getRecord(recordKey);
 			log.fine("record name = " + record.getName());
@@ -93,9 +94,9 @@ public class AnalogDisplay extends Composite {
 			log.finer("canvas size = " + width + " x " + height);
 			canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
-			double actualValue = device.translateValue(recordKey, new Double(record.get(record.size() - 1) / 1000.0));
-			double maxValue =  device.translateValue(recordKey, new Double(record.getMaxValue()) / 1000.0);
-			double minValue =  device.translateValue(recordKey, new Double(record.getMinValue()) / 1000.0);
+			double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
+			double maxValue =  device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0);
+			double minValue =  device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0);
 			log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
 
 			// draw clipping bounding 

@@ -42,30 +42,6 @@ public class DataBlockType {
 		this.endingByte = XMLUtils.getByteValue(element, "endingByte");
 	}
 
-	public DataBlockType() {
-		this.size = 0;
-		this.checkSumType = "";
-		this.endingByte = 0x00;
-	}
-
-	public DataBlockType(int size) {
-		this.size = size;
-		this.checkSumType = "";
-		this.endingByte = 0x00;
-	}
-
-	public DataBlockType(int size, String checkSum) {
-		this.size = size;
-		this.checkSumType = checkSum;
-		this.endingByte = 0x00;
-	}
-
-	public DataBlockType(int size, String checkSum, byte endingByte) {
-		this.size = size;
-		this.checkSumType = checkSum;
-		this.endingByte = endingByte;
-	}
-
 	public String toString() {
 		return String.format("<DataBlock> size = %d, checkSumType = %s, endingByte = 0x%x", size, checkSumType, endingByte);
 	}
@@ -88,7 +64,7 @@ public class DataBlockType {
 	 * @param size the size to set
 	 */
 	public void setSize(int size) {
-		if (domElement != null) XMLUtils.setIntValue(domElement, "size", size);
+		XMLUtils.setIntValue(domElement, "size", size);
 		this.size = size;
 	}
 

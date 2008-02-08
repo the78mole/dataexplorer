@@ -313,14 +313,17 @@ public class SimulatorDialog extends DeviceDialog {
 									RecordSet recordSet;
 									try {
 
-										data = serialPort.getData(null, recordNumber, null);
+										// prepare the data for adding to record set
+										recordSet = channel.get(recordSetKey);
+										
+										data = serialPort.getData(null, recordNumber, null, recordSet.getChannelName());
 
 										if (channel.size() == 0 || isCollectDataStopped) {
 											isCollectDataStopped = false;
 											recordNumber++;
 
 											recordSetKey = (channel.size() + 1) + recordSetKeyStem;
-											channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
+											channel.put(recordSetKey, RecordSet.createRecordSet(device.getChannelName(1), recordSetKey, application.getActiveDevice(), true, false));
 											log.fine(recordSetKey + " created for channel " + channel.getName());
 											if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 											channel.get(recordSetKey).setAllDisplayable();
@@ -336,12 +339,10 @@ public class SimulatorDialog extends DeviceDialog {
 											log.fine("re-using " + recordSetKey);
 										}
 
-										// prepare the data for adding to record set
-										recordSet = channel.get(recordSetKey);
 										// build the point array according curves from record set
 										int[] points = new int[recordSet.size()];
 
-										String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Strom
+										String[] measurements = device.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Strom
 										Vector<Integer> voltage = (Vector<Integer>) data.get(measurements[0]);
 										Vector<Integer> current = (Vector<Integer>) data.get(measurements[1]);
 										Iterator<Integer> iterV = voltage.iterator();

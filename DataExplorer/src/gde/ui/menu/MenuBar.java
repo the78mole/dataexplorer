@@ -585,12 +585,14 @@ public class MenuBar {
 				if (channel.getActiveRecordSet() != null) {
 					recordSetKey = (channel.size() + 1) + ") " + dialogName;
 				}
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), isRaw, isFromFile));
-				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, channel.get(recordSetKey), isRaw);
-				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-				channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-				channel.applyTemplate(recordSetKey);
-				channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
+				RecordSet newRecordSet = CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, recordSetKey, isRaw);
+				if(newRecordSet != null) {
+					channel.put(recordSetKey, newRecordSet);
+					channels.getActiveChannel().setActiveRecordSet(recordSetKey);
+					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+					channel.applyTemplate(recordSetKey);
+					channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
+				}
 			}
 		}
 		catch (Exception e) {

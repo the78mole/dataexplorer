@@ -95,6 +95,14 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
+	 * get the name of the channel to be used as configuration key " 1: Ausgang" -> "Ausgang"
+	 * @return String
+	 */
+	public String getConfigKey() {
+		return name.split(":")[1].trim();
+	}
+
+	/**
 	 * method to get all the record sets of this channel
 	 * @return HashMap<Integer, Records>
 	 */

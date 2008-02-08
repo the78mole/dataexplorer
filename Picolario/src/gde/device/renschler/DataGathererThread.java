@@ -38,6 +38,7 @@ public class DataGathererThread extends Thread {
 	private OpenSerialDataExplorer		application;
 	private String[]									datagramNumbers;
 	private final String							RECORD_SET_NAME	= ") Flugaufzeichnung";
+	private final String							configKey;
 	private final PicolarioSerialPort	serialPort;
 	private final PicolarioDialog			dialog;
 	private final Picolario						device;
@@ -53,6 +54,7 @@ public class DataGathererThread extends Thread {
 		this.serialPort = serialPort;
 		this.dialog = device.getDialog();
 		this.datagramNumbers = datagramNumbers;
+		this.configKey = device.getChannelName(1);
 	}
 
 	/**
@@ -65,16 +67,16 @@ public class DataGathererThread extends Thread {
 		try {
 			log.fine("entry data gatherer");
 			Channel channel = Channels.getInstance().getActiveChannel();
-			String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+			String[] measurements = device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
 			dialog.resetDataSetsLabel();
 			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
 				dialog.resetTelegramLabel();
 				dialog.setAlreadyRedDataSets(datagramNumbers[j]);
-				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), device);
+				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), device, configKey);
 				recordSetKey = (channel.size() + 1) + RECORD_SET_NAME;
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(configKey, recordSetKey, application.getActiveDevice(), true, false));
 				log.fine(recordSetKey + " created");
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);

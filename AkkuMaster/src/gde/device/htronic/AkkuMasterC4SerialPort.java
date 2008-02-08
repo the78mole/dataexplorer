@@ -246,7 +246,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws IOException {
 		boolean isActive = true;
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
 

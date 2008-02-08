@@ -232,6 +232,7 @@ public class GraphicsWindow {
 						if (log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseMove = " + evt);
 						RecordSet recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 						if (recordSet != null && curveArea != null) {
+							String configKey = recordSet.getChannelName();
 							Point point = checkCurveBounds(evt.x, evt.y);
 							evt.x = point.x;
 							evt.y = point.y;
@@ -304,14 +305,14 @@ public class GraphicsWindow {
 										if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 											StringBuilder sb = new StringBuilder();
 											sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(
-													record.getDevice().getDataUnit(measureRecordKey));
+													record.getDevice().getDataUnit(configKey, measureRecordKey));
 											sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(
-													record.getDevice().getDataUnit(measureRecordKey)).append("/sec");
+													record.getDevice().getDataUnit(configKey, measureRecordKey)).append("/sec");
 											application.setStatusMessage(sb.toString());
 										}
 										else {
 											application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " "
-													+ record.getDevice().getDataUnit(measureRecordKey) + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
+													+ record.getDevice().getDataUnit(configKey, measureRecordKey) + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
 										}
 									}
 									else if (isRightMouseMeasure) {
@@ -343,9 +344,9 @@ public class GraphicsWindow {
 
 										StringBuilder sb = new StringBuilder();
 										sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(
-												record.getDevice().getDataUnit(measureRecordKey));
+												record.getDevice().getDataUnit(configKey, measureRecordKey));
 										sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(
-												record.getDevice().getDataUnit(measureRecordKey)).append("/sec");
+												record.getDevice().getDataUnit(configKey, measureRecordKey)).append("/sec");
 										application.setStatusMessage(sb.toString());
 									}
 									else if(isPanMouse) {
@@ -628,7 +629,7 @@ public class GraphicsWindow {
 				public void run() {
 					curveSelectorTable.removeAll();
 					
-					String[] recordKeys = device.getMeasurementNames();
+					String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
 					for (int i = 0; i < recordSet.size(); i++) {
 						Record record;
 						switch (type) {
@@ -701,6 +702,7 @@ public class GraphicsWindow {
 		RecordSet recordSet = isGraphicsWindow ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 		String measureRecordKey = recordSet.getRecordKeyMeasurement();
 		Record record = recordSet.get(measureRecordKey);
+		String configKey = recordSet.getChannelName();
 		
 		// set the gc properties
 		canvasGC.setLineWidth(1);
@@ -716,7 +718,7 @@ public class GraphicsWindow {
 			drawVerticalLine(xPosMeasure, 0, curveAreaBounds.height);
 			drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
 
-			application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " " + record.getDevice().getDataUnit(measureRecordKey) + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
+			application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " " + record.getDevice().getDataUnit(configKey, measureRecordKey) + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 			xPosMeasure = isRefresh ? xPosMeasure : curveAreaBounds.width / 4;
@@ -736,8 +738,8 @@ public class GraphicsWindow {
 			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			StringBuilder sb = new StringBuilder();
-			sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(record.getDevice().getDataUnit(measureRecordKey));
-			sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(record.getDevice().getDataUnit(measureRecordKey)).append("/sec");
+			sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(record.getDevice().getDataUnit(configKey, measureRecordKey));
+			sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(record.getDevice().getDataUnit(configKey, measureRecordKey)).append("/sec");
 			application.setStatusMessage(sb.toString());
 		}
 	}

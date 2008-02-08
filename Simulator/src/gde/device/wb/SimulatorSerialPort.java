@@ -54,7 +54,7 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog) throws IOException {
+	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws IOException {
 		if (recordNumber != lastRecord) {
 			lastRecord = recordNumber;
 			lastVoltage = 0;
@@ -76,7 +76,7 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 		}
 		lastCurrent = yBound * 3000;
 
-		String[] measurements = deviceConfig.getMeasurementNames(); // 0=Spannung, 1=Strom
+		String[] measurements = deviceConfig.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Strom
 		data.put(measurements[0], voltage);
 		data.put(measurements[1], current);
 		return data;

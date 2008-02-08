@@ -48,7 +48,6 @@ public class DeviceConfiguration {
 	private final SerialPortType								serialPort;
 	private final TimeBaseType									timeBase;
 	private final HashMap<Integer, ChannelType>	channels									= new HashMap<Integer, ChannelType>();
-	private final String[]											masurementNames;
 	private Document														doc;
 	private File																xmlFile;
 	private boolean															isChangePropery						= false;
@@ -137,7 +136,7 @@ public class DeviceConfiguration {
 			throw new SAXException("<SerialPort> Element fehlerhaft in " + xmlFilePath);
 		this.serialPort = sp;
 
-		//get a nodelist of <TimeBase> element
+		//get a node list of <TimeBase> element
 		TimeBaseType tb = null;
 		NodeList timeBaseNodeList = docEle.getElementsByTagName("TimeBase");
 		if (timeBaseNodeList != null && timeBaseNodeList.getLength() > 0) {
@@ -148,23 +147,48 @@ public class DeviceConfiguration {
 			throw new SAXException("<TimeBase> Element fehlerhaft in " + xmlFilePath);
 		this.timeBase = tb;
 
-		//get a nodelist of <Channel> elements
+		//get a node list of <Channel> elements
 		NodeList channelNodeList = docEle.getElementsByTagName("Channel");
 		if (channelNodeList != null && channelNodeList.getLength() > 0) {
 			// loop through the list if more than one channel
 			for (int i = 0; i < channelNodeList.getLength(); i++) {
-				Element el = (Element) channelNodeList.item(i);
-				ChannelType channel = new ChannelType(el);
+				Element cElm = (Element) channelNodeList.item(i);
+				ChannelType channel = new ChannelType(cElm);
 				channels.put((i + 1), channel);
+				log.info("add channel name = " + channel.getName());
+				// get node list of measurements as child of channel
+				NodeList measurementNodeList = cElm.getElementsByTagName("Measurement");
+				if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
+					for (int j = 0; j < measurementNodeList.getLength(); j++) {
+						Element mElm = (Element) measurementNodeList.item(j);
+						MeasurementType meas = new MeasurementType(mElm);
+						channel.add(meas);
+						channel.addMeasurementName(meas.getName());
+						log.info("channel.addMeasurementName = " + meas.getName());
+						
+						// get node list of data calculation properties as child of measurement - optional
+						NodeList propNodeList = mElm.getElementsByTagName("Property");
+						if (propNodeList != null && propNodeList.getLength() > 0) {
+							for (int k = 0; k < propNodeList.getLength(); k++) {
+								Element pElm = (Element) propNodeList.item(k);
+								PropertyType prop = new PropertyType(pElm);
+								meas.addProperty(prop.getName(), prop);
+								log.info("add property to measurement id = " + prop.toString());
+							}
+						}
+					}
+				}
+				else 
+					throw new SAXException("<Measurement> Element fehlerhaft in " + xmlFilePath);
 			}
 		}
 		else
 			throw new SAXException("<Channel> Element fehlerhaft in " + xmlFilePath);
-
-		// all measurements for all channels are equal !
-		this.masurementNames = channels.get(1).getMeasurementNames().toArray(new String[1]);
-
+		
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
+		
+		if (log.isLoggable(Level.INFO)) XMLUtils.writeXML2Console(this.doc);
+		
 	}
 
 	/**
@@ -177,7 +201,6 @@ public class DeviceConfiguration {
 		for (int i = 1; i <= deviceConfig.channels.size(); ++i) {
 			this.channels.put(i, deviceConfig.channels.get(i));
 		}
-		this.masurementNames = deviceConfig.getMeasurementNames();
 		this.doc = (Document) deviceConfig.doc.cloneNode(true);
 		this.xmlFile = deviceConfig.xmlFile;
 		this.isChangePropery = deviceConfig.isChangePropery;
@@ -193,7 +216,6 @@ public class DeviceConfiguration {
 		for (int i = 1; i <= channels.size(); ++i) {
 			this.channels.put(i, channels.get(i));
 		}
-		this.masurementNames = getChannel(1).getMeasurementNames().toArray(new String[1]);
 
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 	}
@@ -360,8 +382,8 @@ public class DeviceConfiguration {
 	 * @param recordKey
 	 * @return dataUnit as string
 	 */
-	public String getDataUnit(String recordKey) {
-		return this.getMeasurementDefinition(recordKey.split("_")[0]).getUnit();
+	public String getDataUnit(String configKey, String recordKey) {
+		return this.getMeasurementDefinition(configKey, recordKey.split("_")[0]).getUnit();
 	}
 
 	/**
@@ -396,23 +418,118 @@ public class DeviceConfiguration {
 	}
 	
 	/**
-	 * @return the number of measurements of a channel
+	 * @return the number of measurements of a channel, assuming all channels have at least identical number of measurements
 	 */
 	public int getNumberOfMeasurements() {
 		return channels.get(1).size();
 	}
 
 	/**
+	 * set active status of an measurement
+	 * @param channelKey
+	 * @param measurementKey
+	 * @param isActive
+	 */
+	public void setMeasurementActive(String channelKey, String measurementKey, boolean isActive) {
+		log.info("channelKey = \"" + channelKey + "\" measurementKey = \"" + measurementKey + "\"");
+		this.isChangePropery = true;
+		Element element = this.doc.getDocumentElement();
+		NodeList channelNodeList = element.getElementsByTagName("Channel");
+		if (channelNodeList != null && channelNodeList.getLength() > 0) {
+			for (int i = 0; i < channelNodeList.getLength(); i++) {
+				Element el = (Element) channelNodeList.item(i);
+				String foundKey = el.getAttribute("name");
+				if (channelKey.equals(foundKey)) {
+					NodeList measurementNodeList = el.getElementsByTagName("Measurement");
+					if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
+						for (int j = 0; j < measurementNodeList.getLength(); j++) {
+							Element elm = (Element) measurementNodeList.item(j);
+							foundKey = XMLUtils.getTextValue(elm, "name");
+							if (measurementKey.equals(foundKey)) {
+								XMLUtils.setBooleanValue(elm, "isActive", isActive);
+								this.getMeasurementDefinition(channelKey, measurementKey).setActive(isActive);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * set new name of specified measurement
+	 * @param channelKey
+	 * @param measurementKey
+	 * @param name
+	 */
+	public void setMeasurementName(String channelKey, String measurementKey, String name) {
+		log.info("channelKey = \"" + channelKey + "\" measurementKey = \"" + measurementKey + "\"");
+		this.isChangePropery = true;
+		this.getMeasurementDefinition(channelKey, measurementKey).setName(name);
+	}
+	
+	/**
+	 * set new unit of specified measurement
+	 * @param channelKey
+	 * @param measurementKey
+	 * @param unit
+	 */
+	public void setMeasurementUnit(String channelKey, String measurementKey, String unit) {
+		log.info("channelKey = \"" + channelKey + "\" measurementKey = \"" + measurementKey + "\"");
+		this.isChangePropery = true;
+		this.getMeasurementDefinition(channelKey, measurementKey).setUnit(unit);
+	}
+	
+	/**
+	 * set new symbol of specified measurement
+	 * @param channelKey
+	 * @param measurementKey
+	 * @param symbol
+	 */
+	public void setMeasurementSymbol(String channelKey, String measurementKey, String symbol) {
+		this.isChangePropery = true;
+		this.getMeasurementDefinition(channelKey, measurementKey).setSymbol(symbol);
+	}
+	
+	/**
 	 * @return the measurement definitions matching key (voltage, current, ...)
 	 */
-	public MeasurementType getMeasurementDefinition(String recordKey) {
+	public MeasurementType getMeasurementDefinition(String channelKey, String measurementKey) {
 		MeasurementType measurementDefinition = null;
-		// assuming all channels have identical measurements
-		ChannelType channel = channels.get(1);
-		// loop through channels and find 
+//		Element measurementElement = null;
+//		Element element = this.doc.getDocumentElement();
+//		NodeList channelNodeList = element.getElementsByTagName("Channel");
+//		if (channelNodeList != null && channelNodeList.getLength() > 0) {
+//			for (int i = 0; i < channelNodeList.getLength(); i++) {
+//				Element el = (Element) channelNodeList.item(i);
+//				String foundKey = el.getAttribute("name");
+//				if (channelKey.equals(foundKey)) {
+//					NodeList measurementNodeList = el.getElementsByTagName("Measurement");
+//					if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
+//						for (int j = 0; j < measurementNodeList.getLength(); j++) {
+//							Element elm = (Element) measurementNodeList.item(j);
+//							foundKey = XMLUtils.getTextValue(elm, "name");
+//							if (measurementKey.equals(foundKey)) {
+//								measurementElement = elm;
+//								break;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+		// loop through the channels and search for one matching channelKey
+		ChannelType channel = null;
+		for (int i = 1; i <= channels.size(); i++) {
+			channel = channels.get(i);
+			if(channel.getName().equals(channelKey)) break;
+		} 
+		// loop through channel and search for measurementKey 
 		for (int i = 0; i < channel.size(); i++) {
-			if (channel.get(i).getName().equals(recordKey)) {
-				measurementDefinition = channel.get(i);
+			measurementDefinition = channel.get(i);
+			if (channel.get(i).getName().equals(measurementKey)) {
+				//measurementDefinition.setDomElement(measurementElement);
+				break;
 			}
 		}
 		return measurementDefinition;
@@ -421,35 +538,193 @@ public class DeviceConfiguration {
 	/**
 	 * @return the sorted measurement names
 	 */
-	public String[] getMeasurementNames() {
-		return masurementNames;
+	public String[] getMeasurementNames(String channelConfigKey) {
+		// loop through the channels and search for one matching channelKey
+		ChannelType channel = channels.get(0);
+		for (int i = 1; i <= channels.size(); i++) {
+			channel = channels.get(i);
+			if(channel.getName().equals(channelConfigKey)) break;
+		} 
+		// loop through the measurement names and add
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < channel.size(); i++) {
+			sb.append(channel.get(i).getName()).append(";");
+		}
+		return sb.toString().split(";");
 	}
 
 	/**
-	 * @return the offset
+	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
-	public double getOffset(String recordKey) {
-		return (Double)(this.getMeasurementDefinition(recordKey).getDataCalculation().getOffset());
+	public double getOffset(String configKey, String measurementKey) {
+		MeasurementType measurement = this.getMeasurementDefinition(configKey, measurementKey);
+		log.info("measurement name = " + measurement.getName()); 
+		PropertyType property = measurement.get(IDevice.OFFSET);
+		if (property == null) // property does not exist
+			return 0.0;
+		else
+			return (Double)(property.getValue());
 	}
 
 	/**
 	 * @param offset the offset to set
 	 */
-	public void setOffset(String recordKey, double offset) {
-		this.getMeasurementDefinition(recordKey).getDataCalculation().setOffset(offset);
+	public void setOffset(String configKey, String measurementKey, double offset) {
+		log.info("channelKey = \"" + configKey + "\" measurementKey = \"" + measurementKey + "\"");
+		//TODO setDataCalculationProperty(configKey, measurementKey, DataCalculationType.OFFSET, offset);
 	}
 
+//	/**
+//	 * @param configKey
+//	 * @param measurementKey
+//	 * @param type
+//	 * @param value
+//	 */
+//	private void setDataCalculationProperty(String configKey, String measurementKey, String type, double value) {
+//		this.isChangePropery = true;
+//		MeasurementType measurement = this.getMeasurementDefinition(configKey, measurementKey);
+//		DataCalculationType calcDefinition = measurement.getDataCalculation();
+//		if (calcDefinition == null) {  // data calculation element and property does not exist
+//			calcDefinition = createXMLDataCalculatiionType(configKey, measurementKey, type, value);
+//			createXMLMeasurementDataCalculationProperty(measurement, calcDefinition, type, value);			
+//		}
+//		else { // dataCalculation exist
+//			PropertyType property = calcDefinition.get(type);
+//			if (property == null) {
+//				createXMLMeasurementDataCalculationProperty(measurement, calcDefinition, type, value);
+//			}
+//			else {
+//				updateXMLMeasurementDataCalculationProperty(calcDefinition, property, value);
+//			}
+//		}
+//	}
+
+//	/**
+//	 * creates, appends a new DataCalculationType at measurement in XML to enable extension with PropertyTypes
+//	 * @param configKey
+//	 * @param measurementKey
+//	 * @param type
+//	 * @param value
+//	 * @return created data calculation
+//	 */
+//	private DataCalculationType createXMLDataCalculatiionType(String configKey, String measurementKey, String type, double value) {
+//		DataCalculationType calcDefinition = new DataCalculationType(this.doc);
+//		MeasurementType measurement = this.getMeasurementDefinition(configKey, measurementKey);
+//		measurement.setDataCalculation(calcDefinition);
+//		Element element = this.doc.getDocumentElement();
+//		NodeList channelNodeList = element.getElementsByTagName("Channel");
+//		if (channelNodeList != null && channelNodeList.getLength() > 0) {
+//			for (int i = 0; i < channelNodeList.getLength(); i++) {
+//				Element el = (Element) channelNodeList.item(i);
+//				String foundKey = el.getAttribute("name");
+//				if (configKey.equals(foundKey)) {
+//					NodeList measurementNodeList = el.getElementsByTagName("Measurement");
+//					if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
+//						for (int j = 0; j < measurementNodeList.getLength(); j++) {
+//							Element elm = (Element) measurementNodeList.item(j);
+//							foundKey = XMLUtils.getTextValue(elm, "name");
+//							if (measurementKey.equals(foundKey)) {
+//								elm.appendChild(calcDefinition.getDomElement());
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return calcDefinition;
+//	}
+
+//	/**
+//	 * creates a property type at an existing measurement DataCalculationType
+//	 * @param measurement key
+//	 * @param calcDefinition
+//	 * @param type (offset, factor, ..)
+//	 * @param value
+//	 */
+//	private void createXMLMeasurementDataCalculationProperty(MeasurementType measurement, DataCalculationType calcDefinition, String type, double value) {
+//		PropertyType propDefinition = new PropertyType(this.doc, type, PropertyType.Types.Double, value);
+//		calcDefinition.addProperty(type, propDefinition);
+//		calcDefinition.getDomElement().appendChild(propDefinition.getDomElement());
+//		log.info("MeasurementType=" + measurement + " - DataCalculationType created : " + propDefinition.toString());
+//	}
+
+//	/**
+//	 * update a property type at an existing measurement DataCalculationType
+//	 * @param calculation definition
+//	 * @param property definition
+//	 * @param value
+//	 */
+//	private void updateXMLMeasurementDataCalculationProperty(DataCalculationType calculation, PropertyType property, double value) {
+//		property.getDomElement().setAttribute("value", (""+value));
+//		String key = property.getDomElement().getAttribute("name");
+//		calculation.addProperty(key, property);
+//		String measurement = calculation.getDomElement().getParentNode().getNodeName();
+//		log.info("MeasurementType=" + measurement + " - DataCalculationType update : " + property.toString());
+//	}
+
 	/**
-	 * @return the factor
+	 * @return the factor, , if property does not exist return 1.0 as default value
 	 */
-	public double getFactor(String recordKey) {
-		return (Double)(this.getMeasurementDefinition(recordKey).getDataCalculation().getFactor());
+	public double getFactor(String configKey, String measurementKey) {
+		MeasurementType measurement = this.getMeasurementDefinition(configKey, measurementKey);
+		PropertyType property = measurement.get(IDevice.FACTOR);
+		if (property == null) // property does not exist
+			return 1.0;
+		else
+			return (Double)(property.getValue());
 	}
 
 	/**
 	 * @param factor the factor to set
 	 */
-	public void setFactor(String recordKey, double factor) {
-		this.getMeasurementDefinition(recordKey).getDataCalculation().setFactor(factor);
+	public void setFactor(String configKey, String measurementKey, double factor) {
+		log.info("channelKey = \"" + configKey + "\" measurementKey = \"" + measurementKey + "\"");
+		//TODO setDataCalculationProperty(configKey, measurementKey, DataCalculationType.FACTOR, factor);
+	}
+
+	/**
+	 * @modify or add a property at specified measurement
+	 */
+	public void setPropertyValue(String configKey, String measurementkey, String propertyKey, PropertyType.Types type, Object value) {
+		this.isChangePropery = true;
+		PropertyType propertyDefinition = this.getMeasurementDefinition(configKey, measurementkey).get(propertyKey);
+		if (propertyDefinition == null) {  // property does not exist
+			propertyDefinition = new PropertyType(this.doc, propertyKey, type, value);
+			Element element = this.doc.getDocumentElement();
+			NodeList measurementNodeList = element.getElementsByTagName("Measurement");
+			if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
+				for (int i = 0; i < measurementNodeList.getLength(); i++) {
+					Element el = (Element) measurementNodeList.item(i);
+					String foundKey = XMLUtils.getTextValue(el, "name");
+					if (measurementkey.equals(foundKey)) {
+						el.appendChild(propertyDefinition.getDomElement());
+						log.info("created : " + propertyDefinition.toString());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
+	 */
+	public Object getPropertyValue(String configKey, String measurementkey, String propertyKey) {
+		PropertyType prop = this.getMeasurementDefinition(configKey, measurementkey).get(propertyKey);
+		return prop != null ? prop.getValue() : 1;
+	}
+
+	/**
+	 * @return the property from measurement defined by key
+	 */
+	public PropertyType getPropertyDefinition(String configKey, String measurementkey, String propertyKey) {
+		this.isChangePropery = true;
+		return this.getMeasurementDefinition(configKey, measurementkey).get(propertyKey);
+	}
+
+	/**
+	 * @return the configuration document (DOM)
+	 */
+	public Document getConfigurationDocument() {
+		return doc;
 	}
 }

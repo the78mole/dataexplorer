@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.device;
 
+import java.util.HashMap;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -30,14 +32,18 @@ public class MeasurementType {
 	private String							symbol;
 	private String							unit;
 	private boolean							isActive;
-	private boolean							isCalculation = false;
-	private DataCalculationType	dataCalculation;
+	private boolean							isCalculation	= false;
+
+	private Element						domElement;
+
+	private static HashMap<String, PropertyType> properties = new HashMap<String, PropertyType>();
 
 	/**
 	 * constructs a Measurement class using a XML DOM element
 	 * @param element (DOM)
 	 */
 	public MeasurementType(Element element) {
+		this.domElement = element;
 		this.name = XMLUtils.getTextValue(element, "name");
 		this.symbol = XMLUtils.getTextValue(element, "symbol");
 		this.unit = XMLUtils.getTextValue(element, "unit");
@@ -46,29 +52,10 @@ public class MeasurementType {
 			this.isActive = XMLUtils.getBooleanValue(element, "isActive"); // optional element
 		else 
 			this.isCalculation = true;
-
-		this.dataCalculation = new DataCalculationType(); // optional element
-		NodeList timeBaseNodeList = element.getElementsByTagName("DataCalculation");
-		if (timeBaseNodeList != null && timeBaseNodeList.getLength() > 0) {
-			Element el = (Element) timeBaseNodeList.item(0);
-			this.dataCalculation = new DataCalculationType(el);
-		}
-	}
-
-	public MeasurementType(String name, String symbol, String unit, boolean isActive, boolean isCalculation) {
-		this.name = name;
-		this.symbol = symbol;
-		this.unit = unit;
-		this.isActive = isActive;
-		this.isCalculation = isCalculation;
-		this.dataCalculation = null;
 	}
 
 	public String toString() {
-		if (isCalculation)
-			return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isCalculation = %b, %s", name, symbol, unit, isCalculation, dataCalculation.toString());
-		else
-			return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isActive = %b, %s", name, symbol, unit, isActive, dataCalculation.toString());
+		return String.format("<Measurement> name = %s, symbol = %s, unit = %s, isActive = %b", name, symbol, unit, isActive);
 	}
 
 	/**
@@ -82,6 +69,7 @@ public class MeasurementType {
 	 * @param unit the unit to set
 	 */
 	public void setUnit(String unit) {
+		XMLUtils.setStringValue(this.domElement, "unit", unit);
 		this.unit = unit;
 	}
 
@@ -96,23 +84,18 @@ public class MeasurementType {
 	 * @param isActive the isActive to set
 	 */
 	public void setActive(boolean isActive) {
+		XMLUtils.setBooleanValue(this.domElement, "isActive", isActive);
 		this.isActive = isActive;
 	}
 
-	/**
-	 * @return the dataCalculation
-	 */
-	public DataCalculationType getDataCalculation() {
-		return dataCalculation;
+	public PropertyType get(String key) {
+		return properties.get(key);
 	}
-
-	/**
-	 * @param dataCalculation the dataCalculation to set
-	 */
-	public void setDataCalculation(DataCalculationType dataCalculation) {
-		this.dataCalculation = dataCalculation;
+		
+	public void addProperty(String key, PropertyType property) {
+		properties.put(key, property);
 	}
-
+	
 	/**
 	 * @return the name
 	 */
@@ -138,6 +121,7 @@ public class MeasurementType {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		XMLUtils.setStringValue(this.domElement, "name", name);
 		this.name = name;
 	}
 
@@ -145,6 +129,21 @@ public class MeasurementType {
 	 * @param symbol the symbol to set
 	 */
 	public void setSymbol(String symbol) {
+		XMLUtils.setStringValue(this.domElement, "symbol", symbol);
 		this.symbol = symbol;
+	}
+
+	/**
+	 * @return the domElement
+	 */
+	public Element getDomElement() {
+		return domElement;
+	}
+
+	/**
+	 * @param domElement the domElement to set
+	 */
+	public void setDomElement(Element domElement) {
+		this.domElement = domElement;
 	}
 }

@@ -29,6 +29,8 @@ import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
@@ -45,8 +47,7 @@ import osde.ui.StatusBar;
 public class CSVReaderWriter {
 	private static Logger					log			= Logger.getLogger(CSVReaderWriter.class.getName());
 
-	private static String					newLine	= System.getProperty("line.separator");
-	private static DecimalFormat	df2			= new DecimalFormat("0.00");
+	private static String					lineSep	= System.getProperty("line.separator");
 	private static DecimalFormat	df3			= new DecimalFormat("0.000");
 	private static StringBuffer		sb;
 	private static String					line		= "*";
@@ -75,11 +76,12 @@ public class CSVReaderWriter {
 	 * read the selected CSV file
 	 * @throws Exception 
 	 */
-	public static RecordSet read(char separator, String filePath, RecordSet recordSet, boolean isRaw) throws Exception {
+	public static RecordSet read(char separator, String filePath, String recordSetName, boolean isRaw) throws Exception {
+		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
-		String[] recordNames = device.getMeasurementNames();
+		String[] recordNames = device.getMeasurementNames(Channels.getInstance().getActiveChannel().getConfigKey());
 		int sizeRecords = 0;
 		boolean isDeviceName = true;
 		boolean isData = false;
@@ -90,65 +92,101 @@ public class CSVReaderWriter {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
 			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
+			StringBuilder keys = new StringBuilder();
+			String[] recordKeys = null;
+			OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
+			String fileConfig = null;
 
 			while ((line = reader.readLine()) != null) {
 				if (isDeviceName) {
 					// check for device name in first line
-					if (OpenSerialDataExplorer.getInstance().getActiveDevice().getName().equals(line.replace(separator, ' ').trim())) {
+					String activeDeviceName = application.getActiveDevice().getName();
+					String fileDeviceName = line.split(""+separator)[0].trim();
+					log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
+					
+					if (activeDeviceName.equals(fileDeviceName)) {
 						isDeviceName = false;
 					}
 					else {
 						throw new Exception("0"); // mismatch device name
 					}
+					
+					String activeConfig = Channels.getInstance().getActiveChannel().getConfigKey();
+					fileConfig = line.split(""+separator).length > 1 ? line.split(""+separator)[1].trim() : null;
+					log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
+					if(fileConfig == null) {
+						fileConfig = activeConfig;
+						log.fine("using as file channel name = " + fileConfig);
+					}
+					else if (!activeConfig.equals(fileConfig)) {
+						String msg = "Die Kanalconfiguration der datei entspricht nicht der Datei, soll umgeschaltet werden ?";
+							if (application.openYesNoMessageDialog(msg) == SWT.CANCEL) {
+								log.fine("SWT.CANCEL");
+								return null;
+							}
+					}
+					recordNames = device.getMeasurementNames(fileConfig);
+					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 				}
 				else if (!isData) {
-					// first line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
+					// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
 					String[] header = line.split(";");
 					sizeRecords = header.length - 1;
 					int countNotMeasurement = 0;
 					for (String recordKey : recordNames) {
-						MeasurementType measurement = device.getMeasurementDefinition(recordKey);
-						if (!measurement.isCalculation())
+						MeasurementType measurement = device.getMeasurementDefinition(fileConfig, recordKey);
+						if (!measurement.isCalculation()) {
+							keys.append(measurement.getName()).append(separator);
 							++countNotMeasurement;			// update count for possible raw
-						if (!isRaw)
+						}
+						if (!isRaw) // absolute
 							recordSet.get(recordKey).setDisplayable(true);	// all data available 
 					}
-					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) { // first simple check, but name must not match
-						throw new Exception("1"); // mismatch data signature
+					// for raw data check if measurements which !isCalculation match number of entries in header line
+					// first simple check, but name must not match, count only numbers
+					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) { 
+						throw new Exception("1"); // mismatch data signature length
 					}
 					else {
-						int match = 0;  // check match of the measurement units
+						int match = 0;  // check match of the measurement units, relevant for absolute import 
+						if(isRaw) recordKeys = keys.toString().split("" + separator);
+						else recordKeys = recordNames;
+						
 						for (int i = 1; i < header.length; i++) {
-							String expectUnit = device.getMeasurementDefinition(recordNames[i - 1]).getUnit();
+							String recordKey = recordKeys[i - 1];
+							String expectUnit = device.getMeasurementDefinition(fileConfig, recordKey).getUnit();
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
-							log.fine("inUnit = " + inUnit + " - expectUnit = " + expectUnit);
+							log.fine(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit);
 							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
 						}
 						if (match != header.length - 1) {
-							throw new Exception("2"); // mismatch data header
+							throw new Exception("2"); // mismatch data header units
 						}
 					}
 					isData = true;
 				}
-				else { // isData
+				else { // isData use only recordKeys
 					// 0; 14,780;  0,598;  1,000;  8,838;  0,002
 					String[] dataStr = line.split("" + separator);
 					String data = dataStr[0].trim().replace(',', '.');
 					new_time_ms = (int)(new Double(data).doubleValue() * 1000);
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
-					sb = new StringBuffer();
+					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
+					// use only measurement which are isCalculation= false
 					for (int i = 0; i < sizeRecords; i++) {
 						data = dataStr[i + 1].trim().replace(',', '.');
 						double tmpDoubleValue = new Double(data).doubleValue();
 						double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
 						int point = (int) dPoint;
-						sb.append(point + ", ");
-						log.fine("recordNames[" + i + "] = " + recordNames[i]);
-						recordSet.getRecord(recordNames[i]).add(point);
+						if (log.isLoggable(Level.FINE)) {
+							sb.append("recordKeys[" + i + "] = ").append(recordKeys[i]).append(" = ").append(point).append(lineSep);
+						}
+						recordSet.getRecord(recordKeys[i]).add(point);
+						if (log.isLoggable(Level.FINE)) log.fine("recordKeys[" + i + "] = " + recordKeys[i]);
 					}
-					log.fine(sb.toString());
+					if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 				}
 			}
 			// set time base in msec
@@ -198,23 +236,25 @@ public class CSVReaderWriter {
 		BufferedWriter writer;
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		try {
-			statusBar.setMessage("Lese CVS Datei " + filePath);
+			statusBar.setMessage("Schreibe CVS Datei " + filePath);
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8 for Linux
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
-			df2.setGroupingUsed(false);
 			df3.setGroupingUsed(false);
 			sb = new StringBuffer();
-			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
-			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+			RecordSet recordSet = Channels.getInstance().getActiveChannel().get(recordSetKey);
 			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 			// write device name , manufacturer, and serial port string
-			writer.write(device.getName() + newLine);
+			sb.append(device.getName()).append(separator).append(recordSet.getChannelName()).append(lineSep);
+			writer.write(sb.toString());
+			log.fine("written header line = " + sb.toString()); 
 			
+			sb = new StringBuffer();
+			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
-			String[] recordNames = device.getMeasurementNames();
+			String[] recordNames = device.getMeasurementNames(recordSet.getChannelName());
 			for (int i = 0; i < recordNames.length; i++) {
-				MeasurementType  measurement = device.getMeasurementDefinition(recordNames[i]);
+				MeasurementType  measurement = device.getMeasurementDefinition(recordSet.getChannelName(), recordNames[i]);
 				log.finest("append " + recordNames[i]);
 				if (isRaw) {
 				//TODO use all records which have this attribute in XML
@@ -228,7 +268,7 @@ public class CSVReaderWriter {
 					log.finest("append " + recordNames[i]);
 				}
 			}
-			sb.deleteCharAt(sb.length() - 1).append(newLine);
+			sb.deleteCharAt(sb.length() - 1).append(lineSep);
 			log.finer("header line = " + sb.toString());
 			writer.write(sb.toString());
 
@@ -238,22 +278,23 @@ public class CSVReaderWriter {
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
-				sb.append((df2.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
+				sb.append((df3.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
+					MeasurementType measurement = device.getMeasurementDefinition(recordSet.getChannelName(), recordNames[j]);
 					if (isRaw) { // do not change any values
-						if (record.isActive())
+						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())
 								sb.append(df3.format(new Double(record.get(i))/1000.0).replace('.', decimalSeparator)).append(separator);
 							else
-								sb.append(df3.format(device.reverseTranslateValue(record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+								sb.append(df3.format(device.reverseTranslateValue(recordSet.getChannelName(), record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+						sb.append(df3.format(device.translateValue(recordSet.getChannelName(), record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 				}
-				sb.deleteCharAt(sb.length() - 1).append(newLine);
+				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
 				writer.write(sb.toString());
 				statusBar.setProgress(stausIncrement * i);

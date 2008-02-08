@@ -86,7 +86,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device, String channelConfigKey) throws IOException {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -156,7 +156,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 
-		String[] measurements = device.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+		String[] measurements = device.getMeasurementNames(device.getChannelName(0)); // 0=Spannung, 1=Höhe, 2=Steigrate
 		data.put(measurements[0], voltage);
 		data.put(measurements[1], height);
 		if (statusBar != null) {

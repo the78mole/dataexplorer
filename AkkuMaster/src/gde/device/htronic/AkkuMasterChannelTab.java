@@ -473,7 +473,7 @@ public class AkkuMasterChannelTab {
 											 * [7] int		Prozesszeit									[msec]			
 											 */
 											try {
-												data = serialPort.getData(channelSig, 0, null);
+												data = serialPort.getData(channelSig, 0, null, "");
 												// check for no error state
 												log.fine("error state = " + data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO));
 												if (0 == (Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)) {
@@ -491,7 +491,7 @@ public class AkkuMasterChannelTab {
 															isCollectDataStopped = false;
 															// record set does not exist or is outdated, build a new name and create
 															recordSetKey = (channel.size() + 1) + ") " + processName;
-															channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, application.getActiveDevice(), true, false));
+															channel.put(recordSetKey, RecordSet.createRecordSet(name, recordSetKey, application.getActiveDevice(), true, false));
 															log.fine(recordSetKey + " created for channel " + channel.getName());
 															if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 															channel.get(recordSetKey).setAllDisplayable();

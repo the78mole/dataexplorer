@@ -16,6 +16,11 @@
 ****************************************************************************************/
 package osde.device;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -24,45 +29,87 @@ import org.w3c.dom.Node;
  * @author Winfried Brügmann
  */
 public class PropertyType {
+	private Logger							log						= Logger.getLogger(PropertyType.class.getName());
 	
+	public enum Types {Integer, Double, Boolean, String};
 	private String name;
-	private String type;
+	private Types type;
 	private Object value;
 	private String description;
-	public enum Types {Integer, Double, Boolean};
 	private Types types; 
+	
+	private Element domElement;
 	
 	/**
 	 * constructs a DataCalculation class using a XML DOM element
 	 * @param element (DOM)
 	 */
 	public PropertyType(Element element) {
+		this.domElement = element;
 		this.name = element.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
-		this.type = element.getAttributes().getNamedItem("type").getNodeValue();
+		
+		if (element.getAttributes().getNamedItem("type").getNodeValue().equals("Double"))
+			this.type = PropertyType.Types.Double;
+		else if (element.getAttributes().getNamedItem("type").getNodeValue().equals("Integer"))
+			this.type = PropertyType.Types.Integer;
+		else if (element.getAttributes().getNamedItem("type").getNodeValue().equals("Boolean"))
+			this.type = PropertyType.Types.Boolean;
+		else if (element.getAttributes().getNamedItem("type").getNodeValue().equals("String"))
+			this.type = PropertyType.Types.String;
+		
 		this.value = element.getAttributes().getNamedItem("value").getNodeValue().replace(',', '.');
 		Node tmpNode = element.getAttributes().getNamedItem("description");
 		this.description = tmpNode != null ? tmpNode.getNodeValue() : null;
 	}
 
-	public PropertyType(String name, String type, Object value, String description) {
-		this.name = name.toLowerCase();
+	public PropertyType(Document document) {
+		this.domElement = document.createElement("Property");
+	}
+	
+	public PropertyType(Document document, String name, PropertyType.Types type, Object value, String description) {
+		try {
+			this.domElement = document.createElement("Property");
+			this.domElement.setAttribute("name", name);
+			this.domElement.setAttribute("type", type.toString());
+			this.domElement.setAttribute("value", value.toString());
+			this.domElement.setAttribute("description", description);
+		}
+		catch (DOMException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+    this.name = name.toLowerCase();
 		this.type = type;
-		this.value = ((String)value).replace(',', '.');
+		this.value = value.toString().replace(',', '.');
 		this.description = description;
+		
+		log.fine("created : " + this.toString());
 	}
 
-	public PropertyType(String name, String type, Object value) {
+	public PropertyType(Document document, String name, PropertyType.Types type, Object value) {
+		try {
+			this.domElement = document.createElement("Property");
+			this.domElement.setAttribute("name", name);
+			this.domElement.setAttribute("type", type.toString());
+			this.domElement.setAttribute("value", value.toString());
+		}
+		catch (DOMException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+
 		this.name = name.toLowerCase();
 		this.type = type;
-		this.value = ((String)value).replace(',', '.');
+		this.value = value.toString().replace(',', '.');
 		this.description = null;
+		
+		log.fine("created : " + this.toString());
 	}
 
 	public String toString() {
 		if (this.description != null)
-			return String.format("<Property> name = %s, type = %s, value = %s, description = %s", name, type, value, description);
+			return String.format("<Property name = %s, type = %s, value = %s, description = %s />", name, type, value, description);
 		else
-			return String.format("<Property> name = %s, type = %s, value = %s", name, type, value);
+			return String.format("<Property name = %s, type = %s, value = %s />", name, type, value);
 	}
 
 	/**
@@ -76,20 +123,22 @@ public class PropertyType {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		this.domElement.setAttribute("name", name);
 		this.name = name;
 	}
 
 	/**
 	 * @return the type
 	 */
-	public String getType() {
+	public PropertyType.Types getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(String type) {
+	public void setType(PropertyType.Types type) {
+		this.domElement.setAttribute("type", type.toString());
 		this.type = type;
 	}
 
@@ -97,11 +146,12 @@ public class PropertyType {
 	 * @return the value
 	 */
 	public Object getValue() {
+		this.types = this.type;
 		switch (types) {
-		case Integer:	return new Integer((String)this.value);
-		case Double:	return new Double((String)this.value);
-		case Boolean:	return new Boolean((String)this.value);
-		default:			return (String)this.value;
+		case Integer:	return new Integer(this.value.toString());
+		case Double:	return new Double(this.value.toString());
+		case Boolean:	return new Boolean(this.value.toString());
+		default:			return this.value.toString();
 		}
 	}
 
@@ -109,6 +159,7 @@ public class PropertyType {
 	 * @param value the value to set
 	 */
 	public void setValue(Object value) {
+		this.domElement.setAttribute("value", value.toString());
 		this.value = value;
 	}
 
@@ -123,7 +174,15 @@ public class PropertyType {
 	 * @param description the description to set
 	 */
 	public void setDescription(String description) {
+		this.domElement.setAttribute("description", description);
 		this.description = description;
+	}
+
+	/**
+	 * @return the domElement
+	 */
+	public Element getDomElement() {
+		return domElement;
 	}
 
 

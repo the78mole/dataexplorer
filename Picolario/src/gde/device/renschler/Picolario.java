@@ -79,26 +79,26 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 	}
 
-	/**
-	 * function to translate measured values from a device to values represented
-	 * @return double[] where value[0] is the min value and value[1] the max value
-	 */
-	public double[] translateValues(String recordKey, double minValue, double maxValue) {
-		double[] newValues = new double[2];
-
-		newValues[0] = translateValue(recordKey, minValue);
-		newValues[1] = translateValue(recordKey, maxValue);
-
-		return newValues;
-	}
+//	/**
+//	 * function to translate measured values from a device to values represented
+//	 * @return double[] where value[0] is the min value and value[1] the max value
+//	 */
+//	public double[] translateValues(String recordKey, double minValue, double maxValue) {
+//		double[] newValues = new double[2];
+//
+//		newValues[0] = translateValue(recordKey, minValue);
+//		newValues[1] = translateValue(recordKey, maxValue);
+//
+//		return newValues;
+//	}
 
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String recordKey, double value) {
+	public double translateValue(String configKey, String recordKey, double value) {
 		double newValue = 0.0;
-		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
+		String[] measurements = this.getMeasurementNames(configKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
 		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
 			// calculate voltage U = 2.5 + (byte3 - 45) * 0.0532
@@ -155,10 +155,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String recordKey, double value) {
+	public double reverseTranslateValue(String configKey, String recordKey, double value) {
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
 		double newValue = 0;
-		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
+		String[] measurements = this.getMeasurementNames(configKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		if (recordKey.startsWith(measurements[0])) { // 0=Spannung
 			// calculate voltage U = 2.5 + (value - 45) * 0.0532
 			newValue = (value - 2.5) / 0.0532 + 45.0;
@@ -215,11 +215,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dataUnit
 	 */
-	public String getDataUnit(String recordKey) {
+	public String getDataUnit(String channelConfigKey, String recordKey) {
 		String unit = "";
 		recordKey = recordKey.split("_")[0];
-		MeasurementType measurement = this.getMeasurementDefinition(recordKey);
-		String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigung
+		MeasurementType measurement = this.getMeasurementDefinition(channelConfigKey, recordKey);
+		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		//channel.get("Messgröße1");
 		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
 			unit = (String) measurement.getUnit();
@@ -239,15 +239,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isFromFile() && recordSet.isRaw()) {
-			for (String recordKey : recordSet.getRecordNames()) {
-				if (!recordSet.get(recordKey).isDisplayable()) {
-					// calculate the values required				
-					String[] measurements = this.getMeasurementNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
-					calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 8);
-					calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-					calculationThread.setMaxCalcProgressPercent(20);
-					calculationThread.start();
-				}
+			String[] measurements = this.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigrate
+			if (!recordSet.get(measurements[2]).isDisplayable()) {
+				// calculate the values required				
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 80); //TODO get 80 from properties
+				calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
+				calculationThread.setMaxCalcProgressPercent(20);
+				calculationThread.start();
 			}
 		}
 	}

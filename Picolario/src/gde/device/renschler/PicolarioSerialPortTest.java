@@ -41,7 +41,7 @@ public class PicolarioSerialPortTest {
 			SerialPort serialPort = picolario.open();
 
 			picolario.readNumberAvailableRecordSets();
-			picolario.print(picolario.getData(null, 1, null));
+			picolario.print(picolario.getData(null, 1, null, ""));
 			System.out.println();
 
 			serialPort.close();

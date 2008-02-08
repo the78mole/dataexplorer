@@ -30,7 +30,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-import osde.device.DataCalculationType;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
@@ -46,6 +45,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private static Logger									log										= Logger.getLogger(RecordSet.class.getName());
 
 	private String												name;																																// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	private final String									channelName;
 	private final OpenSerialDataExplorer	application;																													// pointer to main application
 	private final Channels								channels;
 	private String[]											recordNames;																													// Spannung, Strom, ..
@@ -83,6 +83,8 @@ public class RecordSet extends HashMap<String, Record> {
 	private Color													colorTimeGrid					= OpenSerialDataExplorer.COLOR_GREY;
 	private int														lineStyleTimeGrid			= new Integer(SWT.LINE_DOT);
 	
+	private int														configuredDisplayable = 0;
+	
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
@@ -90,8 +92,28 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param recordNames string array of the device supported records
 	 * @param timeStep_ms time in msec of device measures points
 	 */
-	public RecordSet(String name, String[] recordNames, int timeStep_ms, boolean isRaw, boolean isFromFile) {
+	public RecordSet(String channelName, String name, String[] recordNames, int timeStep_ms, boolean isRaw, boolean isFromFile, int initialCapacity) {
+		super(initialCapacity);
+		this.channelName = channelName;
+		this.name = name;
+		this.recordNames = recordNames;
+		this.timeStep_ms = timeStep_ms;
+		this.application = OpenSerialDataExplorer.getInstance();
+		this.isRaw = isRaw;
+		this.isFromFile = isFromFile;
+		this.channels = Channels.getInstance();
+	}
+
+	/**
+	 * data buffers according the size of given names array, where
+	 * the name is the key to access the data buffer
+	 * @param name for the records like "1) Laden" 
+	 * @param recordNames string array of the device supported records
+	 * @param timeStep_ms time in msec of device measures points
+	 */
+	public RecordSet(String channelName, String name, String[] recordNames, int timeStep_ms, boolean isRaw, boolean isFromFile) {
 		super();
+		this.channelName = channelName;
 		this.name = name;
 		this.recordNames = recordNames;
 		this.timeStep_ms = timeStep_ms;
@@ -109,8 +131,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isRaw
 	 * @param isCompareSet
 	 */
-	public RecordSet(String name, int timeStep_ms, boolean isRaw, boolean isCompareSet) {
+	public RecordSet(String channelName, String name, int timeStep_ms, boolean isRaw, boolean isCompareSet) {
 		super();
+		this.channelName = channelName;
 		this.name = name;
 		this.recordNames = new String[0];
 		this.timeStep_ms = timeStep_ms;
@@ -125,17 +148,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true/false	
 	 */
 	public synchronized boolean checkAllRecordsDisplayable() {
-		boolean areDisplayavle = false;
+		boolean areDisplayable = false;
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.getRecordNames()) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
 		}
 		log.fine("displayableRecordEntries=" + displayableRecordEntries);
 
-		if (displayableRecordEntries == this.getRecordNames().length) {
-			areDisplayavle = true;
+		if (displayableRecordEntries == this.configuredDisplayable) {
+			areDisplayable = true;
 		}
-		return areDisplayavle;
+		return areDisplayable;
 	}
 
 	/**
@@ -188,7 +211,7 @@ public class RecordSet extends HashMap<String, Record> {
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage() + " - data calcualtion failed ?");
 			}
-			values[i] = df.format(new Double(device.translateValue(record.getName(), indexValue / 1000.0)));
+			values[i] = df.format(new Double(device.translateValue(this.getChannelName(), record.getName(), indexValue / 1000.0)));
 		}
 		return values;
 	}
@@ -251,18 +274,18 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * method to create a record set with given name "1) Laden" containing records according the active device configuration
+	 * @param channelKey (name of the outlet or configuration)
 	 * @param recordName
 	 * @param device 
 	 */
-	public static RecordSet createRecordSet(String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
+	public static RecordSet createRecordSet(String channelKey, String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
 		// assume all channels have the same size
-		String[] recordNames = device.getMeasurementNames();
-		RecordSet newRecordSet = new RecordSet(recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile);
+		String[] recordNames = device.getMeasurementNames(channelKey);
+		RecordSet newRecordSet = new RecordSet(channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, 30);
 		for (int i = 0; i < recordNames.length; i++) {
 			String recordKey = recordNames[i];
-			MeasurementType measurement = device.getMeasurementDefinition(recordKey);
-			DataCalculationType dataCalculation = measurement.getDataCalculation();
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), dataCalculation.getOffset(), dataCalculation.getFactor(), device
+			MeasurementType measurement = device.getMeasurementDefinition(channelKey, recordKey);
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), device.getOffset(channelKey, recordKey), device.getFactor(channelKey, recordKey), device
 					.getTimeStep_ms(), 5);
 
 			// set color defaults
@@ -790,5 +813,26 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setLineStyleTimeGrid(int lineStyleTimeGrid) {
 		this.lineStyleTimeGrid = lineStyleTimeGrid;
+	}
+
+	/**
+	 * @return the configuredDisplayable
+	 */
+	public int getConfiguredDisplayable() {
+		return configuredDisplayable;
+	}
+
+	/**
+	 * @param configuredDisplayable the configuredDisplayable to set
+	 */
+	public void setConfiguredDisplayable(int configuredDisplayable) {
+		this.configuredDisplayable = configuredDisplayable;
+	}
+
+	/**
+	 * @return the channelName
+	 */
+	public String getChannelName() {
+		return channelName;
 	}
 }

@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.device;
 
+import org.w3c.dom.Document;
+
 import osde.data.RecordSet;
 
 /**
@@ -24,6 +26,9 @@ import osde.data.RecordSet;
  * @author Winfried Brügmann
  */
 public interface IDevice {
+	// define some global constants for data calculation 
+	public static final String 	OFFSET = "offset";
+	public static final String	FACTOR = "factor";
 	
 	/**
 	 * @return the device name
@@ -136,12 +141,17 @@ public interface IDevice {
 	/**
 	 * @return the measurement definitions matching key (voltage, current, ...)
 	 */
-	public MeasurementType getMeasurementDefinition(String recordKey);
+	public MeasurementType getMeasurementDefinition(String configKey, String recordKey);
 	
+	/**
+	 * @return the property element of the measurement key (voltage, current, ...)
+	 */
+	public PropertyType getPropertyDefinition(String configKey, String measurementkey, String propertyKey);
+
 	/**
 	 * @return the sorted measurement names
 	 */
-	public String[] getMeasurementNames();
+	public String[] getMeasurementNames(String configKey);
 
 		/**
 	 * @return the device dialog
@@ -154,41 +164,55 @@ public interface IDevice {
 	public DeviceSerialPort getSerialPort();
 	
 	/**
+	 * @return the device configuration document
+	 */
+	public Document getConfigurationDocument();
+	
+	/**
 	 * @return the dataUnit
 	 */
-	public String getDataUnit(String recordKey);
+	public String getDataUnit(String configKey, String recordKey);
 
 	/**
 	 * @return the offset
 	 */
-	public double getOffset(String recordKey);
+	public double getOffset(String configKey, String recordKey);
 
 	/**
 	 * @param offset the offset to set
 	 */
-	public void setOffset(String recordKey, double offset);
+	public void setOffset(String configKey, String recordKey, double offset);
 
 	/**
 	 * @return the factor
 	 */
-	public double getFactor(String recordKey);
+	public double getFactor(String configKey, String recordKey);
 
 	/**
 	 * @param factor the factor to set
 	 */
-	public void setFactor(String recordKey, double factor);
+	public void setFactor(String configKey, String recordKey, double factor);
+
+	/**
+	 * set measurement property value 
+	 * @param measurementkey
+	 * @param propertyKey
+	 * @param type
+	 * @param value
+	 */
+	public void setPropertyValue(String configKey, String measurementkey, String propertyKey, PropertyType.Types type, Object value);
+	
+	/**
+	 * function to translate measured value from a device to values represented
+	 * @return double with the adapted value
+	 */
+	public double translateValue(String configKey, String recordKey, double value);
 
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String recordKey, double value);
-
-	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
-	 */
-	public double reverseTranslateValue(String recordKey, double value);
+	public double reverseTranslateValue(String configKey, String recordKey, double value);
 
 	/**
 	 * function to calculate values for inactive which need to be calculated records

@@ -54,6 +54,7 @@ public class QuasiLinearRegression extends CalculationThread {
 		log.fine("start data calculation for record = " + targetRecordKey);
 
 		Record record = recordSet.get(targetRecordKey);
+		record.clear();
 		Record recordHeight = recordSet.get(sourceRecordKey);
 		StatusBar statusBar = application.getStatusBar();
 		statusBar.setMessageAsync(statusMessage);
@@ -70,8 +71,6 @@ public class QuasiLinearRegression extends CalculationThread {
 		for (int i = 0; i < counter+padding; i++) { // 0,5 sec
 			record.add(0);
 		}
-		// prepare progress status
-		int progInterval = maxCalcProgressPercent / modCounter;
 
 		// calculate avg x
 		double avgX = 0; //(interval-1) * time_ms / 1000.0 / interval; // 9 * 0.05 / 10; --> 0,05 
@@ -121,7 +120,6 @@ public class QuasiLinearRegression extends CalculationThread {
 
 			if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
 			--modCounter;
-			statusBar.setProgressAsync(maxCalcProgressPercent - modCounter * progInterval);
 		}
 		// pad the rest of the curve to make equal size
 		for (int i = record.size()-1; i < recordHeight.size(); i++) {
@@ -130,7 +128,6 @@ public class QuasiLinearRegression extends CalculationThread {
 		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
-		statusBar.setProgressAsync(maxCalcProgressPercent);
 		statusBar.setMessageAsync("");
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();

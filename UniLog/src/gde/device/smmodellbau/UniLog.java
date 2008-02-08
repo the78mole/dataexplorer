@@ -4,6 +4,8 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -11,20 +13,26 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.xml.sax.SAXException;
 
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.CalculationThread;
+import osde.utils.QuasiLinearRegression;
 
 /**
  * UniLog default device implementation, just copied from Sample project
  * @author Winfried Bruegmann
  */
 public class UniLog extends DeviceConfiguration implements IDevice {
+	private Logger																		log									= Logger.getLogger(this.getClass().getName());
 
-	private final OpenSerialDataExplorer application;
-	private final UniLogSerialPort serialPort;
-	private final UniLogDialog	dialog;
+	private final OpenSerialDataExplorer							application;
+	private final UniLogSerialPort										serialPort;
+	private final UniLogDialog												dialog;
+	private CalculationThread													slopeCalculationThread;
 	
 	/**
 	 * constructor using properties file
@@ -59,8 +67,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double translateValue(String recordKey, double value) {
-		double newValues = this.getOffset(recordKey) + this.getFactor(recordKey) * value;
+	public double translateValue(String channelConfigKey, String recordKey, double value) {
+		double newValues = this.getOffset(channelConfigKey, recordKey) + this.getFactor(channelConfigKey, recordKey) * value;
 		// do some calculation
 		return newValues;
 	}
@@ -70,8 +78,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double reverseTranslateValue(String recordKey, double value) {
-		double newValues = value / this.getFactor(recordKey) - this.getOffset(recordKey);
+	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
+		double newValues = value / this.getFactor(channelConfigKey, recordKey) - this.getOffset(channelConfigKey, recordKey);
 		// do some calculation
 		return newValues;
 	}
@@ -83,8 +91,133 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//add implementation where data point are calculated
+		String configKey = recordSet.getChannelName();
 		//do not forget to make record displayable -> record.setDisplayable(true);
+		if (recordSet.isFromFile() && recordSet.isRaw()) {
+			// calculate the values required
+			Record record;
+			String recordKey;
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			String[] measurements = this.getMeasurementNames(configKey);
+
+			int displayableCounter = 0;
+
+			// check if measurements isActive == false and set to isDisplayable == false
+			for (int j = 0; j < measurements.length; j++) {
+				record = recordSet.get(measurements[j]);
+				if (record.isActive()) {
+					++displayableCounter;
+				}
+				else {
+					record.setDisplayable(false);
+				}
+			}
+			
+			recordKey = measurements[3]; // 3=capacity [Ah]
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
+				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
+				for (int i = 0; i < recordCurrent.size(); i++) {
+					record.add(new Double(((recordCurrent.get(i) / 1000.0) * i * timeStep_ms) / (1000 * 3600)).intValue());
+					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				}
+				if (recordCurrent.isDisplayable()) {
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			
+			recordKey = measurements[4]; // 4=power [W]
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+
+				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
+				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
+				for (int i = 0; i < recordVoltage.size(); i++) {
+					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
+					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				}
+				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()){
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			
+			recordKey = measurements[5]; // 5=energy [Wh]
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
+				Record recordCharge = recordSet.get(measurements[3]); // 3=capacity
+				for (int i = 0; i < recordVoltage.size(); i++) {
+					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000).intValue());
+					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				}
+				if (recordVoltage.isDisplayable() && recordCharge.isDisplayable()) {
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			
+			recordKey = measurements[6]; // 6=votagePerCell
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
+				PropertyType property = record.getDevice().getPropertyDefinition(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
+				int numberCells = property != null ? (Integer) property.getValue() : 4;
+				for (int i = 0; i < recordVoltage.size(); i++) {
+					record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
+					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				}
+				if (recordVoltage.isDisplayable()) {
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			
+			recordKey = measurements[8]; // 8=efficiency
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
+				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
+				PropertyType property = record.getDevice().getPropertyDefinition(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
+				int prop_n100W = property != null ? (Integer) property.getValue() : 2222;
+				for (int i = 0; i < recordRevolution.size(); i++) {
+					double eta = recordPower.get(i) != 0 ? (recordRevolution.get(i) / 10.0) / (recordPower.get(i) * prop_n100W) : 0;
+					record.add(new Double(eta * 1000).intValue());
+					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				}
+				if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			
+			recordKey = measurements[10]; // 10=slope
+			log.info("start data calculation for record = " + recordKey);
+			record = recordSet.get(recordKey);
+			if (!record.isDisplayable()) {
+				// calculate the values required				
+				slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], 10); //TODO get 80 from properties
+				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
+				slopeCalculationThread.setMaxCalcProgressPercent(20);
+				slopeCalculationThread.start();
+				if (recordSet.get(measurements[9]).isDisplayable()) {
+					record.setDisplayable(true);
+					++displayableCounter;
+				}
+			}
+			log.fine("displayableCounter = " + displayableCounter);
+			recordSet.setConfiguredDisplayable(displayableCounter);
+
+			application.updateGraphicsWindow();
+			log.fine("finished data calculation for record = " + recordKey);
+		}
 	}
 
 	/**

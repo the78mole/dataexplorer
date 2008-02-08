@@ -73,7 +73,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double translateValue(String recordKey, double value) {
+	public double translateValue(String channelConfigKey, String recordKey, double value) {
 		double newValues = value;
 		// do some calculation
 		return newValues;
@@ -84,7 +84,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double reverseTranslateValue(String recordKey, double value) {
+	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
 		double newValues = value;
 		// do some calculation
 		return newValues;

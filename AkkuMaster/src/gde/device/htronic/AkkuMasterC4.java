@@ -82,7 +82,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String recordKey, double value) {
+	public double translateValue(String configKey, String recordKey, double value) {
 		double newValue = value;
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
@@ -93,7 +93,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String recordKey, double value) {
+	public double reverseTranslateValue(String configKey, String recordKey, double value) {
 		double newValue = value;
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
@@ -109,9 +109,9 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		if (recordSet.isFromFile() && recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				String[] recordNames = this.getMeasurementNames();
+				String[] recordNames = this.getMeasurementNames(recordSet.getChannelName());
 				for (String recordKey : recordNames) {
-					MeasurementType measurement = this.getMeasurementDefinition(recordKey);
+					MeasurementType measurement = this.getMeasurementDefinition(recordSet.getChannelName(), recordKey);
 					if (measurement.isCalculation()) {
 						log.fine(recordKey);
 						calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, channels.getActiveChannel().getActiveRecordSet()));

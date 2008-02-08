@@ -68,11 +68,11 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device) throws IOException {
+	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device, String channelConfigKey) throws IOException {
 		Vector<Integer> numRecordSet = new Vector<Integer>();
 		Vector<Integer> time_ms = new Vector<Integer>();
 		
-		String[] measurements = device.getMeasurementNames(); 
+		String[] measurements = device.getMeasurementNames(channelConfigKey); 
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		// *** power/drive *** group
 		Vector<Integer> voltageReceiver = new Vector<Integer>();

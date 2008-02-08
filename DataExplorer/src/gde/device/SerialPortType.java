@@ -80,7 +80,7 @@ public class SerialPortType {
 		}
 		this.timeOut = to;
 
-		DataBlockType db = new DataBlockType(); // optional element
+		DataBlockType db = null; // optional element
 		NodeList dataBlockNodeList = element.getElementsByTagName("DataBlock");
 		if (dataBlockNodeList != null && dataBlockNodeList.getLength() > 0) {
 			for (int i = 0; i < dataBlockNodeList.getLength(); i++) {
@@ -92,45 +92,6 @@ public class SerialPortType {
 		}
 		this.dataBlock = db;
 
-	}
-
-	public SerialPortType(String port, int baudeRate, int dataBits, int parity, int stopBits, int flowControlMode, boolean isRTS, boolean isDTS) {
-		this.port = port;
-		this.baudeRate = baudeRate;
-		this.dataBits = dataBits;
-		this.parity = parity;
-		this.stopBits = stopBits;
-		this.flowControlMode = flowControlMode;
-		this.isRTS = isRTS;
-		this.isDTR = isDTS;
-		this.timeOut = new TimeOutType();
-		this.dataBlock = new DataBlockType();
-	}
-
-	public SerialPortType(String port, int baudeRate, int dataBits, int parity, int stopBits, int flowControlMode, boolean isRTS, boolean isDTS, DataBlockType dataBlock) {
-		this.port = port;
-		this.baudeRate = baudeRate;
-		this.dataBits = dataBits;
-		this.parity = parity;
-		this.stopBits = stopBits;
-		this.flowControlMode = flowControlMode;
-		this.isRTS = isRTS;
-		this.isDTR = isDTS;
-		this.timeOut = new TimeOutType();
-		this.dataBlock = dataBlock;
-	}
-
-	public SerialPortType(String port, int baudeRate, int dataBits, int parity, int stopBits, int flowControlMode, boolean isRTS, boolean isDTS, DataBlockType dataBlock, TimeOutType timeOut) {
-		this.port = port;
-		this.baudeRate = baudeRate;
-		this.dataBits = dataBits;
-		this.parity = parity;
-		this.stopBits = stopBits;
-		this.flowControlMode = flowControlMode;
-		this.isRTS = isRTS;
-		this.isDTR = isDTS;
-		this.timeOut = timeOut;
-		this.dataBlock = dataBlock;
 	}
 
 	public String toString() {

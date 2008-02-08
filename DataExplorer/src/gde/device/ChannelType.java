@@ -22,6 +22,8 @@ import java.util.Vector;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import osde.utils.XMLUtils;
+
 /**
  * ChannelType class represents one element in the DeviceConfiguration DOM tree, refer to DeviceProperties style sheet
  * @author Winfried Brügmann
@@ -34,6 +36,7 @@ public class ChannelType extends Vector<MeasurementType> {
 
 	private String								name;
 	private final int							type;
+	private final Element					domElement;
 	private final Vector<String>	measurementNames	= new Vector<String>();
 
 	/**
@@ -41,42 +44,18 @@ public class ChannelType extends Vector<MeasurementType> {
 	 * @param element (DOM)
 	 */
 	public ChannelType(Element element) {
+		this.domElement = element;
 		this.name = element.getAttributes().getNamedItem("name").getNodeValue();
 		this.type = getChannelType(element.getAttributes().getNamedItem("type").getNodeValue());
-		NodeList measurementNodeList = element.getElementsByTagName("Measurement");
-		if (measurementNodeList != null && measurementNodeList.getLength() > 0) {
-			for (int i = 0; i < measurementNodeList.getLength(); i++) {
-				Element el = (Element) measurementNodeList.item(i);
-				MeasurementType meas = new MeasurementType(el);
-				this.add(meas);
-				measurementNames.add(meas.getName());
-			}
-		}
-	}
-
-	public ChannelType(String name, int type, MeasurementType measurement) {
-		this.name = name;
-		this.type = type;
-		this.add(measurement);
-		measurementNames.add(measurement.getName());
-	}
-
-	public ChannelType(String name, int type, Vector<MeasurementType> measurements) {
-		this.name = name;
-		this.type = type;
-		for (Iterator<MeasurementType> iterator = measurements.iterator(); iterator.hasNext();) {
-			MeasurementType meas = iterator.next();
-			this.add(meas);
-			measurementNames.add(meas.getName());
-		}
 	}
 
 	public String toString() {
 		String lineSep = System.getProperty("line.separator");
-		StringBuffer sb = new StringBuffer().append("<Channel>").append(lineSep);
+		StringBuffer sb = new StringBuffer().append(lineSep).append("<Channel>").append(lineSep);
 		for (Iterator<MeasurementType> iterator = this.iterator(); iterator.hasNext();) {
 			sb.append(iterator.next().toString()).append(lineSep);
 		}
+		sb.append("</Channel>").append(lineSep);
 		return sb.toString();
 	}
 
@@ -85,6 +64,14 @@ public class ChannelType extends Vector<MeasurementType> {
 	 */
 	public Vector<String> getMeasurementNames() {
 		return measurementNames;
+	}
+	
+	/**
+	 * measurement names has to be added from outside else DOM elements are out of sync
+	 * @param name
+	 */
+	public void addMeasurementName(String name) {
+		measurementNames.add(name);
 	}
 
 	private int getChannelType(String key) {
@@ -113,6 +100,7 @@ public class ChannelType extends Vector<MeasurementType> {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		XMLUtils.setStringValue(this.domElement, "name", name);
 		this.name = name;
 	}
 }

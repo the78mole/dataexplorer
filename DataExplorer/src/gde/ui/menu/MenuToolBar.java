@@ -622,11 +622,13 @@ public class MenuToolBar {
 			public void run() {
 				Vector<String> newRecordSetItems = new Vector<String>(recordSelectCombo.getItems().length);
 				String[] recordSetNames = recordSelectCombo.getItems();
+				int index = recordSelectCombo.getSelectionIndex();
 				for (int i = 0; i < recordSetNames.length; i++) {
 					if (recordSetNames[i].length() > 3) newRecordSetItems.add(recordSetNames[i]);
 				}
 				newRecordSetItems.add(recordSetKey);
 				recordSelectCombo.setItems(newRecordSetItems.toArray(new String[1]));
+				recordSelectCombo.select(index);
 				updateChannelToolItems();
 			}
 		});

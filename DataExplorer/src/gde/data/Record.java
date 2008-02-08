@@ -302,8 +302,9 @@ public class Record extends Vector<Integer> {
 			this.minScaleValue = newMinScaleValue;
 		}
 		else {
-			this.maxScaleValue = device.translateValue(this.name, maxValue/1000);
-			this.minScaleValue = device.translateValue(this.name, minValue/1000);
+			String channelConfigKey = this.getParent().getChannelName();
+			this.maxScaleValue = device.translateValue(channelConfigKey, this.name, maxValue/1000);
+			this.minScaleValue = device.translateValue(channelConfigKey, this.name, minValue/1000);
 		}
 	}
 

@@ -49,6 +49,7 @@ public class CurveUtils {
 	 */
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
+		final String channelConfigKey = record.getParent().getChannelName();
 
 		if (log.isLoggable(Level.FINER)) log.finer("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
@@ -74,8 +75,8 @@ public class CurveUtils {
 			yMinValueDisplay = record.getMinScaleValue();
 			yMaxValueDisplay = record.getMaxScaleValue();
 			if (isRaw) {
-				yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
-				yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+				yMinValue = device.reverseTranslateValue(channelConfigKey, recordName, yMinValueDisplay);
+				yMaxValue = device.reverseTranslateValue(channelConfigKey, recordName, yMaxValueDisplay);
 			}
 			else {
 				yMinValue = yMinValueDisplay;
@@ -87,8 +88,8 @@ public class CurveUtils {
 		else {
 			// TODO exclude imported data where values don't need correction
 			if (device != null && isRaw) { // adapt to device specific range
-				yMinValueDisplay = device.translateValue(recordName, yMinValue);
-				yMaxValueDisplay = device.translateValue(recordName, yMaxValue);
+				yMinValueDisplay = device.translateValue(channelConfigKey, recordName, yMinValue);
+				yMaxValueDisplay = device.translateValue(channelConfigKey, recordName, yMaxValue);
 			}
 
 			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling alogorithm
@@ -96,8 +97,8 @@ public class CurveUtils {
 				yMinValueDisplay = roundValues[0]; 	// min
 				yMaxValueDisplay = roundValues[1];	// max
 				if (isRaw) {
-					yMinValue = device.reverseTranslateValue(recordName, yMinValueDisplay);
-					yMaxValue = device.reverseTranslateValue(recordName, yMaxValueDisplay);
+					yMinValue = device.reverseTranslateValue(channelConfigKey, recordName, yMinValueDisplay);
+					yMaxValue = device.reverseTranslateValue(channelConfigKey, recordName, yMaxValueDisplay);
 				}
 				else {
 					yMinValue = yMinValueDisplay;
@@ -114,7 +115,7 @@ public class CurveUtils {
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
 		if (log.isLoggable(Level.FINE)) log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
-		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getDataUnit(recordName) + "]";
+		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getDataUnit(record.getParent().getChannelName(), recordName) + "]";
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
