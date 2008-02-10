@@ -49,11 +49,12 @@ public class CurveUtils {
 	 */
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-		final String channelConfigKey = record.getParent().getChannelName();
+		final boolean isCompareSet = record.getParent().isCompareSet();
+		final String channelConfigKey = record.getChannelConfigKey();
+		log.fine("isCompareSet = " + isCompareSet + " channelConfigKey = " + channelConfigKey);
 
 		if (log.isLoggable(Level.FINER)) log.finer("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
-		boolean isCompareSet = record.getParent().isCompareSet();
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
 		log.fine("drawing record =" + recordName + " isCompareSet = " + isCompareSet);
 
@@ -115,7 +116,7 @@ public class CurveUtils {
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
 		if (log.isLoggable(Level.FINE)) log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
-		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getMeasurementUnit(record.getParent().getChannelName(), recordName) + "]";
+		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getMeasurementUnit(channelConfigKey, recordName) + "]";
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));

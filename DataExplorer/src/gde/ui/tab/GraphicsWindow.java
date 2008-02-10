@@ -580,7 +580,7 @@ public class GraphicsWindow {
 		// draw each record
 		for (String record : recordSet.getRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
-			log.fine("drawing record = " + actualRecord.getName());
+			log.fine("drawing record = " + actualRecord.getName() + "-" + actualRecord.isVisible() +  "-" + actualRecord.isDisplayable());
 			if (actualRecord.isVisible() && actualRecord.isDisplayable()){
 				CurveUtils.drawScale(actualRecord, canvasGC, x0, y0, width, height, dataScaleWidth);
 				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet());

@@ -732,7 +732,8 @@ public class CurveSelectorContextMenu {
 							compareSet.setTimeStep_ms(recordSet.getTimeStep_ms());
 							String recordkey = newRecordKey + "_" + compareSet.size();
 							compareSet.addRecordName(recordkey);
-							compareSet.put(recordkey, recordSet.get(newRecordKey).clone());
+							compareSet.put(recordkey, recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
+							compareSet.get(recordkey).setChannelConfigKey(recordSet.get(newRecordKey).getChannelConfigKey());
 							int maxRecordSize = compareSet.getSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();

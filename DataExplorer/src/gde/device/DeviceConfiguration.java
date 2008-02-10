@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -56,7 +55,6 @@ public class DeviceConfiguration {
 	private DeviceType												device;
 	private SerialPortType										serialPort;
 	private TimeBaseType											timeBase;
-	private HashMap<Integer, ChannelType>			channels									= new HashMap<Integer, ChannelType>();
 	private boolean														isChangePropery						= false;
 
 	public final static int										DEVICE_TYPE_CHARGER				= 1;
@@ -134,10 +132,6 @@ public class DeviceConfiguration {
 		this.device = deviceProps.getDevice();
 		this.serialPort = deviceProps.getSerialPort();
 		this.timeBase = deviceProps.getTimeBase();
-		int i = 1;
-		for (ChannelType channel : this.deviceProps.getChannel()) {
-			this.channels.put(i++, channel);
-		}
 		
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 	}
@@ -154,7 +148,6 @@ public class DeviceConfiguration {
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
 		this.timeBase = deviceConfig.timeBase;	
-		this.channels = new HashMap<Integer, ChannelType>(deviceConfig.channels);
 		this.isChangePropery = deviceConfig.isChangePropery;
 
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
@@ -170,17 +163,6 @@ public class DeviceConfiguration {
 //
 //		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 //	}
-
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		String lineSep = System.getProperty("line.separator");
-		sb.append("<DeviceProperties>").append(lineSep);
-		sb.append(device.toString()).append(lineSep);
-		sb.append(serialPort.toString()).append(lineSep);
-		sb.append(timeBase.toString()).append(lineSep);
-		sb.append(channels.toString()).append(lineSep);
-		return sb.toString();
-	}
 
 	/**
 	 * writes updated device properties XML
@@ -215,20 +197,6 @@ public class DeviceConfiguration {
 	 */
 	public TimeBaseType getTimeBaseType() {
 		return timeBase;
-	}
-
-	/**
-	 * @return the map of measurements(records) definitions
-	 */
-	public HashMap<Integer, ChannelType> getChannelTypes() {
-		return channels;
-	}
-
-	/**
-	 * @return the channel 1 to n
-	 */
-	public ChannelType getChannel(int number) {
-		return channels.get(number);
 	}
 
 	public boolean isUsed() {
@@ -332,14 +300,14 @@ public class DeviceConfiguration {
 	 * @return the channel count
 	 */
 	public int getChannelCount() {
-		return channels.size();
+		return this.deviceProps.getChannel().size();
 	}
 
 	/**
 	 * @return the channel name
 	 */
 	public String getChannelName(int channelNumber) {
-		return channels.get(channelNumber).getName();
+		return this.deviceProps.getChannel().get(channelNumber - 1).getName();
 	}
 
 	/**
@@ -349,7 +317,7 @@ public class DeviceConfiguration {
 	 */
 	public void setChannelName(String channelName, int channelNumber) {
 		this.isChangePropery = true;
-		channels.get(channelNumber).setName(channelName);
+		this.deviceProps.getChannel().get(channelNumber - 1).setName(channelName);
 	}
 
 	/**
@@ -357,7 +325,7 @@ public class DeviceConfiguration {
 	 * 0 = TYPE_OUTLET, 1 = TYPE_CONFIG;
 	 */
 	public int getChannelType(int channelNumber) {
-		return channels.get(channelNumber).getType().ordinal();
+		return this.deviceProps.getChannel().get(channelNumber - 1).getType().ordinal();
 	}
 	
 	/**
@@ -372,7 +340,7 @@ public class DeviceConfiguration {
 	 * @return the number of measurements of a channel by given channel number
 	 */
 	public int getNumberOfMeasurements(int channelNumber) {
-		return channels.get(channelNumber).getMeasurement().size();
+		return this.deviceProps.getChannel().get(channelNumber - 1).getMeasurement().size();
 	}
 
 	/**
@@ -390,7 +358,7 @@ public class DeviceConfiguration {
 	private ChannelType getChannel(String channelConfigKey) {
 		ChannelType channel = null;
 		for (ChannelType c : this.deviceProps.getChannel()) {
-			if(c.getName().equals(channelConfigKey)) {
+			if(c.getName().trim().equals(channelConfigKey)) {
 				channel = c;
 				break;
 			}
@@ -469,7 +437,7 @@ public class DeviceConfiguration {
 	 * @param symbol
 	 */
 	public String getMeasurementSymbol(String channelConfigKey, String measurementKey) {
-		return this.getMeasurement(channelConfigKey, measurementKey).getSymbol();
+		return this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getSymbol();
 	}
 
 	/**
@@ -507,7 +475,7 @@ public class DeviceConfiguration {
 	 */
 	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = null;
-		List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey).getProperty();
+		List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getProperty();
 		for (PropertyType propertyType : properties) {
 			if(propertyType.getName().equals(propertyKey)) {
 				property = propertyType;
@@ -525,7 +493,7 @@ public class DeviceConfiguration {
 	 */
 	public double getMeasurementOffset(String channelConfigKey, String measurementKey) {
 		if(log.isLoggable(Level.FINER)) log.finer("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.OFFSET);
 		if (property == null) // property does not exist
 			return 0.0;
 		else
@@ -557,7 +525,7 @@ public class DeviceConfiguration {
 	 */
 	public double getMeasurementFactor(String channelConfigKey, String measurementKey) {
 		if(log.isLoggable(Level.FINER)) log.finer("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
+		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.FACTOR);
 		if (property == null) // property does not exist
 			return 1.0;
 		else
@@ -589,7 +557,7 @@ public class DeviceConfiguration {
 	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
 	 */
 	public Object getMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey) {
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, propertyKey);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], propertyKey);
 		return property != null ? property.getValue() : 1;
 	}
 	
@@ -626,5 +594,12 @@ public class DeviceConfiguration {
 		newProperty.setType(type);
 		newProperty.setValue("" + value);
 		this.getMeasurement(channelConfigKey, measurementKey).getProperty().add(newProperty);
+	}
+
+	/**
+	 * @param isChangePropery the isChangePropery to set
+	 */
+	public void setChangePropery(boolean isChangePropery) {
+		this.isChangePropery = isChangePropery;
 	}
 }

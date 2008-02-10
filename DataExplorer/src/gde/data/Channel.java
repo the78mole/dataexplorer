@@ -36,7 +36,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	private Logger												log								= Logger.getLogger(this.getClass().getName());
 	
 	private String												fileSep = System.getProperty("file.separator");
-	private final String									name;																														// 1: Ausgang
+	private String												name;																														// 1: Ausgang
 	private final int											type;
 	private GraphicsTemplate							template;																												// graphics template holds view configuration
 	private RecordSet											activeRecordSet;
@@ -216,5 +216,12 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public int getType() {
 		return type;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

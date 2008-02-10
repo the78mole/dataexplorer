@@ -276,7 +276,12 @@ public interface IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet);
 
 	/**
-	 * writes updated device properties XML
+	 * @param isChangePropery the isChangePropery to set
+	 */
+	public void setChangePropery(boolean isChangePropery);
+
+	/**
+	 * writes updated device properties XML if isChangePropery == true;
 	 */
 	public void storeDeviceProperties();
 }

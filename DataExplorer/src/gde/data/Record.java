@@ -49,6 +49,7 @@ public class Record extends Vector<Integer> {
 	private int									minValue							= Integer.MAX_VALUE;													// min value of the curve
 
 	private RecordSet						parent;
+	private String							channelConfigKey; 		// used as channelConfigKey
 	private String							keyName;
 	private boolean							isActive;
 	private boolean							isDisplayable;
@@ -145,6 +146,8 @@ public class Record extends Vector<Integer> {
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
 		this.device = record.device;
+		this.channelConfigKey = record.channelConfigKey;
+		log.info("channelConfigKey = " + this.channelConfigKey);
 	}
 
 	/**
@@ -368,6 +371,7 @@ public class Record extends Vector<Integer> {
 	 * @param parent the parent to set
 	 */
 	public void setParent(RecordSet parent) {
+		this.channelConfigKey = parent.getChannelName();
 		this.parent = parent;
 	}
 
@@ -621,5 +625,19 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode) {
 		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
+	}
+
+	/**
+	 * @return the parentName
+	 */
+	public String getChannelConfigKey() {
+		return channelConfigKey;
+	}
+
+	/**
+	 * @param channelConfigKey the channelConfigKey to set
+	 */
+	public void setChannelConfigKey(String channelConfigKey) {
+		this.channelConfigKey = channelConfigKey;
 	}
 }

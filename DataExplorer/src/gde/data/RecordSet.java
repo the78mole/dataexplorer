@@ -247,7 +247,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String[] getActiveRecordNames() {
 		Vector<String> activeRecords = new Vector<String>();
 		for (String recordKey : recordNames) {
-			if (this.get(recordKey).isActive()) activeRecords.add(recordKey);
+			if (this.get(recordKey).isDisplayable()) activeRecords.add(recordKey);
 		}
 		return activeRecords.toArray(new String[1]);
 	}
