@@ -19,11 +19,8 @@ package osde.device.wb;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXBException;
 
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
@@ -43,13 +40,11 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using properties file
 	 * @param deviceProperties
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 * @throws NoSuchPortException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
 	 */
-	public Simulator(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, application.getStatusBar());

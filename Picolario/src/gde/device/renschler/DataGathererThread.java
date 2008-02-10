@@ -92,7 +92,7 @@ public class DataGathererThread extends Thread {
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 8);
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 80);
 				calculationThread.start();
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);

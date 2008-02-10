@@ -156,7 +156,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 
-		String[] measurements = device.getMeasurementNames(device.getChannelName(0)); // 0=Spannung, 1=Höhe, 2=Steigrate
+		String[] measurements = device.getMeasurementNames(device.getChannelName(1)); // 0=Spannung, 1=Höhe, 2=Steigrate
 		data.put(measurements[0], voltage);
 		data.put(measurements[1], height);
 		if (statusBar != null) {

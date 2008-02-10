@@ -29,6 +29,8 @@ public abstract class CalculationThread extends Thread {
 	protected Logger												log					= Logger.getLogger(this.getClass().getName());
 
 	protected static String									newLine			= System.getProperty("line.separator");
+	
+	public static final String REGRESSION_INTERVAL_SEC = "regression_interval_sec";
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;

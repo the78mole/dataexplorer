@@ -134,7 +134,7 @@ public class CSVReaderWriter {
 					sizeRecords = header.length - 1;
 					int countNotMeasurement = 0;
 					for (String recordKey : recordNames) {
-						MeasurementType measurement = device.getMeasurementDefinition(fileConfig, recordKey);
+						MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
 						if (!measurement.isCalculation()) {
 							keys.append(measurement.getName()).append(separator);
 							++countNotMeasurement;			// update count for possible raw
@@ -154,7 +154,7 @@ public class CSVReaderWriter {
 						
 						for (int i = 1; i < header.length; i++) {
 							String recordKey = recordKeys[i - 1];
-							String expectUnit = device.getMeasurementDefinition(fileConfig, recordKey).getUnit();
+							String expectUnit = device.getUnit(fileConfig, recordKey);
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
 							log.fine(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit);
@@ -254,10 +254,9 @@ public class CSVReaderWriter {
 			// write the measurements signature
 			String[] recordNames = device.getMeasurementNames(recordSet.getChannelName());
 			for (int i = 0; i < recordNames.length; i++) {
-				MeasurementType  measurement = device.getMeasurementDefinition(recordSet.getChannelName(), recordNames[i]);
+				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[i]);
 				log.finest("append " + recordNames[i]);
 				if (isRaw) {
-				//TODO use all records which have this attribute in XML
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
 						sb.append(measurement.getName()).append(" [---]").append(separator);	
 						log.finest("append " + recordNames[i]);
@@ -282,7 +281,7 @@ public class CSVReaderWriter {
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
-					MeasurementType measurement = device.getMeasurementDefinition(recordSet.getChannelName(), recordNames[j]);
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[i]);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())

@@ -19,13 +19,10 @@ package osde.device.renschler;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXBException;
 
 import osde.data.Channels;
 import osde.data.Record;
@@ -52,13 +49,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * @param iniFile
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 * @throws NoSuchPortException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
 	 */
-	public Picolario(String iniFile) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+	public Picolario(String iniFile) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(iniFile);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application.getStatusBar());
@@ -218,7 +213,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public String getDataUnit(String channelConfigKey, String recordKey) {
 		String unit = "";
 		recordKey = recordKey.split("_")[0];
-		MeasurementType measurement = this.getMeasurementDefinition(channelConfigKey, recordKey);
+		MeasurementType measurement = this.getMeasurement(channelConfigKey, recordKey);
 		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		//channel.get("Messgröße1");
 		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
