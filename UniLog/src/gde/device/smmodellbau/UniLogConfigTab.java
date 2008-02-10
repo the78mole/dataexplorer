@@ -945,24 +945,24 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setActive(a1ValueButton.getSelection());
 		measurement.setName(a1Text.getText());
 		measurement.setUnit(a1Unit.getText());
-		measurement.setOffset(new Double(a1Offset.getText()));
-		measurement.setFactor(new Double(a1Factor.getText()));
+		measurement.setOffset(new Double(a1Offset.getText().replace(',', '.')));
+		measurement.setFactor(new Double(a1Factor.getText().replace(',', '.')));
 		
 		measurementKey = device.getMeasurementNames(configName)[12];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(a2ValueButton.getSelection());
 		measurement.setName(a2Text.getText());
 		measurement.setUnit(a2Unit.getText());
-		measurement.setOffset(new Double(a2Offset.getText()));
-		measurement.setFactor(new Double(a2Factor.getText()));
+		measurement.setOffset(new Double(a2Offset.getText().replace(',', '.')));
+		measurement.setFactor(new Double(a2Factor.getText().replace(',', '.')));
 
 		measurementKey = device.getMeasurementNames(configName)[13];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(a3ValueButton.getSelection());
 		measurement.setName(a3Text.getText());
 		measurement.setUnit(a3Unit.getText());
-		measurement.setOffset(new Double(a3Offset.getText()));
-		measurement.setFactor(new Double(a3Factor.getText()));
+		measurement.setOffset(new Double(a3Offset.getText().replace(',', '.')));
+		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.')));
 	}
 	
 	/**
