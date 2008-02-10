@@ -200,7 +200,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				// calculate the values required				
-				slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], 10); //TODO get 80 from properties
+				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_INTERVAL_SEC);
+				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+				slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
 				slopeCalculationThread.setMaxCalcProgressPercent(20);
 				slopeCalculationThread.start();

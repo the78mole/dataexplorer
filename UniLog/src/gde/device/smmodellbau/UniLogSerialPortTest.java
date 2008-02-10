@@ -41,7 +41,7 @@ public class UniLogSerialPortTest {
 				//System.out.println("checkSum = " + last2bytes);
 				//serialPort.waitDataReady(5);
 				
-				serialPort.getData(null, 0, device, device.getChannel(1).getName());
+				serialPort.getData(null, 0, device, device.getChannelName(1));
 				
 			}
 			else {

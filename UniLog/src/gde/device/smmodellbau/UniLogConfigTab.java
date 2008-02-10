@@ -103,7 +103,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	private int prop100WValue = 3400;
 	private int numCellValue = 12;
 
-	private final String									configName; // tabName
+	private String												configName; // tabName
 	private final UniLogDialog						dialog;
 	private CCombo regressionTime;
 	private final UniLog									device;																						// get device specific things, get serial port, ...
@@ -166,7 +166,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					powerGroup.setToolTipText("Hier bitte alle Datenkanäle auswählen, die angezeigt werden sollen");
 					powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							if (log.isLoggable(Level.FINEST))  log.finest("powerGroup.paintControl, event="+evt);
+							if (log.isLoggable(Level.FINEST))  log.finest("powerGroup.paintControl, event="+evt);							
 							String recordKey = device.getMeasurementNames(configName)[0];
 							MeasurementType measurement = device.getMeasurement(configName, recordKey);
 							reveiverVoltageButton.setSelection(measurement.isActive());
@@ -489,6 +489,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								int regressionTime_sec = regressionTime.getSelectionIndex() + 1;
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
+								device.storeDeviceProperties();
 							}
 						});
 					}
@@ -774,7 +775,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							if (log.isLoggable(Level.FINEST))  log.finest("setConfigButton.widgetSelected, event="+evt);
 							collectAndUpdateConfiguration();
 							device.storeDeviceProperties();
-							log.info(device.getChannel(1).toString());
 							setConfigButton.setEnabled(false);
 						}
 					});
@@ -991,6 +991,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 */
 	public boolean getConfigButtonStatus() {
 		return this.setConfigButton.getEnabled();
+	}
+
+	/**
+	 * @param configName the configName to set
+	 */
+	public void setConfigName(String configName) {
+		this.configName = configName;
 	}
 
 }

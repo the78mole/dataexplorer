@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
+import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -140,7 +141,7 @@ public class UniLogDialog extends DeviceDialog {
 	private String[]											configurationNames	= new String[] { " Konfig 1" };
 	private String												redDataSetsText			= "0";
 	private String												numberReadErrorText	= "0";
-
+	private int														channelSelectionIndex = 0;
 	
 	/**
 	* main method to test this dialog inside a shell 
@@ -247,7 +248,7 @@ public class UniLogDialog extends DeviceDialog {
 									a1ModusCombo.setItems(A1_MODUS);
 									a1ModusCombo.select(2);
 									a1ModusCombo.setEditable(false);
-									a1ModusCombo.setBounds(91, 24, 117, 18);
+									a1ModusCombo.setBounds(91, 24, 117, 20);
 									a1ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -264,7 +265,7 @@ public class UniLogDialog extends DeviceDialog {
 								currentSensotGroup.setBounds(337, 119, 277, 59);
 								{
 									sensorCurrentCombo = new CCombo(currentSensotGroup, SWT.BORDER);
-									sensorCurrentCombo.setBounds(88, 23, 119, 18);
+									sensorCurrentCombo.setBounds(88, 23, 119, 20);
 									sensorCurrentCombo.setItems(CURRENT_SENSOR);
 									sensorCurrentCombo.select(2);
 									sensorCurrentCombo.setEditable(false);
@@ -474,7 +475,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									timeIntervalCombo = new CCombo(dataRateGroup, SWT.BORDER);
 									timeIntervalCombo.setItems(TIME_INTERVAL);
-									timeIntervalCombo.setBounds(83, 16, 122, 18);
+									timeIntervalCombo.setBounds(83, 16, 122, 20);
 									timeIntervalCombo.select(1);
 									timeIntervalCombo.setEditable(false);
 									timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -573,11 +574,13 @@ public class UniLogDialog extends DeviceDialog {
 							dataReadGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									if (log.isLoggable(Level.FINEST))  log.finest("dataReadGroup.paintControl, event="+evt);
+									int index = useConfigCombo.getSelectionIndex();
 									configurationNames = new String[device.getChannelCount()];
 									for (int i = 0; i < configurationNames.length; i++) {
 										configurationNames[i] = " " + device.getChannelName(i+1);
 									}
 									useConfigCombo.setItems(configurationNames);
+									useConfigCombo.select(index);
 								}
 							});
 							{
@@ -588,19 +591,45 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							{
 								useConfigCombo = new CCombo(dataReadGroup, SWT.BORDER);
-								useConfigCombo.setBounds(12, 47, 147, 20);
+								useConfigCombo.setBounds(14, 47, 140, 20);
 								useConfigCombo.setItems(configurationNames);
-								useConfigCombo.select(0);
+								useConfigCombo.select(channelSelectionIndex);
 								useConfigCombo.setEditable(false);
+								useConfigCombo.setTextLimit(18);
 								useConfigCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								useConfigCombo.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet werden soll");
 								useConfigCombo.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.keyReleased, event="+evt);
 										if (evt.character == SWT.CR) {
-											device.getChannel(useConfigCombo.getSelectionIndex()).setName(useConfigCombo.getText());
+											String configName = useConfigCombo.getText();
+											device.setChannelName(configName, channelSelectionIndex + 1);
+											configurationNames[channelSelectionIndex] = configName;
+											useConfigCombo.select(channelSelectionIndex);
 											dataReadGroup.redraw();
+											Channels.getInstance().get(channelSelectionIndex + 1).setName(" " + (channelSelectionIndex + 1) + " : " + configName);
+											application.getMenuToolBar().updateChannelSelector();
+											switch (channelSelectionIndex) {
+											case 0: //configTab1
+												configTabItem1.setText(configName);
+												configTab1.setConfigName(configName);
+												break;
+											case 1: //configTab2
+												configTabItem2.setText(configName);
+												configTab2.setConfigName(configName);
+												break;
+											case 2: //configTab3												
+												configTabItem3.setText(configName);
+												configTab3.setConfigName(configName);
+												break;
+											case 3: //configTab4
+												configTabItem4.setText(configName);
+												configTab4.setConfigName(configName);
+												break;
+											}
+											configTabFolder.redraw();
 											editConfigButton.setEnabled(false);
+											device.storeDeviceProperties();
 										}
 									}
 								});
@@ -608,13 +637,17 @@ public class UniLogDialog extends DeviceDialog {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.widgetSelected, event="+evt);
 										readDataButton.setEnabled(true);
+										channelSelectionIndex = useConfigCombo.getSelectionIndex();
+										useConfigCombo.select(channelSelectionIndex);
+										editConfigButton.setEnabled(true);
 									}
 								});
 							}
 							{
 								editConfigButton = new Button(dataReadGroup, SWT.PUSH | SWT.CENTER);
-								editConfigButton.setBounds(180, 46, 88, 23);
+								editConfigButton.setBounds(182, 46, 88, 23);
 								editConfigButton.setText("ändern");
+								editConfigButton.setEnabled(false);
 								editConfigButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("editConfigButton.widgetSelected, event="+evt);
@@ -631,9 +664,12 @@ public class UniLogDialog extends DeviceDialog {
 								readDataButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("readDataButton.widgetSelected, event="+evt);
-										gatherThread = new DataGathererThread(application, device, serialPort, useConfigCombo.getText());
+										String channelName = " " + (useConfigCombo.getSelectionIndex() + 1) + " : " + useConfigCombo.getText();
+										gatherThread = new DataGathererThread(application, device, serialPort, channelName);
 										gatherThread.start();
 										
+										readDataButton.setEnabled(false);
+										editConfigButton.setEnabled(false);
 										stopDataButton.setEnabled(true);
 										startLoggingButton.setEnabled(false);
 										stopLoggingButton.setEnabled(false);
