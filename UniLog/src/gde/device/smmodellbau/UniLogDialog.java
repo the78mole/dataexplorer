@@ -10,11 +10,12 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -50,7 +51,9 @@ import osde.ui.SWTResourceManager;
  */
 public class UniLogDialog extends DeviceDialog {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
-	
+	private Button editConfigButton;
+	private Text memoryDeleteInfo;
+
 	public final static int			WERTESAETZE_MAX							= 25920;
 	public final static String[]					TIME_INTERVAL			= { " 1/16 s (-> 27 min)", 
 																															" 1/8 s   (-> 54 min)", 
@@ -88,11 +91,6 @@ public class UniLogDialog extends DeviceDialog {
 	private Group													motorPropGroup;
 	private Button												storeAdjustmentsButton;
 
-	private CLabel												a3ModusLabel;
-	private CLabel												a2ModusLabel;
-	private CLabel												a3Label;
-	private CLabel												a2Label;
-	private Group													a2a3ModusGroup;
 	private CLabel												useConfigLabel;
 	private CCombo												useConfigCombo;
 	private CLabel												firmwareVersionLabel;
@@ -107,10 +105,6 @@ public class UniLogDialog extends DeviceDialog {
 	private Button												clearMemoryButton;
 	private Group													clearDataBufferGroup;
 	private Button												liveViewButton;
-	private CLabel												orangeLabel;
-	private CLabel												greenLabel;
-	private CLabel												redLabel;
-	private Composite											dataCaptureComposite;
 	private Button												stopLoggingButton;
 	private Button												startLoggingButton;
 	private Group													loggingGroup;
@@ -190,7 +184,7 @@ public class UniLogDialog extends DeviceDialog {
 				dialogShell.setLayout(new FormLayout());
 				dialogShell.layout();
 				dialogShell.pack();
-				dialogShell.setSize(320, 572);
+				dialogShell.setSize(642, 378);
 				{
 					configTabFolder = new CTabFolder(dialogShell, SWT.NONE);
 					{
@@ -204,15 +198,15 @@ public class UniLogDialog extends DeviceDialog {
 								statusGroup = new Group(composite1, SWT.NONE);
 								statusGroup.setLayout(null);
 								statusGroup.setText("Status");
-								statusGroup.setBounds(12, 7, 283, 65);
+								statusGroup.setBounds(12, 7, 602, 45);
 								{
 									firmwareText = new CLabel(statusGroup, SWT.NONE);
 									firmwareText.setText("Firmware :  ");
-									firmwareText.setBounds(142, 15, 75, 22);
+									firmwareText.setBounds(146, 15, 79, 22);
 								}
 								{
 									firmwareVersionLabel = new CLabel(statusGroup, SWT.NONE);
-									firmwareVersionLabel.setBounds(217, 15, 39, 22);
+									firmwareVersionLabel.setBounds(225, 15, 71, 22);
 									firmwareVersionLabel.setText(unilogVersion);
 								}
 								{
@@ -222,38 +216,38 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									snLabel = new CLabel(statusGroup, SWT.CENTER | SWT.EMBEDDED);
-									snLabel.setBounds(48, 15, 88, 22);
+									snLabel.setBounds(52, 15, 88, 22);
 									snLabel.setText(serialNumber);
 								}
 								{
 									memoryUsageText = new CLabel(statusGroup, SWT.NONE);
 									memoryUsageText.setText("Speicherbelegung");
-									memoryUsageText.setBounds(12, 36, 134, 22);
+									memoryUsageText.setBounds(338, 15, 134, 22);
 								}
 								{
 									memUsagePercent = new CLabel(statusGroup, SWT.NONE);
 									FormLayout statusLabelLayout = new FormLayout();
 									memUsagePercent.setLayout(statusLabelLayout);
-									memUsagePercent.setBounds(146, 36, 59, 22);
+									memUsagePercent.setBounds(472, 15, 59, 22);
 									memUsagePercent.setText(memoryUsedPercent);
 								}
 								{
 									memUsageUnit = new CLabel(statusGroup, SWT.NONE);
 									memUsageUnit.setText("[%]");
-									memUsageUnit.setBounds(217, 36, 26, 22);
+									memUsageUnit.setBounds(543, 15, 26, 22);
 								}
 							}
 							{
 								outletA1Group = new Group(composite1, SWT.NONE);
 								outletA1Group.setLayout(null);
 								outletA1Group.setText("A1 Modus");
-								outletA1Group.setBounds(12, 386, 134, 64);
+								outletA1Group.setBounds(337, 190, 277, 59);
 								{
 									a1ModusCombo = new CCombo(outletA1Group, SWT.BORDER);
 									a1ModusCombo.setItems(A1_MODUS);
 									a1ModusCombo.select(2);
 									a1ModusCombo.setEditable(false);
-									a1ModusCombo.setBounds(16, 26, 100, 18);
+									a1ModusCombo.setBounds(91, 24, 117, 18);
 									a1ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -267,10 +261,10 @@ public class UniLogDialog extends DeviceDialog {
 								currentSensotGroup = new Group(composite1, SWT.NONE);
 								currentSensotGroup.setLayout(null);
 								currentSensotGroup.setText("Stromsensor");
-								currentSensotGroup.setBounds(183, 127, 113, 49);
+								currentSensotGroup.setBounds(337, 119, 277, 59);
 								{
 									sensorCurrentCombo = new CCombo(currentSensotGroup, SWT.BORDER);
-									sensorCurrentCombo.setBounds(17, 21, 74, 18);
+									sensorCurrentCombo.setBounds(88, 23, 119, 18);
 									sensorCurrentCombo.setItems(CURRENT_SENSOR);
 									sensorCurrentCombo.select(2);
 									sensorCurrentCombo.setEditable(false);
@@ -287,11 +281,11 @@ public class UniLogDialog extends DeviceDialog {
 								autoStartGroup = new Group(composite1, SWT.NONE);
 								autoStartGroup.setLayout(null);
 								autoStartGroup.setText("Logging Autostart");
-								autoStartGroup.setBounds(12, 286, 284, 93);
+								autoStartGroup.setBounds(12, 209, 300, 99);
 								{
 									currentTriggerButton = new Button(autoStartGroup, SWT.CHECK | SWT.LEFT);
 									currentTriggerButton.setText("bei Stromschwelle");
-									currentTriggerButton.setBounds(34, 20, 150, 18);
+									currentTriggerButton.setBounds(34, 22, 150, 18);
 									currentTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST))  log.finest("currentTriggerButton.widgetSelected, event="+evt);
@@ -302,7 +296,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									timeTriggerButton = new Button(autoStartGroup, SWT.CHECK | SWT.LEFT);
 									timeTriggerButton.setText("Zeitschwelle");
-									timeTriggerButton.setBounds(34, 42, 150, 18);
+									timeTriggerButton.setBounds(34, 46, 150, 18);
 									timeTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST))  log.finest("timeTriggerButton.widgetSelected, event="+evt);
@@ -313,7 +307,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									impulseTriggerButton = new Button(autoStartGroup, SWT.CHECK | SWT.LEFT);
 									impulseTriggerButton.setText("RC-Signallänge");
-									impulseTriggerButton.setBounds(34, 64, 150, 18);
+									impulseTriggerButton.setBounds(34, 70, 150, 18);
 									impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST))  log.finest("impulseTriggerButton.widgetSelected, event="+evt);
@@ -323,7 +317,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									currentTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									currentTriggerCombo.setBounds(184, 20, 60, 18);
+									currentTriggerCombo.setBounds(193, 22, 60, 18);
 									currentTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50"});
 									currentTriggerCombo.select(2);
 									currentTriggerCombo.setEditable(false);
@@ -337,7 +331,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									timeTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									timeTriggerCombo.setBounds(184, 42, 60, 18);
+									timeTriggerCombo.setBounds(193, 46, 60, 18);
 									timeTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", " 20", " 30", " 60", " 120" });
 									timeTriggerCombo.select(16);
 									timeTriggerCombo.setEditable(true);
@@ -351,7 +345,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									impulseTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									impulseTriggerCombo.setBounds(184, 64, 60, 18);
+									impulseTriggerCombo.setBounds(193, 70, 60, 18);
 									impulseTriggerCombo.setEditable(false);
 									impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									impulseTriggerCombo.setItems(RX_AUTO_START_MS);
@@ -368,7 +362,7 @@ public class UniLogDialog extends DeviceDialog {
 								motorPropGroup = new Group(composite1, SWT.NONE);
 								motorPropGroup.setLayout(null);
 								motorPropGroup.setText("Drehzahlsensor");
-								motorPropGroup.setBounds(13, 187, 283, 89);
+								motorPropGroup.setBounds(12, 105, 300, 96);
 								{
 									numberPolsButton = new Button(motorPropGroup, SWT.RADIO | SWT.LEFT);
 									numberPolsButton.setText("Motorpole");
@@ -391,7 +385,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									motorPoleCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									motorPoleCombo.setBounds(181, 20, 50, 18);
+									motorPoleCombo.setBounds(190, 20, 50, 18);
 									motorPoleCombo.setItems(new String[] {"  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16"});
 									motorPoleCombo.select(6);
 									motorPoleCombo.setEditable(false);
@@ -405,19 +399,19 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									gearLabel = new CLabel(motorPropGroup, SWT.LEFT);
-									gearLabel.setBounds(31, 40, 150, 20);
+									gearLabel.setBounds(31, 42, 150, 20);
 									gearLabel.setText("Getriebeuntersetzung");
 								}
 								{
 									gearFactorCombo = new Text(motorPropGroup, SWT.LEFT | SWT.BORDER);
-									gearFactorCombo.setBounds(181, 42, 50, 18);		
+									gearFactorCombo.setBounds(190, 44, 50, 18);		
 									gearFactorCombo.setText(" 1.0  :  1");
 									gearFactorCombo.setEditable(false);
 									gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								}
 								{
 									gearRatioSlider = new Slider(motorPropGroup, SWT.VERTICAL);
-									gearRatioSlider.setBounds(233, 38, 17, 26);
+									gearRatioSlider.setBounds(242, 40, 17, 26);
 									gearRatioSlider.setMinimum(0);
 									gearRatioSlider.setMaximum(100);
 									gearRatioSlider.setSelection(sliderPosition);
@@ -440,7 +434,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									numberPropButton = new Button(motorPropGroup, SWT.RADIO | SWT.LEFT);
 									numberPropButton.setText("Propellerblätter");
-									numberPropButton.setBounds(31, 64, 150, 18);
+									numberPropButton.setBounds(31, 68, 150, 18);
 									numberPropButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST))  log.finest("numberPropButton.widgetSelected, event="+evt);
@@ -459,7 +453,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									numbeProbCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									numbeProbCombo.setBounds(181, 64, 50, 18);
+									numbeProbCombo.setBounds(190, 68, 50, 18);
 									numbeProbCombo.setItems(new String[] {" 1", " 2", " 3", " 4"});
 									numbeProbCombo.select(1);
 									numbeProbCombo.setEditable(false);
@@ -476,11 +470,11 @@ public class UniLogDialog extends DeviceDialog {
 								dataRateGroup = new Group(composite1, SWT.NONE);
 								dataRateGroup.setLayout(null);
 								dataRateGroup.setText("Speicherrate");
-								dataRateGroup.setBounds(12, 127, 159, 49);
+								dataRateGroup.setBounds(337, 61, 277, 46);
 								{
 									timeIntervalCombo = new CCombo(dataRateGroup, SWT.BORDER);
 									timeIntervalCombo.setItems(TIME_INTERVAL);
-									timeIntervalCombo.setBounds(20, 21, 122, 18);
+									timeIntervalCombo.setBounds(83, 16, 122, 18);
 									timeIntervalCombo.select(1);
 									timeIntervalCombo.setEditable(false);
 									timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -495,7 +489,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								readAdjustmentButton = new Button(composite1, SWT.PUSH | SWT.FLAT | SWT.CENTER);
 								readAdjustmentButton.setText("Einstellungen auslesen");
-								readAdjustmentButton.setBounds(12, 84, 281, 29);
+								readAdjustmentButton.setBounds(12, 64, 300, 29);
 								//readAdjustmentButton.setBackground(SWTResourceManager.getColor(64, 128, 64));
 								readAdjustmentButton.setForeground(SWTResourceManager.getColor(205, 227, 196));
 								readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
@@ -514,7 +508,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								storeAdjustmentsButton = new Button(composite1, SWT.PUSH | SWT.CENTER);
 								storeAdjustmentsButton.setText("Einstellungen speichern");
-								storeAdjustmentsButton.setBounds(12, 467, 281, 31);
+								storeAdjustmentsButton.setBounds(335, 266, 281, 31);
 								storeAdjustmentsButton.setEnabled(false);
 								storeAdjustmentsButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -532,41 +526,6 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									}
 								});
-							}
-							{
-								a2a3ModusGroup = new Group(composite1, SWT.NONE);
-								a2a3ModusGroup.setLayout(null);
-								a2a3ModusGroup.setBounds(158, 386, 138, 64);
-								a2a3ModusGroup.setText("A2, A3 Modus");
-//								a2a3ModusGroup.addPaintListener(new PaintListener() {
-//									public void paintControl(PaintEvent evt) {
-//										if (log.isLoggable(Level.FINEST))  log.finest("powerGroup.paintControl, event=" + evt);
-//										String recordKey = device.getMeasurementNames()[12];
-//										MeasurementType measurement = device.getMeasurementDefinition(configName, recordKey);
-//										a2ModusLabel.setText(measurement.getName());
-//										recordKey = device.getMeasurementNames()[13];
-//										measurement = device.getMeasurementDefinition(configName, recordKey);
-//										a3ModusLabel.setText(measurement.getName());
-//									}
-//								});
-								{
-									a2Label = new CLabel(a2a3ModusGroup, SWT.NONE);
-									a2Label.setText("A2 :");
-									a2Label.setBounds(8, 15, 28, 20);
-								}
-								{
-									a3Label = new CLabel(a2a3ModusGroup, SWT.NONE);
-									a3Label.setBounds(8, 34, 28, 21);
-									a3Label.setText("A3:");
-								}
-								{
-									a2ModusLabel = new CLabel(a2a3ModusGroup, SWT.NONE);
-									a2ModusLabel.setBounds(36, 15, 90, 19);
-								}
-								{
-									a3ModusLabel = new CLabel(a2a3ModusGroup, SWT.NONE);
-									a3ModusLabel.setBounds(36, 34, 90, 21);
-								}
 							}
 						}
 					}
@@ -609,7 +568,7 @@ public class UniLogDialog extends DeviceDialog {
 						{
 							dataReadGroup = new Group(dataMainComposite, SWT.NONE);
 							dataReadGroup.setLayout(null);
-							dataReadGroup.setBounds(14, 12, 280, 204);
+							dataReadGroup.setBounds(14, 12, 294, 296);
 							dataReadGroup.setText("Daten auslesen");
 							dataReadGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
@@ -618,22 +577,33 @@ public class UniLogDialog extends DeviceDialog {
 									for (int i = 0; i < configurationNames.length; i++) {
 										configurationNames[i] = " " + device.getChannelName(i+1);
 									}
+									useConfigCombo.setItems(configurationNames);
 								}
 							});
 							{
-								useConfigLabel = new CLabel(dataReadGroup, SWT.NONE);
-								useConfigLabel.setBounds(12, 18, 150, 20);
-								useConfigLabel.setText("verwende Konfiguration");
+								useConfigLabel = new CLabel(dataReadGroup, SWT.CENTER | SWT.EMBEDDED);
+								useConfigLabel.setBounds(12, 18, 276, 20);
+								useConfigLabel.setText("Konfiguration für die Daten auswählen");
 								useConfigLabel.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet werden soll");
 							}
 							{
 								useConfigCombo = new CCombo(dataReadGroup, SWT.BORDER);
-								useConfigCombo.setBounds(165, 20, 103, 20);
+								useConfigCombo.setBounds(12, 47, 147, 20);
 								useConfigCombo.setItems(configurationNames);
 								useConfigCombo.select(0);
 								useConfigCombo.setEditable(false);
 								useConfigCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								useConfigCombo.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet werden soll");
+								useConfigCombo.addKeyListener(new KeyAdapter() {
+									public void keyReleased(KeyEvent evt) {
+										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.keyReleased, event="+evt);
+										if (evt.character == SWT.CR) {
+											device.getChannel(useConfigCombo.getSelectionIndex()).setName(useConfigCombo.getText());
+											dataReadGroup.redraw();
+											editConfigButton.setEnabled(false);
+										}
+									}
+								});
 								useConfigCombo.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.widgetSelected, event="+evt);
@@ -642,9 +612,21 @@ public class UniLogDialog extends DeviceDialog {
 								});
 							}
 							{
+								editConfigButton = new Button(dataReadGroup, SWT.PUSH | SWT.CENTER);
+								editConfigButton.setBounds(180, 46, 88, 23);
+								editConfigButton.setText("ändern");
+								editConfigButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										if (log.isLoggable(Level.FINEST))  log.finest("editConfigButton.widgetSelected, event="+evt);
+										useConfigCombo.setEditable(true);
+										editConfigButton.setEnabled(false);
+									}
+								});
+							}
+							{
 								readDataButton = new Button(dataReadGroup, SWT.PUSH | SWT.CENTER);
 								readDataButton.setText("Start Daten auslesen");
-								readDataButton.setBounds(10, 51, 260, 25);
+								readDataButton.setBounds(12, 87, 260, 30);
 								readDataButton.setEnabled(false);
 								readDataButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -663,33 +645,33 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							{
 								dataSetLabel = new CLabel(dataReadGroup, SWT.NONE);
-								dataSetLabel.setBounds(25, 91, 180, 20);
+								dataSetLabel.setBounds(23, 132, 180, 20);
 								dataSetLabel.setText("gelesene Telegramme     :");
 							}
 							{
 								redDataSetLabel = new CLabel(dataReadGroup, SWT.RIGHT);
-								redDataSetLabel.setBounds(200, 91, 55, 20);
+								redDataSetLabel.setBounds(206, 132, 55, 20);
 								redDataSetLabel.setText("0");
 							}
 							{
 								readDataErrorLabel = new CLabel(dataReadGroup, SWT.NONE);
-								readDataErrorLabel.setBounds(25, 111, 180, 20);
+								readDataErrorLabel.setBounds(23, 158, 180, 20);
 								readDataErrorLabel.setText("Datenübertragungsfehler  :");
 							}
 							{
 								numberReadErrorLabel = new CLabel(dataReadGroup, SWT.RIGHT);
-								numberReadErrorLabel.setBounds(200, 111, 55, 20);
+								numberReadErrorLabel.setBounds(206, 158, 55, 20);
 								numberReadErrorLabel.setText("0");
 							}
 							{
 								readDataProgressBar = new ProgressBar(dataReadGroup, SWT.NONE);
-								readDataProgressBar.setBounds(10, 141, 260, 15);
+								readDataProgressBar.setBounds(16, 205, 260, 15);
 								readDataProgressBar.setMinimum(0);
 								readDataProgressBar.setMaximum(100);
 							}
 							{
 								stopDataButton = new Button(dataReadGroup, SWT.PUSH | SWT.CENTER);
-								stopDataButton.setBounds(10, 166, 260, 25);
+								stopDataButton.setBounds(16, 247, 260, 30);
 								stopDataButton.setText("S T O P");
 								stopDataButton.setEnabled(false);
 							}
@@ -697,72 +679,59 @@ public class UniLogDialog extends DeviceDialog {
 						{
 							loggingGroup = new Group(dataMainComposite, SWT.NONE);
 							loggingGroup.setLayout(null);
-							loggingGroup.setBounds(14, 221, 281, 125);
+							loggingGroup.setBounds(328, 12, 281, 105);
 							loggingGroup.setText("Daten aufnehmen");
 							{
 								startLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
 								startLoggingButton.setText("Start logging");
-								startLoggingButton.setBounds(10, 20, 260, 25);
-							}
-							{
-								dataCaptureComposite = new Composite(loggingGroup, SWT.BORDER);
-								FillLayout dataCaptureCompositeLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
-								dataCaptureComposite.setLayout(dataCaptureCompositeLayout);
-								dataCaptureComposite.setBounds(50, 55, 185, 20);
-								{
-									redLabel = new CLabel(dataCaptureComposite, SWT.CENTER | SWT.EMBEDDED | SWT.BORDER);
-									redLabel.setText("red");
-								}
-								{
-									orangeLabel = new CLabel(dataCaptureComposite, SWT.CENTER | SWT.EMBEDDED | SWT.BORDER);
-									orangeLabel.setText("orange");
-								}
-								{
-									greenLabel = new CLabel(dataCaptureComposite, SWT.CENTER | SWT.EMBEDDED | SWT.BORDER);
-									greenLabel.setText("green");
-								}
+								startLoggingButton.setBounds(10, 20, 260, 30);
 							}
 							{
 								stopLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
 								stopLoggingButton.setText("Stop logging");
-								stopLoggingButton.setBounds(10, 85, 260, 25);
+								stopLoggingButton.setBounds(12, 64, 260, 30);
 								stopLoggingButton.setEnabled(false);
 							}
 						}
 						{
 							clearDataBufferGroup = new Group(dataMainComposite, SWT.NONE);
 							clearDataBufferGroup.setLayout(null);
-							clearDataBufferGroup.setBounds(14, 421, 280, 64);
+							clearDataBufferGroup.setBounds(328, 196, 280, 112);
 							clearDataBufferGroup.setText("Datenspeicher");
 							{
 								clearMemoryButton = new Button(clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 								clearMemoryButton.setText("löschen");
-								clearMemoryButton.setBounds(10, 24, 260, 25);
+								clearMemoryButton.setBounds(12, 62, 260, 30);
+							}
+							{
+								memoryDeleteInfo = new Text(clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
+								memoryDeleteInfo.setBounds(12, 22, 256, 34);
+								memoryDeleteInfo.setText("Löschen wird erst beim nächsten einschalten wirksam");
+								memoryDeleteInfo.setEditable(false);
 							}
 						}
 						{
 							liveDataCaptureGroup = new Group(dataMainComposite, SWT.NONE);
 							liveDataCaptureGroup.setLayout(null);
-							liveDataCaptureGroup.setBounds(14, 352, 280, 63);
-							liveDataCaptureGroup.setText("Datenabfrage");
+							liveDataCaptureGroup.setBounds(328, 123, 280, 69);
+							liveDataCaptureGroup.setText("Datenabfrage ohne Aufzeichnung");
 							{
 								liveViewButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 								liveViewButton.setText("live Datenanzeige");
-								liveViewButton.setBounds(10, 24, 260, 25);
+								liveViewButton.setBounds(10, 24, 260, 30);
 							}
 						}
 					}
 				} // end measurement configuration tab
 				{
-					FormData configTabFolderLData = new FormData(346, 515);
-					configTabFolderLData.width = 346;
-					configTabFolderLData.height = 515;
+					FormData configTabFolderLData = new FormData();
+					configTabFolderLData.width = 626;
+					configTabFolderLData.height = 355;
 					configTabFolderLData.left =  new FormAttachment(0, 1000, 0);
 					configTabFolderLData.top =  new FormAttachment(0, 1000, 0);
 					configTabFolderLData.right =  new FormAttachment(1000, 1000, 0);
 					configTabFolderLData.bottom =  new FormAttachment(1000, 1000, 0);
 					configTabFolder.setLayoutData(configTabFolderLData);
-					configTabFolder.setSize(346, 515);
 				}
 //				dialogShell.addFocusListener(new FocusAdapter() {
 //					public void focusGained(FocusEvent evt) {
@@ -776,8 +745,7 @@ public class UniLogDialog extends DeviceDialog {
 				dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt);
-						if (configTab1.getConfigButtonStatus()) {
-							//TODO meherere config tabs jede config abfragen
+						if (configTab1.getConfigButtonStatus() && configTab2.getConfigButtonStatus() && configTab3.getConfigButtonStatus() && configTab4.getConfigButtonStatus()) {
 							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werde ?";
 							if (application.openYesNoMessageDialog(msg) == SWT.YES) {
 								log.fine("SWT.YES");
@@ -912,7 +880,10 @@ public class UniLogDialog extends DeviceDialog {
 		log.finer(String.format("gearRatio = %.1f", gearRatio));
 		gearFactorCombo.setText(String.format(" %.1f  :  1", gearRatio + 0.1));
 		
-		configTab1.setA1ModusAvailable(true); //TODO more config tabs
+		if (configTab1 != null) configTab1.setA1ModusAvailable(true); 
+		if (configTab2 != null) configTab2.setA1ModusAvailable(true); 
+		if (configTab3 != null) configTab3.setA1ModusAvailable(true); 
+		if (configTab4 != null) configTab4.setA1ModusAvailable(true); 
 	}
 	
 	public byte[] buildUpdateBuffer() {

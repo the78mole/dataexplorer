@@ -16,8 +16,6 @@
 ****************************************************************************************/
 package osde.device;
 
-import org.w3c.dom.Document;
-
 import osde.data.RecordSet;
 
 /**
@@ -122,36 +120,36 @@ public interface IDevice {
 	public String getChannelName(int channelNumber);
 	
 	/**
-	 * @param channelName - size should not exceed 15 char length
+	 * @param channelName - size should not exceed 15 char length - this is the key to get access
 	 * @param channelNumber
 	 */
 	public void setChannelName(String channelName, int channelNumber);
 
 	/**
-	 * @param channelNumber
+	 * @param channelNumber (starts at 1)
 	 * @return the channel type
 	 */
 	public int getChannelType(int channelNumber);
 	
 	/**
-	 * @return the number of measurements of a channel
+	 * @return the number of measurements of a channel, assume channels have different number of measurements
 	 */
-	public int getNumberOfMeasurements();
+	public int getNumberOfMeasurements(String channelConfigKey);
 	
 	/**
 	 * @return the measurement definitions matching key (voltage, current, ...)
 	 */
-	public MeasurementType getMeasurementDefinition(String configKey, String recordKey);
+	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey);
 	
 	/**
 	 * @return the property element of the measurement key (voltage, current, ...)
 	 */
-	public PropertyType getPropertyDefinition(String configKey, String measurementkey, String propertyKey);
+	public PropertyType getProperty(String channelConfigKey, String measurementkey, String propertyKey);
 
 	/**
 	 * @return the sorted measurement names
 	 */
-	public String[] getMeasurementNames(String configKey);
+	public String[] getMeasurementNames(String channelConfigKey);
 
 		/**
 	 * @return the device dialog
@@ -164,34 +162,34 @@ public interface IDevice {
 	public DeviceSerialPort getSerialPort();
 	
 	/**
-	 * @return the device configuration document
+	 * @return the data unit of the specified measurement at the specified channel configuration
 	 */
-	public Document getConfigurationDocument();
-	
+	public String getUnit(String channelConfigKey, String measurementKey);
+
 	/**
-	 * @return the dataUnit
+	 * @set the data unit of the specified measurement at the specified channel configuration
 	 */
-	public String getDataUnit(String configKey, String recordKey);
+	public void setUnit(String channelConfigKey, String measurementKey, String unit);
 
 	/**
 	 * @return the offset
 	 */
-	public double getOffset(String configKey, String recordKey);
+	public double getOffset(String channelConfigKey, String measurementKey);
 
 	/**
 	 * @param offset the offset to set
 	 */
-	public void setOffset(String configKey, String recordKey, double offset);
+	public void setOffset(String channelConfigKey, String measurementKey, double offset);
 
 	/**
 	 * @return the factor
 	 */
-	public double getFactor(String configKey, String recordKey);
+	public double getFactor(String channelConfigKey, String measurementKey);
 
 	/**
 	 * @param factor the factor to set
 	 */
-	public void setFactor(String configKey, String recordKey, double factor);
+	public void setFactor(String channelConfigKey, String measurementKey, double factor);
 
 	/**
 	 * set measurement property value 
@@ -200,19 +198,19 @@ public interface IDevice {
 	 * @param type
 	 * @param value
 	 */
-	public void setPropertyValue(String configKey, String measurementkey, String propertyKey, PropertyType.Types type, Object value);
+	public void setPropertyValue(String channelConfigKey, String measurementkey, String propertyKey, DataTypes type, Object value);
 	
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String configKey, String recordKey, double value);
+	public double translateValue(String channelConfigKey, String measurementKey, double value);
 
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String configKey, String recordKey, double value);
+	public double reverseTranslateValue(String channelConfigKey, String measurementKey, double value);
 
 	/**
 	 * function to calculate values for inactive which need to be calculated records

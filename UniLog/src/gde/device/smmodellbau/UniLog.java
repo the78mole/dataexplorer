@@ -3,15 +3,13 @@ package osde.device.smmodellbau;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.xml.sax.SAXException;
 
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -37,13 +35,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using properties file
 	 * @param deviceProperties
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 * @throws NoSuchPortException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
 	 */
-	public UniLog(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, application.getStatusBar()) : new UniLogSerialPort(this, null);
@@ -167,8 +163,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
-				PropertyType property = record.getDevice().getPropertyDefinition(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
-				int numberCells = property != null ? (Integer) property.getValue() : 4;
+				PropertyType property = record.getDevice().getProperty(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
+				int numberCells = property != null ? new Integer(property.getValue()) : 4;
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
@@ -185,8 +181,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (!record.isDisplayable()) {
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
-				PropertyType property = record.getDevice().getPropertyDefinition(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
-				int prop_n100W = property != null ? (Integer) property.getValue() : 2222;
+				PropertyType property = record.getDevice().getProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
+				int prop_n100W = property != null ? new Integer(property.getValue()) : 2222;
 				for (int i = 0; i < recordRevolution.size(); i++) {
 					double eta = recordPower.get(i) != 0 ? (recordRevolution.get(i) / 10.0) / (recordPower.get(i) * prop_n100W) : 0;
 					record.add(new Double(eta * 1000).intValue());
