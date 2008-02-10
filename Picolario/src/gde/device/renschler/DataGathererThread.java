@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
@@ -92,7 +93,9 @@ public class DataGathererThread extends Thread {
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 80);
+				PropertyType property = device.getMeasruementProperty(configKey, measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
+				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				calculationThread.start();
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);

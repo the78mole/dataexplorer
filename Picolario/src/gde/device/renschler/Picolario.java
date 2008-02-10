@@ -30,6 +30,7 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
@@ -237,7 +238,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			String[] measurements = this.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			if (!recordSet.get(measurements[2]).isDisplayable()) {
 				// calculate the values required				
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], 80); //TODO get 80 from properties
+				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
+				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); 
 				calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
 				calculationThread.setMaxCalcProgressPercent(20);
 				calculationThread.start();
