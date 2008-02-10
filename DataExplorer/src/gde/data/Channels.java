@@ -97,6 +97,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			// set record set to the first
 			this.getActiveChannel().setActiveRecordSet(instance.getActiveChannel().getRecordSetNames()[0]);
 			// update viewable
+			application.getMenuToolBar().updateChannelSelector();
 			application.getMenuToolBar().updateRecordSetSelectCombo();
 			application.updateDataTable();
 			application.updateDigitalWindowChilds();

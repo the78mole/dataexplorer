@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.data;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -83,7 +84,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @return String[] containing the records names
 	 */
 	public String[] getRecordSetNames() {
-		return this.keySet().toArray(new String[1]);
+		String[] keys = this.keySet().toArray( new String[1]);
+		Arrays.sort(keys);
+		return keys;
 	}
 
 	/**

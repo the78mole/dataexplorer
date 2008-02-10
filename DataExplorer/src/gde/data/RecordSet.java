@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Display;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.menu.MenuToolBar;
 import osde.utils.TimeLine;
 
 /**
@@ -153,9 +152,11 @@ public class RecordSet extends HashMap<String, Record> {
 		for (String recordKey : this.getRecordNames()) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
 		}
-		log.fine("displayableRecordEntries=" + displayableRecordEntries);
 
-		if (displayableRecordEntries == this.configuredDisplayable) {
+		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable; 
+		log.fine("targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries);
+
+		if (displayableRecordEntries == targetDisplayable) {
 			areDisplayable = true;
 		}
 		return areDisplayable;
@@ -284,9 +285,9 @@ public class RecordSet extends HashMap<String, Record> {
 		RecordSet newRecordSet = new RecordSet(channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, 30);
 		for (int i = 0; i < recordNames.length; i++) {
 			String recordKey = recordNames[i];
-			MeasurementType measurement = device.getMeasurementDefinition(channelKey, recordKey);
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), device.getOffset(channelKey, recordKey), device.getFactor(channelKey, recordKey), device
-					.getTimeStep_ms(), 5);
+			MeasurementType measurement = device.getMeasurement(channelKey, recordKey);
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), device.getOffset(channelKey, recordKey), 
+					device.getFactor(channelKey, recordKey), device.getTimeStep_ms(), 5);
 
 			// set color defaults
 			switch (i) {
@@ -414,18 +415,11 @@ public class RecordSet extends HashMap<String, Record> {
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				MenuToolBar menuToolBar = application.getMenuToolBar();
-				String[] recordSetNames = menuToolBar.updateRecordSetSelectCombo();
 				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
+				log.fine("switching to record set " + recordSetKey);
+				application.getMenuToolBar().updateRecordSetSelectCombo();
 				application.updateDataTable();
 				application.updateDigitalWindowChilds();
-				for (int i = 0; i < recordSetNames.length; i++) {
-					if (recordSetNames[i].equals(recordSetKey)) {
-						menuToolBar.getRecordSelectCombo().select(i);
-						log.fine("switching to record set " + recordSetKey + " - list position " + i);
-					}
-				}
-				menuToolBar.updateRecordToolItems();
 			}
 		});
 	}

@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
-import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -553,9 +552,17 @@ public class MenuToolBar {
 						deleteRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("deleteAufnahme.widgetSelected, event=" + evt);
-								String deleteRecordSetName = channels.getActiveChannel().getActiveRecordSet().getName();
-								channels.getActiveChannel().get(deleteRecordSetName).clear();
-								channels.getActiveChannel().remove(deleteRecordSetName);
+								Channel activeCahnnel = channels.getActiveChannel();
+								String deleteRecordSetName = activeCahnnel.getActiveRecordSet().getName();
+								// before deletion set new active record set
+								String newRecorKey = null;
+								int selectionIndex = recordSelectCombo.getSelectionIndex();
+								if ((selectionIndex - 1) > 0) newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
+								else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex +1);;
+								if (newRecorKey != null) activeCahnnel.setActiveRecordSet(newRecorKey);
+								// ready for deletion
+								activeCahnnel.get(deleteRecordSetName).clear();
+								activeCahnnel.remove(deleteRecordSetName);
 								log.fine("deleted " + deleteRecordSetName);
 								updateRecordSetSelectCombo();
 							}
@@ -639,14 +646,17 @@ public class MenuToolBar {
 	 * updates the channel select combo according the active channel
 	 */
 	public synchronized void updateChannelSelector() {
+		int activeChannelNumber = 0;
 		if (channels.size() > 0) {
 			String[] channelNames = new String[channels.size()];
+			String activeChannelName = channels.getActiveChannel().getName();
 			for (int i = 0; i < channelNames.length; i++) {
 				channelNames[i] = channels.get(i+1).getName();
+				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
 			}
 			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
-		channelSelectCombo.select(0); // kanalCombo.setText("K1: Kanal 1");
+		channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
 		application.updateGraphicsWindow();
 		application.updateDataTable();
@@ -657,10 +667,13 @@ public class MenuToolBar {
 	 */
 	public String[] updateRecordSetSelectCombo() {
 		String[] recordSetNames = channels.getActiveChannel().getRecordSetNames();
-		Arrays.sort(recordSetNames);
-		if (recordSetNames != null && recordSetNames[0] != null) {
+		if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
+			String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
 			recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
-			recordSelectCombo.select(0); // aufnahmeCombo.setText("1) Datensatz");
+			for (int i = 0; i < recordSetNames.length; i++) {
+				if (recordSetNames[i].equals(activeRecord))
+					recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
+			}
 		}
 		else {
 			recordSelectCombo.setItems(new String[0]);
