@@ -29,8 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="symbol" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="isActive" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
- *         &lt;element name="isCalculation" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         &lt;element name="active" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *         &lt;element name="Property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -45,8 +44,7 @@ import javax.xml.bind.annotation.XmlType;
     "name",
     "symbol",
     "unit",
-    "isActive",
-    "isCalculation",
+    "active",
     "property"
 })
 public class MeasurementType {
@@ -198,4 +196,86 @@ public class MeasurementType {
         return this.property;
     }
 
+  	/**
+  	 * @param propertyKey
+  	 * @param type
+  	 * @param value
+  	 */
+  	private void createProperty(String propertyKey, DataTypes type, Object value) {
+  		ObjectFactory factory = new ObjectFactory();
+  		PropertyType newProperty = factory.createPropertyType();
+  		newProperty.setName(propertyKey);
+  		newProperty.setType(type);
+  		newProperty.setValue("" + value);
+  		this.getProperty().add(newProperty);
+  	}
+  	
+  	/**
+  	 * get property type with given key (IDevice.OFFSET, ...)
+  	 * @param propertyKey
+  	 * @return
+  	 */
+  	public PropertyType getProperty(String propertyKey) {
+  		PropertyType property = null;
+  		List<PropertyType> properties = this.getProperty();
+  		for (PropertyType propertyType : properties) {
+  			if(propertyType.getName().equals(propertyKey)) {
+  				property = propertyType;
+  				break;
+  			}
+  		}
+  		return property;
+  	}
+
+  	/**
+  	 * get the offset value
+  	 * @return the offset, if property does not exist return 0.0 as default value
+  	 */
+  	public double getOffset() {
+  		PropertyType property = this.getProperty(IDevice.OFFSET);
+  		if (property == null) // property does not exist
+  			return 0.0;
+  		else
+  			return new Double(property.getValue()).doubleValue();
+  	}
+
+  	/**
+  	 * set new value for offset
+  	 * @param offset the offset to set
+  	 */
+  	public void setOffset(double offset) {
+  		PropertyType property = this.getProperty(IDevice.OFFSET);
+  		if (property == null) {
+  			createProperty(IDevice.OFFSET, DataTypes.DOUBLE, offset);
+  		}
+  		else {
+  			property.setValue("" + offset);
+  		}
+  	}
+
+  	/**
+  	 * get the factor value
+  	 * @return the factor, if property does not exist return 1.0 as default value
+  	 */
+  	public double getFactor() {
+  		PropertyType property = getProperty(IDevice.FACTOR);
+  		if (property == null) // property does not exist
+  			return 1.0;
+  		else
+  			return new Double(property.getValue()).doubleValue();
+  	}
+
+  	/**
+  	 * set new value for factor
+ 		 * @param factor the offset to set
+  	 */
+  	public void setFactor(double factor) {
+  		PropertyType property = this.getProperty(IDevice.FACTOR);
+  		if (property == null) {
+  			createProperty(IDevice.FACTOR, DataTypes.DOUBLE, factor);
+  		}
+  		else {
+  			property.setValue("" + factor);
+  		}
+  	}
 }

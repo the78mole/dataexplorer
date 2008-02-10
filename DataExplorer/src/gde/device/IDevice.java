@@ -29,6 +29,16 @@ public interface IDevice {
 	public static final String	FACTOR = "factor";
 	
 	/**
+	 * @return the device dialog
+	 */
+	public DeviceDialog getDialog();
+	
+	/**
+	 * @return the device serial port
+	 */
+	public DeviceSerialPort getSerialPort();
+		
+	/**
 	 * @return the device name
 	 */
 	public String	getName();
@@ -137,68 +147,116 @@ public interface IDevice {
 	public int getNumberOfMeasurements(String channelConfigKey);
 	
 	/**
-	 * @return the measurement definitions matching key (voltage, current, ...)
+	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey);
 	
-	/**
-	 * @return the property element of the measurement key (voltage, current, ...)
-	 */
-	public PropertyType getProperty(String channelConfigKey, String measurementkey, String propertyKey);
-
 	/**
 	 * @return the sorted measurement names
 	 */
 	public String[] getMeasurementNames(String channelConfigKey);
 
-		/**
-	 * @return the device dialog
-	 */
-	public DeviceDialog getDialog();
-	
 	/**
-	 * @return the device serial port
+	 * set new name of specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param name
 	 */
-	public DeviceSerialPort getSerialPort();
-	
-	/**
-	 * @return the data unit of the specified measurement at the specified channel configuration
-	 */
-	public String getUnit(String channelConfigKey, String measurementKey);
+	public void setMeasurementName(String channelConfigKey, String measurementKey, String name);
 
 	/**
-	 * @set the data unit of the specified measurement at the specified channel configuration
+	 * method to query the unit of measurement data unit by a given record key
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return dataUnit as string
 	 */
-	public void setUnit(String channelConfigKey, String measurementKey, String unit);
+	public String getMeasurementUnit(String channelConfigKey, String measurementKey);
 
 	/**
-	 * @return the offset
+	 * method to set the unit of measurement by a given measurement key
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param unit
 	 */
-	public double getOffset(String channelConfigKey, String measurementKey);
+	public void setMeasurementUnit(String channelConfigKey, String measurementKey, String unit);
 
 	/**
+	 * get the symbol of specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param symbol
+	 */
+	public String getMeasurementSymbol(String channelConfigKey, String measurementKey);
+
+	/**
+	 * set new symbol of specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param symbol
+	 */
+	public void setMeasurementSymbol(String channelConfigKey, String measurementKey, String symbol);
+
+	/**
+	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param propertyKey
+	 * @return
+	 */
+	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementkey, String propertyKey);
+
+	/**
+	 * get the offset value of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return the offset, if property does not exist return 0.0 as default value
+	 */
+	public double getMeasurementOffset(String channelConfigKey, String measurementKey);
+
+	/**
+	 * set new value for offset at the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
 	 * @param offset the offset to set
 	 */
-	public void setOffset(String channelConfigKey, String measurementKey, double offset);
+	public void setMeasurementOffset(String channelConfigKey, String measurementKey, double offset);
 
 	/**
-	 * @return the factor
+	 * get the factor value of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
-	public double getFactor(String channelConfigKey, String measurementKey);
+	public double getMeasurementFactor(String channelConfigKey, String measurementKey);
 
 	/**
-	 * @param factor the factor to set
+	 * set new value for factor at the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param factor the offset to set
 	 */
-	public void setFactor(String channelConfigKey, String measurementKey, double factor);
+	public void setMeasurementFactor(String channelConfigKey, String measurementKey, double factor);
 
 	/**
-	 * set measurement property value 
-	 * @param measurementkey
+	 * get a property of specified measurement, the data type must be known - data conversion is up to implementation
+	 * @param channelConfigKey
+	 * @param measurementKey
 	 * @param propertyKey
-	 * @param type
+	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
+	 */
+	public Object getMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey);
+	/**
+	 * set new property value of specified measurement, if the property does not exist it will be created
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param propertyKey
+	 * @param type of DataTypes
 	 * @param value
 	 */
-	public void setPropertyValue(String channelConfigKey, String measurementkey, String propertyKey, DataTypes type, Object value);
+	public void setMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey, DataTypes type, Object value);
 	
 	/**
 	 * function to translate measured value from a device to values represented
@@ -220,5 +278,5 @@ public interface IDevice {
 	/**
 	 * writes updated device properties XML
 	 */
-	public void store();
+	public void storeDeviceProperties();
 }

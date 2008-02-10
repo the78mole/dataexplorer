@@ -286,8 +286,8 @@ public class RecordSet extends HashMap<String, Record> {
 		for (int i = 0; i < recordNames.length; i++) {
 			String recordKey = recordNames[i];
 			MeasurementType measurement = device.getMeasurement(channelKey, recordKey);
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), device.getOffset(channelKey, recordKey), 
-					device.getFactor(channelKey, recordKey), device.getTimeStep_ms(), 5);
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getOffset(), 
+					measurement.getFactor(), device.getTimeStep_ms(), 5);
 
 			// set color defaults
 			switch (i) {

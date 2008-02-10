@@ -154,7 +154,7 @@ public class CSVReaderWriter {
 						
 						for (int i = 1; i < header.length; i++) {
 							String recordKey = recordKeys[i - 1];
-							String expectUnit = device.getUnit(fileConfig, recordKey);
+							String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
 							log.fine(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit);

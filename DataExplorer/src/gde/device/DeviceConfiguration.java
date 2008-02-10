@@ -185,7 +185,7 @@ public class DeviceConfiguration {
 	/**
 	 * writes updated device properties XML
 	 */
-	public void store() {
+	public void storeDeviceProperties() {
 		if (isChangePropery) {
 			try {
 		    marshaller.marshal(this.elememt,  new FileOutputStream(this.xmlFile));
@@ -405,12 +405,13 @@ public class DeviceConfiguration {
 	 * @param isActive
 	 */
 	public void setMeasurementActive(String channelConfigKey, String measurementKey, boolean isActive) {
-		log.info("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
+		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementKey).setActive(isActive);
 	}
 
 	/**
+	 * get the measurement to get/set measurement specific parameter/properties
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @return
@@ -433,44 +434,44 @@ public class DeviceConfiguration {
 	 * @param name
 	 */
 	public void setMeasurementName(String channelConfigKey, String measurementKey, String name) {
-		log.info("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
+		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementKey).setName(name);
 	}
 	
 	/**
-	 * method to query the unit of measurement data by a given record key
+	 * method to query the unit of measurement data unit by a given record key
 	 * @param channelConfigKey
-	 * @param recordKey
+	 * @param measurementKey
 	 * @return dataUnit as string
 	 */
-	public String getUnit(String channelConfigKey, String recordKey) {
-		return this.getMeasurement(channelConfigKey, recordKey.split("_")[0]).getUnit();
+	public String getMeasurementUnit(String channelConfigKey, String measurementKey) {
+		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
+		return this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getUnit();
 	}
 
 	/**
-	 * method to query the unit of measurement data by a given record key
-	 * @param channelConfigKey
-	 * @param recordKey
-	 * @param unit
-	 */
-	public void setUnit(String channelConfigKey, String recordKey, String unit) {
-		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, recordKey.split("_")[0]).setUnit(unit);
-	}
-
-	/**
-	 * set new unit of specified measurement
+	 * method to set the unit of measurement by a given measurement key
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @param unit
 	 */
 	public void setMeasurementUnit(String channelConfigKey, String measurementKey, String unit) {
-		log.info("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
+		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, measurementKey).setUnit(unit);
+		this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).setUnit(unit);
 	}
 	
+	/**
+	 * get the symbol of specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param symbol
+	 */
+	public String getMeasurementSymbol(String channelConfigKey, String measurementKey) {
+		return this.getMeasurement(channelConfigKey, measurementKey).getSymbol();
+	}
+
 	/**
 	 * set new symbol of specified measurement
 	 * @param channelConfigKey
@@ -498,27 +499,13 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param channelConfigKey
-	 * @param measurementKey
-	 * @return the offset, if property does not exist return 0.0 as default value
-	 */
-	public double getOffset(String channelConfigKey, String measurementKey) {
-		log.info("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
-		if (property == null) // property does not exist
-			return 0.0;
-		else
-			return new Double(property.getValue()).doubleValue();
-	}
-
-	/**
 	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @param propertyKey
 	 * @return
 	 */
-	public PropertyType getProperty(String channelConfigKey, String measurementKey, String propertyKey) {
+	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = null;
 		List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey).getProperty();
 		for (PropertyType propertyType : properties) {
@@ -531,11 +518,29 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * get the offset value of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return the offset, if property does not exist return 0.0 as default value
+	 */
+	public double getMeasurementOffset(String channelConfigKey, String measurementKey) {
+		if(log.isLoggable(Level.FINER)) log.finer("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
+		if (property == null) // property does not exist
+			return 0.0;
+		else
+			return new Double(property.getValue()).doubleValue();
+	}
+
+	/**
+	 * set new value for offset at the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
 	 * @param offset the offset to set
 	 */
-	public void setOffset(String channelConfigKey, String measurementKey, double offset) {
-		log.info("set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
+	public void setMeasurementOffset(String channelConfigKey, String measurementKey, double offset) {
+		if(log.isLoggable(Level.FINER)) log.finer("set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE, offset);
 		}
@@ -545,11 +550,14 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * get the factor value of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
-	public double getFactor(String channelConfigKey, String measurementKey) {
-		log.info("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = getProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
+	public double getMeasurementFactor(String channelConfigKey, String measurementKey) {
+		if(log.isLoggable(Level.FINER)) log.finer("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
 		if (property == null) // property does not exist
 			return 1.0;
 		else
@@ -557,11 +565,14 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param factor the factor to set
+	 * set new value for factor at the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param factor the offset to set
 	 */
-	public void setFactor(String channelConfigKey, String measurementKey, double factor) {
-		log.info("set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
+	public void setMeasurementFactor(String channelConfigKey, String measurementKey, double factor) {
+		if(log.isLoggable(Level.FINER)) log.finer("set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, IDevice.FACTOR, DataTypes.DOUBLE, factor);
 		}
@@ -571,11 +582,28 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @modify or add a property at specified measurement
+	 * get a property of specified measurement, the data type must be known - data conversion is up to implementation
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param propertyKey
+	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
 	 */
-	public void setPropertyValue(String channelConfigKey, String measurementKey, String propertyKey, DataTypes type, Object value) {
+	public Object getMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey) {
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, propertyKey);
+		return property != null ? property.getValue() : 1;
+	}
+	
+	/**
+	 * set new property value of specified measurement, if the property does not exist it will be created
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param propertyKey
+	 * @param type of DataTypes
+	 * @param value
+	 */
+	public void setMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey, DataTypes type, Object value) {
 		this.isChangePropery = true;
-		PropertyType property = this.getProperty(channelConfigKey, measurementKey, propertyKey);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, propertyKey);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, propertyKey, type, value);
 		}
@@ -598,13 +626,5 @@ public class DeviceConfiguration {
 		newProperty.setType(type);
 		newProperty.setValue("" + value);
 		this.getMeasurement(channelConfigKey, measurementKey).getProperty().add(newProperty);
-	}
-
-	/**
-	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
-	 */
-	public Object getPropertyValue(String channelConfigKey, String measurementKey, String propertyKey) {
-		PropertyType property = this.getProperty(channelConfigKey, measurementKey, propertyKey);
-		return property != null ? property.getValue() : 1;
 	}
 }

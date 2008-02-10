@@ -115,7 +115,7 @@ public class CurveUtils {
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
 		if (log.isLoggable(Level.FINE)) log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
-		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getUnit(record.getParent().getChannelName(), recordName) + "]";
+		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + device.getMeasurementUnit(record.getParent().getChannelName(), recordName) + "]";
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
