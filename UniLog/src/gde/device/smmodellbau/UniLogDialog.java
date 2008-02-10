@@ -749,7 +749,7 @@ public class UniLogDialog extends DeviceDialog {
 							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werde ?";
 							if (application.openYesNoMessageDialog(msg) == SWT.YES) {
 								log.fine("SWT.YES");
-								device.store();
+								device.storeDeviceProperties();
 							}
 						}
 					}

@@ -193,7 +193,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							
 							// number cells voltagePerCell
 							recordKey = device.getMeasurementNames(configName)[6];
-							numCellValue = new Integer("" + device.getPropertyValue(configName, recordKey, UniLogDialog.NUMBER_CELLS));
+							numCellValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.NUMBER_CELLS));
 
 							recordKey = device.getMeasurementNames(configName)[7];
 							measurement = device.getMeasurement(configName, recordKey);
@@ -205,7 +205,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							// n100W value, eta calculation 										
 							updateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
 							recordKey = device.getMeasurementNames(configName)[8];
-							prop100WValue = new Integer("" + device.getPropertyValue(configName, recordKey, UniLogDialog.PROP_N_100_WATT));
+							prop100WValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.PROP_N_100_WATT));
 							
 							recordKey = device.getMeasurementNames(configName)[9];
 							measurement = device.getMeasurement(configName, recordKey);
@@ -289,11 +289,11 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								String measurementKey = device.getMeasurementNames(configName)[2]; //2=current
 								switch (currentUnit.getSelectionIndex()) {
 								case 0: // [mA]
-									device.setFactor(configName, measurementKey, 0.001); //2=current
+									device.setMeasurementFactor(configName, measurementKey, 0.001); //2=current
 									device.setMeasurementUnit(configName, measurementKey, "mA");
 									break;
 								default: // [A]
-									device.setFactor(configName, measurementKey, 1.0); //2=current
+									device.setMeasurementFactor(configName, measurementKey, 1.0); //2=current
 									device.setMeasurementUnit(configName, measurementKey, "A");
 									break;
 								}
@@ -488,7 +488,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								System.out.println("regressionTime.widgetSelected, event="+evt);
 								int regressionTime_sec = regressionTime.getSelectionIndex() + 1;
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
-								device.setPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
+								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
 							}
 						});
 					}
@@ -507,24 +507,24 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							a1ValueButton.setSelection(measurement.isActive());
 							a1Text.setText(measurement.getName());
 							a1Unit.setText(measurement.getUnit());
-							a1Offset.setText(String.format("%.2f", device.getOffset(configName, recordKey)));
-							a1Factor.setText(String.format("%.2f", device.getFactor(configName, recordKey)));
+							a1Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
+							a1Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 							
 							recordKey = device.getMeasurementNames(configName)[12];
 							measurement = device.getMeasurement(configName, recordKey);
 							a2ValueButton.setSelection(measurement.isActive());
 							a2Text.setText(measurement.getName());
 							a2Unit.setText(measurement.getUnit());
-							a2Offset.setText(String.format("%.2f", device.getOffset(configName, recordKey)));
-							a2Factor.setText(String.format("%.2f", device.getFactor(configName, recordKey)));
+							a2Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
+							a2Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 
 							recordKey = device.getMeasurementNames(configName)[13];
 							measurement = device.getMeasurement(configName, recordKey);
 							a3ValueButton.setSelection(measurement.isActive());
 							a3Text.setText(measurement.getName());
 							a3Unit.setText(measurement.getUnit());
-							a3Offset.setText(String.format("%.2f", device.getOffset(configName, recordKey)));
-							a3Factor.setText(String.format("%.2f", device.getFactor(configName, recordKey)));
+							a3Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
+							a3Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 }
 					});
 					{
@@ -773,7 +773,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST))  log.finest("setConfigButton.widgetSelected, event="+evt);
 							collectAndUpdateConfiguration();
-							device.store();
+							device.storeDeviceProperties();
 							log.info(device.getChannel(1).toString());
 							setConfigButton.setEnabled(false);
 						}
@@ -920,41 +920,49 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * collect all configuration relevant data and update device configuration
 	 */
 	private void collectAndUpdateConfiguration() {
-		String recordKey = device.getMeasurementNames(configName)[0];
-		device.setMeasurementActive(configName, recordKey, reveiverVoltageButton.getSelection());
+		String measurementKey = device.getMeasurementNames(configName)[0];
+		MeasurementType measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(reveiverVoltageButton.getSelection());
 
-		recordKey = device.getMeasurementNames(configName)[1];
-		device.setMeasurementActive(configName, recordKey, voltageButton.getSelection());
+		measurementKey = device.getMeasurementNames(configName)[1];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(voltageButton.getSelection());
 		
-		recordKey = device.getMeasurementNames(configName)[2];
-		device.setMeasurementActive(configName, recordKey, currentButton.getSelection());
+		measurementKey = device.getMeasurementNames(configName)[2];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(currentButton.getSelection());
 
-		recordKey = device.getMeasurementNames(configName)[7];
-		device.setMeasurementActive(configName, recordKey, revolutionButton.getSelection());
+		measurementKey = device.getMeasurementNames(configName)[7];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(revolutionButton.getSelection());
 		
-		recordKey = device.getMeasurementNames(configName)[9];
-		device.setMeasurementActive(configName, recordKey, heightButton.getSelection());
+		measurementKey = device.getMeasurementNames(configName)[9];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(heightButton.getSelection());
 		
-		recordKey = device.getMeasurementNames(configName)[11];
-		device.setMeasurementActive(configName, recordKey, a1ValueButton.getSelection());
-		device.setMeasurementName(configName, recordKey, a1Text.getText());
-		device.setMeasurementUnit(configName, recordKey, a1Unit.getText());
-		device.setOffset(configName, recordKey, new Double(a1Offset.getText()));
-		device.setFactor(configName, recordKey, new Double(a1Factor.getText()));
+		measurementKey = device.getMeasurementNames(configName)[11];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(a1ValueButton.getSelection());
+		measurement.setName(a1Text.getText());
+		measurement.setUnit(a1Unit.getText());
+		measurement.setOffset(new Double(a1Offset.getText()));
+		measurement.setFactor(new Double(a1Factor.getText()));
 		
-		recordKey = device.getMeasurementNames(configName)[12];
-		device.setMeasurementActive(configName, recordKey, a2ValueButton.getSelection());
-		device.setMeasurementName(configName, recordKey, a2Text.getText());
-		device.setMeasurementUnit(configName, recordKey, a2Unit.getText());
-		device.setOffset(configName, recordKey, new Double(a2Offset.getText()));
-		device.setFactor(configName, recordKey, new Double(a2Factor.getText()));
+		measurementKey = device.getMeasurementNames(configName)[12];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(a2ValueButton.getSelection());
+		measurement.setName(a2Text.getText());
+		measurement.setUnit(a2Unit.getText());
+		measurement.setOffset(new Double(a2Offset.getText()));
+		measurement.setFactor(new Double(a2Factor.getText()));
 
-		recordKey = device.getMeasurementNames(configName)[13];
-		device.setMeasurementActive(configName, recordKey, a3ValueButton.getSelection());
-		device.setMeasurementName(configName, recordKey, a3Text.getText());
-		device.setMeasurementUnit(configName, recordKey, a3Unit.getText());
-		device.setOffset(configName, recordKey, new Double(a3Offset.getText()));
-		device.setFactor(configName, recordKey, new Double(a3Factor.getText()));
+		measurementKey = device.getMeasurementNames(configName)[13];
+		measurement = device.getMeasurement(configName, measurementKey);
+		measurement.setActive(a3ValueButton.getSelection());
+		measurement.setName(a3Text.getText());
+		measurement.setUnit(a3Unit.getText());
+		measurement.setOffset(new Double(a3Offset.getText()));
+		measurement.setFactor(new Double(a3Factor.getText()));
 	}
 	
 	/**

@@ -64,7 +64,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = this.getOffset(channelConfigKey, recordKey) + this.getFactor(channelConfigKey, recordKey) * value;
+		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
 		// do some calculation
 		return newValues;
 	}
@@ -75,7 +75,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value / this.getFactor(channelConfigKey, recordKey) - this.getOffset(channelConfigKey, recordKey);
+		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - this.getMeasurementOffset(channelConfigKey, recordKey);
 		// do some calculation
 		return newValues;
 	}
@@ -106,11 +106,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				else {
 					record.setDisplayable(false);
+					record.setVisible(false);
 				}
 			}
 			
 			recordKey = measurements[3]; // 3=capacity [Ah]
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
@@ -126,7 +127,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			
 			recordKey = measurements[4]; // 4=power [W]
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 
@@ -143,7 +144,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			
 			recordKey = measurements[5]; // 5=energy [Wh]
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
@@ -159,11 +160,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			
 			recordKey = measurements[6]; // 6=votagePerCell
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
-				PropertyType property = record.getDevice().getProperty(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
+				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
 				int numberCells = property != null ? new Integer(property.getValue()) : 4;
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
@@ -176,12 +177,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			
 			recordKey = measurements[8]; // 8=efficiency
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
-				PropertyType property = record.getDevice().getProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
+				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
 				int prop_n100W = property != null ? new Integer(property.getValue()) : 2222;
 				for (int i = 0; i < recordRevolution.size(); i++) {
 					double eta = recordPower.get(i) != 0 ? (recordRevolution.get(i) / 10.0) / (recordPower.get(i) * prop_n100W) : 0;
@@ -195,7 +196,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			
 			recordKey = measurements[10]; // 10=slope
-			log.info("start data calculation for record = " + recordKey);
+			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				// calculate the values required				
