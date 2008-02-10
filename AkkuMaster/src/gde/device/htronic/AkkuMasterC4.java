@@ -19,14 +19,11 @@ package osde.device.htronic;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXBException;
 
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -51,13 +48,11 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using the device properties file for initialization
 	 * @param deviceProperties file
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 * @throws NoSuchPortException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
 	 */
-	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, IOException, NoSuchPortException, ParserConfigurationException, SAXException {
+	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, application.getStatusBar());
@@ -111,7 +106,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			try {
 				String[] recordNames = this.getMeasurementNames(recordSet.getChannelName());
 				for (String recordKey : recordNames) {
-					MeasurementType measurement = this.getMeasurementDefinition(recordSet.getChannelName(), recordKey);
+					MeasurementType measurement = this.getMeasurement(recordSet.getChannelName(), recordKey);
 					if (measurement.isCalculation()) {
 						log.fine(recordKey);
 						calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, channels.getActiveChannel().getActiveRecordSet()));

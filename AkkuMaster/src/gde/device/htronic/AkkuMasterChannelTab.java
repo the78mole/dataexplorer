@@ -491,7 +491,7 @@ public class AkkuMasterChannelTab {
 															isCollectDataStopped = false;
 															// record set does not exist or is outdated, build a new name and create
 															recordSetKey = (channel.size() + 1) + ") " + processName;
-															channel.put(recordSetKey, RecordSet.createRecordSet(name, recordSetKey, application.getActiveDevice(), true, false));
+															channel.put(recordSetKey, RecordSet.createRecordSet(name.trim(), recordSetKey, application.getActiveDevice(), true, false));
 															log.fine(recordSetKey + " created for channel " + channel.getName());
 															if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 															channel.get(recordSetKey).setAllDisplayable();
