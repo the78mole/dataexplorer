@@ -20,9 +20,11 @@ import org.eclipse.swt.widgets.Text;
 
 import osde.device.DataTypes;
 import osde.device.MeasurementType;
+import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
+
 
 
 /**
@@ -105,6 +107,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 	private String												configName; // tabName
 	private final UniLogDialog						dialog;
+	private CLabel calculationTypeLabel;
+	private CCombo slopeCalculationTypeCombo;
 	private CCombo regressionTime;
 	private final UniLog									device;																						// get device specific things, get serial port, ...
 	private final	OpenSerialDataExplorer  application;
@@ -155,12 +159,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		try {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
-			this.setSize(630, 320);
+			this.setSize(630, 340);
 			{
 				this.setLayout(null);
 				{
 					powerGroup = new Group(this, SWT.NONE);
-					powerGroup.setBounds(5, 2, 299, 312);
+					powerGroup.setBounds(5, 2, 299, 331);
 					powerGroup.setLayout(null);
 					powerGroup.setText("Versorgung/Antrieb/Höhe");
 					powerGroup.setToolTipText("Hier bitte alle Datenkanäle auswählen, die angezeigt werden sollen");
@@ -215,6 +219,21 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							heightUnit.setText(measurement.getUnit());
 							
 							updateHeightDependent(heightButton.getSelection());
+
+							PropertyType typeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_INTERVAL_SEC);
+							int intSelection;
+							if (typeSelection == null)  intSelection = 4;
+							else intSelection = new Integer(typeSelection.getValue());
+							regressionTime.select(3);
+
+							typeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_TYPE);
+							if (typeSelection == null)  intSelection = 1;
+							else {
+								String selectionKey = typeSelection.getValue();
+								if(selectionKey.equals(CalculationThread.REGRESSION_TYPE_CURVE)) intSelection = 1; // quasilinear
+								else intSelection = 0; // linear
+							}
+							slopeCalculationTypeCombo.select(intSelection);
 						}
 					});
 					{
@@ -282,7 +301,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						currentUnit.setItems(new String[] {" [mA]", "  [A]"});
 						currentUnit.select(1);
 						currentUnit.setBounds(194, 61, 62, 20);
-						currentUnit.setToolTipText("Stromeinheit entsprechend dem eingestellten Faktor einstellen");
+						currentUnit.setToolTipText("Bei kleinen zu erwartenden Strömen den Anzeigebereich anpassen");
 						currentUnit.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								System.out.println("currentUnit.widgetSelected, event="+evt);
@@ -366,9 +385,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						numCellLabel.setText("Anzahl Akkuzellen");
 					}
 					{
-						numCellInput = new Text(powerGroup, SWT.LEFT);
-						numCellInput.setBounds(158, 174, 40, 18);
+						numCellInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
+						numCellInput.setBounds(158, 173, 40, 20);
 						numCellInput.setText(" " + numCellValue); 
+						numCellInput.setToolTipText("Hier die Anzahl der Akkuzellen einsetzen");
 						numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("numCellInput.keyReleased, event="+evt);
@@ -407,9 +427,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						prop100WLabel.setText("Propeller n100W");
 					}
 					{
-						prop100WInput = new Text(powerGroup, SWT.LEFT);
-						prop100WInput.setBounds(158, 218, 40, 18);
+						prop100WInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
+						prop100WInput.setBounds(158, 217, 40, 20);
 						prop100WInput.setText(" " + prop100WValue);
+						prop100WInput.setToolTipText("Hier die Derhzahl des Propellers bei 100 Watt einsetzen");
 						prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("prop100WInput.keyReleased, event="+evt);
@@ -478,11 +499,32 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						slopeUnit.setBounds(200, 282, 34, 20);
 					}
 					{
+						calculationTypeLabel = new CLabel(powerGroup, SWT.NONE);
+						calculationTypeLabel.setBounds(48, 304, 79, 20);
+						calculationTypeLabel.setText("Berechnung");
+					}
+					{
+						slopeCalculationTypeCombo = new CCombo(powerGroup, SWT.BORDER);
+						slopeCalculationTypeCombo.setBounds(133, 304, 97, 20);
+						slopeCalculationTypeCombo.setItems(new String[] {" "+ CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE });
+						slopeCalculationTypeCombo.setToolTipText("Hier den Berechnungstyp einstellen");
+						slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								System.out.println("slopeCalculationTypeCombo.widgetSelected, event="+evt);
+								String calcType;
+								if (slopeCalculationTypeCombo.getSelectionIndex() == 1) calcType = CalculationThread.REGRESSION_TYPE_CURVE;
+								else calcType = CalculationThread.REGRESSION_TYPE_LINEAR;
+								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
+								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, calcType);
+								device.storeDeviceProperties();
+							}
+						});
+					}
+					{
 						regressionTime = new CCombo(powerGroup, SWT.BORDER);
-						regressionTime.setBounds(238, 282, 55, 20);
+						regressionTime.setBounds(232, 304, 61, 20);
 						regressionTime.setItems(new String[] {" 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s"});
-						regressionTime.select(3);
-						regressionTime.setToolTipText("Regressionszeit in Sekunden");
+						regressionTime.setToolTipText("Hier die Regressionszeit in Sekunden einstellen");
 						regressionTime.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								System.out.println("regressionTime.widgetSelected, event="+evt);
@@ -587,6 +629,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						a1Text = new Text(axModusGroup, SWT.BORDER);
 						a1Text.setBounds(49, 72, 116, 18);
 						a1Text.setText("Speed 250");
+						a1Text.setToolTipText("Name vom A1Ausgang");
 						a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a1Text.keyReleased, event="+evt);
@@ -643,6 +686,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						a2Text = new Text(axModusGroup, SWT.BORDER);
 						a2Text.setBounds(49, 93, 116, 18);
 						a2Text.setText("servoImpuls");
+						a2Text.setToolTipText("Name vom A2 Ausgang");
 						a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a2Text.keyReleased, event="+evt);
@@ -699,6 +743,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						a3Text = new Text(axModusGroup, SWT.BORDER);
 						a3Text.setBounds(49, 115, 116, 18);
 						a3Text.setText("Temperatur");
+						a3Text.setToolTipText("Name vom A3 Ausgang");
 						a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a3Text.keyReleased, event="+evt);
@@ -767,7 +812,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					setConfigButton.setBounds(364, 235, 210, 42);
+					setConfigButton.setBounds(366, 247, 210, 42);
 					setConfigButton.setText("Konfiguration speichern");
 					setConfigButton.setEnabled(false);
 					setConfigButton.addSelectionListener(new SelectionAdapter() {

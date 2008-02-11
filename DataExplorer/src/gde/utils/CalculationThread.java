@@ -30,7 +30,10 @@ public abstract class CalculationThread extends Thread {
 
 	protected static String									newLine			= System.getProperty("line.separator");
 	
-	public static final String REGRESSION_INTERVAL_SEC = "regression_interval_sec";
+	public static final String REGRESSION_TYPE 					= "regression_type";
+	public static final String REGRESSION_TYPE_LINEAR 	= "Linear";
+	public static final String REGRESSION_TYPE_CURVE 		= "Kurve";
+	public static final String REGRESSION_INTERVAL_SEC 	= "regression_interval_sec";
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;
