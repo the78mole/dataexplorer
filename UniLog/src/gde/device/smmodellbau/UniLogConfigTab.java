@@ -931,6 +931,22 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurementKey = device.getMeasurementNames(configName)[2];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(currentButton.getSelection());
+		switch (currentUnit.getSelectionIndex()) {
+		case 0: // [mA]
+			measurement.setFactor(0.001);
+			measurement.setUnit("mA");
+			break;
+		default: // [A]
+			measurement.setFactor(1.0);
+			measurement.setUnit("A");
+			break;
+		}
+
+		measurement.setUnit(currentUnit.getText());
+		if (currentUnit.getText().contains("m"))  // [mA]
+			measurement.setFactor(0.001);						//  [A]
+		else
+			measurement.setFactor(1.0);
 
 		measurementKey = device.getMeasurementNames(configName)[7];
 		measurement = device.getMeasurement(configName, measurementKey);

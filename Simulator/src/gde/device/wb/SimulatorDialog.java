@@ -313,11 +313,6 @@ public class SimulatorDialog extends DeviceDialog {
 									RecordSet recordSet;
 									try {
 
-										// prepare the data for adding to record set
-										recordSet = channel.get(recordSetKey);
-										
-										data = serialPort.getData(null, recordNumber, null, recordSet.getChannelName());
-
 										if (channel.size() == 0 || isCollectDataStopped) {
 											isCollectDataStopped = false;
 											recordNumber++;
@@ -338,6 +333,11 @@ public class SimulatorDialog extends DeviceDialog {
 										else {
 											log.fine("re-using " + recordSetKey);
 										}
+										// prepare the data for adding to record set
+										recordSet = channel.get(recordSetKey);
+										log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
+										
+										data = serialPort.getData(null, recordNumber, null, recordSet.getChannelName());
 
 										// build the point array according curves from record set
 										int[] points = new int[recordSet.size()];

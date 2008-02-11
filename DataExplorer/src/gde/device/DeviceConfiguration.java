@@ -573,10 +573,10 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, propertyKey);
 		if (property == null) {
-			createProperty(channelConfigKey, measurementKey, propertyKey, type, value);
+			createProperty(channelConfigKey, measurementKey, propertyKey, type, ("" + value).replace(',', '.'));
 		}
 		else {
-			property.setValue("" + value);
+			property.setValue(("" + value).replace(',', '.'));
 		}
 	}
 
