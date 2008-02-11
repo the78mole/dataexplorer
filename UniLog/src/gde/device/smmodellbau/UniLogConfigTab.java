@@ -281,7 +281,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						currentUnit = new CCombo(powerGroup, SWT.CENTER | SWT.BORDER);
 						currentUnit.setItems(new String[] {" [mA]", "  [A]"});
 						currentUnit.select(1);
-						currentUnit.setBounds(194, 63, 62, 20);
+						currentUnit.setBounds(194, 61, 62, 20);
 						currentUnit.setToolTipText("Stromeinheit entsprechend dem eingestellten Faktor einstellen");
 						currentUnit.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -479,7 +479,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						regressionTime = new CCombo(powerGroup, SWT.BORDER);
-						regressionTime.setBounds(238, 281, 55, 20);
+						regressionTime.setBounds(238, 282, 55, 20);
 						regressionTime.setItems(new String[] {" 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s"});
 						regressionTime.select(3);
 						regressionTime.setToolTipText("Regressionszeit in Sekunden");
