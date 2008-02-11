@@ -666,22 +666,24 @@ public class MenuToolBar {
 	 * updates the record set select combo according the active record set
 	 */
 	public String[] updateRecordSetSelectCombo() {
-		String[] recordSetNames = channels.getActiveChannel().getRecordSetNames();
-		if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
-			String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
-			recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
-			for (int i = 0; i < recordSetNames.length; i++) {
-				if (recordSetNames[i].equals(activeRecord))
-					recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
+		final String[] recordSetNames = channels.getActiveChannel().getRecordSetNames();
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
+					String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
+					recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
+					for (int i = 0; i < recordSetNames.length; i++) {
+						if (recordSetNames[i].equals(activeRecord)) recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
+					}
+				}
+				else {
+					recordSelectCombo.setItems(new String[0]);
+					recordSelectCombo.setText("");
+				}
+				updateRecordToolItems();
+				application.updateGraphicsWindow();
 			}
-		}
-		else {
-			recordSelectCombo.setItems(new String[0]);
-			recordSelectCombo.setText("");
-		}
-		updateRecordToolItems();
-		application.updateGraphicsWindow();
-
+		});
 		return recordSetNames;
 	}
 

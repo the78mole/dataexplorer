@@ -29,7 +29,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	final static long											serialVersionUID		= 26031957;
 	private Logger												log									= Logger.getLogger(this.getClass().getName());
 
-	private static Channels								instance						= null;
+	private static Channels								channles						= null;
 	private String												fileDescription			= "Dateikommentar : ";
 	private int														activeChannelNumber	= 1;																						// default at least one channel must exist
 	private final OpenSerialDataExplorer	application;
@@ -39,20 +39,20 @@ public class Channels extends HashMap<Integer, Channel> {
 	 *  therefore it is required to give the application instance as argument
 	 */
 	public static Channels getInstance(OpenSerialDataExplorer application) {
-		if (Channels.instance == null) {
-			Channels.instance = new Channels(application, 4);
+		if (Channels.channles == null) {
+			Channels.channles = new Channels(application, 4);
 		}
-		return Channels.instance;
+		return Channels.channles;
 	}
 
 	/**
 	 *  getInstance returns the instance of this singleton
 	 */
 	public static Channels getInstance() {
-		if (Channels.instance == null) {
-			Channels.instance = new Channels(4);
+		if (Channels.channles == null) {
+			Channels.channles = new Channels(4);
 		}
-		return Channels.instance;
+		return Channels.channles;
 	}
 
 	/**
@@ -71,6 +71,21 @@ public class Channels extends HashMap<Integer, Channel> {
 	private Channels(OpenSerialDataExplorer application, int initialCapacity) {
 		super(initialCapacity);
 		this.application = application;
+	}
+	
+	/**
+	 * query the channel number by given string, if string not found channel number 1 is returned 
+	 * @param channelName
+	 * @return channel number
+	 */
+	public int getChannelNumber(String channelName) {
+		int searchedNumber = 1;
+		String[] channelNames = application.getMenuToolBar().getChannelSelectCombo().getItems();
+		for (String name : channelNames) {
+			if (name.split(":")[1].trim().equals(channelName)) break;
+			++searchedNumber;
+		}
+		return searchedNumber;
 	}
 
 	/**
@@ -95,7 +110,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			this.setActiveChannelNumber(channelNumber);
 			application.getMenuToolBar().updateChannelToolItems();
 			// set record set to the first
-			this.getActiveChannel().setActiveRecordSet(instance.getActiveChannel().getRecordSetNames()[0]);
+			this.getActiveChannel().setActiveRecordSet(channles.getActiveChannel().getRecordSetNames()[0]);
 			// update viewable
 			application.getMenuToolBar().updateChannelSelector();
 			application.getMenuToolBar().updateRecordSetSelectCombo();

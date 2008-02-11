@@ -401,7 +401,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						revolutionButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						revolutionButton.setBounds(23, 196, 140, 18);
+						revolutionButton.setBounds(23, 196, 135, 18);
 						revolutionButton.setText("Drehzahl");
 						revolutionButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {

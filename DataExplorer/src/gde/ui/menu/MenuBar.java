@@ -32,7 +32,6 @@ import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
-import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.io.CSVReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
@@ -572,8 +571,6 @@ public class MenuBar {
 	 * @param isFromFile
 	 */
 	private void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
-		String recordSetKey = "1) " + dialogName;
-		Channel channel = channels.getActiveChannel();
 		try {
 			String fileSep = System.getProperty("file.separator");
 			Settings deviceSetting = Settings.getInstance();
@@ -582,23 +579,13 @@ public class MenuBar {
 			if (csvFileDialog.getFileName().length() > 4) {
 				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
 				addSubHistoryMenuItem(csvFileDialog.getFileName());
-				if (channel.getActiveRecordSet() != null) {
-					recordSetKey = (channel.size() + 1) + ") " + dialogName;
-				}
-				RecordSet newRecordSet = CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, recordSetKey, isRaw);
-				if(newRecordSet != null) {
-					channel.put(recordSetKey, newRecordSet);
-					channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
-					channel.applyTemplate(recordSetKey);
-					channel.get(recordSetKey).checkAllDisplayable(); // raw import needs calculation of passive records
-				}
+
+				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, dialogName, isRaw);
 			}
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (channel.get(recordSetKey) != null && channel.get(recordSetKey).get(channel.get(recordSetKey).getActiveRecordNames()[0]).size() == 0)
-				channel.remove(recordSetKey);
+			application.openMessageDialog("Beim Einlesen der Datei ist ein Fehler aufgetreten : " + e.getClass().getName() + " - " + e.getMessage());
 		}
 	}
 

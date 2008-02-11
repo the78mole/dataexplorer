@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 
 import osde.config.Settings;
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -76,7 +77,8 @@ public class CSVReaderWriter {
 	 * read the selected CSV file
 	 * @throws Exception 
 	 */
-	public static RecordSet read(char separator, String filePath, String recordSetName, boolean isRaw) throws Exception {
+	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
+		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
@@ -85,6 +87,7 @@ public class CSVReaderWriter {
 		int sizeRecords = 0;
 		boolean isDeviceName = true;
 		boolean isData = false;
+		Channels channels = Channels.getInstance();
 
 		try {
 			statusBar.setMessage("Lese CVS Datei " + filePath);
@@ -96,6 +99,7 @@ public class CSVReaderWriter {
 			String[] recordKeys = null;
 			OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 			String fileConfig = null;
+			Channel activeChannel = null;
 
 			while ((line = reader.readLine()) != null) {
 				if (isDeviceName) {
@@ -111,7 +115,7 @@ public class CSVReaderWriter {
 						throw new Exception("0"); // mismatch device name
 					}
 					
-					String activeConfig = Channels.getInstance().getActiveChannel().getConfigKey();
+					String activeConfig = channels.getActiveChannel().getConfigKey();
 					fileConfig = line.split(""+separator).length > 1 ? line.split(""+separator)[1].trim() : null;
 					log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
 					if(fileConfig == null) {
@@ -119,11 +123,27 @@ public class CSVReaderWriter {
 						log.fine("using as file channel name = " + fileConfig);
 					}
 					else if (!activeConfig.equals(fileConfig)) {
-						String msg = "Die Kanalconfiguration der datei entspricht nicht der Datei, soll umgeschaltet werden ?";
-							if (application.openYesNoMessageDialog(msg) == SWT.CANCEL) {
+						String msg = "Die Kanalconfiguration der Datei entspricht nicht der gewählten Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
+						int answer = application.openYesNoCancelMessageDialog(msg);
+							if (answer == SWT.YES) {
+								log.fine("SWT.YES");
+								int channelNumber = channels.getChannelNumber(fileConfig);
+								channels.setActiveChannelNumber(channelNumber);
+								channels.switchChannel(channelNumber);
+								application.getMenuToolBar().updateChannelSelector();
+							}
+							else if (answer == SWT.NO) {
+								log.fine("SWT.NO");
+								fileConfig = channels.getActiveChannel().getConfigKey();
+							}
+							else {
 								log.fine("SWT.CANCEL");
 								return null;
 							}
+					}
+					activeChannel = channels.getActiveChannel();
+					if (activeChannel.getActiveRecordSet() != null) {
+						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
 					}
 					recordNames = device.getMeasurementNames(fileConfig);
 					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
@@ -193,6 +213,12 @@ public class CSVReaderWriter {
 			recordSet.setTimeStep_ms(timeStep_ms);
 			recordSet.setSaved(true);
 			log.fine("timeStep_ms = " + timeStep_ms);
+			
+			activeChannel.put(recordSetName, recordSet);
+			activeChannel.setActiveRecordSet(recordSetName);
+			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
+			activeChannel.applyTemplate(recordSetName);
+			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 			reader.close();
 			statusBar.setProgress(10);
@@ -281,7 +307,7 @@ public class CSVReaderWriter {
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[i]);
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())
@@ -319,7 +345,7 @@ public class CSVReaderWriter {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
+			OpenSerialDataExplorer.getInstance().openMessageDialog("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
 		}
 		finally {
 			statusBar.setMessage("");
