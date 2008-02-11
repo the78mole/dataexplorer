@@ -18,6 +18,7 @@ import osde.device.IDevice;
 import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
+import osde.utils.LinearRegression;
 import osde.utils.QuasiLinearRegression;
 
 /**
@@ -202,7 +203,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				// calculate the values required				
 				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
-				slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_TYPE);
+				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
+					slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+				else
+					slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+					
 				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
 				slopeCalculationThread.setMaxCalcProgressPercent(20);
 				slopeCalculationThread.start();

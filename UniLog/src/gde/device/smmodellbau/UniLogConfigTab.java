@@ -224,7 +224,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							int intSelection;
 							if (typeSelection == null)  intSelection = 4;
 							else intSelection = new Integer(typeSelection.getValue());
-							regressionTime.select(3);
+							regressionTime.select(intSelection-1);
 
 							typeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_TYPE);
 							if (typeSelection == null)  intSelection = 1;
@@ -510,7 +510,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						slopeCalculationTypeCombo.setToolTipText("Hier den Berechnungstyp einstellen");
 						slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								System.out.println("slopeCalculationTypeCombo.widgetSelected, event="+evt);
+								if (log.isLoggable(Level.FINEST))  log.finest("slopeCalculationTypeCombo.widgetSelected, event="+evt);
 								String calcType;
 								if (slopeCalculationTypeCombo.getSelectionIndex() == 1) calcType = CalculationThread.REGRESSION_TYPE_CURVE;
 								else calcType = CalculationThread.REGRESSION_TYPE_LINEAR;
@@ -523,11 +523,11 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						regressionTime = new CCombo(powerGroup, SWT.BORDER);
 						regressionTime.setBounds(232, 304, 61, 20);
-						regressionTime.setItems(new String[] {" 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s"});
+						regressionTime.setItems(new String[] {" 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s", "19 s", "20 s"});
 						regressionTime.setToolTipText("Hier die Regressionszeit in Sekunden einstellen");
 						regressionTime.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								System.out.println("regressionTime.widgetSelected, event="+evt);
+								if (log.isLoggable(Level.FINEST))  log.finest("regressionTime.widgetSelected, event="+evt);
 								int regressionTime_sec = regressionTime.getSelectionIndex() + 1;
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
