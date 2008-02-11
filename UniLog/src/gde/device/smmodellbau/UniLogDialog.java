@@ -318,7 +318,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									currentTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									currentTriggerCombo.setBounds(193, 22, 65, 18);
+									currentTriggerCombo.setBounds(200, 22, 80, 20);
 									currentTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50"});
 									currentTriggerCombo.select(2);
 									currentTriggerCombo.setEditable(false);
@@ -332,7 +332,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									timeTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									timeTriggerCombo.setBounds(193, 46, 65, 18);
+									timeTriggerCombo.setBounds(200, 46, 80, 20);
 									timeTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", " 20", " 30", " 60", " 120" });
 									timeTriggerCombo.select(16);
 									timeTriggerCombo.setEditable(true);
@@ -346,7 +346,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									impulseTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									impulseTriggerCombo.setBounds(193, 70, 65, 18);
+									impulseTriggerCombo.setBounds(200, 70, 80, 20);
 									impulseTriggerCombo.setEditable(false);
 									impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									impulseTriggerCombo.setItems(RX_AUTO_START_MS);
@@ -367,7 +367,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									numberPolsButton = new Button(motorPropGroup, SWT.RADIO | SWT.LEFT);
 									numberPolsButton.setText("Motorpole");
-									numberPolsButton.setBounds(31, 20, 150, 18);
+									numberPolsButton.setBounds(31, 20, 150, 20);
 									numberPolsButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST))  log.finest("numberPolsButton.widgetSelected, event="+evt);
@@ -386,7 +386,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									motorPoleCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									motorPoleCombo.setBounds(190, 20, 56, 18);
+									motorPoleCombo.setBounds(198, 20, 63, 20);
 									motorPoleCombo.setItems(new String[] {"  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16"});
 									motorPoleCombo.select(6);
 									motorPoleCombo.setEditable(false);
@@ -405,14 +405,14 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									gearFactorCombo = new Text(motorPropGroup, SWT.LEFT | SWT.BORDER);
-									gearFactorCombo.setBounds(190, 44, 56, 18);		
+									gearFactorCombo.setBounds(198, 44, 63, 20);		
 									gearFactorCombo.setText(" 1.0  :  1");
 									gearFactorCombo.setEditable(false);
 									gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								}
 								{
 									gearRatioSlider = new Slider(motorPropGroup, SWT.VERTICAL);
-									gearRatioSlider.setBounds(249, 40, 17, 28);
+									gearRatioSlider.setBounds(263, 39, 21, 30);
 									gearRatioSlider.setMinimum(0);
 									gearRatioSlider.setMaximum(100);
 									gearRatioSlider.setSelection(sliderPosition);
@@ -454,7 +454,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									numbeProbCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									numbeProbCombo.setBounds(190, 68, 56, 18);
+									numbeProbCombo.setBounds(198, 68, 63, 18);
 									numbeProbCombo.setItems(new String[] {" 1", " 2", " 3", " 4"});
 									numbeProbCombo.select(1);
 									numbeProbCombo.setEditable(false);
