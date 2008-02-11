@@ -550,7 +550,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						axName = new CLabel(axModusGroup, SWT.LEFT);
-						axName.setBounds(45, 50, 96, 20);
+						axName.setBounds(47, 50, 116, 18);
 						axName.setText("Bezeichnung");
 						axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
@@ -574,7 +574,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a1ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a1ValueButton.setBounds(4, 71, 35, 18);
+						a1ValueButton.setBounds(4, 71, 41, 18);
 						a1ValueButton.setText("A1");
 						a1ValueButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -585,7 +585,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a1Text = new Text(axModusGroup, SWT.BORDER);
-						a1Text.setBounds(45, 72, 120, 18);
+						a1Text.setBounds(49, 72, 116, 18);
 						a1Text.setText("Speed 250");
 						a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -630,7 +630,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a2ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a2ValueButton.setBounds(4, 93, 35, 18);
+						a2ValueButton.setBounds(4, 93, 41, 18);
 						a2ValueButton.setText("A2");
 						a2ValueButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -641,7 +641,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a2Text = new Text(axModusGroup, SWT.BORDER);
-						a2Text.setBounds(45, 93, 120, 18);
+						a2Text.setBounds(49, 93, 116, 18);
 						a2Text.setText("servoImpuls");
 						a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -686,7 +686,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a3ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a3ValueButton.setBounds(4, 115, 35, 18);
+						a3ValueButton.setBounds(4, 115, 41, 18);
 						a3ValueButton.setText("A3");
 						a3ValueButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -697,7 +697,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						a3Text = new Text(axModusGroup, SWT.BORDER);
-						a3Text.setBounds(45, 115, 120, 18);
+						a3Text.setBounds(49, 115, 116, 18);
 						a3Text.setText("Temperatur");
 						a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
