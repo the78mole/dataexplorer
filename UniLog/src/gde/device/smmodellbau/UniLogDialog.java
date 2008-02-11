@@ -318,7 +318,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									currentTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									currentTriggerCombo.setBounds(193, 22, 60, 18);
+									currentTriggerCombo.setBounds(193, 22, 65, 18);
 									currentTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50"});
 									currentTriggerCombo.select(2);
 									currentTriggerCombo.setEditable(false);
@@ -332,7 +332,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									timeTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									timeTriggerCombo.setBounds(193, 46, 60, 18);
+									timeTriggerCombo.setBounds(193, 46, 65, 18);
 									timeTriggerCombo.setItems(new String[] {"  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", " 20", " 30", " 60", " 120" });
 									timeTriggerCombo.select(16);
 									timeTriggerCombo.setEditable(true);
@@ -346,7 +346,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									impulseTriggerCombo = new CCombo(autoStartGroup, SWT.BORDER);
-									impulseTriggerCombo.setBounds(193, 70, 60, 18);
+									impulseTriggerCombo.setBounds(193, 70, 65, 18);
 									impulseTriggerCombo.setEditable(false);
 									impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									impulseTriggerCombo.setItems(RX_AUTO_START_MS);
@@ -386,7 +386,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									motorPoleCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									motorPoleCombo.setBounds(190, 20, 50, 18);
+									motorPoleCombo.setBounds(190, 20, 56, 18);
 									motorPoleCombo.setItems(new String[] {"  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16"});
 									motorPoleCombo.select(6);
 									motorPoleCombo.setEditable(false);
@@ -405,14 +405,14 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									gearFactorCombo = new Text(motorPropGroup, SWT.LEFT | SWT.BORDER);
-									gearFactorCombo.setBounds(190, 44, 50, 18);		
+									gearFactorCombo.setBounds(190, 44, 56, 18);		
 									gearFactorCombo.setText(" 1.0  :  1");
 									gearFactorCombo.setEditable(false);
 									gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								}
 								{
 									gearRatioSlider = new Slider(motorPropGroup, SWT.VERTICAL);
-									gearRatioSlider.setBounds(242, 40, 17, 26);
+									gearRatioSlider.setBounds(249, 40, 17, 28);
 									gearRatioSlider.setMinimum(0);
 									gearRatioSlider.setMaximum(100);
 									gearRatioSlider.setSelection(sliderPosition);
@@ -454,7 +454,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									numbeProbCombo = new CCombo(motorPropGroup, SWT.BORDER);
-									numbeProbCombo.setBounds(190, 68, 50, 18);
+									numbeProbCombo.setBounds(190, 68, 56, 18);
 									numbeProbCombo.setItems(new String[] {" 1", " 2", " 3", " 4"});
 									numbeProbCombo.select(1);
 									numbeProbCombo.setEditable(false);
@@ -475,7 +475,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									timeIntervalCombo = new CCombo(dataRateGroup, SWT.BORDER);
 									timeIntervalCombo.setItems(TIME_INTERVAL);
-									timeIntervalCombo.setBounds(83, 16, 122, 20);
+									timeIntervalCombo.setBounds(70, 17, 136, 20);
 									timeIntervalCombo.select(1);
 									timeIntervalCombo.setEditable(false);
 									timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -743,6 +743,7 @@ public class UniLogDialog extends DeviceDialog {
 								memoryDeleteInfo = new Text(clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
 								memoryDeleteInfo.setBounds(12, 22, 256, 34);
 								memoryDeleteInfo.setText("Löschen wird erst beim nächsten einschalten wirksam");
+								memoryDeleteInfo.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								memoryDeleteInfo.setEditable(false);
 							}
 						}
