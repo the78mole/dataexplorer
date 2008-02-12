@@ -39,7 +39,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -58,7 +57,6 @@ import osde.ui.SWTResourceManager;
 import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.CurveUtils;
 import osde.utils.TimeLine;
-
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -98,6 +96,7 @@ public class GraphicsWindow {
 	private final TimeLine								timeLine								= new TimeLine();
 	private final int											type;
 	private boolean												isCurveSelectorEnabled	= true;
+	private int selectorHeaderWidth;
 	
 	private int														xDown = 0;
 	private int														xUp = 0;
@@ -136,9 +135,9 @@ public class GraphicsWindow {
 		{ // graphicSashForm
 			graphicSashForm = new SashForm(displayTab, SWT.HORIZONTAL);
 			graphic.setControl(graphicSashForm);
-			GridLayout sashForm1Layout2 = new GridLayout();
-			sashForm1Layout2.makeColumnsEqualWidth = true;
-			graphicSashForm.setLayout(sashForm1Layout2);
+//			GridLayout sashForm1Layout2 = new GridLayout();
+//			sashForm1Layout2.makeColumnsEqualWidth = true;
+//			graphicSashForm.setLayout(sashForm1Layout2);
 			{ // curveSelector
 				curveSelector = new Composite(graphicSashForm, SWT.BORDER);
 				FormLayout curveSelectorLayout = new FormLayout();
@@ -148,17 +147,19 @@ public class GraphicsWindow {
 				{
 					curveSelectorHeader = new CLabel(curveSelector, SWT.NONE);
 					curveSelectorHeader.setText("Kurvenselektor");
+					curveSelectorHeader.pack();
+					selectorHeaderWidth = curveSelectorHeader.getSize().x;
 					//curveSelectorHeader.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					FormData curveSelectorHeaderLData = new FormData();
-					curveSelectorHeaderLData.width = 145;
-					curveSelectorHeaderLData.height = 26;
+					curveSelectorHeaderLData.width = selectorHeaderWidth;
+					curveSelectorHeaderLData.height = 24;
 					curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 0);
 					curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 3);
 					curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
 					curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					curveSelectorTable = new Table(curveSelector, SWT.SINGLE | SWT.CHECK);
+					curveSelectorTable = new Table(curveSelector, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
 					curveSelectorTable.setLinesVisible(true);
 					FormData curveTableLData = new FormData();
 					curveTableLData.width = 82;
@@ -177,8 +178,9 @@ public class GraphicsWindow {
 					curveSelectorTable.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finest("curveTable.paintControl, event=" + evt);
-							Point size = curveSelectorTable.getSize();
-							tableSelectorColumn.setWidth(size.x);
+							int selectorItemWidth = graphicSashForm.getSize().x / 10;
+							curveSelectorHeader.setSize(selectorItemWidth, curveSelectorHeader.getSize().y);
+							tableSelectorColumn.setWidth(selectorItemWidth);
 						}
 					});
 					curveSelectorTable.addSelectionListener(new SelectionAdapter() {
@@ -219,7 +221,7 @@ public class GraphicsWindow {
 					});
 					{
 						tableSelectorColumn = new TableColumn(curveSelectorTable, SWT.LEFT);
-						tableSelectorColumn.setWidth(100);
+						tableSelectorColumn.setWidth(selectorHeaderWidth);
 					}
 				}
 			} // curveSelector
@@ -457,7 +459,7 @@ public class GraphicsWindow {
 					}
 				});
 			} // graphicCanvas
-			graphicSashForm.setWeights(new int[] { 9, 100 }); // 9:100  -> 9 == width required for curveSelectorTable
+			graphicSashForm.setWeights(new int[] { 10, 100 }); // 10:100  -> 9 == width required for curveSelectorTable
 		} // graphicSashForm
 	}
 
