@@ -210,7 +210,7 @@ public class RecordSet extends HashMap<String, Record> {
 				indexValue = record.get(index);
 			}
 			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage() + " - data calcualtion failed ?");
+				log.log(Level.WARNING, e.getMessage() + "at index = " + index + " - data calcualtion failed ?");
 			}
 			values[i] = df.format(new Double(device.translateValue(this.getChannelName(), record.getName(), indexValue / 1000.0)));
 		}

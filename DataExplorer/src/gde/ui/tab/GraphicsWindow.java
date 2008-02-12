@@ -516,7 +516,7 @@ public class GraphicsWindow {
 		int numberCurvesLeft = 0;
 		String[] recordNames = recordSet.getRecordNames();
 		for (String string : recordNames) {
-			if (recordSet.getRecord(string).isVisible()) {
+			if (recordSet.getRecord(string).isVisible() && recordSet.getRecord(string).isDisplayable()) {
 				if (recordSet.getRecord(string).isPositionLeft())
 					numberCurvesLeft++;
 				else
@@ -586,6 +586,8 @@ public class GraphicsWindow {
 				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet());
 			}
 		}
+		offSetX = x0;
+		offSetY = y0-height;
 		// check for activated time grid
 		if (recordSet.getGridType() > 0) {
 			curveAreaGC.setForeground(recordSet.getColorTimeGrid());
@@ -594,7 +596,7 @@ public class GraphicsWindow {
 				curveAreaGC.drawLine(x-offSetX, 0, x-offSetX, height-1);
 			}
 		}
-		canvasGC.drawImage(curveArea, offSetX = x0, offSetY = y0-height);
+		canvasGC.drawImage(curveArea, offSetX, offSetY);
 		
 
 		if (startTime != 0) { // scaled window 
