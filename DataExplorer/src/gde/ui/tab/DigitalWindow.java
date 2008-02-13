@@ -75,12 +75,12 @@ public class DigitalWindow {
 	/**
 	 * method to update the window with its children
 	 */
-	public synchronized void updateChilds() {
+	public void updateChilds() {
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
 				if (recordSet != null) { // channel does not have a record set yet
-					String[] activeRecordKeys = recordSet.getActiveRecordNames();
+					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 					for (String recordKey : activeRecordKeys) {
 						DigitalDisplay display = displays.get(recordKey);
 						if (display != null) display.getDigitalLabel().redraw();
@@ -91,9 +91,9 @@ public class DigitalWindow {
 	}
 
 	/**
-	 * method to update digital window
+	 * method to update digital window by adding removing digital displays
 	 */
-	public synchronized void update() {
+	public void update() {
 		final RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
@@ -101,7 +101,7 @@ public class DigitalWindow {
 					// if recordSet name signature changed new displays need to be created
 					if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
 						oldRecordSet = recordSet;
-						String[] activeRecordKeys = recordSet.getActiveRecordNames();
+						String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 						for (String recordKey : activeRecordKeys) {
 							DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 							display.create();

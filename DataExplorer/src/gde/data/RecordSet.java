@@ -241,13 +241,13 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * method to get the sorted record active names as array
+	 * method to get the sorted record active names which are visible as string array
 	 * @return String[] containing record names 
 	 */
-	public String[] getActiveRecordNames() {
+	public String[] getActiveAndVisibleRecordNames() {
 		Vector<String> activeRecords = new Vector<String>();
 		for (String recordKey : recordNames) {
-			if (this.get(recordKey).isDisplayable()) activeRecords.add(recordKey);
+			if (this.get(recordKey).isActive() && this.get(recordKey).isVisible()) activeRecords.add(recordKey);
 		}
 		return activeRecords.toArray(new String[1]);
 	}

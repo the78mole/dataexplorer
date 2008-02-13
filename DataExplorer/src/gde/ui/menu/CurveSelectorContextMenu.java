@@ -723,7 +723,7 @@ public class CurveSelectorContextMenu {
 							isComparable = false;
 							return;
 						}
-						if (!compareSet.isEmpty() && !compareSet.getActiveRecordNames()[0].startsWith(newRecordKey)) {
+						if (!compareSet.isEmpty() && !compareSet.getActiveAndVisibleRecordNames()[0].startsWith(newRecordKey)) {
 							application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0].split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
 							isComparable = false;
 							return;

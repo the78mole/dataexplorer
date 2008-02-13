@@ -86,7 +86,7 @@ public class AnalogWindow {
 			// if recordSet name signature changed new displays need to be created
 			if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
 				oldRecordSet = recordSet;
-				String[] activeRecordKeys = recordSet.getActiveRecordNames();
+				String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 				for (String recordKey : activeRecordKeys) {
 					AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 					display.create();

@@ -52,6 +52,7 @@ import osde.ui.SWTResourceManager;
  */
 public class UniLogDialog extends DeviceDialog {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	private Button stopLiveGatherButton;
 	private Button editConfigButton;
 	private Text memoryDeleteInfo;
 
@@ -105,7 +106,7 @@ public class UniLogDialog extends DeviceDialog {
 	private Group													liveDataCaptureGroup;
 	private Button												clearMemoryButton;
 	private Group													clearDataBufferGroup;
-	private Button												liveViewButton;
+	private Button												startLiveGatherButton;
 	private Button												stopLoggingButton;
 	private Button												startLoggingButton;
 	private Group													loggingGroup;
@@ -131,6 +132,8 @@ public class UniLogDialog extends DeviceDialog {
 	private final OpenSerialDataExplorer	application;		// interaction with application instance
 	private final UniLog									device;					// get device specific things, get serial port, ...
 	private DataGathererThread						gatherThread;
+	private LiveGathererThread						liveThread;
+	private String 												liveRecordName;
 	private UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 
 	private String												statusText					= "";
@@ -569,7 +572,7 @@ public class UniLogDialog extends DeviceDialog {
 						{
 							dataReadGroup = new Group(dataMainComposite, SWT.NONE);
 							dataReadGroup.setLayout(null);
-							dataReadGroup.setBounds(14, 22, 294, 296);
+							dataReadGroup.setBounds(14, 19, 294, 299);
 							dataReadGroup.setText("Daten auslesen");
 							dataReadGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
@@ -674,7 +677,7 @@ public class UniLogDialog extends DeviceDialog {
 										startLoggingButton.setEnabled(false);
 										stopLoggingButton.setEnabled(false);
 										useConfigCombo.setEnabled(false);
-										liveViewButton.setEnabled(false);
+										startLiveGatherButton.setEnabled(false);
 										clearMemoryButton.setEnabled(false);
 									}
 								});
@@ -715,34 +718,61 @@ public class UniLogDialog extends DeviceDialog {
 						{
 							loggingGroup = new Group(dataMainComposite, SWT.NONE);
 							loggingGroup.setLayout(null);
-							loggingGroup.setBounds(328, 22, 281, 105);
-							loggingGroup.setText("Daten aufnehmen");
+							loggingGroup.setBounds(328, 19, 281, 92);
+							loggingGroup.setText("Daten aufnehmen ohne Aufzeichnung");
 							{
 								startLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
-								startLoggingButton.setText("Start logging");
-								startLoggingButton.setBounds(10, 20, 260, 30);
+								startLoggingButton.setText("Start Datenaufnahme");
+								startLoggingButton.setBounds(10, 20, 260, 25);
+								startLoggingButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										System.out.println("startLoggingButton.widgetSelected, event="+evt);
+										//TODO add your code for startLoggingButton.widgetSelected
+									}
+								});
 							}
 							{
 								stopLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
-								stopLoggingButton.setText("Stop logging");
-								stopLoggingButton.setBounds(12, 64, 260, 30);
+								stopLoggingButton.setText("Stop Datenaufnahme");
+								stopLoggingButton.setBounds(12, 54, 260, 25);
 								stopLoggingButton.setEnabled(false);
+								stopLoggingButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										System.out.println("stopLoggingButton.widgetSelected, event="+evt);
+										//TODO add your code for stopLoggingButton.widgetSelected
+									}
+								});
 							}
 						}
 						{
 							clearDataBufferGroup = new Group(dataMainComposite, SWT.NONE);
 							clearDataBufferGroup.setLayout(null);
-							clearDataBufferGroup.setBounds(328, 206, 280, 112);
+							clearDataBufferGroup.setBounds(328, 214, 280, 104);
 							clearDataBufferGroup.setText("Datenspeicher");
 							{
 								clearMemoryButton = new Button(clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 								clearMemoryButton.setText("löschen");
-								clearMemoryButton.setBounds(12, 62, 260, 30);
+								clearMemoryButton.setBounds(12, 62, 260, 25);
+								clearMemoryButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										System.out.println("clearMemoryButton.widgetSelected, event="+evt);
+										try {
+											clearMemoryButton.setEnabled(false);
+											serialPort.clearMemory();
+										}
+										catch (Exception e) {
+											log.log(Level.SEVERE, e.getMessage(), e);
+											application.openMessageDialog("Bei der Löschoperation ist ein Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+											e.printStackTrace();
+										}
+										clearMemoryButton.setEnabled(true);
+									}
+								});
 							}
 							{
 								memoryDeleteInfo = new Text(clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
 								memoryDeleteInfo.setBounds(12, 22, 256, 34);
-								memoryDeleteInfo.setText("Löschen wird erst beim nächsten einschalten wirksam");
+								memoryDeleteInfo.setText("Löschen wird erst bei der nächsten Datenaufnahme wirksam");
 								memoryDeleteInfo.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								memoryDeleteInfo.setEditable(false);
 							}
@@ -750,12 +780,42 @@ public class UniLogDialog extends DeviceDialog {
 						{
 							liveDataCaptureGroup = new Group(dataMainComposite, SWT.NONE);
 							liveDataCaptureGroup.setLayout(null);
-							liveDataCaptureGroup.setBounds(328, 133, 280, 69);
-							liveDataCaptureGroup.setText("Datenabfrage ohne Aufzeichnung");
+							liveDataCaptureGroup.setBounds(328, 114, 280, 100);
+							liveDataCaptureGroup.setText("Datenabfrage mit Aufzeichnung");
 							{
-								liveViewButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
-								liveViewButton.setText("live Datenanzeige");
-								liveViewButton.setBounds(10, 24, 260, 30);
+								startLiveGatherButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
+								startLiveGatherButton.setText("Start live Datenabfrage");
+								startLiveGatherButton.setBounds(10, 24, 260, 25);
+								startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										log.fine("liveViewButton.widgetSelected, event="+evt);
+										try {
+											String channelName = " " + (useConfigCombo.getSelectionIndex() + 1) + " : " + useConfigCombo.getText();
+											liveThread = new LiveGathererThread(application, device, serialPort, channelName);
+											liveRecordName = liveThread.startTimerThread();
+											startLiveGatherButton.setEnabled(false);
+											stopLiveGatherButton.setEnabled(true);
+										}
+										catch (Exception e) {
+											log.log(Level.SEVERE, e.getMessage(), e);
+											application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !");
+										}
+									}
+								});
+							}
+							{
+								stopLiveGatherButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
+								stopLiveGatherButton.setBounds(10, 61, 258, 25);
+								stopLiveGatherButton.setText("Stop live Datenabfrage");
+								stopLiveGatherButton.setEnabled(false);
+								stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										log.fine("stopLiveGatherButton.widgetSelected, event="+evt);
+										if (liveThread != null) liveThread.finalizeRecordSet(liveRecordName);
+										stopLiveGatherButton.setEnabled(false);
+										startLiveGatherButton.setEnabled(true);
+									}
+								});
 							}
 						}
 					}
@@ -1071,7 +1131,7 @@ public class UniLogDialog extends DeviceDialog {
 				startLoggingButton.setEnabled(true);
 				stopLoggingButton.setEnabled(false);
 				useConfigCombo.setEnabled(true);
-				liveViewButton.setEnabled(true);
+				startLiveGatherButton.setEnabled(true);
 				clearMemoryButton.setEnabled(true);
 			}
 		});
