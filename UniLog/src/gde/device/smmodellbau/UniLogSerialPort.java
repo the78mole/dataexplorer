@@ -561,4 +561,11 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 		return (checkSum == checkSumLast2Bytes);
 	}
+
+	/**
+	 * @param isTransmitFinished the isTransmitFinished to set
+	 */
+	public void setTransmitFinished(boolean isTransmitFinished) {
+		this.isTransmitFinished = isTransmitFinished;
+	}
 }
