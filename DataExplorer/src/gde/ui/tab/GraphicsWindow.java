@@ -537,7 +537,7 @@ public class GraphicsWindow {
 		int y0;
 		int height; // make modulo 20
 		// draw x coordinate	- time scale
-		int startTime;
+		int startTime, endTime;
 		// Calculate the horizontal area to used for plotting graphs
 		int maxTime = maxTimeNumber; // alle 10 min/sec eine Markierung
 		Point pt = canvasGC.textExtent("000,00");
@@ -561,8 +561,8 @@ public class GraphicsWindow {
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		if (log.isLoggable(Level.FINE)) log.fine("curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height);
 		startTime = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
-		maxTime = startTime + maxTime;
-		timeLine.drawTimeLine(canvasGC, x0, y0, fitTimeWidth, startTime, maxTime, scaleFactor, OpenSerialDataExplorer.COLOR_BLACK);
+		endTime = startTime + maxTime;
+		timeLine.drawTimeLine(canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
 		curveArea = SWTResourceManager.getImage(width, height);

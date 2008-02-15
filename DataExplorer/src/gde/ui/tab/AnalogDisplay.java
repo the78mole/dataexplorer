@@ -31,7 +31,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.SWTResourceManager;
+import osde.utils.GraphicsUtils;
 
 /**
  * Child display class displaying analog active measurements
@@ -91,8 +91,8 @@ public class AnalogDisplay extends Composite {
 			Canvas canvas = (Canvas) evt.widget;
 			int width = canvas.getSize().x;
 			int height = canvas.getSize().y;
-			log.finer("canvas size = " + width + " x " + height);
-			canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
+			log.info("canvas size = " + width + " x " + height);
+			//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
 			double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
 			double maxValue =  device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0);
@@ -103,10 +103,41 @@ public class AnalogDisplay extends Composite {
 			//evt.gc.setClipping(10, 10, width-20, height-20);
 			evt.gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			canvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			evt.gc.setLineWidth(2);
-			evt.gc.drawLine(width / 2, height, width / 2, height / 2);
-			evt.gc.drawArc(10, 25, width - 20, (width - 20), -20, 220);
-			evt.gc.drawArc((width / 2) - 20, (int) (height / 1.4), 40, 40, 0, 360);
+	    
+	    int centerX = width / 2;
+	    int centerY = (int)(height * 0.75);
+	    evt.gc.drawLine(0, centerY, width, centerY);
+	    evt.gc.drawLine(centerX, 0, centerX, height);
+
+	    int radiusW = (int)(width / 2 * 0.85);
+	    int radiusH = (int)(height / 2 * 0.90);
+	    int radius = radiusW < radiusH ? radiusW : radiusH;
+	    int angleStart = -20;
+	    int angleDelta = 220;
+	    evt.gc.drawArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, angleStart, angleDelta);
+
+	    int minV = 0;
+	    int maxV = 15;
+	    int numberTicks = maxV - minV;
+	    double angleSteps = angleDelta * 1.0 / numberTicks; 
+	    int dxr, dxtick, dyr, dytick, dxtext, dytext;
+	    for (int i = 0; i <= numberTicks; ++i) {
+	    	double angle = angleStart + i * angleSteps;  // -20, 0, 20, 40, ...
+		    log.info("angle = " + angle);
+		    dxr = new Double(radius * Math.cos(angle * Math.PI / 180)).intValue();
+		    dyr = new Double(radius * Math.sin(angle * Math.PI / 180)).intValue();
+		    dxtick = new Double((radius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
+		    dytick = new Double((radius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
+		    dxtext = new Double((radius + 20) * Math.cos(angle * Math.PI / 180)).intValue();
+		    dytext = new Double((radius + 20) * Math.sin(angle * Math.PI / 180)).intValue();
+
+		    evt.gc.drawLine(centerX - dxtick, centerY - dytick, centerX - dxr, centerY - dyr);	
+		    GraphicsUtils.drawText("" + (minV + i * 1), centerX - dxtext, centerY - dytext, evt.gc, SWT.HORIZONTAL);
+			}
+
+	    evt.gc.setBackground(OpenSerialDataExplorer.COLOR_GREY);
+			radius = (int)(width / 2 * 0.1);
+			evt.gc.fillArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360);
 		}
 	}
 }
