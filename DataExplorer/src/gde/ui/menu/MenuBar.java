@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -584,8 +583,7 @@ public class MenuBar {
 			}
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			application.openMessageDialog("Beim Einlesen der Datei ist ein Fehler aufgetreten : " + e.getClass().getName() + " - " + e.getMessage());
+			application.openMessageDialog(e.getMessage());
 		}
 	}
 

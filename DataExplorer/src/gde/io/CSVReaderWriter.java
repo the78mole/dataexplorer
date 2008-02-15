@@ -95,6 +95,7 @@ public class CSVReaderWriter {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
 			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
+			StringBuilder headerStringConf = new StringBuilder().append(lineSep);
 			StringBuilder keys = new StringBuilder();
 			String[] recordKeys = null;
 			OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
@@ -155,6 +156,8 @@ public class CSVReaderWriter {
 					int countNotMeasurement = 0;
 					for (String recordKey : recordNames) {
 						MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
+						headerStringConf.append(measurement.getName()).append(separator);
+
 						if (!measurement.isCalculation()) {
 							keys.append(measurement.getName()).append(separator);
 							++countNotMeasurement;			// update count for possible raw
@@ -165,23 +168,25 @@ public class CSVReaderWriter {
 					// for raw data check if measurements which !isCalculation match number of entries in header line
 					// first simple check, but name must not match, count only numbers
 					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) { 
-						throw new Exception("1"); // mismatch data signature length
+						throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
 					}
 					else {
 						int match = 0;  // check match of the measurement units, relevant for absolute import 
 						if(isRaw) recordKeys = keys.toString().split("" + separator);
 						else recordKeys = recordNames;
 						
+						StringBuilder unitCompare = new StringBuilder().append(lineSep);
 						for (int i = 1; i < header.length; i++) {
 							String recordKey = recordKeys[i - 1];
 							String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
 							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
-							log.fine(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit);
+							unitCompare.append(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit).append(lineSep);
 							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
 						}
+						log.fine(unitCompare.toString());
 						if (match != header.length - 1) {
-							throw new Exception("2"); // mismatch data header units
+							throw new Exception("2" + unitCompare.toString()); // mismatch data header units
 						}
 					}
 					isData = true;
@@ -225,29 +230,27 @@ public class CSVReaderWriter {
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
-			throw e;
+			throw new UnsupportedEncodingException("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei existiert nicht - \"filePath\"");
-			throw e;
+			throw new FileNotFoundException("Die CSV Datei existiert nicht - \"" + filePath + "\"");
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei kann nicht gelesen werden - \"filePath\"");
-			throw e;
+			throw new IOException("Die CSV Datei kann nicht gelesen werden - \"" + filePath + "\"");
 		}
 		catch (Exception e) {
+			String msg = null;
 			if (e.getMessage().startsWith("0"))
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät");
+				msg = "Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät";
 			else if (e.getMessage().startsWith("1"))
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei entspricht nicht der Messgrößensignatur des eingestellten Gerätes");
+				msg = "Die geöffnete CSV Datei entspricht nicht der Messgrößensignatur des eingestellten Gerätes (vermutlich raw/absolute) :" + e.getMessage().substring(1);
 			else if (e.getMessage().startsWith("2"))
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Die geöffnete CSV Datei hat ...");
+				msg = "Bei der geöffneten CVS Datei stimmen die Einheiten nicht mit der Konfiguration überein : " + e.getMessage().substring(1);
 			else
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes");
-			throw e;
+				msg = "Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes";
+			throw new Exception(msg);
 		}
 		finally {
 			statusBar.setMessage("");
