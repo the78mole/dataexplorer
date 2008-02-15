@@ -239,10 +239,16 @@ public class Record extends Vector<Integer> {
 	 */
 	public Integer get(int index) {
 		if(parent.isZoomMode()) {
-			return super.get(index + parent.getRecordZoomOffset());
-		}
-		else
+			index = index + parent.getRecordZoomOffset();
+			index = index > (this.size()-1) ? (this.size()-1) : index;
+			index = index < 0 ? 0 : index;
 			return super.get(index);
+		}
+		else {
+			index = index > (this.size()-1) ? (this.size()-1) : index;
+			index = index < 0 ? 0 : index;
+			return super.get(index);
+		}
 	}
 	
 	/**

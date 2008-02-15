@@ -182,11 +182,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		if (doUpdate) {
 			if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-					public void run() {
-						application.updateGraphicsWindow();
-					}
-				});
+				application.updateGraphicsWindow();
 				application.updateDataTable();
 				application.updateDigitalWindowChilds();
 			}

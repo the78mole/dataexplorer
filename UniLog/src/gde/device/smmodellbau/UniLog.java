@@ -65,7 +65,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
+		double newValues = (this.getMeasurementOffset(channelConfigKey, recordKey) * 1000) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
 		// do some calculation
 		return newValues;
 	}
@@ -76,7 +76,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - this.getMeasurementOffset(channelConfigKey, recordKey);
+		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - (this.getMeasurementOffset(channelConfigKey, recordKey) * 1000);
 		// do some calculation
 		return newValues;
 	}

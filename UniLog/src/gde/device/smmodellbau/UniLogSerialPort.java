@@ -38,7 +38,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	@SuppressWarnings("unused")
 	private final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
 	@SuppressWarnings("unused")
-	private final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
+	public final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
 	
 	private final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
 	private final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
@@ -255,13 +255,13 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		try {
 			this.write(COMMAND_READ_DATA);
-			readBuffer = this.read(DATA_LENGTH_BYTES, 5);
+			readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 			
 			// give it another try
 			if (!isChecksumOK(readBuffer)) {
 				++reveiceErrors;
 				this.write(COMMAND_REPEAT);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 5);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
 		}
@@ -283,7 +283,15 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		try {
 			if (this.isConnected) {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.readSingleTelegramm();
+				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
+				
+				// give it another try
+				if (!isChecksumOK(readBuffer)) {
+					++reveiceErrors;
+					this.write(COMMAND_REPEAT);
+					readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+					verifyChecksum(readBuffer); // throws exception if checksum miss match
+				}
 			}
 			else
 				throw new Exception("Der serialle Port ist nicht geöffnet!");
@@ -302,20 +310,24 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @throws Exception
 	 */
 	public synchronized boolean startLogging() throws Exception {
+		boolean isPortOpenedByMe = false;
 		try {
-			if (!isLoggingActive && this.isConnected) {
-
-				this.write(COMMAND_START_LOGGING);
-				byte[] readBuffer = this.read(1, 2);
-				if (readBuffer[0] != DATA_STATE_OK) isLoggingActive = true;
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+				waitDataReady(2);
 			}
-			else
-				throw new Exception("Der serialle Port ist nicht geöffnet!");
+
+			this.write(COMMAND_START_LOGGING);
+			isLoggingActive = true;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.close();
 			throw e;
+		}
+		finally {
+			if (isPortOpenedByMe) this.close();
 		}
 		return isLoggingActive;
 	}
@@ -326,20 +338,23 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @throws Exception
 	 */
 	public synchronized boolean stopLogging() throws Exception {
+		boolean isPortOpenedByMe = false;
 		try {
-			if (isLoggingActive && this.isConnected) {
-
-				this.write(COMMAND_STOP_LOGGING);
-				byte[] readBuffer = this.read(1, 2);
-				if (readBuffer[0] != DATA_STATE_OK) isLoggingActive = false;
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+				waitDataReady(2);
 			}
-			else
-				throw new Exception("Der serialle Port ist nicht geöffnet!");
+
+			this.write(COMMAND_STOP_LOGGING);
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.close();
 			throw e;
+		}
+		finally {
+			if (isPortOpenedByMe) this.close();
 		}
 		return !isLoggingActive;
 	}
@@ -352,17 +367,19 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public synchronized boolean clearMemory() throws Exception {
 		boolean success = false;
 		try {
-			this.open();
-			// check data ready for read operation
-			if (this.waitDataReady(5)) {
+			if (!this.isConnected) { // port may not used by other
+				this.open();
+				// check data ready for read operation
+				if (this.waitDataReady(5)) {
 					this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = this.read(1, 2);
 					if (readBuffer[0] != DATA_STATE_OK) success = true;
-					
+
+				}
+				else
+					throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
 			}
-			else
-				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -417,8 +434,12 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized byte[] readConfiguration() throws Exception {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
+		boolean isPortOpenedByMe = false;
 		try {
-			this.open();
+			if(!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
 
 			// check device connected
 			if (this.checkConnectionStatus()) {
@@ -442,7 +463,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			throw e;
 		}
 		finally {
-			this.close();
+			if(isPortOpenedByMe) this.close();
 		}
 		return readBuffer;
 	}
@@ -457,7 +478,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 		this.write(COMMAND_QUERY_STATE);
 
-		byte[] buffer = this.read(1, 2);
+		byte[] buffer = this.read(1, 5);
 
 		if ((buffer[0] & DATA_STATE_WAITING) == DATA_STATE_WAITING || (buffer[0] & DATA_STATE_READY) == DATA_STATE_READY) { 
 			isConnect = true;
@@ -540,12 +561,4 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 		return (checkSum == checkSumLast2Bytes);
 	}
-	
-	/**
-	 * @param isTransmitFinished the isTransmitFinished to set
-	 */
-	public void setTransmitFinished(boolean isTransmitFinished) {
-		this.isTransmitFinished = isTransmitFinished;
-	}
-
 }

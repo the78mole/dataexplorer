@@ -145,6 +145,7 @@ public class UniLogDialog extends DeviceDialog {
 	private String												redDataSetsText			= "0";
 	private String												numberReadErrorText	= "0";
 	private int														channelSelectionIndex = 0;
+	private boolean												isPortOpenedByLogging = false;
 	
 	/**
 	* main method to test this dialog inside a shell 
@@ -622,6 +623,8 @@ public class UniLogDialog extends DeviceDialog {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.widgetSelected, event="+evt);
 										readDataButton.setEnabled(true);
+										startLoggingButton.setEnabled(true);
+										startLiveGatherButton.setEnabled(true);
 										channelSelectionIndex = useConfigCombo.getSelectionIndex();
 										useConfigCombo.select(channelSelectionIndex);
 										editConfigButton.setEnabled(true);
@@ -724,16 +727,18 @@ public class UniLogDialog extends DeviceDialog {
 								startLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
 								startLoggingButton.setText("Start Datenaufnahme");
 								startLoggingButton.setBounds(10, 20, 260, 25);
+								startLoggingButton.setEnabled(false);
 								startLoggingButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										System.out.println("startLoggingButton.widgetSelected, event="+evt);
 										try {
 											if (!serialPort.isConnected()) {
 												serialPort.open();
-												serialPort.startLogging();
-												startLoggingButton.setEnabled(false);
-												stopLoggingButton.setEnabled(true);
+												isPortOpenedByLogging = true;
 											}
+											startLoggingButton.setEnabled(false);
+											stopLoggingButton.setEnabled(true);
+											serialPort.startLogging();
 										}
 										catch (Exception e) {
 											log.log(Level.SEVERE, e.getMessage(), e);
@@ -753,7 +758,10 @@ public class UniLogDialog extends DeviceDialog {
 										try {
 											if (serialPort.isConnected()) {
 												serialPort.stopLogging();
-												serialPort.close();
+												if (isPortOpenedByLogging) {
+													serialPort.close();
+													isPortOpenedByLogging = true;
+												}
 											}
 											startLoggingButton.setEnabled(true);
 											stopLoggingButton.setEnabled(false);
@@ -774,6 +782,7 @@ public class UniLogDialog extends DeviceDialog {
 									startLiveGatherButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									startLiveGatherButton.setText("Start live Datenabfrage");
 									startLiveGatherButton.setBounds(17, 26, 201, 25);
+									startLiveGatherButton.setEnabled(false);
 									startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.fine("liveViewButton.widgetSelected, event="+evt);
