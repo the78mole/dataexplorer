@@ -207,7 +207,7 @@ public class CurveUtils {
 			if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
-			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?", e);
+			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e);
 		}
 		
 		try {
@@ -224,7 +224,7 @@ public class CurveUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?", e);
+			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e);
 		}
 		if (log.isLoggable(Level.FINEST)) log.info(sb.toString());
 	}
