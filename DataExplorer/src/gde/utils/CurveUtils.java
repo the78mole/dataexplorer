@@ -204,10 +204,10 @@ public class CurveUtils {
 		try {
 			// calculate start point of the curve, which is the first oldPoint
 			oldPoint = record.getDisplayPoint(0, 0, x0, y0);
-			if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(oldPoint.toString());
+			if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
-			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?");
+			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?", e);
 		}
 		
 		try {
@@ -215,7 +215,7 @@ public class CurveUtils {
 			for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScale) {
 				// get the point to be drawn
 				newPoint = record.getDisplayPoint(i, j, x0, y0);
-				if (log.isLoggable(Level.INFO)) sb.append(lineSep).append(newPoint.toString());
+				if (log.isLoggable(Level.FINEST)) sb.append(lineSep).append(newPoint.toString());
 
 				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 
@@ -224,9 +224,9 @@ public class CurveUtils {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?");
+			log.log(Level.WARNING, e.getMessage() + " zoomed compare set ?", e);
 		}
-		if (log.isLoggable(Level.INFO)) log.finest(sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.info(sb.toString());
 	}
 	
 	/**
