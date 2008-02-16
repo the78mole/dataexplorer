@@ -51,7 +51,7 @@ public class CurveSelectorContextMenu {
 	private MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
 	private MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
 	private MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
-	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2;
+	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
 	private MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
 	private MenuItem 											measure, deltaMeasure;
 	private MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60, timeGridLineStyle;
@@ -462,21 +462,26 @@ public class CurveSelectorContextMenu {
 							axisNumberFormat0.setSelection(true);
 							axisNumberFormat1.setSelection(false);
 							axisNumberFormat2.setSelection(false);
+							axisNumberFormat3.setSelection(false);
 							break;
 						case 1:
 							axisNumberFormat0.setSelection(false);
 							axisNumberFormat1.setSelection(true);
 							axisNumberFormat2.setSelection(false);
+							axisNumberFormat3.setSelection(false);
 							break;
+						default:
 						case 2:
 							axisNumberFormat0.setSelection(false);
 							axisNumberFormat1.setSelection(false);
 							axisNumberFormat2.setSelection(true);
+							axisNumberFormat3.setSelection(false);
 							break;
-						default:
+						case 3:
 							axisNumberFormat0.setSelection(false);
 							axisNumberFormat1.setSelection(false);
 							axisNumberFormat2.setSelection(false);
+							axisNumberFormat3.setSelection(true);
 							break;
 						}
 					}
@@ -518,6 +523,18 @@ public class CurveSelectorContextMenu {
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					if (recordNameKey != null) {
 						recordSet.getRecord(recordNameKey).setNumberFormat(2);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			axisNumberFormat3 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
+			axisNumberFormat3.setText("00.000");
+			axisNumberFormat3.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("axisNumberFormat3");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.getRecord(recordNameKey).setNumberFormat(3);
 						application.updateGraphicsWindow();
 					}
 				}

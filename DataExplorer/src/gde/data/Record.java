@@ -363,6 +363,9 @@ public class Record extends Vector<Integer> {
 		default:
 			df.applyPattern("0.00");
 			break;
+		case 3:
+			df.applyPattern("0.000");
+			break;
 		}
 	}
 
