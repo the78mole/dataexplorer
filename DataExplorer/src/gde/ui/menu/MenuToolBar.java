@@ -639,27 +639,30 @@ public class MenuToolBar {
 				updateChannelToolItems();
 			}
 		});
-
 	}
 
 	/**
 	 * updates the channel select combo according the active channel
 	 */
-	public synchronized void updateChannelSelector() {
-		int activeChannelNumber = 0;
-		if (channels.size() > 0) {
-			String[] channelNames = new String[channels.size()];
-			String activeChannelName = channels.getActiveChannel().getName();
-			for (int i = 0; i < channelNames.length; i++) {
-				channelNames[i] = channels.get(i+1).getName();
-				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
+	public void updateChannelSelector() {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				int activeChannelNumber = 0;
+				if (channels.size() > 0) {
+					String[] channelNames = new String[channels.size()];
+					String activeChannelName = channels.getActiveChannel().getName();
+					for (int i = 0; i < channelNames.length; i++) {
+						channelNames[i] = channels.get(i + 1).getName();
+						if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
+					}
+					channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
+				}
+				channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
+				updateChannelToolItems();
+				//application.updateGraphicsWindow();
+				//application.updateDataTable();
 			}
-			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
-		}
-		channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
-		updateChannelToolItems();
-		application.updateGraphicsWindow();
-		application.updateDataTable();
+		});
 	}
 
 	/**
@@ -726,35 +729,39 @@ public class MenuToolBar {
 	 * updates the netxtChannel , prevChannel tool items
 	 */
 	public void updateChannelToolItems() {
-		int numberChannels = channels.size();
-		if (numberChannels <= 1) {
-			nextChannel.setEnabled(false);
-			prevChannel.setEnabled(false);
-		}
-		else {
-			int index = channelSelectCombo.getSelectionIndex();
-			int maxIndex = channelSelectCombo.getItemCount() - 1;
-			if (numberChannels == 2 && index == 0) {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(false);
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				int numberChannels = channels.size();
+				if (numberChannels <= 1) {
+					nextChannel.setEnabled(false);
+					prevChannel.setEnabled(false);
+				}
+				else {
+					int index = channelSelectCombo.getSelectionIndex();
+					int maxIndex = channelSelectCombo.getItemCount() - 1;
+					if (numberChannels == 2 && index == 0) {
+						nextChannel.setEnabled(true);
+						prevChannel.setEnabled(false);
+					}
+					else if (numberChannels == 2 && index == 1) {
+						nextChannel.setEnabled(false);
+						prevChannel.setEnabled(true);
+					}
+					if (numberChannels >= 2 && index == 0) {
+						nextChannel.setEnabled(true);
+						prevChannel.setEnabled(false);
+					}
+					else if (numberChannels >= 2 && index == maxIndex) {
+						nextChannel.setEnabled(false);
+						prevChannel.setEnabled(true);
+					}
+					else {
+						nextChannel.setEnabled(true);
+						prevChannel.setEnabled(true);
+					}
+				}
 			}
-			else if (numberChannels == 2 && index == 1) {
-				nextChannel.setEnabled(false);
-				prevChannel.setEnabled(true);
-			}
-			if (numberChannels >= 2 && index == 0) {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(false);
-			}
-			else if (numberChannels >= 2 && index == maxIndex) {
-				nextChannel.setEnabled(false);
-				prevChannel.setEnabled(true);
-			}
-			else {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(true);
-			}
-		}
+		});
 	}
 
 	public void setPortConnected(final boolean isOpenStatus) {

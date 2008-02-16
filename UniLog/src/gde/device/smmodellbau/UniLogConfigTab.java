@@ -50,8 +50,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
 	
 	private CLabel												receiverVoltageSymbol, receiverVoltageUnit;
-	private CLabel voltageUnit;
-	private CCombo currentUnit;
+	private CLabel 												voltageUnit;
+	private CLabel 												currentUnit;
 	private CLabel												revolutionSymbol, revolutionUnit;
 	private CLabel												heightSymbol, heightUnit;
 	private Button												a23ExternModus;
@@ -69,9 +69,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	private CLabel												slopeSymbol;
 	private CLabel												etaButton;
 	private CLabel												slopeLabel;
-	private Button												a3ValueButton;
-	private Button												a1ValueButton;
-	private Button												a2ValueButton;
+	private Button												a3Button;
+	private Button												a1Button;
+	private Button												a2Button;
 	private Button												reveiverVoltageButton;
 	private Button												revolutionButton;
 	private Button												heightButton;
@@ -176,27 +176,49 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							reveiverVoltageButton.setSelection(measurement.isActive());
 							reveiverVoltageButton.setText(measurement.getName());
 							receiverVoltageSymbol.setText(measurement.getSymbol());
-							receiverVoltageUnit.setText(measurement.getUnit());
+							receiverVoltageUnit.setText("[" + measurement.getUnit() + "]");
 
 							recordKey = device.getMeasurementNames(configName)[1];
 							measurement = device.getMeasurement(configName, recordKey);
 							voltageButton.setSelection(measurement.isActive());
 							voltageButton.setText(measurement.getName());
 							voltageSymbol.setText(measurement.getSymbol());
-							voltageUnit.setText(measurement.getUnit());
+							voltageUnit.setText("[" + measurement.getUnit() + "]");
 							
 							recordKey = device.getMeasurementNames(configName)[2];
 							measurement = device.getMeasurement(configName, recordKey);
 							currentButton.setSelection(measurement.isActive());
 							currentButton.setText(measurement.getName());
-							currentSymbol.setText(measurement.getSymbol());
-							currentUnit.setText(" [" + measurement.getUnit() + "]");
+							currentSymbol.setText(" " + measurement.getSymbol());
+							currentUnit.setText("[" + measurement.getUnit() + "]");
 							
+							recordKey = device.getMeasurementNames(configName)[3];
+							measurement = device.getMeasurement(configName, recordKey);
+							capacityLabel.setText(measurement.getName());
+							capacitySymbol.setText(measurement.getSymbol());
+							capacityUnit.setText("[" + measurement.getUnit() + "]");
+
+							recordKey = device.getMeasurementNames(configName)[4];
+							measurement = device.getMeasurement(configName, recordKey);
+							powerLabel.setText(measurement.getName());
+							powerSymbol.setText(measurement.getSymbol());
+							powerUnit.setText("[" + measurement.getUnit() + "]");
+
+							recordKey = device.getMeasurementNames(configName)[5];
+							measurement = device.getMeasurement(configName, recordKey);
+							energyLabel.setText(measurement.getName());
+							energySymbol.setText(measurement.getSymbol());
+							energyUnit.setText("[" + measurement.getUnit() + "]");
+
 							// capacity, power, energy
-							updateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+							updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
 							
 							// number cells voltagePerCell
 							recordKey = device.getMeasurementNames(configName)[6];
+							measurement = device.getMeasurement(configName, recordKey);
+							voltagePerCellLabel.setText(measurement.getName());
+							voltagePerCellSymbol.setText(measurement.getSymbol());
+							voltagePerCellUnit.setText("[" + measurement.getUnit() + "]");
 							numCellValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.NUMBER_CELLS));
 
 							recordKey = device.getMeasurementNames(configName)[7];
@@ -204,20 +226,31 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							revolutionButton.setSelection(measurement.isActive());
 							revolutionButton.setText(measurement.getName());
 							revolutionSymbol.setText(measurement.getSymbol());
-							revolutionUnit.setText(measurement.getUnit());
+							revolutionUnit.setText("[" + measurement.getUnit() + "]");
+							
+							recordKey = device.getMeasurementNames(configName)[8];
+							measurement = device.getMeasurement(configName, recordKey);
+							etaButton.setText(measurement.getName());
+							etaSymbol.setText(measurement.getSymbol());
+							etaUnit.setText("[" + measurement.getUnit() + "]");
+							prop100WValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.PROP_N_100_WATT));
 							
 							// n100W value, eta calculation 										
-							updateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
-							recordKey = device.getMeasurementNames(configName)[8];
-							prop100WValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.PROP_N_100_WATT));
+							updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
 							
 							recordKey = device.getMeasurementNames(configName)[9];
 							measurement = device.getMeasurement(configName, recordKey);
 							heightButton.setSelection(measurement.isActive());
 							heightButton.setText(measurement.getName());
 							heightSymbol.setText(measurement.getSymbol());
-							heightUnit.setText(measurement.getUnit());
+							heightUnit.setText("[" + measurement.getUnit() + "]");
 							
+							recordKey = device.getMeasurementNames(configName)[10];
+							measurement = device.getMeasurement(configName, recordKey);
+							slopeLabel.setText(measurement.getName());
+							slopeSymbol.setText(measurement.getSymbol());
+							slopeUnit.setText("[" + measurement.getUnit() + "]");
+
 							updateHeightDependent(heightButton.getSelection());
 
 							PropertyType typeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_INTERVAL_SEC);
@@ -239,7 +272,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						reveiverVoltageButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
 						reveiverVoltageButton.setBounds(23, 20, 132, 18);
-						reveiverVoltageButton.setText("EmpfSpannung");
 						reveiverVoltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("reveiverVoltageButton.widgetSelected, event="+evt);
@@ -250,133 +282,95 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						receiverVoltageSymbol = new CLabel(powerGroup, SWT.NONE);
 						receiverVoltageSymbol.setBounds(158, 18, 40, 20);
-						receiverVoltageSymbol.setText("U");
 					}
 					{
 						receiverVoltageUnit = new CLabel(powerGroup, SWT.NONE);
 						receiverVoltageUnit.setBounds(198, 18, 40, 20);
-						receiverVoltageUnit.setText("[V]");
 					}
 					{
 						voltageButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						voltageButton.setText("Spannung");
 						voltageButton.setBounds(23, 42, 120, 18);
 						voltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("voltageButton.widgetSelected, event="+evt);
-								updateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
 								setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
 						voltageSymbol = new CLabel(powerGroup, SWT.NONE);
-						voltageSymbol.setText("U");
 						voltageSymbol.setBounds(158, 40, 40, 20);
 					}
 					{
 						voltageUnit = new CLabel(powerGroup, SWT.NONE);
-						voltageUnit.setText("[V]");
 						voltageUnit.setBounds(198, 40, 40, 20);
 					}
 					{
 						currentButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						currentButton.setText("Strom");
 						currentButton.setBounds(23, 64, 120, 18);
 						currentButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("currentButton.widgetSelected, event="+evt);
-								updateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
 								setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
 						currentSymbol = new CLabel(powerGroup, SWT.NONE);
-						currentSymbol.setText(" I");
 						currentSymbol.setBounds(158, 62, 30, 18);
 					}
 					{
-						currentUnit = new CCombo(powerGroup, SWT.CENTER | SWT.BORDER);
-						currentUnit.setItems(new String[] {" [mA]", "  [A]"});
-						currentUnit.select(1);
-						currentUnit.setBounds(194, 61, 62, 20);
-						currentUnit.setToolTipText("Bei kleinen zu erwartenden Strömen den Anzeigebereich anpassen");
-						currentUnit.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								System.out.println("currentUnit.widgetSelected, event="+evt);
-								String measurementKey = device.getMeasurementNames(configName)[2]; //2=current
-								switch (currentUnit.getSelectionIndex()) {
-								case 0: // [mA]
-									device.setMeasurementFactor(configName, measurementKey, 0.001); //2=current
-									device.setMeasurementUnit(configName, measurementKey, "mA");
-									break;
-								default: // [A]
-									device.setMeasurementFactor(configName, measurementKey, 1.0); //2=current
-									device.setMeasurementUnit(configName, measurementKey, "A");
-									break;
-								}
-							}
-						});
+						currentUnit = new CLabel(powerGroup, SWT.NONE);
+						currentUnit.setBounds(198, 62, 62, 20);
 					}
 					{
 						capacityLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						capacityLabel.setText("Ladung");
 						capacityLabel.setBounds(37, 86, 120, 20);
 					}
 					{
 						capacitySymbol = new CLabel(powerGroup, SWT.NONE);
-						capacitySymbol.setText("C");
 						capacitySymbol.setBounds(158, 84, 40, 20);
 					}
 					{
 						capacityUnit = new CLabel(powerGroup, SWT.NONE);
-						capacityUnit.setText("[Ah]");
 						capacityUnit.setBounds(198, 84, 40, 20);
 					}
 					{
 						powerLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						powerLabel.setText("Leistung");
 						powerLabel.setBounds(37, 108, 120, 20);
 					}
 					{
 						powerSymbol = new CLabel(powerGroup, SWT.NONE);
-						powerSymbol.setText("P");
 						powerSymbol.setBounds(158, 106, 40, 20);
 					}
 					{
 						powerUnit = new CLabel(powerGroup, SWT.NONE);
-						powerUnit.setText("[W]");
 						powerUnit.setBounds(198, 106, 40, 20);
 					}
 					{
 						energyLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						energyLabel.setText("Energie");
 						energyLabel.setBounds(37, 130, 120, 20);
 					}
 					{
 						energySymbol = new CLabel(powerGroup, SWT.NONE);
-						energySymbol.setText("E");
 						energySymbol.setBounds(158, 128, 40, 20);
 					}
 					{
 						energyUnit = new CLabel(powerGroup, SWT.NONE);
-						energyUnit.setText("[Wh]");
 						energyUnit.setBounds(198, 128, 40, 20);
 					}
 					{
 						voltagePerCellLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						voltagePerCellLabel.setText("Spannung/Zelle");
 						voltagePerCellLabel.setBounds(37, 152, 120, 20);
 					}
 					{
 						voltagePerCellSymbol = new CLabel(powerGroup, SWT.NONE);
-						voltagePerCellSymbol.setText("Uc");
 						voltagePerCellSymbol.setBounds(158, 150, 40, 20);
 					}
 					{
 						voltagePerCellUnit = new CLabel(powerGroup, SWT.NONE);
-						voltagePerCellUnit.setText("[V]");
 						voltagePerCellUnit.setBounds(198, 150, 40, 20);
 					}
 					{
@@ -394,7 +388,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								if (log.isLoggable(Level.FINEST))  log.finest("numCellInput.keyReleased, event="+evt);
 								if (evt.character == SWT.CR) {
 									setConfigButton.setEnabled(true);
-									numCellValue = new Integer(numCellInput.getText());
+									numCellValue = new Integer(numCellInput.getText().trim());
+									numCellInput.setText(" " + numCellValue); 
+									device.setMeasurementPropertyValue(configName, device.getMeasurementNames(configName)[6], UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, numCellValue);
 								}
 							}
 						});
@@ -402,11 +398,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						revolutionButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
 						revolutionButton.setBounds(23, 196, 135, 18);
-						revolutionButton.setText("Drehzahl");
 						revolutionButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("revolutionButton.widgetSelected, event="+evt);
-								updateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
+								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
 								setConfigButton.setEnabled(true);
 							}
 						});
@@ -414,12 +409,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						revolutionSymbol = new CLabel(powerGroup, SWT.NONE);
 						revolutionSymbol.setBounds(158, 194, 40, 20);
-						revolutionSymbol.setText("rpm");
 					}
 					{
 						revolutionUnit = new CLabel(powerGroup, SWT.NONE);
 						revolutionUnit.setBounds(198, 194, 40, 20);
-						revolutionUnit.setText("1/min");
 					}
 					{
 						prop100WLabel = new CLabel(powerGroup, SWT.LEFT);
@@ -436,7 +429,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								if (log.isLoggable(Level.FINEST))  log.finest("prop100WInput.keyReleased, event="+evt);
 								if (evt.character == SWT.CR) {
 									setConfigButton.setEnabled(true);
-									prop100WValue = new Integer(prop100WInput.getText());
+									prop100WValue = new Integer(prop100WInput.getText().trim());
+									prop100WInput.setText(" " + prop100WValue);
+									device.setMeasurementPropertyValue(configName, device.getMeasurementNames(configName)[8], UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, prop100WValue);
 								}
 							}
 						});
@@ -449,21 +444,17 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						etaButton = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
 						etaButton.setBounds(37, 240, 108, 20);
-						etaButton.setText("Wirkungsgrad");
 					}
 					{
 						etaSymbol = new CLabel(powerGroup, SWT.NONE);
 						etaSymbol.setBounds(158, 239, 40, 20);
-						etaSymbol.setText("eta");
 					}
 					{
 						etaUnit = new CLabel(powerGroup, SWT.NONE);
 						etaUnit.setBounds(198, 238, 40, 20);
-						etaUnit.setText("%");
 					}
 					{
 						heightButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						heightButton.setText("Höhe");
 						heightButton.setBounds(23, 262, 120, 18);
 						heightButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -475,28 +466,23 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						heightSymbol = new CLabel(powerGroup, SWT.NONE);
-						heightSymbol.setText("h");
 						heightSymbol.setBounds(158, 260, 40, 20);
 					}
 					{
 						heightUnit = new CLabel(powerGroup, SWT.NONE);
-						heightUnit.setText("[m]");
 						heightUnit.setBounds(198, 260, 40, 20);
 					}
 					{
 						slopeLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						slopeLabel.setText("Steigrate");
 						slopeLabel.setBounds(37, 282, 120, 19);
 					}
 					{
 						slopeSymbol = new CLabel(powerGroup, SWT.NONE);
-						slopeSymbol.setText("V");
 						slopeSymbol.setBounds(158, 282, 40, 20);
 					}
 					{
 						slopeUnit = new CLabel(powerGroup, SWT.NONE);
-						slopeUnit.setText("[m/s]");
-						slopeUnit.setBounds(200, 282, 34, 20);
+						slopeUnit.setBounds(198, 282, 40, 20);
 					}
 					{
 						calculationTypeLabel = new CLabel(powerGroup, SWT.NONE);
@@ -517,6 +503,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, calcType);
 								device.storeDeviceProperties();
+								setConfigButton.setEnabled(true);
 							}
 						});
 					}
@@ -532,6 +519,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
 								device.storeDeviceProperties();
+								setConfigButton.setEnabled(true);
 							}
 						});
 					}
@@ -547,25 +535,25 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							if (log.isLoggable(Level.FINEST))  log.finest("axModusGroup.paintControl, event="+evt);
 							String recordKey = device.getMeasurementNames(configName)[11];
 							MeasurementType measurement = device.getMeasurement(configName, recordKey);
-							a1ValueButton.setSelection(measurement.isActive());
+							a1Button.setSelection(measurement.isActive());
 							a1Text.setText(measurement.getName());
-							a1Unit.setText(measurement.getUnit());
+							a1Unit.setText("[" + measurement.getUnit() + "]");
 							a1Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
 							a1Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 							
 							recordKey = device.getMeasurementNames(configName)[12];
 							measurement = device.getMeasurement(configName, recordKey);
-							a2ValueButton.setSelection(measurement.isActive());
+							a2Button.setSelection(measurement.isActive());
 							a2Text.setText(measurement.getName());
-							a2Unit.setText(measurement.getUnit());
+							a2Unit.setText("[" + measurement.getUnit() + "]");
 							a2Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
 							a2Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 
 							recordKey = device.getMeasurementNames(configName)[13];
 							measurement = device.getMeasurement(configName, recordKey);
-							a3ValueButton.setSelection(measurement.isActive());
+							a3Button.setSelection(measurement.isActive());
 							a3Text.setText(measurement.getName());
-							a3Unit.setText(measurement.getUnit());
+							a3Unit.setText("[" + measurement.getUnit() + "]");
 							a3Offset.setText(String.format("%.2f", device.getMeasurementOffset(configName, recordKey)));
 							a3Factor.setText(String.format("%.2f", device.getMeasurementFactor(configName, recordKey)));
 }
@@ -615,10 +603,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
 					{
-						a1ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a1ValueButton.setBounds(4, 71, 41, 18);
-						a1ValueButton.setText("A1");
-						a1ValueButton.addSelectionListener(new SelectionAdapter() {
+						a1Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
+						a1Button.setBounds(4, 71, 41, 18);
+						a1Button.setText("A1");
+						a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a1ValueButton.widgetSelected, event="+evt);
 								setConfigButton.setEnabled(true);
@@ -628,8 +616,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a1Text = new Text(axModusGroup, SWT.BORDER);
 						a1Text.setBounds(49, 72, 116, 18);
-						a1Text.setText("Speed 250");
-						a1Text.setToolTipText("Name vom A1Ausgang");
+						a1Text.setToolTipText("Name vom A1 Ausgang");
 						a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a1Text.keyReleased, event="+evt);
@@ -640,7 +627,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a1Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
 						a1Unit.setBounds(165, 72, 40, 18);
-						a1Unit.setText("°C");
 						a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -652,7 +638,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a1Offset = new Text(axModusGroup, SWT.BORDER);
 						a1Offset.setBounds(205, 72, 50, 18);
-						a1Offset.setText("0.0");
 						a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a1Offset.keyReleased, event="+evt);
@@ -663,7 +648,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a1Factor = new Text(axModusGroup, SWT.BORDER);
 						a1Factor.setBounds(255, 72, 50, 18);
-						a1Factor.setText("1.0");
 						a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a1Factor.keyReleased, event="+evt);
@@ -672,10 +656,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						});
 					}
 					{
-						a2ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a2ValueButton.setBounds(4, 93, 41, 18);
-						a2ValueButton.setText("A2");
-						a2ValueButton.addSelectionListener(new SelectionAdapter() {
+						a2Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
+						a2Button.setBounds(4, 93, 41, 18);
+						a2Button.setText("A2");
+						a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a2ValueButton.widgetSelected, event="+evt);
 								setConfigButton.setEnabled(true);
@@ -685,7 +669,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a2Text = new Text(axModusGroup, SWT.BORDER);
 						a2Text.setBounds(49, 93, 116, 18);
-						a2Text.setText("servoImpuls");
 						a2Text.setToolTipText("Name vom A2 Ausgang");
 						a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -697,7 +680,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a2Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
 						a2Unit.setBounds(165, 93, 40, 18);
-						a2Unit.setText("°C");
 						a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -709,7 +691,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a2Offset = new Text(axModusGroup, SWT.BORDER);
 						a2Offset.setBounds(205, 93, 50, 18);
-						a2Offset.setText("0.0");
 						a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a2Offset.keyReleased, event="+evt);
@@ -720,7 +701,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a2Factor = new Text(axModusGroup, SWT.BORDER);
 						a2Factor.setBounds(255, 93, 50, 18);
-						a2Factor.setText("1.0");
 						a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a2Factor.keyReleased, event="+evt);
@@ -729,10 +709,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						});
 					}
 					{
-						a3ValueButton = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a3ValueButton.setBounds(4, 115, 41, 18);
-						a3ValueButton.setText("A3");
-						a3ValueButton.addSelectionListener(new SelectionAdapter() {
+						a3Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
+						a3Button.setBounds(4, 115, 41, 18);
+						a3Button.setText("A3");
+						a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a3ValueButton.widgetSelected, event="+evt);
 								setConfigButton.setEnabled(true);
@@ -742,7 +722,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a3Text = new Text(axModusGroup, SWT.BORDER);
 						a3Text.setBounds(49, 115, 116, 18);
-						a3Text.setText("Temperatur");
 						a3Text.setToolTipText("Name vom A3 Ausgang");
 						a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -754,7 +733,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a3Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
 						a3Unit.setBounds(165, 115, 40, 18);
-						a3Unit.setText("°C");
 						a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -766,7 +744,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a3Offset = new Text(axModusGroup, SWT.BORDER);
 						a3Offset.setBounds(205, 115, 50, 18);
-						a3Offset.setText("0.0");
 						a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a3Offset.keyReleased, event="+evt);
@@ -777,7 +754,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						a3Factor = new Text(axModusGroup, SWT.BORDER);
 						a3Factor.setBounds(255, 115, 50, 18);
-						a3Factor.setText("1.0");
 						a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("a3Factor.keyReleased, event="+evt);
@@ -835,7 +811,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * enable voltage, current, revolution dependent measurement fields
 	 * @param enabled
 	 */
-	private void updateVoltageCurrentRevolutionDependent(boolean enabled) {
+	private void updateStateVoltageCurrentRevolutionDependent(boolean enabled) {
 		prop100WLabel.setEnabled(enabled);
 		prop100WInput.setEnabled(enabled);
 		prop100WUnit.setEnabled(enabled);
@@ -872,11 +848,17 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		}
 		else {
 			slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		}
 	}
 	/**
@@ -893,7 +875,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			break;
 		case 'I':	// intern
 		default:
-			a2Values = new String[] {"ServoImpuls", "A2", "ms", "0.0", "1.0"};
+			a2Values = new String[] {"ServoImpuls", "A2", "µs", "0.0", "1.0"};
 			a3Values = new String[] {"TempIntern", "A3", "°C", "0.0", "1.0"};
 			break;
 		}
@@ -912,7 +894,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * enable or disable voltage and current dependent measurement fields
 	 * @param enabled true | false
 	 */
-	private void updateVoltageAndCurrentDependent(boolean enabled) {
+	private void updateStateVoltageAndCurrentDependent(boolean enabled) {
 		capacityLabel.setEnabled(enabled);
 		capacitySymbol.setEnabled(enabled);
 		capacityUnit.setEnabled(enabled);
@@ -976,22 +958,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurementKey = device.getMeasurementNames(configName)[2];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(currentButton.getSelection());
-		switch (currentUnit.getSelectionIndex()) {
-		case 0: // [mA]
-			measurement.setFactor(0.001);
-			measurement.setUnit("mA");
-			break;
-		default: // [A]
-			measurement.setFactor(1.0);
-			measurement.setUnit("A");
-			break;
-		}
-
-		measurement.setUnit(currentUnit.getText());
-		if (currentUnit.getText().contains("m"))  // [mA]
-			measurement.setFactor(0.001);						//  [A]
-		else
-			measurement.setFactor(1.0);
 
 		measurementKey = device.getMeasurementNames(configName)[7];
 		measurement = device.getMeasurement(configName, measurementKey);
@@ -1003,27 +969,27 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		
 		measurementKey = device.getMeasurementNames(configName)[11];
 		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a1ValueButton.getSelection());
-		measurement.setName(a1Text.getText());
-		measurement.setUnit(a1Unit.getText());
-		measurement.setOffset(new Double(a1Offset.getText().replace(',', '.')));
-		measurement.setFactor(new Double(a1Factor.getText().replace(',', '.')));
+		measurement.setActive(a1Button.getSelection());
+		measurement.setName(a1Text.getText().trim());
+		measurement.setUnit(a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(a1Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(a1Factor.getText().replace(',', '.').trim()));
 		
 		measurementKey = device.getMeasurementNames(configName)[12];
 		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a2ValueButton.getSelection());
-		measurement.setName(a2Text.getText());
-		measurement.setUnit(a2Unit.getText());
-		measurement.setOffset(new Double(a2Offset.getText().replace(',', '.')));
-		measurement.setFactor(new Double(a2Factor.getText().replace(',', '.')));
+		measurement.setActive(a2Button.getSelection());
+		measurement.setName(a2Text.getText().trim());
+		measurement.setUnit(a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(a2Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(a2Factor.getText().replace(',', '.').trim()));
 
 		measurementKey = device.getMeasurementNames(configName)[13];
 		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a3ValueButton.getSelection());
-		measurement.setName(a3Text.getText());
-		measurement.setUnit(a3Unit.getText());
-		measurement.setOffset(new Double(a3Offset.getText().replace(',', '.')));
-		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.')));
+		measurement.setActive(a3Button.getSelection());
+		measurement.setName(a3Text.getText().trim());
+		measurement.setUnit(a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(a3Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.').trim()));
 	}
 	
 	/**

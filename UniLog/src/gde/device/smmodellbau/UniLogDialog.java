@@ -145,7 +145,6 @@ public class UniLogDialog extends DeviceDialog {
 	private String												numberRedDataSetsText			= "0";
 	private String												numberReadErrorText	= "0";
 	private int														channelSelectionIndex = 0;
-	private boolean												isPortOpenedByLogging = false;
 	
 	/**
 	* main method to test this dialog inside a shell 
@@ -723,8 +722,8 @@ public class UniLogDialog extends DeviceDialog {
 										if(gatherThread != null && gatherThread.isAlive()) {
 											serialPort.setTransmitFinished(true);
 											gatherThread.setThreadStop(true);
-											resetButtons();
 										}
+										resetButtons();
 									}
 								});
 							}
@@ -788,13 +787,9 @@ public class UniLogDialog extends DeviceDialog {
 									public void widgetSelected(SelectionEvent evt) {
 										log.fine("startLoggingButton.widgetSelected, event=" + evt);
 										try {
-											if (!serialPort.isConnected()) {
-												serialPort.open();
-												isPortOpenedByLogging = true;
-											}
+											serialPort.startLogging();
 											startLoggingButton.setEnabled(false);
 											stopLoggingButton.setEnabled(true);
-											serialPort.startLogging();
 										}
 										catch (Exception e) {
 											log.log(Level.SEVERE, e.getMessage(), e);
@@ -812,13 +807,7 @@ public class UniLogDialog extends DeviceDialog {
 									public void widgetSelected(SelectionEvent evt) {
 										log.fine("stopLoggingButton.widgetSelected, event=" + evt);
 										try {
-											if (serialPort.isConnected()) {
-												serialPort.stopLogging();
-												if (isPortOpenedByLogging) {
-													serialPort.close();
-													isPortOpenedByLogging = true;
-												}
-											}
+											serialPort.stopLogging();
 											startLoggingButton.setEnabled(true);
 											stopLoggingButton.setEnabled(false);
 										}
@@ -875,15 +864,6 @@ public class UniLogDialog extends DeviceDialog {
 					configTabFolderLData.bottom =  new FormAttachment(1000, 1000, 0);
 					configTabFolder.setLayoutData(configTabFolderLData);
 				}
-//				dialogShell.addFocusListener(new FocusAdapter() {
-//					public void focusGained(FocusEvent evt) {
-//						log.fine("dialogShell.focusGained, event=" + evt);
-//						// this is only placed in the focus listener as hint, do not forget place this query 
-//						if (!serialPort.isConnected()) {
-//							application.openMessageDialog("Der serielle Port ist nicht geöffnet!");
-//						}
-//					}
-//				});
 				dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -912,7 +892,7 @@ public class UniLogDialog extends DeviceDialog {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-
+	
 	/**
 	 * update the configuration tab with values red 
 	 * @param readBuffer

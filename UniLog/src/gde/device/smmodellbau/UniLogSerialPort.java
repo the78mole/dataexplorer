@@ -24,6 +24,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 	public final static String 		NUMBER_RECORD						= "number_record";
 	public final static String 		TIME_MILLI_SEC					= "time_ms";
+	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3";
 	
 	private final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
 	private final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
@@ -96,8 +97,6 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
 		
-		StringBuilder sb;
-		String lineSep = System.getProperty("line.separator");
 		UniLogDialog dialog = (UniLogDialog)device.getDialog();
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
@@ -124,101 +123,76 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				int counter = 0;
 				while (!isTransmitFinished && memoryUsed > 0) {
 					--memoryUsed;
-					sb = new StringBuilder();
 					readBuffer = readSingleTelegramm();
 											
 					tmpValue = ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
-					if (log.isLoggable(Level.FINER)) sb.append("time_ms = " + tmpValue).append(lineSep);
 					time_ms.add(tmpValue);
 
 					// number record set
 					tmpValue = (readBuffer[5] & 0xF8) / 8 + 1;
-					if (log.isLoggable(Level.FINER)) sb.append("number record set = " + tmpValue).append(lineSep);
 					numRecordSet.add(tmpValue);
 
 					// voltageReceiver *** power/drive *** group
 					tmpValue = (((readBuffer[7] & 0xFF) << 8) + (readBuffer[6] & 0xFF)) & 0x0FFF;
-					voltageReceiver.add(tmpValue * 10);
-					if (log.isLoggable(Level.FINER)) sb.append("voltageReceiver [mV] = " + tmpValue).append(lineSep);
+					voltageReceiver.add(tmpValue);
 
 					// voltage *** power/drive *** group
 					tmpValue = (((readBuffer[9] & 0xFF) << 8) + (readBuffer[8] & 0xFF));
 					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					voltage.add(tmpValue * 10);
-					if (log.isLoggable(Level.FINER)) sb.append("voltage [mV] = " + tmpValue).append(lineSep);
+					voltage.add(tmpValue);
 
 					// current *** power/drive *** group - asymmetric for 400 A sensor 
 					tmpValue = (((readBuffer[11] & 0xFF) << 8) + (readBuffer[10] & 0xFF));
-					if (tmpValue > 55536) tmpValue = -65536;
-					current.add(tmpValue * 10);
-					if (log.isLoggable(Level.FINER)) sb.append("current [mA] = " + tmpValue).append(lineSep);
+					tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
+					current.add(tmpValue);
 
 					// revolution speed *** power/drive *** group
 					tmpValue = (((readBuffer[13] & 0xFF) << 8) + (readBuffer[12] & 0xFF));
 					if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
-					revolutionSpeed.add(tmpValue * 10);
-					if (log.isLoggable(Level.FINER)) sb.append("revolution speed [1000/min] = " + tmpValue).append(lineSep);
+					revolutionSpeed.add(tmpValue);
 
 					// height *** power/drive *** group
 					tmpValue = (((readBuffer[15] & 0xFF) << 8) + (readBuffer[14] & 0xFF)) + 20000;
 					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					height.add(tmpValue * 100);
-					if (log.isLoggable(Level.FINER)) sb.append("height [mm] = " + tmpValue).append(lineSep);
+					height.add(tmpValue);
 
 					// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
 					int a1Modus = (readBuffer[7] & 0xF0) >> 4; // 11110000
 					aModus.add(a1Modus);
-					if (log.isLoggable(Level.FINER)) sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
 					tmpValue = (((readBuffer[17] & 0xFF) << 8) + (readBuffer[16] & 0xFF));
 					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					a1Value.add(tmpValue * 100);
-					if (log.isLoggable(Level.FINER)) sb.append("a1Value [1/1000] = " + tmpValue).append(lineSep);
+					a1Value.add(tmpValue);
 
 					// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
 					int a2Modus = (readBuffer[4] & 0x30); // 00110000
 					aModus.add(a2Modus);
-					if (log.isLoggable(Level.FINER)) sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
 					if (a2Modus == 0) {//
 						tmpValue = (((readBuffer[19] & 0xEF) << 8) + (readBuffer[18] & 0xFF));
-						if (tmpValue > 32768) tmpValue = (tmpValue - 65536) * 100;
-						if (log.isLoggable(Level.FINER)) sb.append("a2Value [1/1000] = " + tmpValue).append(lineSep);
+						if (tmpValue > 32768) tmpValue = (tmpValue - 65536);
 					}
 					else {
-						tmpValue = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[18] & 0xFF)) * 1000;
-						if (log.isLoggable(Level.FINER)) sb.append("impulseTime [us]= " + tmpValue).append(lineSep);
+						tmpValue = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[18] & 0xFF));
 					}
 					a2Value.add(tmpValue);
 
 					// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
 					int a3Modus = (readBuffer[4] & 0xC0); // 11000000
-					if (log.isLoggable(Level.FINER)) sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
+					aModus.add(a3Modus);
 					tmpValue = (((readBuffer[21] & 0xEF) << 8) + (readBuffer[20] & 0xFF));
 					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					a3Value.add(tmpValue * 100);
-					if (log.isLoggable(Level.FINER)) {
-						if (a3Modus == 0) {
-							sb.append("a3Value [1/1000] = " + tmpValue).append(lineSep);
-						}
-						else {
-							sb.append("tempIntern [1/1000] = " + tmpValue).append(lineSep);
-						}
-					}
+					a3Value.add(tmpValue);
 					++counter;
+					
 					if (application != null) {
 						dialog.setReadDataProgressBar(new Double(counter * progressFactor).intValue());
 						dialog.updateDataGatherProgress(counter, reveiceErrors);
-					}
-
-					if (log.isLoggable(Level.FINER)) { 
-						sb.append("counter = " + counter + " progress = " + new Double(counter * progressFactor).intValue()).append(lineSep);
-						sb.append("--- end data record ---");
-						log.fine(sb.toString());
 					}
 				}
 				
 				// store collected data into hash map
 				dataCollection.put(NUMBER_RECORD, numRecordSet);
 				dataCollection.put(TIME_MILLI_SEC, time_ms);	
+				dataCollection.put(A_MODUS_1_2_3, aModus);
 				dataCollection.put(measurements[0], voltageReceiver);				//0=voltageReceiver
 				dataCollection.put(measurements[1], voltage);								//1=voltage
 				dataCollection.put(measurements[2], current);								//2=current

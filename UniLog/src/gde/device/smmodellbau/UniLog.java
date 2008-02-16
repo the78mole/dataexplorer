@@ -117,8 +117,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (!record.isDisplayable()) {
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
+				Double capacity = 0.0;
 				for (int i = 0; i < recordCurrent.size(); i++) {
-					record.add(new Double(((recordCurrent.get(i) / 1000.0) * i * timeStep_ms) / (1000 * 3600)).intValue());
+					capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms * 1.0) / 3600) : 0.0;
+					record.add(capacity.intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
 				if (recordCurrent.isDisplayable()) {
@@ -151,7 +153,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCharge = recordSet.get(measurements[3]); // 3=capacity
 				for (int i = 0; i < recordVoltage.size(); i++) {
-					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000).intValue());
+					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
 				if (recordVoltage.isDisplayable() && recordCharge.isDisplayable()) {
