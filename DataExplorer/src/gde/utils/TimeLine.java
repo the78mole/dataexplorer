@@ -174,15 +174,25 @@ public class TimeLine {
 		
 		// calculate a scale factor, a big time difference would have to much ticks
 		if (timeDelta > 0) {
-			switch (timeFormat) { // TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
-			case TIME_LINE_MSEC:
-				numberTicks = timeDelta; // every 1'th units one tick
+			switch (timeFormat * scaleFactor) { // TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
+			case TIME_LINE_MSEC * 1:
+				numberTicks = timeDelta / 100; // every 1'th units one tick
 				scaleFactor = 1;
 				break;
+			case TIME_LINE_SEC * 100:
+				if (timeDelta <= 7000) {
+					numberTicks = timeDelta /1000 ; // every 1'th units one tick
+					scaleFactor = 100;
+				}
+				else {
+					numberTicks = timeDelta /500 ; // every 1'th units one tick
+					scaleFactor = 200;
+				}
+				break;
 			default:
-			case TIME_LINE_SEC:
-			case TIME_LINE_MIN:
-			case TIME_LINE_HRS:
+			case TIME_LINE_SEC * 10:
+			case TIME_LINE_MIN * 10:
+			case TIME_LINE_HRS * 10:
 				if (timeDelta > 0 && timeDelta <= 7) {
 					numberTicks = timeDelta * 2; // every 0.5'th units one tick
 					scaleFactor = scaleFactor * 20;
@@ -203,8 +213,8 @@ public class TimeLine {
 					numberTicks = timeDelta / 10.0; // every 10th units one tick
 				}
 				break;
-			case TIME_LINE_SEC_MIN:
-			case TIME_LINE_MIN_HRS:
+			case TIME_LINE_SEC_MIN * 10:
+			case TIME_LINE_MIN_HRS * 10:
 				if (timeDelta >= 0 && timeDelta <= 30) {
 					numberTicks = timeDelta / 2.5; // every 2.5 th units one tick
 					scaleFactor = scaleFactor * 4;
@@ -218,7 +228,7 @@ public class TimeLine {
 				}
 				break;
 			}
-			if (log.isLoggable(Level.FINER)) log.fine("timeFormat = " + timeFormat + " numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+			if (log.isLoggable(Level.FINE)) log.fine("timeFormat = " + timeFormat + " numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
 			
 			double deltaTick = 1.0 * width / numberTicks;
 			miniticks++;
@@ -250,7 +260,7 @@ public class TimeLine {
 				//draw values to the scale	
 				double timeValue = i * 100.0 / scaleFactor;
 				//timeValue = timeValue > 10 ? timeValue : i * 100 / scaleFactor * 10;
-				log.info("timeValue = " + timeValue);
+				if (log.isLoggable(Level.FINE)) log.fine("timeValue = " + timeValue);
 				// prepare to make every minute or hour to bold
 				boolean isMod60 = (timeValue % 60) == 0;
 				String numberStr;
