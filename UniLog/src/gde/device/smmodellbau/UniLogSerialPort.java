@@ -105,7 +105,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			reveiceErrors = 0;
 
 			// check data ready for read operation
-			if (this.waitDataReady(5)) {
+			if (this.waitDataReady()) {
 				// query config to have actual values -> get number of entries to calculate percentage and progress bar
 				this.write(COMMAND_QUERY_CONFIG);
 				readBuffer = this.read(DATA_LENGTH_BYTES, 5);
@@ -261,9 +261,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
-					++reveiceErrors;
 					this.write(COMMAND_REPEAT);
-					readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+					readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 					verifyChecksum(readBuffer); // throws exception if checksum miss match
 				}
 			}
@@ -289,7 +288,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (!this.isConnected) {
 				this.open();
 				isPortOpenedByMe = true;
-				waitDataReady(2);
+				//waitDataReady();
 			}
 
 			this.write(COMMAND_START_LOGGING);
@@ -317,7 +316,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (!this.isConnected) {
 				this.open();
 				isPortOpenedByMe = true;
-				waitDataReady(2);
+				//waitDataReady();
 			}
 
 			this.write(COMMAND_STOP_LOGGING);
@@ -344,7 +343,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (!this.isConnected) { // port may not used by other
 				this.open();
 				// check data ready for read operation
-				if (this.waitDataReady(5)) {
+				if (this.waitDataReady()) {
 					this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = this.read(1, 2);
@@ -449,15 +448,15 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized boolean checkConnectionStatus() throws IOException {
 		boolean isConnect = false;
+		int counter = 10;
 
-		this.write(COMMAND_QUERY_STATE);
-
-		byte[] buffer = this.read(1, 5);
-
-		if ((buffer[0] & DATA_STATE_WAITING) == DATA_STATE_WAITING || (buffer[0] & DATA_STATE_READY) == DATA_STATE_READY) { 
-			isConnect = true;
+		while (!isConnect && counter-- > 0) {
+			this.write(COMMAND_QUERY_STATE);
+			byte[] buffer = this.read(1, 1);
+			if (buffer[0] == DATA_STATE_WAITING || buffer[0] == DATA_STATE_READY) {
+				isConnect = true;
+			}
 		}
-
 		return isConnect;
 	}
 
@@ -468,15 +467,16 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized boolean checkDataReady() throws Exception {
 		boolean isReady = false;
+		int counter = 10;
 
-		this.write(COMMAND_QUERY_STATE); 
-
-		byte[] buffer = this.read(1, 2);
-
-		if (buffer[0] == DATA_STATE_READY) { 
-			isReady = true;
+		while (!isReady && counter-- > 0) {
+			this.write(COMMAND_QUERY_STATE);
+			byte[] buffer = this.read(1, 1);
+			if (buffer[0] == DATA_STATE_READY) {
+				isReady = true;
+			}
 		}
-
+		
 		return isReady;
 	}
 
@@ -486,18 +486,16 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true if UniLog signals data ready for transmission
 	 * @throws Exception
 	 */
-	public synchronized boolean waitDataReady(int timeout) throws Exception {
+	public synchronized boolean waitDataReady() throws Exception {
 		boolean isReady = false;
-		int retryCount = timeout * 2;
+		int retryCount = 10;
 		
-		while (!isReady && retryCount > 0) {
+		while (!isReady && retryCount-- > 0) {
 			this.write(COMMAND_QUERY_STATE); 
-			byte[] buffer = this.read(1, 2);
+			byte[] buffer = this.read(1, 1);
 			if (buffer[0] == DATA_STATE_READY) { 
 				isReady = true;
 			}
-			Thread.sleep(500);
-			--retryCount;
 		}
 		return isReady;
 	}

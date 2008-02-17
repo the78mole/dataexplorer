@@ -119,7 +119,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
 				Double capacity = 0.0;
 				for (int i = 0; i < recordCurrent.size(); i++) {
-					capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms * 1.0) / 3600) : 0.0;
+					capacity = i > 0 ? capacity + ((1.0 * recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
 					record.add(capacity.intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
@@ -137,7 +137,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				for (int i = 0; i < recordVoltage.size(); i++) {
-					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
+					record.add(new Double(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
 				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()){
@@ -153,7 +153,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCharge = recordSet.get(measurements[3]); // 3=capacity
 				for (int i = 0; i < recordVoltage.size(); i++) {
-					record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
+					record.add(new Double(1.0 * recordVoltage.get(i) * recordCharge.get(i) / 1000000.0).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
 				if (recordVoltage.isDisplayable() && recordCharge.isDisplayable()) {
@@ -186,9 +186,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
 				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
-				int prop_n100W = property != null ? new Integer(property.getValue()) : 2222;
+				int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 				for (int i = 0; i < recordRevolution.size(); i++) {
-					double eta = recordPower.get(i) != 0 ? (recordRevolution.get(i) / 10.0) / (recordPower.get(i) * prop_n100W) : 0;
+					double motorPower = (recordRevolution.get(i)*100.0)/prop_n100W;
+					double eta = (recordPower.get(i)) > motorPower ? (motorPower*100.0)/recordPower.get(i) : 0;
 					record.add(new Double(eta * 1000).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}

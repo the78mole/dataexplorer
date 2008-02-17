@@ -219,7 +219,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							voltagePerCellLabel.setText(measurement.getName());
 							voltagePerCellSymbol.setText(measurement.getSymbol());
 							voltagePerCellUnit.setText("[" + measurement.getUnit() + "]");
-							numCellValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.NUMBER_CELLS));
+							PropertyType property = device.getMeasruementProperty(configName, recordKey, UniLogDialog.NUMBER_CELLS);
+							numCellValue = property != null ? new Integer(property.getValue()) : 4;
+							numCellInput.setText(" " + numCellValue);
 
 							recordKey = device.getMeasurementNames(configName)[7];
 							measurement = device.getMeasurement(configName, recordKey);
@@ -233,7 +235,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							etaButton.setText(measurement.getName());
 							etaSymbol.setText(measurement.getSymbol());
 							etaUnit.setText("[" + measurement.getUnit() + "]");
-							prop100WValue = new Integer("" + device.getMeasurementPropertyValue(configName, recordKey, UniLogDialog.PROP_N_100_WATT));
+							property = device.getMeasruementProperty(configName, recordKey, UniLogDialog.PROP_N_100_WATT);
+							prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+							prop100WInput.setText(" " + prop100WValue);
+
 							
 							// n100W value, eta calculation 										
 							updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
@@ -294,6 +299,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("voltageButton.widgetSelected, event="+evt);
 								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
 								setConfigButton.setEnabled(true);
 							}
 						});
@@ -313,6 +319,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void widgetSelected(SelectionEvent evt) {
 								if (log.isLoggable(Level.FINEST))  log.finest("currentButton.widgetSelected, event="+evt);
 								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
 								setConfigButton.setEnabled(true);
 							}
 						});
@@ -381,7 +388,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						numCellInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
 						numCellInput.setBounds(158, 173, 40, 20);
-						numCellInput.setText(" " + numCellValue); 
 						numCellInput.setToolTipText("Hier die Anzahl der Akkuzellen einsetzen");
 						numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -422,7 +428,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						prop100WInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
 						prop100WInput.setBounds(158, 217, 40, 20);
-						prop100WInput.setText(" " + prop100WValue);
 						prop100WInput.setToolTipText("Hier die Derhzahl des Propellers bei 100 Watt einsetzen");
 						prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -502,7 +507,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								else calcType = CalculationThread.REGRESSION_TYPE_LINEAR;
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, calcType);
-								device.storeDeviceProperties();
+								collectAndUpdateConfiguration();
+								//device.storeDeviceProperties();
 								setConfigButton.setEnabled(true);
 							}
 						});
@@ -518,7 +524,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								int regressionTime_sec = regressionTime.getSelectionIndex() + 1;
 								String measurementKey = device.getMeasurementNames(configName)[10]; //10=slope
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, regressionTime_sec);
-								device.storeDeviceProperties();
+								collectAndUpdateConfiguration();
+								//device.storeDeviceProperties();
 								setConfigButton.setEnabled(true);
 							}
 						});
@@ -992,20 +999,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.').trim()));
 	}
 	
-	/**
-	 * @return number of cells
-	 */
-	public int getNumCell() {
-		return numCellValue;
-	}
-	
-	/**
-	 * @return prop revolution at 100 W
-	 */
-	public int getPropN100Value() {
-		return prop100WValue;
-	}
-
 	/**
 	 * @param isA1ModusAvailable the isA1ModusAvailable to set
 	 */

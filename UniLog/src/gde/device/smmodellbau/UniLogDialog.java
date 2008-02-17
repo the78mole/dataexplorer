@@ -1166,20 +1166,6 @@ public class UniLogDialog extends DeviceDialog {
 	}
 	
 	/**
-	 * @return number of cells
-	 */
-	public int getNumCell() {
-		return this.configTab1.getNumCell();
-	}
-	
-	/**
-	 * @return prop revolution at 100 W
-	 */
-	public int getPropN100Value() {
-		return this.configTab1.getPropN100Value();
-	}
-	
-	/**
 	 * enable the button to store the configuration
 	 * @param enabled
 	 */
