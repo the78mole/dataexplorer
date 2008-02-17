@@ -593,15 +593,20 @@ public class MenuBar {
 	 * @param isRaw
 	 */
 	private void exportFileCVS(String dialogName, boolean isRaw) {
-		Settings deviceSetting = Settings.getInstance();
-		String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
-		FileDialog csvFileDialog = application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
-		if (csvFileDialog.getFileName().length() > 4) {
-			Channel activeChannel = channels.getActiveChannel();
-			String recordSetKey = activeChannel.getActiveRecordSet().getName();
-			String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
-			addSubHistoryMenuItem(csvFileDialog.getFileName());
-			CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
+		try {
+			Settings deviceSetting = Settings.getInstance();
+			String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
+			FileDialog csvFileDialog = application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
+			if (csvFileDialog.getFileName().length() > 4) {
+				Channel activeChannel = channels.getActiveChannel();
+				String recordSetKey = activeChannel.getActiveRecordSet().getName();
+				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+				addSubHistoryMenuItem(csvFileDialog.getFileName());
+				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
+			}
+		}
+		catch (Exception e) {
+			application.openMessageDialog(e.getMessage());
 		}
 	}
 

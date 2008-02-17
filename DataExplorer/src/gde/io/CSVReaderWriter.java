@@ -124,7 +124,7 @@ public class CSVReaderWriter {
 						log.fine("using as file channel name = " + fileConfig);
 					}
 					else if (!activeConfig.equals(fileConfig)) {
-						String msg = "Die Kanalconfiguration der Datei entspricht nicht der gewählten Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
+						String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
 						int answer = application.openYesNoCancelMessageDialog(msg);
 							if (answer == SWT.YES) {
 								log.fine("SWT.YES");
@@ -222,23 +222,23 @@ public class CSVReaderWriter {
 			activeChannel.put(recordSetName, recordSet);
 			activeChannel.setActiveRecordSet(recordSetName);
 			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
-			activeChannel.applyTemplate(recordSetName);
 			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+			activeChannel.applyTemplate(recordSetName);
 
 			reader.close();
 			statusBar.setProgress(10);
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new UnsupportedEncodingException("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
+			throw new Exception("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new FileNotFoundException("Die CSV Datei existiert nicht - \"" + filePath + "\"");
+			throw new Exception("Die CSV Datei existiert nicht - \"" + filePath + "\"");
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new IOException("Die CSV Datei kann nicht gelesen werden - \"" + filePath + "\"");
+			throw new Exception("Die CSV Datei kann nicht gelesen werden - \"" + filePath + "\"");
 		}
 		catch (Exception e) {
 			String msg = null;
@@ -259,9 +259,10 @@ public class CSVReaderWriter {
 	}
 
 	/**
-	 * write the application settings file
+	 * write data CVS file
+	 * @throws Exception 
 	 */
-	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) {
+	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		try {
@@ -334,21 +335,13 @@ public class CSVReaderWriter {
 			log.fine("data line = " + sb.toString());
 			statusBar.setProgress(100);
 		}
-		catch (UnsupportedEncodingException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
-		}
-		catch (FileNotFoundException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei existiert nicht - \"filePath\"");
-		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Die CSV Datei kann nicht gelesen werden - \"filePath\"");
+			throw new Exception("Die CSV Datei kann nicht geschrieben werden - \"" + filePath + "\"");
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+			throw new Exception("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
 		}
 		finally {
 			statusBar.setMessage("");
