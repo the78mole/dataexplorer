@@ -91,7 +91,7 @@ public class AnalogDisplay extends Composite {
 			Canvas canvas = (Canvas) evt.widget;
 			int width = canvas.getSize().x;
 			int height = canvas.getSize().y;
-			log.info("canvas size = " + width + " x " + height);
+			log.fine("canvas size = " + width + " x " + height);
 			//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
 			double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
@@ -123,7 +123,7 @@ public class AnalogDisplay extends Composite {
 	    int dxr, dxtick, dyr, dytick, dxtext, dytext;
 	    for (int i = 0; i <= numberTicks; ++i) {
 	    	double angle = angleStart + i * angleSteps;  // -20, 0, 20, 40, ...
-		    log.info("angle = " + angle);
+		    log.fine("angle = " + angle);
 		    dxr = new Double(radius * Math.cos(angle * Math.PI / 180)).intValue();
 		    dyr = new Double(radius * Math.sin(angle * Math.PI / 180)).intValue();
 		    dxtick = new Double((radius + 10) * Math.cos(angle * Math.PI / 180)).intValue();

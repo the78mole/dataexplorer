@@ -147,7 +147,7 @@ public class Record extends Vector<Integer> {
 		this.minScaleValue = record.minScaleValue;
 		this.device = record.device;
 		this.channelConfigKey = record.channelConfigKey;
-		log.info("channelConfigKey = " + this.channelConfigKey);
+		log.fine("channelConfigKey = " + this.channelConfigKey);
 	}
 
 	/**

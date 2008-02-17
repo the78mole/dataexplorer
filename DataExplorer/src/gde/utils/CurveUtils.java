@@ -226,7 +226,7 @@ public class CurveUtils {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e);
 		}
-		if (log.isLoggable(Level.FINEST)) log.info(sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.finest(sb.toString());
 	}
 	
 	/**
