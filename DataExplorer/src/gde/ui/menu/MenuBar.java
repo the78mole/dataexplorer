@@ -122,7 +122,8 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("openFileMenuItem.widgetSelected, event=" + evt);
 							//TODO implement data file format and set ending as file open dialog filter 
-							application.openMessageDialog("Diese Implementierung fehlt noch :-( , benutze vorübergehend Datei->Import");
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							importFileCVS("Import CSV raw", true, true);
 						}
 					});
 				}
@@ -133,13 +134,22 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
 							//TODO implement data file format and set ending as file save dialog filter 
-							application.openMessageDialog("Diese Implementierung fehlt noch :-( , benutze vorübergehend Datei->Export");
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
 				{
 					saveAsFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					saveAsFileMenuItem.setText("Speichern unter ...");
+					saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt);
+							//TODO implement data file format and set ending as file save dialog filter 
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+						}
+					});
 				}
 				{
 					historyFileMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
@@ -247,7 +257,6 @@ public class MenuBar {
 		{
 			editMenuItem = new MenuItem(parent, SWT.CASCADE);
 			editMenuItem.setText("Bearbeiten");
-			editMenuItem.setEnabled(false);
 			{
 				editMenu = new Menu(editMenuItem);
 				editMenuItem.setMenu(editMenu);
@@ -569,7 +578,7 @@ public class MenuBar {
 	 * @param isRaw
 	 * @param isFromFile
 	 */
-	private void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
+	public void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
 		try {
 			String fileSep = System.getProperty("file.separator");
 			Settings deviceSetting = Settings.getInstance();
@@ -592,7 +601,7 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	private void exportFileCVS(String dialogName, boolean isRaw) {
+	public void exportFileCVS(String dialogName, boolean isRaw) {
 		try {
 			Settings deviceSetting = Settings.getInstance();
 			String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();

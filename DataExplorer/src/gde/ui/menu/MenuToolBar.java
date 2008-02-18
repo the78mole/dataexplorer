@@ -135,7 +135,8 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("openToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for openToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! ");
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							application.getMenuBar().importFileCVS("Import CSV raw", true, true);
 						}
 					});
 				}
@@ -148,7 +149,8 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for saveToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! ");
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
@@ -161,7 +163,8 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveAsToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for saveAsToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! ");
+							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
