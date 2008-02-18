@@ -172,6 +172,7 @@ public class Record extends Vector<Integer> {
 		}
 		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point);
 		this.add(new Integer(point));
+		this.parent.dataTableAddPoint(this.getName(), this.size()-1, point);
 	}
 
 	public String getName() {

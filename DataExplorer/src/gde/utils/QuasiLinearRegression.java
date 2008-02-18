@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.StatusBar;
 
 /**
  * This thread implementation calculates the slop of the height curve using quasi linear regression
@@ -48,7 +47,7 @@ public class QuasiLinearRegression extends CalculationThread {
 	 */
 	public void run() {
 		if (recordSet == null || sourceRecordKey == null || targetRecordKey == null) {
-			log.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
+			log.warning("Die Steigung kann nicht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
 			return;
 		}
 		log.fine("start data calculation for record = " + targetRecordKey);
@@ -56,8 +55,6 @@ public class QuasiLinearRegression extends CalculationThread {
 		Record record = recordSet.get(targetRecordKey);
 		record.clear();
 		Record recordHeight = recordSet.get(sourceRecordKey);
-		StatusBar statusBar = application.getStatusBar();
-		statusBar.setMessageAsync(statusMessage);
 
 		int time_ms = recordSet.getTimeStep_ms();
 		int pointsPerInterval = calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
@@ -122,13 +119,12 @@ public class QuasiLinearRegression extends CalculationThread {
 			--modCounter;
 		}
 		// pad the rest of the curve to make equal size
-		for (int i = record.size()-1; i < recordHeight.size(); i++) {
+		for (int i = record.size()-1; i < recordHeight.size()-1; i++) {
 			record.add(0);
 		}
 		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
-		statusBar.setMessageAsync("");
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
 		log.fine("finished data calculation for record = " + targetRecordKey);

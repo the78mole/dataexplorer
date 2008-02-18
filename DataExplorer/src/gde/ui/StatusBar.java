@@ -42,6 +42,7 @@ public class StatusBar {
 	private Composite								comComposite;
 	private CLabel									msgLabel;
 	private ProgressBar							progressBar;
+	private int 										progessPercentage = 0;
 
 	public StatusBar(OpenSerialDataExplorer application, Composite statusComposite) {
 		this.statusComposite = statusComposite;
@@ -161,6 +162,19 @@ public class StatusBar {
 		});
 	}
 
+	public synchronized int getProgressPercentage() {
+		return progressBar.getSelection();
+	}
+
+	public synchronized int getProgressPercentageAsync() {
+		progessPercentage = 0;
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				progessPercentage = progressBar.getSelection();
+			}
+		});
+		return progessPercentage;
+	}
 
 	/**
 	 * set the serial com port rx light on

@@ -80,6 +80,8 @@ public class SimulatorDialog extends DeviceDialog {
 	private TimerTask											timerTask;
 	private boolean												isCollectDataStopped	= false;
 	private int														recordNumber					= 0;
+	private int 													counter 							= 0;
+
 
 	/**
 	* main method to test this dialog inside a shell 
@@ -329,13 +331,16 @@ public class SimulatorDialog extends DeviceDialog {
 												application.getMenuToolBar().addRecordSetName(recordSetKey);
 												channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSetKey);
 											}
+											recordSet = channel.get(recordSetKey);
+											log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
+											recordSet.setTimeStep_ms(device.getTimeStep_ms());
+											counter = 0;
 										}
 										else {
+											recordSet = channel.get(recordSetKey);
 											log.fine("re-using " + recordSetKey);
 										}
 										// prepare the data for adding to record set
-										recordSet = channel.get(recordSetKey);
-										log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
 										
 										data = serialPort.getData(null, recordNumber, null, recordSet.getChannelName());
 
@@ -351,12 +356,13 @@ public class SimulatorDialog extends DeviceDialog {
 											points[0] = iterV.next().intValue();//Spannung 
 											points[1] = iterA.next().intValue();//Strom 
 											log.fine(String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1]));
+											recordSet.dataTableAddPoint(RecordSet.TIME, 0, device.getTimeStep_ms() * counter++);
 											recordSet.addPoints(points, false);
 										}
 
 										application.updateGraphicsWindow();
-										//application.updateDataTable();
-										//application.updateDigitalWindow();
+										application.updateDataTable();
+										application.updateDigitalWindow();
 									}
 									catch (IOException e) {
 										e.printStackTrace();

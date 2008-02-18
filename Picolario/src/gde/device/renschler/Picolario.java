@@ -239,10 +239,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			if (!recordSet.get(measurements[2]).isDisplayable()) {
 				// calculate the values required				
 				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
-				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+				int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
 				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); 
 				calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				calculationThread.setMaxCalcProgressPercent(20);
+				//calculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentageAsync(), 30);
 				calculationThread.start();
 			}
 		}

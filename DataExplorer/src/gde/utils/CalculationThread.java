@@ -39,7 +39,8 @@ public abstract class CalculationThread extends Thread {
 	protected String												sourceRecordKey, targetRecordKey;
 	protected int														calcInterval_sec = 10;
 	protected String												statusMessage = "";
-	protected	int														maxCalcProgressPercent = 0;
+	protected	int														startCalcProgressPercent = 0;
+	protected	int														endCalcProgressPercent = 0;
 	protected final OpenSerialDataExplorer	application;
 	protected boolean												threadStop	= false;
 
@@ -105,8 +106,9 @@ public abstract class CalculationThread extends Thread {
 	/**
 	 * @param maxCalcProgressPercent the maxCalcProgressPercent to set
 	 */
-	public void setMaxCalcProgressPercent(int maxCalcProgressPercent) {
-		this.maxCalcProgressPercent = maxCalcProgressPercent;
+	public void setCalcProgressPercent(int startProgressPercent, int endProgressPercent) {
+		this.startCalcProgressPercent = startProgressPercent;
+		this.endCalcProgressPercent = endProgressPercent;
 	}
 
 	/**

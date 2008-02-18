@@ -42,7 +42,7 @@ import osde.utils.TimeLine;
 public class RecordSet extends HashMap<String, Record> {
 	private static final long							serialVersionUID			= 26031957;
 	private static Logger									log										= Logger.getLogger(RecordSet.class.getName());
-
+	
 	private String												name;																																// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	private final String									channelName;
 	private final OpenSerialDataExplorer	application;																													// pointer to main application
@@ -55,6 +55,8 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean												isRaw									= false;																				// indicates imported file with raw data, no translation at all
 	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
 	private Rectangle											drawAreaBounds;
+	private final DecimalFormat						df = new DecimalFormat("0.000");;
+	private Vector<Vector<Integer>>				dataTable;
 	
 	//in compare set x min/max and y max (time) might be different
 	private boolean												isCompareSet					= false;
@@ -71,6 +73,7 @@ public class RecordSet extends HashMap<String, Record> {
 	// measurement
 	private String 												recordKeyMeasurement;
 	
+	public static final String 						TIME 									= "time";
 	public static final String						TIME_GRID_STATE				= "RecordSet_timeGridState";
 	public static final String						TIME_GRID_COLOR				= "RecordSet_timeGridColor";
 	public static final String						TIME_GRID_LINE_SYSLE	= "RecordSet_timeGridLineStyle";
@@ -101,6 +104,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRaw;
 		this.isFromFile = isFromFile;
 		this.channels = Channels.getInstance();
+		this.dataTable = new Vector<Vector<Integer>>(); 
 	}
 
 	/**
@@ -120,6 +124,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRaw;
 		this.isFromFile = isFromFile;
 		this.channels = Channels.getInstance();
+		this.dataTable = new Vector<Vector<Integer>>(); 
 	}
 
 	/**
@@ -140,6 +145,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRaw;
 		this.isCompareSet = isCompareSet;
 		this.channels = null;
+		this.dataTable = new Vector<Vector<Integer>>(); 
 	}
 
 	/**
@@ -177,40 +183,80 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param doUpdate to manage display update
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) {
+		IDevice device = this.get(this.recordNames[0]).getDevice();
+		Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
+		dataTableRow.add(this.get(this.recordNames[0]).size() * this.getTimeStep_ms());
 		for (int i = 0; i < points.length; i++) {
-			this.getRecord(recordNames[i]).add((new Integer(points[i])).intValue());
+			Record record = this.getRecord(recordNames[i]);
+			record.add((new Integer(points[i])).intValue());
+			dataTableRow.add(new Double(device.translateValue(this.getChannelName(), record.getName(), points[i])).intValue());
 		}
+		dataTable.add(dataTableRow);
+		
 		if (doUpdate) {
 			if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
 				application.updateGraphicsWindow();
 				application.updateDataTable();
 				application.updateDigitalWindowChilds();
+				//TODO add analog display update
 			}
 		}
 	}
 	
 	/**
-	 * get all calculated and formated data points of a given index
+	 * add a data point at specified index to the data table
+	 * @param recordkey
+	 * @param index
+	 * @param value
+	 */
+	public void dataTableAddPoint(String recordkey, int index, int value) {
+		log.fine(recordkey + " - " + index + " - " + value);
+		if (recordkey.equals(RecordSet.TIME)) {
+			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
+			if (value != 0) dataTableRow.add(value);
+			else 						dataTableRow.add(this.get(this.recordNames[0]).size() * this.getTimeStep_ms());
+			for (@SuppressWarnings("unused")
+			String recordName : recordNames) {
+				dataTableRow.add(0);
+			}
+			dataTable.add(dataTableRow);
+		}
+		else {
+			IDevice device = this.get(this.recordNames[0]).getDevice();
+			int columnIndex = getRecordIndex(recordkey) + 1; // + time column
+			Vector<Integer> tableRow = this.dataTable.get(index);
+			if (tableRow != null) {
+				tableRow.set(columnIndex, new Double(device.translateValue(this.getChannelName(), recordkey, value)).intValue());
+			}
+			else log.log(Level.WARNING, "add time point before adding other values !");
+		}
+	}
+	
+	/**
+	 * query the record index by given string, if 0 is returned the given name is not found as record name
+	 * @param recordName
+	 * @return record number
+	 */
+	public int getRecordIndex(String recordName) {
+		int searchedNumber = 0;
+		for (String name : recordNames) {
+			if (name.equals(recordName)) break;
+			++searchedNumber;
+		}
+		return searchedNumber;
+	}
+
+	/**
+	 * get all calculated and formated data points of a given index, decimal format is "0.000"
 	 * @param index of the data points
-	 * @param df decimal formatting information
 	 * @return string array including time
 	 */
-	public String[] getDataPoints(int index, DecimalFormat df) {
-		IDevice device = this.get(this.recordNames[0]).getDevice();
-		String[] values = new String[this.size() + 1];
-		values[0] = df.format(new Double(index * this.getTimeStep_ms() / 1000.0));
-		for (int i = 1; i < values.length; i++) {
-			Record record = this.getRecord(this.recordNames[i-1]);
-			int indexValue = 0;
-			try {
-				indexValue = record.get(index);
-			}
-			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage() + "at index = " + index + " - data calcualtion failed ?");
-			}
-			values[i] = df.format(new Double(device.translateValue(this.getChannelName(), record.getName(), indexValue / 1000.0)));
+	public String[] getDataPoints(int index) {
+		Vector<String> dfValues = new Vector<String>();
+		for (Integer integer : dataTable.get(index)) {
+			dfValues.add(df.format(integer/1000.0));
 		}
-		return values;
+		return dfValues.toArray(new String[this.size() + 1]);
 	}
 
 	public int getTimeStep_ms() {
@@ -816,6 +862,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param configuredDisplayable the configuredDisplayable to set
 	 */
 	public void setConfiguredDisplayable(int configuredDisplayable) {
+		log.fine("configuredDisplayable = " + configuredDisplayable);
 		this.configuredDisplayable = configuredDisplayable;
 	}
 
