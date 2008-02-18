@@ -151,12 +151,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
-				Record recordCharge = recordSet.get(measurements[3]); // 3=capacity
+				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
+				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
+				Double power = 0.0;
 				for (int i = 0; i < recordVoltage.size(); i++) {
-					record.add(new Double(1.0 * recordVoltage.get(i) * recordCharge.get(i) / 1000000.0).intValue());
+					power = i > 0 ? power + ((recordVoltage.get(i)/1000.0) * (recordCurrent.get(i)/1000.0) * (timeStep_ms/3600.0)) : 0.0;
+					record.add(power.intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
-				if (recordVoltage.isDisplayable() && recordCharge.isDisplayable()) {
+				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
@@ -213,7 +216,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 					
 				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				slopeCalculationThread.setMaxCalcProgressPercent(20);
+				slopeCalculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentageAsync(), 30);
 				slopeCalculationThread.start();
 				if (recordSet.get(measurements[9]).isDisplayable()) {
 					record.setDisplayable(true);
