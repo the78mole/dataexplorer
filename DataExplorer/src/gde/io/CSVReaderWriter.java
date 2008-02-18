@@ -80,6 +80,7 @@ public class CSVReaderWriter {
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
 		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
+		RecordSet oldActiveRecordSet = null;
 		BufferedReader reader; // to read the data
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
@@ -88,6 +89,7 @@ public class CSVReaderWriter {
 		boolean isDeviceName = true;
 		boolean isData = false;
 		Channels channels = Channels.getInstance();
+		Channel activeChannel = null;
 
 		try {
 			statusBar.setMessage("Lese CVS Datei " + filePath);
@@ -100,7 +102,6 @@ public class CSVReaderWriter {
 			String[] recordKeys = null;
 			OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 			String fileConfig = null;
-			Channel activeChannel = null;
 
 			while ((line = reader.readLine()) != null) {
 				if (isDeviceName) {
@@ -148,6 +149,9 @@ public class CSVReaderWriter {
 					}
 					recordNames = device.getMeasurementNames(fileConfig);
 					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
+					activeChannel.put(recordSetName, recordSet);
+					oldActiveRecordSet = activeChannel.getActiveRecordSet();
+					activeChannel.setActiveRecordSet(recordSetName);
 				}
 				else if (!isData) {
 					// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
@@ -196,6 +200,7 @@ public class CSVReaderWriter {
 					String[] dataStr = line.split("" + separator);
 					String data = dataStr[0].trim().replace(',', '.');
 					new_time_ms = (int)(new Double(data).doubleValue() * 1000);
+					recordSet.dataTableAddPoint(RecordSet.TIME, 0, new_time_ms);
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
 					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
@@ -219,8 +224,6 @@ public class CSVReaderWriter {
 			recordSet.setSaved(true);
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
-			activeChannel.put(recordSetName, recordSet);
-			activeChannel.setActiveRecordSet(recordSetName);
 			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
 			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 			activeChannel.applyTemplate(recordSetName);
@@ -230,17 +233,26 @@ public class CSVReaderWriter {
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
+			if (activeChannel != null) activeChannel.remove(recordSetName);
+			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
+			if (activeChannel != null) activeChannel.remove(recordSetName);
+			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei existiert nicht - \"" + filePath + "\"");
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
+			if (activeChannel != null) activeChannel.remove(recordSetName);
+			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei kann nicht gelesen werden - \"" + filePath + "\"");
 		}
 		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			if (activeChannel != null) activeChannel.remove(recordSetName);
+			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			String msg = null;
 			if (e.getMessage().startsWith("0"))
 				msg = "Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät";
@@ -249,7 +261,7 @@ public class CSVReaderWriter {
 			else if (e.getMessage().startsWith("2"))
 				msg = "Bei der geöffneten CVS Datei stimmen die Einheiten nicht mit der Konfiguration überein : " + e.getMessage().substring(1);
 			else
-				msg = "Die Kopfzeile der geöffnete CSV Datei (" + line + ")entspricht nicht der des eingestellten Gerätes";
+				msg = "Beim Einlesen der CSV Datei ist folgender Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage();
 			throw new Exception(msg);
 		}
 		finally {
