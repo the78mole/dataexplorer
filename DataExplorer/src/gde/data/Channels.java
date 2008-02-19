@@ -159,6 +159,14 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * method to cleanup all child and dependent
 	 */
 	public void cleanup() {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				String activeRecordName = activeRecordSet.getName();
+				activeChannel.get(activeRecordName).clear();
+			}
+		}
 		for (int i = 1; i <= this.size(); i++) {
 			Channel channel = this.get(i);
 			for (int j = 0; j < channel.size(); j++) {
