@@ -27,7 +27,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.ui.SWTResourceManager;
 
@@ -114,6 +113,7 @@ public class TimeLine {
 	/**
 	 * draws the time line - requires to call preparation steps
 	 * - x0, y0 defines the start point of the scale, y0, width the nd point
+	 * @param recordSet
 	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
@@ -125,7 +125,7 @@ public class TimeLine {
 	 * @param color
 	 * @return position, where the time line text is drawn
 	 */
-	public synchronized void drawTimeLine(GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, Color color) {
+	public synchronized void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, Color color) {
 		if (isTimeLinePrepared == false) {
 			log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first");
 			return ;
@@ -143,7 +143,7 @@ public class TimeLine {
 		int gap = pt.y / 3;
 		int miniTicks = 3;
 		
-		drawTickMarks(gc, x0, y0, width, startTimeValue, endTimeValue, scaleFactor, timeFormat, ticklength, miniTicks, gap);
+		drawTickMarks(recordSet, gc, x0, y0, width, startTimeValue, endTimeValue, scaleFactor, timeFormat, ticklength, miniTicks, gap);
 
 		// draw the scale description centered
 		GraphicsUtils.drawText(timeLineText, (int) (x0 + width / 2), y0 + ticklength + pt.y * 2, gc, SWT.HORIZONTAL);
@@ -151,6 +151,7 @@ public class TimeLine {
 
 	/**
 	 * draws tick marks to a scale in horizontal direction
+	 * @param recordSet
 	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
@@ -163,7 +164,7 @@ public class TimeLine {
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 */
-	private void drawTickMarks(GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int ticklength, int miniticks, int gap) {
+	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int ticklength, int miniticks, int gap) {
 		// adapt x0 and width, measurement scales are outside the curve draw area
 		x0 = x0 - 1;
 		width = width + 1;
@@ -237,7 +238,6 @@ public class TimeLine {
 			Point pt = gc.textExtent("00");
 			
 			// prepare grid vector
-			RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			Vector<Integer> timeGrid = new Vector<Integer>();
 
 			for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
@@ -259,8 +259,7 @@ public class TimeLine {
 				}
 				//draw values to the scale	
 				double timeValue = i * 100.0 / scaleFactor;
-				//timeValue = timeValue > 10 ? timeValue : i * 100 / scaleFactor * 10;
-				if (log.isLoggable(Level.FINE)) log.fine("timeValue = " + timeValue);
+				if (log.isLoggable(Level.FINER)) log.finer("timeValue = " + timeValue);
 				// prepare to make every minute or hour to bold
 				boolean isMod60 = (timeValue % 60) == 0;
 				String numberStr;
