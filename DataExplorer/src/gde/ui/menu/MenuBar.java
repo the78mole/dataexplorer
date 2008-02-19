@@ -110,8 +110,6 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("newFileMenuItem.widgetSelected, event=" + evt);
 							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
-							application.updateDataTable();
-							application.updateDigitalWindow();
 						}
 					});
 				}
