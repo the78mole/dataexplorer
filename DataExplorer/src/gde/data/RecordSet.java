@@ -57,6 +57,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private Rectangle											drawAreaBounds;
 	private final DecimalFormat						df = new DecimalFormat("0.000");;
 	private Vector<Vector<Integer>>				dataTable;
+	private boolean												isTableDisplayable = false;
 	
 	//in compare set x min/max and y max (time) might be different
 	private boolean												isCompareSet					= false;
@@ -183,22 +184,15 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param doUpdate to manage display update
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) {
-		IDevice device = this.get(this.recordNames[0]).getDevice();
-		Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
-		dataTableRow.add(this.get(this.recordNames[0]).size() * this.getTimeStep_ms());
 		for (int i = 0; i < points.length; i++) {
 			Record record = this.getRecord(recordNames[i]);
 			record.add((new Integer(points[i])).intValue());
-			dataTableRow.add(new Double(device.translateValue(this.getChannelName(), record.getName(), points[i])).intValue());
-		}
-		dataTable.add(dataTableRow);
-		
+		}		
 		if (doUpdate) {
 			if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
 				application.updateGraphicsWindow();
-				application.updateDataTable();
 				application.updateDigitalWindowChilds();
-				//TODO add analog display update
+				application.updateAnalogWindowChilds();
 			}
 		}
 	}
@@ -230,6 +224,10 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 			else log.log(Level.WARNING, "add time point before adding other values !");
 		}
+	}
+
+	public void dataTableAddRow(Vector<Integer> dataTableRow) {
+		dataTable.add(dataTableRow);
 	}
 	
 	/**
@@ -460,8 +458,9 @@ public class RecordSet extends HashMap<String, Record> {
 				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
 				log.fine("switching to record set " + recordSetKey);
 				application.getMenuToolBar().updateRecordSetSelectCombo();
+				application.updateDigitalWindow();
+				application.updateAnalogWindow();
 				application.updateDataTable();
-				application.updateDigitalWindowChilds();
 			}
 		});
 	}
@@ -539,6 +538,7 @@ public class RecordSet extends HashMap<String, Record> {
 		application.updateGraphicsWindow();
 		application.updateDataTable();
 		application.updateDigitalWindow();
+		application.updateAnalogWindow();
 	}
 
 	/**
@@ -871,5 +871,20 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public String getChannelName() {
 		return channelName;
+	}
+
+	/**
+	 * @return the isTableDisplayable boolean value
+	 */
+	public boolean isTableDisplayable() {
+		return isTableDisplayable;
+	}
+
+	/**
+	 * @param isTableDisplayable, boolean value if the table need to calculated
+	 */
+	public void setTableDisplayable(boolean isTableDisplayable) {
+		if (!isTableDisplayable) this.dataTable = new Vector<Vector<Integer>>(); 
+		this.isTableDisplayable = isTableDisplayable;
 	}
 }

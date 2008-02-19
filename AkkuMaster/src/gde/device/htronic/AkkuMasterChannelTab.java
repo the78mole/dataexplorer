@@ -537,7 +537,10 @@ public class AkkuMasterChannelTab {
 														points[4] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; 	//Energie		[mWh]
 														log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh");
 
-														recordSet.addPoints(points, true); // updates data table and digital windows
+														recordSet.addPoints(points, false); // updates data table and digital windows
+														application.updateGraphicsWindow();
+														application.updateDigitalWindowChilds();
+														application.updateAnalogWindowChilds();
 													}
 													else {
 														// only the voltage can be displayed and updated
@@ -608,6 +611,7 @@ public class AkkuMasterChannelTab {
 							isCollectData = false;
 							isCollectDataStopped = true;
 							stopTimer();
+							application.updateDataTable();
 						}
 					});
 				}
