@@ -361,8 +361,8 @@ public class SimulatorDialog extends DeviceDialog {
 										}
 
 										application.updateGraphicsWindow();
-										application.updateDataTable();
-										application.updateDigitalWindow();
+										application.updateDigitalWindowChilds();
+										application.updateAnalogWindowChilds();
 									}
 									catch (IOException e) {
 										e.printStackTrace();
@@ -390,6 +390,7 @@ public class SimulatorDialog extends DeviceDialog {
 							isCollectDataStopped = true;
 							startButton.setEnabled(true);
 							stopButton.setEnabled(false);
+							application.updateDataTable();
 						}
 					});
 				}

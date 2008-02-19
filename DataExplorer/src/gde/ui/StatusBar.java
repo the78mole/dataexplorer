@@ -120,9 +120,7 @@ public class StatusBar {
 			}
 			{
 				msgLabel = new CLabel(statusComposite, SWT.LEFT);
-				//msgLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
-				//msgLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-
+				msgLabel.setText(" ");
 			}
 		}
 	}
@@ -133,7 +131,6 @@ public class StatusBar {
 	public void setMessage(final String text) {
 		if (text.length() > 5) msgLabel.setText("   " + text + "   ");
 		else msgLabel.setText(text);
-		msgLabel.pack(true);
 	}
 	
 	/**
@@ -144,7 +141,6 @@ public class StatusBar {
 			public void run() {
 				if (text.length() > 5) msgLabel.setText("   " + text + "   ");
 				else msgLabel.setText(text);
-				msgLabel.pack(true);
 			}
 		});
 	}
@@ -152,6 +148,14 @@ public class StatusBar {
 
 	public void setProgress(final int precent) {
 		progressBar.setSelection(precent);
+		if (precent == 100) {
+			try {
+				Thread.sleep(500);
+				setProgressAsync(0);
+			}
+			catch (InterruptedException e) {
+			}
+		}
 	}
 	
 	public void setProgressAsync(final int precent) {

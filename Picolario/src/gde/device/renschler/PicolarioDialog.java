@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -414,6 +415,7 @@ public class PicolarioDialog extends DeviceDialog {
 							}
 							application.updateGraphicsWindow();
 							application.updateDigitalWindowChilds();
+							Channels.getInstance().getActiveChannel().getActiveRecordSet().setTableDisplayable(false);
 							application.updateDataTable();
 						}
 					});
