@@ -121,8 +121,6 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("newToolItem.widgetSelected, event=" + evt);
 							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
-							application.updateDataTable();
-							application.updateDigitalWindow();
 						}
 					});
 				}
@@ -555,19 +553,25 @@ public class MenuToolBar {
 						deleteRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("deleteAufnahme.widgetSelected, event=" + evt);
-								Channel activeCahnnel = channels.getActiveChannel();
-								String deleteRecordSetName = activeCahnnel.getActiveRecordSet().getName();
-								// before deletion set new active record set
-								String newRecorKey = null;
-								int selectionIndex = recordSelectCombo.getSelectionIndex();
-								if ((selectionIndex - 1) > 0) newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
-								else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex +1);;
-								if (newRecorKey != null) activeCahnnel.setActiveRecordSet(newRecorKey);
-								// ready for deletion
-								activeCahnnel.get(deleteRecordSetName).clear();
-								activeCahnnel.remove(deleteRecordSetName);
-								log.fine("deleted " + deleteRecordSetName);
-								updateRecordSetSelectCombo();
+								Channel activeChannel = channels.getActiveChannel();
+								RecordSet recordSet = activeChannel.getActiveRecordSet();
+								if (recordSet != null) {
+									String deleteRecordSetName = recordSet.getName();
+									// before deletion set new active record set
+									String newRecorKey = null;
+									int selectionIndex = recordSelectCombo.getSelectionIndex();
+									if ((selectionIndex - 1) > 0)
+										newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
+									else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex + 1);
+									;
+									if (newRecorKey != null) activeChannel.setActiveRecordSet(newRecorKey);
+									// ready for deletion
+									activeChannel.get(deleteRecordSetName).clear();
+									activeChannel.remove(deleteRecordSetName);
+									log.fine("deleted " + deleteRecordSetName);
+									updateRecordSetSelectCombo();
+									application.updateDataTable();
+								}
 							}
 						});
 					}
