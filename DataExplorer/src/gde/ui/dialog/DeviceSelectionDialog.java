@@ -789,6 +789,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		application.getMenuToolBar().updateChannelSelector();
 		application.updateGraphicsWindow();
 		application.updateDataTable();
+		application.updateDigitalWindow();
+		application.updateAnalogWindow();
 		application.getMenuToolBar().updateRecordSetSelectCombo(); // clear
 
 		return;
