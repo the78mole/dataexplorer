@@ -80,7 +80,6 @@ public class CSVReaderWriter {
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
 		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
-		RecordSet oldActiveRecordSet = null;
 		BufferedReader reader; // to read the data
 		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
@@ -92,7 +91,7 @@ public class CSVReaderWriter {
 		Channel activeChannel = null;
 
 		try {
-			statusBar.setMessage("Lese CVS Datei " + filePath);
+			//statusBar.setMessage("Lese CVS Datei " + filePath);
 			
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
@@ -149,9 +148,6 @@ public class CSVReaderWriter {
 					}
 					recordNames = device.getMeasurementNames(fileConfig);
 					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
-					activeChannel.put(recordSetName, recordSet);
-					oldActiveRecordSet = activeChannel.getActiveRecordSet();
-					activeChannel.setActiveRecordSet(recordSetName);
 				}
 				else if (!isData) {
 					// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
@@ -200,7 +196,6 @@ public class CSVReaderWriter {
 					String[] dataStr = line.split("" + separator);
 					String data = dataStr[0].trim().replace(',', '.');
 					new_time_ms = (int)(new Double(data).doubleValue() * 1000);
-					recordSet.dataTableAddPoint(RecordSet.TIME, 0, new_time_ms);
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
 					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
@@ -224,35 +219,29 @@ public class CSVReaderWriter {
 			recordSet.setSaved(true);
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
+			activeChannel.put(recordSetName, recordSet);
+			activeChannel.setActiveRecordSet(recordSetName);
 			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
-			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 			activeChannel.applyTemplate(recordSetName);
+			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 			reader.close();
 			statusBar.setProgress(10);
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (activeChannel != null) activeChannel.remove(recordSetName);
-			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei entspricht nicht dem unterstützten Encoding - \"ISO-8859-1\"");
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (activeChannel != null) activeChannel.remove(recordSetName);
-			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei existiert nicht - \"" + filePath + "\"");
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (activeChannel != null) activeChannel.remove(recordSetName);
-			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			throw new Exception("Die CSV Datei kann nicht gelesen werden - \"" + filePath + "\"");
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (activeChannel != null) activeChannel.remove(recordSetName);
-			if(oldActiveRecordSet != null) activeChannel.setActiveRecordSet(oldActiveRecordSet.getName());
 			String msg = null;
 			if (e.getMessage().startsWith("0"))
 				msg = "Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät";
@@ -265,7 +254,7 @@ public class CSVReaderWriter {
 			throw new Exception(msg);
 		}
 		finally {
-			statusBar.setMessage("");
+			//statusBar.setMessage("");
 		}
 		return recordSet;
 	}
@@ -315,7 +304,7 @@ public class CSVReaderWriter {
 
 			// write data
 			int recordEntries = recordSet.getRecord(recordSet.getRecordNames()[0]).size();
-			int stausIncrement = recordEntries/100;
+			double stausIncrement = recordEntries/100.0;
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
@@ -338,7 +327,7 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
 				writer.write(sb.toString());
-				statusBar.setProgress(stausIncrement * i);
+				statusBar.setProgress((int)(stausIncrement * i));
 			}
 
 			writer.flush();
@@ -356,7 +345,7 @@ public class CSVReaderWriter {
 			throw new Exception("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
 		}
 		finally {
-			statusBar.setMessage("");
+			//statusBar.setMessage("");
 		}
 
 	}
