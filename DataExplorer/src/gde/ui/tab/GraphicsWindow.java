@@ -562,7 +562,7 @@ public class GraphicsWindow {
 		if (log.isLoggable(Level.FINE)) log.fine("curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height);
 		startTime = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTime = startTime + maxTime;
-		timeLine.drawTimeLine(canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
+		timeLine.drawTimeLine(recordSet, canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
 		curveArea = SWTResourceManager.getImage(width, height);
