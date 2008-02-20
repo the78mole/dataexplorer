@@ -493,8 +493,10 @@ public class AkkuMasterChannelTab {
 															recordSetKey = (channel.size() + 1) + ") " + processName;
 															channel.put(recordSetKey, RecordSet.createRecordSet(name.trim(), recordSetKey, application.getActiveDevice(), true, false));
 															log.fine(recordSetKey + " created for channel " + channel.getName());
-															if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
-															channel.get(recordSetKey).setAllDisplayable();
+															if (channel.getActiveRecordSet() == null) channel.setActiveRecordSet(recordSetKey);
+															recordSet = channel.get(recordSetKey);
+															recordSet.setTableDisplayable(false); // suppress table calc + display 
+															recordSet.setAllDisplayable();
 															channel.applyTemplate(recordSetKey);
 															// switch the active record set if the current record set is child of active channel
 															if (channel.getName().equals(channels.getActiveChannel().getName())) {
@@ -580,6 +582,7 @@ public class AkkuMasterChannelTab {
 										}
 									};
 									timer.scheduleAtFixedRate(timerTask, delay, period);
+
 								}
 								catch (IOException e1) {
 									application.openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
@@ -611,6 +614,8 @@ public class AkkuMasterChannelTab {
 							isCollectData = false;
 							isCollectDataStopped = true;
 							stopTimer();
+							// hope this is the right record set
+							channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
 							application.updateDataTable();
 						}
 					});

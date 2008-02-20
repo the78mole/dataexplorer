@@ -57,7 +57,8 @@ public class RecordSet extends HashMap<String, Record> {
 	private Rectangle											drawAreaBounds;
 	private final DecimalFormat						df = new DecimalFormat("0.000");;
 	private Vector<Vector<Integer>>				dataTable;
-	private boolean												isTableDisplayable = false;
+	private boolean												isTableDataCalculated = false;  // value to manage only one time calculation
+	private boolean												isTableDisplayable		= true;		// value to suppress table data calculation(live view)
 	
 	//in compare set x min/max and y max (time) might be different
 	private boolean												isCompareSet					= false;
@@ -874,17 +875,31 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the isTableDisplayable boolean value
+	 * @return the boolean value true if all table data are calculated and table can be displayed
+	 */
+	public boolean isTableDataCalculated() {
+		return isTableDataCalculated;
+	}
+
+	/**
+	 * @param isTableDataCalculated, boolean value if the table need to be calculated before it can be displayed
+	 */
+	public void setTableDataCalculated(boolean isTableDataCalculated) {
+		if (!isTableDataCalculated) this.dataTable = new Vector<Vector<Integer>>(); 
+		this.isTableDataCalculated = isTableDataCalculated;
+	}
+
+	/**
+	 * @return the boolean value if table can be displayed or displaying is suppressed
 	 */
 	public boolean isTableDisplayable() {
 		return isTableDisplayable;
 	}
 
 	/**
-	 * @param isTableDisplayable, boolean value if the table need to calculated
+	 * @param isTableDisplayable the boolean value if table can be displayed or displaying is suppressed (live view)
 	 */
 	public void setTableDisplayable(boolean isTableDisplayable) {
-		if (!isTableDisplayable) this.dataTable = new Vector<Vector<Integer>>(); 
 		this.isTableDisplayable = isTableDisplayable;
 	}
 }
