@@ -120,7 +120,6 @@ public class StatusBar {
 			}
 			{
 				msgLabel = new CLabel(statusComposite, SWT.LEFT);
-				msgLabel.setText(" ");
 			}
 		}
 	}
@@ -131,6 +130,7 @@ public class StatusBar {
 	public void setMessage(final String text) {
 		if (text.length() > 5) msgLabel.setText("   " + text + "   ");
 		else msgLabel.setText(text);
+		msgLabel.pack();
 	}
 	
 	/**
@@ -141,6 +141,7 @@ public class StatusBar {
 			public void run() {
 				if (text.length() > 5) msgLabel.setText("   " + text + "   ");
 				else msgLabel.setText(text);
+				msgLabel.pack();
 			}
 		});
 	}

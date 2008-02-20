@@ -95,6 +95,7 @@ public class AnalogWindow {
 				if (recordSet != null) { // channel does not have a record set yet
 					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 					for (String recordKey : activeRecordKeys) {
+						@SuppressWarnings("unused")
 						AnalogDisplay display = displays.get(recordKey);
 						//TODO if (display != null) display.getDigitalLabel().redraw();
 					}

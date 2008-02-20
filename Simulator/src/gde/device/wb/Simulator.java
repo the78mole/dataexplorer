@@ -19,6 +19,7 @@ package osde.device.wb;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
@@ -32,6 +33,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class Simulator extends DeviceConfiguration implements IDevice {
+	private Logger												log	= Logger.getLogger(this.getClass().getName());
 
 	private final OpenSerialDataExplorer application;
 	private final SimulatorSerialPort serialPort;
@@ -69,7 +71,8 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value;
+		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
+		log.info("newValue = " + newValues);
 		// do some calculation
 		return newValues;
 	}
@@ -80,7 +83,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value;
+		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - this.getMeasurementOffset(channelConfigKey, recordKey);
 		// do some calculation
 		return newValues;
 	}

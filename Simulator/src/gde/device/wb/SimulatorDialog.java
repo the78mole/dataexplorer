@@ -80,7 +80,6 @@ public class SimulatorDialog extends DeviceDialog {
 	private TimerTask											timerTask;
 	private boolean												isCollectDataStopped	= false;
 	private int														recordNumber					= 0;
-	private int 													counter 							= 0;
 
 
 	/**
@@ -323,7 +322,10 @@ public class SimulatorDialog extends DeviceDialog {
 											channel.put(recordSetKey, RecordSet.createRecordSet(device.getChannelName(1), recordSetKey, application.getActiveDevice(), true, false));
 											log.fine(recordSetKey + " created for channel " + channel.getName());
 											if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
-											channel.get(recordSetKey).setAllDisplayable();
+											recordSet = channel.get(recordSetKey);
+											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
+											recordSet.setTimeStep_ms(device.getTimeStep_ms());
+											recordSet.setAllDisplayable();
 											channel.applyTemplate(recordSetKey);
 
 											// switch the active record set if the current record set is child of active channel
@@ -331,10 +333,7 @@ public class SimulatorDialog extends DeviceDialog {
 												application.getMenuToolBar().addRecordSetName(recordSetKey);
 												channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSetKey);
 											}
-											recordSet = channel.get(recordSetKey);
 											log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
-											recordSet.setTimeStep_ms(device.getTimeStep_ms());
-											counter = 0;
 										}
 										else {
 											recordSet = channel.get(recordSetKey);
@@ -356,7 +355,6 @@ public class SimulatorDialog extends DeviceDialog {
 											points[0] = iterV.next().intValue();//Spannung 
 											points[1] = iterA.next().intValue();//Strom 
 											log.fine(String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1]));
-											recordSet.dataTableAddPoint(RecordSet.TIME, 0, device.getTimeStep_ms() * counter++);
 											recordSet.addPoints(points, false);
 										}
 
@@ -390,6 +388,7 @@ public class SimulatorDialog extends DeviceDialog {
 							isCollectDataStopped = true;
 							startButton.setEnabled(true);
 							stopButton.setEnabled(false);
+							channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
 							application.updateDataTable();
 						}
 					});
