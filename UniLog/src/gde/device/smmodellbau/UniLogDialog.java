@@ -720,8 +720,7 @@ public class UniLogDialog extends DeviceDialog {
 									public void widgetSelected(SelectionEvent evt) {
 										log.fine("stopDataButton.widgetSelected, event="+evt);
 										if(gatherThread != null && gatherThread.isAlive()) {
-											serialPort.setTransmitFinished(true);
-											gatherThread.setThreadStop(true);
+											serialPort.setTransmitFinished(true); // end serial communication
 										}
 										resetButtons();
 									}

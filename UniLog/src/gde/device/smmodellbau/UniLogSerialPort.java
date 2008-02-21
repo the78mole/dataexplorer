@@ -45,7 +45,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	private final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
 	private final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
 
-	private final static int			DATA_LENGTH_BYTES				= 24;			//TODO exchange with deviceConfig.get()
+	public final static int				DATA_LENGTH_BYTES				= 24;			//TODO exchange with deviceConfig.get()
 	
 	private boolean 							isLoggingActive 				= false;
 	private boolean 							isTransmitFinished			= false;
@@ -68,32 +68,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device, String channelConfigKey) throws IOException {
-		Vector<Integer> numRecordSet = new Vector<Integer>();
-		Vector<Integer> time_ms = new Vector<Integer>();
-		
-		String[] measurements = device.getMeasurementNames(channelConfigKey); 
-		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		// *** power/drive *** group
-		Vector<Integer> voltageReceiver = new Vector<Integer>();
-		Vector<Integer> voltage = new Vector<Integer>();
-		Vector<Integer> current = new Vector<Integer>();
-		// capacity, power, energy, votagePerCell
-		Vector<Integer> revolutionSpeed = new Vector<Integer>();
-		// efficiency
-		
-		// *** dynamic *** group
-		Vector<Integer> height = new Vector<Integer>();
-		// slope
-
-		// *** A1 - A2 - A3 **** group
-		// A1 Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
-		// A2 Modus == 0 -> external temperature sensor; A2 Modus != 0 -> impulse time length
-		// A3 Modus == 0 -> external temperature sensor; A3 Modus != 0 -> internal temperature
-		Vector<Integer> aModus = new Vector<Integer>();
-		Vector<Integer> a1Value = new Vector<Integer>();
-		Vector<Integer> a2Value = new Vector<Integer>();
-		Vector<Integer> a3Value = new Vector<Integer>();
+	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device, String channelConfigKey) throws IOException {
 		
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
 		
@@ -108,7 +83,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (this.waitDataReady()) {
 				// query config to have actual values -> get number of entries to calculate percentage and progress bar
 				this.write(COMMAND_QUERY_CONFIG);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 5);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 3);
 				verifyChecksum(readBuffer);
 				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 				log.fine("memoryUsed = " + memoryUsed);
@@ -119,68 +94,23 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				this.write(COMMAND_RESET);
 
 				if (application != null) dialog.setReadDataProgressBar(0);
-				int tmpValue = 0;
+				Vector<byte[]> telegrams = new Vector<byte[]>();
+				int numberRecordSet = 1;
 				int counter = 0;
-				while (!isTransmitFinished && memoryUsed > 0) {
-					--memoryUsed;
+				
+				while (!isTransmitFinished && memoryUsed-- > 0) {
 					readBuffer = readSingleTelegramm();
 											
-					tmpValue = ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
-					time_ms.add(tmpValue);
-
 					// number record set
-					tmpValue = (readBuffer[5] & 0xF8) / 8 + 1;
-					numRecordSet.add(tmpValue);
-
-					// voltageReceiver *** power/drive *** group
-					tmpValue = (((readBuffer[7] & 0xFF) << 8) + (readBuffer[6] & 0xFF)) & 0x0FFF;
-					voltageReceiver.add(tmpValue);
-
-					// voltage *** power/drive *** group
-					tmpValue = (((readBuffer[9] & 0xFF) << 8) + (readBuffer[8] & 0xFF));
-					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					voltage.add(tmpValue);
-
-					// current *** power/drive *** group - asymmetric for 400 A sensor 
-					tmpValue = (((readBuffer[11] & 0xFF) << 8) + (readBuffer[10] & 0xFF));
-					tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
-					current.add(tmpValue);
-
-					// revolution speed *** power/drive *** group
-					tmpValue = (((readBuffer[13] & 0xFF) << 8) + (readBuffer[12] & 0xFF));
-					if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
-					revolutionSpeed.add(tmpValue);
-
-					// height *** power/drive *** group
-					tmpValue = (((readBuffer[15] & 0xFF) << 8) + (readBuffer[14] & 0xFF)) + 20000;
-					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					height.add(tmpValue);
-
-					// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
-					int a1Modus = (readBuffer[7] & 0xF0) >> 4; // 11110000
-					aModus.add(a1Modus);
-					tmpValue = (((readBuffer[17] & 0xFF) << 8) + (readBuffer[16] & 0xFF));
-					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					a1Value.add(tmpValue);
-
-					// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
-					int a2Modus = (readBuffer[4] & 0x30); // 00110000
-					aModus.add(a2Modus);
-					if (a2Modus == 0) {//
-						tmpValue = (((readBuffer[19] & 0xEF) << 8) + (readBuffer[18] & 0xFF));
-						if (tmpValue > 32768) tmpValue = (tmpValue - 65536);
+					if(numberRecordSet == ((readBuffer[5] & 0xF8) / 8 + 1)) {
+						telegrams.add(readBuffer);
 					}
 					else {
-						tmpValue = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[18] & 0xFF));
+						dataCollection.put(""+numberRecordSet, telegrams);
+						++numberRecordSet;
+						telegrams = new Vector<byte[]>();
 					}
-					a2Value.add(tmpValue);
 
-					// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
-					int a3Modus = (readBuffer[4] & 0xC0); // 11000000
-					aModus.add(a3Modus);
-					tmpValue = (((readBuffer[21] & 0xEF) << 8) + (readBuffer[20] & 0xFF));
-					if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-					a3Value.add(tmpValue);
 					++counter;
 					
 					if (application != null) {
@@ -188,19 +118,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						dialog.updateDataGatherProgress(counter, reveiceErrors);
 					}
 				}
-				
-				// store collected data into hash map
-				dataCollection.put(NUMBER_RECORD, numRecordSet);
-				dataCollection.put(TIME_MILLI_SEC, time_ms);	
-				dataCollection.put(A_MODUS_1_2_3, aModus);
-				dataCollection.put(measurements[0], voltageReceiver);				//0=voltageReceiver
-				dataCollection.put(measurements[1], voltage);								//1=voltage
-				dataCollection.put(measurements[2], current);								//2=current
-				dataCollection.put(measurements[7], revolutionSpeed);				//7=revolutionSpeed
-				dataCollection.put(measurements[9], height);								//9=height
-				dataCollection.put(measurements[11], a1Value);							//11=a1Value
-				dataCollection.put(measurements[12], a2Value);							//12=a2Value
-				dataCollection.put(measurements[13], a3Value);							//13=a3Value
+				dataCollection.put(""+numberRecordSet, telegrams);
 			}
 			else
 				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
@@ -210,7 +128,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			//throw e;
 		}
 		finally {
-			this.close();
+			if(this.isConnected) this.close();
 			if (statusBar != null) {
 				statusBar.setSerialRxOff();
 				statusBar.setSerialTxOff();
@@ -229,13 +147,13 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		try {
 			this.write(COMMAND_READ_DATA);
-			readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+			readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 			
 			// give it another try
 			if (!isChecksumOK(readBuffer)) {
 				++reveiceErrors;
 				this.write(COMMAND_REPEAT);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
 		}
