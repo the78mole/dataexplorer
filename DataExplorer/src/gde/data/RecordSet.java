@@ -78,16 +78,29 @@ public class RecordSet extends HashMap<String, Record> {
 	public static final String 						TIME 									= "time";
 	public static final String						TIME_GRID_STATE				= "RecordSet_timeGridState";
 	public static final String						TIME_GRID_COLOR				= "RecordSet_timeGridColor";
-	public static final String						TIME_GRID_LINE_SYSLE	= "RecordSet_timeGridLineStyle";
+	public static final String						TIME_GRID_LINE_STYLE	= "RecordSet_timeGridLineStyle";
 	public static final int								TIME_GRID_NONE				= 0;																						// no time grid
 	public static final int								TIME_GRID_MAIN				= 1;																						// each main tickmark
 	public static final int								TIME_GRID_MOD60				= 2;																						// each mod60 tickmark
-	private int														gridType							= TIME_GRID_NONE;
+	private int														timeGridType					= TIME_GRID_NONE;
 	private Vector<Integer>								timeGrid 							= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
-	private Color													colorTimeGrid					= OpenSerialDataExplorer.COLOR_GREY;
-	private int														lineStyleTimeGrid			= new Integer(SWT.LINE_DOT);
+	private Color													timeGridColor					= OpenSerialDataExplorer.COLOR_GREY;
+	private int														timeGridLineStyle			= new Integer(SWT.LINE_DOT);
 	
-	private int														configuredDisplayable = 0;
+	public static final String						HORIZONTAL_GRID_RECORD			= "RecordSet_horizontalGridRecord";
+	public static final String						HORIZONTAL_GRID_STATE				= "RecordSet_horizontalGridState";
+	public static final String						HORIZONTAL_GRID_COLOR				= "RecordSet_horizontalGridColor";
+	public static final String						HORIZONTAL_GRID_LINE_STYSLE	= "RecordSet_horizontalGridLineStyle";
+	public static final int								HORIZONTAL_GRID_NONE				= 0;																	// no time grid
+	public static final int								HORIZONTAL_GRID_EVERY				= 1;																	// each main tickmark
+	public static final int								HORIZONTAL_GRID_SECOND			= 2;																	// each main tickmark
+	private int														horizontalGridType					= HORIZONTAL_GRID_NONE;
+	private Vector<Integer>								horizontalGrid 							= new Vector<Integer>();							// contains the time grid position, updated from TimeLine.drawTickMarks
+	private Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
+	private int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
+	private String												horizontalGridRecordKey			= "";																	// recordNames[horizontalGridRecord]
+
+	private int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
 	
 	/**
 	 * data buffers according the size of given names array, where
@@ -799,15 +812,15 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @return the gridType
 	 */
-	public int getGridType() {
-		return gridType;
+	public int getTimeGridType() {
+		return timeGridType;
 	}
 
 	/**
 	 * @param gridType the gridType to set
 	 */
-	public void setGridType(int gridType) {
-		this.gridType = gridType;
+	public void setTimeGridType(int gridType) {
+		this.timeGridType = gridType;
 	}
 
 	/**
@@ -828,28 +841,28 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the colorTimeGrid
 	 */
 	public Color getColorTimeGrid() {
-		return colorTimeGrid;
+		return timeGridColor;
 	}
 
 	/**
 	 * @param colorTimeGrid the colorTimeGrid to set
 	 */
-	public void setColorTimeGrid(Color colorTimeGrid) {
-		this.colorTimeGrid = colorTimeGrid;
+	public void setTimeGridColor(Color colorTimeGrid) {
+		this.timeGridColor = colorTimeGrid;
 	}
 
 	/**
 	 * @return the lineStyleTimeGrid
 	 */
 	public int getLineStyleTimeGrid() {
-		return lineStyleTimeGrid;
+		return timeGridLineStyle;
 	}
 
 	/**
 	 * @param lineStyleTimeGrid the lineStyleTimeGrid to set
 	 */
-	public void setLineStyleTimeGrid(int lineStyleTimeGrid) {
-		this.lineStyleTimeGrid = lineStyleTimeGrid;
+	public void setTimeGridLineStyle(int lineStyleTimeGrid) {
+		this.timeGridLineStyle = lineStyleTimeGrid;
 	}
 
 	/**
@@ -901,5 +914,75 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setTableDisplayable(boolean isTableDisplayable) {
 		this.isTableDisplayable = isTableDisplayable;
+	}
+
+	/**
+	 * @return the horizontalGridType
+	 */
+	public int getHorizontalGridType() {
+		return horizontalGridType;
+	}
+
+	/**
+	 * @param horizontalGridType the horizontalGridType to set
+	 */
+	public void setHorizontalGridType(int horizontalGridType) {
+		this.horizontalGridType = horizontalGridType;
+	}
+
+	/**
+	 * @return the horizontalGrid
+	 */
+	public Vector<Integer> getHorizontalGrid() {
+		return horizontalGrid;
+	}
+
+	/**
+	 * @param horizontalGrid the horizontalGrid to set
+	 */
+	public void setHorizontalGrid(Vector<Integer> horizontalGrid) {
+		this.horizontalGrid = horizontalGrid;
+	}
+
+	/**
+	 * @return the horizontalGridColor
+	 */
+	public Color getHorizontalGridColor() {
+		return horizontalGridColor;
+	}
+
+	/**
+	 * @param horizontalGridColor the horizontalGridColor to set
+	 */
+	public void setHorizontalGridColor(Color horizontalGridColor) {
+		this.horizontalGridColor = horizontalGridColor;
+	}
+
+	/**
+	 * @return the horizontalGridLineStyle
+	 */
+	public int getHorizontalGridLineStyle() {
+		return horizontalGridLineStyle;
+	}
+
+	/**
+	 * @param horizontalGridLineStyle the horizontalGridLineStyle to set
+	 */
+	public void setHorizontalGridLineStyle(int horizontalGridLineStyle) {
+		this.horizontalGridLineStyle = horizontalGridLineStyle;
+	}
+
+	/**
+	 * @return the horizontalGridRecord
+	 */
+	public String getHorizontalGridRecordName() {
+		return horizontalGridRecordKey;
+	}
+
+	/**
+	 * @param horizontalGridRecordKey the horizontal grid record name to set
+	 */
+	public void setHorizontalGridRecordKey(String horizontalGridRecordKey) {
+		this.horizontalGridRecordKey = horizontalGridRecordKey;
 	}
 }

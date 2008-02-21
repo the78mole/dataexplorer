@@ -239,12 +239,13 @@ public class TimeLine {
 			
 			// prepare grid vector
 			Vector<Integer> timeGrid = new Vector<Integer>();
+			boolean isBuildGridVector = recordSet.getTimeGridType() == RecordSet.TIME_GRID_MAIN;
 
 			for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
 				//draw the main scale ticks, length = 5 and gap to scale = 2
 				double xTickPosition = x0 + i * deltaTick;
 				int intXTickPosition = new Double(xTickPosition).intValue();
-				if(i != 0 && recordSet.getGridType() == RecordSet.TIME_GRID_MAIN) timeGrid.add(intXTickPosition);
+				if(i != 0 && isBuildGridVector) timeGrid.add(intXTickPosition);
 				gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
 
 				//draw the sub ticks to the scale according number of miniTicks
@@ -272,7 +273,7 @@ public class TimeLine {
 					if (isMod60 && timeValue != 0) {
 						fd[0].setStyle(SWT.BOLD);
 						gc.setFont(SWTResourceManager.getFont(fd[0]));
-						if (i != 0 && recordSet.getGridType() == RecordSet.TIME_GRID_MOD60) timeGrid.add(intXTickPosition);
+						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) timeGrid.add(intXTickPosition);
 					}
 					GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 					if (isMod60 && timeValue != 0) { // reset font style

@@ -17,6 +17,8 @@
 package osde.utils;
 
 import java.text.DecimalFormat;
+import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -25,6 +27,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
+import osde.data.Record;
+import osde.data.RecordSet;
 import osde.ui.SWTResourceManager;
 
 
@@ -37,6 +41,7 @@ public class GraphicsUtils {
 
 	/**
 	 * draws tick marks to a scale in vertical direction (plus 90 degrees)
+	 * @param recordSet
 	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
@@ -49,7 +54,7 @@ public class GraphicsUtils {
 	 * @param isPositionLeft position of to be drawn scale
 	 * @param df - decimal format
 	 */
-	public static void drawVerticalTickMarks(GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
+	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
 		// enable scale value 0.0  -- algorithm must round algorithm
 		int numberTicks = 10;
@@ -81,33 +86,38 @@ public class GraphicsUtils {
 				if (numberTicks > 20) numberTicks = 20;
 			}
 		}
-
+		
+		// prepare grid vector
+		Vector<Integer> horizontalGrid = new Vector<Integer>();
+		RecordSet recordSet = record.getParent();
+		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordName().equals(record.getName());
+		
 		int dist = 10;
 		double deltaValue = deltaScale / numberTicks;
 		double deltaTick = 1.0 * height / numberTicks;
 		miniticks++;
 
 		if (!isPositionLeft) {
-			ticklength = ticklength * -1; // mirrow drwaing direction 
+			ticklength = ticklength * -1; // mirror drawing direction 
 			gap = gap * -1;
 			dist = dist * -1;
 		}
 		for (int i = 0; i <= numberTicks; i++) {
 			//draw the main scale, length = 5 and gap to scale = 2
 			int yPosition = (int) (y0 - i * deltaTick);
-			log.finest("yPosition=" + yPosition);			
 			gc.drawLine(x0, yPosition, x0 - ticklength, yPosition);
+			if (i != 0 && isBuildGridVector) horizontalGrid.add(yPosition);
 			//draw the sub scale according number of miniTicks
 			int deltaPosMini = (int) (deltaTick / miniticks);
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
 				int yPosMini = yPosition - j * deltaPosMini;
-				log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini);
+				if(log.isLoggable(Level.FINEST)) log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini);
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	
-			//String text = new Double(startNumber + i * deltaValue).toString().replace('.', ',').concat("00");
 			drawText(df.format(startNumber + i * deltaValue), x0 - ticklength - gap - dist, (int) (y0 - i * deltaTick), gc, SWT.HORIZONTAL);
 		}
+		if (isBuildGridVector) recordSet.setHorizontalGrid(horizontalGrid);
 	}
 
 	/**

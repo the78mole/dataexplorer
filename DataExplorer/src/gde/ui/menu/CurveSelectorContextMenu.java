@@ -46,7 +46,7 @@ import osde.ui.tab.GraphicsWindow;
 public class CurveSelectorContextMenu {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
 
-	private Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu;
+	private Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu;
 	private MenuItem											lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	private MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
 	private MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
@@ -54,7 +54,8 @@ public class CurveSelectorContextMenu {
 	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
 	private MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
 	private MenuItem 											measure, deltaMeasure;
-	private MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60, timeGridLineStyle;
+	private MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60;
+	private MenuItem											horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
 
 	private RecordSet											recordSet;
 	private final OpenSerialDataExplorer	application;
@@ -316,6 +317,7 @@ public class CurveSelectorContextMenu {
 					}
 				}
 			});
+			
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
@@ -602,7 +604,7 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					if (selectedItem != null && !selectedItem.isDisposed()) {
-						int gridType = recordSet.getGridType();
+						int gridType = recordSet.getTimeGridType();
 						switch (gridType) {
 						case RecordSet.TIME_GRID_MAIN:
 							timeGridOff.setSelection(false);
@@ -634,7 +636,7 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridOff Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					if (recordNameKey != null) {
-						recordSet.setGridType(RecordSet.TIME_GRID_NONE);
+						recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
 						application.updateGraphicsWindow();
 					}
 				}
@@ -646,7 +648,7 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridMain Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					if (recordNameKey != null) {
-						recordSet.setGridType(RecordSet.TIME_GRID_MAIN);
+						recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
 						application.updateGraphicsWindow();
 					}
 				}
@@ -658,7 +660,7 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridMod60 Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					if (recordNameKey != null) {
-						recordSet.setGridType(RecordSet.TIME_GRID_MOD60);
+						recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
 						application.updateGraphicsWindow();
 					}
 				}
@@ -672,27 +674,132 @@ public class CurveSelectorContextMenu {
 					if (recordNameKey != null) {
 						RGB rgb = application.openColorDialog();
 						if (rgb != null) {
-							recordSet.setColorTimeGrid(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 							application.updateGraphicsWindow();
 						}
 					}
 				}
 			});
-			timeGridLineStyle = new MenuItem(timeGridMenu, SWT.PUSH);
-			timeGridLineStyle.setText("Linientype");
-			timeGridLineStyle.addListener(SWT.Selection, new Listener() {
+//			timeGridLineStyle = new MenuItem(timeGridMenu, SWT.PUSH);
+//			timeGridLineStyle.setText("Linientype");
+//			timeGridLineStyle.setEnabled(false);
+//			timeGridLineStyle.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.finest("timeGridLineStyle Action performed!");
+//					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+//					if (recordNameKey != null) {
+//						recordSet.setTimeGridLineStyle(SWT.LINE_DOT); //TODO
+//						application.updateGraphicsWindow();
+//					}
+//				}
+//			});
+			
+			horizontalGrid = new MenuItem(popupmenu, SWT.CASCADE);
+			horizontalGrid.setText("Kurven-Grid(horizontal)");
+			horizontalGridMenu = new Menu(horizontalGrid);
+			horizontalGrid.setMenu(horizontalGridMenu);
+			horizontalGridMenu.addMenuListener(new MenuListener() {
+				public void menuShown(MenuEvent evt) {
+					log.finest("horizontalGridMenu MenuListener " + evt);
+					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					if (selectedItem != null && !selectedItem.isDisposed()) {
+						horizontalGridRecordName.setText((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						int gridType = recordSet.getHorizontalGridType();
+						switch (gridType) {
+						case RecordSet.HORIZONTAL_GRID_EVERY:
+							horizontalGridOff.setSelection(false);
+							horizontalGridEveryTick.setSelection(true);
+							horizontalGridEverySecond.setSelection(false);
+							break;
+						case RecordSet.HORIZONTAL_GRID_SECOND:
+							horizontalGridOff.setSelection(false);
+							horizontalGridEveryTick.setSelection(false);
+							horizontalGridEverySecond.setSelection(true);
+							break;
+						case RecordSet.HORIZONTAL_GRID_NONE:
+						default:
+							horizontalGridOff.setSelection(true);
+							horizontalGridEveryTick.setSelection(false);
+							horizontalGridEverySecond.setSelection(false);
+							break;
+						}
+					}
+				}
+				public void menuHidden(MenuEvent evt) {
+				}
+			});
+
+			horizontalGridRecordName = new MenuItem(horizontalGridMenu, SWT.NONE);
+
+			horizontalGridOff = new MenuItem(horizontalGridMenu, SWT.CHECK);
+			horizontalGridOff.setText("aus");
+			horizontalGridOff.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("timeGridLineStyle Action performed!");
+					log.finest("horizontalGridOff Action performed!");
 					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					if (recordNameKey != null) {
-						recordSet.setGridType(RecordSet.TIME_GRID_MOD60);
+						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
 						application.updateGraphicsWindow();
 					}
 				}
 			});
+			horizontalGridEveryTick = new MenuItem(horizontalGridMenu, SWT.CHECK);
+			horizontalGridEveryTick.setText("jede Zeitmarke");
+			horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("horizontalGridMain Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
+						recordSet.setHorizontalGridRecordKey(recordNameKey);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			horizontalGridEverySecond = new MenuItem(horizontalGridMenu, SWT.CHECK);
+			horizontalGridEverySecond.setText("jede zweite Zeitmarke");
+			horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("horizontalGridMod60 Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
+						recordSet.setHorizontalGridRecordKey(recordNameKey);
+						application.updateGraphicsWindow();
+					}
+				}
+			});
+			horizontalGridColor = new MenuItem(horizontalGridMenu, SWT.PUSH);
+			horizontalGridColor.setText("Linienfarbe");
+			horizontalGridColor.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.finest("horizontalGridColor Action performed!");
+					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (recordNameKey != null) {
+						RGB rgb = application.openColorDialog();
+						if (rgb != null) {
+							recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							application.updateGraphicsWindow();
+						}
+					}
+				}
+			});
+//			horizontalGridLineStyle = new MenuItem(horizontalGridMenu, SWT.PUSH);
+//			horizontalGridLineStyle.setText("Linientype");
+//			horizontalGridLineStyle.setEnabled(false);
+//			horizontalGridLineStyle.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					log.finest("horizontalGridLineStyle Action performed!");
+//					String recordNameKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+//					if (recordNameKey != null) {
+//						recordSet.setHorizontalGridLineStyle(SWT.LINE_DASH); //TODO
+//						application.updateGraphicsWindow();
+//					}
+//				}
+//			});
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
-			
+
 			measure = new MenuItem(popupmenu, SWT.CHECK);
 			measure.setText("Kurvenpunkt messen");
 			measure.addSelectionListener(new SelectionAdapter() {
@@ -805,6 +912,7 @@ public class CurveSelectorContextMenu {
 		axisNumberFormat.setEnabled(enabled);
 		axisPosition.setEnabled(enabled);
 		timeGrid.setEnabled(enabled);
+		horizontalGrid.setEnabled(enabled);
 		measure.setEnabled(enabled);
 		deltaMeasure.setEnabled(enabled);
 		copyCurveCompare.setEnabled(enabled);

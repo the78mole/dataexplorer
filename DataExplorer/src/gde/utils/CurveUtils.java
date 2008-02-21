@@ -139,7 +139,7 @@ public class CurveUtils {
 			gc.drawLine(xPos, y0, xPos, y0 - height); //xPos = x0
 			if (log.isLoggable(Level.FINE)) log.fine("y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			GraphicsUtils.drawVerticalTickMarks(gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
 			if (log.isLoggable(Level.FINEST)) log.finest("drawText x = " + (int) (xPos - pt.y - 15)); //xPosition Text Spannung []
 			GraphicsUtils.drawText(graphText, (int) (xPos - pt.x - pt.y - 15), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
@@ -148,7 +148,7 @@ public class CurveUtils {
 			gc.drawLine(xPos, y0, xPos, y0 - height); //yMax
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			if (log.isLoggable(Level.FINEST)) log.finest("y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax
-			GraphicsUtils.drawVerticalTickMarks(gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
+			GraphicsUtils.drawVerticalTickMarks(record,gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
 			GraphicsUtils.drawText(graphText, (int) (xPos + pt.x + 15), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 		

@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -590,12 +591,24 @@ public class GraphicsWindow {
 		}
 		offSetX = x0;
 		offSetY = y0-height;
+		int[] dash = {25, 10};
+		curveAreaGC.setLineDash(dash);
+		curveAreaGC.setLineStyle(SWT.LINE_CUSTOM);
 		// check for activated time grid
-		if (recordSet.getGridType() > 0) {
+		if (recordSet.getTimeGridType() > 0) {
 			curveAreaGC.setForeground(recordSet.getColorTimeGrid());
-			curveAreaGC.setLineStyle(recordSet.getLineStyleTimeGrid());
 			for (Integer x : recordSet.getTimeGrid()) {
 				curveAreaGC.drawLine(x-offSetX, 0, x-offSetX, height-1);
+			}
+		}
+		// check for activated horizontal grid
+		if (recordSet.getHorizontalGridType() > 0) {
+			curveAreaGC.setForeground(recordSet.getHorizontalGridColor());
+			//curveAreaGC.setLineStyle(recordSet.getHorizontalGridLineStyle());
+			Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
+			for (int i = 0; i<horizontalGridVector.size() - 1; i+=recordSet.getHorizontalGridType()) {
+				int y = horizontalGridVector.get(i);
+				curveAreaGC.drawLine(0, y - offSetY, width - 1, y - offSetY);
 			}
 		}
 		canvasGC.drawImage(curveArea, offSetX, offSetY);
