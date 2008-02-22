@@ -97,7 +97,7 @@ public class DataGathererThread extends Thread {
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				calculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentageAsync(), 30);
+				calculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentage(), 30);
 				calculationThread.start();
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);
