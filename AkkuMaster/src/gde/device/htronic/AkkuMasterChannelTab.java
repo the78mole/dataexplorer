@@ -501,7 +501,7 @@ public class AkkuMasterChannelTab {
 															// switch the active record set if the current record set is child of active channel
 															if (channel.getName().equals(channels.getActiveChannel().getName())) {
 																application.getMenuToolBar().addRecordSetName(recordSetKey);
-																channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSetKey);
+																channels.getActiveChannel().switchRecordSet(recordSetKey);
 															}
 															// update discharge / charge current display
 															int actualCurrent = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue();
