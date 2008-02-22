@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class StatusBar {
+	private final OpenSerialDataExplorer application;
+	
 	private Composite								statusComposite;
 	private Composite								connectionComposite;
 	private Text										txText;
@@ -45,6 +47,7 @@ public class StatusBar {
 	private int 										progessPercentage = 0;
 
 	public StatusBar(OpenSerialDataExplorer application, Composite statusComposite) {
+		this.application = application;
 		this.statusComposite = statusComposite;
 	}
 
@@ -148,36 +151,38 @@ public class StatusBar {
 
 
 	public void setProgress(final int precent) {
-		progressBar.setSelection(precent);
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			progressBar.setSelection(precent);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					progressBar.setSelection(precent);
+				}
+			});
+		}
 		if (precent == 100) {
 			try {
 				Thread.sleep(500);
-				setProgressAsync(0);
+				setProgress(0);
 			}
 			catch (InterruptedException e) {
 			}
 		}
 	}
 	
-	public void setProgressAsync(final int precent) {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				progressBar.setSelection(precent);
-			}
-		});
-	}
-
 	public synchronized int getProgressPercentage() {
-		return progressBar.getSelection();
-	}
-
-	public synchronized int getProgressPercentageAsync() {
 		progessPercentage = 0;
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				progessPercentage = progressBar.getSelection();
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			progessPercentage = progressBar.getSelection();
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					progessPercentage = progressBar.getSelection();
+				}
+			});
+		}
 		return progessPercentage;
 	}
 
@@ -185,77 +190,95 @@ public class StatusBar {
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+				}
+			});
+		}
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+				}
+			});
+		}
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+				}
+			});
+		}
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+				}
+			});
+		}
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+				}
+			});
+		}
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-			}
-		});
-	}
-
-	/**
-	 * update the progress bar percentage
-	 */
-	public void updateProgressbar(final int precentage) {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				progressBar.setSelection(precentage);
-				progressBar.redraw();
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		}
+		else {
+			OpenSerialDataExplorer.display.syncExec(new Runnable() {
+				public void run() {
+					portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+				}
+			});
+		}
 	}
 }

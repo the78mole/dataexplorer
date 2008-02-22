@@ -240,23 +240,40 @@ public class Channel extends HashMap<String, RecordSet> {
 		log.fine("switching to record set " + recordSetName);
 		final Channel activeChannel = this;
 		final String recordSetKey = recordSetName;
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				//reset old record set before switching
-				RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
-				if (oldRecordSet != null) oldRecordSet.reset();
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			//reset old record set before switching
+			RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
+			if (oldRecordSet != null) oldRecordSet.reset();
 
-				RecordSet recordSet = activeChannel.get(recordSetKey);
-				if (recordSet != null) { // record  set exist
-					activeChannel.setActiveRecordSet(recordSetKey);
-					activeChannel.applyTemplate(recordSetKey);
-				}
-				application.getMenuToolBar().updateRecordSetSelectCombo();
-				application.updateDigitalWindow();
-				application.updateAnalogWindow();
-				application.updateDataTable();
+			RecordSet recordSet = activeChannel.get(recordSetKey);
+			if (recordSet != null) { // record  set exist
+				activeChannel.setActiveRecordSet(recordSetKey);
+				activeChannel.applyTemplate(recordSetKey);
 			}
-		});
+			application.getMenuToolBar().updateRecordSetSelectCombo();
+			application.updateDigitalWindow();
+			application.updateAnalogWindow();
+			application.updateDataTable();
+		}
+		else { // execute asynchronous
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					//reset old record set before switching
+					RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
+					if (oldRecordSet != null) oldRecordSet.reset();
+
+					RecordSet recordSet = activeChannel.get(recordSetKey);
+					if (recordSet != null) { // record  set exist
+						activeChannel.setActiveRecordSet(recordSetKey);
+						activeChannel.applyTemplate(recordSetKey);
+					}
+					application.getMenuToolBar().updateRecordSetSelectCombo();
+					application.updateDigitalWindow();
+					application.updateAnalogWindow();
+					application.updateDataTable();
+				}
+			});
+		}
 	}
 
 	/**
