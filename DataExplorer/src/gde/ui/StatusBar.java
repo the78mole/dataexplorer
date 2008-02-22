@@ -131,24 +131,21 @@ public class StatusBar {
 	 * method to set a message text to the message label of the status bar
 	 */
 	public void setMessage(final String text) {
-		if (text.length() > 5) msgLabel.setText("   " + text + "   ");
-		else msgLabel.setText(text);
-		msgLabel.pack();
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			if (text.length() > 5) msgLabel.setText("   " + text + "   ");
+			else msgLabel.setText(text);
+			msgLabel.pack();
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					if (text.length() > 5) msgLabel.setText("   " + text + "   ");
+					else msgLabel.setText(text);
+					msgLabel.pack();
+				}
+			});
+		}
 	}
-	
-	/**
-	 * method to set a message text to the message label of the status bar
-	 */
-	public void setMessageAsync(final String text) {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				if (text.length() > 5) msgLabel.setText("   " + text + "   ");
-				else msgLabel.setText(text);
-				msgLabel.pack();
-			}
-		});
-	}
-
 
 	public void setProgress(final int precent) {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
@@ -162,12 +159,16 @@ public class StatusBar {
 			});
 		}
 		if (precent == 100) {
-			try {
-				Thread.sleep(500);
-				setProgress(0);
-			}
-			catch (InterruptedException e) {
-			}
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					try {
+						Thread.sleep(500);
+						setProgress(0);
+					}
+					catch (InterruptedException e) {
+					}
+				}
+			});
 		}
 	}
 	
