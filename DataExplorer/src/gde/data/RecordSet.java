@@ -240,8 +240,20 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 	}
 
+	/**
+	 * add a row to the data table where all values are integers multiplied with 1000 to enable 3 decimals
+	 * @param dataTableRow
+	 */
 	public void dataTableAddRow(Vector<Integer> dataTableRow) {
 		dataTable.add(dataTableRow);
+	}
+	
+	/**
+	 * query the number of calculated rows of the data table
+	 * @return number of rows of the data table
+	 */
+	public int getNumberDataTableRows() {
+		return this.dataTable.size();
 	}
 	
 	/**
@@ -463,18 +475,23 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public void switchRecordSet(String recordSetName) {
-		log.finest("entry - " + recordSetName);
+		log.fine("switching to record set " + recordSetName);
 		//reset old record set before switching
 		this.reset();
 		final String recordSetKey = recordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				channels.getActiveChannel().setActiveRecordSet(recordSetKey);
-				log.fine("switching to record set " + recordSetKey);
-				application.getMenuToolBar().updateRecordSetSelectCombo();
-				application.updateDigitalWindow();
-				application.updateAnalogWindow();
-				application.updateDataTable();
+				Channel activeChannel = channels.getActiveChannel();
+				if (activeChannel != null) { // channel exist
+					if (activeChannel.get(recordSetKey) != null) { // record exist
+						activeChannel.setActiveRecordSet(recordSetKey);
+						activeChannel.applyTemplate(recordSetKey);
+					}
+					application.getMenuToolBar().updateRecordSetSelectCombo();
+					application.updateDigitalWindow();
+					application.updateAnalogWindow();
+					application.updateDataTable();
+				}
 			}
 		});
 	}
