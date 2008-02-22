@@ -150,7 +150,7 @@ public interface IDevice {
 	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
 	 * @param channelConfigKey
 	 * @param measurementKey
-	 * @return
+	 * @return PropertyType object
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey);
 	
@@ -187,7 +187,6 @@ public interface IDevice {
 	 * get the symbol of specified measurement
 	 * @param channelConfigKey
 	 * @param measurementKey
-	 * @param symbol
 	 */
 	public String getMeasurementSymbol(String channelConfigKey, String measurementKey);
 
@@ -202,9 +201,9 @@ public interface IDevice {
 	/**
 	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
 	 * @param channelConfigKey
-	 * @param measurementKey
+	 * @param measurementkey
 	 * @param propertyKey
-	 * @return
+	 * @return PropertyType object
 	 */
 	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementkey, String propertyKey);
 

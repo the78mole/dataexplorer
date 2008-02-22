@@ -719,7 +719,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * @param zoomBounds, where the start point offset is x,y and the area is width, height
+	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
 	 */
 	public void setZoomOffsetAndWidth(Rectangle zoomBounds) {
 		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
@@ -744,7 +744,6 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * calculate index in data vector from given display point
 	 * @param xPos
-	 * @param drawAreaBounds
 	 * @return position integer value
 	 */
 	public int getPointIndexFromDisplayPoint(int xPos) {
@@ -876,7 +875,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param isTableDataCalculated, boolean value if the table need to be calculated before it can be displayed
+	 * @param isTableDataCalculated - boolean value if the table need to be calculated before it can be displayed
 	 */
 	public void setTableDataCalculated(boolean isTableDataCalculated) {
 		if (!isTableDataCalculated) this.dataTable = new Vector<Vector<Integer>>(); 

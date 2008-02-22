@@ -104,7 +104,9 @@ public abstract class CalculationThread extends Thread {
 	}
 
 	/**
-	 * @param maxCalcProgressPercent the maxCalcProgressPercent to set
+	 * method to allow split percentage values for one process with several child processes reporting to the same progress bar
+	 * @param startProgressPercent the start value in percent
+	 * @param endProgressPercent the end value in percent
 	 */
 	public void setCalcProgressPercent(int startProgressPercent, int endProgressPercent) {
 		this.startCalcProgressPercent = startProgressPercent;

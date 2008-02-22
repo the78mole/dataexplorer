@@ -1080,7 +1080,7 @@ public class UniLogDialog extends DeviceDialog {
 		return updateBuffer;
 	}
 	/**
-	 * @param memUsagePercent the memUsagePercent to set
+	 * @param newStatus the status text to set
 	 */
 	public void setStatusText(String newStatus) {
 		this.statusText = newStatus;

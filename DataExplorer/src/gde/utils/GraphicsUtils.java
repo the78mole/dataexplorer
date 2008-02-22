@@ -41,7 +41,7 @@ public class GraphicsUtils {
 
 	/**
 	 * draws tick marks to a scale in vertical direction (plus 90 degrees)
-	 * @param recordSet
+	 * @param record
 	 * @param gc graphics context
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction

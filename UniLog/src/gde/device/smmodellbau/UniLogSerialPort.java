@@ -283,7 +283,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	}
 	/**
 	 * set UniLog configuration with new values
-	 * @param updateBuffer, byte array to be written
+	 * @param updateBuffer - byte array to be written
 	 * @return true | false for state of the operation
 	 * @throws Exception
 	 */
@@ -380,7 +380,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 	/**
 	 * check if UniLog is capable to send data
-	 * @return
+	 * @return true if device is ready to gather data telegrams
 	 * @throws Exception
 	 */
 	public synchronized boolean checkDataReady() throws Exception {
@@ -400,7 +400,6 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 	/**
 	 * loop while writing status request until data state signaled as ready
-	 * @param timeout in seconds
 	 * @return true if UniLog signals data ready for transmission
 	 * @throws Exception
 	 */

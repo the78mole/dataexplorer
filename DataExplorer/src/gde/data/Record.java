@@ -452,7 +452,6 @@ public class Record extends Vector<Integer> {
 	 * method to query time and value for display at a given index
 	 * @param index
 	 * @param scaledIndex (may differ from index if display width << number of points)
-	 * @param xDisplayO
 	 * @param xDisplayOffset
 	 * @param yDisplayOffset
 	 * @return point time, value
@@ -561,7 +560,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * @param displayScaleFactorValue the displayScaleFactorValue to set
+	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);

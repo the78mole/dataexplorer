@@ -213,7 +213,7 @@ public class MeasurementType {
   	/**
   	 * get property type with given key (IDevice.OFFSET, ...)
   	 * @param propertyKey
-  	 * @return
+  	 * @return PropertyType object
   	 */
   	public PropertyType getProperty(String propertyKey) {
   		PropertyType property = null;

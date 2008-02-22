@@ -806,8 +806,6 @@ public class GraphicsWindow {
 
 	/**
 	 * clean (old) measurement pointer - check pointer in curve area
-	 * @param drawAreaBounds
-	 * @param gc
 	 */
 	public void cleanMeasurementPointer() {
 		if ((xPosMeasure != 0 && (xPosMeasure < offSetX || xPosMeasure > offSetX + curveAreaBounds.width))

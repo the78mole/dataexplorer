@@ -313,7 +313,6 @@ public class DeviceConfiguration {
 	/**
 	 * @param channelName - size should not exceed 15 char length
 	 * @param channelNumber
-	 * @return the channel name
 	 */
 	public void setChannelName(String channelName, int channelNumber) {
 		this.isChangePropery = true;
@@ -382,7 +381,7 @@ public class DeviceConfiguration {
 	 * get the measurement to get/set measurement specific parameter/properties
 	 * @param channelConfigKey
 	 * @param measurementKey
-	 * @return
+	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey) {
 		MeasurementType measurement = null;
@@ -434,7 +433,7 @@ public class DeviceConfiguration {
 	 * get the symbol of specified measurement
 	 * @param channelConfigKey
 	 * @param measurementKey
-	 * @param symbol
+	 * @return the measurement symbol as string
 	 */
 	public String getMeasurementSymbol(String channelConfigKey, String measurementKey) {
 		return this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getSymbol();
@@ -471,7 +470,7 @@ public class DeviceConfiguration {
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @param propertyKey
-	 * @return
+	 * @return PropertyType
 	 */
 	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = null;

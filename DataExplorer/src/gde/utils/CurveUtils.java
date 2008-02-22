@@ -159,15 +159,13 @@ public class CurveUtils {
 
 	/**
 	 * method draw the curve using the given graphics context (GC)
-	 * @param gc
 	 * @param record
+	 * @param gc
 	 * @param x0
 	 * @param y0
 	 * @param width
 	 * @param height
 	 * @param isCompareSet
-	 * @param yMinValue
-	 * @param yMaxValue
 	 */
 	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
 		if (log.isLoggable(Level.FINE)) log.fine(String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height));

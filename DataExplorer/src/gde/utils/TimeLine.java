@@ -120,10 +120,8 @@ public class TimeLine {
 	 * @param width in points where the ticks should be drawn
 	 * @param startTimeValue  the time value where the scale should start to count
 	 * @param endTimeValue depends on the time gap and the unit calculated from the gap
-	 * @param sacleFactor (100 -> timeDelta 2900 = 2,9)
 	 * @param timeFormat - TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
 	 * @param color
-	 * @return position, where the time line text is drawn
 	 */
 	public synchronized void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, Color color) {
 		if (isTimeLinePrepared == false) {
@@ -320,7 +318,7 @@ public class TimeLine {
 
 	/**
 	 * get the formatted time of time value in m_sec, if hours are 0 or minutes are 0 the string will be cut of
-	 * @param millis
+	 * @param milliSeconds
 	 * @return string of time value in simple date format HH:mm:ss:SSS
 	 */
 	public static String getFomatedTime(int milliSeconds) {
