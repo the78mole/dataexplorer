@@ -468,7 +468,7 @@ public class MenuToolBar {
 							recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("recordSelectCombo.widgetSelected, event=" + evt);
-									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
 								}
 							});
 							recordSelectCombo.addKeyListener(new KeyAdapter() {
@@ -490,7 +490,7 @@ public class MenuToolBar {
 										activeChannel.put(newRecordSetName, recordSet);
 										activeChannel.remove(oldRecordSetName);
 										activeChannel.getRecordSetNames();
-										channels.getActiveChannel().getActiveRecordSet().switchRecordSet(newRecordSetName);
+										channels.getActiveChannel().switchRecordSet(newRecordSetName);
 									}
 								}
 							});
@@ -512,7 +512,7 @@ public class MenuToolBar {
 									if (selectionIndex > 0) recordSelectCombo.select(selectionIndex - 1);
 									if (selectionIndex == 1) prevRecord.setEnabled(false);
 									nextRecord.setEnabled(true);
-									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
 								}
 							});
 						}
@@ -536,7 +536,7 @@ public class MenuToolBar {
 										if (selectionIndex == maxIndex - 1) nextRecord.setEnabled(false);
 										prevRecord.setEnabled(true);
 									}
-									channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSelectCombo.getText());
+									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
 								}
 							});
 						}

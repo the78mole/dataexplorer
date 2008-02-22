@@ -220,7 +220,7 @@ public class CSVReaderWriter {
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
 			activeChannel.put(recordSetName, recordSet);
-			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
+			activeChannel.switchRecordSet(recordSetName);
 			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 			reader.close();

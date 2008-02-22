@@ -233,6 +233,33 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
+	 * switch the record set according selection and set applications active channel
+	 * @param recordSetName p.e. "1) Laden"
+	 */
+	public void switchRecordSet(String recordSetName) {
+		log.fine("switching to record set " + recordSetName);
+		final Channel activeChannel = this;
+		final String recordSetKey = recordSetName;
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				//reset old record set before switching
+				RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
+				if (oldRecordSet != null) oldRecordSet.reset();
+
+				RecordSet recordSet = activeChannel.get(recordSetKey);
+				if (recordSet != null) { // record  set exist
+					activeChannel.setActiveRecordSet(recordSetKey);
+					activeChannel.applyTemplate(recordSetKey);
+				}
+				application.getMenuToolBar().updateRecordSetSelectCombo();
+				application.updateDigitalWindow();
+				application.updateAnalogWindow();
+				application.updateDataTable();
+			}
+		});
+	}
+
+	/**
 	 * @return the type
 	 */
 	public int getType() {

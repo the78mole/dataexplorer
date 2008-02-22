@@ -471,32 +471,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * switch the record set according selection and set applications active channel
-	 * @param recordSetName p.e. "1) Laden"
-	 */
-	public void switchRecordSet(String recordSetName) {
-		log.fine("switching to record set " + recordSetName);
-		//reset old record set before switching
-		this.reset();
-		final String recordSetKey = recordSetName;
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				Channel activeChannel = channels.getActiveChannel();
-				if (activeChannel != null) { // channel exist
-					if (activeChannel.get(recordSetKey) != null) { // record exist
-						activeChannel.setActiveRecordSet(recordSetKey);
-						activeChannel.applyTemplate(recordSetKey);
-					}
-					application.getMenuToolBar().updateRecordSetSelectCombo();
-					application.updateDigitalWindow();
-					application.updateAnalogWindow();
-					application.updateDataTable();
-				}
-			}
-		});
-	}
-
-	/**
 	 * @param timeStep_ms the timeStep_ms to set
 	 */
 	public void setTimeStep_ms(int timeStep_ms) {
@@ -560,16 +534,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isFromFile() {
 		return isFromFile;
-	}
-
-	/**
-	 * method to refresh data table, graphics canvas and curve selection table
-	 */
-	public void refreshAll() {
-		application.updateGraphicsWindow();
-		application.updateDataTable();
-		application.updateDigitalWindow();
-		application.updateAnalogWindow();
 	}
 
 	/**

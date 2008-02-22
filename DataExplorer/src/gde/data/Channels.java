@@ -123,18 +123,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	}
 
 	/**
-	 * method to set the channel number for active channel displayed
-	 * @param activeChannelNumber the channel number of the active channel
-	 * @param doRedrawRecordSet - flag to manage update
-	 */
-	public void setActiveChannelNumber(int activeChannelNumber, boolean doRedrawRecordSet) {
-		this.activeChannelNumber = activeChannelNumber;
-		if (doRedrawRecordSet) {
-			if (this.getActiveChannel().getActiveRecordSet() != null) this.getActiveChannel().getActiveRecordSet().refreshAll();
-		}
-	}
-
-	/**
 	 * @return the activeChannelNumber
 	 */
 	public int getActiveChannelNumber() {

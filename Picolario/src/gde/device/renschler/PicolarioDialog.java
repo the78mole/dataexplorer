@@ -415,6 +415,7 @@ public class PicolarioDialog extends DeviceDialog {
 							}
 							application.updateGraphicsWindow();
 							application.updateDigitalWindowChilds();
+							application.updateAnalogWindowChilds();
 							Channels.getInstance().getActiveChannel().getActiveRecordSet().setTableDataCalculated(false);
 							application.updateDataTable();
 						}

@@ -102,7 +102,7 @@ public class DataGathererThread extends Thread {
 
 				application.getMenuToolBar().addRecordSetName(recordSetKey);
 				if (channel.getRecordSetNames().length <= 1 || dialog.isDoSwtichRecordSet())
-					channel.getActiveRecordSet().switchRecordSet(recordSetKey);
+					channel.switchRecordSet(recordSetKey);
 
 				// update the progress bar reading one after the other only
 				channel.get(recordSetKey).setAllDisplayable();

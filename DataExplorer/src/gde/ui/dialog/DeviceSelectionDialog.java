@@ -787,11 +787,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		channels.setActiveChannelNumber(1); // set " 1 : Ausgang" as default after device switch
 
 		application.getMenuToolBar().updateChannelSelector();
+		application.getMenuToolBar().updateRecordSetSelectCombo(); // clear
 		application.updateGraphicsWindow();
 		application.updateDataTable();
 		application.updateDigitalWindow();
 		application.updateAnalogWindow();
-		application.getMenuToolBar().updateRecordSetSelectCombo(); // clear
 
 		return;
 	}

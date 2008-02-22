@@ -331,7 +331,7 @@ public class SimulatorDialog extends DeviceDialog {
 											// switch the active record set if the current record set is child of active channel
 											if (channel.getName().equals(channels.getActiveChannel().getName())) {
 												application.getMenuToolBar().addRecordSetName(recordSetKey);
-												channels.getActiveChannel().getActiveRecordSet().switchRecordSet(recordSetKey);
+												channels.getActiveChannel().switchRecordSet(recordSetKey);
 											}
 											log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
 										}
