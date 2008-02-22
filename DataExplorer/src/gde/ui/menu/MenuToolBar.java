@@ -593,7 +593,7 @@ public class MenuToolBar {
 				}
 			}
 			dataBarComposite.pack();
-			int height = size.y;
+			int height = size.y + 2;
 			size = dataBarComposite.getSize();
 			log.fine("pre dataBarComposite.size = " + size);
 			dataBarComposite.setSize(size.x, height);
@@ -643,6 +643,7 @@ public class MenuToolBar {
 				newRecordSetItems.add(recordSetKey);
 				recordSelectCombo.setItems(newRecordSetItems.toArray(new String[1]));
 				recordSelectCombo.select(index);
+				updateRecordSetSelectCombo();
 				updateChannelToolItems();
 			}
 		});
