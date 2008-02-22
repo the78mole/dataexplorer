@@ -494,8 +494,6 @@ public class UniLogDialog extends DeviceDialog {
 								readAdjustmentButton = new Button(composite1, SWT.PUSH | SWT.FLAT | SWT.CENTER);
 								readAdjustmentButton.setText("Einstellungen auslesen");
 								readAdjustmentButton.setBounds(12, 74, 300, 29);
-								//readAdjustmentButton.setBackground(SWTResourceManager.getColor(64, 128, 64));
-								readAdjustmentButton.setForeground(SWTResourceManager.getColor(205, 227, 196));
 								readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("readAdjustmentButton.widgetSelected, event="+evt);
