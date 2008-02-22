@@ -657,14 +657,22 @@ public class AkkuMasterChannelTab {
 	public void stopTimer() {
 		if (timerTask != null) timerTask.cancel();
 		if (timer != null) timer.cancel();
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				startDataGatheringButton.setEnabled(false);
-				captureOnlyButton.setSelection(false);
-				programmButton.setSelection(false);
-				stopAuzeichnungButton.setEnabled(false);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			startDataGatheringButton.setEnabled(false);
+			captureOnlyButton.setSelection(false);
+			programmButton.setSelection(false);
+			stopAuzeichnungButton.setEnabled(false);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					startDataGatheringButton.setEnabled(false);
+					captureOnlyButton.setSelection(false);
+					programmButton.setSelection(false);
+					stopAuzeichnungButton.setEnabled(false);
+				}
+			});
+		}
 	}
 
 	/**
