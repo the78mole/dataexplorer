@@ -216,7 +216,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 					
 				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				slopeCalculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentageAsync(), 30);
+				slopeCalculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentage(), 30);
 				slopeCalculationThread.start();
 				if (recordSet.get(measurements[9]).isDisplayable()) {
 					record.setDisplayable(true);
