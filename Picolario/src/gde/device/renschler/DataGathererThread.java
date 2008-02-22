@@ -106,7 +106,6 @@ public class DataGathererThread extends Thread {
 
 				// update the progress bar reading one after the other only
 				channel.get(recordSetKey).setAllDisplayable();
-				channel.applyTemplate(recordSetKey);
 			}// end for
 			dialog.enableReadButtons();
 			log.fine("exit data gatherer");

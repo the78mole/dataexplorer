@@ -220,9 +220,7 @@ public class CSVReaderWriter {
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
 			activeChannel.put(recordSetName, recordSet);
-			activeChannel.setActiveRecordSet(recordSetName);
 			activeChannel.getActiveRecordSet().switchRecordSet(recordSetName);
-			activeChannel.applyTemplate(recordSetName);
 			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 			reader.close();
@@ -312,6 +310,9 @@ public class CSVReaderWriter {
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
+					if (record == null)
+						throw new Exception("Es wird kein passender Record zu dem Namen " + recordNames[j] + " gefunden. Vermutlich wurde die Konfiguration \"" + recordSet.getChannelName() + "\" zwischenzeitlich verändert.");
+
 					MeasurementType measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
