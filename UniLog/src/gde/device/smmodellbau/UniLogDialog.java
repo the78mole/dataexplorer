@@ -117,6 +117,7 @@ public class UniLogDialog extends DeviceDialog {
 	private ProgressBar										readDataProgressBar;
 	private Button												readDataButton;
 	private Group													dataReadGroup;
+	private Button helpButton;
 	private Composite											dataMainComposite;
 	private CTabItem											dataTabItem;
 	private Group													statusGroup;
@@ -245,7 +246,7 @@ public class UniLogDialog extends DeviceDialog {
 								outletA1Group = new Group(composite1, SWT.NONE);
 								outletA1Group.setLayout(null);
 								outletA1Group.setText("A1 Modus");
-								outletA1Group.setBounds(337, 200, 277, 59);
+								outletA1Group.setBounds(337, 189, 277, 59);
 								{
 									a1ModusCombo = new CCombo(outletA1Group, SWT.BORDER);
 									a1ModusCombo.setItems(A1_MODUS);
@@ -265,7 +266,7 @@ public class UniLogDialog extends DeviceDialog {
 								currentSensotGroup = new Group(composite1, SWT.NONE);
 								currentSensotGroup.setLayout(null);
 								currentSensotGroup.setText("Stromsensor");
-								currentSensotGroup.setBounds(337, 129, 277, 59);
+								currentSensotGroup.setBounds(337, 122, 277, 59);
 								{
 									sensorCurrentCombo = new CCombo(currentSensotGroup, SWT.BORDER);
 									sensorCurrentCombo.setBounds(88, 23, 119, 20);
@@ -285,7 +286,7 @@ public class UniLogDialog extends DeviceDialog {
 								autoStartGroup = new Group(composite1, SWT.NONE);
 								autoStartGroup.setLayout(null);
 								autoStartGroup.setText("Logging Autostart");
-								autoStartGroup.setBounds(12, 219, 300, 99);
+								autoStartGroup.setBounds(12, 226, 300, 99);
 								{
 									currentTriggerButton = new Button(autoStartGroup, SWT.CHECK | SWT.LEFT);
 									currentTriggerButton.setText("bei Stromschwelle");
@@ -366,7 +367,7 @@ public class UniLogDialog extends DeviceDialog {
 								motorPropGroup = new Group(composite1, SWT.NONE);
 								motorPropGroup.setLayout(null);
 								motorPropGroup.setText("Drehzahlsensor");
-								motorPropGroup.setBounds(12, 115, 300, 96);
+								motorPropGroup.setBounds(12, 117, 300, 96);
 								{
 									numberPolsButton = new Button(motorPropGroup, SWT.RADIO | SWT.LEFT);
 									numberPolsButton.setText("Motorpole");
@@ -493,7 +494,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								readAdjustmentButton = new Button(composite1, SWT.PUSH | SWT.FLAT | SWT.CENTER);
 								readAdjustmentButton.setText("Einstellungen auslesen");
-								readAdjustmentButton.setBounds(12, 74, 300, 29);
+								readAdjustmentButton.setBounds(12, 74, 300, 30);
 								readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("readAdjustmentButton.widgetSelected, event="+evt);
@@ -510,7 +511,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								storeAdjustmentsButton = new Button(composite1, SWT.PUSH | SWT.CENTER);
 								storeAdjustmentsButton.setText("Einstellungen speichern");
-								storeAdjustmentsButton.setBounds(335, 276, 281, 31);
+								storeAdjustmentsButton.setBounds(335, 256, 281, 30);
 								storeAdjustmentsButton.setEnabled(false);
 								storeAdjustmentsButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -526,6 +527,17 @@ public class UniLogDialog extends DeviceDialog {
 										catch (Exception e) {
 											application.openMessageDialog(e.getMessage());
 										}
+									}
+								});
+							}
+							{
+								helpButton = new Button(composite1, SWT.PUSH | SWT.CENTER);
+								helpButton.setBounds(337, 296, 277, 30);
+								helpButton.setText("Hilfe    (F1)");
+								helpButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										if (log.isLoggable(Level.FINEST))  log.finest("helpButton.widgetSelected, event="+evt);
+										application.openHelpDialog("UniLog", "HelpInfo.html");
 									}
 								});
 							}
@@ -585,7 +597,7 @@ public class UniLogDialog extends DeviceDialog {
 									public void keyReleased(KeyEvent evt) {
 										if (log.isLoggable(Level.FINEST))  log.finest("useConfigCombo.keyReleased, event="+evt);
 										if (evt.character == SWT.CR) {
-											String configName = useConfigCombo.getText();
+											String configName = useConfigCombo.getText().trim();
 											device.setChannelName(configName, channelSelectionIndex + 1);
 											configurationNames[channelSelectionIndex] = configName;
 											useConfigCombo.select(channelSelectionIndex);
@@ -859,6 +871,12 @@ public class UniLogDialog extends DeviceDialog {
 					configTabFolderLData.right =  new FormAttachment(1000, 1000, 0);
 					configTabFolderLData.bottom =  new FormAttachment(1000, 1000, 0);
 					configTabFolder.setLayoutData(configTabFolderLData);
+					configTabFolder.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.info("configTabFolder.keyReleased, event=" + evt);
+							if (evt.keyCode == SWT.F1) application.openHelpDialog("UniLog", "HelpInfo.html");
+						}
+					});
 				}
 				dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
