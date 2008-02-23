@@ -44,7 +44,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
-import osde.device.DeviceSerialPort;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 

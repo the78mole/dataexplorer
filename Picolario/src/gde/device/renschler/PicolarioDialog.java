@@ -481,12 +481,18 @@ public class PicolarioDialog extends DeviceDialog {
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetTelegramLabel() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				redDatagrams = "0";
-				alreadyRedLabel.setText(redDatagrams);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			redDatagrams = "0";
+			alreadyRedLabel.setText(redDatagrams);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					redDatagrams = "0";
+					alreadyRedLabel.setText(redDatagrams);
+				}
+			});
+		}
 	}
 
 	/**
@@ -495,23 +501,34 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedText(final int newValue) {
 		redDatagrams = new Integer(newValue).toString();
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				alreadyRedLabel.setText(redDatagrams);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			alreadyRedLabel.setText(redDatagrams);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					alreadyRedLabel.setText(redDatagrams);
+				}
+			});
+		}
 	}
 	
 	/**
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetDataSetsLabel() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				redDataSetsText = "0";
-				redDataSets.setText(redDataSetsText);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			redDataSetsText = "0";
+			redDataSets.setText(redDataSetsText);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					redDataSetsText = "0";
+					redDataSets.setText(redDataSetsText);
+				}
+			});
+		}
 	}
 
 	/**
@@ -520,25 +537,38 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedDataSets(final String newValue) {
 		redDataSetsText = newValue;
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				redDataSets.setText(newValue);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			redDataSets.setText(newValue);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					redDataSets.setText(newValue);
+				}
+			});
+		}
 	}
 
 	/**
 	 * function to enable all the read data read buttons, normally called after data gathering finished
 	 */
 	public void enableReadButtons() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				queryAvailableRecordSetButton.setEnabled(true);
-				readSingle.setEnabled(true);
-				readAllRecords.setEnabled(true);
-				stopButton.setEnabled(false);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			queryAvailableRecordSetButton.setEnabled(true);
+			readSingle.setEnabled(true);
+			readAllRecords.setEnabled(true);
+			stopButton.setEnabled(false);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					queryAvailableRecordSetButton.setEnabled(true);
+					readSingle.setEnabled(true);
+					readAllRecords.setEnabled(true);
+					stopButton.setEnabled(false);
+				}
+			});
+		}
 	}
 
 	/**

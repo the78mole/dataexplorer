@@ -44,7 +44,6 @@ public class StatusBar {
 	private Composite								comComposite;
 	private CLabel									msgLabel;
 	private ProgressBar							progressBar;
-	private int 										progessPercentage = 0;
 
 	public StatusBar(OpenSerialDataExplorer application, Composite statusComposite) {
 		this.application = application;
@@ -172,114 +171,49 @@ public class StatusBar {
 		}
 	}
 	
-	public synchronized int getProgressPercentage() {
-		progessPercentage = 0;
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			progessPercentage = progressBar.getSelection();
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					progessPercentage = progressBar.getSelection();
-				}
-			});
-		}
-		return progessPercentage;
+	public int getProgressPercentage() {
+		return progressBar.getSelection();
 	}
 
 	/**
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-				}
-			});
-		}
+		rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-				}
-			});
-		}
+		rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-				}
-			});
-		}
+		txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-				}
-			});
-		}
+		txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
-				}
-			});
-		}
+		portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-		}
-		else {
-			OpenSerialDataExplorer.display.syncExec(new Runnable() {
-				public void run() {
-					portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
-				}
-			});
-		}
+		portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 }

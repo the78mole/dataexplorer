@@ -241,39 +241,35 @@ public class Channel extends HashMap<String, RecordSet> {
 		final Channel activeChannel = this;
 		final String recordSetKey = recordSetName;
 		if (Thread.currentThread().getId() == application.getThreadId()) {
-			//reset old record set before switching
-			RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
-			if (oldRecordSet != null) oldRecordSet.reset();
-
-			RecordSet recordSet = activeChannel.get(recordSetKey);
-			if (recordSet != null) { // record  set exist
-				activeChannel.setActiveRecordSet(recordSetKey);
-				activeChannel.applyTemplate(recordSetKey);
-			}
-			application.getMenuToolBar().updateRecordSetSelectCombo();
-			application.updateDigitalWindow();
-			application.updateAnalogWindow();
-			application.updateDataTable();
+			updateForSwitchRecordSet(activeChannel, recordSetKey);
 		}
 		else { // execute asynchronous
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					//reset old record set before switching
-					RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
-					if (oldRecordSet != null) oldRecordSet.reset();
-
-					RecordSet recordSet = activeChannel.get(recordSetKey);
-					if (recordSet != null) { // record  set exist
-						activeChannel.setActiveRecordSet(recordSetKey);
-						activeChannel.applyTemplate(recordSetKey);
-					}
-					application.getMenuToolBar().updateRecordSetSelectCombo();
-					application.updateDigitalWindow();
-					application.updateAnalogWindow();
-					application.updateDataTable();
+					updateForSwitchRecordSet(activeChannel, recordSetKey);
 				}
 			});
 		}
+	}
+
+	/**
+	 * @param activeChannel
+	 * @param recordSetKey
+	 */
+	private void updateForSwitchRecordSet(final Channel activeChannel, final String recordSetKey) {
+		//reset old record set before switching
+		RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
+		if (oldRecordSet != null) oldRecordSet.reset();
+
+		RecordSet recordSet = activeChannel.get(recordSetKey);
+		if (recordSet != null) { // record  set exist
+			activeChannel.setActiveRecordSet(recordSetKey);
+			activeChannel.applyTemplate(recordSetKey); // updates graphics window
+		}
+		application.getMenuToolBar().updateRecordSetSelectCombo();
+		application.updateDigitalWindow();
+		application.updateAnalogWindow();
+		application.updateDataTable();
 	}
 
 	/**

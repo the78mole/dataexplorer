@@ -17,6 +17,7 @@
 package osde.device;
 
 import osde.data.RecordSet;
+import osde.serial.DeviceSerialPort;
 
 /**
  * Defines the interface for all device implementations, it also covers some interface methods from 

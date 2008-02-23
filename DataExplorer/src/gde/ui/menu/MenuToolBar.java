@@ -40,8 +40,8 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
@@ -234,8 +234,6 @@ public class MenuToolBar {
 					nextDeviceToolItem = new ToolItem(deviceToolBar, SWT.NONE);
 					nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
 					nextDeviceToolItem.setToolTipText("Schalte zum nachfolgenden Gerät");
-					nextDeviceToolItem.setText("");
-					//nextDeviceToolItem.setWidth(20);
 					nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
 					nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -629,6 +627,7 @@ public class MenuToolBar {
 
 	/**
 	 * add record set entry to record set select combo
+	 * @param newRecordSetName
 	 */
 	public void addRecordSetName(String newRecordSetName) {
 		final String recordSetKey = newRecordSetName;
@@ -653,24 +652,34 @@ public class MenuToolBar {
 	 * updates the channel select combo according the active channel
 	 */
 	public void updateChannelSelector() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				int activeChannelNumber = 0;
-				if (channels.size() > 0) {
-					String[] channelNames = new String[channels.size()];
-					String activeChannelName = channels.getActiveChannel().getName();
-					for (int i = 0; i < channelNames.length; i++) {
-						channelNames[i] = channels.get(i + 1).getName();
-						if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
-					}
-					channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			doUpdateChannelSelector();
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					doUpdateChannelSelector();
 				}
-				channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
-				updateChannelToolItems();
-				//application.updateGraphicsWindow();
-				//application.updateDataTable();
+			});
+		}
+	}
+
+	/**
+	 * execute the channel selector update
+	 */
+	private void doUpdateChannelSelector() {
+		int activeChannelNumber = 0;
+		if (channels.size() > 0) {
+			String[] channelNames = new String[channels.size()];
+			String activeChannelName = channels.getActiveChannel().getName();
+			for (int i = 0; i < channelNames.length; i++) {
+				channelNames[i] = channels.get(i + 1).getName();
+				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
 			}
-		});
+			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
+		}
+		channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
+		updateChannelToolItems();
 	}
 
 	/**
@@ -678,24 +687,36 @@ public class MenuToolBar {
 	 */
 	public String[] updateRecordSetSelectCombo() {
 		final String[] recordSetNames = channels.getActiveChannel().getRecordSetNames();
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			doUpdateRecordSetSelectCombo(recordSetNames);
+		}
+		else {
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
-					String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
-					recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
-					for (int i = 0; i < recordSetNames.length; i++) {
-						if (recordSetNames[i].equals(activeRecord)) recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
-					}
+				public void run() {
+					doUpdateRecordSetSelectCombo(recordSetNames);
 				}
-				else {
-					recordSelectCombo.setItems(new String[0]);
-					recordSelectCombo.setText("");
-				}
-				updateRecordToolItems();
-				application.updateGraphicsWindow();
-			}
-		});
+			});
+		}
 		return recordSetNames;
+	}
+
+	/**
+	 * @param recordSetNames
+	 */
+	private void doUpdateRecordSetSelectCombo(final String[] recordSetNames) {
+		if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
+			String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
+			recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
+			for (int i = 0; i < recordSetNames.length; i++) {
+				if (recordSetNames[i].equals(activeRecord)) recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
+			}
+		}
+		else {
+			recordSelectCombo.setItems(new String[0]);
+			recordSelectCombo.setText("");
+		}
+		updateRecordToolItems();
+		application.updateGraphicsWindow();
 	}
 
 	/**
@@ -734,63 +755,75 @@ public class MenuToolBar {
 	}
 
 	/**
+	 * 
+	 */
+	private void doUpdateChannelToolItems() {
+		int numberChannels = channels.size();
+		if (numberChannels <= 1) {
+			nextChannel.setEnabled(false);
+			prevChannel.setEnabled(false);
+		}
+		else {
+			int index = channelSelectCombo.getSelectionIndex();
+			int maxIndex = channelSelectCombo.getItemCount() - 1;
+			if (numberChannels == 2 && index == 0) {
+				nextChannel.setEnabled(true);
+				prevChannel.setEnabled(false);
+			}
+			else if (numberChannels == 2 && index == 1) {
+				nextChannel.setEnabled(false);
+				prevChannel.setEnabled(true);
+			}
+			if (numberChannels >= 2 && index == 0) {
+				nextChannel.setEnabled(true);
+				prevChannel.setEnabled(false);
+			}
+			else if (numberChannels >= 2 && index == maxIndex) {
+				nextChannel.setEnabled(false);
+				prevChannel.setEnabled(true);
+			}
+			else {
+				nextChannel.setEnabled(true);
+				prevChannel.setEnabled(true);
+			}
+		}
+	}
+
+	/**
 	 * updates the netxtChannel , prevChannel tool items
 	 */
 	public void updateChannelToolItems() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				int numberChannels = channels.size();
-				if (numberChannels <= 1) {
-					nextChannel.setEnabled(false);
-					prevChannel.setEnabled(false);
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			doUpdateChannelToolItems();
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					doUpdateChannelToolItems();
 				}
-				else {
-					int index = channelSelectCombo.getSelectionIndex();
-					int maxIndex = channelSelectCombo.getItemCount() - 1;
-					if (numberChannels == 2 && index == 0) {
-						nextChannel.setEnabled(true);
-						prevChannel.setEnabled(false);
-					}
-					else if (numberChannels == 2 && index == 1) {
-						nextChannel.setEnabled(false);
-						prevChannel.setEnabled(true);
-					}
-					if (numberChannels >= 2 && index == 0) {
-						nextChannel.setEnabled(true);
-						prevChannel.setEnabled(false);
-					}
-					else if (numberChannels >= 2 && index == maxIndex) {
-						nextChannel.setEnabled(false);
-						prevChannel.setEnabled(true);
-					}
-					else {
-						nextChannel.setEnabled(true);
-						prevChannel.setEnabled(true);
-					}
-				}
-			}
-		});
+			});
+		}
 	}
 
+	/**
+	 * this function must only called by application which make secure to choose the right thread
+	 * @param isOpenStatus
+	 */
 	public void setPortConnected(final boolean isOpenStatus) {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				if (isOpenStatus) {
-					portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
-					portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
-					portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
-					//portOpenCloseLabel.setText("Port schliessen");
-				}
-				else {
-					if (!application.isDisposed()) {
-						portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-						portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
-						portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
-						//portOpenCloseLabel.setText("Port öffnen         ");
-					}
-				}
+		if (isOpenStatus) {
+			portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
+			portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
+			portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
+			//portOpenCloseLabel.setText("Port schliessen");
+		}
+		else {
+			if (!application.isDisposed()) {
+				portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
+				portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
+				portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
+				//portOpenCloseLabel.setText("Port öffnen         ");
 			}
-		});
+		}
 	}
 
 	public CCombo getChannelSelectCombo() {
@@ -812,5 +845,4 @@ public class MenuToolBar {
 			e.printStackTrace();
 		}
 	}
-
 }

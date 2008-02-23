@@ -17,7 +17,7 @@
 package osde.device.renschler;
 
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
+import osde.serial.DeviceSerialPort;
 import gnu.io.SerialPort;
 
 /**

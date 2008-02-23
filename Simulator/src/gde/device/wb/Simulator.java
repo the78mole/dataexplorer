@@ -49,7 +49,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new SimulatorSerialPort(this, application.getStatusBar());
+		this.serialPort = new SimulatorSerialPort(this, application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 	}
 
@@ -61,7 +61,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(DeviceConfiguration deviceConfig) throws NoSuchPortException {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new SimulatorSerialPort(this, application.getStatusBar());
+		this.serialPort = new SimulatorSerialPort(this, application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 	}
 
@@ -72,7 +72,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
 		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
-		log.info("newValue = " + newValues);
+		log.fine("newValue = " + newValues);
 		// do some calculation
 		return newValues;
 	}

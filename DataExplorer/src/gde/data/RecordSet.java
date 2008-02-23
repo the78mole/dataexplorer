@@ -56,6 +56,8 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
 	private Rectangle											drawAreaBounds;
 	private final DecimalFormat						df = new DecimalFormat("0.000");;
+
+	private Thread												dataTableCalcThread;
 	private Vector<Vector<Integer>>				dataTable;
 	private boolean												isTableDataCalculated = false;  // value to manage only one time calculation
 	private boolean												isTableDisplayable		= true;		// value to suppress table data calculation(live view)
@@ -964,5 +966,56 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setHorizontalGridRecordKey(String horizontalGridRecordKey) {
 		this.horizontalGridRecordKey = horizontalGridRecordKey;
+	}
+	
+	/**
+	 * starts a thread executing the dataTable entries
+	 */
+	public void calculateDataTable() {
+		final RecordSet recordSet = this;
+		dataTableCalcThread = new Thread() {
+			public void run() {
+				if (log.isLoggable(Level.FINE)) log.fine("entry data table calculation");
+
+				String channelName = recordSet.getChannelName();
+				int numberRecords = recordSet.getRecordNames().length;
+				int recordEntries = recordSet.get(recordSet.getRecordNames()[0]).size();
+
+				int maxWaitCounter = 10;
+				int sleepTime = numberRecords*recordEntries/100;
+				while (!recordSet.checkAllRecordsDisplayable() && maxWaitCounter > 0) {
+					try {
+						log.fine("waiting for all records displayable");
+						Thread.sleep(sleepTime);
+						--maxWaitCounter;
+						if (maxWaitCounter == 0) return;
+					}
+					catch (InterruptedException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+					}
+				}
+				if (log.isLoggable(Level.FINE)) log.fine("all records displayable now, create table");
+
+				// calculate record set internal data table
+				if (!recordSet.isTableDataCalculated()) {
+					if (log.isLoggable(Level.FINE)) log.fine("start build table entries");
+
+					IDevice device = recordSet.get(recordSet.getRecordNames()[0]).getDevice();
+					int timeStep_ms = recordSet.getTimeStep_ms();
+					for (int i = 0; i < recordEntries; i++) {
+						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
+						dataTableRow.add(timeStep_ms * i);
+						for (String recordName : recordSet.getRecordNames()) {
+							dataTableRow.add(new Double(1000 * device.translateValue(channelName, recordName, recordSet.get(recordName).get(i) / 1000)).intValue());
+						}
+						recordSet.dataTableAddRow(dataTableRow);
+					}
+					recordSet.setTableDataCalculated(true);
+					if (log.isLoggable(Level.FINE)) log.fine("end build table entries");
+				}
+				if (log.isLoggable(Level.FINE)) log.fine("exit data table calculation");
+			}
+		};
+		dataTableCalcThread.start();
 	}
 }

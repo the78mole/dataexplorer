@@ -76,50 +76,42 @@ public class DigitalWindow {
 	 * method to update the window with its children
 	 */
 	public void updateChilds() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordSet != null) { // channel does not have a record set yet
-					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-					for (String recordKey : activeRecordKeys) {
-						DigitalDisplay display = displays.get(recordKey);
-						if (display != null) display.getDigitalLabel().redraw();
-					}
-				}
+		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) { // channel does not have a record set yet
+			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+			for (String recordKey : activeRecordKeys) {
+				DigitalDisplay display = displays.get(recordKey);
+				if (display != null) display.getDigitalLabel().redraw();
 			}
-		});
+		}
 	}
 
 	/**
 	 * method to update digital window by adding removing digital displays
 	 */
 	public void update() {
-		final RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				if (recordSet != null) { // just created  or device switched
-					// if recordSet name signature changed new displays need to be created
-					if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
-						oldRecordSet = recordSet;
-						String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-						for (String recordKey : activeRecordKeys) {
-							DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
-							display.create();
-							log.fine("created digital display for " + recordKey);
-							displays.put(recordKey, display);
-						}
-						digitalMainComposite.layout();
-					}
+		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) { // just created  or device switched
+			// if recordSet name signature changed new displays need to be created
+			if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
+				oldRecordSet = recordSet;
+				String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+				for (String recordKey : activeRecordKeys) {
+					DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
+					display.create();
+					log.fine("created digital display for " + recordKey);
+					displays.put(recordKey, display);
 				}
-				else { // clean up after device switched
-					for (String recordKey : displays.keySet().toArray(new String[0])) {
-						log.fine("clean child " + recordKey);
-						displays.get(recordKey).dispose();
-						displays.remove(recordKey);
-					}
-					digitalMainComposite.layout();
-				}
+				digitalMainComposite.layout();
 			}
-		});
+		}
+		else { // clean up after device switched
+			for (String recordKey : displays.keySet().toArray(new String[0])) {
+				log.fine("clean child " + recordKey);
+				displays.get(recordKey).dispose();
+				displays.remove(recordKey);
+			}
+			digitalMainComposite.layout();
+		}
 	}
 }

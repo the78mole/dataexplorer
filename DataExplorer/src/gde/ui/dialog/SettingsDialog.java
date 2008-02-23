@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import osde.config.Settings;
-import osde.device.DeviceSerialPort;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -250,6 +250,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						log.finest("serialPortGroup.paintControl, event=" + evt);
 						useGlobalSerialPort.setSelection(settings.isGlobalSerialPort());
 						serialPort.setText(settings.getSerialPort());
+						// execute independent from dialog UI
 						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 							public void run() {
 								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));

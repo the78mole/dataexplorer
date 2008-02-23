@@ -43,7 +43,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = this.application != null ? new UniLogSerialPort(this, application.getStatusBar()) : new UniLogSerialPort(this, null);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
@@ -55,7 +55,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(DeviceConfiguration deviceConfig) throws NoSuchPortException {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = this.application != null ? new UniLogSerialPort(this, application.getStatusBar()) : new UniLogSerialPort(this, null);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
@@ -215,8 +215,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				else
 					slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 					
-				slopeCalculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				slopeCalculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentage(), 30);
 				slopeCalculationThread.start();
 				if (recordSet.get(measurements[9]).isDisplayable()) {
 					record.setDisplayable(true);

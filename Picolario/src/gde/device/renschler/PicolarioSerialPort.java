@@ -26,10 +26,10 @@ import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.DeviceSerialPort;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
-import osde.ui.StatusBar;
+import osde.serial.DeviceSerialPort;
+import osde.ui.OpenSerialDataExplorer;
 import osde.utils.Checksum;
 
 /**
@@ -48,11 +48,11 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	/**
 	 * PicolarioSerialPort constructor
 	 * @param deviceConfig
-	 * @param statusBar
+	 * @param application
 	 * @throws NoSuchPortException
 	 */
-	public PicolarioSerialPort(DeviceConfiguration deviceConfig, StatusBar statusBar) throws NoSuchPortException {
-		super(deviceConfig, statusBar);
+	public PicolarioSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
+		super(deviceConfig, application);
 	}
 
 	/**
@@ -159,9 +159,9 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		String[] measurements = device.getMeasurementNames(device.getChannelName(1)); // 0=Spannung, 1=Höhe, 2=Steigrate
 		data.put(measurements[0], voltage);
 		data.put(measurements[1], height);
-		if (statusBar != null) {
-			statusBar.setSerialRxOff();
-			statusBar.setSerialTxOff();
+		if (application != null) {
+			application.setSerialRxOff();
+			application.setSerialTxOff();
 		}
 		return data;
 	}

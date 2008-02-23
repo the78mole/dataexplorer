@@ -22,7 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
+import osde.serial.DeviceSerialPort;
 
 /**
  * Class to test akkuMaster C4 device serial port communication

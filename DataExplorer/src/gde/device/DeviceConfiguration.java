@@ -37,6 +37,7 @@ import javax.xml.validation.SchemaFactory;
 
 import osde.config.Settings;
 import osde.log.LogFormatter;
+import osde.serial.DeviceSerialPort;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application

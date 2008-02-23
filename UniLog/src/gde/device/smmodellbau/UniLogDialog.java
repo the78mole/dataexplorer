@@ -746,7 +746,6 @@ public class UniLogDialog extends DeviceDialog {
 											stopLiveGatherButton.setEnabled(true);
 										}
 										catch (Exception e) {
-											log.log(Level.SEVERE, e.getMessage(), e);
 											application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !");
 										}
 									}
@@ -1095,7 +1094,7 @@ public class UniLogDialog extends DeviceDialog {
 	}
 
 	/**
-	 * set progress bar to value between 0 to 100
+	 * set progress bar to value between 0 to 100, called out of thread
 	 * @param value
 	 */
 	public void setReadDataProgressBar(final int value) {
@@ -1117,7 +1116,11 @@ public class UniLogDialog extends DeviceDialog {
 	}
 
 	
-	
+	/**
+	 * update the counter number in the dialog, called out of thread
+	 * @param redTelegrams
+	 * @param numReadErrors
+	 */
 	public void updateDataGatherProgress(final int redTelegrams, final int numReadErrors) {
 		numberRedDataSetsText = "" + redTelegrams;
 		numberReadErrorText = "" + numReadErrors;
@@ -1133,33 +1136,54 @@ public class UniLogDialog extends DeviceDialog {
 	 * function to reset counter labels
 	 */
 	public void resetDataSetsLabel() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				numberRedDataSetsText = "0";
-				numberReadErrorText = "0";
-				redDataSetLabel.setText(numberRedDataSetsText);
-				numberReadErrorLabel.setText(numberReadErrorText);
-				readDataProgressBar.setSelection(0);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			numberRedDataSetsText = "0";
+			numberReadErrorText = "0";
+			redDataSetLabel.setText(numberRedDataSetsText);
+			numberReadErrorLabel.setText(numberReadErrorText);
+			readDataProgressBar.setSelection(0);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					numberRedDataSetsText = "0";
+					numberReadErrorText = "0";
+					redDataSetLabel.setText(numberRedDataSetsText);
+					numberReadErrorLabel.setText(numberReadErrorText);
+					readDataProgressBar.setSelection(0);
+				}
+			});
+		}
 	}
 	
 	/**
 	 * function to reset all the buttons, normally called after data gathering finished
 	 */
 	public void resetButtons() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				readDataButton.setEnabled(false);
-				editConfigButton.setEnabled(false);
-				stopDataButton.setEnabled(false);
-				startLoggingButton.setEnabled(false);
-				stopLoggingButton.setEnabled(false);
-				useConfigCombo.setEnabled(true);
-				startLiveGatherButton.setEnabled(false);
-				clearMemoryButton.setEnabled(true);
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			readDataButton.setEnabled(false);
+			editConfigButton.setEnabled(false);
+			stopDataButton.setEnabled(false);
+			startLoggingButton.setEnabled(false);
+			stopLoggingButton.setEnabled(false);
+			useConfigCombo.setEnabled(true);
+			startLiveGatherButton.setEnabled(false);
+			clearMemoryButton.setEnabled(true);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					readDataButton.setEnabled(false);
+					editConfigButton.setEnabled(false);
+					stopDataButton.setEnabled(false);
+					startLoggingButton.setEnabled(false);
+					stopLoggingButton.setEnabled(false);
+					useConfigCombo.setEnabled(true);
+					startLiveGatherButton.setEnabled(false);
+					clearMemoryButton.setEnabled(true);
+				}
+			});
+		}
 	}
 	
 	/**

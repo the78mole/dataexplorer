@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.DeviceSerialPort;
-import osde.ui.StatusBar;
+import osde.serial.DeviceSerialPort;
+import osde.ui.OpenSerialDataExplorer;
 
 /**
  * SSerial port implementation for AkkuMaster C4 device
@@ -130,8 +130,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	//	// Verbleibende Wartezeit bis Formieren wiederholt wird
 	//	private byte							formUpLatencyTime[]							= new byte[2];								//1 bit = 1 Minute
 
-	public AkkuMasterC4SerialPort(DeviceConfiguration deviceConfig, StatusBar statusBar) throws NoSuchPortException {
-		super(deviceConfig, statusBar);
+	public AkkuMasterC4SerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
+		super(deviceConfig, application);
 	}
 
 	/**

@@ -38,9 +38,6 @@ public abstract class CalculationThread extends Thread {
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;
 	protected int														calcInterval_sec = 10;
-	protected String												statusMessage = "";
-	protected	int														startCalcProgressPercent = 0;
-	protected	int														endCalcProgressPercent = 0;
 	protected final OpenSerialDataExplorer	application;
 	protected boolean												threadStop	= false;
 
@@ -87,30 +84,6 @@ public abstract class CalculationThread extends Thread {
 	 */
 	public void setTargetRecordKey(String targetRecordKey) {
 		this.targetRecordKey = targetRecordKey;
-	}
-
-	/**
-	 * @return the statusMessage
-	 */
-	public String getStatusMessage() {
-		return statusMessage;
-	}
-
-	/**
-	 * @param statusMessage the statusMessage to set
-	 */
-	public void setStatusMessage(String statusMessage) {
-		this.statusMessage = statusMessage;
-	}
-
-	/**
-	 * method to allow split percentage values for one process with several child processes reporting to the same progress bar
-	 * @param startProgressPercent the start value in percent
-	 * @param endProgressPercent the end value in percent
-	 */
-	public void setCalcProgressPercent(int startProgressPercent, int endProgressPercent) {
-		this.startCalcProgressPercent = startProgressPercent;
-		this.endCalcProgressPercent = endProgressPercent;
 	}
 
 	/**

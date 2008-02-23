@@ -89,19 +89,15 @@ public class AnalogWindow {
 	 * method to update the window with its children
 	 */
 	public void updateChilds() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordSet != null) { // channel does not have a record set yet
-					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-					for (String recordKey : activeRecordKeys) {
-						@SuppressWarnings("unused")
-						AnalogDisplay display = displays.get(recordKey);
-						//TODO if (display != null) display.getDigitalLabel().redraw();
-					}
-				}
+		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) { // channel does not have a record set yet
+			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+			for (String recordKey : activeRecordKeys) {
+				@SuppressWarnings("unused")
+				AnalogDisplay display = displays.get(recordKey);
+				//TODO if (display != null) display.getDigitalLabel().redraw();
 			}
-		});
+		}
 	}
 
 	/**

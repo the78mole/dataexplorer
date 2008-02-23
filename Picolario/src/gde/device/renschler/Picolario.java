@@ -57,7 +57,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public Picolario(String iniFile) throws FileNotFoundException, JAXBException, NoSuchPortException {
 		super(iniFile);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new PicolarioSerialPort(this, this.application.getStatusBar());
+		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
 	}
@@ -70,7 +70,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public Picolario(DeviceConfiguration deviceConfig) throws NoSuchPortException {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new PicolarioSerialPort(this, this.application.getStatusBar());
+		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
 	}
@@ -115,7 +115,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			// get the record set to be used
 			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			//if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
 			if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
 			
 			if (dialog.isDoSubtractFirst()) {
@@ -176,7 +175,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 			// get the record set to be used
 			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			//if (application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) recordSet = application.getCompareSet();
 			if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
 			
 			if (dialog.isDoSubtractFirst()) {
@@ -241,8 +239,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
 				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); 
-				calculationThread.setStatusMessage("Berechne Steigungskurve aus der Höhenkurve");
-				//calculationThread.setCalcProgressPercent(application.getStatusBar().getProgressPercentageAsync(), 30);
 				calculationThread.start();
 			}
 		}

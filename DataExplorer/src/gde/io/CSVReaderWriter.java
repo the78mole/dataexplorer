@@ -39,7 +39,6 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
-import osde.ui.StatusBar;
 
 /**
  * Class to read and write comma separated value files
@@ -81,7 +80,6 @@ public class CSVReaderWriter {
 		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
-		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
 		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 		String[] recordNames = device.getMeasurementNames(Channels.getInstance().getActiveChannel().getConfigKey());
 		int sizeRecords = 0;
@@ -220,11 +218,10 @@ public class CSVReaderWriter {
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
 			activeChannel.put(recordSetName, recordSet);
-			activeChannel.switchRecordSet(recordSetName);
 			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+			activeChannel.switchRecordSet(recordSetName);
 
 			reader.close();
-			statusBar.setProgress(10);
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -251,9 +248,6 @@ public class CSVReaderWriter {
 				msg = "Beim Einlesen der CSV Datei ist folgender Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage();
 			throw new Exception(msg);
 		}
-		finally {
-			//statusBar.setMessage("");
-		}
 		return recordSet;
 	}
 
@@ -263,9 +257,9 @@ public class CSVReaderWriter {
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
-		StatusBar statusBar = OpenSerialDataExplorer.getInstance().getStatusBar();
+		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		try {
-			statusBar.setMessage("Schreibe CVS Datei " + filePath);
+			application.setStatusMessage("Schreibe CVS Datei " + filePath);
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //TODO check UTF-8 for Linux
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
@@ -328,14 +322,14 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");
 				writer.write(sb.toString());
-				statusBar.setProgress((int)(stausIncrement * i));
+				application.setProgress(new Double(stausIncrement * i).intValue());
 			}
 
 			writer.flush();
 			writer.close();
 			recordSet.setSaved(true);
 			log.fine("data line = " + sb.toString());
-			statusBar.setProgress(100);
+			application.setProgress(100);
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

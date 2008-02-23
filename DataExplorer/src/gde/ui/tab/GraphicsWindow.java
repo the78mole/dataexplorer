@@ -626,68 +626,86 @@ public class GraphicsWindow {
 	 * redraws the graphics canvas as well as the curve selector table
 	 */
 	public void redrawGraphics() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-				updateCurveSelectorTable();
-				graphicCanvas.redraw();
-			}
-		});
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			updateCurveSelectorTable();
+			graphicCanvas.redraw();
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					updateCurveSelectorTable();
+					graphicCanvas.redraw();
+				}
+			});
+		}
 	}
 
 	/**
 	 * method to update the curves displayed in the curve selector panel 
 	 */
 	public void updateCurveSelectorTable() {
-		final IDevice device = application.getActiveDevice();
-		final RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-
-		if (isCurveSelectorEnabled && recordSet != null) {
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			doUpdateCurveSelectorTable();
+		}
+		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					curveSelectorTable.removeAll();
-					
-					String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
-					for (int i = 0; i < recordSet.size(); i++) {
-						Record record;
-						switch (type) {
-						case TYPE_COMPARE:
-							String recordKey = recordSet.getRecordNames()[0].split("_")[0];
-							record = recordSet.getRecord(recordKey + "_" + i);
-							break;
-
-						default: // TYPE_NORMAL
-							record = recordSet.getRecord(recordKeys[i]);
-							break;
-						}
-						if (log.isLoggable(Level.FINER)) log.finer(record.getName());
-
-						TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
-						item.setForeground(record.getColor());
-						item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
-						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
-						if (record.isDisplayable()) {
-							if (record.isVisible()) {
-								item.setChecked(true);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
-								item.setData(WINDOW_TYPE, type);
-							}
-							else {
-								item.setChecked(false);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-								item.setData(WINDOW_TYPE, type);
-							}
-						}
-						else {
-							item.setChecked(false);
-							item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-							item.setData(WINDOW_TYPE, type);
-							item.dispose();
-						}
-					}
+					doUpdateCurveSelectorTable();
 				}
 			});
 		}
-		else curveSelectorTable.removeAll();
+	}
+
+	/**
+	 * executes the update of the curve selector table
+	 */
+	private void doUpdateCurveSelectorTable() {
+		IDevice device = application.getActiveDevice();
+		RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+		if (isCurveSelectorEnabled && recordSet != null) {
+			curveSelectorTable.removeAll();
+
+			String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record;
+				switch (type) {
+				case TYPE_COMPARE:
+					String recordKey = recordSet.getRecordNames()[0].split("_")[0];
+					record = recordSet.getRecord(recordKey + "_" + i);
+					break;
+
+				default: // TYPE_NORMAL
+					record = recordSet.getRecord(recordKeys[i]);
+					break;
+				}
+				if (log.isLoggable(Level.FINER)) log.finer(record.getName());
+
+				TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
+				item.setForeground(record.getColor());
+				item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
+				//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
+				if (record.isDisplayable()) {
+					if (record.isVisible()) {
+						item.setChecked(true);
+						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
+						item.setData(WINDOW_TYPE, type);
+					}
+					else {
+						item.setChecked(false);
+						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
+						item.setData(WINDOW_TYPE, type);
+					}
+				}
+				else {
+					item.setChecked(false);
+					item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
+					item.setData(WINDOW_TYPE, type);
+					item.dispose();
+				}
+			}
+		}
+		else
+			curveSelectorTable.removeAll();
 	}
 
 	public Canvas getGraphicCanvas() {

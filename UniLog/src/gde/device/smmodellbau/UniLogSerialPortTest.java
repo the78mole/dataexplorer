@@ -7,8 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
 import osde.log.LogFormatter;
+import osde.serial.DeviceSerialPort;
 
 public class UniLogSerialPortTest {
 

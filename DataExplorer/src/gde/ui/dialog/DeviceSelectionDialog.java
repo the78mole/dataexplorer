@@ -57,8 +57,8 @@ import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -204,26 +204,34 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
 						setupDevice();
 					}
-					if (settings.isAutoOpenSerialPort()) {
+					if (Thread.currentThread().getId() == application.getThreadId()) {
+						handleAutoOpenAfterClose();
+					}
+					else {
 						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 							public void run() {
-								try {
-									Thread.sleep(50);
-									if (application.getActiveDevice().getSerialPort() != null) application.getActiveDevice().getSerialPort().open();
-								}
-								catch (Exception e) {
-									log.log(Level.SEVERE, e.getMessage(), e);
-									application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getMessage());
-								}
+								handleAutoOpenAfterClose();
 							}
 						});
 					}
+				}
+
+				/**
+				 * handle auto open functions
+				 */
+				private void handleAutoOpenAfterClose() {
+					if (settings.isAutoOpenSerialPort()) {
+						try {
+							Thread.sleep(50);
+							if (application.getActiveDevice().getSerialPort() != null) application.getActiveDevice().getSerialPort().open();
+						}
+						catch (Exception e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
+							application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getMessage());
+						}
+					}
 					if (settings.isAutoOpenToolBox()) {
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-							public void run() {
-								application.getActiveDevice().getDialog().open();
-							}
-						});
+						application.getActiveDevice().getDialog().open();
 					}
 				}
 			});
@@ -784,14 +792,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			// do not call channel.applyTemplate here, there are no record sets
 		}
 
-		channels.setActiveChannelNumber(1); // set " 1 : Ausgang" as default after device switch
-
-		application.getMenuToolBar().updateChannelSelector();
-		application.getMenuToolBar().updateRecordSetSelectCombo(); // clear
-		application.updateGraphicsWindow();
-		application.updateDataTable();
-		application.updateDigitalWindow();
-		application.updateAnalogWindow();
+		channels.switchChannel(1);		// set " 1 : Ausgang" as default after device switch and update
 
 		return;
 	}
@@ -891,8 +892,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		boolean result = true;
 		String unsaved = Channels.getInstance().checkRecordSetsSaved();
 		if (unsaved.length() != 0) {
-			String msg = "Folgenden Datensätze sind nicht gesichert und gehen verloren" + unsaved.toString();
-			if (application.openYesNoMessageDialog(msg) == SWT.CANCEL) {
+			String msg = "Die folgenden Datensätze sind nicht gesichert und gehen verloren" + unsaved.toString();
+			if (application.openOkCancelMessageDialog(msg) == SWT.CANCEL) {
 				result = false;
 				log.fine("SWT.CANCEL");
 			}

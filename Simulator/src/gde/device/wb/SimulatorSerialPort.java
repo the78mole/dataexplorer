@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import osde.device.DeviceConfiguration;
-import osde.device.DeviceSerialPort;
 import osde.device.IDevice;
-import osde.ui.StatusBar;
+import osde.serial.DeviceSerialPort;
+import osde.ui.OpenSerialDataExplorer;
 
 /**
  * Dummy serial port implementation for the simulator device
@@ -41,11 +41,11 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 	/**
 	 * constructor of default implementation
 	 * @param deviceConfig - required by super class to initialize the serial communication port
-	 * @param statusBar - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
+	 * @param application - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 * @throws NoSuchPortException
 	 */
-	public SimulatorSerialPort(DeviceConfiguration deviceConfig, StatusBar statusBar) throws NoSuchPortException {
-		super(deviceConfig, statusBar);
+	public SimulatorSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
+		super(deviceConfig, application);
 	}
 
 	/**

@@ -601,10 +601,7 @@ public class AkkuMasterChannelTab {
 					stopAuzeichnungButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("stopAuzeichnungButton.widgetSelected, event=" + evt);
-							startDataGatheringButton.setEnabled(false);
-							captureOnlyButton.setSelection(false);
-							programmButton.setSelection(false);
-							stopAuzeichnungButton.setEnabled(false);
+							updateDialogAfterStop();
 							if (!isCaptureOnly) try {
 								serialPort.stop(channelSig);
 							}
@@ -658,21 +655,25 @@ public class AkkuMasterChannelTab {
 		if (timerTask != null) timerTask.cancel();
 		if (timer != null) timer.cancel();
 		if (Thread.currentThread().getId() == application.getThreadId()) {
-			startDataGatheringButton.setEnabled(false);
-			captureOnlyButton.setSelection(false);
-			programmButton.setSelection(false);
-			stopAuzeichnungButton.setEnabled(false);
+			updateDialogAfterStop();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					startDataGatheringButton.setEnabled(false);
-					captureOnlyButton.setSelection(false);
-					programmButton.setSelection(false);
-					stopAuzeichnungButton.setEnabled(false);
+					updateDialogAfterStop();
 				}
 			});
 		}
+	}
+
+	/**
+	 * updates dialog UI after stop timer operation
+	 */
+	private void updateDialogAfterStop() {
+		startDataGatheringButton.setEnabled(false);
+		captureOnlyButton.setSelection(false);
+		programmButton.setSelection(false);
+		stopAuzeichnungButton.setEnabled(false);
 	}
 
 	/**
