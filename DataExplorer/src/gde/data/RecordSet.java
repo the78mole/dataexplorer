@@ -100,7 +100,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private Vector<Integer>								horizontalGrid 							= new Vector<Integer>();							// contains the time grid position, updated from TimeLine.drawTickMarks
 	private Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
 	private int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
-	private String												horizontalGridRecordKey			= "";																	// recordNames[horizontalGridRecord]
+	private String												horizontalGridRecordKey			= "-";																	// recordNames[horizontalGridRecord]
 
 	private int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
 	

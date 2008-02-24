@@ -703,7 +703,7 @@ public class CurveSelectorContextMenu {
 					log.finest("horizontalGridMenu MenuListener " + evt);
 					TableItem selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					if (selectedItem != null && !selectedItem.isDisposed()) {
-						horizontalGridRecordName.setText((String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME));
+						horizontalGridRecordName.setText("gesetzt -> " + recordSet.getHorizontalGridRecordName());
 						int gridType = recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
