@@ -127,9 +127,13 @@ public class CSVReaderWriter {
 							if (answer == SWT.YES) {
 								log.fine("SWT.YES");
 								int channelNumber = channels.getChannelNumber(fileConfig);
-								channels.setActiveChannelNumber(channelNumber);
-								channels.switchChannel(channelNumber);
-								application.getMenuToolBar().updateChannelSelector();
+								if (channelNumber != 0) {  // 0 channel configuration does not exist
+									channels.setActiveChannelNumber(channelNumber);
+									channels.switchChannel(channelNumber);
+									application.getMenuToolBar().updateChannelSelector();
+								}
+								else
+									throw new Exception("Die Konfiguration aus der Datei entspricht keiner aktuell vorhandenen :\n" + fileConfig + " != " + channels.getChannelNamesToString());
 							}
 							else if (answer == SWT.NO) {
 								log.fine("SWT.NO");

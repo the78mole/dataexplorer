@@ -80,12 +80,34 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
-		String[] channelNames = application.getMenuToolBar().getChannelSelectCombo().getItems();
+		boolean isFound = false;
+		String[] channelNames = getChannelNames();
 		for (String name : channelNames) {
-			if (name.split(":")[1].trim().equals(channelName)) break;
+			if (name.split(":")[1].trim().equals(channelName)) {
+				isFound = true;
+				break;
+			}
 			++searchedNumber;
 		}
-		return searchedNumber;
+		return isFound ? searchedNumber : 0;
+	}
+
+	/**
+	 * @return array with channel names
+	 */
+	public String[] getChannelNames() {
+		return application.getMenuToolBar().getChannelSelectCombo().getItems();
+	}
+
+	/**
+	 * @return array with channel names
+	 */
+	public String getChannelNamesToString() {
+		StringBuilder sb = new StringBuilder();
+		for (String channelName : application.getMenuToolBar().getChannelSelectCombo().getItems()) {
+			sb.append(channelName.split(":")[1]).append(", ");
+		}
+		return sb.toString();
 	}
 
 	/**
