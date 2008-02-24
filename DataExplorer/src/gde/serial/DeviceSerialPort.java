@@ -311,13 +311,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 */
 	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws IOException {
-		int counter = timeoutInSeconds * 1000 / 2;
+		int counter = timeoutInSeconds * 1000;
 		int resBytes = 0;
 		try {
 			// wait until readbuffer has been filled by eventListener
-			Thread.sleep(5);
+			Thread.sleep(1);
 			while (this.numBytesAvailable < numBytes) {
-				Thread.sleep(2);
+				Thread.sleep(1);
 				counter--;
 				if(log.isLoggable(Level.FINEST)) log.finest("time out counter = " + counter);
 				if (counter <= 0) throw new IOException("Error: can not read result during given timeout !");
