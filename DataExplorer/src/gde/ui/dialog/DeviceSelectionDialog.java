@@ -221,21 +221,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				 * handle auto open functions
 				 */
 				private void handleAutoOpenAfterClose() {
-					if (settings.isAutoOpenSerialPort()) {
-						try {
+					try {
+						if (settings.isAutoOpenSerialPort()) {
 							if (application.getActiveDevice() != null) {
 								DeviceSerialPort serialPort = application.getActiveDevice().getSerialPort();
-								if (serialPort != null && !serialPort.isConnected()) 
-									application.getActiveDevice().getSerialPort().open();
+								if (serialPort != null && !serialPort.isConnected()) application.getActiveDevice().getSerialPort().open();
+							}
+							if (settings.isAutoOpenToolBox()) {
+								application.openDeviceDialog();
 							}
 						}
-						catch (Exception e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
-							application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getMessage());
-						}
 					}
-					if (settings.isAutoOpenToolBox()) {
-						application.openDeviceDialog();
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						application.openMessageDialogAsync("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getCanonicalName() + " - " + e.getMessage() + "\n Bitte die Porteinstellung überprüfen.");
 					}
 				}
 			});

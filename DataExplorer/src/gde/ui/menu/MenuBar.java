@@ -277,6 +277,16 @@ public class MenuBar {
 				deviceMenu = new Menu(deviceMenuItem);
 				deviceMenuItem.setMenu(deviceMenu);
 				{
+					toolBoxDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
+					toolBoxDeviceMenuItem.setText("Geräte ToolBox");
+					toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
+							application.openDeviceDialog();
+						}
+					});
+				}
+				{
 					selectDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
 					selectDeviceMenuItem.setText("Gerät auswählen");
 					selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
@@ -350,16 +360,6 @@ public class MenuBar {
 							else {
 								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
 							}
-						}
-					});
-				}
-				{
-					toolBoxDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					toolBoxDeviceMenuItem.setText("Geräte ToolBox");
-					toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
-							application.setActiveDevice(application.getDeviceSelectionDialog().open());
 						}
 					});
 				}
