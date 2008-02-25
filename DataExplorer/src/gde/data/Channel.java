@@ -17,6 +17,7 @@
 package osde.data;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -27,6 +28,7 @@ import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.RecordSetNameComparator;
 
 /**
  * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
@@ -42,6 +44,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	private GraphicsTemplate							template;																												// graphics template holds view configuration
 	private RecordSet											activeRecordSet;
 	private final OpenSerialDataExplorer	application;
+	private Comparator<String> 						comparator = new RecordSetNameComparator();
+
 
 	/**
 	 * constructor, where channelNumber is used to calculate the name of the channel 1: Ausgang
@@ -86,7 +90,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public String[] getRecordSetNames() {
 		String[] keys = this.keySet().toArray( new String[1]);
-		Arrays.sort(keys);
+		Arrays.sort(keys, comparator);
 		return keys;
 	}
 

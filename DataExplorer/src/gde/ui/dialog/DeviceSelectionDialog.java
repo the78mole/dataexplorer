@@ -214,6 +214,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 						});
 					}
+					log.info("disposed");
 				}
 
 				/**
@@ -222,8 +223,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				private void handleAutoOpenAfterClose() {
 					if (settings.isAutoOpenSerialPort()) {
 						try {
-							Thread.sleep(50);
-							if (application.getActiveDevice().getSerialPort() != null) application.getActiveDevice().getSerialPort().open();
+							if (application.getActiveDevice() != null) {
+								DeviceSerialPort serialPort = application.getActiveDevice().getSerialPort();
+								if (serialPort != null && !serialPort.isConnected()) 
+									application.getActiveDevice().getSerialPort().open();
+							}
 						}
 						catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
@@ -231,7 +235,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 					}
 					if (settings.isAutoOpenToolBox()) {
-						application.getActiveDevice().getDialog().open();
+						application.openDeviceDialog();
 					}
 				}
 			});

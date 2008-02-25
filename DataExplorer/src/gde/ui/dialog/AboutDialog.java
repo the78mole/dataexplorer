@@ -100,7 +100,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
 				version = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				version.setLayoutData(versionLData);
-				version.setText("Version 0.6");
+				version.setText("Version 0.61");
 				version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{

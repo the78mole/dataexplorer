@@ -191,7 +191,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
 				int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 				for (int i = 0; i < recordRevolution.size(); i++) {
-					double motorPower = (recordRevolution.get(i)*100.0)/prop_n100W;
+					double motorPower = Math.pow((recordRevolution.get(i)/1000.0*4.64)/prop_n100W, 3)*1000.0; 
 					double eta = (recordPower.get(i)) > motorPower ? (motorPower*100.0)/recordPower.get(i) : 0;
 					record.add(new Double(eta * 1000).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));

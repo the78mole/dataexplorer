@@ -101,30 +101,39 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	public static Vector<String> listConfiguredSerialPorts() {
 		Vector<String> availablePorts = new Vector<String>(1, 1);
-		String serialPortPrefix = "";
-		String serialPortStr = "";
-		int index = 0;
 		String osname = System.getProperty("os.name", "").toLowerCase();
 
 		if (osname.startsWith("windows")) {
 			// windows
-			serialPortPrefix = "COM";
-			index = 1;
+			availablePorts = getAvailablePorts(availablePorts, "COM", 1, 20); //COM1, COM2 -> COM20
 		}
 		else if (osname.startsWith("linux")) {
 			// linux
-			serialPortPrefix = "/dev/ttyS";
-			index = 0;
+			availablePorts = getAvailablePorts(availablePorts, "/dev/ttyS", 0, 20); // /dev/ttyS0, /dev/ttyS1 -> /dev/ttyS20
+			availablePorts = getAvailablePorts(availablePorts, "/dev/ttyUSB", 0, 10); // /dev/ttyUSB0, /dev/ttyUSB1 -> /dev/ttyUSB10
 		}
 		else {
 			log.severe("Error, your operating system is not supported");
 			System.exit(-1);
 		}
 
+		availablePorts.trimToSize();
+		return availablePorts;
+	}
+
+	/**
+	 * find the serial ports using the given string prefix
+	 * @param availablePorts
+	 * @param serialPortPrefix
+	 * @param startIndex
+	 * @param searchCounter
+	 */
+	private static Vector<String> getAvailablePorts(Vector<String> availablePorts, String serialPortPrefix, int startIndex, int searchCounter) {
+		String serialPortStr;
 		CommPortIdentifier.getPortIdentifiers(); // initializes serial port
 		// find all available serial ports
-		for (; index < 20; index++) {
-			serialPortStr = serialPortPrefix + index;
+		for (; startIndex < searchCounter; startIndex++) {
+			serialPortStr = serialPortPrefix + startIndex;
 			CommPortIdentifier portId;
 			try {
 				portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
@@ -137,25 +146,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				// ignore
 			}
 		}
-		// if linux search for USB2Serial  
-		if (osname.startsWith("linux")) {
-			serialPortPrefix = "/dev/ttyUSB";
-			for (index = 0; index < 10; index++) {
-				serialPortStr = serialPortPrefix + index;
-				CommPortIdentifier portId;
-				try {
-					portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
-					if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-						availablePorts.add(serialPortStr);
-						log.fine("Found port: " + serialPortStr);
-					}
-				}
-				catch (NoSuchPortException e) {
-					// ignore
-				}
-			}
-		}
-		availablePorts.trimToSize();
 		return availablePorts;
 	}
 
