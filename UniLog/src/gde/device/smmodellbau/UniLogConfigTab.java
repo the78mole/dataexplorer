@@ -536,7 +536,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					axModusGroup.setLayout(null);
 					axModusGroup.setText("A* Konfiguration");
 					axModusGroup.setBounds(313, 2, 310, 193);
-					axModusGroup.setToolTipText("HIer bitte die Konfiguration für die A* Ausgange festlegen");
+					axModusGroup.setToolTipText("Hier bitte die Konfiguration für die A* Ausgange festlegen");
 					axModusGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (log.isLoggable(Level.FINEST))  log.finest("axModusGroup.paintControl, event="+evt);
@@ -997,6 +997,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setUnit(a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 		measurement.setOffset(new Double(a3Offset.getText().replace(',', '.').trim()));
 		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.').trim()));
+		
+		device.setChangePropery(true);
 	}
 	
 	/**
