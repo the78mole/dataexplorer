@@ -17,6 +17,7 @@
 package osde.utils;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 /**
  * To sort by starting number or alphabetically
@@ -24,15 +25,24 @@ import java.util.Comparator;
  */
 public class RecordSetNameComparator implements Comparator<String> {
 
+	public static void main(String[] args) {
+		RecordSetNameComparator rc = new RecordSetNameComparator();
+		rc.compare("1) asdfer", "12) 12121");
+	}
 	// Comparator interface requires defining compare method.
 	public int compare(String nameA, String nameB) {
 		try {
-			Integer intA = new Integer(nameA.substring(0, nameA.indexOf(')')));
-			Integer intB = new Integer(nameB.substring(0, nameB.indexOf(')')));
-			if (intA > intB)
-				return 1;
-			else if (intA < intB)
-				return -1;
+			Pattern p = Pattern.compile("^[ ]*[0-9]+[^0-9]");
+			if (p.matcher(nameA).find() && p.matcher(nameB).find() ) {
+				Integer intA = new Integer(nameA.trim().split("\\D")[0]);
+				Integer intB = new Integer(nameB.trim().split("\\D")[0]);
+				if (intA > intB)
+					return 1;
+				else if (intA < intB)
+					return -1;
+				else 
+					return 0;
+			}
 			else {
 				//... If no number, sort alphabetically.
 				return nameA.compareToIgnoreCase(nameB);
