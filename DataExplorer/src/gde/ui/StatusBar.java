@@ -158,16 +158,18 @@ public class StatusBar {
 			});
 		}
 		if (precent == 100) {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			Thread waitThread = new Thread() {
 				public void run() {
 					try {
-						Thread.sleep(500);
+						Thread.sleep(300);
 						setProgress(0);
 					}
 					catch (InterruptedException e) {
 					}
 				}
-			});
+			};
+			waitThread.setPriority(Thread.MIN_PRIORITY);
+			waitThread.start();
 		}
 	}
 	

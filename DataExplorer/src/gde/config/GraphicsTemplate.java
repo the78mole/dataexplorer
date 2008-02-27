@@ -82,7 +82,7 @@ public class GraphicsTemplate extends Properties {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+			log.log(Level.WARNING, e.getMessage());
 		}
 	}
 

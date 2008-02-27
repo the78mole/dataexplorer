@@ -222,8 +222,8 @@ public class CSVReaderWriter {
 			log.fine("timeStep_ms = " + timeStep_ms);
 			
 			activeChannel.put(recordSetName, recordSet);
-			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 			activeChannel.switchRecordSet(recordSetName);
+			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 			reader.close();
 		}

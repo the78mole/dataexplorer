@@ -107,7 +107,7 @@ public class MenuToolBar {
 
 	public void create() {
 		{ // begin file cool item
-			menuCoolItem = new CoolItem(coolBar, SWT.NONE);
+			menuCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin file tool bar
 				fileToolBar = new ToolBar(coolBar, SWT.NONE);
 				menuCoolItem.setControl(fileToolBar);
@@ -176,7 +176,7 @@ public class MenuToolBar {
 		} // end file cool item
 
 		{ // begin device cool item
-			deviceCoolItem = new CoolItem(coolBar, SWT.NONE);
+			deviceCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin device tool bar
 				deviceToolBar = new ToolBar(coolBar, SWT.NONE);
 				deviceCoolItem.setControl(deviceToolBar);
@@ -287,7 +287,7 @@ public class MenuToolBar {
 			deviceCoolItem.setMinimumSize(size);
 		} // end device cool item
 		{ // begin zoom cool item
-			zoomCoolItem = new CoolItem(coolBar, SWT.NONE);
+			zoomCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin zoom tool bar
 				zoomToolBar = new ToolBar(coolBar, SWT.NONE);
 				zoomCoolItem.setControl(zoomToolBar);
@@ -337,7 +337,7 @@ public class MenuToolBar {
 		} // end zoom cool item
 
 		{ // begin port cool item
-			portCoolItem = new CoolItem(coolBar, SWT.NONE);
+			portCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{
 				portToolBar = new ToolBar(coolBar, SWT.NONE);
 				portCoolItem.setControl(portToolBar);
@@ -364,7 +364,7 @@ public class MenuToolBar {
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
-			dataCoolItem = new CoolItem(coolBar, SWT.NONE);
+			dataCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{
 				dataBarComposite = new Composite(coolBar, SWT.NONE);
 				RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
