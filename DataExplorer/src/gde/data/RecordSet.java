@@ -1014,6 +1014,7 @@ public class RecordSet extends HashMap<String, Record> {
 					if (log.isLoggable(Level.FINE)) log.fine("end build table entries");
 				}
 				if (log.isLoggable(Level.FINE)) log.fine("exit data table calculation");
+				application.updateDataTable();  // recall the table update function all prerequisites are checked
 			}
 		};
 		dataTableCalcThread.start();
