@@ -80,7 +80,7 @@ public class AkkuMasterCalculationThread extends Thread {
 			Record recordVoltage = recordSet.get(measurements[0]);	// 0=Spannung
 			Record recordCharge = recordSet.get(measurements[2]);		// 2=Ladung
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000).intValue());
+				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000.0).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 			}
 			record.setDisplayable(true);
