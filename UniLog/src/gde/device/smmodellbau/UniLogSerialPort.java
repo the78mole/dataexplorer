@@ -69,14 +69,17 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device, String channelConfigKey) throws IOException {
-		
+		boolean isPortOpenedByMe = false;
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
 		
 		UniLogDialog dialog = (UniLogDialog)device.getDialog();
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
 		try {
-			this.open();
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
 			reveiceErrors = 0;
 
 			// check data ready for read operation
@@ -128,7 +131,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			//throw e;
 		}
 		finally {
-			if(this.isConnected) this.close();
+			if(this.isConnected && isPortOpenedByMe) this.close();
 		}
 		return dataCollection;
 	}
