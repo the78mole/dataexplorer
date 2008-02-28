@@ -132,8 +132,6 @@ public class StatusBar {
 			msgLabel.setText("   " + text + "   ");
 		else
 			msgLabel.setText(text);
-//		
-		msgLabel.pack();
 	}
 
 	public void setProgress(final int precent) {
