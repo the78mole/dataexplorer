@@ -31,9 +31,8 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class StatusBar {
-	private final OpenSerialDataExplorer application;
 	
-	private Composite								statusComposite;
+	private final Composite					statusComposite;
 	private Composite								connectionComposite;
 	private Text										txText;
 	private Text										rxText;
@@ -45,8 +44,7 @@ public class StatusBar {
 	private CLabel									msgLabel;
 	private ProgressBar							progressBar;
 
-	public StatusBar(OpenSerialDataExplorer application, Composite statusComposite) {
-		this.application = application;
+	public StatusBar(Composite statusComposite) {
 		this.statusComposite = statusComposite;
 	}
 
@@ -130,47 +128,16 @@ public class StatusBar {
 	 * method to set a message text to the message label of the status bar
 	 */
 	public void setMessage(final String text) {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			if (text.length() > 5) msgLabel.setText("   " + text + "   ");
-			else msgLabel.setText(text);
-			msgLabel.pack();
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					if (text.length() > 5) msgLabel.setText("   " + text + "   ");
-					else msgLabel.setText(text);
-					msgLabel.pack();
-				}
-			});
-		}
+		if (text.length() > 5)
+			msgLabel.setText("   " + text + "   ");
+		else
+			msgLabel.setText(text);
+//		
+		msgLabel.pack();
 	}
 
 	public void setProgress(final int precent) {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			progressBar.setSelection(precent);
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					progressBar.setSelection(precent);
-				}
-			});
-		}
-		if (precent == 100) {
-			Thread waitThread = new Thread() {
-				public void run() {
-					try {
-						Thread.sleep(300);
-						setProgress(0);
-					}
-					catch (InterruptedException e) {
-					}
-				}
-			};
-			waitThread.setPriority(Thread.MIN_PRIORITY);
-			waitThread.start();
-		}
+		progressBar.setSelection(precent);
 	}
 	
 	public int getProgressPercentage() {
