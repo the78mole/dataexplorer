@@ -22,7 +22,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
@@ -551,6 +553,11 @@ public class UniLogDialog extends DeviceDialog {
 						configTabItem1.setText(device.getChannelName(1));
 						configTab1 = new UniLogConfigTab(configTabFolder, device, device.getChannelName(1));
 						configTabItem1.setControl(configTab1);
+						configTabItem1.addListener(SWT.Selection, new Listener() {
+							public void handleEvent(Event evt) {
+								if (log.isLoggable(Level.FINEST))  log.finest("SWT.FocusIn, event="+evt);
+							}
+						});
 					}
 					if(device.getChannelCount() > 1) {
 						configTabItem2 = new CTabItem(configTabFolder, SWT.NONE);
