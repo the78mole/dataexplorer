@@ -106,38 +106,35 @@ public class DataTableWindow {
 	 */
 	public void updateDataTable(final Channel channel, final RecordSet recordSet) {
 
-		if (recordSet.isTableDisplayable()) {
+		if (recordSet.isTableDisplayable() && recordSet.isTableDataCalculated()) {
+			if (log.isLoggable(Level.FINE)) log.fine("entry data table update");
+			application.setStatusMessage(" -> erneuere Datentabelle");				
 			application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
 			// cleanup old data table
 			dataTable.removeAll();
 
 			// display data table
-			if (recordSet.isTableDataCalculated()) {
-				if (log.isLoggable(Level.FINE)) log.fine("entry data table update");
-				application.setStatusMessage(" -> erneuere Datentabelle");				
-				
-				try {
-					int recordEntries = recordSet.getNumberDataTableRows();
-					int progressStart = application.getProgressPercentage();
-					double progressInterval = (100.0 - progressStart) / recordEntries;
-					TableItem item;
+			try {
+				int recordEntries = recordSet.getNumberDataTableRows();
+				int progressStart = application.getProgressPercentage();
+				double progressInterval = (100.0 - progressStart) / recordEntries;
+				TableItem item;
 
-					for (int i = 0; i < recordEntries; i++) {
-						application.setProgress(new Double(i * progressInterval + progressStart).intValue());
-						item = new TableItem(dataTable, SWT.RIGHT);
-						item.setText(recordSet.getDataPoints(i));
-					}
+				for (int i = 0; i < recordEntries; i++) {
+					application.setProgress(new Double(i * progressInterval + progressStart).intValue());
+					item = new TableItem(dataTable, SWT.RIGHT);
+					item.setText(recordSet.getDataPoints(i));
 				}
-				catch (RuntimeException e) {
-					log.log(Level.WARNING, e.getMessage(), e);
-				}
-
-				application.setProgress(100);
-				application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-				if (log.isLoggable(Level.FINE)) log.fine("exit data table update");
-				application.setStatusMessage(" ");
 			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+
+			application.setProgress(100);
+			application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			application.setStatusMessage(" ");
+			if (log.isLoggable(Level.FINE)) log.fine("exit data table update");
 		}
 	}
 	

@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
@@ -104,28 +105,31 @@ public class AnalogWindow {
 	 * method to update digital window
 	 */
 	public synchronized void update() {
-		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) { // just created  or device switched
-			// if recordSet name signature changed new displays need to be created
-			if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
-				oldRecordSet = recordSet;
-				String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-				for (String recordKey : activeRecordKeys) {
-					AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
-					display.create();
-					log.fine("created analog display for " + recordKey);
-					displays.put(recordKey, display);
+		Channel activeChannel = channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = activeChannel.getActiveRecordSet();
+			if (recordSet != null) { // just created  or device switched
+				// if recordSet name signature changed new displays need to be created
+				if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
+					oldRecordSet = recordSet;
+					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+					for (String recordKey : activeRecordKeys) {
+						AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
+						display.create();
+						log.fine("created analog display for " + recordKey);
+						displays.put(recordKey, display);
+					}
+					analogMainComposite.layout();
+				}
+			}
+			else { // clean up after device switched
+				for (String recordKey : displays.keySet().toArray(new String[0])) {
+					log.fine("clean child " + recordKey);
+					displays.get(recordKey).dispose();
+					displays.remove(recordKey);
 				}
 				analogMainComposite.layout();
 			}
-		}
-		else { // clean up after device switched
-			for (String recordKey : displays.keySet().toArray(new String[0])) {
-				log.fine("clean child " + recordKey);
-				displays.get(recordKey).dispose();
-				displays.remove(recordKey);
-			}
-			analogMainComposite.layout();
 		}
 	}
 }
