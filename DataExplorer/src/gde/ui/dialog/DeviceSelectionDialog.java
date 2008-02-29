@@ -200,6 +200,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
+					// update device configurations if required
+					for (String deviceKey : devices.keySet().toArray(new String[1])) {
+						DeviceConfiguration configuration = devices.get(deviceKey);
+						configuration.storeDeviceProperties(); // stores only if is changed
+					}
+					// initialize selected device
 					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
 						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
 						setupDevice();
@@ -214,7 +220,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 						});
 					}
-					log.info("disposed");
+					log.fine("disposed");
 				}
 
 				/**
@@ -579,6 +585,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												propertiesFilePath = devices.get(device).getPropertiesFileName();
 												devices.remove(device);
 												devices.put(device, new DeviceConfiguration(propertiesFilePath));
+												devices.get(device).setUsed(true);
 											}
 											catch (Exception e) {
 												activeDevices.remove(device);
@@ -589,6 +596,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										else {
 											log.fine("remove device = " + device);
 											activeDevices.remove(device);
+											devices.get(device).setUsed(false);
 										}
 										updateDialogEntries();
 									}
@@ -613,7 +621,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									deviceTable.removeAll();
 
 									for (String deviceKey : devices.keySet()) {
-										log.finer(deviceKey);
+										log.fine(deviceKey);
 										DeviceConfiguration config = devices.get(deviceKey);
 
 										TableItem item = new TableItem(deviceTable, SWT.NULL);
