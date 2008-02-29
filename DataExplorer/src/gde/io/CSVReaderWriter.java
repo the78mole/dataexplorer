@@ -77,6 +77,7 @@ public class CSVReaderWriter {
 	 * @throws Exception 
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
+		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
@@ -89,7 +90,7 @@ public class CSVReaderWriter {
 		Channel activeChannel = null;
 
 		try {
-			//statusBar.setMessage("Lese CVS Datei " + filePath);
+			application.setStatusMessage("Lese CVS Datei " + filePath);
 			
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
 
@@ -97,7 +98,6 @@ public class CSVReaderWriter {
 			StringBuilder headerStringConf = new StringBuilder().append(lineSep);
 			StringBuilder keys = new StringBuilder();
 			String[] recordKeys = null;
-			OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 			String fileConfig = null;
 
 			while ((line = reader.readLine()) != null) {
@@ -252,6 +252,11 @@ public class CSVReaderWriter {
 				msg = "Beim Einlesen der CSV Datei ist folgender Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage();
 			throw new Exception(msg);
 		}
+		finally {
+			application.setProgress(10);
+			application.setStatusMessage("");
+		}
+		
 		return recordSet;
 	}
 
@@ -344,7 +349,7 @@ public class CSVReaderWriter {
 			throw new Exception("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
 		}
 		finally {
-			//statusBar.setMessage("");
+			application.setStatusMessage("");
 		}
 
 	}

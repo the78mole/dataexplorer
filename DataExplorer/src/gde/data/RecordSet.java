@@ -976,10 +976,12 @@ public class RecordSet extends HashMap<String, Record> {
 		dataTableCalcThread = new Thread() {
 			public void run() {
 				if (log.isLoggable(Level.FINE)) log.fine("entry data table calculation");
+				application.setStatusMessage(" -> berechne Datentabelle");
 
 				String channelName = recordSet.getChannelName();
 				int numberRecords = recordSet.getRecordNames().length;
 				int recordEntries = recordSet.get(recordSet.getRecordNames()[0]).size();
+				int progress = application.getProgressPercentage();
 
 				int maxWaitCounter = 10;
 				int sleepTime = numberRecords*recordEntries/100;
@@ -993,16 +995,19 @@ public class RecordSet extends HashMap<String, Record> {
 					catch (InterruptedException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
 					}
+					application.setProgress(progress+=2);
 				}
 				if (log.isLoggable(Level.FINE)) log.fine("all records displayable now, create table");
 
 				// calculate record set internal data table
 				if (!recordSet.isTableDataCalculated()) {
 					if (log.isLoggable(Level.FINE)) log.fine("start build table entries");
+					double progressInterval = (60.0 - progress) / recordEntries;
 
 					IDevice device = recordSet.get(recordSet.getRecordNames()[0]).getDevice();
 					int timeStep_ms = recordSet.getTimeStep_ms();
 					for (int i = 0; i < recordEntries; i++) {
+						application.setProgress(progress += new Double(i * progressInterval).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(timeStep_ms * i);
 						for (String recordName : recordSet.getRecordNames()) {
