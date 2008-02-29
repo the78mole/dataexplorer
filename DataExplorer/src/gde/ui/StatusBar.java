@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.ui;
 
+import java.util.logging.Logger;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FillLayout;
@@ -23,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
@@ -31,6 +34,8 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class StatusBar {
+	@SuppressWarnings("unused")
+	private Logger	log	= Logger.getLogger(this.getClass().getName());
 	
 	private final Composite					statusComposite;
 	private Composite								connectionComposite;
@@ -41,8 +46,11 @@ public class StatusBar {
 	private CLabel									txButton;
 	private CLabel									rxButton;
 	private Composite								comComposite;
-	private CLabel									msgLabel;
+	private Composite								msgComposite;
+	private Label										msgLabel;
 	private ProgressBar							progressBar;
+	
+	private String blankMsg = "                                                                                                                                                     ";
 
 	public StatusBar(Composite statusComposite) {
 		this.statusComposite = statusComposite;
@@ -119,7 +127,13 @@ public class StatusBar {
 				progressBar.setLayoutData(progressBarLData);
 			}
 			{
-				msgLabel = new CLabel(statusComposite, SWT.LEFT);
+				msgComposite = new Composite(statusComposite, SWT.NONE);
+				FillLayout msgCompositeLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				msgComposite.setLayout(msgCompositeLayout);
+			}
+			{
+				msgLabel = new Label(msgComposite, SWT.LEFT);
+				msgLabel.setText(blankMsg);
 			}
 		}
 	}
