@@ -23,6 +23,8 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -44,6 +46,19 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
@@ -73,6 +88,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 	private CLabel												Port;
 	private CCombo												serialPort;
 	private Button												useGlobalSerialPort;
+	private Button deviceDialogButton;
+	private Group deviceDialogGroup;
 	private Group													serialPortGroup;
 	private Group													separatorGroup;
 	private CCombo												listSeparator;
@@ -102,9 +119,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(496, 514);
+			dialogShell.setSize(496, 575);
 			dialogShell.setText("OpenSerialDataExplorer - Settings");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.gif"));
+			dialogShell.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					System.out.println("dialogShell.helpRequested, event="+evt);
+					//TODO add your code for dialogShell.helpRequested
+				}
+			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
@@ -115,10 +138,38 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					settings.updateLogLevel();
 				}
 			});
+			{
+				FormData GerätedialogLData = new FormData();
+				GerätedialogLData.width = 451;
+				GerätedialogLData.height = 35;
+				GerätedialogLData.left =  new FormAttachment(0, 1000, 12);
+				GerätedialogLData.top =  new FormAttachment(0, 1000, 153);
+				deviceDialogGroup = new Group(dialogShell, SWT.NONE);
+				deviceDialogGroup.setLayout(null);
+				deviceDialogGroup.setLayoutData(GerätedialogLData);
+				deviceDialogGroup.setText("Gerätedialoge");
+				deviceDialogGroup.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						log.finest("deviceDialogGroup.paintControl, event="+evt);
+						deviceDialogButton.setSelection(settings.isDeviceDialogsModal());
+					}
+				});
+				{
+					deviceDialogButton = new Button(deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+					deviceDialogButton.setText("    Gerätedialoge anwendungsmodal einstellen");
+					deviceDialogButton.setBounds(65, 24, 327, 16);
+					deviceDialogButton.setToolTipText("Hiermit stellt man ein ob die Gerätedialoge erst geschlosen werden müssen bevor man an die Hauptfenster herankommt");
+					deviceDialogButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("deviceDialogButton.widgetSelected, event="+evt);
+							settings.enabelModalDeviceDialogs(deviceDialogButton.getSelection());
+						}
+					});
+				}
+			}
 			{ // begin default data path group
 				defaultDataPathGroup = new Group(dialogShell, SWT.NONE);
-				RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				defaultDataPathGroup.setLayout(group1Layout);
+				defaultDataPathGroup.setLayout(null);
 				FormData group1LData = new FormData();
 				group1LData.width = 534;
 				group1LData.height = 42;
@@ -135,26 +186,17 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				});
 				{
 					defaultDataPathLabel = new CLabel(defaultDataPathGroup, SWT.NONE);
-					RowData defaultDataPathLData = new RowData();
-					defaultDataPathLData.width = 90;
-					defaultDataPathLData.height = 20;
-					defaultDataPathLabel.setLayoutData(defaultDataPathLData);
 					defaultDataPathLabel.setText("Datenpfad  :    ");
+					defaultDataPathLabel.setBounds(14, 24, 90, 20);
 				}
 				{
-					RowData defaultDataPathTextLData = new RowData();
-					defaultDataPathTextLData.width = 295;
-					defaultDataPathTextLData.height = 20;
 					defaultDataPath = new Text(defaultDataPathGroup, SWT.NONE);
-					defaultDataPath.setLayoutData(defaultDataPathTextLData);
+					defaultDataPath.setBounds(107, 24, 295, 20);
 				}
 				{
 					defaultDataPathAdjustButton = new Button(defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
-					RowData defaultDataPathAdjustButtonLData = new RowData();
-					defaultDataPathAdjustButtonLData.width = 30;
-					defaultDataPathAdjustButtonLData.height = 20;
-					defaultDataPathAdjustButton.setLayoutData(defaultDataPathAdjustButtonLData);
 					defaultDataPathAdjustButton.setText(". . . ");
+					defaultDataPathAdjustButton.setBounds(405, 24, 30, 20);
 					defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("defaultDataPathAdjustButton.widgetSelected, event=" + evt);
@@ -168,14 +210,13 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			} // end default data path group
 			{ // begin separator group
 				separatorGroup = new Group(dialogShell, SWT.NONE);
-				RowLayout separatorGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				separatorGroup.setLayout(separatorGroupLayout);
+				separatorGroup.setLayout(null);
 				FormData separatorGroupLData = new FormData();
-				separatorGroupLData.width = 534;
+				separatorGroupLData.width = 451;
 				separatorGroupLData.height = 44;
-				separatorGroupLData.left = new FormAttachment(0, 1000, 12);
-				separatorGroupLData.top = new FormAttachment(0, 1000, 85);
-				separatorGroupLData.right = new FormAttachment(1000, 1000, -19);
+				separatorGroupLData.left =  new FormAttachment(0, 1000, 12);
+				separatorGroupLData.top =  new FormAttachment(0, 1000, 80);
+				separatorGroupLData.right =  new FormAttachment(1000, 1000, -19);
 				separatorGroup.setLayoutData(separatorGroupLData);
 				separatorGroup.setText("Zahlen- CSV-Separator");
 				separatorGroup.addPaintListener(new PaintListener() {
@@ -189,14 +230,12 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					decimalSeparatorLabel = new CLabel(separatorGroup, SWT.NONE);
 					decimalSeparatorLabel.setText("Dezimalseparator : ");
 					decimalSeparatorLabel.setToolTipText("Der Dezimalseparator is abhängig von den eingestellten Systemlocalen, einige Betribssysteme erlauben aber davon abweichende Konfiguration");
+					decimalSeparatorLabel.setBounds(28, 24, 122, 22);
 				}
 				{
-					RowData decimalSeparatorLData = new RowData();
-					decimalSeparatorLData.width = 43;
-					decimalSeparatorLData.height = 20;
 					decimalSeparator = new CCombo(separatorGroup, SWT.NONE);
-					decimalSeparator.setLayoutData(decimalSeparatorLData);
 					decimalSeparator.setItems(new String[] { " . ", " , " });
+					decimalSeparator.setBounds(153, 24, 43, 20);
 					decimalSeparator.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("decimalSeparator.widgetSelected, event=" + evt);
@@ -206,24 +245,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					});
 				}
 				{
-					RowData spaceLData = new RowData();
-					spaceLData.width = 89;
-					spaceLData.height = 20;
-					space = new CLabel(separatorGroup, SWT.NONE);
-					space.setLayoutData(spaceLData);
-				}
-				{
 					listSeparatorLabel = new CLabel(separatorGroup, SWT.NONE);
 					listSeparatorLabel.setText("Listenseparator : ");
 					listSeparatorLabel.setToolTipText("Der Listenseparator is abhängig von den eingestellten Systemlocalen, einige Betribssysteme erlauben aber davon abweichende Konfiguration");
+					listSeparatorLabel.setBounds(258, 24, 108, 22);
 				}
 				{
-					RowData listSeparatorLData = new RowData();
-					listSeparatorLData.width = 47;
-					listSeparatorLData.height = 20;
 					listSeparator = new CCombo(separatorGroup, SWT.NONE);
-					listSeparator.setLayoutData(listSeparatorLData);
 					listSeparator.setItems(new String[] { " , ", " ; " });
+					listSeparator.setBounds(369, 24, 47, 20);
 					listSeparator.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("listSeparator.widgetSelected, event=" + evt);
@@ -235,14 +265,13 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			} // end separator group
 			{ // begin serial port group
 				serialPortGroup = new Group(dialogShell, SWT.NONE);
-				RowLayout serialPortGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				serialPortGroup.setLayout(serialPortGroupLayout);
+				serialPortGroup.setLayout(null);
 				FormData serialPortGroupLData = new FormData();
-				serialPortGroupLData.width = 454;
+				serialPortGroupLData.width = 451;
 				serialPortGroupLData.height = 34;
-				serialPortGroupLData.left = new FormAttachment(0, 1000, 12);
-				serialPortGroupLData.right = new FormAttachment(1000, 1000, -19);
-				serialPortGroupLData.top = new FormAttachment(0, 1000, 154);
+				serialPortGroupLData.left =  new FormAttachment(0, 1000, 12);
+				serialPortGroupLData.right =  new FormAttachment(1000, 1000, -19);
+				serialPortGroupLData.top =  new FormAttachment(0, 1000, 216);
 				serialPortGroup.setLayoutData(serialPortGroupLData);
 				serialPortGroup.setText("Serial Port Adjustment");
 				serialPortGroup.addPaintListener(new PaintListener() {
@@ -261,11 +290,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				{
 					useGlobalSerialPort = new Button(serialPortGroup, SWT.CHECK | SWT.LEFT);
 					useGlobalSerialPort.setText(" globale serielle Port Konfiguration ");
-					RowData useGlobalSerialPortLData = new RowData();
-					useGlobalSerialPortLData.width = 251;
-					useGlobalSerialPortLData.height = 20;
-					useGlobalSerialPort.setLayoutData(useGlobalSerialPortLData);
-					useGlobalSerialPort.setToolTipText("Steht dieser Schalter auf ja, wird Anwendungsweit nur ein serieller Port verwendet, sonst kommt die Portkonfiguration aus den  Geräte INI Dateien.");
+					useGlobalSerialPort.setToolTipText("Steht dieser Schalter angewählt wird Anwendungsweit nur ein serieller Port verwendet, sonst wird pro Gerät eine eigene Portkonfiguration verwendet");
+					useGlobalSerialPort.setBounds(15, 19, 251, 20);
 					useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
@@ -279,11 +305,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					});
 				}
 				{
-					RowData serialPortLData = new RowData();
-					serialPortLData.width = 84;
-					serialPortLData.height = 20;
 					serialPort = new CCombo(serialPortGroup, SWT.NONE);
-					serialPort.setLayoutData(serialPortLData);
+					serialPort.setBounds(269, 19, 84, 20);
 					serialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("serialPort.widgetSelected, event=" + evt);
@@ -294,6 +317,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				{
 					Port = new CLabel(serialPortGroup, SWT.NONE);
 					Port.setText("serieller Port");
+					Port.setBounds(356, 19, 81, 22);
 				}
 			} // end serial port group
 			{ // begin logging group
@@ -301,10 +325,10 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				RowLayout loggingGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				loggingGroup.setLayout(loggingGroupLayout);
 				FormData loggingGroupLData = new FormData();
-				loggingGroupLData.width = 460;
+				loggingGroupLData.width = 451;
 				loggingGroupLData.height = 195;
 				loggingGroupLData.left =  new FormAttachment(0, 1000, 12);
-				loggingGroupLData.top =  new FormAttachment(0, 1000, 219);
+				loggingGroupLData.top =  new FormAttachment(0, 1000, 276);
 				loggingGroupLData.right =  new FormAttachment(1000, 1000, -19);
 				loggingGroup.setLayoutData(loggingGroupLData);
 				loggingGroup.setText("Debug Logging Level");
@@ -508,10 +532,10 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			} // end logging group
 			{ // begin ok button
 				FormData okButtonLData = new FormData();
-				okButtonLData.width = 260;
+				okButtonLData.width = 250;
 				okButtonLData.height = 25;
-				okButtonLData.left =  new FormAttachment(0, 1000, 103);
-				okButtonLData.right =  new FormAttachment(1000, 1000, -135);
+				okButtonLData.left =  new FormAttachment(0, 1000, 116);
+				okButtonLData.right =  new FormAttachment(1000, 1000, -122);
 				okButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
 				okButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				okButton.setLayoutData(okButtonLData);

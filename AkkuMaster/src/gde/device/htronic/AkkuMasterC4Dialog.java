@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
@@ -62,6 +63,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	private CTabItem								versionTabItem;
 	private CTabFolder							tabFolder;
 
+	private final Settings					settings;
 	private final AkkuMasterC4			device;
 	private final AkkuMasterC4SerialPort	serialPort;
 	private final OpenSerialDataExplorer	application;
@@ -87,12 +89,17 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.numberChannels = device.getChannelCount();
+		this.settings = Settings.getInstance();
 	}
 
 	public void open() {
 		log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
 		if (dialogShell == null || dialogShell.isDisposed()) {
-			dialogShell = new Shell(new Shell(SWT.MODELESS), SWT.DIALOG_TRIM);
+			if (this.settings.isDeviceDialogsModal())
+				dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			else
+				dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
+			
 			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();

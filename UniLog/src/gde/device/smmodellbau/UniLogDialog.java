@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
@@ -58,8 +59,9 @@ public class UniLogDialog extends DeviceDialog {
 	private Button stopLiveGatherButton;
 	private Button editConfigButton;
 	private Text memoryDeleteInfo;
+	private final Settings	settings;
 
-	public final static int			WERTESAETZE_MAX							= 25920;
+	public final static int								WERTESAETZE_MAX		= 25920;
 	public final static String[]					TIME_INTERVAL			= { " 1/16 s (-> 27 min)", 
 																															" 1/8 s   (-> 54 min)", 
 																															" 1/4 s   (-> 1:48 h)", 
@@ -175,6 +177,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.serialPort = device.getSerialPort();
 		this.device = device;
 		this.application = OpenSerialDataExplorer.getInstance();
+		this.settings = Settings.getInstance();
 	}
 
 	/**
@@ -184,7 +187,11 @@ public class UniLogDialog extends DeviceDialog {
 		try {
 			log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
 			if (dialogShell == null || dialogShell.isDisposed()) {
-				dialogShell = new Shell(new Shell(SWT.MODELESS), SWT.DIALOG_TRIM);
+				if (this.settings.isDeviceDialogsModal())
+					dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				else
+					dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
+				
 				dialogShell.setText("UniLog ToolBox");
 				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
 				SWTResourceManager.registerResourceUser(dialogShell);

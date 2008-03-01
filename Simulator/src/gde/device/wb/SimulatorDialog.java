@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -70,6 +71,7 @@ public class SimulatorDialog extends DeviceDialog {
 	private final DeviceSerialPort				serialPort;																													// open/close port execute getData()....
 	private final OpenSerialDataExplorer	application;																													// interaction with application instance
 	private final Channels								channels;																														// interaction with channels, source of all records
+	private final Settings								settings;
 
 	private Channel												channel;
 	private Timer													timer;
@@ -109,6 +111,7 @@ public class SimulatorDialog extends DeviceDialog {
 		this.device = device;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
 	}
 
 	/**
@@ -118,7 +121,11 @@ public class SimulatorDialog extends DeviceDialog {
 		try {
 			log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
 			if (dialogShell == null || dialogShell.isDisposed()) {
-				dialogShell = new Shell(new Shell(SWT.MODELESS), SWT.DIALOG_TRIM);
+				if (this.settings.isDeviceDialogsModal())
+					dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				else
+					dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
+				
 				SWTResourceManager.registerResourceUser(dialogShell);
 				dialogShell.setLayout(new FormLayout());
 				dialogShell.layout();
