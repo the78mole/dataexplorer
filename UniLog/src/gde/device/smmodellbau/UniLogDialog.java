@@ -880,7 +880,7 @@ public class UniLogDialog extends DeviceDialog {
 					configTabFolder.setLayoutData(configTabFolderLData);
 					configTabFolder.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent evt) {
-							log.info("configTabFolder.keyReleased, event=" + evt);
+							log.finest("configTabFolder.keyReleased, event=" + evt);
 							if (evt.keyCode == SWT.F1) application.openHelpDialog("UniLog", "HelpInfo.html");
 						}
 					});
