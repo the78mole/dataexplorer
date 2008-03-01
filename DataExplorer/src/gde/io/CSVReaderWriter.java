@@ -81,8 +81,8 @@ public class CSVReaderWriter {
 		String recordSetName = "1) " + recordSetNameExtend;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
-		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
-		String[] recordNames = device.getMeasurementNames(Channels.getInstance().getActiveChannel().getConfigKey());
+		IDevice device = application.getActiveDevice();
+		String[] recordNames = null;
 		int sizeRecords = 0;
 		boolean isDeviceName = true;
 		boolean isData = false;

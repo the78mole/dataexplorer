@@ -191,7 +191,8 @@ public class MenuToolBar {
 							log.finest("deviceToolItem.widgetSelected, event=" + evt);
 							DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
 							if (deviceSelect.checkDataSaved()) {
-								application.setActiveDevice(deviceSelect.open());
+								IDevice activeDevice = deviceSelect.open();
+								application.setActiveDevice(activeDevice);
 							}
 						}
 					});
@@ -466,7 +467,9 @@ public class MenuToolBar {
 							recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("recordSelectCombo.widgetSelected, event=" + evt);
-									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
+									Channel activeChannel = channels.getActiveChannel();
+									if (activeChannel != null)
+										activeChannel.switchRecordSet(recordSelectCombo.getText());
 								}
 							});
 							recordSelectCombo.addKeyListener(new KeyAdapter() {
@@ -474,21 +477,23 @@ public class MenuToolBar {
 									log.finest("recordSelectCombo.keyPressed, event=" + evt);
 									if (evt.character == SWT.CR) {
 										Channel activeChannel = channels.getActiveChannel();
-										String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
-										String newRecordSetName = recordSelectCombo.getText();
-										log.fine("newRecordSetName = " + newRecordSetName);
-										String[] recordSetNames = recordSelectCombo.getItems();
-										for (int i = 0; i < recordSetNames.length; i++) {
-											if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
+										if (activeChannel != null) {
+											String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
+											String newRecordSetName = recordSelectCombo.getText();
+											log.fine("newRecordSetName = " + newRecordSetName);
+											String[] recordSetNames = recordSelectCombo.getItems();
+											for (int i = 0; i < recordSetNames.length; i++) {
+												if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
+											}
+											recordSelectCombo.setEditable(false);
+											recordSelectCombo.setItems(recordSetNames);
+											RecordSet recordSet = channels.getActiveChannel().get(oldRecordSetName);
+											recordSet.setName(newRecordSetName);
+											activeChannel.put(newRecordSetName, recordSet);
+											activeChannel.remove(oldRecordSetName);
+											activeChannel.getRecordSetNames();
+											channels.getActiveChannel().switchRecordSet(newRecordSetName);
 										}
-										recordSelectCombo.setEditable(false);
-										recordSelectCombo.setItems(recordSetNames);
-										RecordSet recordSet = channels.getActiveChannel().get(oldRecordSetName);
-										recordSet.setName(newRecordSetName);
-										activeChannel.put(newRecordSetName, recordSet);
-										activeChannel.remove(oldRecordSetName);
-										activeChannel.getRecordSetNames();
-										channels.getActiveChannel().switchRecordSet(newRecordSetName);
 									}
 								}
 							});
@@ -552,23 +557,25 @@ public class MenuToolBar {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("deleteAufnahme.widgetSelected, event=" + evt);
 								Channel activeChannel = channels.getActiveChannel();
-								RecordSet recordSet = activeChannel.getActiveRecordSet();
-								if (recordSet != null) {
-									String deleteRecordSetName = recordSet.getName();
-									// before deletion set new active record set
-									String newRecorKey = null;
-									int selectionIndex = recordSelectCombo.getSelectionIndex();
-									if ((selectionIndex - 1) > 0)
-										newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
-									else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex + 1);
-									;
-									if (newRecorKey != null) activeChannel.setActiveRecordSet(newRecorKey);
-									// ready for deletion
-									activeChannel.get(deleteRecordSetName).clear();
-									activeChannel.remove(deleteRecordSetName);
-									log.fine("deleted " + deleteRecordSetName);
-									updateRecordSetSelectCombo();
-									application.updateDataTable();
+								if (activeChannel != null) {
+									RecordSet recordSet = activeChannel.getActiveRecordSet();
+									if (recordSet != null) {
+										String deleteRecordSetName = recordSet.getName();
+										// before deletion set new active record set
+										String newRecorKey = null;
+										int selectionIndex = recordSelectCombo.getSelectionIndex();
+										if ((selectionIndex - 1) > 0)
+											newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
+										else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex + 1);
+										;
+										if (newRecorKey != null) activeChannel.setActiveRecordSet(newRecorKey);
+										// ready for deletion
+										activeChannel.get(deleteRecordSetName).clear();
+										activeChannel.remove(deleteRecordSetName);
+										log.fine("deleted " + deleteRecordSetName);
+										updateRecordSetSelectCombo();
+										application.updateDataTable();
+									}
 								}
 							}
 						});
@@ -608,19 +615,21 @@ public class MenuToolBar {
 	 */
 	private void openCloseSerialPort() {
 		IDevice device = application.getActiveDevice();
-		DeviceSerialPort serialPort = device.getSerialPort();
-		if (serialPort != null) {
-			if (!serialPort.isConnected()) {
-				try {
-					serialPort.open();
+		if (device != null) {
+			DeviceSerialPort serialPort = device.getSerialPort();
+			if (serialPort != null) {
+				if (!serialPort.isConnected()) {
+					try {
+						serialPort.open();
+					}
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					}
 				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+				else {
+					serialPort.close();
 				}
-			}
-			else {
-				serialPort.close();
 			}
 		}
 	}
@@ -677,6 +686,9 @@ public class MenuToolBar {
 				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
 			}
 			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
+		}
+		else { // no channel
+			channelSelectCombo.setItems( new String[] {""});
 		}
 		channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
@@ -834,6 +846,12 @@ public class MenuToolBar {
 		return recordSelectCombo;
 	}
 
+	public void enableDeviceSwitchButtons(boolean enabled) {
+		prevDeviceToolItem.setEnabled(enabled);
+		nextDeviceToolItem.setEnabled(enabled);
+		updateChannelSelector();
+	}
+	
 	@SuppressWarnings("unused")
 	private void initGUI() {
 		try {

@@ -31,7 +31,10 @@ import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
+import osde.device.IDevice;
+import osde.exception.ApplicationConfigurationException;
 import osde.io.CSVReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -578,9 +581,12 @@ public class MenuBar {
 	 */
 	public void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
 		try {
+			IDevice activeDevice = application.getActiveDevice();
+			if (activeDevice == null) throw new ApplicationConfigurationException("Vor dem Import bitte erst ein Gerät auswählen !");
 			String fileSep = System.getProperty("file.separator");
 			Settings deviceSetting = Settings.getInstance();
-			String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
+			String devicePath = application.getActiveDevice() != null ? fileSep + application.getActiveDevice().getName() : "";
+			String path = deviceSetting.getDataFilePath() + devicePath + fileSep;
 			FileDialog csvFileDialog = application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
 			if (csvFileDialog.getFileName().length() > 4) {
 				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
@@ -590,7 +596,7 @@ public class MenuBar {
 			}
 		}
 		catch (Exception e) {
-			application.openMessageDialog(e.getMessage());
+			application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 
@@ -602,18 +608,22 @@ public class MenuBar {
 	public void exportFileCVS(String dialogName, boolean isRaw) {
 		try {
 			Settings deviceSetting = Settings.getInstance();
-			String path = deviceSetting.getDataFilePath() + fileSep + application.getActiveDevice().getName();
+			String devicePath = application.getActiveDevice() != null ? fileSep + application.getActiveDevice().getName() : "";
+			String path = deviceSetting.getDataFilePath() + devicePath + fileSep;
 			FileDialog csvFileDialog = application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
 			if (csvFileDialog.getFileName().length() > 4) {
 				Channel activeChannel = channels.getActiveChannel();
-				String recordSetKey = activeChannel.getActiveRecordSet().getName();
+				if (activeChannel == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
+				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+				if (activeRecordSet == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
+				String recordSetKey = activeRecordSet.getName();
 				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
 				addSubHistoryMenuItem(csvFileDialog.getFileName());
 				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
 			}
 		}
 		catch (Exception e) {
-			application.openMessageDialog(e.getMessage());
+			application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 
