@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DataTypes;
@@ -344,9 +345,14 @@ public class PicolarioConfigTab extends Composite {
 								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, slopeTimeSelection);
 								device.setChangePropery(true);
 								device.storeDeviceProperties();
-								RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-								activeRecordSet.get(measurementKey).setDisplayable(false);
-								device.makeInActiveDisplayable(activeRecordSet);
+								Channel activeChannel = Channels.getInstance().getActiveChannel();
+								if (activeChannel != null) {
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									if (activeRecordSet != null) {
+										activeRecordSet.get(measurementKey).setDisplayable(false);
+										device.makeInActiveDisplayable(activeRecordSet);
+									}
+								}
 							}
 						});
 					}
