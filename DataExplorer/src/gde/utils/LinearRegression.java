@@ -117,7 +117,8 @@ public class LinearRegression extends CalculationThread {
 		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
-
+		if (record.isVisible()) application.updateGraphicsWindow();
+		
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
 		log.fine("finished data calculation for record = " + targetRecordKey);
 	}

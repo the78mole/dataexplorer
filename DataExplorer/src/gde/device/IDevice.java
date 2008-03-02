@@ -26,8 +26,9 @@ import osde.serial.DeviceSerialPort;
  */
 public interface IDevice {
 	// define some global constants for data calculation 
-	public static final String 	OFFSET = "offset";
-	public static final String	FACTOR = "factor";
+	public static final String 	OFFSET 		= "offset";
+	public static final String	FACTOR 		= "factor";
+	public static final String	REDUCTION = "reduction";
 	
 	/**
 	 * @return the device dialog

@@ -16,16 +16,15 @@
 ****************************************************************************************/
 package osde.device.renschler;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -34,15 +33,26 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.config.Settings;
-import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
  * @author Winfried Brügmann
@@ -55,21 +65,9 @@ public class PicolarioDialog extends DeviceDialog {
 	private CLabel										numberAvailableRecordSetsLabel;
 	private String										numberAvailable				= "0";
 
-	private Group											heightAdaptionGroup2;
-	private Button										reduceByFirstValueButton;
-	private CCombo										heightUnit;
-	private Label											heightUnitLabel;
-	private CCombo										heightOffset;
-	private Button										noAdaptioButton;
-	private Button										reduceByDefinedValueButton;
-	private Label											heightReductionLabel;
-	private boolean										doSubtractFirst				= true;																					// indicates to subtract first values from all other
-	private boolean										doSubtractLast				= false;																				// indicates to subtract last values from all other
-	private boolean										doReduceHeight				= false;																				// indicates that the height has to be corrected by an offset
-	private int												heightUnitSelection		= 0;																						// Feet 0, Meter 1
-	private int												heightOffsetSelection	= 7;																						// represents the offset the measurment should be modified
-	private double										heightOffsetValue			= 100;																					// represents the offset value
-	private boolean 									doSwtichRecordSet = false;
+	private CTabFolder 								configTabFolder;
+	private CTabItem									configTabItem1, configTabItem2;
+	private PicolarioConfigTab				configTab1, configTab2;
 
 	private Group											readDataGroup3;
 	private Button										readSingle;
@@ -78,13 +76,12 @@ public class PicolarioDialog extends DeviceDialog {
 	private CLabel 										alreadyRedDataSetsLabel;
 	private CLabel 										redDataSets;
 	private Button										switchRecordSetButton;
-	private Button										reduceByLastValueButton;
 	private Button										readAllRecords;
 	private CLabel										numberRedTelegramLabel;
 	private CCombo										recordSetSelectCombo;
 	private String										redDatagrams					= "0";
-	private String										heightDataUnit				= "m";																					// Meter is default
 	private String										redDataSetsText				= "0";
+	private boolean 									doSwtichRecordSet = false;
 
 	private final Settings						settings;
 	private final Picolario						device;
@@ -117,7 +114,7 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(344, 490);
+			dialogShell.setSize(344, 548);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
@@ -271,163 +268,30 @@ public class PicolarioDialog extends DeviceDialog {
 					});
 				}
 			} // end group 3
-			{ // group 2
-				heightAdaptionGroup2 = new Group(dialogShell, SWT.NONE);
-				heightAdaptionGroup2.setLayout(null);
-				FormData heightAdaptionGroupLData = new FormData();
-				heightAdaptionGroupLData.width = 306;
-				heightAdaptionGroupLData.height = 119;
-				heightAdaptionGroupLData.left =  new FormAttachment(0, 1000, 12);
-				heightAdaptionGroupLData.top =  new FormAttachment(0, 1000, 85);
-				heightAdaptionGroupLData.right =  new FormAttachment(1000, 1000, -12);
-				heightAdaptionGroup2.setLayoutData(heightAdaptionGroupLData);
-				heightAdaptionGroup2.setText("2. Einstellungen für die Höhenberechnung");
-				{
-					noAdaptioButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
-					noAdaptioButton.setText("Höhenwerte nicht anpassen");
-					noAdaptioButton.setBounds(12, 21, 186, 16);
-					noAdaptioButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("noAdaptioButton.widgetSelected, event=" + evt);
-							noAdaptioButton.setSelection(true);
-							reduceByFirstValueButton.setSelection(false);
-							reduceByLastValueButton.setSelection(false);
-							reduceByDefinedValueButton.setSelection(false);
-							doSubtractFirst = false;
-							doSubtractLast = false;
-							doReduceHeight = false;
-							application.updateGraphicsWindow();
-						}
-					});
-				}
-				{
-					reduceByFirstValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
-					reduceByFirstValueButton.setText("ersten Höhenwert von den folgenden abziehen");
-					reduceByFirstValueButton.setSelection(doSubtractFirst);
-					reduceByFirstValueButton.setBounds(12, 42, 297, 16);
-					reduceByFirstValueButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("reduceByFirstValueButton.widgetSelected, event=" + evt);
-							noAdaptioButton.setSelection(false);
-							reduceByFirstValueButton.setSelection(true);
-							reduceByLastValueButton.setSelection(false);
-							reduceByDefinedValueButton.setSelection(false);
-							doSubtractFirst = true;
-							doSubtractLast = false;
-							doReduceHeight = false;
-							application.updateGraphicsWindow();
-						}
-					});
-				}
-				{
-					reduceByLastValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
-					reduceByLastValueButton.setBounds(12, 62, 293, 18);
-					reduceByLastValueButton.setText("letzten Höhenwert von allen anderen abziehen");
-					reduceByLastValueButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("reduceByLastValueButton.widgetSelected, event=" + evt);
-							noAdaptioButton.setSelection(false);
-							reduceByFirstValueButton.setSelection(false);
-							reduceByLastValueButton.setSelection(true);
-							reduceByDefinedValueButton.setSelection(false);
-							doSubtractFirst = false;
-							doSubtractLast = true;
-							doReduceHeight = false;
-							application.updateGraphicsWindow();
-						}
-					});
-				}
-				{
-					reduceByDefinedValueButton = new Button(heightAdaptionGroup2, SWT.RADIO | SWT.LEFT);
-					reduceByDefinedValueButton.setText("Höhe um");
-					reduceByDefinedValueButton.setSelection(doReduceHeight);
-					reduceByDefinedValueButton.setBounds(12, 84, 75, 16);
-					reduceByDefinedValueButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("reduceByDefinedValueButton.widgetSelected, event=" + evt);
-							noAdaptioButton.setSelection(false);
-							reduceByFirstValueButton.setSelection(false);
-							reduceByLastValueButton.setSelection(false);
-							reduceByDefinedValueButton.setSelection(true);
-							doReduceHeight = true;
-							doSubtractFirst = false;
-							doSubtractLast = false;
-							heightOffsetValue = new Double(heightOffset.getText()).doubleValue();
-							application.updateGraphicsWindow();
-						}
-					});
-				}
-				{
-					heightOffset = new CCombo(heightAdaptionGroup2, SWT.BORDER);
-					final String[] heightOffsetValues = new String[] {"-200", "-100", "-50", "0", "50", "100", "150", "200", "250", "300", "400", "500", "750", "1000", "1500" };
-					heightOffset.setItems(heightOffsetValues);
-					heightOffset.setText(new Double(heightOffsetValue).toString());
-					for (int i = 0; i < heightOffsetValues.length; i++) {
-						if (heightOffsetValues.equals(heightOffsetValue)) heightOffset.select(heightOffsetSelection);
+			{
+				configTabFolder = new CTabFolder(dialogShell, SWT.BORDER);
+				FormData cTabFolder1LData = new FormData();
+				cTabFolder1LData.width = 306;
+				cTabFolder1LData.height = 184;
+				cTabFolder1LData.left =  new FormAttachment(0, 1000, 12);
+				cTabFolder1LData.right =  new FormAttachment(1000, 1000, -12);
+				cTabFolder1LData.top =  new FormAttachment(0, 1000, 79);
+				configTabFolder.setLayoutData(cTabFolder1LData);
+				{ // config tab
+					if(device.getChannelCount() > 0) {
+						configTabItem1 = new CTabItem(configTabFolder, SWT.NONE);
+						configTabItem1.setText(device.getChannelName(1));
+						configTab1 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(1));
+						configTabItem1.setControl(configTab1);
 					}
-					heightOffset.setBounds(104, 84, 84, 21);
-					heightOffset.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("heightOffset.widgetSelected, event=" + evt);
-							heightOffsetValue = new Double(heightOffsetValues[heightOffset.getSelectionIndex()]).doubleValue();
-							application.updateGraphicsWindow();
-						}
-					});
-					heightOffset.addKeyListener(new KeyAdapter() {
-						public void keyPressed(KeyEvent evt) {
-							log.finest("heightOffset.keyPressed, event=" + evt);
-							if (evt.character == SWT.CR) {
-								//heightOffsetSelection 
-								try {
-									heightOffsetValue = new Double(heightOffset.getText().replace(',', '.')).doubleValue();
-									application.updateGraphicsWindow();
-								}
-								catch (NumberFormatException e) {
-									log.log(Level.WARNING, e.getMessage(), e);
-									application.openMessageDialog("Eingabefehler : " + e.getMessage());
-								}
-							}
-						}
-					});
-				}
-				{
-					heightReductionLabel = new Label(heightAdaptionGroup2, SWT.NONE);
-					heightReductionLabel.setBounds(197, 82, 60, 19);
-					heightReductionLabel.setText("verringern");
-				}
-				{
-					heightUnitLabel = new Label(heightAdaptionGroup2, SWT.NONE);
-					heightUnitLabel.setBounds(14, 108, 88, 19);
-					heightUnitLabel.setText("Höheneinheit");
-				}
-				{
-					heightUnit = new CCombo(heightAdaptionGroup2, SWT.BORDER | SWT.LEFT);
-					heightUnit.setBounds(104, 108, 84, 21);
-					heightUnit.setItems(new java.lang.String[] { "Meter", "Fuß" });
-					heightUnit.setEditable(false);
-					heightUnit.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-					heightUnit.setToolTipText("1 Meter = 3.2808 Fuß  <-->  1 Fuß = 0.3048 Meter]");
-					heightUnit.select(heightUnitSelection); // feet is default
-					heightUnit.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("höhenMassCombo.widgetSelected, event=" + evt);
-							heightUnitSelection = heightUnit.getSelectionIndex();
-							switch (heightUnitSelection) {
-							case 0:
-								heightDataUnit = "m";
-								break;
-							case 1:
-								heightDataUnit = "Fuß";
-								break;
-							}
-							application.updateGraphicsWindow();
-							application.updateDigitalWindowChilds();
-							application.updateAnalogWindowChilds();
-							Channels.getInstance().getActiveChannel().getActiveRecordSet().setTableDataCalculated(false);
-							application.updateDataTable();
-						}
-					});
-				}
+					if(device.getChannelCount() > 1) {
+						configTabItem2 = new CTabItem(configTabFolder, SWT.NONE);
+						configTabItem2.setText(device.getChannelName(2));
+						configTab2 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(2));
+						configTabItem2.setControl(configTab2);
+					}
+				}// config tab
+				configTabFolder.setSelection(0);
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();
@@ -444,29 +308,6 @@ public class PicolarioDialog extends DeviceDialog {
 
 	public void setAvailableRecordSets(int number) {
 		numberAvailableRecordSetsLabel.setText(new Integer(number).toString());
-	}
-
-	/**
-	 * returns the check info as follow
-	 *   1 = nichtAnpassenButton.setSelection(true);
-	 *   2 = ertsenWertAbziehenButton.setSelection(true);
-	 *   4 = höheVerringernButton.setSelection(true);
-	 *   only 1 or 2 or 4 can returned
-	 * @return integer of unit type
-	 */
-	public int getReduceHeightSelectionType() {
-		int selection = noAdaptioButton.getSelection() ? 1 : 0;
-		selection = selection + (reduceByFirstValueButton.getSelection() ? 1 : 0);
-		selection = selection + (reduceByDefinedValueButton.getSelection() ? 1 : 0);
-		return selection;
-	}
-
-	/**
-	 * call this method, if reduceHeightSelectiontYpe is 4
-	 * @return integer of dialog selected value
-	 */
-	public int getReduceHeightSelection() {
-		return new Integer(heightOffset.getText()).intValue();
 	}
 
 	/**
@@ -577,53 +418,12 @@ public class PicolarioDialog extends DeviceDialog {
 			});
 		}
 	}
-
-	/**
-	 * @return the heightDataUnit
-	 */
-	public String getHeightDataUnit() {
-		return heightDataUnit;
-	}
-
-	/**
-	 * @return the heightUnitSelection
-	 */
-	public int getHeightUnitSelection() {
-		return heightUnitSelection;
-	}
-
-	/**
-	 * @return the heightOffsetValue
-	 */
-	public double getHeightOffsetValue() {
-		return heightOffsetValue;
-	}
-
-	/**
-	 * @return the doReduceHeight
-	 */
-	public boolean isDoReduceHeight() {
-		return doReduceHeight;
-	}
-
-	/**
-	 * @return the doSubtractFirst
-	 */
-	public boolean isDoSubtractFirst() {
-		return doSubtractFirst;
-	}
-
-	/**
-	 * @return the doSubtractLast
-	 */
-	public boolean isDoSubtractLast() {
-		return doSubtractLast;
-	}
-
+	
 	/**
 	 * @return the doSwtichRecordSet
 	 */
 	public boolean isDoSwtichRecordSet() {
 		return doSwtichRecordSet;
 	}
+	
 }

@@ -518,7 +518,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * get the factor value of the specified measurement
+	 * get the factor value of the specified measurement (offset + (value - reduction) * factor)
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @return the factor, if property does not exist return 1.0 as default value
@@ -533,7 +533,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * set new value for factor at the specified measurement
+	 * set new value for factor at the specified measurement (offset + (value - reduction) * factor)
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @param factor the offset to set
@@ -546,6 +546,38 @@ public class DeviceConfiguration {
 		}
 		else {
 			property.setValue("" + factor);
+		}
+	}
+
+	/**
+	 * get the reduction value of the specified measurement (offset + (value - reduction) * factor)
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return the reduction, if property does not exist return 0.0 as default value
+	 */
+	public double getMeasurementReduction(String channelConfigKey, String measurementKey) {
+		if(log.isLoggable(Level.FINER)) log.finer("get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.REDUCTION);
+		if (property == null) // property does not exist
+			return 0.0;
+		else
+			return new Double(property.getValue()).doubleValue();
+	}
+
+	/**
+	 * set new value for factor at the specified measurement (offset + (value - reduction) * factor)
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param factor the offset to set
+	 */
+	public void setMeasurementReduction(String channelConfigKey, String measurementKey, double reduction) {
+		if(log.isLoggable(Level.FINER)) log.finer("set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.REDUCTION);
+		if (property == null) {
+			createProperty(channelConfigKey, measurementKey, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
+		}
+		else {
+			property.setValue("" + reduction);
 		}
 	}
 

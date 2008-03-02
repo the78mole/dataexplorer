@@ -25,14 +25,13 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import osde.data.Channels;
-import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.MeasurementType;
 import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
+import osde.utils.LinearRegression;
 import osde.utils.QuasiLinearRegression;
 
 /**
@@ -40,13 +39,18 @@ import osde.utils.QuasiLinearRegression;
  * @author Winfried Brügmann
  */
 public class Picolario extends DeviceConfiguration implements IDevice {
-	private Logger									log										= Logger.getLogger(this.getClass().getName());
+	private Logger												log								= Logger.getLogger(this.getClass().getName());
 
-	private final OpenSerialDataExplorer application;
-	private final PicolarioDialog	dialog;
-	private final PicolarioSerialPort serialPort;
-	private final Channels channels;
-	private CalculationThread				calculationThread;
+	public final static String						DO_NO_ADAPTION		= "do_no_adaption";
+	public final static String						DO_OFFSET_HEIGHT	= "do_offset_height";
+	public final static String						DO_SUBTRACT_FIRST	= "do_subtract_first";
+	public final static String						DO_SUBTRACT_LAST	= "subtract_last";
+
+	private final OpenSerialDataExplorer	application;
+	private final PicolarioDialog					dialog;
+	private final PicolarioSerialPort			serialPort;
+	private final Channels								channels;
+	private CalculationThread							slopeCalculationThread;
 
 	/**
 	 * @param iniFile
@@ -75,156 +79,100 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 	}
 
-//	/**
-//	 * function to translate measured values from a device to values represented
-//	 * @return double[] where value[0] is the min value and value[1] the max value
-//	 */
-//	public double[] translateValues(String recordKey, double minValue, double maxValue) {
-//		double[] newValues = new double[2];
-//
-//		newValues[0] = translateValue(recordKey, minValue);
-//		newValues[1] = translateValue(recordKey, maxValue);
-//
-//		return newValues;
-//	}
-
 	/**
-	 * function to translate measured value from a device to values represented
+	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String configKey, String recordKey, double value) {
-		double newValue = 0.0;
-		String[] measurements = this.getMeasurementNames(configKey); // 0=Spannung, 1=Höhe, 2=Steigung
+	public double translateValue(String channelConfigKey, String recordKey, double value) {
 		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
-			// calculate voltage U = 2.5 + (byte3 - 45) * 0.0532
-			newValue = 2.5 + (value - 45.0) * 0.0532;
-		}
-		else if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
-			int firstValue = 0; // != 0 if first value must subtracted
-			double offset = 0; // != 0 if curve has an defined offset
-			double factor = 1.0; // != 1 if a unit translation is required
-			// prepare the data for adding to record set
-			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
-			case 0: // Meter , Feet is default
-				factor = 1852.0 / 6076.0;
-				break;
-			case 1: // Feet /Fuß
-				factor = 1.0;
-				break;
-			}
-			// get the record set to be used
-			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-			
-			if (dialog.isDoSubtractFirst()) {
-				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
-			}
-			else if (dialog.isDoSubtractLast()) {
-				Record record = recordSet.getRecord(recordKey);
-				firstValue = record.getLast().intValue() / 1000;
-			}
-			else if (dialog.isDoReduceHeight()) {
-				offset = dialog.getHeightOffsetValue();
-			}
-			if (log.isLoggable(Level.FINER)) log.finer("value = " + value + " firstValue = " + firstValue + " factor = " + factor + " offset = " + offset);
-			newValue = (value - firstValue) * factor - offset;
-		}
-		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
-			double factor = 1.0; // != 1 if a unit translation is required
-			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
-			case 0: // Meter , Feet is default
-				factor = 1852.0 / 6076.0;
-				break;
-			case 1: // Feet /Fuß
-				factor = 1.0;
-				break;
-			}
-			newValue = value * factor;
-		}
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
-		return newValue;
-	}
-
-	/**
-	 * function to translate measured value from a device to values represented
-	 * @return double with the adapted value
-	 */
-	public double reverseTranslateValue(String configKey, String recordKey, double value) {
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		double newValue = 0;
-		String[] measurements = this.getMeasurementNames(configKey); // 0=Spannung, 1=Höhe, 2=Steigung
-		if (recordKey.startsWith(measurements[0])) { // 0=Spannung
-			// calculate voltage U = 2.5 + (value - 45) * 0.0532
-			newValue = (value - 2.5) / 0.0532 + 45.0;
-		}
-		else if (recordKey.startsWith(measurements[1])) {  	// 1=Höhe
-			int firstValue = 0; // != 0 if first value must subtracted
-			double offset = 0; // != 0 if curve has an defined offset
-			double factor = 1.0; // != 1 if a unit translation is required
-			// prepare the data for adding to record set
-			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
-			case 0: // Meter , Feet is default
-				if (log.isLoggable(Level.FINER)) log.finer("heightUnitSelection = " + dialog.getHeightUnitSelection());
-				factor = 1852.0 / 6076.0;
-				break;
-			case 1: // Feet /Fuß
-				if (log.isLoggable(Level.FINER)) log.finer("heightUnitSelection = " + dialog.getHeightUnitSelection());
-				factor = 1.0;
-				break;
-			}
-			// get the record set to be used
-			RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-			if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-			
-			if (dialog.isDoSubtractFirst()) {
-				firstValue = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
-			}
-			else if (dialog.isDoSubtractLast()) {
-				Record record = recordSet.getRecord(recordKey);
-				firstValue = record.getLast().intValue() / 1000;
-			}
-			else if (dialog.isDoReduceHeight()) {
-				offset = dialog.getHeightOffsetValue();
-			}
-			if (log.isLoggable(Level.FINER)) log.finer("value = " + value + " offset = " + offset + " factor = " + factor + " firstValue = " + firstValue);
-			newValue = (value + offset) / factor + firstValue;
-		}
-		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
-			double factor = 1.0; // != 1 if a unit translation is required
-			switch (dialog.getHeightUnitSelection()) { // Feet 1, Meter 0
-			case 0: // Meter , Feet is default
-				factor = 1852.0 / 6076.0;
-				break;
-			case 1: // Feet /Fuß
-				factor = 1.0;
-				break;
-			}
-			newValue = value / factor;
-		}
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
-		return newValue;
-	}
-
-	/**
-	 * @return the dataUnit
-	 */
-	public String getDataUnit(String channelConfigKey, String recordKey) {
-		String unit = "";
-		recordKey = recordKey.split("_")[0];
-		MeasurementType measurement = this.getMeasurement(channelConfigKey, recordKey);
+		
 		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
-		//channel.get("Messgröße1");
-		if (recordKey.startsWith(measurements[0])) {		// 0=Spannung
-			unit = (String) measurement.getUnit();
+		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
+		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
+		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
+		
+		// height calculation need special procedure
+		if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
+			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
+			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
+			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			
+			if(subtractFirst) {
+				// get the record set to be used
+				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
+				
+				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
+			}
+			else if (subtractLast) {
+				// get the record set to be used
+				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
+				
+				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+			}
+			else
+				reduction = 0;
 		}
-		else if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
-			unit = dialog.getHeightDataUnit();
+		
+		// slope calculation needs height factor
+		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
+			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]); 
 		}
-		else if (recordKey.startsWith(measurements[2])) {	// 2=Steigung
-			unit = dialog.getHeightDataUnit() + "/" +  measurement.getUnit().split("/")[1];
+		
+		double newValue = offset + (value - reduction) * factor;
+		
+		if(log.isLoggable(Level.FINER)) log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+		return newValue;
+	}
+
+	/**
+	 * function to translate measured value from a device to values represented (((value - offset + firstLastAdaption)/factor) + reduction)
+	 * @return double with the adapted value
+	 */
+	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
+		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
+		
+		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
+		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
+		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
+		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
+		
+		// height calculation need special procedure
+		if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
+			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
+			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
+			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			
+			if(subtractFirst) {
+				// get the record set to be used
+				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
+				
+				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
+			}
+			else if (subtractLast) {
+				// get the record set to be used
+				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
+				
+				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+			}
+			else
+				reduction = 0;
 		}
-		return unit;
+
+		// slope calculation needs height factor
+		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
+			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]); 
+		}
+		
+		double newValue = (value - offset)/factor + reduction;
+
+		if(log.isLoggable(Level.FINER)) log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+		return newValue;
 	}
 
 	/**
@@ -238,8 +186,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				// calculate the values required				
 				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); 
-				calculationThread.start();
+				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_TYPE);
+				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
+					slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				else
+					slopeCalculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+
+				slopeCalculationThread.start();
 			}
 		}
 	}
