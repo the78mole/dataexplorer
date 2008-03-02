@@ -314,13 +314,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									deviceSlider.setBounds(393, 18, 119, 25);
 									deviceSlider.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									deviceSlider.setMinimum(0);
+									deviceSlider.setMaximum(1);
+									deviceSlider.setIncrement(1);
 									deviceSlider.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("deviceSlider.widgetSelected, event=" + evt);
 											// allow device switch only if port not connected
 											if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port not connected
 												int position = deviceSlider.getSelection();
-												log.fine(" Position: " + position);
+												log.info(" Position: " + position);
 												if (activeDevices.size() > 0 && !activeDevices.get(position).equals(activeName)) {
 													activeName = activeDevices.get(position);
 													log.fine("activeName = " + activeName);
@@ -734,7 +736,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			log.fine(activeName + " - " + activeDevices.indexOf(activeName));
 
 			deviceSlider.setMaximum(activeDevices.size());
-			deviceSlider.setIncrement(1);
 			deviceSlider.setSelection(activeDevices.indexOf(activeName));
 			log.fine("activeDevices.size() " + activeDevices.size());
 		}
