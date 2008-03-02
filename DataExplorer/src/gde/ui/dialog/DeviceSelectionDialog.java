@@ -617,7 +617,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											deviceConfigurations.get(device).setUsed(false);
 											
 											// the removed configuration is the active one
-											if (activeDeviceConfig.getName().equals(deviceConfigurations.get(device).getName())) {
+											if (activeDeviceConfig != null && activeDeviceConfig.getName().equals(deviceConfigurations.get(device).getName())) {
 												// take another available
 												if (activeDevices.size() >  0) {
 													activeDeviceConfig = deviceConfigurations.get(activeDevices.firstElement());
