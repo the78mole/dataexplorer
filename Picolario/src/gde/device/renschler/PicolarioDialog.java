@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -36,6 +38,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.config.Settings;
+import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -121,6 +124,11 @@ public class PicolarioDialog extends DeviceDialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
 					if (gatherThread != null && gatherThread.isAlive()) gatherThread.setThreadStop(true);
+				}
+			});
+			dialogShell.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 				}
 			});
 			{ // group 1

@@ -321,7 +321,7 @@ public class PicolarioConfigTab extends Composite {
 									slopeTypeSelection = CalculationThread.REGRESSION_TYPE_LINEAR;
 								
 								String measurementKey = device.getMeasurementNames(configName)[2]; // slope
-								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, slopeTypeSelection);
+								device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, slopeTypeSelection);
 								device.setChangePropery(true);
 								device.storeDeviceProperties();
 								RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
