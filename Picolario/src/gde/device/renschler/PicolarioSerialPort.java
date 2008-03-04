@@ -58,23 +58,35 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	/**
 	 * ask the Picolario about the number of available record sets
 	 * @return number of record sets available
-	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * @throws Exception 
 	 */
-	public synchronized int readNumberAvailableRecordSets() throws IOException, InterruptedException {
+	public synchronized int readNumberAvailableRecordSets() throws Exception {
 		int recordSets = 0;
+		boolean isPortOpenedByMe = false;
+		try {
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
 
-		this.write(readNumberRecordSets);
-		Thread.sleep(30);
-		this.write(readNumberRecordSets);
+			this.write(readNumberRecordSets);
+			Thread.sleep(30);
+			this.write(readNumberRecordSets);
 
-		byte[] answer = this.read(4, 2);
+			byte[] answer = this.read(4, 2);
 
-		if (answer[0] != readNumberRecordSets[0] && answer[2] != readNumberRecordSets[0])
-			throw new IOException("command to answer missmatch");
-		else
-			recordSets = (int) (answer[1] & 0xFF);
-
+			if (answer[0] != readNumberRecordSets[0] && answer[2] != readNumberRecordSets[0])
+				throw new IOException("command to answer missmatch");
+			else
+				recordSets = (int) (answer[1] & 0xFF);
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			if (isPortOpenedByMe) this.close();
+		}
 		log.fine("number available record sets = " + recordSets);
 		return recordSets;
 	}
@@ -94,10 +106,16 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		byte[] readBuffer;
 		int numberRed = 0;
 		byte[] readRecordSetsWithNumber = new byte[] { readRecordSets[0], (byte) datagramNumber, readRecordSets[0], (byte) datagramNumber };
-		write(readRecordSetsWithNumber);
-		isTransmitFinished = false;
 
+		boolean isPortOpenedByMe = false;
 		try {
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
+			write(readRecordSetsWithNumber);
+			isTransmitFinished = false;
+
 			Thread.sleep(20); // wait for 20 ms since it makes no sense to check receive buffer earlier
 
 			while (!isTransmitFinished) {
@@ -127,13 +145,13 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 						//acknowledge request next
 						this.write(new byte[] { readBuffer[readBuffer.length - 1], readBuffer[readBuffer.length - 1] });
 						// update the dialog
-						if (device != null) ((PicolarioDialog)device.getDialog()).setAlreadyRedText(numberRed++);
+						if (device != null) ((PicolarioDialog) device.getDialog()).setAlreadyRedText(numberRed++);
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
 						log.warning("write wrong checksum required");
 						byte wrongChecksum = readBuffer[readBuffer.length - 1];
-						byte[] requestAgain = new byte[] {wrongChecksum, wrongChecksum};
+						byte[] requestAgain = new byte[] { wrongChecksum, wrongChecksum };
 						this.write(requestAgain);
 					}
 				}
@@ -142,26 +160,15 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 				}
 			} // end while receive loop
 
+			String[] measurements = device.getMeasurementNames(device.getChannelName(1)); // 0=Spannung, 1=Höhe, 2=Steigrate
+			data.put(measurements[0], voltage);
+			data.put(measurements[1], height);
 		}
-		catch (TimeOutException e) {
+		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		catch (IOException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-		catch (ReadWriteOutOfSyncException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-		catch (InterruptedException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-
-		String[] measurements = device.getMeasurementNames(device.getChannelName(1)); // 0=Spannung, 1=Höhe, 2=Steigrate
-		data.put(measurements[0], voltage);
-		data.put(measurements[1], height);
-		if (application != null) {
-			application.setSerialRxOff();
-			application.setSerialTxOff();
+		finally {
+			if (isPortOpenedByMe) this.close();
 		}
 		return data;
 	}

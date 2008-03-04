@@ -150,7 +150,7 @@ public class PicolarioDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt);
 							try {
-								if (serialPort != null && serialPort.isConnected()) {
+								if (serialPort != null) {
 									int availableRecords = serialPort.readNumberAvailableRecordSets();
 									numberAvailable = new Integer(availableRecords).toString();
 									numberAvailableRecordSetsLabel.setText(numberAvailable);
@@ -160,12 +160,10 @@ public class PicolarioDialog extends DeviceDialog {
 									resetTelegramLabel();
 									resetDataSetsLabel();
 								}
-								else
-									application.openMessageDialog("Erst den seriellen Port öffnen");
 							}
 							catch (Exception e) {
 								serialPort.close();
-								application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port");
+								application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
 							}
 						}
 					});
