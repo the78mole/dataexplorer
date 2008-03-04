@@ -206,14 +206,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		try {
 			if (application != null) application.setSerialTxOn();
 
-			if (log.isLoggable(Level.FINER)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
 				sb.append("Write data: ");
 				for (int i = 0; i < buf.length; i++) {
 					sb.append(String.format("%02X ", buf[i]));
 				}
 				sb.append(" to port ").append(serialPort.getName()).append(newLine);
-				log.finer(sb.toString());
+				log.fine(sb.toString());
 			}
 
 			// write string to serial port
@@ -244,8 +244,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			try {
 				this.numBytesAvailable = inputStream.available();
 				if (this.numBytesAvailable > 0) isReadBufferEmpty = false;
-				if (log.isLoggable(Level.FINE)) {
-					log.fine("inputStream numBytesAvailable = " + this.numBytesAvailable);
+				if (log.isLoggable(Level.FINER)) {
+					log.finer("inputStream numBytesAvailable = " + this.numBytesAvailable);
 				}
 			}
 			catch (IOException e) {
@@ -274,13 +274,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				throw new IOException("Warning: missed expected number of bytes to be read");
 			}
 
-			if (log.isLoggable(Level.FINER)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: ");
 				for (int i = 0; i < readBuffer.length; i++) {
 					sb.append(String.format("%02X ", readBuffer[i]));
 				}
-				log.finer(sb.toString());
+				log.fine(sb.toString());
 			}
 
 			if (application != null) application.setSerialRxOff();
@@ -309,10 +309,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			while (this.numBytesAvailable < numBytes) {
 				Thread.sleep(1);
 				counter--;
-				if(log.isLoggable(Level.FINEST)) log.finest("time out counter = " + counter);
+				if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
 				if (counter <= 0) throw new IOException("Error: can not read result during given timeout !");
 			}
-			if(log.isLoggable(Level.FINEST)) log.finest("inputStream numBytesAvailable = " + (resBytes = this.numBytesAvailable));
+			if(log.isLoggable(Level.FINER)) log.finer("inputStream numBytesAvailable = " + (resBytes = this.numBytesAvailable));
 		}
 		catch (InterruptedException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -330,16 +330,16 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int waitForStabelReceiveBuffer(int expectedBytes, int timeout_sec) throws InterruptedException, TimeOutException {
 
-		int timeCounter = timeout_sec * 1000 / 5; // 5 msec per time interval
+		int timeCounter = timeout_sec * 1000/2; // 2 msec per time interval
 		int stableCounter = 20;
 		boolean isStable = false;
 		boolean isTimedOut = false;
 
 		// availableBytes are updated by event handler
 		int byteCounter = this.numBytesAvailable;
-		Thread.sleep(7);
+		Thread.sleep(15);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			Thread.sleep(5); // 2 ms
+			Thread.sleep(2); // 2 ms
 
 			if (byteCounter == this.numBytesAvailable)
 				--stableCounter;
@@ -351,9 +351,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			byteCounter = this.numBytesAvailable;
 			--timeCounter;
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.finest("stableCounter = " + stableCounter);
-				log.finest(" timeCounter = " + timeCounter);
+			if (log.isLoggable(Level.FINER)) {
+				log.finer("stableCounter = " + stableCounter);
+				log.finer(" timeCounter = " + timeCounter);
 			}
 			if (timeCounter == 0) throw new TimeOutException("can not receive data in given time");
 
@@ -369,7 +369,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public void checkForLeftBytes() throws ReadWriteOutOfSyncException, IOException {
 		//check available bytes in receive buffer == 0
-		log.finest("inputStream available bytes = " + inputStream.available());
+		if (log.isLoggable(Level.FINER)) log.finer("inputStream available bytes = " + inputStream.available());
 		if (inputStream.available() != 0) throw new ReadWriteOutOfSyncException("receive buffer not empty");
 	}
 
@@ -388,7 +388,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				if (buf.length > 0) inputStream.read(buf);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 			serialPort.close();
 			isConnected = false;

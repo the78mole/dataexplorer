@@ -32,7 +32,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -94,7 +93,6 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 	private Group													separatorGroup;
 	private CCombo												listSeparator;
 	private CLabel												listSeparatorLabel;
-	private CLabel												space;
 	private CCombo												decimalSeparator;
 	private CLabel												decimalSeparatorLabel;
 	private Button												defaultDataPathAdjustButton;
@@ -190,7 +188,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					defaultDataPathLabel.setBounds(14, 24, 90, 20);
 				}
 				{
-					defaultDataPath = new Text(defaultDataPathGroup, SWT.NONE);
+					defaultDataPath = new Text(defaultDataPathGroup, SWT.BORDER);
 					defaultDataPath.setBounds(107, 24, 295, 20);
 				}
 				{
@@ -233,7 +231,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					decimalSeparatorLabel.setBounds(28, 24, 122, 22);
 				}
 				{
-					decimalSeparator = new CCombo(separatorGroup, SWT.NONE);
+					decimalSeparator = new CCombo(separatorGroup, SWT.BORDER);
 					decimalSeparator.setItems(new String[] { " . ", " , " });
 					decimalSeparator.setBounds(153, 24, 43, 20);
 					decimalSeparator.addSelectionListener(new SelectionAdapter() {
@@ -251,7 +249,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					listSeparatorLabel.setBounds(258, 24, 108, 22);
 				}
 				{
-					listSeparator = new CCombo(separatorGroup, SWT.NONE);
+					listSeparator = new CCombo(separatorGroup, SWT.BORDER);
 					listSeparator.setItems(new String[] { " , ", " ; " });
 					listSeparator.setBounds(369, 24, 47, 20);
 					listSeparator.addSelectionListener(new SelectionAdapter() {
@@ -305,7 +303,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					});
 				}
 				{
-					serialPort = new CCombo(serialPortGroup, SWT.NONE);
+					serialPort = new CCombo(serialPortGroup, SWT.BORDER);
 					serialPort.setBounds(269, 19, 84, 20);
 					serialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -322,8 +320,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 			} // end serial port group
 			{ // begin logging group
 				loggingGroup = new Group(dialogShell, SWT.NONE);
-				RowLayout loggingGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				loggingGroup.setLayout(loggingGroupLayout);
+				loggingGroup.setLayout(null);
 				FormData loggingGroupLData = new FormData();
 				loggingGroupLData.width = 451;
 				loggingGroupLData.height = 195;
@@ -349,20 +346,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 				});
 				{
-					RowData composite1LData = new RowData();
-					composite1LData.width = 195;
-					composite1LData.height = 50;
+
 					globalLoggingComposite = new Composite(loggingGroup, SWT.NONE);
-					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					globalLoggingComposite.setLayout(composite1Layout);
-					globalLoggingComposite.setLayoutData(composite1LData);
+					globalLoggingComposite.setLayout(null);
+					globalLoggingComposite.setBounds(6, 19, 154, 50);
 					{
 						globalLogLevel = new Button(globalLoggingComposite, SWT.CHECK | SWT.LEFT);
-						RowData globalLogLevelLData = new RowData();
-						globalLogLevelLData.width = 150;
-						globalLogLevelLData.height = 20;
-						globalLogLevel.setLayoutData(globalLogLevelLData);
+
 						globalLogLevel.setText(" globaler Log Level");
+						globalLogLevel.setBounds(4, 3, 148, 21);
 						globalLogLevel.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("globalLogLevel.widgetSelected, event=" + evt);
@@ -381,15 +373,9 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						});
 					}
 					{
-						space = new CLabel(globalLoggingComposite, SWT.NONE);
-						RowData cLabel1LData1 = new RowData();
-						cLabel1LData1.width = 41;
-						cLabel1LData1.height = 20;
-						space.setLayoutData(cLabel1LData1);
-					}
-					{
-						globalLoggingCombo = new CCombo(globalLoggingComposite, SWT.NONE);
+						globalLoggingCombo = new CCombo(globalLoggingComposite, SWT.BORDER);
 						globalLoggingCombo.setItems(new String[] { "SEVERE", "WARNING", "INFO", "FINE", "FINER", "FINEST" });
+						globalLoggingCombo.setBounds(4, 28, 148, 21);
 						globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("globalLoggingCombo.widgetSelected, event=" + evt);
@@ -401,25 +387,20 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					individualLoggingComosite = new Composite(loggingGroup, SWT.NONE);
-					RowLayout individualLoggingComositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					RowData individualLoggingComositeLData = new RowData();
-					individualLoggingComositeLData.width = 246;
-					individualLoggingComositeLData.height = 184;
-					individualLoggingComosite.setLayoutData(individualLoggingComositeLData);
-					individualLoggingComosite.setLayout(individualLoggingComositeLayout);
+					individualLoggingComosite.setLayout(null);
+					individualLoggingComosite.setBounds(172, 19, 278, 184);
 					{
 						uiLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout uiLevelLabelLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel1LData = new RowData();
-						cLabel1LData.width = 150;
-						cLabel1LData.height = 20;
-						uiLevelLabel.setLayoutData(cLabel1LData);
+
 						uiLevelLabel.setLayout(uiLevelLabelLayout);
 						uiLevelLabel.setText("Graphische Oberfläche : ");
+						uiLevelLabel.setBounds(3, 3, 170, 20);
 					}
 					{
-						uiLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						uiLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						uiLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						uiLevelCombo.setBounds(183, 3, 79, 21);
 						uiLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("uiLevelCombo.widgetSelected, event=" + evt);
@@ -430,16 +411,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						deviceLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel1LData = new RowData();
-						cLabel1LData.width = 150;
-						cLabel1LData.height = 20;
-						deviceLevelLabel.setLayoutData(cLabel1LData);
+
 						deviceLevelLabel.setLayout(cLabel1Layout);
 						deviceLevelLabel.setText("Geräte :");
+						deviceLevelLabel.setBounds(3, 27, 170, 20);
 					}
 					{
-						deviceLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						deviceLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						deviceLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						deviceLevelCombo.setBounds(183, 27, 79, 21);
 						deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("deviceLevelCombo.widgetSelected, event=" + evt);
@@ -450,16 +430,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						commonLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel2LData = new RowData();
-						cLabel2LData.width = 150;
-						cLabel2LData.height = 20;
-						commonLevelLabel.setLayoutData(cLabel2LData);
+
 						commonLevelLabel.setLayout(cLabel2Layout);
 						commonLevelLabel.setText("Datenmodell : ");
+						commonLevelLabel.setBounds(3, 51, 170, 20);
 					}
 					{
-						commonLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						commonLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						commonLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						commonLevelCombo.setBounds(183, 51, 79, 21);
 						commonLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("commonLevelCombo.widgetSelected, event=" + evt);
@@ -470,16 +449,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						configLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel3LData = new RowData();
-						cLabel3LData.width = 150;
-						cLabel3LData.height = 20;
-						configLevelLabel.setLayoutData(cLabel3LData);
+
 						configLevelLabel.setLayout(cLabel3Layout);
 						configLevelLabel.setText("Konfiguration :");
+						configLevelLabel.setBounds(3, 75, 170, 20);
 					}
 					{
-						configLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						configLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						configLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						configLevelCombo.setBounds(183, 75, 79, 21);
 						configLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("configLevelCombo.widgetSelected, event=" + evt);
@@ -490,16 +468,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						utilsLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel4LData = new RowData();
-						cLabel4LData.width = 150;
-						cLabel4LData.height = 20;
-						utilsLevelLabel.setLayoutData(cLabel4LData);
+
 						utilsLevelLabel.setLayout(cLabel4Layout);
 						utilsLevelLabel.setText("allgem. Funktionen : ");
+						utilsLevelLabel.setBounds(3, 99, 170, 20);
 					}
 					{
-						utilsLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						utilsLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						utilsLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						utilsLevelCombo.setBounds(183, 99, 79, 21);
 						utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("utilsLevelCombo.widgetSelected, event=" + evt);
@@ -510,16 +487,15 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						serialIOLevelLabel = new CLabel(individualLoggingComosite, SWT.NONE);
 						RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						RowData cLabel4LData = new RowData();
-						cLabel4LData.width = 150;
-						cLabel4LData.height = 20;
-						serialIOLevelLabel.setLayoutData(cLabel4LData);
+
 						serialIOLevelLabel.setLayout(cLabel4Layout);
 						serialIOLevelLabel.setText("serial I/O : ");
+						serialIOLevelLabel.setBounds(3, 123, 170, 20);
 					}
 					{
-						serialIOLevelCombo = new CCombo(individualLoggingComosite, SWT.NONE);
+						serialIOLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
 						serialIOLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						serialIOLevelCombo.setBounds(183, 123, 79, 21);
 						serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.finest("serialIOLevelCombo.widgetSelected, event=" + evt);
