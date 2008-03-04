@@ -18,12 +18,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import osde.data.Channel;
+import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.device.DataTypes;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
+
 
 /**
 * This code was edited or generated using CloudGarden's Jigloo
@@ -40,8 +44,6 @@ import osde.utils.CalculationThread;
 public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 	{
-		//Register as a resource user - SWTResourceManager will
-		//handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
 
@@ -104,6 +106,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	private boolean												isActiveU						= false;
 	private boolean												isActiveI						= false;
 	private boolean												isActiveRPM					= false;
+	private Button updateGraphicsButton;
 	private boolean												isActiveHeight			= false;
 	private int														prop100WValue				= 3400;
 	private int														numCellValue				= 12;
@@ -251,7 +254,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 							regressionTime.select(slopeTimeSelection - 1);
 
-							slopeCalculationTypeCombo.select(slopeTypeSelection == CalculationThread.REGRESSION_TYPE_CURVE ? 1 : 0);
+							slopeCalculationTypeCombo.select(slopeTypeSelection.equals(CalculationThread.REGRESSION_TYPE_CURVE) ? 1 : 0);
 						}
 					});
 					{
@@ -764,15 +767,32 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					setConfigButton.setBounds(366, 247, 210, 42);
+					setConfigButton.setBounds(366, 226, 210, 30);
 					setConfigButton.setText("Konfiguration speichern");
 					setConfigButton.setEnabled(false);
 					setConfigButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.finest("setConfigButton.widgetSelected, event=" + evt);
 							collectAndUpdateConfiguration();
-							device.storeDeviceProperties();
 							setConfigButton.setEnabled(false);
+							updateGraphicsButton.setEnabled(true);
+						}
+					});
+				}
+				{
+					updateGraphicsButton = new Button(this, SWT.PUSH | SWT.CENTER);
+					updateGraphicsButton.setBounds(366, 275, 210, 30);
+					updateGraphicsButton.setText("Neuberechnung");
+					updateGraphicsButton.setEnabled(false);
+					updateGraphicsButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.finest("setConfigButton.widgetSelected, event=" + evt);
+							updateGraphicsButton.setEnabled(false);
+							Channel activeChannel = Channels.getInstance().getActiveChannel();
+							if (activeChannel != null) {
+								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+								if (activeRecordSet != null) device.makeInActiveDisplayable(activeRecordSet);
+							}
 						}
 					});
 				}
@@ -937,13 +957,23 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(currentButton.getSelection());
 
+		measurementKey = device.getMeasurementNames(configName)[6]; // 6=votagePerCell
+		device.setMeasurementPropertyValue(configName, measurementKey, UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, numCellValue);
+
 		measurementKey = device.getMeasurementNames(configName)[7];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(revolutionButton.getSelection());
+		
+		measurementKey = device.getMeasurementNames(configName)[8]; // 8=efficiency
+		device.setMeasurementPropertyValue(configName, measurementKey, UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, prop100WValue);
 
 		measurementKey = device.getMeasurementNames(configName)[9];
 		measurement = device.getMeasurement(configName, measurementKey);
 		measurement.setActive(heightButton.getSelection());
+
+		measurementKey = device.getMeasurementNames(configName)[10]; // 10=slope
+		device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, slopeTypeSelection);
+		device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, slopeTimeSelection);
 
 		measurementKey = device.getMeasurementNames(configName)[11];
 		measurement = device.getMeasurement(configName, measurementKey);
@@ -970,6 +1000,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.').trim()));
 
 		device.setChangePropery(true);
+		device.storeDeviceProperties();
 	}
 
 	/**
@@ -1063,5 +1094,4 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		offsetA3 = device.getMeasurementOffset(configName, recordKey);
 		factorA3 = device.getMeasurementFactor(configName, recordKey);
 	}
-
 }

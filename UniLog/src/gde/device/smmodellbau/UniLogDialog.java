@@ -22,9 +22,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
@@ -199,8 +197,26 @@ public class UniLogDialog extends DeviceDialog {
 				dialogShell.layout();
 				dialogShell.pack();
 				dialogShell.setSize(642, 400);
+				dialogShell.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent evt) {
+						log.fine("dialogShell.widgetDisposed, event=" + evt);
+						if (configTab1.getConfigButtonStatus() && configTab2.getConfigButtonStatus() && configTab3.getConfigButtonStatus() && configTab4.getConfigButtonStatus()) {
+							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werde ?";
+							if (application.openYesNoMessageDialog(msg) == SWT.YES) {
+								log.fine("SWT.YES");
+								device.storeDeviceProperties();
+							}
+						}
+					}
+				});
 				{
 					configTabFolder = new CTabFolder(dialogShell, SWT.NONE);
+					configTabFolder.addPaintListener(new PaintListener() {
+						public void paintControl(PaintEvent evt) {
+							log.fine("configTabFolder.paintControl, setSelection = " + Channels.getInstance().getActiveChannelNumber());
+							configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber());
+						}
+					});
 					{
 						baseConfigTabItem = new CTabItem(configTabFolder, SWT.NONE);
 						baseConfigTabItem.setText("Einstellung");
@@ -560,11 +576,6 @@ public class UniLogDialog extends DeviceDialog {
 						configTabItem1.setText(device.getChannelName(1));
 						configTab1 = new UniLogConfigTab(configTabFolder, device, device.getChannelName(1));
 						configTabItem1.setControl(configTab1);
-						configTabItem1.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event evt) {
-								if (log.isLoggable(Level.FINEST))  log.finest("SWT.FocusIn, event="+evt);
-							}
-						});
 					}
 					if(device.getChannelCount() > 1) {
 						configTabItem2 = new CTabItem(configTabFolder, SWT.NONE);
@@ -892,18 +903,6 @@ public class UniLogDialog extends DeviceDialog {
 						}
 					});
 				}
-				dialogShell.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent evt) {
-						log.fine("dialogShell.widgetDisposed, event=" + evt);
-						if (configTab1.getConfigButtonStatus() && configTab2.getConfigButtonStatus() && configTab3.getConfigButtonStatus() && configTab4.getConfigButtonStatus()) {
-							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werde ?";
-							if (application.openYesNoMessageDialog(msg) == SWT.YES) {
-								log.fine("SWT.YES");
-								device.storeDeviceProperties();
-							}
-						}
-					}
-				});
 				dialogShell.setLocation(getParent().toDisplay(100, 100));
 				dialogShell.open();
 			}

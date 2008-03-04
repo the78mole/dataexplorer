@@ -107,7 +107,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				else {
 					record.setDisplayable(false);
-					record.setVisible(false);
+					//record.setVisible(false);
 				}
 			}
 			
