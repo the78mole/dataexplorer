@@ -375,7 +375,7 @@ public class DeviceConfiguration {
 	public void setMeasurementActive(String channelConfigKey, String measurementKey, boolean isActive) {
 		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, measurementKey).setActive(isActive);
+		this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).setActive(isActive);
 	}
 
 	/**
@@ -385,6 +385,7 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey) {
+		measurementKey = measurementKey.split("_")[0];
 		MeasurementType measurement = null;
 		for (MeasurementType meas : this.getChannel(channelConfigKey).getMeasurement()) {
 			if (meas.getName().equals(measurementKey)) {
@@ -404,7 +405,7 @@ public class DeviceConfiguration {
 	public void setMeasurementName(String channelConfigKey, String measurementKey, String name) {
 		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + measurementKey + "\"");
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, measurementKey).setName(name);
+		this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).setName(name);
 	}
 	
 	/**
@@ -448,7 +449,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementSymbol(String channelConfigKey, String measurementKey, String symbol) {
 		this.isChangePropery = true;
-		this.getMeasurement(channelConfigKey, measurementKey).setSymbol(symbol);
+		this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).setSymbol(symbol);
 	}
 	
 	/**
@@ -508,7 +509,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementOffset(String channelConfigKey, String measurementKey, double offset) {
 		if(log.isLoggable(Level.FINER)) log.finer("set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.OFFSET);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE, offset);
 		}
@@ -540,7 +541,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementFactor(String channelConfigKey, String measurementKey, double factor) {
 		if(log.isLoggable(Level.FINER)) log.finer("set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.FACTOR);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, IDevice.FACTOR, DataTypes.DOUBLE, factor);
 		}
@@ -572,7 +573,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementReduction(String channelConfigKey, String measurementKey, double reduction) {
 		if(log.isLoggable(Level.FINER)) log.finer("set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, IDevice.REDUCTION);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
 		}
@@ -603,7 +604,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey, DataTypes type, Object value) {
 		this.isChangePropery = true;
-		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey, propertyKey);
+		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], propertyKey);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementKey, propertyKey, type, ("" + value).replace(',', '.'));
 		}
@@ -625,7 +626,7 @@ public class DeviceConfiguration {
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
 		newProperty.setValue("" + value);
-		this.getMeasurement(channelConfigKey, measurementKey).getProperty().add(newProperty);
+		this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getProperty().add(newProperty);
 	}
 
 	/**

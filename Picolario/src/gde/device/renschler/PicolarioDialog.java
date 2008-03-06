@@ -38,24 +38,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.config.Settings;
+import osde.data.Channel;
 import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
  * @author Winfried Brügmann
@@ -298,6 +287,28 @@ public class PicolarioDialog extends DeviceDialog {
 					}
 				}// config tab
 				configTabFolder.setSelection(0);
+				configTabFolder.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("configTabFolder.widgetSelected, event="+evt);
+						int channelNumber = configTabFolder.getSelectionIndex() + 1;
+						String configKey = channelNumber + " : " + ((CTabItem)evt.item).getText();
+						Channels channels = Channels.getInstance();
+						Channel activeChannel = channels.getActiveChannel();
+						log.info("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
+						if (activeChannel != null) {
+							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+							if (activeRecordSet!= null && !activeChannel.getName().trim().equals(configKey)) {
+								int answer = application.openYesNoMessageDialog("Soll der aktuelle Datensatz in die selektierte Konfiguration verschoben werden ?");
+								if (answer == SWT.YES) {
+									System.out.println("verschieben");
+									channels.get(channelNumber).put(activeRecordSet.getName(), activeRecordSet.clone(configKey.split(":")[1].trim()));
+									activeChannel.remove(activeRecordSet.getName());
+									channels.switchChannel(channelNumber);
+								}
+							}
+						}
+					}
+				});
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();

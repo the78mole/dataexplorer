@@ -95,10 +95,9 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * method to receive full set of Picolario data
 	 * @param datagramNumber
 	 * @return hash map contining gathered data points (voltage and height in separate vector)
-	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device, String channelConfigKey) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device, String channelConfigKey) throws Exception {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -166,6 +165,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
 		finally {
 			if (isPortOpenedByMe) this.close();

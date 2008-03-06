@@ -18,17 +18,14 @@ package osde.serial;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.TooManyListenersException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,7 +146,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		return availablePorts;
 	}
 
-	public synchronized SerialPort open() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, TooManyListenersException, IOException  {
+	public synchronized SerialPort open() throws Exception  {
 		// Initialize serial port
 		try {
 			Settings settings = Settings.getInstance();
@@ -177,17 +174,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (application != null) application.setPortConnected(true);
 			return serialPort;
 		}
-		catch (PortInUseException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			if (serialPort != null) serialPort.close();
-			throw e;
-		}
-		catch (UnsupportedCommOperationException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			if (serialPort != null) serialPort.close();
-			throw e;
-		}
-		catch (TooManyListenersException e) {
+		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (serialPort != null) serialPort.close();
 			throw e;
@@ -427,9 +414,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * method to gather data from device, implementation is individual for device
 	 * @param channel signature if device has more than one or required by device
 	 * @return map containing gathered data - this can individual specified per device
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public abstract  HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws IOException;
+	public abstract  HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws Exception;
 
 	/**
 	 * @return the serialPortStr

@@ -166,6 +166,69 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * copy constructor
+	 * @param recordSet
+	 * @param channelName
+	 */
+	private RecordSet(RecordSet recordSet, String channelName) {
+		super(recordSet);
+
+		this.name = recordSet.name;
+		this.application = recordSet.application;
+		this.channels = recordSet.channels;
+		this.channelName = channelName;
+		for (String recordKey : this.keySet()) {
+			this.get(recordKey).setChannelConfigKey(channelName);
+		}
+
+		this.recordNames = recordSet.recordNames.clone();
+		this.timeStep_ms = recordSet.timeStep_ms;
+		this.recordSetDescription = recordSet.recordSetDescription;
+		this.isSaved = recordSet.isSaved;
+		this.isRaw = recordSet.isRaw;
+		this.isFromFile = recordSet.isFromFile;
+		this.drawAreaBounds = recordSet.drawAreaBounds;
+
+		this.dataTable = new Vector<Vector<Integer>>(recordSet.dataTable);
+		this.isTableDataCalculated = recordSet.isTableDataCalculated;
+		this.isTableDisplayable = recordSet.isTableDisplayable;
+
+		this.isCompareSet = recordSet.isCompareSet;
+
+		this.maxSize = recordSet.maxSize;
+		this.maxValue = recordSet.maxValue;
+		this.minValue = recordSet.minValue;
+
+		this.zoomLevel = recordSet.zoomLevel;
+		this.isZoomMode = recordSet.isZoomMode;
+		this.recordZoomOffset = recordSet.recordZoomOffset;
+		this.recordZoomSize = recordSet.recordZoomSize;
+
+		this.recordKeyMeasurement = recordSet.recordKeyMeasurement;
+
+		this.timeGridType = recordSet.timeGridType;
+		this.timeGrid = new Vector<Integer>(recordSet.timeGrid);
+		this.timeGridColor = recordSet.timeGridColor;
+		this.timeGridLineStyle = recordSet.timeGridLineStyle;
+
+		this.horizontalGridType = recordSet.horizontalGridType;
+		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
+		this.horizontalGridColor = recordSet.horizontalGridColor;
+		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
+		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
+
+		this.configuredDisplayable = recordSet.configuredDisplayable;
+	}
+	
+	/**
+	 * overwritten clone method used to move record sets to other configuration or channel
+	 * @param channelName according the new configuration
+	 */
+	public RecordSet clone(String channelName) {
+		return new RecordSet(this, channelName);
+	}
+
+	/**
 	 * check all records of this record set are displayable
 	 * @return true/false	
 	 */
@@ -1006,12 +1069,14 @@ public class RecordSet extends HashMap<String, Record> {
 
 					IDevice device = recordSet.get(recordSet.getRecordNames()[0]).getDevice();
 					int timeStep_ms = recordSet.getTimeStep_ms();
+					String[] recordNames = recordSet.getRecordNames();
 					for (int i = 0; i < recordEntries; i++) {
 						application.setProgress(new Double(i * progressInterval + progress).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(timeStep_ms * i);
-						for (String recordName : recordSet.getRecordNames()) {
-							dataTableRow.add(new Double(1000 * device.translateValue(channelName, recordName, recordSet.get(recordName).get(i) / 1000)).intValue());
+						for (int j = 0; j < recordNames.length; ++j) {
+							log.info(recordNames[j]);
+							dataTableRow.add(new Double(1000 * device.translateValue(channelName, recordNames[j], recordSet.get(recordNames[j]).get(i) / 1000)).intValue());
 						}
 						recordSet.dataTableAddRow(dataTableRow);
 					}

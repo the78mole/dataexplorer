@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.device.wb;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
@@ -369,8 +368,8 @@ public class SimulatorDialog extends DeviceDialog {
 										application.updateDigitalWindowChilds();
 										application.updateAnalogWindowChilds();
 									}
-									catch (IOException e) {
-										e.printStackTrace();
+									catch (Exception e) {
+										log.log(Level.SEVERE, e.getMessage(), e);
 									}
 								}
 							};
