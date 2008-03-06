@@ -20,6 +20,7 @@ import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
@@ -244,47 +245,61 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * [7] int		Prozesszeit									[msec]			
 	 * @param channel signature if device has more than one or required by device
 	 * @return map containing gathered data - this can individual specified per device
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws IOException {
+	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws Exception {
 		boolean isActive = true;
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
+		boolean isPortOpenedByMe = false;
+		try {
+			if (!this.isConnected) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
 
-		String[] configuration = getConfiguration(channel);
-		String[] measurements = getMeasuredValues(channel);
+			String[] configuration = getConfiguration(channel);
+			String[] measurements = getMeasuredValues(channel);
 
-		values.put(PROCESS_NAME, configuration[0].split(" ")[0]); // AkkuMaster aktiv
-		values.put(PROCESS_ERROR_NO, new Integer(configuration[1].split(" ")[0])); // Aktuelle Fehlernummer
-		values.put(PROCESS_VOLTAGE, new Integer(measurements[2].split(" ")[0])); // Aktuelle Akkuspannung
+			values.put(PROCESS_NAME, configuration[0].split(" ")[0]); // AkkuMaster aktiv
+			values.put(PROCESS_ERROR_NO, new Integer(configuration[1].split(" ")[0])); // Aktuelle Fehlernummer
+			values.put(PROCESS_VOLTAGE, new Integer(measurements[2].split(" ")[0])); // Aktuelle Akkuspannung
 
-		switch (new Integer(configuration[0].split(" ")[0])) {
-		case 1:
-			values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Laden");
-			values.put(PROCESS_CURRENT, new Integer(configuration[7].split(" ")[0])); // eingestellter Ladestrom
-			values.put(PROCESS_CAPACITY, new Integer(measurements[1].split(" ")[0])); // Aktuelle Ladekapazität
-			break;
-		case 2:
-			values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Entladen");
-			values.put(PROCESS_CURRENT, new Integer(configuration[6].split(" ")[0])); // eingestellter Entladestrom
-			values.put(PROCESS_CAPACITY, new Integer(measurements[0].split(" ")[0])); // Aktuelle Entladekapazität
-			break;
-		case 3:
-			values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Erhaltungsladen");
-			values.put(PROCESS_CAPACITY, new Integer("0"));
-			break;
-		default:
-			isActive = false;
-			values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " AkkuMaster_inactiv");
-			values.put(PROCESS_CAPACITY, new Integer("0"));
-			break;
+			switch (new Integer(configuration[0].split(" ")[0])) {
+			case 1:
+				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Laden");
+				values.put(PROCESS_CURRENT, new Integer(configuration[7].split(" ")[0])); // eingestellter Ladestrom
+				values.put(PROCESS_CAPACITY, new Integer(measurements[1].split(" ")[0])); // Aktuelle Ladekapazität
+				break;
+			case 2:
+				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Entladen");
+				values.put(PROCESS_CURRENT, new Integer(configuration[6].split(" ")[0])); // eingestellter Entladestrom
+				values.put(PROCESS_CAPACITY, new Integer(measurements[0].split(" ")[0])); // Aktuelle Entladekapazität
+				break;
+			case 3:
+				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Erhaltungsladen");
+				values.put(PROCESS_CAPACITY, new Integer("0"));
+				break;
+			default:
+				isActive = false;
+				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " AkkuMaster_inactiv");
+				values.put(PROCESS_CAPACITY, new Integer("0"));
+				break;
+			}
+
+			if (isActive) {
+				int voltage = (Integer) values.get(PROCESS_VOLTAGE);
+				values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); // Errechnete Leistung	[mW]
+				values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+			}
+
 		}
-
-		if (isActive) {
-			int voltage = (Integer) values.get(PROCESS_VOLTAGE);
-			values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); // Errechnete Leistung	[mW]
-			values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
-
+		finally {
+			if (isPortOpenedByMe) this.close();
+		}
 		return values;
 	}
 
@@ -501,46 +516,59 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * [2] Stromvariante
 	 * [3] Frontplattenversion
 	 * @return String[] containing described values
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getVersion() throws IOException {
+	public synchronized HashMap<String, Object> getVersion() throws Exception {
 		HashMap<String, Object> result = new HashMap<String, Object>(4);
+		try {
+			if (!this.isConnected) {
+				this.open();
+			}
 
-		this.write(readVersion);
-		this.version = this.read(11, 5);
+			this.write(readVersion);
+			this.version = this.read(11, 5);
 
-		// Versionsnummer der Software
-		String versionsNummer = new Integer(version[1]).toString();
-		// Versionsindex der Software
-		String versionsIndex = new Integer(version[2]).toString();
-		result.put(VERSION_NUMBER, versionsNummer + "." + versionsIndex);
+			// Versionsnummer der Software
+			String versionsNummer = new Integer(version[1]).toString();
+			// Versionsindex der Software
+			String versionsIndex = new Integer(version[2]).toString();
+			result.put(VERSION_NUMBER, versionsNummer + "." + versionsIndex);
 
-		// Datum der Software Tag
-		String day = new Integer(version[3]).toString();
-		// Datum der Software Monat
-		String month = new Integer(version[4]).toString();
-		int iYear = ((int) version[5] & 0xFF) << 8;
-		iYear += ((int) version[6] & 0xFF) << 0;
-		// Datum der Software Jahr
-		String year = new Integer(iYear).toString();
-		result.put(VERSION_DATE, day + "." + month + "." + year);
+			// Datum der Software Tag
+			String day = new Integer(version[3]).toString();
+			// Datum der Software Monat
+			String month = new Integer(version[4]).toString();
+			int iYear = ((int) version[5] & 0xFF) << 8;
+			iYear += ((int) version[6] & 0xFF) << 0;
+			// Datum der Software Jahr
+			String year = new Integer(iYear).toString();
+			result.put(VERSION_DATE, day + "." + month + "." + year);
 
-		// Stromvariante OOH = 0,5A Variante; 01 H = 2A Variante
-		if (version[7] == 0x00)
-			result.put(VERSION_TYPE_CURRENT, "0,5A");
-		else if (version[7] == 0x01)
-			result.put(VERSION_TYPE_CURRENT, "2,0A");
-		else
-			result.put(VERSION_TYPE_CURRENT, "?,?A");
+			// Stromvariante OOH = 0,5A Variante; 01 H = 2A Variante
+			if (version[7] == 0x00)
+				result.put(VERSION_TYPE_CURRENT, "0,5A");
+			else if (version[7] == 0x01)
+				result.put(VERSION_TYPE_CURRENT, "2,0A");
+			else
+				result.put(VERSION_TYPE_CURRENT, "?,?A");
 
-		// Frontplattenvariante 0OH = 6 Tasten; 01 H = 4 Tasten (turned around ?)
-		if (version[8] == 0x00)
-			result.put(VERSION_TYPE_FRONT, "4 Tasten");
-		else if (version[8] == 0x01)
-			result.put(VERSION_TYPE_FRONT, "6 Tasten");
-		else
-			result.put(VERSION_TYPE_FRONT, "? Tasten");
+			// Frontplattenvariante 0OH = 6 Tasten; 01 H = 4 Tasten (turned around ?)
+			if (version[8] == 0x00)
+				result.put(VERSION_TYPE_FRONT, "4 Tasten");
+			else if (version[8] == 0x01)
+				result.put(VERSION_TYPE_FRONT, "6 Tasten");
+			else
+				result.put(VERSION_TYPE_FRONT, "? Tasten");
 
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			// could not secure all timer threads are stopped
+			//if (isPortOpenedByMe) this.close();
+		}
 		return result;
 	}
 
@@ -548,7 +576,6 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		if (!this.isConnected) {
 			this.close();
 		}
-
 	}
 
 	/**

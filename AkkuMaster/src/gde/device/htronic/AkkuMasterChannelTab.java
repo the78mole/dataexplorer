@@ -28,6 +28,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -57,8 +59,6 @@ public class AkkuMasterChannelTab {
 	private String[]											aProgramm;
 	private String[]											aChargeCurrent_mA;
 	private String[]											aDischargeCurrent_mA;
-	private String[]											aCycleCount;
-	private String[]											aWaitTime_Min;
 	private AkkuMasterC4SerialPort				serialPort;
 	private Channel												channel;
 	private Timer													timer;
@@ -75,12 +75,8 @@ public class AkkuMasterChannelTab {
 	private Text													chargeCurrentText;
 	private Button												stopAuzeichnungButton;
 	private Button												startDataGatheringButton;
-	private CCombo												waitTimeMin;
 	private Text													memoryNumberText;
-	private Text													waitTimeMinText;
-	private Text													numberCyclesText;
 	private CCombo												waitTimeDays;
-	private Text													waitTimeDaysText;
 	private CCombo												dischargeCurrent;
 	private Text													dischargeCurrentText;
 	private CCombo												chargeCurrent;
@@ -93,10 +89,19 @@ public class AkkuMasterChannelTab {
 	private Text													countCellsText;
 	private Text													capacityText;
 	private Text													captureOnlyText;
-	private Group													programCycleGroup;
 	private Button												programmButton;
 	private Composite											channelComposite;
-	private boolean												isCaptureOnly						= true;
+	private boolean												isCaptureOnly						= false;
+	private boolean 											isDefinedProgram				= false;
+	private boolean												isDataGatheringEnabled	= false;
+	private String												capacityMilliAhValue		= aCapacity[5];
+	private String												countCellsValue					= aCellCount[3];
+	private String												akkuTypeValue 					= aAkkuTyp[0];
+	private String												programValue 						= aProgramm[2];
+	private String												chargeCurrentValue			= aChargeCurrent_mA[5];
+	private String												dischargeCurrentValue		= aDischargeCurrent_mA[5];
+	private int														memoryNumberValue 			= 1;
+	
 	private boolean												isCollectData						= false;
 	private RecordSet											recordSet;
 	private int														retryCounter						= 3;
@@ -135,8 +140,6 @@ public class AkkuMasterChannelTab {
 		this.aProgramm = aProgramm;
 		this.aChargeCurrent_mA = aChargeCurrent_mA;
 		this.aDischargeCurrent_mA = aDischargeCurrent_mA;
-		this.aCycleCount = aCycleCount;
-		this.aWaitTime_Min = aWaitTime_Min;
 		this.channels = Channels.getInstance();
 		this.application = OpenSerialDataExplorer.getInstance();
 	};
@@ -152,10 +155,20 @@ public class AkkuMasterChannelTab {
 				channelComposite = new Composite(tabFolder, SWT.NONE);
 				channelTab.setControl(channelComposite);
 				channelComposite.setLayout(null);
+				channelComposite.addPaintListener( new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						startDataGatheringButton.setEnabled(isDataGatheringEnabled);
+					}
+				});
 				{
 					captureOnlyGroup = new Group(channelComposite, SWT.NONE);
 					captureOnlyGroup.setLayout(null);
 					captureOnlyGroup.setBounds(14, 8, 401, 82);
+					captureOnlyGroup.addPaintListener( new PaintListener() {
+						public void paintControl(PaintEvent evt) {
+							captureOnlyButton.setSelection(isCaptureOnly);
+						}
+					});
 					{
 						captureOnlyText = new Text(captureOnlyGroup, SWT.MULTI | SWT.WRAP);
 						captureOnlyText.setText("Mit dieser Funktion kann ein am Ladegerät gestarteter Vorgang aufgenommen werden");
@@ -172,20 +185,17 @@ public class AkkuMasterChannelTab {
 								log.finest("captureOnlyButton.widgetSelected, event=" + evt);
 								if (captureOnlyButton.getSelection()) {
 									try {
-										if (serialPort.isConnected()) {
-											updateAdjustedValues();
-											startDataGatheringButton.setEnabled(true);
-										}
-										else {
-											captureOnlyButton.setSelection(false);
-											OpenSerialDataExplorer.getInstance().openMessageDialog("Erst den seriellen Port öffnen");
-										}
+										isCaptureOnly = true;
+										isDefinedProgram = false;
+										isDataGatheringEnabled = true;
+										updateAdjustedValues();
 									}
 									catch (IOException e) {
 										OpenSerialDataExplorer.getInstance().openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
 									}
-									isCaptureOnly = true;
-									programmButton.setSelection(false);
+									captureOnlyButton.setSelection(isCaptureOnly);
+									programmButton.setSelection(isDefinedProgram);
+									startDataGatheringButton.setEnabled(isDataGatheringEnabled);
 								}
 							}
 						});
@@ -195,6 +205,11 @@ public class AkkuMasterChannelTab {
 					programGroup = new Group(channelComposite, SWT.NONE);
 					programGroup.setLayout(null);
 					programGroup.setBounds(12, 95, 403, 325);
+					programGroup.addPaintListener( new PaintListener() {
+						public void paintControl(PaintEvent evt) {
+							programmButton.setSelection(isDefinedProgram);
+						}
+					});
 					{
 						programmButton = new Button(programGroup, SWT.RADIO | SWT.LEFT);
 						programmButton.setText("  Selbst konfiguriertes Programm");
@@ -205,20 +220,17 @@ public class AkkuMasterChannelTab {
 								log.finest("programmButton.widgetSelected, event=" + evt);
 								if (programmButton.getSelection()) {
 									try {
-										if (serialPort.isConnected()) {
-											updateAdjustedValues();
-											startDataGatheringButton.setEnabled(true);
-										}
-										else {
-											programmButton.setSelection(false);
-											OpenSerialDataExplorer.getInstance().openMessageDialog("Erst den seriellen Port öffnen");
-										}
+										isCaptureOnly = false;
+										isDefinedProgram = true;
+										isDataGatheringEnabled = true;
+										updateAdjustedValues();
 									}
 									catch (IOException e) {
 										OpenSerialDataExplorer.getInstance().openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
 									}
-									isCaptureOnly = false;
-									captureOnlyButton.setSelection(false);
+									captureOnlyButton.setSelection(isCaptureOnly);
+									programmButton.setSelection(isDefinedProgram);
+									startDataGatheringButton.setEnabled(isDataGatheringEnabled);
 								}
 							}
 						});
@@ -228,6 +240,13 @@ public class AkkuMasterChannelTab {
 						akkuGroup.setLayout(null);
 						akkuGroup.setText("Akku");
 						akkuGroup.setBounds(15, 40, 369, 67);
+						akkuGroup.addPaintListener( new PaintListener() {
+							public void paintControl(PaintEvent evt) {
+								capacityMilliAh.setText(capacityMilliAhValue);
+								countCells.setText(countCellsValue);
+								akkuType.setText(akkuTypeValue);
+							}
+						});
 						{
 							capacityText = new Text(akkuGroup, SWT.NONE);
 							capacityText.setBounds(12, 20, 105, 18);
@@ -279,6 +298,14 @@ public class AkkuMasterChannelTab {
 						programTypeGroup.setBounds(15, 110, 369, 123);
 						programTypeGroup.setText("Programmtyp");
 						programTypeGroup.setLayout(null);
+						programTypeGroup.addPaintListener( new PaintListener() {
+							public void paintControl(PaintEvent evt) {
+								program.setText(programValue);
+								chargeCurrent.setText(chargeCurrentValue);
+								dischargeCurrent.setText(dischargeCurrentValue);
+								memoryNumberCombo.select(memoryNumberValue);
+							}
+						});
 						{
 							programText = new Text(programTypeGroup, SWT.NONE);
 							programText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
@@ -295,16 +322,7 @@ public class AkkuMasterChannelTab {
 							program.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("program.widgetSelected, event=" + evt);
-									int cycleType = program.getSelectionIndex() + 1;
-									switch (cycleType) {
-									case 5:
-										enableProgramCycle(true);
-										break;
-
-									default:
-										enableProgramCycle(false);
-										break;
-									}
+									//TODO
 								}
 							});
 						}
@@ -354,55 +372,6 @@ public class AkkuMasterChannelTab {
 								}
 							});
 						}
-					}
-					{
-						programCycleGroup = new Group(programGroup, SWT.NONE);
-						programCycleGroup.setLayout(null);
-						programCycleGroup.setBounds(15, 240, 369, 75);
-						programCycleGroup.setText("Programmwiederholung");
-						{
-							numberCyclesText = new Text(programCycleGroup, SWT.NONE);
-							numberCyclesText.setBounds(23, 23, 60, 18);
-							numberCyclesText.setText("Anzahl");
-							numberCyclesText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							numberCyclesText.setEditable(false);
-						}
-						{
-							numberCycles = new CCombo(programCycleGroup, SWT.NONE);
-							numberCycles.setBounds(12, 49, 89, 18);
-							numberCycles.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							numberCycles.setItems(aCycleCount);
-							numberCycles.select(0);
-						}
-						{
-							waitTimeMinText = new Text(programCycleGroup, SWT.NONE);
-							waitTimeMinText.setBounds(128, 23, 90, 18);
-							waitTimeMinText.setText("Wartezeit [Min]");
-							waitTimeMinText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							waitTimeMinText.setEditable(false);
-						}
-						{
-							waitTimeMin = new CCombo(programCycleGroup, SWT.NONE);
-							waitTimeMin.setBounds(128, 49, 90, 18);
-							waitTimeMin.setItems(aWaitTime_Min);
-							waitTimeMin.select(2);
-							waitTimeMin.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-						}
-						{
-							waitTimeDaysText = new Text(programCycleGroup, SWT.NONE);
-							waitTimeDaysText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							waitTimeDaysText.setBounds(268, 23, 60, 18);
-							waitTimeDaysText.setText("Wartezeit [Tage]");
-							waitTimeDaysText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							waitTimeDaysText.setEditable(false);
-						}
-						{
-							waitTimeDays = new CCombo(programCycleGroup, SWT.NONE);
-							waitTimeDays.setBounds(259, 49, 83, 18);
-							waitTimeDays.setText("1");
-							waitTimeDays.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-						}
-						enableProgramCycle(false);
 					}
 				}
 				{
@@ -457,9 +426,9 @@ public class AkkuMasterChannelTab {
 									int period = application.getActiveDevice().getTimeStep_ms(); // repeat every 10 sec.
 									timer = new Timer();
 									timerTask = new TimerTask() {
-										private Logger	log						= Logger.getLogger(this.getClass().getName());
-										String					recordSetKey	= ") nicht definiert";
-										HashMap<String, Object>	data;	// [8]
+										private Logger					log						= Logger.getLogger(this.getClass().getName());
+										String									recordSetKey	= ") nicht definiert";
+										HashMap<String, Object>	data;																												// [8]
 
 										public void run() {
 											/*
@@ -476,12 +445,12 @@ public class AkkuMasterChannelTab {
 												data = serialPort.getData(channelSig, 0, null, "");
 												// check for no error state
 												log.fine("error state = " + data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO));
-												if (0 == (Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)) {
-													String processName = ((String)data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[1];
+												if (0 == (Integer) data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)) {
+													String processName = ((String) data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[1];
 													log.fine("processName = " + processName);
 
 													// check if device is ready for data capturing
-													int processNumber = new Integer(((String)data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[0]).intValue();
+													int processNumber = new Integer(((String) data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[0]).intValue();
 													if (processNumber == 1 || processNumber == 2) { // 1=Laden; 2=Entladen - AkkuMaster activ
 														// check state change waiting to discharge to charge
 														// check if a record set matching for re-use is available and prepare a new if required
@@ -504,7 +473,7 @@ public class AkkuMasterChannelTab {
 																channels.getActiveChannel().switchRecordSet(recordSetKey);
 															}
 															// update discharge / charge current display
-															int actualCurrent = ((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue();
+															int actualCurrent = ((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue();
 															if (processName.equals("Laden")) {
 																parent.addTotalChargeCurrent(actualCurrent);
 																isChargeCurrentAdded = true;
@@ -531,12 +500,12 @@ public class AkkuMasterChannelTab {
 														// build the point array according curves from record set
 														int[] points = new int[recordSet.size()];
 
-														points[0] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
-														points[1] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
+														points[0] = new Integer((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
+														points[1] = new Integer((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
 														// display adaption * 1000  -  / 1000
-														points[2] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
-														points[3] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; 		//Leistung		[mW]
-														points[4] = new Integer((Integer)data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; 	//Energie		[mWh]
+														points[2] = new Integer((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
+														points[3] = new Integer((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; //Leistung		[mW]
+														points[4] = new Integer((Integer) data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
 														log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh");
 
 														recordSet.addPoints(points, false); // updates data table and digital windows
@@ -553,7 +522,6 @@ public class AkkuMasterChannelTab {
 														// enable switching records sets
 														if (0 == retryCounter--) {
 															stopTimer();
-															isCollectData = false;
 															log.fine("Timer stopped AkkuMaster inactiv");
 															retryCounter = 3;
 														}
@@ -572,12 +540,11 @@ public class AkkuMasterChannelTab {
 													application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
 												}
 											}
-											catch (IOException e) {
-												log.log(Level.SEVERE, e.getMessage(), e);
+											catch (Exception e) {
+												// exception is logged where it is thrown first log.log(Level.SEVERE, e.getMessage(), e);
 												isCollectData = false;
 												stopTimer();
-												if (!parent.isDisposed())
-													application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
+												if (!parent.isDisposed()) application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
 											}
 										}
 									};
@@ -608,8 +575,6 @@ public class AkkuMasterChannelTab {
 							catch (IOException e) {
 								e.printStackTrace();
 							}
-							isCollectData = false;
-							isCollectDataStopped = true;
 							stopTimer();
 							// hope this is the right record set
 							channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
@@ -628,7 +593,7 @@ public class AkkuMasterChannelTab {
 		// update channel tab with values red from device
 		if (serialPort != null) {
 			String[] configuration = serialPort.getConfiguration(channelSig);
-			if(log.isLoggable(Level.FINER)) serialPort.print(configuration);
+			if (log.isLoggable(Level.FINER)) serialPort.print(configuration);
 			if (!configuration[0].equals("0")) { // AkkuMaster somehow active
 				program.setText(aProgramm[new Integer(configuration[2].split(" ")[0]).intValue() - 1]);
 				akkuType.setText(aAkkuTyp[new Integer(configuration[3].split(" ")[0]).intValue()]);
@@ -641,7 +606,7 @@ public class AkkuMasterChannelTab {
 				String[] adjustments = serialPort.getAdjustedValues(channelSig);
 				memoryNumberCombo.select(new Integer(adjustments[0].split(" ")[0]));
 				numberCycles.setText(adjustments[1].split(" ")[0]);
-				if(log.isLoggable(Level.FINER)) serialPort.print(adjustments);
+				if (log.isLoggable(Level.FINER)) serialPort.print(adjustments);
 			}
 		}
 		else
@@ -653,7 +618,14 @@ public class AkkuMasterChannelTab {
 	 */
 	public void stopTimer() {
 		if (timerTask != null) timerTask.cancel();
-		if (timer != null) timer.cancel();
+		if (timer != null) {
+			timer.cancel();
+			timer.purge();
+		}
+		
+		isCollectData = false;
+		isCollectDataStopped = true;
+		
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			updateDialogAfterStop();
 		}
@@ -676,15 +648,21 @@ public class AkkuMasterChannelTab {
 		stopAuzeichnungButton.setEnabled(false);
 	}
 
+	public boolean isDataColletionActive() {
+		return isCollectData() && isCollectDataStopped();
+	}
+
 	/**
-	 * enalbe program cycle group
+	 * @return the isCollectData
 	 */
-	private void enableProgramCycle(boolean value) {
-		numberCyclesText.setEnabled(value);
-		numberCycles.setEnabled(value);
-		waitTimeMinText.setEnabled(value);
-		waitTimeMin.setEnabled(value);
-		waitTimeDaysText.setEnabled(value);
-		waitTimeDays.setEnabled(value);
+	public boolean isCollectData() {
+		return isCollectData;
+	}
+
+	/**
+	 * @return the isCollectDataStopped
+	 */
+	public boolean isCollectDataStopped() {
+		return isCollectDataStopped;
 	}
 }

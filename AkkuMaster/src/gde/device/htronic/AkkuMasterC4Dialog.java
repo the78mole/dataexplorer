@@ -113,6 +113,11 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					//TODO check if some thing to do before exiting
 				}
 			});
+			dialogShell.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				}
+			});
 			{
 				FormData tabFolderLData = new FormData();
 				tabFolderLData.width = 427;
@@ -167,15 +172,13 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							public void paintControl(PaintEvent evt) {
 								log.finest("versionComposite.paintControl, event=" + evt);
 								try {
-									if (serialPort != null && serialPort.isConnected()) {
-										version = serialPort.getVersion();
+									if (serialPort != null) {
+										version = version == null ? serialPort.getVersion() : version;
 										versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
 										versionDate.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
 										versionCurrentType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
 										versionFrontplateType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
 									}
-									else 
-										application.openMessageDialog("Erst den seriellen Port öffnen");
 								}
 								catch (Exception e) {
 									application.openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
@@ -325,6 +328,13 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			channel4Tab.stopTimer();
 			dialogShell.dispose();
 		}
+	}
+
+	public boolean isDataColletionActive() {
+		return channel1Tab.isCollectData() && channel1Tab.isCollectDataStopped()
+			&& channel2Tab.isCollectData() && channel2Tab.isCollectDataStopped()
+			&& channel3Tab.isCollectData() && channel3Tab.isCollectDataStopped()
+			&& channel4Tab.isCollectData() && channel4Tab.isCollectDataStopped();
 	}
 
 	/**
