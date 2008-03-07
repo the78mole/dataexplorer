@@ -46,6 +46,8 @@ import osde.serial.DeviceSerialPort;
 public class DeviceConfiguration {
 	private final static Logger									log												= Logger.getLogger(DeviceSerialPort.class.getName());
 
+	private final Settings										settings;
+
 	// JAXB XML environment
 	private final Unmarshaller								unmarshaller;
 	private final Marshaller									marshaller;
@@ -124,9 +126,9 @@ public class DeviceConfiguration {
 
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException("Die Gerätedatei wurde nicht gefunden - " + xmlFileName);
 
-		Settings settings = Settings.getInstance();
-		this.unmarshaller = settings.getUnmarshaller();
-		this.marshaller = settings.getMarshaller();
+		this.settings = Settings.getInstance();
+		this.unmarshaller = this.settings.getUnmarshaller();
+		this.marshaller = this.settings.getMarshaller();
 
 		this.elememt = (JAXBElement<DevicePropertiesType>)unmarshaller.unmarshal(this.xmlFile);
 		this.deviceProps = elememt.getValue();
@@ -141,6 +143,7 @@ public class DeviceConfiguration {
 	 * copy constructor
 	 */
 	public DeviceConfiguration(DeviceConfiguration deviceConfig) {
+		this.settings = deviceConfig.settings;
 		this.unmarshaller = deviceConfig.unmarshaller;
 		this.marshaller = deviceConfig.marshaller;
 		this.xmlFile = deviceConfig.xmlFile;

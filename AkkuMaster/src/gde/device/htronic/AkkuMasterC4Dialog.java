@@ -106,7 +106,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			dialogShell.pack();
 			dialogShell.setSize(439, 593);
 			dialogShell.setText("Akkumaster C4 ToolBox");
-			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -225,6 +225,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				FormLayout StatusAnzeigeLayout = new FormLayout();
 				statusComposite.setLayout(StatusAnzeigeLayout);
 				statusComposite.setLayoutData(StatusAnzeigeLData);
+				statusComposite.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						totalDischargeCurrentLabel.setText(new Integer(totalDischargeCurrent).toString());
+						totalChargeCurrentLabel.setText(new Integer(totalChargeCurrent).toString());
+					}
+				});
 				{
 					FormData totalDischargeCurrentTextLData = new FormData();
 					totalDischargeCurrentTextLData.width = 50;
@@ -235,11 +241,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					totalDischargeCurrentLabel.setLayoutData(totalDischargeCurrentTextLData);
 					totalDischargeCurrentLabel.setText(new Double(totalDischargeCurrent).toString());
 					totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					totalDischargeCurrentLabel.addPaintListener(new PaintListener() {
-						public void paintControl(PaintEvent evt) {
-							totalDischargeCurrentLabel.setText(new Integer(totalDischargeCurrent).toString());
-						}
-					});
 				}
 				{
 					FormData totalChargeCurrentTextLData = new FormData();
@@ -251,11 +252,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					totalChargeCurrentLabel.setLayoutData(totalChargeCurrentTextLData);
 					totalChargeCurrentLabel.setText(new Double(totalChargeCurrent).toString());
 					totalChargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					totalChargeCurrentLabel.addPaintListener(new PaintListener() {
-						public void paintControl(PaintEvent evt) {
-							totalChargeCurrentLabel.setText(new Integer(totalChargeCurrent).toString());
-						}
-					});
 				}
 				{
 					FormData totalChargeCurrentTextLData1 = new FormData();

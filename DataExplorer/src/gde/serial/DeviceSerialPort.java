@@ -135,8 +135,15 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			try {
 				portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
 				if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-					availablePorts.add(serialPortStr);
-					log.fine("Found port: " + serialPortStr);
+					try {
+						portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
+						((SerialPort) portId.open("OpenSerialDataExplorer", 2000)).close();
+						availablePorts.add(serialPortStr);
+						log.fine("Found port: " + serialPortStr);
+					}
+					catch (Exception e) {
+						log.fine("Found port, but can't open: " + serialPortStr);
+					}
 				}
 			}
 			catch (NoSuchPortException e) {

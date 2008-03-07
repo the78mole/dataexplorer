@@ -259,6 +259,12 @@ public class AkkuMasterChannelTab {
 							capacityMilliAh.setItems(aCapacity);
 							capacityMilliAh.setText(aCapacity[5]);
 							capacityMilliAh.setBounds(12, 40, 105, 18);
+							capacityMilliAh.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("capacityMilliAh.widgetSelected, event=" + evt);
+									capacityMilliAhValue = capacityMilliAh.getText();
+								}
+							});
 						}
 						{
 							countCellsText = new Text(akkuGroup, SWT.NONE);
@@ -274,6 +280,12 @@ public class AkkuMasterChannelTab {
 							countCells.setText(aCellCount[3]);
 							countCells.setEditable(false);
 							countCells.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							countCells.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("countCells.widgetSelected, event=" + evt);
+									countCellsValue = aCellCount[countCells.getSelectionIndex()];
+								}
+							});
 						}
 						{
 							akkuTypeText = new Text(akkuGroup, SWT.NONE);
@@ -291,6 +303,12 @@ public class AkkuMasterChannelTab {
 							akkuType.setText(aAkkuTyp[0]);
 							akkuType.setEditable(false);
 							akkuType.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							akkuType.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("akkuType.widgetSelected, event=" + evt);
+									akkuTypeValue = aAkkuTyp[akkuType.getSelectionIndex()];
+								}
+							});
 						}
 					}
 					{
@@ -322,7 +340,7 @@ public class AkkuMasterChannelTab {
 							program.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("program.widgetSelected, event=" + evt);
-									//TODO
+									programValue = aProgramm[program.getSelectionIndex()];
 								}
 							});
 						}
@@ -338,6 +356,12 @@ public class AkkuMasterChannelTab {
 							chargeCurrent.setBounds(12, 93, 105, 18);
 							chargeCurrent.setItems(aChargeCurrent_mA);
 							chargeCurrent.setText(aChargeCurrent_mA[5]);
+							chargeCurrent.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("chargeCurrent.widgetSelected, event=" + evt);
+									chargeCurrentValue = chargeCurrent.getText();
+								}
+							});
 						}
 						{
 							dischargeCurrentText = new Text(programTypeGroup, SWT.NONE);
@@ -353,6 +377,12 @@ public class AkkuMasterChannelTab {
 							dischargeCurrent.setBounds(130, 93, 105, 18);
 							dischargeCurrent.setItems(aDischargeCurrent_mA);
 							dischargeCurrent.setText(aDischargeCurrent_mA[5]);
+							dischargeCurrent.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									log.finest("dischargeCurrent.widgetSelected, event=" + evt);
+									dischargeCurrentValue = dischargeCurrent.getText();
+								}
+							});
 						}
 						{
 							memoryNumberText = new Text(programTypeGroup, SWT.NONE);
@@ -366,9 +396,10 @@ public class AkkuMasterChannelTab {
 							memoryNumberCombo.setBounds(255, 93, 105, 18);
 							memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" });
 							memoryNumberCombo.select(1);
+							memoryNumberCombo.setEditable(false);
 							memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									//TODO check if values can be updated using the selected memory
+									memoryNumberValue = memoryNumberCombo.getSelectionIndex() - 1;
 								}
 							});
 						}

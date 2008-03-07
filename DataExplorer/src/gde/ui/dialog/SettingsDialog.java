@@ -374,7 +374,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					{
 						globalLoggingCombo = new CCombo(globalLoggingComposite, SWT.BORDER);
-						globalLoggingCombo.setItems(new String[] { "SEVERE", "WARNING", "INFO", "FINE", "FINER", "FINEST" });
+						globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
 						globalLoggingCombo.setBounds(4, 28, 148, 21);
 						globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -399,7 +399,7 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					{
 						uiLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						uiLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						uiLevelCombo.setBounds(183, 3, 79, 21);
 						uiLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
