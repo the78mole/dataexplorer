@@ -20,6 +20,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.ui.OpenSerialDataExplorer;
+
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations
  * @author Winfried Brügmann
@@ -27,6 +29,11 @@ import org.eclipse.swt.widgets.Shell;
 public abstract class DeviceDialog extends Dialog{
 
 	protected Shell	dialogShell;
+	
+	protected boolean isClosePossible = true; // use this variable to manage if dialog can be disposed 
+	protected String disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
+	
+	protected final OpenSerialDataExplorer application;
 
 	/**
 	 * constructor for the dialog, in most cases this dialog should not modal  
@@ -34,6 +41,7 @@ public abstract class DeviceDialog extends Dialog{
 	 */
 	public DeviceDialog(Shell parent) {
 		super(parent, SWT.NONE);
+		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	/**
@@ -46,7 +54,15 @@ public abstract class DeviceDialog extends Dialog{
 	 * implement all cleanup operation in a disposeListener method
 	 */
 	public void dispose() {
-		dialogShell.dispose();
+		if (this.isClosePossible) {
+			dialogShell.dispose();
+			application.setStatusMessage("");
+		}
+		else application.setStatusMessage(disposeDisabledMessage);
+	}
+
+	public void close() {
+		this.dispose();
 	}
 
 	/**

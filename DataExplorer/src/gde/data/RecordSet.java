@@ -1075,7 +1075,6 @@ public class RecordSet extends HashMap<String, Record> {
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(timeStep_ms * i);
 						for (int j = 0; j < recordNames.length; ++j) {
-							log.info(recordNames[j]);
 							dataTableRow.add(new Double(1000 * device.translateValue(channelName, recordNames[j], recordSet.get(recordNames[j]).get(i) / 1000)).intValue());
 						}
 						recordSet.dataTableAddRow(dataTableRow);

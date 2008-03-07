@@ -50,7 +50,7 @@ public class StatusBar {
 	private Label										msgLabel;
 	private ProgressBar							progressBar;
 	
-	private String blankMsg = "                                                                                                                                                     ";
+	private String blankMsg = "                                                                                                                                                                                                           ";
 
 	public StatusBar(Composite statusComposite) {
 		this.statusComposite = statusComposite;

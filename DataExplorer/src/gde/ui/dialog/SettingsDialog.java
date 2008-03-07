@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
@@ -45,24 +46,11 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
  */
-public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
+public class SettingsDialog extends Dialog {
 	private Logger												log	= Logger.getLogger(this.getClass().getName());
 
 	private CCombo												configLevelCombo;
@@ -294,7 +282,8 @@ public class SettingsDialog extends org.eclipse.swt.widgets.Dialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
 							if (useGlobalSerialPort.getSelection()) {
-								settings.setIsGlobalSerialPort("true");								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
+								settings.setIsGlobalSerialPort("true");	
+								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
 							}
 							else {
 								settings.setIsGlobalSerialPort("false");

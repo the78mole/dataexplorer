@@ -217,11 +217,13 @@ public class MenuToolBar {
 									}
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
+									
+									// if a device tool box is open, dispose it
 									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
 										application.getDeviceDialog().dispose();
 									}
+									
 									deviceSelect.setActiveConfig(deviceConfig);
-									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
 									deviceSelect.setupDevice();
 								}
 							}
@@ -250,11 +252,13 @@ public class MenuToolBar {
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection + 1));
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
+									
+									// if a device tool box is open, dispose it
 									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
 										application.getDeviceDialog().dispose();
 									}
+									
 									deviceSelect.setActiveConfig(deviceConfig);
-									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
 									deviceSelect.setupDevice();
 								}
 							}

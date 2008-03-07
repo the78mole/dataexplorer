@@ -33,6 +33,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
+import osde.device.DeviceDialog;
 import osde.device.IDevice;
 import osde.exception.ApplicationConfigurationException;
 import osde.io.CSVReaderWriter;
@@ -235,7 +236,14 @@ public class MenuBar {
 					preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("preferencesFileMenuItem.widgetSelected, event=" + evt);
-							application.openSettingsDialog();
+							// check if other none modal dialog is open
+							DeviceDialog deviceDialog = application.getDeviceDialog();
+							if (deviceDialog == null || deviceDialog.isDisposed()) {
+								application.openSettingsDialog();
+								application.setStatusMessage("");
+							}
+							else
+								application.setStatusMessage("Es ist ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist nicht möglich !");
 						}
 					});
 				}
@@ -320,11 +328,13 @@ public class MenuBar {
 									}
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
+									
+									// if a device tool box is open, dispose it
 									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
 										application.getDeviceDialog().dispose();
 									}
+									
 									deviceSelect.setActiveConfig(deviceConfig);
-									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
 									deviceSelect.setupDevice();
 								}
 							}
@@ -352,11 +362,12 @@ public class MenuBar {
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
 
+									// if a device tool box is open, dispose it
 									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
 										application.getDeviceDialog().dispose();
 									}
+									
 									deviceSelect.setActiveConfig(deviceConfig);
-									if (!deviceSelect.checkPortSelection()) application.setActiveDevice(application.getDeviceSelectionDialog().open());
 									deviceSelect.setupDevice();
 								}
 							}

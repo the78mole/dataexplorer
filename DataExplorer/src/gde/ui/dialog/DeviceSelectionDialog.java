@@ -206,7 +206,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						configuration.storeDeviceProperties(); // stores only if is changed
 					}
 					// initialize selected device
-					log.info("activeDeviceConfig = " + activeDeviceConfig + " activeDevice = " + activeDevice + " application.getActiveDevice() = " + application.getActiveDevice());
+					log.fine("activeDeviceConfig = " + activeDeviceConfig + " activeDevice = " + activeDevice + " application.getActiveDevice() = " + application.getActiveDevice());
 					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
 						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
 						setupDevice();
@@ -296,7 +296,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 													application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();
-												//checkPortSelection();
 											}
 											else {
 												application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -317,7 +316,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											// allow device switch only if port not connected
 											if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port not connected
 												int position = deviceSlider.getSelection();
-												log.info(" Position: " + position);
+												log.fine(" Position: " + position);
 												if (activeDevices.size() > 0 && !activeDevices.get(position).equals(activeDeviceName)) {
 													activeDeviceName = activeDevices.get(position);
 													log.fine("activeName = " + activeDeviceName);
@@ -327,7 +326,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 														application.getDeviceDialog().dispose();
 													}
 													updateDialogEntries();
-													//checkPortSelection();
 												}
 											}
 											else {
@@ -460,10 +458,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("portSelectCombo.widgetSelected, event=" + evt);
 											activeDeviceConfig.setPort(portSelectCombo.getText());
-											if (checkPortSelection()) {
-												activeDeviceConfig.storeDeviceProperties();
-												application.updateTitleBar(activeDeviceConfig.getName(), activeDeviceConfig.getPort());
-											}
+											activeDeviceConfig.storeDeviceProperties();
+											application.updateTitleBar(activeDeviceConfig.getName(), activeDeviceConfig.getPort());
 										}
 									});
 								}
@@ -587,37 +583,32 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								deviceTable.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										TableItem item = (TableItem) evt.item;
-										String device = ((TableItem) evt.item).getText();
-										String propertiesFilePath = " - kein Dateiname ?";
+										String deviceName = ((TableItem) evt.item).getText();
+										DeviceConfiguration tmpDeviceConfiguration;
 										if (item.getChecked()) {
-											log.fine("add device = " + device);
-											try {
-												activeDevices.add(device);
-												propertiesFilePath = deviceConfigurations.get(device).getPropertiesFileName();
-												deviceConfigurations.remove(device);
-												deviceConfigurations.put(device, new DeviceConfiguration(propertiesFilePath));
-												deviceConfigurations.get(device).setUsed(true);
-												if(activeDevices.size() == 1) {
-													activeDeviceConfig = deviceConfigurations.get(device);
-												}
-											}
-											catch (Exception e) {
-												activeDevices.remove(device);
-												item.setChecked(false);
-												application.openMessageDialog("Lesefehler - " + propertiesFilePath);
+											log.fine("add device = " + deviceName);
+											tmpDeviceConfiguration = deviceConfigurations.get(deviceName);
+											tmpDeviceConfiguration.setUsed(true);
+											tmpDeviceConfiguration.storeDeviceProperties();
+											deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
+											activeDevices.add(deviceName);
+											if (activeDevices.size() == 1) {
+												activeDeviceConfig = deviceConfigurations.get(deviceName);
 											}
 										}
 										else {
-											log.fine("remove device = " + device);
-											activeDevices.remove(device);
-											deviceConfigurations.get(device).setUsed(false);
+											log.fine("remove device = " + deviceName);
+											tmpDeviceConfiguration = deviceConfigurations.get(deviceName);
+											tmpDeviceConfiguration.setUsed(false);
+											tmpDeviceConfiguration.storeDeviceProperties();
+											activeDevices.remove(deviceName);
 											
 											// the removed configuration is the active one
-											if (activeDeviceConfig != null && activeDeviceConfig.getName().equals(deviceConfigurations.get(device).getName())) {
-												// take another available
+											if (activeDeviceConfig != null && activeDeviceConfig.getName().equals(deviceName)) {
+												// take first available
 												if (activeDevices.size() >  0) {
 													activeDeviceConfig = deviceConfigurations.get(activeDevices.firstElement());
-													activeDevice = null;
+													activeDevice = getInstanceOfDevice();
 												}
 												else { // no device
 													activeDeviceConfig = null;
@@ -828,20 +819,21 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	public void setupDevice() {
 		if (isDeviceChanged()) {
-			if (!checkPortSelection()) {
-				if (settings.isGlobalSerialPort())
-					application.openSettingsDialog();
-				else
-					application.setActiveDevice(open());
-			}
-			else if (settings.getActiveDevice().startsWith("---")) {
-				application.setActiveDevice(open());
-			}
+//			if (!checkPortSelection()) {
+//				if (settings.isGlobalSerialPort())
+//					application.openSettingsDialog();
+//				else
+//					application.setActiveDevice(this.open());
+//			}
+//			else if (settings.getActiveDevice().startsWith("---")) {
+//				application.setActiveDevice(this.open());
+//			}
 			activeDevice = this.getInstanceOfDevice();
 			application.setActiveDevice(activeDevice);
 			setupDataChannels(activeDevice);
 			application.setupDataTableHeader();
 			application.updateDigitalWindow();
+			application.updateAnalogWindow();
 		}
 	}
 

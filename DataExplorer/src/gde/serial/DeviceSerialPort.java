@@ -134,9 +134,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			CommPortIdentifier portId;
 			try {
 				portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
-				if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+				if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL && !portId.isCurrentlyOwned()) {
 					try {
-						portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
 						((SerialPort) portId.open("OpenSerialDataExplorer", 2000)).close();
 						availablePorts.add(serialPortStr);
 						log.fine("Found port: " + serialPortStr);
@@ -158,6 +157,24 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		try {
 			Settings settings = Settings.getInstance();
 			serialPortStr = settings.isGlobalSerialPort() ? settings.getSerialPort() : deviceConfig.getPort();
+			// check if a serial port is selected to be opened
+			if (serialPortStr == null || serialPortStr.length() < 4) {
+				// no serial port is selected, if only one serial port is available choose this one
+				Vector<String> availableSerialPorts = listConfiguredSerialPorts();
+				if (availableSerialPorts.size() == 1) {
+					serialPortStr = availableSerialPorts.firstElement();
+					if (settings.isGlobalSerialPort())
+						settings.setSerialPort(serialPortStr);
+					else
+						deviceConfig.setPort(serialPortStr);
+					
+					deviceConfig.storeDeviceProperties();
+				}
+				else {
+					application.openMessageDialog("Es ist kein serialler Port für das ausgewählte Gerät konfiguriert !");
+					application.getDeviceSelectionDialog().open();
+				}
+			}
 			log.fine(String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", serialPortStr, deviceConfig.getBaudeRate(), deviceConfig.getDataBits(), deviceConfig.getStopBits(), deviceConfig.getParity(), deviceConfig.getFlowCtrlMode(), deviceConfig.isRTS(), deviceConfig.isDTR()));
 			portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
 			serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 2000);
