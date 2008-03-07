@@ -106,12 +106,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		int numberRed = 0;
 		byte[] readRecordSetsWithNumber = new byte[] { readRecordSets[0], (byte) datagramNumber, readRecordSets[0], (byte) datagramNumber };
 
-		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected) {
-				this.open();
-				isPortOpenedByMe = true;
-			}
 			write(readRecordSetsWithNumber);
 			isTransmitFinished = false;
 
@@ -166,9 +161,6 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
-		}
-		finally {
-			if (isPortOpenedByMe) this.close();
 		}
 		return data;
 	}

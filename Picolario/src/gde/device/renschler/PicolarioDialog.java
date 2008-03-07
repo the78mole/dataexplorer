@@ -45,6 +45,19 @@ import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
  * @author Winfried Brügmann
@@ -63,6 +76,7 @@ public class PicolarioDialog extends DeviceDialog {
 
 	private Group											readDataGroup3;
 	private Button										readSingle;
+	private Button closeButton;
 	private Button										stopButton;
 	private CLabel										alreadyRedLabel;
 	private CLabel 										alreadyRedDataSetsLabel;
@@ -106,9 +120,26 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(344, 548);
+			dialogShell.setSize(344, 591);
 			dialogShell.setText("Picolario ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+			{
+				FormData closeButtonLData = new FormData();
+				closeButtonLData.width = 203;
+				closeButtonLData.height = 25;
+				closeButtonLData.bottom =  new FormAttachment(1000, 1000, -20);
+				closeButtonLData.right =  new FormAttachment(1000, 1000, -66);
+				closeButtonLData.left =  new FormAttachment(0, 1000, 67);
+				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+				closeButton.setLayoutData(closeButtonLData);
+				closeButton.setText("Schliessen");
+				closeButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.fine("closeButton.widgetSelected, event="+evt);
+						dispose();
+					}
+				});
+			}
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
@@ -122,171 +153,178 @@ public class PicolarioDialog extends DeviceDialog {
 			});
 			{ // group 1
 				FormData numberAvailableRecorsSetsGroupLData = new FormData();
-				numberAvailableRecorsSetsGroupLData.width = 306;
-				numberAvailableRecorsSetsGroupLData.height = 42;
-				numberAvailableRecorsSetsGroupLData.left = new FormAttachment(0, 1000, 12);
-				numberAvailableRecorsSetsGroupLData.top = new FormAttachment(0, 1000, 12);
-				numberAvailableRecorsSetsGroupLData.right = new FormAttachment(1000, 1000, -12);
-				numberAvailableRecorsSetsGroup1 = new Group(dialogShell, SWT.NONE);
-				numberAvailableRecorsSetsGroup1.setLayout(null);
-				numberAvailableRecorsSetsGroup1.setLayoutData(numberAvailableRecorsSetsGroupLData);
-				numberAvailableRecorsSetsGroup1.setText("1. Anzahl Aufzeichnungen");
-				{
-					queryAvailableRecordSetButton = new Button(numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
-					queryAvailableRecordSetButton.setText("Anzahl der Aufzeichnungen auslesen");
-					queryAvailableRecordSetButton.setBounds(8, 25, 230, 25);
-					queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt);
-							try {
-								if (serialPort != null) {
-									int availableRecords = serialPort.readNumberAvailableRecordSets();
-									numberAvailable = new Integer(availableRecords).toString();
-									numberAvailableRecordSetsLabel.setText(numberAvailable);
-									setRecordSetSelection(availableRecords, 0);
-									readSingle.setEnabled(true);
-									readAllRecords.setEnabled(true);
-									resetTelegramLabel();
-									resetDataSetsLabel();
-								}
-							}
-							catch (Exception e) {
-								serialPort.close();
-								application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
+			numberAvailableRecorsSetsGroupLData.width = 306;
+			numberAvailableRecorsSetsGroupLData.height = 42;
+			numberAvailableRecorsSetsGroupLData.left =  new FormAttachment(0, 1000, 12);
+			numberAvailableRecorsSetsGroupLData.top =  new FormAttachment(0, 1000, 5);
+			numberAvailableRecorsSetsGroupLData.right =  new FormAttachment(1000, 1000, -12);
+			numberAvailableRecorsSetsGroup1 = new Group(dialogShell, SWT.NONE);
+			numberAvailableRecorsSetsGroup1.setLayout(null);
+			numberAvailableRecorsSetsGroup1.setLayoutData(numberAvailableRecorsSetsGroupLData);
+			numberAvailableRecorsSetsGroup1.setText("1. Anzahl Aufzeichnungen");
+			{
+				queryAvailableRecordSetButton = new Button(numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
+				queryAvailableRecordSetButton.setText("Anzahl der Aufzeichnungen auslesen");
+				queryAvailableRecordSetButton.setBounds(8, 25, 230, 25);
+				queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt);
+						try {
+							if (serialPort != null) {
+								isClosePossible = false;
+								int availableRecords = serialPort.readNumberAvailableRecordSets();
+								numberAvailable = new Integer(availableRecords).toString();
+								numberAvailableRecordSetsLabel.setText(numberAvailable);
+								setRecordSetSelection(availableRecords, 0);
+								readSingle.setEnabled(true);
+								readAllRecords.setEnabled(true);
+								resetTelegramLabel();
+								resetDataSetsLabel();
+								isClosePossible = true;
 							}
 						}
-					});
-				}
-				{
-					numberAvailableRecordSetsLabel = new CLabel(numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
-					numberAvailableRecordSetsLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-					numberAvailableRecordSetsLabel.setBounds(255, 25, 29, 22);
-				}
+						catch (Exception e) {
+							serialPort.close();
+							application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
+							application.getDeviceSelectionDialog().open();
+						}
+					}
+				});
+			}
+			{
+				numberAvailableRecordSetsLabel = new CLabel(numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
+				numberAvailableRecordSetsLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+				numberAvailableRecordSetsLabel.setBounds(255, 25, 29, 22);
+			}
 			} // end group1
 			{ // group 3
 				readDataGroup3 = new Group(dialogShell, SWT.NONE);
-				readDataGroup3.setLayout(null);
-				FormData auslesenGroupLData = new FormData();
-				auslesenGroupLData.width = 306;
-				auslesenGroupLData.height = 196;
-				auslesenGroupLData.left =  new FormAttachment(0, 1000, 12);
-				auslesenGroupLData.right =  new FormAttachment(1000, 1000, -12);
-				auslesenGroupLData.bottom =  new FormAttachment(1000, 1000, -7);
-				readDataGroup3.setLayoutData(auslesenGroupLData);
-				readDataGroup3.setText("3. Aufzeichnungen auslesen");
-				{
-					readSingle = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					readSingle.setText("angewählte Aufzeichnungen auslesen");
-					readSingle.setBounds(8, 54, 236, 25);
-					readSingle.setEnabled(false);
-					readSingle.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("ausleseButton.widgetSelected, event=" + evt);
-							queryAvailableRecordSetButton.setEnabled(false);
-							readSingle.setEnabled(false);
-							readAllRecords.setEnabled(false);
-							stopButton.setEnabled(true);
-							gatherThread = new DataGathererThread(application, device, serialPort, new String[] { recordSetSelectCombo.getText() });
-							gatherThread.start();
-							log.fine("gatherThread.run() - executing");
-						} // end widget selected
-					}); // end selection adapter
-				}
-				{
-					readAllRecords = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					readAllRecords.setBounds(8, 112, 292, 25);
-					readAllRecords.setText("alle Aufzeichnungen hintereinander auslesen");
-					readAllRecords.setEnabled(false);
-					readAllRecords.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("readAllRecords.widgetSelected, event=" + evt);
-							queryAvailableRecordSetButton.setEnabled(false);
-							readAllRecords.setEnabled(false);
-							readSingle.setEnabled(false);
-							stopButton.setEnabled(true);
-							String[] itemNames = recordSetSelectCombo.getItems();
-							gatherThread = new DataGathererThread(application, device, serialPort, itemNames);
-							gatherThread.start();
-							log.fine("gatherThread.run() - executing");
-						}
-					});
-				}
-				{
-					recordSetSelectCombo = new CCombo(readDataGroup3, SWT.BORDER | SWT.RIGHT);
-					recordSetSelectCombo.setText("0");
-					recordSetSelectCombo.setBounds(252, 56, 45, 22);
-				}
-				{
-					numberRedTelegramLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					numberRedTelegramLabel.setBounds(10, 82, 234, 26);
-					numberRedTelegramLabel.setText("Anzahl ausgelesener Telegramme :");
-					numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
-				}
-				{
-					alreadyRedLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					alreadyRedLabel.setBounds(244, 82, 56, 26);
-					alreadyRedLabel.setText(redDatagrams);
-				}
-				{
-					stopButton = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					stopButton.setText("S T O P");
-					stopButton.setEnabled(false);
-					stopButton.setBounds(74, 176, 150, 26);
-					stopButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("stopButton.widgetSelected, event=" + evt);
-							gatherThread.setThreadStop(true);
-						}
-					});
-				}
-				{
-					alreadyRedDataSetsLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					alreadyRedDataSetsLabel.setBounds(10, 139, 234, 26);
-					alreadyRedDataSetsLabel.setForeground(SWTResourceManager.getColor(64,128,128));
-					alreadyRedDataSetsLabel.setText("aktuelle Datensatznummer :");
-				}
-				{
-					redDataSets = new CLabel(readDataGroup3, SWT.RIGHT);
-					redDataSets.setBounds(244, 139, 56, 26);
-					redDataSets.setText(redDataSetsText);
-				}
-				{
-					switchRecordSetButton = new Button(readDataGroup3, SWT.CHECK | SWT.CENTER);
-					switchRecordSetButton.setBounds(13, 25, 288, 17);
-					switchRecordSetButton.setText("Datensatz nach Auslesen sofort anzeigen");
-					switchRecordSetButton.setSelection(doSwtichRecordSet);
-					switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("switchRecordSetButton.widgetSelected, event="+evt);
-							doSwtichRecordSet = switchRecordSetButton.getSelection();
-						}
-					});
-				}
+			readDataGroup3.setLayout(null);
+			FormData auslesenGroupLData = new FormData();
+			auslesenGroupLData.width = 306;
+			auslesenGroupLData.height = 189;
+			auslesenGroupLData.left =  new FormAttachment(0, 1000, 12);
+			auslesenGroupLData.right =  new FormAttachment(1000, 1000, -12);
+			auslesenGroupLData.bottom =  new FormAttachment(1000, 1000, -64);
+			readDataGroup3.setLayoutData(auslesenGroupLData);
+			readDataGroup3.setText("3. Aufzeichnungen auslesen");
+			{
+				readSingle = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
+				readSingle.setText("angewählte Aufzeichnungen auslesen");
+				readSingle.setBounds(8, 54, 236, 25);
+				readSingle.setEnabled(false);
+				readSingle.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("ausleseButton.widgetSelected, event=" + evt);
+						isClosePossible = false;
+						queryAvailableRecordSetButton.setEnabled(false);
+						readSingle.setEnabled(false);
+						readAllRecords.setEnabled(false);
+						stopButton.setEnabled(true);
+						gatherThread = new DataGathererThread(application, device, serialPort, new String[] { recordSetSelectCombo.getText() });
+						gatherThread.start();
+						log.fine("gatherThread.run() - executing");
+					} // end widget selected
+				}); // end selection adapter
+			}
+			{
+				readAllRecords = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
+				readAllRecords.setBounds(8, 112, 292, 25);
+				readAllRecords.setText("alle Aufzeichnungen hintereinander auslesen");
+				readAllRecords.setEnabled(false);
+				readAllRecords.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("readAllRecords.widgetSelected, event=" + evt);
+						isClosePossible = false;
+						queryAvailableRecordSetButton.setEnabled(false);
+						readAllRecords.setEnabled(false);
+						readSingle.setEnabled(false);
+						stopButton.setEnabled(true);
+						String[] itemNames = recordSetSelectCombo.getItems();
+						gatherThread = new DataGathererThread(application, device, serialPort, itemNames);
+						gatherThread.start();
+						log.fine("gatherThread.run() - executing");
+					}
+				});
+			}
+			{
+				recordSetSelectCombo = new CCombo(readDataGroup3, SWT.BORDER | SWT.RIGHT);
+				recordSetSelectCombo.setText("0");
+				recordSetSelectCombo.setBounds(252, 56, 45, 22);
+			}
+			{
+				numberRedTelegramLabel = new CLabel(readDataGroup3, SWT.RIGHT);
+				numberRedTelegramLabel.setBounds(10, 82, 234, 26);
+				numberRedTelegramLabel.setText("Anzahl ausgelesener Telegramme :");
+				numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
+			}
+			{
+				alreadyRedLabel = new CLabel(readDataGroup3, SWT.RIGHT);
+				alreadyRedLabel.setBounds(244, 82, 56, 26);
+				alreadyRedLabel.setText(redDatagrams);
+			}
+			{
+				stopButton = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
+				stopButton.setText("S T O P");
+				stopButton.setEnabled(false);
+				stopButton.setBounds(81, 171, 150, 26);
+				stopButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("stopButton.widgetSelected, event=" + evt);
+						gatherThread.setThreadStop(true);
+						isClosePossible = true;
+					}
+				});
+			}
+			{
+				alreadyRedDataSetsLabel = new CLabel(readDataGroup3, SWT.RIGHT);
+				alreadyRedDataSetsLabel.setBounds(10, 139, 234, 26);
+				alreadyRedDataSetsLabel.setForeground(SWTResourceManager.getColor(64,128,128));
+				alreadyRedDataSetsLabel.setText("aktuelle Datensatznummer :");
+			}
+			{
+				redDataSets = new CLabel(readDataGroup3, SWT.RIGHT);
+				redDataSets.setBounds(244, 139, 56, 26);
+				redDataSets.setText(redDataSetsText);
+			}
+			{
+				switchRecordSetButton = new Button(readDataGroup3, SWT.CHECK | SWT.CENTER);
+				switchRecordSetButton.setBounds(13, 25, 288, 17);
+				switchRecordSetButton.setText("Datensatz nach Auslesen sofort anzeigen");
+				switchRecordSetButton.setSelection(doSwtichRecordSet);
+				switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.finest("switchRecordSetButton.widgetSelected, event="+evt);
+						doSwtichRecordSet = switchRecordSetButton.getSelection();
+					}
+				});
+			}
 			} // end group 3
 			{
 				configTabFolder = new CTabFolder(dialogShell, SWT.BORDER);
-				FormData cTabFolder1LData = new FormData();
+				FormData cTabFolder1LData = new FormData(306, 184);
 				cTabFolder1LData.width = 306;
 				cTabFolder1LData.height = 184;
 				cTabFolder1LData.left =  new FormAttachment(0, 1000, 12);
 				cTabFolder1LData.right =  new FormAttachment(1000, 1000, -12);
-				cTabFolder1LData.top =  new FormAttachment(0, 1000, 79);
+				cTabFolder1LData.top =  new FormAttachment(0, 1000, 72);
 				configTabFolder.setLayoutData(cTabFolder1LData);
 				{ // config tab
-					if(device.getChannelCount() > 0) {
-						configTabItem1 = new CTabItem(configTabFolder, SWT.NONE);
-						configTabItem1.setText(device.getChannelName(1));
-						configTab1 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(1));
-						configTabItem1.setControl(configTab1);
-					}
-					if(device.getChannelCount() > 1) {
+					if(device.getChannelCount() > 0)					if(device.getChannelCount() > 1) {
 						configTabItem2 = new CTabItem(configTabFolder, SWT.NONE);
 						configTabItem2.setText(device.getChannelName(2));
 						configTab2 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(2));
 						configTabItem2.setControl(configTab2);
 					}
+				{
+					configTabItem1 = new CTabItem(configTabFolder, SWT.NONE);
+					configTabItem1.setText(device.getChannelName(1));
+					configTab1 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(1));
+					configTabItem1.setControl(configTab1);
+				}
 				}// config tab
 				configTabFolder.setSelection(0);
+				configTabFolder.setSize(306, 184);
 				configTabFolder.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.finest("configTabFolder.widgetSelected, event="+evt);
@@ -294,7 +332,7 @@ public class PicolarioDialog extends DeviceDialog {
 						String configKey = channelNumber + " : " + ((CTabItem)evt.item).getText();
 						Channels channels = Channels.getInstance();
 						Channel activeChannel = channels.getActiveChannel();
-						log.info("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
+						log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet!= null && !activeChannel.getName().trim().equals(configKey)) {
@@ -353,8 +391,12 @@ public class PicolarioDialog extends DeviceDialog {
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					redDatagrams = "0";
-					alreadyRedLabel.setText(redDatagrams);
+					if (!application.getDeviceDialog().isDisposed()) {
+						if (!application.getDeviceDialog().isDisposed()) {
+							redDatagrams = "0";
+							alreadyRedLabel.setText(redDatagrams);
+						}
+					}
 				}
 			});
 		}
@@ -372,7 +414,7 @@ public class PicolarioDialog extends DeviceDialog {
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					alreadyRedLabel.setText(redDatagrams);
+					if (!application.getDeviceDialog().isDisposed()) alreadyRedLabel.setText(redDatagrams);
 				}
 			});
 		}
@@ -389,8 +431,10 @@ public class PicolarioDialog extends DeviceDialog {
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					redDataSetsText = "0";
-					redDataSets.setText(redDataSetsText);
+					if (!application.getDeviceDialog().isDisposed()) {
+						redDataSetsText = "0";
+						redDataSets.setText(redDataSetsText);
+					}
 				}
 			});
 		}
@@ -408,7 +452,9 @@ public class PicolarioDialog extends DeviceDialog {
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					redDataSets.setText(newValue);
+					if (!application.getDeviceDialog().isDisposed()) {
+						redDataSets.setText(newValue);
+					}
 				}
 			});
 		}
@@ -423,14 +469,18 @@ public class PicolarioDialog extends DeviceDialog {
 			readSingle.setEnabled(true);
 			readAllRecords.setEnabled(true);
 			stopButton.setEnabled(false);
+			isClosePossible = true;
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					queryAvailableRecordSetButton.setEnabled(true);
-					readSingle.setEnabled(true);
-					readAllRecords.setEnabled(true);
-					stopButton.setEnabled(false);
+					if (!application.getDeviceDialog().isDisposed()) {
+						queryAvailableRecordSetButton.setEnabled(true);
+						readSingle.setEnabled(true);
+						readAllRecords.setEnabled(true);
+						stopButton.setEnabled(false);
+						isClosePossible = true;
+					}
 				}
 			});
 		}

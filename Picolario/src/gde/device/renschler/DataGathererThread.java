@@ -65,13 +65,20 @@ public class DataGathererThread extends Thread {
 	 */
 	@SuppressWarnings("unchecked") // cast from Object to Vector<Integer>
 	public void run() {
+		boolean isPortOpenedByMe = false;
 		try {
 			log.fine("entry data gatherer");
 			Channel channel = Channels.getInstance().getActiveChannel();
 			String[] measurements = device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
+
 			dialog.resetDataSetsLabel();
+			if (!this.serialPort.isConnected()) {
+				this.serialPort.open();
+				isPortOpenedByMe = true;
+			}
+
 			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
 				dialog.resetTelegramLabel();
 				dialog.setAlreadyRedDataSets(datagramNumbers[j]);
@@ -112,6 +119,9 @@ public class DataGathererThread extends Thread {
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !");
+		}
+		finally {
+			if (isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()
 
