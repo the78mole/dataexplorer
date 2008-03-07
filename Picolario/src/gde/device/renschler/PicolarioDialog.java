@@ -108,7 +108,7 @@ public class PicolarioDialog extends DeviceDialog {
 			dialogShell.pack();
 			dialogShell.setSize(344, 548);
 			dialogShell.setText("Picolario ToolBox");
-			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);

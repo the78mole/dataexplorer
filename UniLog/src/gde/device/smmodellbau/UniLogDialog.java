@@ -191,7 +191,7 @@ public class UniLogDialog extends DeviceDialog {
 					dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
 				
 				dialogShell.setText("UniLog ToolBox");
-				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 				SWTResourceManager.registerResourceUser(dialogShell);
 				dialogShell.setLayout(new FormLayout());
 				dialogShell.layout();

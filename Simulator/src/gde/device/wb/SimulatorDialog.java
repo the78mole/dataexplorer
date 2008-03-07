@@ -131,7 +131,7 @@ public class SimulatorDialog extends DeviceDialog {
 				dialogShell.pack();
 				dialogShell.setSize(336, 393);
 				dialogShell.setText("Simulator");
-				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Tools.gif"));
+				dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 				{
 					FormData timeResultLabelLData = new FormData();
 					timeResultLabelLData.width = 94;
