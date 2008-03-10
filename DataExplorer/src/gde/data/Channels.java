@@ -126,24 +126,27 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public void switchChannel(int channelNumber) {
 		log.fine("switching to channel " + channelNumber);		
-		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) recordSet.reset();
-		if (channelNumber != this.getActiveChannelNumber()) {
-			this.setActiveChannelNumber(channelNumber);
-			application.getMenuToolBar().updateChannelToolItems();
-			// set record set to the first
-			this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getRecordSetNames()[0]);
+		Channel activeChannel = this.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = activeChannel.getActiveRecordSet();
+			if (recordSet != null) recordSet.reset();
+			if (channelNumber != this.getActiveChannelNumber()) {
+				this.setActiveChannelNumber(channelNumber);
+				application.getMenuToolBar().updateChannelToolItems();
+				// set record set to the first
+				this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getRecordSetNames()[0]);
+			}
+			else {
+				log.fine("nothing to do selected channel == active channel");
+			}
+			// update viewable
+			application.getMenuToolBar().updateChannelSelector();
+			application.getMenuToolBar().updateRecordSetSelectCombo();
+			application.updateGraphicsWindow();
+			application.updateDigitalWindow();
+			application.updateAnalogWindow();
+			application.updateDataTable();
 		}
-		else {
-			log.fine("nothing to do selected channel == active channel");
-		}
-		// update viewable
-		application.getMenuToolBar().updateChannelSelector();
-		application.getMenuToolBar().updateRecordSetSelectCombo(); 
-		application.updateGraphicsWindow();
-		application.updateDigitalWindow();
-		application.updateAnalogWindow();
-		application.updateDataTable();
 	}
 
 	/**
