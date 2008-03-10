@@ -82,8 +82,7 @@ public class CurveSelectorContextMenu {
 
 							String recordNameKey = selectedItem.getText();
 							lineVisible.setSelection(recordSet.getRecord(recordNameKey).isVisible());
-							if (type == GraphicsWindow.TYPE_COMPARE) copyCurveCompare.setEnabled(false);
-
+							
 							// check zoom mode
 							if (recordSet.isZoomMode()) {
 								axisEndValues.setEnabled(false);
@@ -97,6 +96,11 @@ public class CurveSelectorContextMenu {
 							// check measurement selections
 							measure.setSelection(recordSet.isMeasurementMode(recordNameKey));
 							deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
+							
+							if (type == GraphicsWindow.TYPE_COMPARE){
+								copyCurveCompare.setEnabled(false);
+								axisEndValues.setEnabled(false);
+							}
 						}
 						else
 							setAllEnabled(false);
@@ -838,7 +842,7 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("copyCurveCompare Action performed!");
 					String newRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (newRecordKey != null) {
+					if (newRecordKey != null && recordSet.get(newRecordKey).isVisible()) {
 						RecordSet compareSet = application.getCompareSet();
 						boolean isComparable = true;
 						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != recordSet.getTimeStep_ms()) {
@@ -847,7 +851,7 @@ public class CurveSelectorContextMenu {
 							isComparable = false;
 							return;
 						}
-						if (!compareSet.isEmpty() && !compareSet.getActiveAndVisibleRecordNames()[0].startsWith(newRecordKey)) {
+						if (!compareSet.isEmpty() && !compareSet.getRecordNames()[0].startsWith(newRecordKey)) {
 							application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0].split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
 							isComparable = false;
 							return;
@@ -858,6 +862,7 @@ public class CurveSelectorContextMenu {
 							compareSet.addRecordName(recordkey);
 							compareSet.put(recordkey, recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
 							compareSet.get(recordkey).setChannelConfigKey(recordSet.get(newRecordKey).getChannelConfigKey());
+							compareSet.get(recordkey).setVisible(true); // if a non visible record added
 							int maxRecordSize = compareSet.getSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
@@ -885,6 +890,7 @@ public class CurveSelectorContextMenu {
 							application.updateCompareWindow();
 						}
 					}
+					else if( newRecordKey != null) application.openMessageDialog("Die Kurve sollte sichtbar sein, bevor man sie in den Kurvenvergleich kopiert!");
 				}
 			});
 			cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
