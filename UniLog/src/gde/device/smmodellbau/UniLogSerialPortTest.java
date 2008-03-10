@@ -53,7 +53,7 @@ public class UniLogSerialPortTest {
 			e.printStackTrace();
 		}
 		finally {
-			if (serialPort != null && serialPort.isConnected()) {
+			if (serialPort != null) {
 				serialPort.close();
 				System.out.println("port is closed");
 			}

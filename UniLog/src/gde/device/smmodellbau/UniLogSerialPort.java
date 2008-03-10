@@ -101,7 +101,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				int numberRecordSet = 1;
 				int counter = 0;
 				
-				while (!isTransmitFinished && memoryUsed-- > 0) {
+				while (memoryUsed-- > 0) {
 					readBuffer = readSingleTelegramm();
 											
 					// number record set
@@ -118,7 +118,11 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					
 					if (application != null) {
 						dialog.setReadDataProgressBar(new Double(counter * progressFactor).intValue());
-						dialog.updateDataGatherProgress(counter, reveiceErrors);
+						dialog.updateDataGatherProgress(counter, numberRecordSet, reveiceErrors);
+					}
+					if (isTransmitFinished) {
+						log.log(Level.WARNING, "transmission stopped by user");
+						break;
 					}
 				}
 				dataCollection.put(""+numberRecordSet, telegrams);
@@ -131,7 +135,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			//throw e;
 		}
 		finally {
-			if(this.isConnected && isPortOpenedByMe) this.close();
+			if(isPortOpenedByMe) this.close();
 		}
 		return dataCollection;
 	}
@@ -455,5 +459,12 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public void setTransmitFinished(boolean isTransmitFinished) {
 		this.isTransmitFinished = isTransmitFinished;
+	}
+
+	/**
+	 * @return the isTransmitFinished
+	 */
+	public boolean isTransmitFinished() {
+		return this.isTransmitFinished;
 	}
 }
