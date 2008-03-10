@@ -243,7 +243,7 @@ public class MenuBar {
 								application.setStatusMessage("");
 							}
 							else
-								application.setStatusMessage("Es ist ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist nicht möglich !");
+								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist erst möglich, wenn der Gerätedialog geschlossen ist !", SWT.COLOR_RED);
 						}
 					});
 				}
@@ -256,7 +256,10 @@ public class MenuBar {
 					exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("exitMenuItem.widgetSelected, event=" + evt);
-							parent.getParent().dispose();
+							DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+							if (deviceSelect.checkDataSaved()) {
+								parent.getParent().dispose();
+							}
 						}
 					});
 				}
