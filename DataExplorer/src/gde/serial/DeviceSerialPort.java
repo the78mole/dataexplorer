@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import osde.config.Settings;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.exception.ApplicationConfigurationException;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
 import osde.ui.OpenSerialDataExplorer;
@@ -49,6 +50,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	protected SerialPort										serialPort 				= null;
 	protected boolean												isConnected				= false;
 	private String													serialPortStr			= "";
+	private Thread													closeThread;
 	
 	static CommPortIdentifier			portId;
 	static CommPortIdentifier			saveportId;
@@ -152,16 +154,33 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		return availablePorts;
 	}
 
+	/**
+	 * check if a configures serial port string matches actual available ports
+	 * @param serialPortStr
+	 * @param availableSerialPorts
+	 * @return true if given port string matches one of the available once
+	 */
+	private boolean isMatchAvailablePorts(String serialPortStr, Vector<String> availableSerialPorts) {
+		boolean match = false;
+		for (String availablePort : availableSerialPorts) {
+			if (availablePort.equals(serialPortStr)) {
+				match = true;
+				break;
+			}
+		}
+		return match;
+	}
+	
 	public synchronized SerialPort open() throws Exception  {
 		// Initialize serial port
 		try {
 			Settings settings = Settings.getInstance();
 			serialPortStr = settings.isGlobalSerialPort() ? settings.getSerialPort() : deviceConfig.getPort();
 			// check if a serial port is selected to be opened
-			if (serialPortStr == null || serialPortStr.length() < 4) {
+			Vector<String> availableSerialPorts = listConfiguredSerialPorts();
+			if (serialPortStr == null || serialPortStr.length() < 4 || !isMatchAvailablePorts(serialPortStr, availableSerialPorts)) {
 				// no serial port is selected, if only one serial port is available choose this one
-				Vector<String> availableSerialPorts = listConfiguredSerialPorts();
-				if (availableSerialPorts.size() == 1) {
+				if (availableSerialPorts.size() >= 1) {
 					serialPortStr = availableSerialPorts.firstElement();
 					if (settings.isGlobalSerialPort())
 						settings.setSerialPort(serialPortStr);
@@ -171,8 +190,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					deviceConfig.storeDeviceProperties();
 				}
 				else {
-					application.openMessageDialog("Es ist kein serialler Port für das ausgewählte Gerät konfiguriert !");
-					application.getDeviceSelectionDialog().open();
+//					application.openMessageDialog("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
+//					application.getDeviceSelectionDialog().open();
+					throw new ApplicationConfigurationException("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
 				}
 			}
 			log.fine(String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", serialPortStr, deviceConfig.getBaudeRate(), deviceConfig.getDataBits(), deviceConfig.getStopBits(), deviceConfig.getParity(), deviceConfig.getFlowCtrlMode(), deviceConfig.isRTS(), deviceConfig.isDTR()));
@@ -342,7 +362,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	public int waitForStabelReceiveBuffer(int expectedBytes, int timeout_sec) throws InterruptedException, TimeOutException {
 
 		int timeCounter = timeout_sec * 1000/2; // 2 msec per time interval
-		int stableCounter = 20;
+		int stableCounter = 50;
 		boolean isStable = false;
 		boolean isTimedOut = false;
 
@@ -355,7 +375,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (byteCounter == this.numBytesAvailable)
 				--stableCounter;
 			else
-				stableCounter = 20;
+				stableCounter = 50;
 
 			if (stableCounter == 0) isStable = true;
 
@@ -393,18 +413,30 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	public synchronized void close() {
-		if (isConnected && serialPort != null) {
-			try {
-				byte[] buf = new byte[inputStream.available()];
-				if (buf.length > 0) inputStream.read(buf);
+		log.info(">");
+		closeThread = new Thread() { 
+			public void run() { 
+				log.info("> run");
+				if (isConnected && serialPort != null) {
+					try {
+						Thread.sleep(2);
+						byte[] buf = new byte[inputStream.available()];
+						if (buf.length > 0) inputStream.read(buf);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+					log.info("before close");
+					serialPort.close();
+					log.info("after close");
+					isConnected = false;
+					if (application != null) application.setPortConnected(false);
+					log.info("< run");
+				}
 			}
-			catch (IOException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-			serialPort.close();
-			isConnected = false;
-			if (application != null) application.setPortConnected(false);
-		}
+		};
+		closeThread.start();
+		log.info("<");
 	}
 
 	public InputStream getInputStream() {
