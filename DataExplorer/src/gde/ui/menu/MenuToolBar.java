@@ -272,6 +272,7 @@ public class MenuToolBar {
 					toolBoxToolItem = new ToolItem(deviceToolBar, SWT.NONE);
 					toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif"));
 					toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+					toolBoxToolItem.setToolTipText("Gerätedialog öffnen");
 					toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("toolBoxToolItem.widgetSelected, event=" + evt);
@@ -721,7 +722,8 @@ public class MenuToolBar {
 	 */
 	private void doUpdateRecordSetSelectCombo(final String[] recordSetNames) {
 		if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
-			String activeRecord = channels.getActiveChannel().getActiveRecordSet().getName();
+			Channel activeChannel = channels.getActiveChannel();
+			String activeRecord = activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : recordSetNames[0];
 			recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
 			for (int i = 0; i < recordSetNames.length; i++) {
 				if (recordSetNames[i].equals(activeRecord)) recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
