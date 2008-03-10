@@ -141,13 +141,19 @@ public class StatusBar {
 	/**
 	 * method to set a message text to the message label of the status bar
 	 */
-	public void setMessage(final String text) {
-		if (text.length() > 5)
-			msgLabel.setText("   " + text + "   ");
-		else
-			msgLabel.setText(text);
+	public void setMessage(final String text, int swtColor) {
+		msgLabel.setForeground(SWTResourceManager.getColor(swtColor));
+		msgLabel.setText("   " + text);
 	}
 
+	/**
+	 * method to set a message text to the message label of the status bar
+	 */
+	public void setMessage(final String text) {
+		msgLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		msgLabel.setText("   " + text);
+	}
+	
 	public void setProgress(final int precent) {
 		progressBar.setSelection(precent);
 	}

@@ -58,7 +58,7 @@ public abstract class DeviceDialog extends Dialog{
 			dialogShell.dispose();
 			application.setStatusMessage("");
 		}
-		else application.setStatusMessage(disposeDisabledMessage);
+		else application.setStatusMessage(disposeDisabledMessage, SWT.COLOR_RED);
 	}
 
 	public void close() {
