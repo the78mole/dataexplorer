@@ -572,12 +572,6 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		return result;
 	}
 
-	public void stop(int kanalNummer) {
-		if (!this.isConnected) {
-			this.close();
-		}
-	}
-
 	/**
 	 * log string array
 	 * @param array

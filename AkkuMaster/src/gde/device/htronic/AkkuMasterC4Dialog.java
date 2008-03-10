@@ -25,11 +25,15 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -42,7 +46,7 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * DSialog class for device AkkuMaster C4
+ * Dialog class for device AkkuMaster C4
  * @author Winfried Brügmann
  */
 public class AkkuMasterC4Dialog extends DeviceDialog {
@@ -62,6 +66,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	private Composite								versionComposite;
 	private CTabItem								versionTabItem;
 	private CTabFolder							tabFolder;
+	private Button 									closeButton;
 
 	private final Settings					settings;
 	private final AkkuMasterC4			device;
@@ -69,13 +74,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	private final OpenSerialDataExplorer	application;
 	private AkkuMasterChannelTab		channel1Tab, channel2Tab, channel3Tab, channel4Tab;
 
+	private boolean									isOpenPortTried				= false;
 	private int											totalDischargeCurrent	= 0000;																				// mA
 	private int											totalChargeCurrent		= 0000;																				// mA
 	private HashMap<String, Object>	version;
+	private Thread									versionThread;
 	private final int								numberChannels;
 	private final int								maxCurrent						= 2000; // [mA]
 	private Channels								channels;
-	private int											lastTabFolderNummer		= 0;
 
 	/**
 	 * constructor initialize all variables required
@@ -101,36 +107,18 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
 			
 			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setLayout(new FormLayout());
+			dialogShell.setLayout(null);
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(439, 593);
+			dialogShell.setSize(440, 590);
 			dialogShell.setText("Akkumaster C4 ToolBox");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
-			dialogShell.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent evt) {
-					log.fine("dialogShell.widgetDisposed, event=" + evt);
-					//TODO check if some thing to do before exiting
-				}
-			});
-			dialogShell.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
-				}
-			});
 			{
-				FormData tabFolderLData = new FormData();
-				tabFolderLData.width = 427;
-				tabFolderLData.height = 462;
-				tabFolderLData.left = new FormAttachment(0, 1000, 0);
-				tabFolderLData.top = new FormAttachment(0, 1000, 0);
-				tabFolderLData.right = new FormAttachment(1000, 1000, 0);
-				tabFolderLData.bottom = new FormAttachment(1000, 1000, -73);
 				tabFolder = new CTabFolder(dialogShell, SWT.NONE);
-				tabFolder.setLayoutData(tabFolderLData);
-
+				tabFolder.setBounds(0, 0, 430, 425);
+				
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
-				String[] aCellCount = new String[] { "1 Zelle", "2 Zellen", "3 Zellen", "4 Zellen", "5 Zellen", "6 Zellen", "7 Zellen", "8 Zellen", "9 Zellen", "10 Zellen", "11 Zellen", "12 Zellen" };
+				String[] aCellCount = new String[] { "1 Zelle", "2 Zellen", "3 Zellen", "4 Zellen", "5 Zellen", "6 Zellen", "7 Zellen", "8 Zellen", "9 Zellen", "10 Zellen", "11 Zellen", "12 Zellen", "13 Zellen", "14 Zellen"};
 				String[] aAkkuType = new String[] { "0 NiCa", "1 NiMh", "2 Pb" };
 				String[] aProgramm = new String[] { "1 nur laden", "2 nur entladen", "3 entladen-laden", "4 laden-entladen-laden", "5 formieren", "6 überwintern", "7 auffrischen", "8 ermittle Kapazität",
 						"9 auffrischen" };
@@ -138,29 +126,29 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				String[] aDischargeCurrent_mA = aChargeCurrent_mA;
 				String[] aCycleCount = new String[] { "0", "1", "2", "3", "4", "5" };
 				String[] aWaitTime_Min = new String[] { "5", "10", "15", "20", "30", "60", "120" };
-
+				
 				///////////////////////////////////////////////////				
 				if (channel1Tab == null && numberChannels > 0)
 					channel1Tab = new AkkuMasterChannelTab(this, (" " + device.getChannelName(1)), AkkuMasterC4SerialPort.channel_1, serialPort, channels.get(1), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel1Tab.addChannelTab(tabFolder);
-
+				
 				if (channel2Tab == null && numberChannels > 1)
 					channel2Tab = new AkkuMasterChannelTab(this, (" " + device.getChannelName(2)), AkkuMasterC4SerialPort.channel_2, serialPort, channels.get(2), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel2Tab.addChannelTab(tabFolder);
-
+				
 				if (channel3Tab == null && numberChannels > 2)
 					channel3Tab = new AkkuMasterChannelTab(this, (" " + device.getChannelName(3)), AkkuMasterC4SerialPort.channel_3, serialPort, channels.get(3), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel3Tab.addChannelTab(tabFolder);
-
+				
 				if (channel4Tab == null && numberChannels > 3)
 					channel4Tab = new AkkuMasterChannelTab(this, (" " + device.getChannelName(4)), AkkuMasterC4SerialPort.channel_4, serialPort, channels.get(4), aCapacity, aCellCount, aAkkuType, aProgramm, aChargeCurrent_mA,
 							aDischargeCurrent_mA, aCycleCount, aWaitTime_Min);
 				channel4Tab.addChannelTab(tabFolder);
 				///////////////////////////////////////////////////		
-
+				
 				{
 					versionTabItem = new CTabItem(tabFolder, SWT.NONE);
 					versionTabItem.setText("Version");
@@ -171,17 +159,17 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						versionComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								log.finest("versionComposite.paintControl, event=" + evt);
-								try {
-									if (serialPort != null) {
-										version = version == null ? serialPort.getVersion() : version;
-										versionNumber.setText(AkkuMasterC4SerialPort.VERSION_NUMBER + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER));
-										versionDate.setText(AkkuMasterC4SerialPort.VERSION_DATE + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE));
-										versionCurrentType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT));
-										versionFrontplateType.setText(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT + " :  " + (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT));
-									}
+								if (version != null) {
+									versionNumber.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_NUMBER, "\t\t", (String) version.get(AkkuMasterC4SerialPort.VERSION_NUMBER)));
+									versionDate.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_DATE, "\t\t", (String) version.get(AkkuMasterC4SerialPort.VERSION_DATE)));
+									versionCurrentType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "\t\t", (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT)));
+									versionFrontplateType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "\t\t", (String) version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT)));
 								}
-								catch (Exception e) {
-									application.openMessageDialog("Das angeschlossene Gerät antwortet nicht auf dem seriellen Port!");
+								else {
+									versionNumber.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_NUMBER, "\t\t", "?"));
+									versionDate.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_DATE, "\t\t", "?"));
+									versionCurrentType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "\t\t", "?"));
+									versionFrontplateType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "\t\t", "?"));
 								}
 							}
 						});
@@ -211,20 +199,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 					}
 				}
-				tabFolder.setSelection(lastTabFolderNummer);
+				tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 			}
 			{
-				FormData StatusAnzeigeLData = new FormData();
-				StatusAnzeigeLData.width = 431;
-				StatusAnzeigeLData.height = 67;
-				StatusAnzeigeLData.left = new FormAttachment(0, 1000, 0);
-				StatusAnzeigeLData.top = new FormAttachment(0, 1000, 493);
-				StatusAnzeigeLData.right = new FormAttachment(1000, 1000, 0);
-				StatusAnzeigeLData.bottom = new FormAttachment(1000, 1000, 0);
 				statusComposite = new Composite(dialogShell, SWT.NONE);
-				FormLayout StatusAnzeigeLayout = new FormLayout();
-				statusComposite.setLayout(StatusAnzeigeLayout);
-				statusComposite.setLayoutData(StatusAnzeigeLData);
+				statusComposite.setLayout(null);
+				statusComposite.setBounds(0, 430, 430, 65);
 				statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						totalDischargeCurrentLabel.setText(new Integer(totalDischargeCurrent).toString());
@@ -232,75 +212,98 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 				{
-					FormData totalDischargeCurrentTextLData = new FormData();
-					totalDischargeCurrentTextLData.width = 50;
-					totalDischargeCurrentTextLData.height = 16;
-					totalDischargeCurrentTextLData.left = new FormAttachment(0, 1000, 235);
-					totalDischargeCurrentTextLData.top = new FormAttachment(0, 1000, 34);
 					totalDischargeCurrentLabel = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					totalDischargeCurrentLabel.setLayoutData(totalDischargeCurrentTextLData);
+					totalDischargeCurrentLabel.setBounds(235, 34, 50, 16);
 					totalDischargeCurrentLabel.setText(new Double(totalDischargeCurrent).toString());
 					totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					FormData totalChargeCurrentTextLData = new FormData();
-					totalChargeCurrentTextLData.width = 50;
-					totalChargeCurrentTextLData.height = 16;
-					totalChargeCurrentTextLData.left = new FormAttachment(0, 1000, 235);
-					totalChargeCurrentTextLData.top = new FormAttachment(0, 1000, 8);
 					totalChargeCurrentLabel = new CLabel(statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					totalChargeCurrentLabel.setLayoutData(totalChargeCurrentTextLData);
+					totalChargeCurrentLabel.setBounds(235, 8, 50, 16);
 					totalChargeCurrentLabel.setText(new Double(totalChargeCurrent).toString());
 					totalChargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					FormData totalChargeCurrentTextLData1 = new FormData();
-					totalChargeCurrentTextLData1.width = 190;
-					totalChargeCurrentTextLData1.height = 20;
-					totalChargeCurrentTextLData1.left = new FormAttachment(0, 1000, 20);
-					totalChargeCurrentTextLData1.top = new FormAttachment(0, 1000, 10);
 					totalChareCurrentText = new Text(statusComposite, SWT.NONE);
-					totalChareCurrentText.setLayoutData(totalChargeCurrentTextLData1);
 					totalChareCurrentText.setText("Gesammtladestrom       :");
 					totalChareCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					totalChareCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					totalChareCurrentText.setBounds(20, 10, 190, 20);
 				}
 				{
-					FormData totalDischargeCurrentTextLData1 = new FormData();
-					totalDischargeCurrentTextLData1.width = 190;
-					totalDischargeCurrentTextLData1.height = 20;
-					totalDischargeCurrentTextLData1.left = new FormAttachment(0, 1000, 20);
-					totalDischargeCurrentTextLData1.top = new FormAttachment(0, 1000, 35);
 					totalDischargeCurrentText = new Text(statusComposite, SWT.NONE);
 					totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					totalDischargeCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-					totalDischargeCurrentText.setLayoutData(totalDischargeCurrentTextLData1);
 					totalDischargeCurrentText.setText("Gesammtentladestrom  :");
+					totalDischargeCurrentText.setBounds(20, 35, 190, 20);
 				}
 				{
 					totalDischargeCurrentUnit = new Text(statusComposite, SWT.NONE);
 					totalDischargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					totalDischargeCurrentUnit.setText("[mA]");
 					totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-					FormData text1LData = new FormData();
-					text1LData.width = 150;
-					text1LData.height = 20;
-					text1LData.left = new FormAttachment(0, 1000, 300);
-					text1LData.top = new FormAttachment(0, 1000, 10);
-					totalDischargeCurrentUnit.setLayoutData(text1LData);
+					totalDischargeCurrentUnit.setBounds(300, 10, 119, 20);
 				}
 				{
 					totalChargeCurrentUnit = new Text(statusComposite, SWT.NONE);
 					totalChargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					totalChargeCurrentUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					totalChargeCurrentUnit.setText("[mA]");
-					FormData text2LData = new FormData();
-					text2LData.width = 150;
-					text2LData.height = 20;
-					text2LData.left = new FormAttachment(0, 1000, 300);
-					text2LData.top = new FormAttachment(0, 1000, 35);
-					totalChargeCurrentUnit.setLayoutData(text2LData);
+					totalChargeCurrentUnit.setBounds(300, 35, 119, 20);
 				}
+			}
+			dialogShell.addFocusListener(new FocusAdapter() {
+				public void focusGained(FocusEvent evt) {
+					log.fine("dialogShell.focusGained, event="+evt);
+					try {
+						if (serialPort != null) {
+							if (!isOpenPortTried && !serialPort.isConnected()){
+								serialPort.open();
+								versionThread = new Thread() {
+									public void run() {
+										try {
+											version = version == null ? serialPort.getVersion() : version;
+										}
+										catch (Exception e) {
+											application.openMessageDialog("Bei der seriellen Kommunikation gibt es Probleme, bitte die Portkonfiguration überprüfen.\n" + e.getMessage());
+										}
+									}
+								};
+								versionThread.start();
+							}
+						}
+					}
+					catch (Exception e) {
+						application.openMessageDialog("Der Versuch den seriellen Port zu öffnen ist gescheitert. Bitte gegebenenfalls die Portkonfiguration überprüfen.\n" + e.getMessage());
+					}
+					isOpenPortTried = true;
+				}
+			});
+			dialogShell.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent evt) {
+					log.fine("dialogShell.widgetDisposed, event=" + evt);
+					if (serialPort != null && serialPort.isConnected()) serialPort.close();
+				}
+			});
+			{
+				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+				closeButton.setText("Schliessen");
+				closeButton.setBounds(82, 509, 260, 30);
+				closeButton.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						application.openHelpDialog("AkkuMaster", "HelpInfo.html");
+					}
+				});
+				closeButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						if(channel1Tab.isDataColletionActive() || channel2Tab.isDataColletionActive() || channel3Tab.isDataColletionActive() && channel4Tab.isDataColletionActive())
+							isClosePossible = false;
+						else 
+							isClosePossible = true;
+						
+						dispose();
+					}
+				});
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();
@@ -374,13 +377,5 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	public int getMaxCurrent() {
 		return maxCurrent;
-	}
-
-	/**
-	 * the number drives which tab folder is displayed next if dialog opened
-	 * @param lastTabFolderNummer the lastTabFolderNummer to set
-	 */
-	public void setLastTabFolderNummer(int lastTabFolderNummer) {
-		this.lastTabFolderNummer = lastTabFolderNummer;
 	}
 }
