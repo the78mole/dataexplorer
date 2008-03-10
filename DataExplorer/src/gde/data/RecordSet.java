@@ -54,6 +54,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private boolean												isSaved								= false;																				// indicates if the record set is saved to file
 	private boolean												isRaw									= false;																				// indicates imported file with raw data, no translation at all
 	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
+	private boolean												isRecalculation				= false;																				// indicates record is modified and need re-calculation
 	private Rectangle											drawAreaBounds;
 	private final DecimalFormat						df = new DecimalFormat("0.000");;
 
@@ -1087,5 +1088,25 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		};
 		dataTableCalcThread.start();
+	}
+
+	/**
+	 * @return the isRecalculation
+	 */
+	public boolean isRecalculation() {
+		return isRecalculation;
+	}
+
+	/**
+	 * @param isRecalculation the isRecalculation to set
+	 */
+	public void setRecalculation(boolean isRecalculation) {
+		this.isRecalculation = isRecalculation;
+		IDevice device = this.get(this.recordNames[0]).getDevice();
+		String channelConfigKey = this.get(this.recordNames[0]).getChannelConfigKey();
+		for (String recordKey : recordNames) {
+			if (device.getMeasurement(channelConfigKey, recordKey).isCalculation())
+				this.get(recordKey).resetMinMax();
+		}
 	}
 }

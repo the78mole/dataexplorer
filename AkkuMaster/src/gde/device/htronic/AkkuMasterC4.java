@@ -101,7 +101,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
-		if (recordSet.isFromFile() && recordSet.isRaw()) {
+		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
 				String[] recordNames = this.getMeasurementNames(recordSet.getChannelName());

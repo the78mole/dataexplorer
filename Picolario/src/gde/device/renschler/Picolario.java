@@ -180,7 +180,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
-		if (recordSet.isFromFile() && recordSet.isRaw()) {
+		if (recordSet.isRaw()) {
 			String[] measurements = this.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			if (!recordSet.get(measurements[2]).isDisplayable()) {
 				// calculate the values required				

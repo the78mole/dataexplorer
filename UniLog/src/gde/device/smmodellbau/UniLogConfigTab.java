@@ -791,7 +791,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							Channel activeChannel = Channels.getInstance().getActiveChannel();
 							if (activeChannel != null) {
 								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-								if (activeRecordSet != null) device.makeInActiveDisplayable(activeRecordSet);
+								if (activeRecordSet != null) {
+									activeRecordSet.setRecalculation(true);
+									device.makeInActiveDisplayable(activeRecordSet);
+								}
 							}
 						}
 					});

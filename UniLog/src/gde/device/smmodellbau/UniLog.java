@@ -90,7 +90,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		String configKey = recordSet.getChannelName();
 		//do not forget to make record displayable -> record.setDisplayable(true);
-		if (recordSet.isFromFile() && recordSet.isRaw()) {
+		if (recordSet.isRaw()) {
 			// calculate the values required
 			Record record;
 			String recordKey;
@@ -106,8 +106,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					++displayableCounter;
 				}
 				else {
-					record.setDisplayable(false);
-					//record.setVisible(false);
+					record.setDisplayable(false); 		// force recalculation
+					if (!recordSet.isRecalculation()) {
+						record.setVisible(false);  			// required for to enable different configurations (import)
+					}
 				}
 			}
 			

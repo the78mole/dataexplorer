@@ -648,4 +648,13 @@ public class Record extends Vector<Integer> {
 	public void setChannelConfigKey(String channelConfigKey) {
 		this.channelConfigKey = channelConfigKey;
 	}
+
+	/**
+	 * reset the min-max-values to enable new settings after re-calculation
+	 */
+	public void resetMinMax() {
+		this.maxValue = Integer.MIN_VALUE;
+		this.minValue = Integer.MAX_VALUE;
+	}
 }
+
