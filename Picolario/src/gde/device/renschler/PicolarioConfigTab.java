@@ -112,7 +112,7 @@ public class PicolarioConfigTab extends Composite {
 				{ // group 2
 					heightAdaptionGroup = new Group(this, SWT.NONE);
 					heightAdaptionGroup.setLayout(null);
-					heightAdaptionGroup.setText("2. Berechnungseinstellung für Höhe und Steigung");
+					heightAdaptionGroup.setText("Berechnungseinstellung für Höhe und Steigung");
 					heightAdaptionGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finest("heightAdaptionGroup2.paintControl, event="+evt);
