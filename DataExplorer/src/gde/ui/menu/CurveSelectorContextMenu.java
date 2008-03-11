@@ -99,7 +99,6 @@ public class CurveSelectorContextMenu {
 							
 							if (type == GraphicsWindow.TYPE_COMPARE){
 								copyCurveCompare.setEnabled(false);
-								axisEndValues.setEnabled(false);
 							}
 						}
 						else
