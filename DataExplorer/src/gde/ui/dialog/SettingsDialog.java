@@ -407,7 +407,7 @@ public class SettingsDialog extends Dialog {
 					}
 					{
 						deviceLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						deviceLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						deviceLevelCombo.setBounds(183, 27, 79, 21);
 						deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -426,7 +426,7 @@ public class SettingsDialog extends Dialog {
 					}
 					{
 						commonLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						commonLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						commonLevelCombo.setBounds(183, 51, 79, 21);
 						commonLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -445,7 +445,7 @@ public class SettingsDialog extends Dialog {
 					}
 					{
 						configLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						configLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						configLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						configLevelCombo.setBounds(183, 75, 79, 21);
 						configLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -464,7 +464,7 @@ public class SettingsDialog extends Dialog {
 					}
 					{
 						utilsLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						utilsLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						utilsLevelCombo.setBounds(183, 99, 79, 21);
 						utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -483,7 +483,7 @@ public class SettingsDialog extends Dialog {
 					}
 					{
 						serialIOLevelCombo = new CCombo(individualLoggingComosite, SWT.BORDER);
-						serialIOLevelCombo.setItems(new String[] { "INFO", "FINE", "FINER", "FINEST" });
+						serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						serialIOLevelCombo.setBounds(183, 123, 79, 21);
 						serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
