@@ -311,7 +311,8 @@ public class Record extends Vector<Integer> {
 			this.minScaleValue = newMinScaleValue;
 		}
 		else {
-			String channelConfigKey = this.getParent().getChannelName();
+			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
+				this.channelConfigKey = this.parent.getChannelName();
 			this.maxScaleValue = device.translateValue(channelConfigKey, this.name, maxValue/1000);
 			this.minScaleValue = device.translateValue(channelConfigKey, this.name, minValue/1000);
 		}
@@ -380,7 +381,8 @@ public class Record extends Vector<Integer> {
 	 * @param parent the parent to set
 	 */
 	public void setParent(RecordSet parent) {
-		this.channelConfigKey = parent.getChannelName();
+		if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
+			this.channelConfigKey = parent.getChannelName();
 		this.parent = parent;
 	}
 
