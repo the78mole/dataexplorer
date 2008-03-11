@@ -85,19 +85,22 @@ public class DataTableWindow {
 
 		// set the new header line
 		IDevice device = application.getActiveDevice();
-		String channelConfigKey = channels.getActiveChannel().getConfigKey();
-		String[] measurements = device.getMeasurementNames(channelConfigKey);
-		for (int i = 0; i < measurements.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
-			StringBuilder sb = new StringBuilder();
-			sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append("]");
-			TableColumn column = new TableColumn(dataTable, SWT.CENTER);
-			column.setWidth(sb.length() * extentFactor);
-			column.setText(sb.toString());
-		}
-		if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding
-			TableColumn column = new TableColumn(dataTable, SWT.CENTER);
-			column.setWidth(100);
+		Channel activeChannel = channels.getActiveChannel();
+		if (activeChannel != null) {
+			String channelConfigKey = activeChannel.getConfigKey();
+			String[] measurements = device.getMeasurementNames(channelConfigKey);
+			for (int i = 0; i < measurements.length; i++) {
+				MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
+				StringBuilder sb = new StringBuilder();
+				sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append("]");
+				TableColumn column = new TableColumn(dataTable, SWT.CENTER);
+				column.setWidth(sb.length() * extentFactor);
+				column.setText(sb.toString());
+			}
+			if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding
+				TableColumn column = new TableColumn(dataTable, SWT.CENTER);
+				column.setWidth(100);
+			}
 		}
 	}
 
