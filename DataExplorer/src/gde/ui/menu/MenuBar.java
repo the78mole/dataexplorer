@@ -243,7 +243,7 @@ public class MenuBar {
 								application.setStatusMessage("");
 							}
 							else
-								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist erst möglich, wenn der Gerätedialog geschlossen ist !", SWT.COLOR_RED);
+								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
 						}
 					});
 				}
