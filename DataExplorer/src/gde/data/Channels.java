@@ -72,7 +72,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		super(initialCapacity);
 		this.application = application;
 	}
-	
+		
 	/**
 	 * query the channel number by given string, if string not found channel number 1 is returned 
 	 * @param channelName
@@ -117,14 +117,16 @@ public class Channels extends HashMap<Integer, Channel> {
 	public synchronized void switchChannel(String channelName) {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.reset();
-		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue());
+		
+		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue(), "");
 	}
 
 	/**
 	 * switch the channel according selection and set applications active channel
 	 * @param channelNumber 1 -> " 1 : Ausgang"
+	 * @param recordSetKey or empty string if switched to first record set
 	 */
-	public void switchChannel(int channelNumber) {
+	public void switchChannel(int channelNumber, String recordSetKey) {
 		log.fine("switching to channel " + channelNumber);		
 		Channel activeChannel = this.getActiveChannel();
 		if (activeChannel != null) {
@@ -133,8 +135,10 @@ public class Channels extends HashMap<Integer, Channel> {
 			if (channelNumber != this.getActiveChannelNumber()) {
 				this.setActiveChannelNumber(channelNumber);
 				application.getMenuToolBar().updateChannelToolItems();
-				// set record set to the first
-				this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getRecordSetNames()[0]);
+				if(recordSetKey == null || recordSetKey.length() < 1)
+					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getRealRecordSetNames()[0]); // set record set to the first
+				else
+					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 			}
 			else {
 				log.fine("nothing to do selected channel == active channel");
@@ -182,7 +186,8 @@ public class Channels extends HashMap<Integer, Channel> {
 				activeChannel.get(activeRecordName).clear();
 			}
 		}
-		for (int i = 1; i <= this.size(); i++) {
+		// use super.size instead of this.size to enable only one channel for multiple channel configurations
+		for (int i = 1; i <= super.size(); i++) { 
 			Channel channel = this.get(i);
 			for (int j = 0; j < channel.size(); j++) {
 				channel.getRecordSets().clear(); // clear records
@@ -207,7 +212,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public String checkRecordSetsSaved() {
 		StringBuffer sb = new StringBuffer();
-		for (int i = 1; i <= this.size(); i++) {
+		// use super.size instead of this.size to enable only one channel for multiple channel configurations
+		for (int i = 1; i <= super.size(); i++) {
 			Channel channel = this.get(i);
 			for (String recordSetkey : channel.getRecordSetNames()) {
 				if (channel.get(recordSetkey)!= null && !channel.get(recordSetkey).isSaved())

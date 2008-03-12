@@ -36,6 +36,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.device.ChannelTypes;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
@@ -129,7 +130,7 @@ public class CSVReaderWriter {
 								int channelNumber = channels.getChannelNumber(fileConfig);
 								if (channelNumber != 0) {  // 0 channel configuration does not exist
 									channels.setActiveChannelNumber(channelNumber);
-									channels.switchChannel(channelNumber);
+									channels.switchChannel(channelNumber, "");
 									application.getMenuToolBar().updateChannelSelector();
 								}
 								else
@@ -145,7 +146,7 @@ public class CSVReaderWriter {
 							}
 					}
 					activeChannel = channels.getActiveChannel();
-					if (activeChannel.getActiveRecordSet() != null) {
+					if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
 						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
 					}
 					recordNames = device.getMeasurementNames(fileConfig);

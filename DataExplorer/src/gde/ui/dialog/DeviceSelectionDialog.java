@@ -856,7 +856,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				channels.put(new Integer(i), newChannel);
 				// do not call channel.applyTemplate here, there are no record sets
 			}
-			channels.switchChannel(1); // set " 1 : Ausgang" as default after device switch and update
+			channels.switchChannel(1, ""); // set " 1 : Ausgang" as default after device switch and update
 		}
 	}
 

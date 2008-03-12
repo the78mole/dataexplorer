@@ -19,6 +19,7 @@ package osde.data;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -26,6 +27,7 @@ import org.eclipse.swt.graphics.Color;
 
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
+import osde.device.ChannelTypes;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.RecordSetNameComparator;
@@ -52,7 +54,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param channelNumber 1 -> " 1 : Ausgang"
 	 */
 	public Channel(int channelNumber, String channelName, int channelType) {
-		super(5);
+		super(1);
 		this.name = " " + channelNumber + " : " + channelName;
 		this.type = channelType;
 		
@@ -67,7 +69,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param newRecordSet
 	 */
 	public Channel(int channelNumber, String channelName, int channelType, RecordSet newRecordSet) {
-		super(5);
+		super(1);
 		this.name = " " + channelNumber + " : " + channelName;
 		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);
@@ -77,6 +79,68 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.template = new GraphicsTemplate(Settings.getInstance().getApplHomePath(), filename);
 	}
 
+//	/**
+//	 * overwrites the put method to fake multiple channel if channel type is ChannelTypes.TYPE_CONFIG
+//	 */
+//	public RecordSet put(String newRecordkey, RecordSet newRecord) {
+//		if(this.name.startsWith(" 1 ") || this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+//			super.put(newRecordkey, newRecord);
+//		}
+//		else { // ChannelTypes.TYPE_CONFIG
+//			Channels.getInstance().get(1).put(newRecordkey, newRecord);
+//		}
+//		return super.get(newRecordkey);
+//	}
+//	
+//	/**
+//	 * overwrites the get method to fake multiple channel if channel type is ChannelTypes.TYPE_CONFIG
+//	 */
+//	public RecordSet get(String recordkey) {
+//		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+//			return super.get(recordkey);
+//		}
+//		else { // ChannelTypes.TYPE_CONFIG
+//			Channels channels = Channels.getInstance();
+//			RecordSet recordSet = null;
+//			for (Integer channelNumber : Channels.getInstance().keySet()) {
+//				recordSet = channels.get(channelNumber)._get(recordkey);
+//				if (recordSet != null) break;
+//			}
+//			return recordSet;
+//		}
+//	}
+//	
+//	/**
+//	 * method to get record set within channels instance to avoid stack overflow due to never ending recursion 
+//	 */
+//	private RecordSet _get(String recordkey) {
+//		return super.get(recordkey);
+//	}
+	
+	/**
+	 * overwrites the size method to return faked size in case of channel type is ChannelTypes.TYPE_CONFIG
+	 */
+	public int size() {
+		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			return super.size();
+		}
+		else { // ChannelTypes.TYPE_CONFIG
+			int size = 0;
+			Channels channels = Channels.getInstance();
+			for (Integer channelNumber : Channels.getInstance().keySet()) {
+				size += channels.get(channelNumber)._size();
+			}
+			return size;
+		}
+	}
+
+	/**
+	 * method to get size within channels instance to avoid stack overflow due to never ending recursion 
+	 */
+	private int _size(){
+		return super.size();
+	}
+	
 	/**
 	 * @return the graphics template
 	 */
@@ -89,9 +153,30 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @return String[] containing the records names
 	 */
 	public String[] getRecordSetNames() {
-		String[] keys = this.keySet().toArray( new String[1]);
+		String[] keys;
+		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			keys = this.keySet().toArray( new String[1]);
+		}
+		else { // ChannelTypes.TYPE_CONFIG
+			Channels channels = Channels.getInstance();
+			Vector<String> namesVector = new Vector<String>();
+ 			for (int i=1; i <= channels.size(); ++i) {
+ 				String[] recordSetNames = channels.get(i).getRealRecordSetNames();
+ 				for (int j = 0; j < recordSetNames.length; j++) {
+ 	 				if (recordSetNames[j] != null) namesVector.add(recordSetNames[j]);
+				}
+			}
+			keys = namesVector.toArray( new String[1]);
+		}
 		Arrays.sort(keys, comparator);
 		return keys;
+	}
+	
+	/**
+	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion 
+	 */
+	public String[] getRealRecordSetNames() {
+		return this.keySet().toArray( new String[1]);
 	}
 
 	/**
@@ -208,7 +293,8 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridRecordKey(template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0"));
 			}
 			log.fine("applied graphics template file " + template.getCurrentFilePath());
-			if (recordSet.equals(this.getActiveRecordSet())) application.updateGraphicsWindow();
+			if (recordSet.equals(this.getActiveRecordSet())) 
+				application.updateGraphicsWindow();
 		}
 	}
 	
@@ -226,6 +312,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @return the activeRecordSet
 	 */
 	public RecordSet getActiveRecordSet() {
+		//return (this.name.startsWith(" 1 ") || this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) ? this.activeRecordSet : Channels.getInstance().get(1).getActiveRecordSet();
 		return this.activeRecordSet;
 	}
 
@@ -234,8 +321,22 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
 		this.activeRecordSet = this.get(recordSetKey);
+//		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+//			this.activeRecordSet = this.get(recordSetKey);
+//		}
+//		else { // ChannelTypes.TYPE_CONFIG
+//			RecordSet recordSet = this.get(recordSetKey);
+//			Channels channels = Channels.getInstance();
+//			for (int i =1; i <= channels.size(); ++i) {
+//				channels.get(i).setActiveRecordSet(recordSet);
+//			}
+//		}
+//	}
+//
+//	private void setActiveRecordSet(RecordSet recordSet) {
+//		this.activeRecordSet = recordSet;
 	}
-
+	
 	/**
 	 * switch the record set according selection and set applications active channel
 	 * @param recordSetName p.e. "1) Laden"
@@ -266,16 +367,41 @@ public class Channel extends HashMap<String, RecordSet> {
 		if (oldRecordSet != null) oldRecordSet.reset();
 
 		RecordSet recordSet = activeChannel.get(recordSetKey);
-		if (recordSet != null) { // record  set exist
+		if (recordSet == null) { //activeChannel do not have this record set, try to switch
+			int channelNumber = this.findChannelOfRecordSet(recordSetKey);
+			if (channelNumber > 0) {
+				Channels.getInstance().switchChannel(channelNumber, recordSetKey);
+				recordSet = activeChannel.get(recordSetKey);
+				activeChannel.applyTemplate(recordSetKey); // updates graphics window
+			}
+		}
+		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
 			activeChannel.applyTemplate(recordSetKey); // updates graphics window
+			application.getMenuToolBar().updateRecordSetSelectCombo();
+			application.updateDigitalWindow();
+			application.updateAnalogWindow();
+			application.updateDataTable();
 		}
-		application.getMenuToolBar().updateRecordSetSelectCombo();
-		application.updateDigitalWindow();
-		application.updateAnalogWindow();
-		application.updateDataTable();
 	}
 
+	/**
+	 * search through all channels/configurations for the channel which owns a record set with the given key
+	 * @param recordSetKey
+	 * @return 0 if record set does not exist
+	 */
+	public int findChannelOfRecordSet(String recordSetKey) {
+		int channelNumber = 0;
+		Channels channels = Channels.getInstance();
+		for (Integer number : Channels.getInstance().keySet()) {
+			Channel channel = channels.get(number);
+			if (channel.get(recordSetKey) != null) {
+				channelNumber = number.intValue();
+			}
+		}
+		return channelNumber;
+	}
+	
 	/**
 	 * @return the type
 	 */
