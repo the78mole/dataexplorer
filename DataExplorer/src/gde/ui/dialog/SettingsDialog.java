@@ -88,6 +88,7 @@ public class SettingsDialog extends Dialog {
 	private CCombo												globalLoggingCombo;
 	private Group													loggingGroup;
 
+	private Thread												listPortsThread;
 	private final Settings								settings;
 	private final OpenSerialDataExplorer	application;
 
@@ -264,13 +265,21 @@ public class SettingsDialog extends Dialog {
 					public void paintControl(PaintEvent evt) {
 						log.finest("serialPortGroup.paintControl, event=" + evt);
 						useGlobalSerialPort.setSelection(settings.isGlobalSerialPort());
-						serialPort.setText(settings.getSerialPort());
+						//serialPort.setText(settings.getSerialPort());
 						// execute independent from dialog UI
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+						listPortsThread = new Thread() {
 							public void run() {
-								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
+								final String[] ports = DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]);
+								if (ports != null && ports[0] != null) {
+									dialogShell.getDisplay().asyncExec(new Runnable() {
+										public void run() {
+											serialPort.setItems(ports);
+										}
+									});
+								}
 							}
-						});
+						};
+						listPortsThread.start();
 					}
 				});
 				{
@@ -283,7 +292,7 @@ public class SettingsDialog extends Dialog {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
 							if (useGlobalSerialPort.getSelection()) {
 								settings.setIsGlobalSerialPort("true");	
-								serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
+								//serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
 							}
 							else {
 								settings.setIsGlobalSerialPort("false");
