@@ -222,10 +222,11 @@ public class PicolarioDialog extends DeviceDialog {
 							if (activeRecordSet!= null && !activeChannel.getName().trim().equals(configKey)) {
 								int answer = application.openYesNoMessageDialog("Soll der aktuelle Datensatz in die selektierte Konfiguration verschoben werden ?");
 								if (answer == SWT.YES) {
-									System.out.println("verschieben");
-									channels.get(channelNumber).put(activeRecordSet.getName(), activeRecordSet.clone(configKey.split(":")[1].trim()));
-									activeChannel.remove(activeRecordSet.getName());
-									channels.switchChannel(channelNumber);
+									String recordSetKey = activeRecordSet.getName();
+									log.fine("move record set " + recordSetKey + " to configuration " + configKey);
+									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
+									activeChannel.remove(recordSetKey);
+									channels.switchChannel(channelNumber, recordSetKey);
 								}
 							}
 						}
