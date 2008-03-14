@@ -212,9 +212,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					// initialize selected device
 					log.fine("activeDeviceConfig = " + activeDeviceConfig + " activeDevice = " + activeDevice + " application.getActiveDevice() = " + application.getActiveDevice());
 					if (activeDeviceConfig != null || activeDevice != null) {
-						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
-						if (!activeDevice.getName().equals(application.getActiveDevice().getName())) // device changed
+						if (!activeDevice.getName().equals(activeDeviceConfig.getName())) {// device changed
+							settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
 							setupDevice();
+						}
 					}
 					else{ // no device selected
 						settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
