@@ -1070,7 +1070,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 					IDevice device = recordSet.get(recordSet.getRecordNames()[0]).getDevice();
 					int timeStep_ms = recordSet.getTimeStep_ms();
-					String[] recordNames = recordSet.getRecordNames();
+					String[] recordNames = device.getMeasurementNames(Channels.getInstance().getActiveChannel().getConfigKey());
 					for (int i = 0; i < recordEntries; i++) {
 						application.setProgress(new Double(i * progressInterval + progress).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
