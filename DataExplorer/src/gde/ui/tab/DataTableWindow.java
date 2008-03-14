@@ -144,6 +144,9 @@ public class DataTableWindow {
 	
 	public void cleanTable(boolean isDisabled) {
 		dataTable.removeAll();
-		if (isDisabled) new TableItem(dataTable, SWT.RIGHT).setText("Die Anzeige ist ausgeschaltet!");
+		if (isDisabled) {
+			TableItem item = new TableItem(dataTable, SWT.RIGHT);
+			item.setText(new String[] {"Die", "Anzeige",  "ist",  "ausgeschaltet!"});
+		}
 	}
 }
