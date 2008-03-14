@@ -413,10 +413,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	public synchronized void close() {
-		log.info(">");
+		log.info("entry");
 		closeThread = new Thread() { 
 			public void run() { 
-				log.info("> run");
+				log.info("entry");
 				if (isConnected && serialPort != null) {
 					try {
 						Thread.sleep(2);
@@ -431,12 +431,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					log.info("after close");
 					isConnected = false;
 					if (application != null) application.setPortConnected(false);
-					log.info("< run");
+					log.info("exit");
 				}
 			}
 		};
 		closeThread.start();
-		log.info("<");
+		log.info("exit, close thread started");
 	}
 
 	public InputStream getInputStream() {
