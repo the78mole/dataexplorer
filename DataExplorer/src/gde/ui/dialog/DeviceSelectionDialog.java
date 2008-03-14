@@ -580,10 +580,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								desktopTabsGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										log.finest("desktopTabsGroup.paintControl, event="+evt);
-										tableTabButton.setSelection(activeDeviceConfig.isTableTabRequested());
-										digitalTabButton.setSelection(activeDeviceConfig.isDigitalTabRequested());
-										analogTabButton.setSelection(activeDeviceConfig.isAnalogTabRequested());
-										voltagePerCellButton.setSelection(activeDeviceConfig.isVoltagePerCellTabRequested());
+										if (activeDeviceConfig != null) {
+											tableTabButton.setSelection(activeDeviceConfig.isTableTabRequested());
+											digitalTabButton.setSelection(activeDeviceConfig.isDigitalTabRequested());
+											analogTabButton.setSelection(activeDeviceConfig.isAnalogTabRequested());
+											voltagePerCellButton.setSelection(activeDeviceConfig.isVoltagePerCellTabRequested());
+										}
 									}
 								});
 								{
