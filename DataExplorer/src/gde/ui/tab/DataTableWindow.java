@@ -123,12 +123,13 @@ public class DataTableWindow {
 				int progressStart = application.getProgressPercentage();
 				double progressInterval = (100.0 - progressStart) / recordEntries;
 				TableItem item;
-
+				
 				for (int i = 0; i < recordEntries; i++) {
 					application.setProgress(new Double(i * progressInterval + progressStart).intValue());
 					item = new TableItem(dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataPoints(i));
 				}
+				dataTable.setVisible(true);
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
@@ -141,7 +142,8 @@ public class DataTableWindow {
 		}
 	}
 	
-	public void cleanTable() {
+	public void cleanTable(boolean isDisabled) {
 		dataTable.removeAll();
+		if (isDisabled) new TableItem(dataTable, SWT.RIGHT).setText("Die Anzeige ist ausgeschaltet!");
 	}
 }

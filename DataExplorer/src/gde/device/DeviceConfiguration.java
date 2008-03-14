@@ -57,6 +57,7 @@ public class DeviceConfiguration {
 	private DeviceType												device;
 	private SerialPortType										serialPort;
 	private TimeBaseType											timeBase;
+	private DesktopType												desktop;
 	private boolean														isChangePropery						= false;
 
 	public final static int										DEVICE_TYPE_CHARGER				= 1;
@@ -134,6 +135,8 @@ public class DeviceConfiguration {
 		this.device = deviceProps.getDevice();
 		this.serialPort = deviceProps.getSerialPort();
 		this.timeBase = deviceProps.getTimeBase();
+		this.desktop = deviceProps.getDesktop();
+		this.isChangePropery = false;
 		
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 	}
@@ -151,6 +154,7 @@ public class DeviceConfiguration {
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
 		this.timeBase = deviceConfig.timeBase;	
+		this.desktop = deviceProps.getDesktop();
 		this.isChangePropery = deviceConfig.isChangePropery;
 
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
@@ -178,6 +182,7 @@ public class DeviceConfiguration {
 			catch (Throwable t) {
 				log.log(Level.SEVERE, t.getMessage(), t);
 			}
+			isChangePropery = false;
 		}
 	}
 
@@ -298,7 +303,122 @@ public class DeviceConfiguration {
 	public boolean isRTS() {
 		return this.serialPort.isIsRTS();
 	}
-
+	
+	/**
+	 * method to query desktop properties, like: table tab switched of, ...
+	 * @param dektopType
+	 * @return property of the queried type or null if not defined
+	 */
+	private PropertyType getDesktopProperty(String dektopType) {
+		PropertyType property = null;
+		if (this.desktop != null) {
+			List<PropertyType> properties = this.desktop.getProperty();
+			for (PropertyType propertyType : properties) {
+				if (propertyType.getName().equals(dektopType)) {
+					property = propertyType;
+					break;
+				}
+			}
+		}
+		return property;
+	}
+	
+	/**
+	 * query if the table tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isTableTabRequested() {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_TABLE_TAB);
+		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+	}
+	
+	/**
+	 * set the DesktopType.TYPE_TABLE_TAB property to the given value
+	 * @param enable
+	 */
+	public void setTableTabRequested(boolean enable) {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_TABLE_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopType.TYPE_TABLE_TAB, DataTypes.BOOLEAN, enable);
+		}
+		else {
+			property.setValue("" + enable);
+		}
+		this.isChangePropery = true;
+	}
+		
+	/**
+	 * query if the digital tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isDigitalTabRequested() {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB);
+		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+	}
+	
+	/**
+	 * set the DesktopType.TYPE_DIGITAL_TAB property to the given value
+	 * @param enable
+	 */
+	public void setDigitalTabRequested(boolean enable) {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopType.TYPE_DIGITAL_TAB, DataTypes.BOOLEAN, enable);
+		}
+		else {
+			property.setValue("" + enable);
+		}
+		this.isChangePropery = true;
+	}
+	
+	/**
+	 * query if the analog tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isAnalogTabRequested() {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB);
+		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+	}
+	
+	/**
+	 * set the DesktopType.TYPE_ANALOG_TAB property to the given value
+	 * @param enable
+	 */
+	public void setAnalogTabRequested(boolean enable) {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopType.TYPE_ANALOG_TAB, DataTypes.BOOLEAN, enable);
+		}
+		else {
+			property.setValue("" + enable);
+		}
+		this.isChangePropery = true;
+	}
+	
+	/**
+	 * query if the voltage per cell tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isVoltagePerCellTabRequested() {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB);
+		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+	}
+	
+	/**
+	 * set the DesktopType.TYPE_VOLTAGE_PER_CELL_TAB property to the given value
+	 * @param enable
+	 */
+	public void setVoltagePerCellTabRequested(boolean enable) {
+		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB);
+		if (property == null) {
+			createDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB, DataTypes.BOOLEAN, enable);
+		}
+		else {
+			property.setValue("" + enable);
+		}
+		this.isChangePropery = true;
+	}
+	
 	/**
 	 * @return the channel count
 	 */
@@ -616,6 +736,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * create a measurement property
 	 * @param channelConfigKey
 	 * @param measurementKey
 	 * @param propertyKey
@@ -632,9 +753,39 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * create a desktop property
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @param propertyKey
+	 * @param type
+	 * @param value
+	 */
+	private void createDesktopProperty(String propertyKey, DataTypes type, Object value) {
+		ObjectFactory factory = new ObjectFactory();
+		PropertyType newProperty = factory.createPropertyType();
+		newProperty.setName(propertyKey);
+		newProperty.setType(type);
+		newProperty.setValue("" + value);
+		
+		if (this.desktop == null) {
+			this.desktop = factory.createDesktopType();
+			this.deviceProps.setDesktop(this.desktop);
+		}
+
+		this.desktop.getProperty().add(newProperty);
+	}
+
+	/**
 	 * @param isChangePropery the isChangePropery to set
 	 */
 	public void setChangePropery(boolean isChangePropery) {
 		this.isChangePropery = isChangePropery;
+	}
+
+	/**
+	 * @return the isChangePropery
+	 */
+	public boolean isChangePropery() {
+		return isChangePropery;
 	}
 }

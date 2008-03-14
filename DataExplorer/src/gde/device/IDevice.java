@@ -66,6 +66,54 @@ public interface IDevice {
 	public String getManufacturerURL();
 	
 	/**
+	 * query if the table tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isTableTabRequested();
+	
+	/**
+	 * set the DesktopType.TYPE_TABLE_TAB property to the given value
+	 * @param enable
+	 */
+	public void setTableTabRequested(boolean enable);
+	
+	/**
+	 * query if the digital tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isDigitalTabRequested();
+	
+	/**
+	 * set the DesktopType.TYPE_DIGITAL_TAB property to the given value
+	 * @param enable
+	 */
+	public void setDigitalTabRequested(boolean enable);
+	
+	/**
+	 * query if the analog tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isAnalogTabRequested();
+	
+	/**
+	 * set the DesktopType.TYPE_ANALOG_TAB property to the given value
+	 * @param enable
+	 */
+	public void setAnalogTabRequested(boolean enable);
+	
+	/**
+	 * query if the voltage per cell tab should be updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isVoltagePerCellTabRequested();
+	
+	/**
+	 * set the DesktopType.TYPE_VOLTAGE_PER_CELL_TAB property to the given value
+	 * @param enable
+	 */
+	public void setVoltagePerCellTabRequested(boolean enable);
+
+	/**
 	 * @return time step in ms
 	 */
 	public int getTimeStep_ms();

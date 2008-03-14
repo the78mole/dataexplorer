@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -44,10 +45,12 @@ public class AnalogWindow {
 	private TabItem													analogTab;
 	private Composite												analogMainComposite;
 	private HashMap<String, AnalogDisplay>	displays;
+	private CLabel													infoText;
 
 	private final Channels									channels;
 	private final TabFolder									displayTab;
 	private RecordSet												oldRecordSet;
+	private Channel													oldChannel;
 
 	public AnalogWindow(TabFolder displayTab) {
 		this.displayTab = displayTab;
@@ -61,16 +64,15 @@ public class AnalogWindow {
 		{
 			analogMainComposite = new Composite(displayTab, SWT.NONE);
 			GridLayout analogWindowLayout = new GridLayout();
-			analogTab.setControl(analogMainComposite);
+			analogWindowLayout.makeColumnsEqualWidth = true;
 			analogWindowLayout.numColumns = 2;
-			analogWindowLayout.horizontalSpacing = 2;
-			analogWindowLayout.verticalSpacing = 0;
+			analogTab.setControl(analogMainComposite);
 			analogMainComposite.setLayout(analogWindowLayout);
 			log.fine("digitalMainComposite " + analogMainComposite.getBounds().toString());
 			analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.finest("analogMainComposite.paintControl, event=" + evt);
-					log.fine("digitalMainComposite " + analogMainComposite.getBounds().toString());
+					log.fine("analogMainComposite " + analogMainComposite.getBounds().toString());
 					update();
 				}
 			});
@@ -80,9 +82,23 @@ public class AnalogWindow {
 					update();
 				}
 			});
+			setActiveInfoText("Die Anzeige ist ausgeschaltet!");
+			
 			analogMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			//analogMainComposite.pack();
 			analogMainComposite.layout();
+		}
+	}
+
+	/**
+	 * create new info text
+	 */
+	private void setActiveInfoText(String info) {
+		if (infoText == null || infoText.isDisposed()) {
+			infoText = new CLabel(analogMainComposite, SWT.LEFT);
+			infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+			infoText.setBounds(10, 10, 200, 30);
+			infoText.setText(info);
 		}
 	}
 
@@ -94,9 +110,8 @@ public class AnalogWindow {
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 			for (String recordKey : activeRecordKeys) {
-				@SuppressWarnings("unused")
 				AnalogDisplay display = displays.get(recordKey);
-				//TODO if (display != null) display.getDigitalLabel().redraw();
+				if (display != null) display.redraw();
 			}
 		}
 	}
@@ -108,28 +123,46 @@ public class AnalogWindow {
 		Channel activeChannel = channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
-			if (recordSet != null) { // just created  or device switched
+			// check if just created  or device switched or disabled
+			if (recordSet != null && recordSet.get(recordSet.getRecordNames()[0]).getDevice().isAnalogTabRequested()) {
 				// if recordSet name signature changed new displays need to be created
-				if (oldRecordSet == null || !recordSet.keySet().toString().equals(oldRecordSet.keySet().toString())) {
-					oldRecordSet = recordSet;
-					String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-					for (String recordKey : activeRecordKeys) {
+				boolean isUpdateRequired = oldRecordSet == null || !recordSet.getName().equals(oldRecordSet.getName())
+				|| oldChannel == null  || !oldChannel.getName().equals(activeChannel.getName());
+				log.fine("isUpdateRequired = " + isUpdateRequired);
+				if (isUpdateRequired) {
+					if (!infoText.isDisposed()) infoText.dispose();
+					// clean
+					for (String recordKey : displays.keySet().toArray(new String[0])) {
+						AnalogDisplay display = displays.get(recordKey);
+						if (display != null) {
+							display.dispose();
+							displays.remove(recordKey);
+						}
+					}
+					// add new displays
+					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
 						AnalogDisplay display = new AnalogDisplay(analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.fine("created analog display for " + recordKey);
 						displays.put(recordKey, display);
 					}
-					analogMainComposite.layout();
+					oldRecordSet = recordSet;
+					oldChannel = activeChannel;
 				}
 			}
 			else { // clean up after device switched
 				for (String recordKey : displays.keySet().toArray(new String[0])) {
-					log.fine("clean child " + recordKey);
-					displays.get(recordKey).dispose();
-					displays.remove(recordKey);
+					AnalogDisplay display = displays.get(recordKey);
+					if (display != null) {
+						log.fine("clean child " + recordKey);
+						display.dispose();
+						displays.remove(recordKey);
+					}
 				}
-				analogMainComposite.layout();
+				if (recordSet != null && !recordSet.get(recordSet.getRecordNames()[0]).getDevice().isAnalogTabRequested())
+					setActiveInfoText("Die Anzeige ist ausgeschaltet!");
 			}
+			analogMainComposite.layout();
 		}
 	}
 }

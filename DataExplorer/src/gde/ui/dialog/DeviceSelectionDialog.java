@@ -94,12 +94,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private Text																	flowcontrolDescription;
 	private Text																	baudeDescription;
 	private Group																	portSettings;
-	private Text																	portAdditionalText;
 	private CCombo																portSelectCombo;
 	private Text																	portDescription;
 	private Group																	portGroup;
+	private Button																voltagePerCellButton;
+	private Button																analogTabButton;
+	private Button																digitalTabButton;
+	private Button																tableTabButton;
+	private Group																	desktopTabsGroup;
 	private Group																	group1;
-	//private Button																showPortAdjustmentCheck;
 	private Button																openToolBoxCheck;
 	private Button																openPortCheck;
 	private Text																	internetLinkText;
@@ -201,15 +204,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
 					// update device configurations if required
-					for (String deviceKey : deviceConfigurations.keySet().toArray(new String[1])) {
+					for (String deviceKey : deviceConfigurations.keySet().toArray(new String[0])) {
 						DeviceConfiguration configuration = deviceConfigurations.get(deviceKey);
+						if (configuration.isChangePropery()) log.fine(configuration.isChangePropery() + " update device properties for " + configuration.getName());
 						configuration.storeDeviceProperties(); // stores only if is changed
 					}
 					// initialize selected device
 					log.fine("activeDeviceConfig = " + activeDeviceConfig + " activeDevice = " + activeDevice + " application.getActiveDevice() = " + application.getActiveDevice());
-					if (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice()) {
+					if (activeDeviceConfig != null || activeDevice != null) {
 						settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
-						setupDevice();
+						if (!activeDevice.getName().equals(application.getActiveDevice().getName())) // device changed
+							setupDevice();
 					}
 					else{ // no device selected
 						settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
@@ -254,12 +259,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			{
 				FormData composite1LData = new FormData();
-				composite1LData.width = 571;
+				composite1LData.width = 558;
 				composite1LData.height = 559;
-				composite1LData.left = new FormAttachment(0, 1000, 0);
-				composite1LData.top = new FormAttachment(0, 1000, 0);
+				composite1LData.left =  new FormAttachment(0, 1000, 0);
+				composite1LData.top =  new FormAttachment(0, 1000, 0);
+				composite1LData.right =  new FormAttachment(1000, 1000, 0);
+				composite1LData.bottom =  new FormAttachment(1000, 1000, -52);
 				composite1 = new Composite(dialogShell, SWT.NONE);
-				FormLayout composite1Layout = new FormLayout();
+				FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				composite1.setLayout(composite1Layout);
 				composite1.setLayoutData(composite1LData);
 				{
@@ -275,7 +282,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								group1 = new Group(composite2, SWT.NONE);
 								group1.setLayout(null);
 								group1.setText("Gerät");
-								group1.setBounds(12, 12, 524, 250);
+								group1.setBounds(12, 9, 524, 250);
 								{
 									deviceSelectCombo = new CCombo(group1, SWT.FLAT | SWT.BORDER);
 									deviceSelectCombo.setItems(new String[] {"-- no device selected --"});
@@ -296,6 +303,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 													application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();
+												desktopTabsGroup.redraw();
 											}
 											else {
 												application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
@@ -326,6 +334,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 														application.getDeviceDialog().dispose();
 													}
 													updateDialogEntries();
+													desktopTabsGroup.redraw();
 												}
 											}
 											else {
@@ -428,31 +437,31 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								portGroup = new Group(composite2, SWT.NONE);
 								portGroup.setLayout(null);
 								portGroup.setText("Anschlussport");
-								portGroup.setBounds(12, 268, 524, 69);
+								portGroup.setBounds(12, 265, 524, 58);
 								portGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										if (settings.isGlobalSerialPort()) {
 											portDescription.setEnabled(false);
 											portSelectCombo.setEnabled(false);
-											portAdditionalText.setEnabled(false);
 										}
 										else {
 											portDescription.setEnabled(true);
 											portSelectCombo.setEnabled(true);
-											portAdditionalText.setEnabled(true);
 										}
 									}
 								});
 								{
 									portDescription = new Text(portGroup, SWT.NONE);
 									portDescription.setText("Portbezeichnung");
-									portDescription.setBounds(8, 25, 100, 18);
+									portDescription.setBounds(30, 29, 183, 18);
+									portDescription.setToolTipText("Bitte wählen Sie den Port aus mit dem Gerät und Rechner verbunden sind");
 									portDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								}
 								{
 									portSelectCombo = new CCombo(portGroup, SWT.FLAT | SWT.BORDER);
-									portSelectCombo.setBounds(120, 25, 115, 22);
+									portSelectCombo.setBounds(249, 27, 205, 22);
 									portSelectCombo.setEditable(false);
+									portSelectCombo.setToolTipText("Bitte wählen Sie den Port aus mit dem Gerät und Rechner verbunden sind");
 									portSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									portSelectCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -463,18 +472,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										}
 									});
 								}
-								{
-									portAdditionalText = new Text(portGroup, SWT.MULTI | SWT.WRAP);
-									portAdditionalText.setBounds(244, 25, 268, 35);
-									portAdditionalText.setText("Bitte wählen Sie den Port aus mit dem Gerät und Rechner verbunden sind");
-									portAdditionalText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-								}
 							}
 							{
 								portSettings = new Group(composite2, SWT.NONE);
 								portSettings.setLayout(null);
 								portSettings.setText("Anschlusseinstellungen");
-								portSettings.setBounds(12, 349, 524, 115);
+								portSettings.setBounds(12, 409, 524, 115);
 								{
 									baudeDescription = new Text(portSettings, SWT.NONE);
 									baudeDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
@@ -567,6 +570,70 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									rtsCheckBox.setEnabled(false);
 								}
 							}
+							{
+								desktopTabsGroup = new Group(composite2, SWT.NONE);
+								desktopTabsGroup.setLayout(null);
+								desktopTabsGroup.setBounds(12, 329, 524, 74);
+								desktopTabsGroup.setText("Anzeigeeinstellungen");
+								desktopTabsGroup.setToolTipText("Hier können pro Gerät die aktiven Anzeigetabulatoren ausgewählt werden");
+								desktopTabsGroup.addPaintListener(new PaintListener() {
+									public void paintControl(PaintEvent evt) {
+										log.finest("desktopTabsGroup.paintControl, event="+evt);
+										tableTabButton.setSelection(activeDeviceConfig.isTableTabRequested());
+										digitalTabButton.setSelection(activeDeviceConfig.isDigitalTabRequested());
+										analogTabButton.setSelection(activeDeviceConfig.isAnalogTabRequested());
+										voltagePerCellButton.setSelection(activeDeviceConfig.isVoltagePerCellTabRequested());
+									}
+								});
+								{
+									tableTabButton = new Button(desktopTabsGroup, SWT.CHECK | SWT.LEFT);
+									tableTabButton.setBounds(12, 30, 110, 25);
+									tableTabButton.setText("Tabelle");
+									tableTabButton.setToolTipText("Tabellenansicht ein-aus-schalten");
+									tableTabButton.addSelectionListener(new SelectionAdapter() {
+										public void widgetSelected(SelectionEvent evt) {
+											log.finest("tableTabButton.widgetSelected, event="+evt);
+											activeDeviceConfig.setTableTabRequested(tableTabButton.getSelection());
+										}
+									});
+								}
+								{
+									digitalTabButton = new Button(desktopTabsGroup, SWT.CHECK | SWT.LEFT);
+									digitalTabButton.setBounds(141, 30, 110, 25);
+									digitalTabButton.setText("Digital");
+									digitalTabButton.setToolTipText("Digitalanzeigeansicht ein- aus- schalten");
+									digitalTabButton.addSelectionListener(new SelectionAdapter() {
+										public void widgetSelected(SelectionEvent evt) {
+											log.finest("digitalTabButton.widgetSelected, event="+evt);
+											activeDeviceConfig.setDigitalTabRequested(digitalTabButton.getSelection());
+										}
+									});
+								}
+								{
+									analogTabButton = new Button(desktopTabsGroup, SWT.CHECK | SWT.LEFT);
+									analogTabButton.setBounds(272, 30, 110, 25);
+									analogTabButton.setText("Analog");
+									analogTabButton.setToolTipText("Analoganzeigeansicht ein- aus- schalten");
+									analogTabButton.addSelectionListener(new SelectionAdapter() {
+										public void widgetSelected(SelectionEvent evt) {
+											log.finest("analogTabButton.widgetSelected, event="+evt);
+											activeDeviceConfig.setAnalogTabRequested(analogTabButton.getSelection());
+										}
+									});
+								}
+								{
+									voltagePerCellButton = new Button(desktopTabsGroup, SWT.CHECK | SWT.LEFT);
+									voltagePerCellButton.setBounds(402, 30, 110, 25);
+									voltagePerCellButton.setText("Spannung/Zelle");
+									voltagePerCellButton.setToolTipText("Ansicht Spannung pro Akkuzelle  ein- aus- schalten");
+									voltagePerCellButton.addSelectionListener(new SelectionAdapter() {
+										public void widgetSelected(SelectionEvent evt) {
+											log.finest("cellVoltageButton.widgetSelected, event="+evt);
+											activeDeviceConfig.setVoltagePerCellTabRequested(voltagePerCellButton.getSelection());
+										}
+									});
+								}
+							}
 						}
 					}
 					{
@@ -655,39 +722,30 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 						}
 					}
-					FormData einstellungenTabFolderLData = new FormData();
-					einstellungenTabFolderLData.width = 546;
-					einstellungenTabFolderLData.height = 472;
-					einstellungenTabFolderLData.left = new FormAttachment(0, 1000, 7);
-					einstellungenTabFolderLData.top = new FormAttachment(0, 1000, 7);
-					einstellungenTabFolderLData.right = new FormAttachment(1000, 1000, -12);
-					einstellungenTabFolderLData.bottom = new FormAttachment(1000, 1000, -54);
-					einstellungenTabFolder.setLayoutData(einstellungenTabFolderLData);
 					einstellungenTabFolder.setSelection(0);
+					einstellungenTabFolder.setBounds(0, 0, 559, 505);
 				}
-				{
-					closeButton = new Button(composite1, SWT.PUSH | SWT.CENTER);
-					FormData closeButtonLData = new FormData();
-					closeButtonLData.width = 552;
-					closeButtonLData.height = 26;
-					closeButtonLData.left = new FormAttachment(13, 1000, 0);
-					closeButtonLData.right = new FormAttachment(979, 1000, 0);
-					closeButtonLData.top = new FormAttachment(929, 1000, 0);
-					closeButtonLData.bottom = new FormAttachment(1000, 1000, -14);
-					closeButton.setLayoutData(closeButtonLData);
-					closeButton.setText("Schliessen");
-					closeButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.fine("closeButton.widgetSelected, event=" + evt);
-							dialogShell.dispose();
-						}
-					});
-				}
+			}
+			{
+				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+				FormData closeButtonLData = new FormData();
+				closeButtonLData.left =  new FormAttachment(0, 1000, 12);
+				closeButtonLData.top =  new FormAttachment(0, 1000, 573);
+				closeButtonLData.width = 529;
+				closeButtonLData.height = 26;
+				closeButton.setLayoutData(closeButtonLData);
+				closeButton.setText("Schliessen");
+				closeButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.fine("closeButton.widgetSelected, event=" + evt);
+						dialogShell.dispose();
+					}
+				});
 			}
 			updateDialogEntries(); // update all the entries according active device configuration
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(566, 581);
+			dialogShell.setSize(566, 644);
 			dialogShell.setText("Geräteauswahl und Schnittstelleneinstellung");
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();

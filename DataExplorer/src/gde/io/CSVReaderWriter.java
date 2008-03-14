@@ -254,7 +254,9 @@ public class CSVReaderWriter {
 			throw new Exception(msg);
 		}
 		finally {
-			application.setProgress(10);
+			if (device.isTableTabRequested())	application.setProgress(10);
+			else application.setProgress(100);
+			
 			application.setStatusMessage("");
 		}
 		

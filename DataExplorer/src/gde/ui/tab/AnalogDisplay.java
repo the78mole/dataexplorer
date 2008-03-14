@@ -19,18 +19,21 @@ package osde.ui.tab;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 import osde.utils.GraphicsUtils;
 
 /**
@@ -38,21 +41,21 @@ import osde.utils.GraphicsUtils;
  * @author Winfried Brügmann
  */
 public class AnalogDisplay extends Composite {
-	private Logger							log	= Logger.getLogger(this.getClass().getName());
+	private Logger					log	= Logger.getLogger(this.getClass().getName());
 
-	private Canvas							tacho;
+	private Canvas					tacho;
+	private CLabel					textDigitalLabel;
 
-	private final Channels			channels;
-	private final String				recordKey;
-	private final IDevice	device;
+	private final Channels	channels;
+	private final String		recordKey;
+	private final IDevice		device;
 
 	/**
 	 * 
 	 */
 	public AnalogDisplay(Composite analogWindow, String recordKey, IDevice device) {
 		super(analogWindow, SWT.NONE);
-		GridLayout AnalogDisplayLayout = new GridLayout();
-		AnalogDisplayLayout.makeColumnsEqualWidth = true;
+		FillLayout AnalogDisplayLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		GridData analogDisplayLData = new GridData();
 		analogDisplayLData.grabExcessVerticalSpace = true;
 		analogDisplayLData.grabExcessHorizontalSpace = true;
@@ -66,78 +69,106 @@ public class AnalogDisplay extends Composite {
 	}
 
 	public void create() {
-		GridData tachoLData = new GridData();
-		tachoLData.horizontalAlignment = GridData.FILL;
-		tachoLData.verticalAlignment = GridData.FILL;
-		tachoLData.grabExcessVerticalSpace = true;
-		tachoLData.grabExcessHorizontalSpace = true;
 		tacho = new Canvas(this, SWT.NONE);
-		tacho.setLayoutData(tachoLData);
 		tacho.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				tachoPaintControl(evt);
 			}
 		});
+		textDigitalLabel = new CLabel(tacho, SWT.LEFT);
+		textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
+		textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		textDigitalLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+		textDigitalLabel.setBounds(10, 10, 200, 30);
 	}
 
 	private void tachoPaintControl(PaintEvent evt) {
 		log.finest("tacho.paintControl, event=" + evt);
-		RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
-		final String channelConfigKey = activeRecordSet.getChannelName();
-		if (activeRecordSet != null) {
-			Record record = activeRecordSet.getRecord(recordKey);
-			log.fine("record name = " + record.getName());
-			// Get the canvas and its dimensions
-			Canvas canvas = (Canvas) evt.widget;
-			int width = canvas.getSize().x;
-			int height = canvas.getSize().y;
-			log.fine("canvas size = " + width + " x " + height);
-			//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
+		Channel activeChannel = channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			final String channelConfigKey = activeRecordSet.getChannelName();
+			if (activeRecordSet != null) {
+				Record record = activeRecordSet.getRecord(recordKey);
+				log.fine("record name = " + record.getName());
+				// Get the canvas and its dimensions
+				Canvas canvas = (Canvas) evt.widget;
+				int width = canvas.getSize().x;
+				int height = canvas.getSize().y;
+				log.fine("canvas size = " + width + " x " + height);
+				//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
-			double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
-			double maxValue =  device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0);
-			double minValue =  device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0);
-			log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
+				double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
+				double maxValue = record.getMaxDisplayValue();
+				double minValue = record.getMinDisplayValue();
+				log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
 
-			// draw clipping bounding 
-			//evt.gc.setClipping(10, 10, width-20, height-20);
-			evt.gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			canvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-	    
-	    int centerX = width / 2;
-	    int centerY = (int)(height * 0.75);
-	    evt.gc.drawLine(0, centerY, width, centerY);
-	    evt.gc.drawLine(centerX, 0, centerX, height);
+				canvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				int centerX = width / 2;
+				int centerY = (int) (height * 0.75);
+				//evt.gc.drawLine(0, centerY, width, centerY);
+				//evt.gc.drawLine(centerX, 0, centerX, height);
+				String recordText = record.getName() + " [" + record.getUnit() + "]";
+				textDigitalLabel.setText(recordText);
+				//GraphicsUtils.drawText(recordText, centerX, 10, evt.gc, SWT.HORIZONTAL);
 
-	    int radiusW = (int)(width / 2 * 0.85);
-	    int radiusH = (int)(height / 2 * 0.90);
-	    int radius = radiusW < radiusH ? radiusW : radiusH;
-	    int angleStart = -20;
-	    int angleDelta = 220;
-	    evt.gc.drawArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, angleStart, angleDelta);
+				int radiusW = (int) (width / 2 * 0.80);
+				int radiusH = (int) (height / 2 * 0.90);
+				int radius = radiusW < radiusH ? radiusW : radiusH;
+				int angleStart = -20;
+				int angleDelta = 220;
+				evt.gc.setForeground(record.getColor()); // TODO use line color
+				evt.gc.setLineWidth(4);
+				evt.gc.drawArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, angleStart, angleDelta);
+				evt.gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 
-	    int minV = 0;
-	    int maxV = 15;
-	    int numberTicks = maxV - minV;
-	    double angleSteps = angleDelta * 1.0 / numberTicks; 
-	    int dxr, dxtick, dyr, dytick, dxtext, dytext;
-	    for (int i = 0; i <= numberTicks; ++i) {
-	    	double angle = angleStart + i * angleSteps;  // -20, 0, 20, 40, ...
-		    log.fine("angle = " + angle);
-		    dxr = new Double(radius * Math.cos(angle * Math.PI / 180)).intValue();
-		    dyr = new Double(radius * Math.sin(angle * Math.PI / 180)).intValue();
-		    dxtick = new Double((radius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
-		    dytick = new Double((radius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
-		    dxtext = new Double((radius + 20) * Math.cos(angle * Math.PI / 180)).intValue();
-		    dytext = new Double((radius + 20) * Math.sin(angle * Math.PI / 180)).intValue();
+				int numberTicks = 10; //new Double(maxValue - minValue).intValue();
+				double deltaValue = (maxValue - minValue) / numberTicks;
+				double angleSteps = angleDelta * 1.0 / numberTicks;
+				int tickRadius = radius + 2;
+				int dxr, dxtick, dyr, dytick, dxtext, dytext;
+				evt.gc.setLineWidth(2);
+				for (int i = 0; i <= numberTicks; ++i) {
+					double angle = angleStart + i * angleSteps; // -20, 0, 20, 40, ...
+					dxr = new Double(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
+					dyr = new Double(tickRadius * Math.sin(angle * Math.PI / 180)).intValue();
+					dxtick = new Double((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
+					dytick = new Double((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
+					evt.gc.drawLine(centerX - dxtick, centerY - dytick, centerX - dxr, centerY - dyr);
 
-		    evt.gc.drawLine(centerX - dxtick, centerY - dytick, centerX - dxr, centerY - dyr);	
-		    GraphicsUtils.drawText("" + (minV + i * 1), centerX - dxtext, centerY - dytext, evt.gc, SWT.HORIZONTAL);
+					dxtext = new Double((radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
+					dytext = new Double((radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
+					String valueText = record.getDecimalFormat().format(minValue + (i * deltaValue));
+					GraphicsUtils.drawText(valueText, centerX - dxtext, centerY - dytext, evt.gc, SWT.HORIZONTAL);
+				}
+
+				// draw tacho needle
+				int needleRadius = radius - 5;
+				int innerRadius = (int) (width / 2 * 0.1) + 3;
+				double angle = angleStart + (actualValue - minValue) / (maxValue - minValue) * angleDelta;
+				log.finer("angle = " + angle + " actualValue = " + actualValue);
+
+				int posXo = new Double(centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
+				int posYo = new Double(centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
+				int posXi = new Double(centerX - (innerRadius * Math.cos(angle * Math.PI / 180))).intValue();
+				int posYi = new Double(centerY - (innerRadius * Math.sin(angle * Math.PI / 180))).intValue();
+				int posX1 = new Double(centerX - ((needleRadius - 30) * Math.cos((angle - 3) * Math.PI / 180))).intValue();
+				int posY1 = new Double(centerY - ((needleRadius - 30) * Math.sin((angle - 3) * Math.PI / 180))).intValue();
+				int posX2 = new Double(centerX - ((needleRadius - 30) * Math.cos((angle + 3) * Math.PI / 180))).intValue();
+				int posY2 = new Double(centerY - ((needleRadius - 30) * Math.sin((angle + 3) * Math.PI / 180))).intValue();
+				int[] needle = { posX1, posY1, posXo, posYo, posX2, posY2, posXi, posYi };
+				evt.gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+				evt.gc.setLineWidth(1);
+				evt.gc.fillPolygon(needle);
+
+				// center knob
+				evt.gc.setBackground(OpenSerialDataExplorer.COLOR_GREY);
+				radius = (int) (width / 2 * 0.1);
+				evt.gc.fillArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360);
+				evt.gc.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
+				radius = (int) (width / 20 * 0.1);
+				evt.gc.fillArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360);
 			}
-
-	    evt.gc.setBackground(OpenSerialDataExplorer.COLOR_GREY);
-			radius = (int)(width / 2 * 0.1);
-			evt.gc.fillArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, 0, 360);
 		}
 	}
 }

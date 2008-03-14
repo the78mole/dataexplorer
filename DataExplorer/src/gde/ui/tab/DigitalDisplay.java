@@ -25,6 +25,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -37,15 +38,15 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class DigitalDisplay extends Composite {
-	private Logger							log	= Logger.getLogger(this.getClass().getName());
+	private Logger					log	= Logger.getLogger(this.getClass().getName());
 
-	private CLabel							textDigitalLabel;
-	private CLabel							actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
-	private Composite						minMaxComposite;
+	private CLabel					textDigitalLabel;
+	private CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
+	private Composite				minMaxComposite;
 
-	private final Channels			channels;
-	private final String				recordKey;
-	private final IDevice	device;
+	private final Channels	channels;
+	private final String		recordKey;
+	private final IDevice		device;
 
 	public DigitalDisplay(Composite digitalWindow, String recordKey, IDevice device) {
 		super(digitalWindow, SWT.NONE);
@@ -65,10 +66,13 @@ public class DigitalDisplay extends Composite {
 			textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.finest("textDigitalLabel.paintControl, event=" + evt);
-					RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
-					if (activeRecordSet != null) {
-						log.fine("update label for " + recordKey);
-						textDigitalLabel.setText(activeRecordSet.get(recordKey).getName() + " [" + activeRecordSet.get(recordKey).getUnit() + "]");
+					Channel activeChannel = channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+						if (activeRecordSet != null) {
+							log.fine("update label for " + recordKey);
+							textDigitalLabel.setText(activeRecordSet.get(recordKey).getName() + " [" + activeRecordSet.get(recordKey).getUnit() + "]");
+						}
 					}
 				}
 			});
@@ -81,17 +85,20 @@ public class DigitalDisplay extends Composite {
 			actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
 					log.finest("digitalLabel.paintControl, event=" + evt);
-					RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
-					if (activeRecordSet != null) {
-						String channelConfigKey = activeRecordSet.getChannelName();
+					Channel activeChannel = channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(recordKey);
-							if (record != null) {
-								CLabel label = (CLabel) evt.widget;
-								label.setForeground(record.getColor());
-								actualDigitalLabel.setText(String.format("%3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
-								maxDigitalLabel.setText(String.format("MAX : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0)));
-								minDigitalLabel.setText(String.format("MIN : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0)));
+							String channelConfigKey = activeRecordSet.getChannelName();
+							if (activeRecordSet != null) {
+								Record record = activeRecordSet.getRecord(recordKey);
+								if (record != null) {
+									CLabel label = (CLabel) evt.widget;
+									label.setForeground(record.getColor());
+									actualDigitalLabel.setText(String.format("%3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
+									maxDigitalLabel.setText(String.format("MAX : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0)));
+									minDigitalLabel.setText(String.format("MIN : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0)));
+								}
 							}
 						}
 					}
