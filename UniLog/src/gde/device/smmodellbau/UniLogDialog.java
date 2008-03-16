@@ -821,6 +821,7 @@ public class UniLogDialog extends DeviceDialog {
 												isClosePossible = false;
 											}
 											catch (Exception e) {
+												stopLiveGatherButton.setEnabled(false);
 												application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !");
 											}
 										}
