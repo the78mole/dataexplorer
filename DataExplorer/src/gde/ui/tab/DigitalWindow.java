@@ -64,14 +64,19 @@ public class DigitalWindow {
 			digitalTab.setControl(digitalMainComposite);
 			FillLayout composite1Layout = new FillLayout(SWT.HORIZONTAL);
 			digitalMainComposite.setLayout(composite1Layout);
-			log.fine("digitalMainComposite " + digitalMainComposite.getBounds().toString());
 			digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.finest("digitalMainComposite.paintControl, event=" + evt);
+					log.fine("digitalMainComposite.paintControl, event=" + evt);
 					update();
 				}
 			});
-			setActiveInfoText("Die Anzeige ist ausgeschaltet!");
+			setActiveInfoText("");
+			infoText.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					log.fine("infoText.paintControl, event=" + evt);
+					update();
+				}
+			});
 			
 			digitalMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			digitalMainComposite.layout();

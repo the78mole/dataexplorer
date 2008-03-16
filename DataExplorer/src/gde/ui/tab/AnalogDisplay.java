@@ -34,6 +34,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.CurveUtils;
 import osde.utils.GraphicsUtils;
 
 /**
@@ -98,10 +99,16 @@ public class AnalogDisplay extends Composite {
 				log.fine("canvas size = " + width + " x " + height);
 				//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
 
+				
 				double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
-				double maxValue = record.getMaxDisplayValue();
-				double minValue = record.getMinDisplayValue();
-				log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
+				double minValue = device.translateValue(channelConfigKey, recordKey, record.getMinValue()/1000.0);
+				double maxValue = device.translateValue(channelConfigKey, recordKey, record.getMaxValue()/1000.0);
+				log.info(recordKey + " minValue = " + record.getMinValue() + " maxValue = " + record.getMaxValue());
+				log.info(recordKey + " minValue = " + minValue + " maxValue = " + maxValue);
+				double[] roundValues = CurveUtils.round(minValue, maxValue);
+				minValue = roundValues[0]; 	// min
+				maxValue = roundValues[1];	// max
+				log.info(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
 
 				canvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				int centerX = width / 2;

@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -71,18 +69,11 @@ public class AnalogWindow {
 			log.fine("digitalMainComposite " + analogMainComposite.getBounds().toString());
 			analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.finest("analogMainComposite.paintControl, event=" + evt);
-					log.fine("analogMainComposite " + analogMainComposite.getBounds().toString());
+					log.fine("analogMainComposite.paintControl, event=" + evt);
 					update();
 				}
 			});
-			analogMainComposite.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent evt) {
-					log.finest("analogMainComposite.focusGained, event=" + evt);
-					update();
-				}
-			});
-			setActiveInfoText("Die Anzeige ist ausgeschaltet!");
+			setActiveInfoText("");
 			
 			analogMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			analogMainComposite.layout();

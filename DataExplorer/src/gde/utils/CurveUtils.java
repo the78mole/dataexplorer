@@ -234,7 +234,7 @@ public class CurveUtils {
 	 * @param double array minValue, maxValue 
 	 * @return double array roundMinValue, roundMaxValue 
 	 */
-	private static double[] round(double minValue, double maxValue) {
+	public static double[] round(double minValue, double maxValue) {
 		double[] outValues = {0.0, 0.0};
 		
 		if (minValue != 0) {
