@@ -123,9 +123,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private final OpenSerialDataExplorer					application;
 	private final Settings												settings;
 	private String																activeDeviceName;
-	private DeviceConfiguration										activeDeviceConfig;
-	private IDevice																activeDevice;
-	private Vector<String>												availablePorts	= null;
+	private DeviceConfiguration										selectedActiveDeviceConfig;
+	private Vector<String>												availablePorts	= new Vector<String>();
+	private Thread																listPortsThread;
 
 	public DeviceSelectionDialog(Shell parent, int style, final OpenSerialDataExplorer application) {
 		super(parent, style);
@@ -163,7 +163,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
 					devConfig = new DeviceConfiguration(settings.getDevicesPath() + fileSep + files[i]);
 					if (devConfig.getName().equals(activeDeviceName)) { // define the active device after re-start
-						activeDeviceConfig = devConfig;
+						selectedActiveDeviceConfig = devConfig;
 					}
 					// add the active once into the active device vector
 					if(devConfig.isUsed())
@@ -188,7 +188,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 	}
 
-	public IDevice open() {
+	public void open() {
 		try {
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -210,17 +210,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						configuration.storeDeviceProperties(); // stores only if is changed
 					}
 					// initialize selected device
-					log.fine("activeDeviceConfig = " + activeDeviceConfig + " activeDevice = " + activeDevice + " application.getActiveDevice() = " + application.getActiveDevice());
-					if (activeDeviceConfig != null && activeDevice != null) {
-						if (!activeDevice.getName().equals(activeDeviceConfig.getName())) {// device changed
-							settings.setActiveDevice(activeDeviceConfig.getName() + ";" + activeDeviceConfig.getManufacturer() + ";" + activeDeviceConfig.getPort());
-							setupDevice();
-						}
+					if (isDeviceChanged()) {
+						setupDevice();
 					}
 					else{ // no device selected
-						settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
 						application.setActiveDevice(null);
-						activeDevice = null;
 					}
 						
 					if (Thread.currentThread().getId() == application.getThreadId()) {
@@ -298,7 +292,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port not connected
 												activeDeviceName = deviceSelectCombo.getText();
 												log.fine("activeName = " + activeDeviceName);
-												activeDeviceConfig = deviceConfigurations.get(activeDeviceName);
+												selectedActiveDeviceConfig = deviceConfigurations.get(activeDeviceName);
 												// if a device tool box is open, dispose it
 												if (application.getActiveDevice() != null && !application.getDeviceDialog().isDisposed()) {
 													application.getDeviceDialog().dispose();
@@ -329,7 +323,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												if (activeDevices.size() > 0 && !activeDevices.get(position).equals(activeDeviceName)) {
 													activeDeviceName = activeDevices.get(position);
 													log.fine("activeName = " + activeDeviceName);
-													activeDeviceConfig = deviceConfigurations.get(activeDeviceName);
+													selectedActiveDeviceConfig = deviceConfigurations.get(activeDeviceName);
 													// if a device tool box is open, dispose it
 													if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
 														application.getDeviceDialog().dispose();
@@ -448,6 +442,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										else {
 											portDescription.setEnabled(true);
 											portSelectCombo.setEnabled(true);
+											portSelectCombo.setItems(availablePorts.toArray(new String[availablePorts.size()]));
+											int index = availablePorts.indexOf(settings.getSerialPort());
+											portSelectCombo.select(index != -1 ? index : 0);
 										}
 									}
 								});
@@ -467,9 +464,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									portSelectCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("portSelectCombo.widgetSelected, event=" + evt);
-											activeDeviceConfig.setPort(portSelectCombo.getText());
-											activeDeviceConfig.storeDeviceProperties();
-											application.updateTitleBar(activeDeviceConfig.getName(), activeDeviceConfig.getPort());
+											selectedActiveDeviceConfig.setPort(portSelectCombo.getText());
+											selectedActiveDeviceConfig.storeDeviceProperties();
+											application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 										}
 									});
 								}
@@ -580,11 +577,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								desktopTabsGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										log.finest("desktopTabsGroup.paintControl, event="+evt);
-										if (activeDeviceConfig != null) {
-											tableTabButton.setSelection(activeDeviceConfig.isTableTabRequested());
-											digitalTabButton.setSelection(activeDeviceConfig.isDigitalTabRequested());
-											analogTabButton.setSelection(activeDeviceConfig.isAnalogTabRequested());
-											voltagePerCellButton.setSelection(activeDeviceConfig.isVoltagePerCellTabRequested());
+										if (selectedActiveDeviceConfig != null) {
+											tableTabButton.setSelection(selectedActiveDeviceConfig.isTableTabRequested());
+											digitalTabButton.setSelection(selectedActiveDeviceConfig.isDigitalTabRequested());
+											analogTabButton.setSelection(selectedActiveDeviceConfig.isAnalogTabRequested());
+											voltagePerCellButton.setSelection(selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
+										}
+										else {
+											tableTabButton.setSelection(false);
+											digitalTabButton.setSelection(false);
+											analogTabButton.setSelection(false);
+											voltagePerCellButton.setSelection(false);
 										}
 									}
 								});
@@ -596,7 +599,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									tableTabButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("tableTabButton.widgetSelected, event="+evt);
-											activeDeviceConfig.setTableTabRequested(tableTabButton.getSelection());
+											selectedActiveDeviceConfig.setTableTabRequested(tableTabButton.getSelection());
 										}
 									});
 								}
@@ -608,7 +611,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									digitalTabButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("digitalTabButton.widgetSelected, event="+evt);
-											activeDeviceConfig.setDigitalTabRequested(digitalTabButton.getSelection());
+											selectedActiveDeviceConfig.setDigitalTabRequested(digitalTabButton.getSelection());
 										}
 									});
 								}
@@ -620,7 +623,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									analogTabButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("analogTabButton.widgetSelected, event="+evt);
-											activeDeviceConfig.setAnalogTabRequested(analogTabButton.getSelection());
+											selectedActiveDeviceConfig.setAnalogTabRequested(analogTabButton.getSelection());
 										}
 									});
 								}
@@ -632,7 +635,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									voltagePerCellButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											log.finest("cellVoltageButton.widgetSelected, event="+evt);
-											activeDeviceConfig.setVoltagePerCellTabRequested(voltagePerCellButton.getSelection());
+											selectedActiveDeviceConfig.setVoltagePerCellTabRequested(voltagePerCellButton.getSelection());
 										}
 									});
 								}
@@ -659,30 +662,28 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											log.fine("add device = " + deviceName);
 											tmpDeviceConfiguration = deviceConfigurations.get(deviceName);
 											tmpDeviceConfiguration.setUsed(true);
-											tmpDeviceConfiguration.storeDeviceProperties();
+											//tmpDeviceConfiguration.storeDeviceProperties();
 											deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
 											activeDevices.add(deviceName);
 											if (activeDevices.size() == 1) {
-												activeDeviceConfig = deviceConfigurations.get(deviceName);
+												selectedActiveDeviceConfig = deviceConfigurations.get(deviceName);
 											}
 										}
 										else {
 											log.fine("remove device = " + deviceName);
 											tmpDeviceConfiguration = deviceConfigurations.get(deviceName);
 											tmpDeviceConfiguration.setUsed(false);
-											tmpDeviceConfiguration.storeDeviceProperties();
+											//tmpDeviceConfiguration.storeDeviceProperties();
 											activeDevices.remove(deviceName);
 											
 											// the removed configuration is the active one
-											if (activeDeviceConfig != null && activeDeviceConfig.getName().equals(deviceName)) {
+											if (selectedActiveDeviceConfig != null && selectedActiveDeviceConfig.getName().equals(deviceName)) {
 												// take first available
 												if (activeDevices.size() >  0) {
-													activeDeviceConfig = deviceConfigurations.get(activeDevices.firstElement());
-													activeDevice = getInstanceOfDevice();
+													selectedActiveDeviceConfig = deviceConfigurations.get(activeDevices.firstElement());
 												}
 												else { // no device
-													activeDeviceConfig = null;
-													activeDevice = null;
+													selectedActiveDeviceConfig = null;
 												}
 											}
 										}
@@ -761,13 +762,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			application.openMessageDialog("Es ist ein Fehler aufgetreten : " + e.getMessage());
 		}
-		return activeDevice;
 	}
 
 	/**
 	 * update entries according configuration, this is called whenever a new device is selected
 	 */
 	private void updateDialogEntries() {
+		updateAvailablePorts();
 		// device selection
 		log.fine(activeDevices.toString());
 		String[] list = activeDevices.toArray(new String[activeDevices.size()]);
@@ -777,7 +778,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			activeDevices.add(string);
 		}
 		if (list.length > 0) {
-			activeDeviceName = (activeDeviceConfig == null) ? "" : activeDeviceConfig.getName();
+			activeDeviceName = (selectedActiveDeviceConfig == null) ? "" : selectedActiveDeviceConfig.getName();
 			deviceSelectCombo.setItems(list);
 			deviceSelectCombo.setVisibleItemCount(activeDevices.size());
 			deviceSelectCombo.select(activeDevices.indexOf(activeDeviceName));
@@ -788,8 +789,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			log.fine("activeDevices.size() " + activeDevices.size());
 		}
 		else { // no active device
-			activeDeviceConfig = null;
-			activeDeviceName = (activeDeviceConfig == null) ? "" : activeDeviceConfig.getName();
+			selectedActiveDeviceConfig = null;
+			activeDeviceName = (selectedActiveDeviceConfig == null) ? "" : selectedActiveDeviceConfig.getName();
 			deviceSelectCombo.setItems(new String[] {"---->>>>   kein Gerät gewählt"});
 			deviceSelectCombo.setVisibleItemCount(1);
 			deviceSelectCombo.select(0);
@@ -802,7 +803,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}	
 
 		// update all serial Port settings
-		if (activeDeviceConfig == null) {
+		if (selectedActiveDeviceConfig == null) {
 			log.fine("activeDeviceConfig == null -> no device selected as active");
 			application.setActiveDevice(null);
 			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesPath() + fileSep + "NoDevicePicture.jpg"));
@@ -812,7 +813,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceTypeText.setText("---");
 			internetLinkText.setText("---");
 
-			availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
 			portSelectCombo.setItems(availablePorts.toArray(new String[availablePorts.size()]));
 			portSelectCombo.select(0);
 			
@@ -826,27 +826,26 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			rtsCheckBox.setSelection(false);
 		}
 		else {
-			log.fine(settings.getDevicesPath() + activeDeviceConfig.getImageFileName());
-			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesPath() + fileSep + activeDeviceConfig.getImageFileName()));
+			log.fine(settings.getDevicesPath() + selectedActiveDeviceConfig.getImageFileName());
+			deviceCanvas.setBackgroundImage(new Image(dialogShell.getDisplay(), settings.getDevicesPath() + fileSep + selectedActiveDeviceConfig.getImageFileName()));
 
-			herstellerText.setText(activeDeviceConfig.getManufacturer());
-			deviceText.setText(activeDeviceConfig.getName());
-			deviceTypeText.setText(activeDeviceConfig.getDeviceGroup());
-			String link = activeDeviceConfig.getManufacturerURL() != null ? activeDeviceConfig.getManufacturerURL() : "????";
+			herstellerText.setText(selectedActiveDeviceConfig.getManufacturer());
+			deviceText.setText(selectedActiveDeviceConfig.getName());
+			deviceTypeText.setText(selectedActiveDeviceConfig.getDeviceGroup());
+			String link = selectedActiveDeviceConfig.getManufacturerURL() != null ? selectedActiveDeviceConfig.getManufacturerURL() : "????";
 			internetLinkText.setText(link);
 
-			availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
 			portSelectCombo.setItems(availablePorts.toArray(new String[availablePorts.size()]));
-			portSelectCombo.select(availablePorts.indexOf(activeDeviceConfig.getPort()));
+			portSelectCombo.select(availablePorts.indexOf(selectedActiveDeviceConfig.getPort()));
 
 			// com port adjustments group
-			baudeSelectLabel.setText(new Integer(activeDeviceConfig.getBaudeRate()).toString());
-			dataBitsSelectLabel.setText(new Integer(activeDeviceConfig.getDataBits()).toString());
-			stopBitsSelectLabel.setText(new Integer(activeDeviceConfig.getStopBits()).toString());
-			paritySelectLabel.setText(new Integer(activeDeviceConfig.getParity()).toString());
-			flowControlSelectLabel.setText(new Integer(activeDeviceConfig.getFlowCtrlMode()).toString());
-			dtrCheckBox.setSelection(activeDeviceConfig.isDTR());
-			rtsCheckBox.setSelection(activeDeviceConfig.isRTS());
+			baudeSelectLabel.setText(new Integer(selectedActiveDeviceConfig.getBaudeRate()).toString());
+			dataBitsSelectLabel.setText(new Integer(selectedActiveDeviceConfig.getDataBits()).toString());
+			stopBitsSelectLabel.setText(new Integer(selectedActiveDeviceConfig.getStopBits()).toString());
+			paritySelectLabel.setText(new Integer(selectedActiveDeviceConfig.getParity()).toString());
+			flowControlSelectLabel.setText(new Integer(selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
+			dtrCheckBox.setSelection(selectedActiveDeviceConfig.isDTR());
+			rtsCheckBox.setSelection(selectedActiveDeviceConfig.isRTS());
 		}
 	}
 
@@ -863,13 +862,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			application.openMessageDialog("Der für die Anwendung konfigurierte serielle Port steht am System nicht zur Verfügung, bitte wählen sie einen anderen");
 			matches = false;
 		}
-		else if (!settings.isGlobalSerialPort() && (activeDeviceConfig != null && availablePorts.indexOf(activeDeviceConfig.getPort()) < 0)) {
+		else if (!settings.isGlobalSerialPort() && (selectedActiveDeviceConfig != null && availablePorts.indexOf(selectedActiveDeviceConfig.getPort()) < 0)) {
 			application.openMessageDialog("Der für das Gerät konfigurierte serielle Port steht am System nicht zur Verfügung, bitte wählen sie einen anderen");
 			matches = false;
 		}
 		else {
-			if (activeDeviceConfig != null) { //currently no device selected
-				if (settings.isGlobalSerialPort()) activeDeviceConfig.setPort(settings.getSerialPort());
+			if (selectedActiveDeviceConfig != null) { //currently no device selected
+				if (settings.isGlobalSerialPort()) selectedActiveDeviceConfig.setPort(settings.getSerialPort());
 			}
 		}
 		return matches;
@@ -879,23 +878,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
-		if (isDeviceChanged()) {
-//			if (!checkPortSelection()) {
-//				if (settings.isGlobalSerialPort())
-//					application.openSettingsDialog();
-//				else
-//					application.setActiveDevice(this.open());
-//			}
-//			else if (settings.getActiveDevice().startsWith("---")) {
-//				application.setActiveDevice(this.open());
-//			}
-			activeDevice = this.getInstanceOfDevice();
-			application.setActiveDevice(activeDevice);
-			setupDataChannels(activeDevice);
-			application.setupDataTableHeader();
-			application.updateDigitalWindow();
-			application.updateAnalogWindow();
-		}
+		IDevice activeDevice = this.getInstanceOfDevice();
+		application.setActiveDevice(activeDevice);
+		setupDataChannels(activeDevice);
+		application.setupDataTableHeader();
+		application.updateDigitalWindow();
+		application.updateAnalogWindow();
 	}
 
 	/**
@@ -927,8 +915,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	@SuppressWarnings("unchecked")
 	public IDevice getInstanceOfDevice() {
 		IDevice newInst = null;
-		String selectedDeviceName = activeDeviceConfig.getName().replace(" ", "").replace("-", "");
-		String className = "osde.device." + activeDeviceConfig.getManufacturer().toLowerCase().replace(" ", "").replace("-", "") + "." + selectedDeviceName;
+		String selectedDeviceName = selectedActiveDeviceConfig.getName().replace(" ", "").replace("-", "");
+		String className = "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(" ", "").replace("-", "") + "." + selectedDeviceName;
 		try {
 			//String className = "osde.device.DefaultDeviceDialog";
 			log.fine("loading Class " + className);
@@ -937,7 +925,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			//Class c = Class.forName(className);
 			Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
 			log.fine("constructor != null -> " + (constructor != null ? "true" : "false"));
-			newInst = (IDevice) constructor.newInstance(new Object[] { activeDeviceConfig });
+			newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig });
 
 		}
 		catch (NoClassDefFoundError e) {
@@ -984,14 +972,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	public DeviceConfiguration getActiveConfig() {
-		return activeDeviceConfig;
+		return selectedActiveDeviceConfig;
 	}
 
 	/**
 	 * @param activeConfig the activeConfig to set
 	 */
 	public void setActiveConfig(DeviceConfiguration activeConfig) {
-		this.activeDeviceConfig = activeConfig;
+		this.selectedActiveDeviceConfig = activeConfig;
 	}
 
 	/**
@@ -1006,7 +994,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return true if device selection changed
 	 */
 	public boolean isDeviceChanged() {
-		return (activeDeviceConfig != null || activeDevice != null && activeDevice != application.getActiveDevice());
+		IDevice activeDevice = application.getActiveDevice();
+		boolean isFirstConfigSelected = selectedActiveDeviceConfig != null && activeDevice == null; // new configuration selected, but no active device
+		@SuppressWarnings("unused")
+		boolean isLastConfigDeselected = selectedActiveDeviceConfig == null && activeDevice != null; // all configurations deselected, but a device is still selected
+		boolean isDeviceSwitched = selectedActiveDeviceConfig != null && activeDevice != null && !selectedActiveDeviceConfig.getName().equals(activeDevice.getName());
+		log.info("" + (isFirstConfigSelected || isDeviceSwitched));
+		return (isFirstConfigSelected || isDeviceSwitched);
 	}
 	
 	/**
@@ -1024,6 +1018,24 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		return result;
 		
+	}
+	
+	private void updateAvailablePorts() {
+		// execute independent from dialog UI
+		listPortsThread = new Thread() {
+			public void run() {
+				availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+				if (availablePorts != null && availablePorts.size() > 0) {
+					dialogShell.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							portGroup.redraw();
+						}
+					});
+				}
+			}
+		};
+		listPortsThread.start();
+
 	}
 }
 

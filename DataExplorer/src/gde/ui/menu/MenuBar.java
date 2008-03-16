@@ -306,9 +306,9 @@ public class MenuBar {
 					selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
-							DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
-							if (deviceSelect.checkDataSaved()) {
-								application.setActiveDevice(deviceSelect.open());
+							DeviceSelectionDialog deviceSelection = application.getDeviceSelectionDialog();
+							if (deviceSelection.checkDataSaved()) {
+								deviceSelection.open();
 							}
 						}
 					});

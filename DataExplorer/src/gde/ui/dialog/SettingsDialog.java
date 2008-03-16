@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.dialog;
 
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -75,8 +76,8 @@ public class SettingsDialog extends Dialog {
 	private CLabel												Port;
 	private CCombo												serialPort;
 	private Button												useGlobalSerialPort;
-	private Button deviceDialogButton;
-	private Group deviceDialogGroup;
+	private Button 												deviceDialogButton;
+	private Group 												deviceDialogGroup;
 	private Group													serialPortGroup;
 	private Group													separatorGroup;
 	private CCombo												listSeparator;
@@ -89,6 +90,7 @@ public class SettingsDialog extends Dialog {
 	private Group													loggingGroup;
 
 	private Thread												listPortsThread;
+	private Vector<String>								availablePorts = new Vector<String>();
 	private final Settings								settings;
 	private final OpenSerialDataExplorer	application;
 
@@ -111,8 +113,8 @@ public class SettingsDialog extends Dialog {
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.gif"));
 			dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					System.out.println("dialogShell.helpRequested, event="+evt);
-					//TODO add your code for dialogShell.helpRequested
+					log.fine("dialogShell.helpRequested, event="+evt);
+					application.openHelpDialog("", "HelpInfo.html" + '#' + "settings_dialog");
 				}
 			});
 			dialogShell.addDisposeListener(new DisposeListener() {
@@ -266,20 +268,9 @@ public class SettingsDialog extends Dialog {
 						log.finest("serialPortGroup.paintControl, event=" + evt);
 						useGlobalSerialPort.setSelection(settings.isGlobalSerialPort());
 						//serialPort.setText(settings.getSerialPort());
-						// execute independent from dialog UI
-						listPortsThread = new Thread() {
-							public void run() {
-								final String[] ports = DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]);
-								if (ports != null && ports[0] != null) {
-									dialogShell.getDisplay().asyncExec(new Runnable() {
-										public void run() {
-											serialPort.setItems(ports);
-										}
-									});
-								}
-							}
-						};
-						listPortsThread.start();
+						serialPort.setItems(availablePorts.toArray(new String[availablePorts.size()]));
+						int index = availablePorts.indexOf(settings.getSerialPort());
+						serialPort.select(index != -1 ? index : 0);
 					}
 				});
 				{
@@ -292,7 +283,7 @@ public class SettingsDialog extends Dialog {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
 							if (useGlobalSerialPort.getSelection()) {
 								settings.setIsGlobalSerialPort("true");	
-								//serialPort.setItems(DeviceSerialPort.listConfiguredSerialPorts().toArray(new String[1]));
+								updateAvailablePorts();
 							}
 							else {
 								settings.setIsGlobalSerialPort("false");
@@ -523,6 +514,9 @@ public class SettingsDialog extends Dialog {
 			} // end ok button
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();
+			
+			updateAvailablePorts();
+			
 			Display display = dialogShell.getDisplay();
 			while (!dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
@@ -531,6 +525,26 @@ public class SettingsDialog extends Dialog {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void updateAvailablePorts() {
+		// execute independent from dialog UI
+		listPortsThread = new Thread() {
+			public void run() {
+				availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+				if (availablePorts != null && availablePorts.size() > 0) {
+					dialogShell.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							serialPortGroup.redraw();
+						}
+					});
+				}
+			}
+		};
+		listPortsThread.start();
 	}
 
 	/**

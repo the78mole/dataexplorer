@@ -189,10 +189,9 @@ public class MenuToolBar {
 					deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("deviceToolItem.widgetSelected, event=" + evt);
-							DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
-							if (deviceSelect.checkDataSaved()) {
-								IDevice activeDevice = deviceSelect.open();
-								application.setActiveDevice(activeDevice);
+							DeviceSelectionDialog deviceSelection = application.getDeviceSelectionDialog();
+							if (deviceSelection.checkDataSaved()) {
+								deviceSelection.open();
 							}
 						}
 					});
@@ -280,7 +279,7 @@ public class MenuToolBar {
 								application.getDeviceDialog().open();
 							}
 							else {
-								application.setActiveDevice(application.getDeviceSelectionDialog().open());
+								application.getDeviceSelectionDialog().open();
 							}
 						}
 					});
