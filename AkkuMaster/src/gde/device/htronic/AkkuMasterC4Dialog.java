@@ -17,6 +17,7 @@
 package osde.device.htronic;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -25,8 +26,6 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -45,6 +44,19 @@ import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Dialog class for device AkkuMaster C4
  * @author Winfried Brügmann
@@ -74,7 +86,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	private final OpenSerialDataExplorer	application;
 	private AkkuMasterChannelTab		channel1Tab, channel2Tab, channel3Tab, channel4Tab;
 
-	private boolean									isOpenPortTried				= false;
 	private int											totalDischargeCurrent	= 0000;																				// mA
 	private int											totalChargeCurrent		= 0000;																				// mA
 	private HashMap<String, Object>	version;
@@ -170,6 +181,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 									versionDate.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_DATE, "\t\t", "?"));
 									versionCurrentType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "\t\t", "?"));
 									versionFrontplateType.setText(String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "\t\t", "?"));
+									updateVersion();
 								}
 							}
 						});
@@ -178,24 +190,28 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							versionNumber.setBounds(24, 62, 288, 30);
 							versionNumber.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							versionNumber.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionNumber.setEditable(false);
 						}
 						{
 							versionDate = new Text(versionComposite, SWT.NONE);
 							versionDate.setBounds(24, 111, 288, 30);
 							versionDate.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							versionDate.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionDate.setEditable(false);
 						}
 						{
 							versionCurrentType = new Text(versionComposite, SWT.NONE);
 							versionCurrentType.setBounds(24, 159, 288, 30);
 							versionCurrentType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							versionCurrentType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionCurrentType.setEditable(false);
 						}
 						{
 							versionFrontplateType = new Text(versionComposite, SWT.NONE);
 							versionFrontplateType.setBounds(24, 212, 288, 30);
 							versionFrontplateType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							versionFrontplateType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							versionFrontplateType.setEditable(false);
 						}
 					}
 				}
@@ -252,48 +268,22 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					totalChargeCurrentUnit.setBounds(300, 35, 119, 20);
 				}
 			}
-			dialogShell.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent evt) {
-					log.fine("dialogShell.focusGained, event="+evt);
-					try {
-						if (serialPort != null) {
-							if (!isOpenPortTried && !serialPort.isConnected()){
-								serialPort.open();
-								versionThread = new Thread() {
-									public void run() {
-										try {
-											version = version == null ? serialPort.getVersion() : version;
-										}
-										catch (Exception e) {
-											application.openMessageDialog("Bei der seriellen Kommunikation gibt es Probleme, bitte die Portkonfiguration überprüfen.\n" + e.getMessage());
-										}
-									}
-								};
-								versionThread.start();
-							}
-						}
-					}
-					catch (Exception e) {
-						application.openMessageDialog("Der Versuch den seriellen Port zu öffnen ist gescheitert. Bitte gegebenenfalls die Portkonfiguration überprüfen.\n" + e.getMessage());
-					}
-					isOpenPortTried = true;
-				}
-			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
 					if (serialPort != null && serialPort.isConnected()) serialPort.close();
+					if (versionThread.isAlive()) versionThread = null;
+				}
+			});
+			dialogShell.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					application.openHelpDialog("AkkuMaster", "HelpInfo.html");
 				}
 			});
 			{
 				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				closeButton.setText("Schliessen");
 				closeButton.setBounds(82, 509, 260, 30);
-				closeButton.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						application.openHelpDialog("AkkuMaster", "HelpInfo.html");
-					}
-				});
 				closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						if(channel1Tab.isDataColletionActive() || channel2Tab.isDataColletionActive() || channel3Tab.isDataColletionActive() && channel4Tab.isDataColletionActive())
@@ -307,6 +297,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();
+			updateVersion();
 		}
 		else {
 			dialogShell.setVisible(true);
@@ -377,5 +368,40 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	public int getMaxCurrent() {
 		return maxCurrent;
+	}
+
+	/**
+	 * update version string 
+	 */
+	private void updateVersion() {
+		try {
+			if (serialPort != null) {
+				if (!serialPort.isConnected()) {
+					serialPort.open();
+				}
+				if (versionThread == null || !versionThread.isAlive()) {
+					versionThread = new Thread() {
+						public void run() {
+							try {
+								version = serialPort.getVersion();
+								dialogShell.getDisplay().asyncExec(new Runnable() {
+									public void run() {
+										versionComposite.redraw();
+									}
+								});
+							}
+							catch (Exception e) {
+								application.openMessageDialog("Bei der seriellen Kommunikation gibt es Probleme, bitte die Portkonfiguration überprüfen.\n" + e.getMessage());
+							}
+						}
+					};
+					versionThread.start();
+				}
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			application.openMessageDialog("Der Versuch den seriellen Port zu öffnen ist gescheitert. Bitte gegebenenfalls die Portkonfiguration überprüfen.\n" + e.getMessage());
+		}
 	}
 }

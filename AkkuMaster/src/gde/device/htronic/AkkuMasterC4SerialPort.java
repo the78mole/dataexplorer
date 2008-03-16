@@ -229,7 +229,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		byte[] answer = this.read(2, 5);
 
-		if (answer[0] != setMomoryCycleSleep) throw new IOException("command to answer missmatch");
+		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != ok) throw new IOException("command setMemoryNumberCycleCoundSleepTime failed");
 	}
 

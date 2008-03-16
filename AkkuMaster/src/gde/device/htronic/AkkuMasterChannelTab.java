@@ -108,6 +108,9 @@ public class AkkuMasterChannelTab {
 	private boolean												isChargeCurrentAdded		= false;
 	private boolean												isDischargeCurrentAdded	= false;
 	private boolean												isCollectDataStopped		= false;
+	private boolean												isMemorySelectionChanged = false;
+	private String												recordSetKey	= ") nicht definiert";
+
 
 	private final Channels								channels;
 	private final OpenSerialDataExplorer	application;
@@ -286,7 +289,7 @@ public class AkkuMasterChannelTab {
 							countCells.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									log.finest("countCells.widgetSelected, event=" + evt);
-									countCellsValue = countCells.getSelectionIndex() + 1;
+									countCellsValue = countCells.getSelectionIndex();
 								}
 							});
 						}
@@ -400,9 +403,12 @@ public class AkkuMasterChannelTab {
 							memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" });
 							memoryNumberCombo.select(1);
 							memoryNumberCombo.setEditable(false);
+							memoryNumberCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 							memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									memoryNumberValue = memoryNumberCombo.getSelectionIndex() - 1;
+									memoryNumberValue = memoryNumberCombo.getSelectionIndex();
+									memoryNumberCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_CYAN));
+									isMemorySelectionChanged = true;
 								}
 							});
 						}
@@ -442,9 +448,12 @@ public class AkkuMasterChannelTab {
 												+ " dischargeCurrent_mA = " + dischargeCurrent_mA + " chargeCurrent_mA = " + chargeCurrent_mA);
 										serialPort.writeNewProgram(channelSig, programNumber, waitTime_days, accuTyp, cellCount, akkuCapacity, dischargeCurrent_mA, chargeCurrent_mA);
 
-										int memoryNumber = memoryNumberCombo.getSelectionIndex();
-										log.fine("memoryNumber =" + memoryNumber);
-
+										if (isMemorySelectionChanged) {
+											int memoryNumber = memoryNumberCombo.getSelectionIndex();
+											log.fine("memoryNumber =" + memoryNumber);
+											serialPort.setMemoryNumberCycleCoundSleepTime(channelSig, memoryNumber, 2, 2000);
+										}
+										
 										if (parent.getMaxCurrent() < parent.getActiveCurrent() + dischargeCurrent_mA || parent.getMaxCurrent() < parent.getActiveCurrent() + chargeCurrent_mA) {
 											application.openMessageDialog("Der für das Gerät erlaubte Gesammtstrom würde mit den angegebenen Werten für Entladestrom = " + dischargeCurrent_mA
 													+ " mA oder für den Ladestrom = " + chargeCurrent_mA + " mA überschritten, bitte korrigieren.");
@@ -464,7 +473,6 @@ public class AkkuMasterChannelTab {
 									timer = new Timer();
 									timerTask = new TimerTask() {
 										private Logger					log						= Logger.getLogger(this.getClass().getName());
-										String									recordSetKey	= ") nicht definiert";
 										HashMap<String, Object>	data;																												// [8]
 
 										public void run() {
@@ -614,7 +622,8 @@ public class AkkuMasterChannelTab {
 							}
 							stopTimer();
 							// hope this is the right record set
-							channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
+							RecordSet recordSet = channels.getActiveChannel().get(recordSetKey);
+							if (recordSet != null) recordSet.setTableDisplayable(true); // enable table display after calculation
 							application.updateDataTable();
 						}
 					});
@@ -628,7 +637,8 @@ public class AkkuMasterChannelTab {
 	 */
 	private void updateAdjustedValues() throws Exception {
 		// update channel tab with values red from device
-		if (!serialPort.isConnected()) serialPort.open();
+		if (!serialPort.isConnected()) 
+			serialPort.open();
 		String[] configuration = serialPort.getConfiguration(channelSig);
 		if (log.isLoggable(Level.FINER)) serialPort.print(configuration);
 		if (!configuration[0].equals("0")) { // AkkuMaster somehow active			
@@ -686,10 +696,11 @@ public class AkkuMasterChannelTab {
 	 * updates dialog UI after stop timer operation
 	 */
 	private void updateDialogAfterStop() {
-		isDataGatheringEnabled 	= false;
-		isStopButtonEnabled			= false;
-		isCaptureOnly						= false;
-		isDefinedProgram				= false;
+		isDataGatheringEnabled 		= false;
+		isStopButtonEnabled				= false;
+		isCaptureOnly							= false;
+		isDefinedProgram					= false;
+		isMemorySelectionChanged 	= false;
 		startDataGatheringButton.setEnabled(isDataGatheringEnabled);
 		stopDataGatheringButton.setEnabled(isStopButtonEnabled);
 
