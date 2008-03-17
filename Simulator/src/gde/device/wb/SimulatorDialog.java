@@ -29,6 +29,10 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -262,6 +266,18 @@ public class SimulatorDialog extends DeviceDialog {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt);
 						//TODO check if some thing to do before exiting
+					}
+				});
+				dialogShell.addKeyListener(new KeyAdapter() {
+					public void keyReleased(KeyEvent evt) {
+						System.out.println("dialogShell.keyReleased, event=" + evt);
+						//TODO add your code for dialogShell.keyReleased
+					}
+				});
+				dialogShell.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						System.out.println("dialogShell.helpRequested, event=" + evt);
+						//TODO add your code for dialogShell.helpRequested
 					}
 				});
 				{
