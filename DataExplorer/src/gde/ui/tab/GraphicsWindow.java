@@ -99,6 +99,8 @@ public class GraphicsWindow {
 	private final int											type;
 	private boolean												isCurveSelectorEnabled	= true;
 	private int selectorHeaderWidth;
+	private int selectorColumnWidth;
+	private int[] sashformWeights = new int[] {100,1000};
 	
 	private int														xDown = 0;
 	private int														xUp = 0;
@@ -147,7 +149,7 @@ public class GraphicsWindow {
 					curveSelectorHeader = new CLabel(curveSelector, SWT.NONE);
 					curveSelectorHeader.setText("Kurvenselektor");
 					curveSelectorHeader.pack();
-					selectorHeaderWidth = curveSelectorHeader.getSize().x;
+					selectorHeaderWidth = curveSelectorHeader.getSize().x + 10;
 					//curveSelectorHeader.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					FormData curveSelectorHeaderLData = new FormData();
 					curveSelectorHeaderLData.width = selectorHeaderWidth;
@@ -177,9 +179,9 @@ public class GraphicsWindow {
 					curveSelectorTable.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finest("curveTable.paintControl, event=" + evt);
-							int selectorItemWidth = graphicSashForm.getSize().x / 10;
-							curveSelectorHeader.setSize(selectorItemWidth, curveSelectorHeader.getSize().y);
-							tableSelectorColumn.setWidth(selectorItemWidth);
+							//int selectorColumnWidth = graphicSashForm.getSize().x / 10;
+							//curveSelectorHeader.setSize(selectorColumnWidth, curveSelectorHeader.getSize().y);
+							//tableSelectorColumn.setWidth(selectorColumnWidth);
 						}
 					});
 					curveSelectorTable.addSelectionListener(new SelectionAdapter() {
@@ -220,7 +222,7 @@ public class GraphicsWindow {
 					});
 					{
 						tableSelectorColumn = new TableColumn(curveSelectorTable, SWT.LEFT);
-						tableSelectorColumn.setWidth(selectorHeaderWidth);
+						tableSelectorColumn.setWidth(selectorColumnWidth);
 					}
 				}
 			} // curveSelector
@@ -467,7 +469,7 @@ public class GraphicsWindow {
 					}
 				});
 			} // graphicCanvas
-			graphicSashForm.setWeights(new int[] { 10, 100 }); // 10:100  -> 9 == width required for curveSelectorTable
+			//graphicSashForm.setWeights(new int[] { 10, 100 }); // 10:100  -> 9 == width required for curveSelectorTable
 		} // graphicSashForm
 	}
 
@@ -710,9 +712,12 @@ public class GraphicsWindow {
 	 */
 	private void doUpdateCurveSelectorTable() {
 		IDevice device = application.getActiveDevice();
+		int itemWidth = selectorHeaderWidth;
 		RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
 		if (isCurveSelectorEnabled && recordSet != null) {
 			curveSelectorTable.removeAll();
+			curveSelectorHeader.pack(true);
+			itemWidth = selectorHeaderWidth = curveSelectorHeader.getSize().x;
 
 			String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
 			for (int i = 0; i < recordSet.size(); i++) {
@@ -732,6 +737,10 @@ public class GraphicsWindow {
 				TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
 				item.setForeground(record.getColor());
 				item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
+				//curveSelectorTable.pack();
+				//log.info(item.getText() + " " + item.getBounds().width);
+				if (itemWidth < item.getBounds().width) itemWidth = item.getBounds().width;
+				//log.info(item.getText() + " " + itemWidth);
 				//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 				if (record.isDisplayable()) {
 					if (record.isVisible()) {
@@ -755,7 +764,19 @@ public class GraphicsWindow {
 		}
 		else
 			curveSelectorTable.removeAll();
-	}
+
+		selectorColumnWidth = itemWidth + 30;
+		if (log.isLoggable(Level.FINER)) {
+			log.finer("curveSelectorTable width = " + selectorColumnWidth);
+			log.finer("graphicSashForm width = " + graphicSashForm.getSize().x);
+		}
+		if (graphicSashForm.getSize().x > 100) {
+			curveSelectorHeader.setSize(selectorColumnWidth, curveSelectorHeader.getSize().y);
+			tableSelectorColumn.setWidth(selectorColumnWidth);
+			sashformWeights = new int[] {selectorColumnWidth, graphicSashForm.getSize().x - selectorColumnWidth};
+			graphicSashForm.setWeights(sashformWeights);
+		}
+}
 
 	public Canvas getGraphicCanvas() {
 		return graphicCanvas;
@@ -964,5 +985,12 @@ public class GraphicsWindow {
 		}
 		if(log.isLoggable(Level.FINER)) log.finer("out xPos = " + xPos + " yPos = " + yPos);
 		return new Point(xPos, yPos);
+	}
+
+	/**
+	 * @return the selectorColumnWidth
+	 */
+	public int[] getSashformWeights() {
+		return this.sashformWeights;
 	}
 }
