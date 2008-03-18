@@ -100,7 +100,7 @@ public class AnalogDisplay extends Composite {
 				int height = canvas.getSize().y;
 				log.fine("canvas size = " + width + " x " + height);
 				
-				String recordText = record.getName() + " [" + record.getUnit() + "]";
+				String recordText = record.getName() + " [ " + record.getUnit() + " ]";
 				textDigitalLabel.setSize(width, textHeight);
 				textDigitalLabel.setText(recordText);
 

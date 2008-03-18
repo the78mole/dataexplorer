@@ -71,7 +71,7 @@ public class DigitalDisplay extends Composite {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							log.fine("update label for " + recordKey);
-							textDigitalLabel.setText(activeRecordSet.get(recordKey).getName() + " [" + activeRecordSet.get(recordKey).getUnit() + "]");
+							textDigitalLabel.setText(activeRecordSet.get(recordKey).getName() + " [ " + activeRecordSet.get(recordKey).getUnit() + " ]");
 						}
 					}
 				}
