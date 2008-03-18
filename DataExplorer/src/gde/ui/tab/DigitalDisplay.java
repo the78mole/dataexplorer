@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -49,7 +50,7 @@ public class DigitalDisplay extends Composite {
 	private final IDevice		device;
 
 	public DigitalDisplay(Composite digitalWindow, String recordKey, IDevice device) {
-		super(digitalWindow, SWT.NONE);
+		super(digitalWindow, SWT.BORDER);
 		FillLayout digitalComposite1Layout = new FillLayout(SWT.VERTICAL);
 		this.setLayout(digitalComposite1Layout);
 		this.recordKey = recordKey;
@@ -62,7 +63,6 @@ public class DigitalDisplay extends Composite {
 			textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
 			textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			//textDigitalLabel.setText("Spannung [V]");
 			textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.finest("textDigitalLabel.paintControl, event=" + evt);
@@ -95,9 +95,10 @@ public class DigitalDisplay extends Composite {
 								if (record != null) {
 									CLabel label = (CLabel) evt.widget;
 									label.setForeground(record.getColor());
-									actualDigitalLabel.setText(String.format("%3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
-									maxDigitalLabel.setText(String.format("MAX : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0)));
-									minDigitalLabel.setText(String.format("MIN : %3.2f", device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0)));
+									DecimalFormat df = record.getDecimalFormat();
+									actualDigitalLabel.setText(df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
+									maxDigitalLabel.setText("MAX : " + df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0)));
+									minDigitalLabel.setText("MIN : " + df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0)));
 								}
 							}
 						}

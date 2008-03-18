@@ -49,6 +49,7 @@ public class DigitalWindow {
 	private final TabFolder									displayTab;
 	private RecordSet												oldRecordSet;
 	private Channel													oldChannel;
+	private String[] 												oldRecordsToDisplay;
 
 	public DigitalWindow(TabFolder displayTab) {
 		this.displayTab = displayTab;
@@ -119,9 +120,12 @@ public class DigitalWindow {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.get(recordSet.getRecordNames()[0]).getDevice().isDigitalTabRequested()) {
+				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
+		
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = oldRecordSet == null || !recordSet.getName().equals(oldRecordSet.getName())
-				|| oldChannel == null  || !oldChannel.getName().equals(activeChannel.getName());
+				|| oldChannel == null  || !oldChannel.getName().equals(activeChannel.getName())
+						|| (recordsToDisplay.length != oldRecordsToDisplay.length);
 				log.fine("isUpdateRequired = " + isUpdateRequired);
 				if (isUpdateRequired) {
 					if (!infoText.isDisposed()) infoText.dispose();
@@ -142,6 +146,7 @@ public class DigitalWindow {
 					}
 					oldRecordSet = recordSet;
 					oldChannel = activeChannel;
+					oldRecordsToDisplay = recordsToDisplay;
 				}
 			}
 			else { // clean up after device switched

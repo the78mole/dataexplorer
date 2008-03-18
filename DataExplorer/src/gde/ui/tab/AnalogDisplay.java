@@ -122,7 +122,7 @@ public class AnalogDisplay extends Composite {
 				int radius = radiusW < radiusH ? radiusW : radiusH;
 				int angleStart = -20;
 				int angleDelta = 220;
-				evt.gc.setForeground(record.getColor()); // TODO use line color
+				evt.gc.setForeground(record.getColor());
 				evt.gc.setLineWidth(4);
 				evt.gc.drawArc(centerX - radius, centerY - radius, 2 * radius, 2 * radius, angleStart, angleDelta);
 				evt.gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
