@@ -190,6 +190,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public void open() {
 		try {
+			updateAvailablePorts();
+
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
@@ -213,7 +215,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					if (isDeviceChanged()) {
 						setupDevice();
 					}
-					else{ // no device selected
+					else if(selectedActiveDeviceConfig == null){ // no device selected
 						application.setActiveDevice(null);
 					}
 						
@@ -664,7 +666,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											tmpDeviceConfiguration.setUsed(true);
 											//tmpDeviceConfiguration.storeDeviceProperties();
 											deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
-											activeDevices.add(deviceName);
+											if (!activeDevices.contains(deviceName))
+												activeDevices.add(deviceName);
 											if (activeDevices.size() == 1) {
 												selectedActiveDeviceConfig = deviceConfigurations.get(deviceName);
 											}
@@ -674,7 +677,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											tmpDeviceConfiguration = deviceConfigurations.get(deviceName);
 											tmpDeviceConfiguration.setUsed(false);
 											//tmpDeviceConfiguration.storeDeviceProperties();
-											activeDevices.remove(deviceName);
+											if (activeDevices.contains(deviceName))
+												activeDevices.remove(deviceName);
 											
 											// the removed configuration is the active one
 											if (selectedActiveDeviceConfig != null && selectedActiveDeviceConfig.getName().equals(deviceName)) {
@@ -768,15 +772,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * update entries according configuration, this is called whenever a new device is selected
 	 */
 	private void updateDialogEntries() {
-		updateAvailablePorts();
+		//updateAvailablePorts();
 		// device selection
-		log.fine(activeDevices.toString());
+		log.fine("active devices " + activeDevices.toString());
 		String[] list = activeDevices.toArray(new String[activeDevices.size()]);
 		Arrays.sort(list); // this sorts the list but not the vector
-		activeDevices = new Vector<String>(list.length);
-		for (String string : list) {
-			activeDevices.add(string);
+		//get sorted devices list and activeDevices array in sync
+		activeDevices.removeAllElements();
+		for (String device : list) {
+			activeDevices.add(device);
 		}
+
 		if (list.length > 0) {
 			activeDeviceName = (selectedActiveDeviceConfig == null) ? "" : selectedActiveDeviceConfig.getName();
 			deviceSelectCombo.setItems(list);
@@ -787,7 +793,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceSlider.setMaximum(activeDevices.size());
 			deviceSlider.setSelection(activeDevices.indexOf(activeDeviceName));
 			log.fine("activeDevices.size() " + activeDevices.size());
-			application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
+			if (selectedActiveDeviceConfig != null)
+				application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 		}
 		else { // no active device
 			selectedActiveDeviceConfig = null;
@@ -801,7 +808,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceSlider.setIncrement(0);
 			deviceSlider.setSelection(0);
 			log.fine("activeDevices.size() = 0");
-			application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
+			application.updateTitleBar(Settings.EMPTY, Settings.EMPTY);
 		}	
 
 		// update all serial Port settings
@@ -838,6 +845,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			internetLinkText.setText(link);
 
 			portSelectCombo.setItems(availablePorts.toArray(new String[availablePorts.size()]));
+			int portIndex = availablePorts.indexOf(selectedActiveDeviceConfig.getPort());
+			if(portIndex < 0 && availablePorts.size() > 0)
+				selectedActiveDeviceConfig.setPort(availablePorts.firstElement());
 			portSelectCombo.select(availablePorts.indexOf(selectedActiveDeviceConfig.getPort()));
 
 			// com port adjustments group
