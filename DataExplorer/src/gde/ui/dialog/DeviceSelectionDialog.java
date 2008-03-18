@@ -787,6 +787,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceSlider.setMaximum(activeDevices.size());
 			deviceSlider.setSelection(activeDevices.indexOf(activeDeviceName));
 			log.fine("activeDevices.size() " + activeDevices.size());
+			application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 		}
 		else { // no active device
 			selectedActiveDeviceConfig = null;
@@ -800,6 +801,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceSlider.setIncrement(0);
 			deviceSlider.setSelection(0);
 			log.fine("activeDevices.size() = 0");
+			application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 		}	
 
 		// update all serial Port settings
@@ -999,7 +1001,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		@SuppressWarnings("unused")
 		boolean isLastConfigDeselected = selectedActiveDeviceConfig == null && activeDevice != null; // all configurations deselected, but a device is still selected
 		boolean isDeviceSwitched = selectedActiveDeviceConfig != null && activeDevice != null && !selectedActiveDeviceConfig.getName().equals(activeDevice.getName());
-		log.info("" + (isFirstConfigSelected || isDeviceSwitched));
+		log.fine("" + (isFirstConfigSelected || isDeviceSwitched));
 		return (isFirstConfigSelected || isDeviceSwitched);
 	}
 	
