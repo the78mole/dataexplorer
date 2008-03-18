@@ -209,6 +209,8 @@ public class GraphicsWindow {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
 									item.setData(WINDOW_TYPE, type);
 									graphicCanvas.redraw();
+									application.updateDigitalWindow();
+									application.updateAnalogWindow();
 								}
 								else {
 									activeRecord.setVisible(false);
@@ -216,6 +218,8 @@ public class GraphicsWindow {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
 									item.setData(WINDOW_TYPE, type);
 									graphicCanvas.redraw();
+									application.updateDigitalWindow();
+									application.updateAnalogWindow();
 								}
 							}
 						}
