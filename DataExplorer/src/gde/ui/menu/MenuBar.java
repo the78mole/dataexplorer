@@ -549,11 +549,10 @@ public class MenuBar {
 				{
 					contentsMenuItem = new MenuItem(helpMenu, SWT.PUSH);
 					contentsMenuItem.setText("Inhalt");
-					contentsMenuItem.setEnabled(false);
 					contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("contentsMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for contentsMenuItem.widgetSelected
+							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo.html");
 						}
 					});
 				}
