@@ -46,6 +46,7 @@ public class AnalogDisplay extends Composite {
 
 	private Canvas					tacho;
 	private CLabel					textDigitalLabel;
+	private final int				textHeight = 30;
 
 	private final Channels	channels;
 	private final String		recordKey;
@@ -55,7 +56,7 @@ public class AnalogDisplay extends Composite {
 	 * 
 	 */
 	public AnalogDisplay(Composite analogWindow, String recordKey, IDevice device) {
-		super(analogWindow, SWT.NONE);
+		super(analogWindow, SWT.BORDER);
 		FillLayout AnalogDisplayLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		GridData analogDisplayLData = new GridData();
 		analogDisplayLData.grabExcessVerticalSpace = true;
@@ -71,16 +72,17 @@ public class AnalogDisplay extends Composite {
 
 	public void create() {
 		tacho = new Canvas(this, SWT.NONE);
+		tacho.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		tacho.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				tachoPaintControl(evt);
 			}
 		});
-		textDigitalLabel = new CLabel(tacho, SWT.LEFT);
+		textDigitalLabel = new CLabel(tacho, SWT.CENTER);
 		textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
 		textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		textDigitalLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-		textDigitalLabel.setBounds(10, 10, 200, 30);
+		textDigitalLabel.setBounds(0, 0, tacho.getSize().x, textHeight);
 	}
 
 	private void tachoPaintControl(PaintEvent evt) {
@@ -97,27 +99,23 @@ public class AnalogDisplay extends Composite {
 				int width = canvas.getSize().x;
 				int height = canvas.getSize().y;
 				log.fine("canvas size = " + width + " x " + height);
-				//canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/WorkItem.gif"));
-
 				
+				String recordText = record.getName() + " [" + record.getUnit() + "]";
+				textDigitalLabel.setSize(width, textHeight);
+				textDigitalLabel.setText(recordText);
+
 				double actualValue = device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0));
 				double minValue = device.translateValue(channelConfigKey, recordKey, record.getMinValue()/1000.0);
 				double maxValue = device.translateValue(channelConfigKey, recordKey, record.getMaxValue()/1000.0);
-				log.info(recordKey + " minValue = " + record.getMinValue() + " maxValue = " + record.getMaxValue());
-				log.info(recordKey + " minValue = " + minValue + " maxValue = " + maxValue);
+				log.fine(recordKey + " minValue = " + record.getMinValue() + " maxValue = " + record.getMaxValue());
+				log.fine(recordKey + " minValue = " + minValue + " maxValue = " + maxValue);
 				double[] roundValues = CurveUtils.round(minValue, maxValue);
 				minValue = roundValues[0]; 	// min
 				maxValue = roundValues[1];	// max
-				log.info(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
+				log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", actualValue, minValue, maxValue));
 
-				canvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				int centerX = width / 2;
 				int centerY = (int) (height * 0.75);
-				//evt.gc.drawLine(0, centerY, width, centerY);
-				//evt.gc.drawLine(centerX, 0, centerX, height);
-				String recordText = record.getName() + " [" + record.getUnit() + "]";
-				textDigitalLabel.setText(recordText);
-				//GraphicsUtils.drawText(recordText, centerX, 10, evt.gc, SWT.HORIZONTAL);
 
 				int radiusW = (int) (width / 2 * 0.80);
 				int radiusH = (int) (height / 2 * 0.90);
