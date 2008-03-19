@@ -896,6 +896,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		application.setupDataTableHeader();
 		application.updateDigitalWindow();
 		application.updateAnalogWindow();
+		application.updateCompareWindow();
 	}
 
 	/**

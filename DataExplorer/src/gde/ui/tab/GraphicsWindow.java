@@ -774,12 +774,11 @@ public class GraphicsWindow {
 			log.finer("curveSelectorTable width = " + selectorColumnWidth);
 			log.finer("graphicSashForm width = " + graphicSashForm.getSize().x);
 		}
-		if (graphicSashForm.getSize().x > 100) {
-			curveSelectorHeader.setSize(selectorColumnWidth, curveSelectorHeader.getSize().y);
-			tableSelectorColumn.setWidth(selectorColumnWidth);
-			sashformWeights = new int[] {selectorColumnWidth, graphicSashForm.getSize().x - selectorColumnWidth};
-			graphicSashForm.setWeights(sashformWeights);
-		}
+		int sashformWidth = graphicSashForm.getSize().x > 100 ? graphicSashForm.getSize().x : selectorColumnWidth * 10;
+		curveSelectorHeader.setSize(selectorColumnWidth, curveSelectorHeader.getSize().y);
+		tableSelectorColumn.setWidth(selectorColumnWidth);
+		sashformWeights = new int[] {selectorColumnWidth, sashformWidth - selectorColumnWidth};
+		graphicSashForm.setWeights(sashformWeights);
 }
 
 	public Canvas getGraphicCanvas() {
