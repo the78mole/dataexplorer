@@ -293,6 +293,7 @@ public class MenuBar {
 				{
 					toolBoxDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
 					toolBoxDeviceMenuItem.setText("Geräte ToolBox");
+					toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 					toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
@@ -303,6 +304,7 @@ public class MenuBar {
 				{
 					selectDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
 					selectDeviceMenuItem.setText("Gerät auswählen");
+					selectDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
 					selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
@@ -315,7 +317,7 @@ public class MenuBar {
 				}
 				{
 					prevDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					prevDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowLeftGreen.gif"));
+					prevDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
 					prevDeviceMenuItem.setText("vorheriges Gerät");
 					prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -349,7 +351,7 @@ public class MenuBar {
 				}
 				{
 					nextDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					nextDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowRightGreen.gif"));
+					nextDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
 					nextDeviceMenuItem.setText("nächstes Gerät");
 					nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -443,6 +445,43 @@ public class MenuBar {
 				viewMenu = new Menu(viewMenuItem);
 				viewMenuItem.setMenu(viewMenu);
 				{
+					curveSelectionMenuItem = new MenuItem(viewMenu, SWT.CHECK);
+					curveSelectionMenuItem.setText("Kurvenauswahl");
+					curveSelectionMenuItem.setSelection(true);
+					curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt);
+							if (curveSelectionMenuItem.getSelection()) {
+								application.setCurveSelectorEnabled(true);
+							}
+							else {
+								application.setCurveSelectorEnabled(false);
+							}
+						}
+					});
+				}
+				{
+					recordCommentMenuItem = new MenuItem(viewMenu, SWT.CHECK);
+					recordCommentMenuItem.setText("Datensatzkommentar");
+					recordCommentMenuItem.setSelection(false);
+					recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("dataCommentMenuItem.widgetSelected, event=" + evt);
+							if (recordCommentMenuItem.getSelection()) {
+								application.setRecordCommentEnabled(true);
+								application.updateDisplayTab();
+							}
+							else {
+								application.setRecordCommentEnabled(false);
+								application.updateDisplayTab();
+							}
+						}
+					});
+				}
+				{
+					new MenuItem(viewMenu, SWT.SEPARATOR);
+				}
+				{
 					graphicTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
 					graphicTabMenuItem.setText("Graphikansicht");
 					graphicTabMenuItem.addSelectionListener(new SelectionAdapter() {
@@ -499,43 +538,6 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("compareTabMenuItem.widgetSelected, event=" + evt);
 							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMPARE);
-						}
-					});
-				}
-				{
-					new MenuItem(viewMenu, SWT.SEPARATOR);
-				}
-				{
-					curveSelectionMenuItem = new MenuItem(viewMenu, SWT.CHECK);
-					curveSelectionMenuItem.setText("Kurvenauswahl");
-					curveSelectionMenuItem.setSelection(true);
-					curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt);
-							if (curveSelectionMenuItem.getSelection()) {
-								application.setCurveSelectorEnabled(true);
-							}
-							else {
-								application.setCurveSelectorEnabled(false);
-							}
-						}
-					});
-				}
-				{
-					recordCommentMenuItem = new MenuItem(viewMenu, SWT.CHECK);
-					recordCommentMenuItem.setText("Datensatzkommentar");
-					recordCommentMenuItem.setSelection(false);
-					recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("dataCommentMenuItem.widgetSelected, event=" + evt);
-							if (recordCommentMenuItem.getSelection()) {
-								application.setRecordCommentEnabled(true);
-								application.updateDisplayTab();
-							}
-							else {
-								application.setRecordCommentEnabled(false);
-								application.updateDisplayTab();
-							}
 						}
 					});
 				}
