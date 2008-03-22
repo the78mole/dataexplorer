@@ -40,6 +40,7 @@ import osde.io.CSVReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
+import osde.ui.tab.GraphicsWindow;
 
 /**
  * menu bar implementation class for the OpenSerialDataExplorer
@@ -55,9 +56,9 @@ public class MenuBar {
 	private Menu													fileMenu;
 	private MenuItem											openFileMenuItem;
 	private MenuItem											historyFileMenuItem;
-	private MenuItem											toolBoxDeviceMenuItem;
+	private MenuItem											toolBoxDeviceMenuItem, portMenuItem;
 	private MenuItem											aboutMenuItem;
-	private MenuItem											contentsMenuItem;
+	private MenuItem											contentsMenuItem, webCheckMenuItem;
 	private Menu													helpMenu;
 	private MenuItem											helpMenuItem;
 	private MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
@@ -74,7 +75,7 @@ public class MenuBar {
 	private Menu													deviceMenu;
 	private MenuItem											deviceMenuItem;
 	private MenuItem											copyTableMenuItem;
-	private MenuItem											copyGraphicMenuItem;
+	private MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
 	private Menu													editMenu;
 	private MenuItem											editMenuItem;
 	private MenuItem											exitMenuItem;
@@ -110,6 +111,7 @@ public class MenuBar {
 				{
 					newFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					newFileMenuItem.setText("Neu");
+					newFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
 					newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("newFileMenuItem.widgetSelected, event=" + evt);
@@ -120,6 +122,7 @@ public class MenuBar {
 				{
 					openFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					openFileMenuItem.setText("Öffnen");
+					openFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
 					openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("openFileMenuItem.widgetSelected, event=" + evt);
@@ -132,6 +135,7 @@ public class MenuBar {
 				{
 					saveFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					saveFileMenuItem.setText("Speichern");
+					saveFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
 					saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
@@ -144,6 +148,7 @@ public class MenuBar {
 				{
 					saveAsFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					saveAsFileMenuItem.setText("Speichern unter ...");
+					saveAsFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
 					saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt);
@@ -233,6 +238,7 @@ public class MenuBar {
 				{
 					preferencesFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
 					preferencesFileMenuItem.setText("Einstellungen");
+					preferencesFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
 					preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("preferencesFileMenuItem.widgetSelected, event=" + evt);
@@ -273,14 +279,67 @@ public class MenuBar {
 				editMenu = new Menu(editMenuItem);
 				editMenuItem.setMenu(editMenu);
 				{
+					activateZoomGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
+					activateZoomGraphicMenuItem.setText("Zoom Graphikfenster aktivieren");
+					activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
+					activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("activateZoomGraphicMenuItem.widgetSelected, event=" + evt);
+							application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
+						}
+					});
+				}
+				{
+					resetZoomGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
+					resetZoomGraphicMenuItem.setText("Zoom Graphikfenster zurücksetzen");
+					resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
+					resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("resetZoomGraphicMenuItem.widgetSelected, event=" + evt);
+							application.setGraphicsMode(GraphicsWindow.MODE_RESET ,false);						}
+					});
+				}
+				{
+					panGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
+					panGraphicMenuItem.setText("Inhalt Graphikfenster verschieben");
+					panGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
+					panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("panGraphicMenuItem.widgetSelected, event=" + evt);
+							application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+						}
+					});
+				}
+				{
+					new MenuItem(editMenu, SWT.SEPARATOR);
+				}
+				{
 					copyGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
 					copyGraphicMenuItem.setText("Kopiere Graphikfenster");
 					copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
+					copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("copyGraphicMenuItem.widgetSelected, event=" + evt);
+//							Clipboard clipboard = new Clipboard(display);
+//			        RTFTransfer rftTransfer = RTFTransfer.getInstance();
+//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
+//			        clipboard.dispose();
+						}
+					});
 				}
 				{
 					copyTableMenuItem = new MenuItem(editMenu, SWT.PUSH);
 					copyTableMenuItem.setText("Kopiere Tabelle");
 					copyTableMenuItem.setEnabled(false); //TODO enable after implementation
+					copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("copyTableMenuItem.widgetSelected, event=" + evt);
+//							Clipboard clipboard = new Clipboard(display);
+//			        TextTransfer transfer = TextTransfer.getInstance();
+//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
+//			        clipboard.dispose();						}
+						}
+					});
 				}
 			}
 		}
@@ -300,6 +359,23 @@ public class MenuBar {
 							application.openDeviceDialog();
 						}
 					});
+				}
+				{
+					new MenuItem(deviceMenu, SWT.SEPARATOR);
+				}
+				{
+					portMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
+					portMenuItem.setText("Port öffnen");
+					portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
+					portMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
+							application.openCloseSerialPort();		
+						}
+					});
+				}
+				{
+					new MenuItem(deviceMenu, SWT.SEPARATOR);
 				}
 				{
 					selectDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
@@ -559,6 +635,16 @@ public class MenuBar {
 					});
 				}
 				{
+					webCheckMenuItem = new MenuItem(helpMenu, SWT.PUSH);
+					webCheckMenuItem.setText("Versioncheck");
+					webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("webCheckMenuItem.widgetSelected, event=" + evt);
+							application.openWebBrowser("http://bruegmaenner.de/de/winfried/osde/Download.html");
+						}
+					});
+				}
+				{
 					aboutMenuItem = new MenuItem(helpMenu, SWT.PUSH);
 					aboutMenuItem.setText("About");
 					aboutMenuItem.addSelectionListener(new SelectionAdapter() {
@@ -641,5 +727,23 @@ public class MenuBar {
 			application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
+	
+	/**
+	 * this function must only called by application which make secure to choose the right thread
+	 * @param isOpenStatus
+	 */
+	public void setPortConnected(final boolean isOpenStatus) {
+		if (isOpenStatus) {
+			portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif"));
+			portMenuItem.setText("Port schliessen");
+		}
+		else {
+			if (!application.isDisposed()) {
+				portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
+				portMenuItem.setText("Port öffnen");
+			}
+		}
+	}
+
 
 }
