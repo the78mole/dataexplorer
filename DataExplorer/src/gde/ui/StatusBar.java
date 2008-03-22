@@ -166,41 +166,41 @@ public class StatusBar {
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!rxButton.isDisposed()) rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!rxButton.isDisposed()) rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!txButton.isDisposed()) txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!txButton.isDisposed()) txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!portButton.isDisposed()) portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!portButton.isDisposed()) portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
 	}
 }
