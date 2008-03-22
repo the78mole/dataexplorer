@@ -40,8 +40,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.serial.DeviceSerialPort;
+import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
@@ -71,6 +70,7 @@ public class MenuToolBar {
 	private ToolItem											prevDeviceToolItem;
 	private ToolItem											deviceSelectToolItem;
 	private ToolItem											saveAsToolItem;
+	private ToolItem											settingsToolItem;
 	private ToolItem											saveToolItem;
 	private ToolItem											openToolItem;
 	private ToolItem											newToolItem;
@@ -163,6 +163,25 @@ public class MenuToolBar {
 							//TODO add your code for saveAsToolItem.widgetSelected
 							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
 							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+						}
+					});
+				}
+				{
+					settingsToolItem = new ToolItem(fileToolBar, SWT.NONE);
+					settingsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
+					settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif"));
+					settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
+					settingsToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.finest("saveAsToolItem.widgetSelected, event=" + evt);
+							// check if other none modal dialog is open
+							DeviceDialog deviceDialog = application.getDeviceDialog();
+							if (deviceDialog == null || deviceDialog.isDisposed()) {
+								application.openSettingsDialog();
+								application.setStatusMessage("");
+							}
+							else
+								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
 						}
 					});
 				}
@@ -356,7 +375,7 @@ public class MenuToolBar {
 					portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("portOpenCloseItem.widgetSelected, event=" + evt);
-							openCloseSerialPort();
+							application.openCloseSerialPort();
 						}
 					});
 				}
@@ -612,30 +631,6 @@ public class MenuToolBar {
 			dataCoolItem.setPreferredSize(size);
 			dataCoolItem.setMinimumSize(size);
 		} // end record cool item
-	}
-
-	/**
-	 * method toggle open close serial port
-	 */
-	private void openCloseSerialPort() {
-		IDevice device = application.getActiveDevice();
-		if (device != null) {
-			DeviceSerialPort serialPort = device.getSerialPort();
-			if (serialPort != null) {
-				if (!serialPort.isConnected()) {
-					try {
-						serialPort.open();
-					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
-					}
-				}
-				else {
-					serialPort.close();
-				}
-			}
-		}
 	}
 
 	/**
