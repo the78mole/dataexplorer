@@ -92,6 +92,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.pack();
 			dialogShell.setSize(345, 272);
 			dialogShell.setText("Achsenendwerte  min / max ");
+			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Measure.gif"));
 			dialogShell.setLocation(100, 100);
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
