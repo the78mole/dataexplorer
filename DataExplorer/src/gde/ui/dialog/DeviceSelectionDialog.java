@@ -793,8 +793,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			deviceSlider.setMaximum(activeDevices.size());
 			deviceSlider.setSelection(activeDevices.indexOf(activeDeviceName));
 			log.fine("activeDevices.size() " + activeDevices.size());
-			if (selectedActiveDeviceConfig != null)
-				application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 		}
 		else { // no active device
 			selectedActiveDeviceConfig = null;
@@ -845,9 +843,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			internetLinkText.setText(link);
 
 			portSelectCombo.setItems(availablePorts.toArray(new String[availablePorts.size()]));
-			int portIndex = availablePorts.indexOf(selectedActiveDeviceConfig.getPort());
-			if(portIndex < 0 && availablePorts.size() > 0)
+			int portIndex = availablePorts.indexOf(selectedActiveDeviceConfig.getPort()); // -1 means not available
+			if(portIndex < 0 && availablePorts.size() > 0) {
 				selectedActiveDeviceConfig.setPort(availablePorts.firstElement());
+				selectedActiveDeviceConfig.setPort(availablePorts.firstElement());
+			}
 			portSelectCombo.select(availablePorts.indexOf(selectedActiveDeviceConfig.getPort()));
 
 			// com port adjustments group
@@ -858,6 +858,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			flowControlSelectLabel.setText(new Integer(selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
 			dtrCheckBox.setSelection(selectedActiveDeviceConfig.isDTR());
 			rtsCheckBox.setSelection(selectedActiveDeviceConfig.isRTS());
+
+			application.updateTitleBar(selectedActiveDeviceConfig.getName(), selectedActiveDeviceConfig.getPort());
 		}
 	}
 
