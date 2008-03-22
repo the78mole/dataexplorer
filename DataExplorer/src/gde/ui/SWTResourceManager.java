@@ -162,6 +162,23 @@ public class SWTResourceManager {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static Image getImage(int x, int y, String imgKey) {
+		String key = "IMAGE:" + x + "_" + y + "_" + imgKey;
+		try {
+			if (resources.containsKey(key))
+				return (Image) resources.get(key);
+			Image img = new Image(Display.getDefault(), x, y);
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
+			if (img != null)
+				resources.put(key, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	public static Image getRotatedImage(Image image, int style, String imgKey) {	
 		Image resultImg = null;
 		
@@ -302,7 +319,7 @@ public class SWTResourceManager {
 		resources.put(name, gc);
 		return gc;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static GC getGC(Display display) {
 		String name = "GC_IMAGE:" + display.hashCode();
