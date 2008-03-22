@@ -211,6 +211,9 @@ public class UniLogDialog extends DeviceDialog {
 								device.storeDeviceProperties();
 								isClosePossible = true;
 							}
+							// check threads before close
+							if(gatherThread != null && gatherThread.isAlive()) gatherThread.interrupt();
+							if(liveThread != null && liveThread.isAlive()) liveThread.interrupt();
 						}
 					}
 				});
