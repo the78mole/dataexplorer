@@ -272,7 +272,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
 					if (serialPort != null && serialPort.isConnected()) serialPort.close();
-					if (versionThread.isAlive()) versionThread = null;
+					if (versionThread!= null && versionThread.isAlive()) versionThread.interrupt();
 				}
 			});
 			dialogShell.addHelpListener(new HelpListener() {
