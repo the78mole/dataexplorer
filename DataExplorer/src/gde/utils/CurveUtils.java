@@ -166,11 +166,11 @@ public class CurveUtils {
 	 * @param width
 	 * @param height
 	 * @param isCompareSet
+	 * @param isisZoomMode
 	 */
-	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
+	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, boolean isZoomMode) {
 		if (log.isLoggable(Level.FINE)) log.fine(String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height));
 		if (log.isLoggable(Level.FINE)) log.fine("curve area bounds = " + record.getParent().getDrawAreaBounds().toString());
-		//gc.setClipping(record.getParent().getCurveBounds());
 	
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -178,7 +178,7 @@ public class CurveUtils {
 		gc.setLineStyle(record.getLineStyle());
 		
 		// get the data points size
-		int recordSize = record.size();
+		int recordSize = isCompareSet ? record.realSize() : record.size();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
 		int timeStep = record.getTimeStep_ms();
@@ -198,6 +198,10 @@ public class CurveUtils {
 		
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		Point newPoint, oldPoint = new Point(0,0);
+		
+		// compare sets might have different size curves, in zoom mode draw only until the curve ends
+		if (isCompareSet && isZoomMode)
+			recordSize = recordSize - record.getParent().getRecordZoomOffset();
 		
 		try {
 			// calculate start point of the curve, which is the first oldPoint

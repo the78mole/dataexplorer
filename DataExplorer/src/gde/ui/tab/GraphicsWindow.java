@@ -627,7 +627,7 @@ public class GraphicsWindow {
 				drawCurveGrid(recordSet, curveAreaGC, offSetY, width, dash);
 			
 			if (isActualRecordEnabled)
-				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet());
+				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
 		}
 		
 		

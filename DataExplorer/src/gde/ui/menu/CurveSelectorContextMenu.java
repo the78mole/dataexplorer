@@ -861,13 +861,13 @@ public class CurveSelectorContextMenu {
 							compareSet.put(recordkey, recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
 							compareSet.get(recordkey).setChannelConfigKey(recordSet.get(newRecordKey).getChannelConfigKey());
 							compareSet.get(recordkey).setVisible(true); // if a non visible record added
-							int maxRecordSize = compareSet.getSize();
+							int maxRecordSize = compareSet.getMaxSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
 							log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
 							for (String recordKey : compareSet.keySet()) {
-								if (compareSet.get(recordKey).size() > maxRecordSize) {
-									compareSet.setMaxSize(compareSet.get(recordKey).size());
+								if (compareSet.get(recordKey).realSize() > maxRecordSize) {
+									compareSet.setMaxSize(compareSet.get(recordKey).realSize());
 								}
 								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
 								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();

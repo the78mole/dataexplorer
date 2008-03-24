@@ -625,6 +625,13 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * get maximum size of data points of a compare set
+	 */
+	public int getMaxSize() {
+		return this.maxSize;
+	}
+
+	/**
 	 * query maximum display scale value of a compare set
 	 * @return the maxValue
 	 */
@@ -757,7 +764,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.recordZoomOffset = 0;
 			
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
-				this.recordZoomSize = this.get(this.recordNames[0]).realSize();
+				this.recordZoomSize = this.isCompareSet ? this.getMaxSize() : this.get(this.recordNames[0]).realSize();
 				// iterate children and reset min/max values
 				for (int i = 0; i < this.recordNames.length; i++) {
 					Record record = this.get(this.recordNames[i]);

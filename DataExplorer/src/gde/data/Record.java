@@ -211,10 +211,17 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * overwrites size method for zoom mode
+	 * overwrites size method for zoom mode and not zoomed compare window
 	 */
 	public int size() {
-		return this.parent.isZoomMode() ? this.parent.getRecordZoomSize() : super.size();
+		int tmpSize = super.size();
+		
+		if (this.parent.isZoomMode())
+			tmpSize = this.parent.getRecordZoomSize();
+		else if (this.parent.isCompareSet())
+			tmpSize = this.parent.getSize();
+		
+		return tmpSize;
 	}
 	
 	/**
