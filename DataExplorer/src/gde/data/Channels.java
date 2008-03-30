@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.data;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -30,7 +32,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	private Logger												log									= Logger.getLogger(this.getClass().getName());
 
 	private static Channels								channles						= null;
-	private String												fileDescription			= "Dateikommentar : ";
+	private String												fileDescription			= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 	private int														activeChannelNumber	= 1;																						// default at least one channel must exist
 	private final OpenSerialDataExplorer	application;
 
@@ -149,7 +151,10 @@ public class Channels extends HashMap<Integer, Channel> {
 			application.updateGraphicsWindow();
 			application.updateDigitalWindow();
 			application.updateAnalogWindow();
+			application.updateCellVoltageWindow();
 			application.updateDataTable();
+			application.updateFileCommentWindow();
+			application.updateRecordCommentWindow();
 		}
 	}
 

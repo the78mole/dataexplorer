@@ -381,7 +381,10 @@ public class Channel extends HashMap<String, RecordSet> {
 			application.getMenuToolBar().updateRecordSetSelectCombo();
 			application.updateDigitalWindow();
 			application.updateAnalogWindow();
+			application.updateCellVoltageWindow();
 			application.updateDataTable();
+			application.updateFileCommentWindow();
+			application.updateRecordCommentWindow();
 		}
 	}
 
