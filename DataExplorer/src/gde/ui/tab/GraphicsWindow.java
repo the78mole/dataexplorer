@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -98,9 +100,9 @@ public class GraphicsWindow {
 	private final TimeLine								timeLine								= new TimeLine();
 	private final int											type;
 	private boolean												isCurveSelectorEnabled	= true;
-	private int selectorHeaderWidth;
-	private int selectorColumnWidth;
-	private int[] sashformWeights = new int[] {100,1000};
+	private int 													selectorHeaderWidth;
+	private int 													selectorColumnWidth;
+	private int[] 												sashformWeights 				= new int[] {100,1000};
 	
 	private int														xDown = 0;
 	private int														xUp = 0;
@@ -136,6 +138,8 @@ public class GraphicsWindow {
 	public void create() {
 		graphic = new TabItem(displayTab, SWT.NONE);
 		graphic.setText(name);
+		SWTResourceManager.registerResourceUser(graphic);
+		
 		{ // graphicSashForm
 			graphicSashForm = new SashForm(displayTab, SWT.HORIZONTAL);
 			graphic.setControl(graphicSashForm);
@@ -145,6 +149,12 @@ public class GraphicsWindow {
 				curveSelector.setLayout(curveSelectorLayout);
 				GridData curveSelectorLData = new GridData();
 				curveSelector.setLayoutData(curveSelectorLData);
+				curveSelector.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						log.finer("curveSelector.helpRequested");
+						application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_41.html");
+					}
+				});
 				{
 					curveSelectorHeader = new CLabel(curveSelector, SWT.NONE);
 					curveSelectorHeader.setText("Kurvenselektor");
@@ -211,6 +221,9 @@ public class GraphicsWindow {
 									graphicCanvas.redraw();
 									application.updateDigitalWindow();
 									application.updateAnalogWindow();
+									application.updateCellVoltageWindow();
+									application.updateFileCommentWindow();
+									application.updateRecordCommentWindow();
 								}
 								else {
 									activeRecord.setVisible(false);
@@ -220,6 +233,9 @@ public class GraphicsWindow {
 									graphicCanvas.redraw();
 									application.updateDigitalWindow();
 									application.updateAnalogWindow();
+									application.updateCellVoltageWindow();
+									application.updateFileCommentWindow();
+									application.updateRecordCommentWindow();
 								}
 							}
 						}
@@ -234,6 +250,15 @@ public class GraphicsWindow {
 				graphicCanvas = new Canvas(graphicSashForm, SWT.NONE);
 				FillLayout graphicCanvasLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				graphicCanvas.setLayout(graphicCanvasLayout);
+				graphicCanvas.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						log.finer("graphicCanvas.helpRequested");
+						if(type == GraphicsWindow.TYPE_NORMAL)
+							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_4.html");
+						else
+							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_9.html");
+					}
+				});
 				graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 					public void mouseMove(MouseEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseMove = " + evt);
@@ -718,7 +743,7 @@ public class GraphicsWindow {
 		IDevice device = application.getActiveDevice();
 		int itemWidth = selectorHeaderWidth;
 		RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-		if (isCurveSelectorEnabled && recordSet != null) {
+		if (isCurveSelectorEnabled && recordSet != null && device != null) {
 			curveSelectorTable.removeAll();
 			curveSelectorHeader.pack(true);
 			itemWidth = selectorHeaderWidth = curveSelectorHeader.getSize().x;

@@ -19,6 +19,8 @@ package osde.ui.menu;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -106,6 +108,12 @@ public class MenuBar {
 		{
 			fileMenuItem = new MenuItem(parent, SWT.CASCADE);
 			fileMenuItem.setText("Datei");
+			fileMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("fileMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_3.html");
+				}
+			});
 			{
 				fileMenu = new Menu(fileMenuItem);
 				{
@@ -275,6 +283,12 @@ public class MenuBar {
 		{
 			editMenuItem = new MenuItem(parent, SWT.CASCADE);
 			editMenuItem.setText("Bearbeiten");
+			editMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("editMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_31.html");
+				}
+			});
 			{
 				editMenu = new Menu(editMenuItem);
 				editMenuItem.setMenu(editMenu);
@@ -346,6 +360,12 @@ public class MenuBar {
 		{
 			deviceMenuItem = new MenuItem(parent, SWT.CASCADE);
 			deviceMenuItem.setText("Gerät");
+			deviceMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("deviceMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_32.html");
+				}
+			});
 			{
 				deviceMenu = new Menu(deviceMenuItem);
 				deviceMenuItem.setMenu(deviceMenu);
@@ -463,6 +483,12 @@ public class MenuBar {
 		{
 			graphicsMenuItem = new MenuItem(parent, SWT.CASCADE);
 			graphicsMenuItem.setText("Graphikvorlagen");
+			graphicsMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("graphicsMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_33.html");
+				}
+			});
 			{
 				graphicsMenu = new Menu(graphicsMenuItem);
 				graphicsMenuItem.setMenu(graphicsMenu);
@@ -517,6 +543,12 @@ public class MenuBar {
 		{
 			viewMenuItem = new MenuItem(parent, SWT.CASCADE);
 			viewMenuItem.setText("Ansicht");
+			viewMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("viewMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+				}
+			});
 			{
 				viewMenu = new Menu(viewMenuItem);
 				viewMenuItem.setMenu(viewMenu);
@@ -622,6 +654,12 @@ public class MenuBar {
 		{
 			helpMenuItem = new MenuItem(parent, SWT.CASCADE);
 			helpMenuItem.setText("Hilfe");
+			helpMenuItem.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("helpMenuItem.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+				}
+			});
 			{
 				helpMenu = new Menu(helpMenuItem);
 				{
@@ -691,9 +729,11 @@ public class MenuBar {
 			FileDialog csvFileDialog = application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
 			if (csvFileDialog.getFileName().length() > 4) {
 				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+				String fileName = csvFileDialog.getFileName();
+				fileName = fileName.substring(0, fileName.indexOf('.'));
 				addSubHistoryMenuItem(csvFileDialog.getFileName());
 
-				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, dialogName, isRaw);
+				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, fileName, isRaw);
 			}
 		}
 		catch (Exception e) {
@@ -745,5 +785,11 @@ public class MenuBar {
 		}
 	}
 
-
+	/**
+	 * set selection of record comment window 
+	 * @param selected
+	 */
+	public void setRecordCommentMenuItemSelection(boolean selected) {
+		recordCommentMenuItem.setSelection(selected);
+	}
 }

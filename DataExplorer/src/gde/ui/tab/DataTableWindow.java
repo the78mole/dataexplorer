@@ -129,7 +129,7 @@ public class DataTableWindow {
 					item = new TableItem(dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataPoints(i));
 				}
-				dataTable.setVisible(true);
+				//dataTable.setVisible(true);
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);

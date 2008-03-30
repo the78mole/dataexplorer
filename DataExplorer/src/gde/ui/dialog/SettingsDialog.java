@@ -114,7 +114,7 @@ public class SettingsDialog extends Dialog {
 			dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.fine("dialogShell.helpRequested, event="+evt);
-					application.openHelpDialog("", "HelpInfo.html" + '#' + "settings_dialog");
+					application.openHelpDialog("", "HelpInfo_1.html");
 				}
 			});
 			dialogShell.addDisposeListener(new DisposeListener() {

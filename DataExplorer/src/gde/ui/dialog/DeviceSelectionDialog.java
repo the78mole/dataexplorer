@@ -32,6 +32,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -202,6 +204,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.setLayout(new FormLayout());
 			dialogShell.setSize(579, 592);
 			dialogShell.setSize(580, 592);
+			dialogShell.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.fine("dialogShell.helpRequested, event="+evt);
+					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_2.html");
+				}
+			});
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
@@ -249,7 +257,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						application.openMessageDialogAsync("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getCanonicalName() + " - " + e.getMessage() + "\n Bitte die Porteinstellung überprüfen.");
+						application.openMessageDialogAsync("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " - " + e.getMessage() + "\n Bitte die Porteinstellung überprüfen.");
 					}
 				}
 			});
@@ -898,7 +906,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		application.setupDataTableHeader();
 		application.updateDigitalWindow();
 		application.updateAnalogWindow();
+		application.updateCellVoltageWindow();
 		application.updateCompareWindow();
+		application.updateFileCommentWindow();
+		application.updateRecordCommentWindow();
 	}
 
 	/**

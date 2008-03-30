@@ -32,6 +32,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 
 /**
  * Display window parent of digital displays
@@ -44,6 +45,8 @@ public class DigitalWindow {
 	private TabItem													digitalTab;
 	private HashMap<String, DigitalDisplay>	displays;
 	private CLabel													infoText;
+	private FillLayout 											digitalMainCompositeLayout;
+	private String 													info = "Die Anzeige ist ausgeschaltet!";
 
 	private final Channels									channels;
 	private final TabFolder									displayTab;
@@ -59,19 +62,21 @@ public class DigitalWindow {
 	public void create() {
 		digitalTab = new TabItem(displayTab, SWT.NONE);
 		digitalTab.setText("Digital");
+		SWTResourceManager.registerResourceUser(digitalTab);
+		
 		displays = new HashMap<String, DigitalDisplay>(3);
 		{
 			digitalMainComposite = new Composite(displayTab, SWT.NONE);
 			digitalTab.setControl(digitalMainComposite);
-			FillLayout composite1Layout = new FillLayout(SWT.HORIZONTAL);
-			digitalMainComposite.setLayout(composite1Layout);
+			digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
+			digitalMainComposite.setLayout(null);
 			digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("digitalMainComposite.paintControl, event=" + evt);
 					update();
 				}
 			});
-			setActiveInfoText("");
+			setActiveInfoText(info);
 			infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("infoText.paintControl, event=" + evt);
@@ -89,6 +94,7 @@ public class DigitalWindow {
 	 */
 	private void setActiveInfoText(String info) {
 		if (infoText == null || infoText.isDisposed()) {
+			digitalMainComposite.setLayout(null);
 			infoText = new CLabel(digitalMainComposite, SWT.LEFT);
 			infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
@@ -128,12 +134,15 @@ public class DigitalWindow {
 						|| (recordsToDisplay.length != oldRecordsToDisplay.length);
 				log.fine("isUpdateRequired = " + isUpdateRequired);
 				if (isUpdateRequired) {
+					// remove the info text 
 					if (!infoText.isDisposed()) infoText.dispose();
+					// set layout 
+					digitalMainComposite.setLayout(digitalMainCompositeLayout);
 					// cleanup
 					for (String recordKey : displays.keySet().toArray(new String[0])) {
 						DigitalDisplay display = displays.get(recordKey);
 						if (display != null) {
-							display.dispose();
+							if (!display.isDisposed()) display.dispose();
 							displays.remove(recordKey);
 						}
 					}
@@ -145,7 +154,6 @@ public class DigitalWindow {
 						displays.put(recordKey, display);
 					}
 					oldRecordSet = recordSet;
-					oldChannel = activeChannel;
 					oldRecordsToDisplay = recordsToDisplay;
 				}
 			}
@@ -154,13 +162,15 @@ public class DigitalWindow {
 					DigitalDisplay display = displays.get(recordKey);
 					if (display != null) {
 						log.fine("clean child " + recordKey);
-						display.dispose();
+						if (!display.isDisposed()) display.dispose();
 						displays.remove(recordKey);
 					}
 				}
 				if (recordSet != null && !recordSet.get(recordSet.getRecordNames()[0]).getDevice().isDigitalTabRequested())
-					setActiveInfoText("Die Anzeige ist ausgeschaltet!");
+					if (infoText.isDisposed()) setActiveInfoText(info);
+					else infoText.setText(info);
 			}
+			oldChannel = activeChannel;
 			digitalMainComposite.layout();
 		}
 	}
