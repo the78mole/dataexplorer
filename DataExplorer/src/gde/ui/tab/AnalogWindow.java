@@ -32,6 +32,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 
 /**
  * Display window parent of analog displays
@@ -44,6 +45,8 @@ public class AnalogWindow {
 	private Composite												analogMainComposite;
 	private HashMap<String, AnalogDisplay>	displays;
 	private CLabel													infoText;
+	private GridLayout 											analogMainCompositeLayout;
+	private String 													info = "Die Anzeige ist ausgeschaltet!";
 
 	private final Channels									channels;
 	private final TabFolder									displayTab;
@@ -59,14 +62,16 @@ public class AnalogWindow {
 	public void create() {
 		analogTab = new TabItem(displayTab, SWT.NONE);
 		analogTab.setText("Analog");
+		SWTResourceManager.registerResourceUser(analogTab);
+		
 		displays = new HashMap<String, AnalogDisplay>(3);
 		{
 			analogMainComposite = new Composite(displayTab, SWT.NONE);
-			GridLayout analogWindowLayout = new GridLayout();
-			analogWindowLayout.makeColumnsEqualWidth = true;
-			analogWindowLayout.numColumns = 2;
+			analogMainCompositeLayout = new GridLayout();
+			analogMainCompositeLayout.makeColumnsEqualWidth = true;
+			analogMainCompositeLayout.numColumns = 2;
 			analogTab.setControl(analogMainComposite);
-			analogMainComposite.setLayout(analogWindowLayout);
+			analogMainComposite.setLayout(null);
 			log.fine("digitalMainComposite " + analogMainComposite.getBounds().toString());
 			analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
@@ -74,7 +79,13 @@ public class AnalogWindow {
 					update();
 				}
 			});
-			setActiveInfoText("");
+			setActiveInfoText(info);
+			infoText.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					log.fine("infoText.paintControl, event=" + evt);
+					update();
+				}
+			});
 			
 			analogMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			analogMainComposite.layout();
@@ -86,6 +97,7 @@ public class AnalogWindow {
 	 */
 	private void setActiveInfoText(String info) {
 		if (infoText == null || infoText.isDisposed()) {
+			analogMainComposite.setLayout(null);
 			infoText = new CLabel(analogMainComposite, SWT.LEFT);
 			infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
@@ -103,7 +115,7 @@ public class AnalogWindow {
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 			for (String recordKey : activeRecordKeys) {
 				AnalogDisplay display = displays.get(recordKey);
-				if (display != null) display.redraw();
+				if (display != null) display.getTacho().redraw();
 			}
 		}
 	}
@@ -118,19 +130,22 @@ public class AnalogWindow {
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.get(recordSet.getRecordNames()[0]).getDevice().isAnalogTabRequested()) {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
-		
+				log.info(activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = oldRecordSet == null || !recordSet.getName().equals(oldRecordSet.getName())
 				|| oldChannel == null  || !oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != oldRecordsToDisplay.length);
 				log.fine("isUpdateRequired = " + isUpdateRequired);
 				if (isUpdateRequired) {
+					// remove the info text
 					if (!infoText.isDisposed()) infoText.dispose();
-					// clean
+					// set the grid layout
+					analogMainComposite.setLayout(analogMainCompositeLayout);
+					// clean possible outdated displays
 					for (String recordKey : displays.keySet().toArray(new String[0])) {
 						AnalogDisplay display = displays.get(recordKey);
 						if (display != null) {
-							display.dispose();
+							if (!display.isDisposed()) display.dispose();
 							displays.remove(recordKey);
 						}
 					}
@@ -142,7 +157,6 @@ public class AnalogWindow {
 						displays.put(recordKey, display);
 					}
 					oldRecordSet = recordSet;
-					oldChannel = activeChannel;
 					oldRecordsToDisplay = recordsToDisplay;
 				}
 			}
@@ -151,13 +165,15 @@ public class AnalogWindow {
 					AnalogDisplay display = displays.get(recordKey);
 					if (display != null) {
 						log.fine("clean child " + recordKey);
-						display.dispose();
+						if (!display.isDisposed()) display.dispose();
 						displays.remove(recordKey);
 					}
 				}
 				if (recordSet != null && !recordSet.get(recordSet.getRecordNames()[0]).getDevice().isAnalogTabRequested())
-					setActiveInfoText("Die Anzeige ist ausgeschaltet!");
+					if (infoText.isDisposed()) setActiveInfoText(info);
+					else infoText.setText(info);
 			}
+			oldChannel = activeChannel;
 			analogMainComposite.layout();
 		}
 	}

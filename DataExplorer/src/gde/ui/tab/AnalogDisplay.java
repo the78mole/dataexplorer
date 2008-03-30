@@ -108,7 +108,7 @@ public class AnalogDisplay extends Composite {
 	}
 
 	private void tachoPaintControl(PaintEvent evt) {
-		log.finest("tacho.paintControl, event=" + evt);
+		if (log.isLoggable(Level.FINEST)) log.finest("tacho.paintControl, event=" + evt);
 		Channel activeChannel = channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
