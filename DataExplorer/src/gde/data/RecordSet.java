@@ -116,7 +116,7 @@ public class RecordSet extends HashMap<String, Record> {
 		super(initialCapacity);
 		this.channelName = channelName;
 		this.name = name;
-		this.recordNames = recordNames;
+		this.recordNames = recordNames.clone();
 		this.timeStep_ms = timeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRaw;
@@ -136,7 +136,7 @@ public class RecordSet extends HashMap<String, Record> {
 		super();
 		this.channelName = channelName;
 		this.name = name;
-		this.recordNames = recordNames;
+		this.recordNames = recordNames.clone();
 		this.timeStep_ms = timeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRaw;
@@ -182,7 +182,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.get(recordKey).setChannelConfigKey(channelName);
 		}
 
-		this.recordNames = recordSet.recordNames.clone();
+		this.recordNames = 	recordSet.recordNames.clone();
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
 		this.isSaved = recordSet.isSaved;
@@ -236,7 +236,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public synchronized boolean checkAllRecordsDisplayable() {
 		boolean areDisplayable = false;
 		int displayableRecordEntries = 0;
-		for (String recordKey : this.getRecordNames()) {
+		for (String recordKey : recordNames) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
 		}
 
@@ -262,19 +262,24 @@ public class RecordSet extends HashMap<String, Record> {
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
 	 * @param doUpdate to manage display update
+	 * @throws Exception 
 	 */
-	public synchronized void addPoints(int[] points, boolean doUpdate) {
-		for (int i = 0; i < points.length; i++) {
-			Record record = this.getRecord(recordNames[i]);
-			record.add((new Integer(points[i])).intValue());
-		}		
-		if (doUpdate) {
-			if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
-				application.updateGraphicsWindow();
-				application.updateDigitalWindowChilds();
-				application.updateAnalogWindowChilds();
+	public synchronized void addPoints(int[] points, boolean doUpdate) throws Exception {
+		if (points.length == recordNames.length) {
+			for (int i = 0; i < points.length; i++) {
+				Record record = this.getRecord(recordNames[i]);
+				record.add((new Integer(points[i])).intValue());
+			}
+			if (doUpdate) {
+				if (isChildOfActiveChannel() && this.equals(channels.getActiveChannel().getActiveRecordSet())) {
+					application.updateGraphicsWindow();
+					application.updateDigitalWindowChilds();
+					application.updateAnalogWindowChilds();
+				}
 			}
 		}
+		else 
+			throw new Exception("RecordSet.addPoints - points.length != recordNames.length");
 	}
 	
 	/**
@@ -289,8 +294,7 @@ public class RecordSet extends HashMap<String, Record> {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
 			if (value != 0) dataTableRow.add(value);
 			else 						dataTableRow.add(this.get(this.recordNames[0]).size() * this.getTimeStep_ms());
-			for (@SuppressWarnings("unused")
-			String recordName : recordNames) {
+			for (int i=0; i<recordNames.length; ++i) {
 				dataTableRow.add(0);
 			}
 			dataTable.add(dataTableRow);
@@ -328,10 +332,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return record number
 	 */
 	public int getRecordIndex(String recordName) {
-		int searchedNumber = 0;
-		for (String name : recordNames) {
-			if (name.equals(recordName)) break;
-			++searchedNumber;
+		int searchedNumber = -1;
+		for (int i=0; i<recordNames.length; ++i) {
+			if (recordNames[i].equals(recordName)) {
+				searchedNumber = i;
+				break;
+			}
 		}
 		return searchedNumber;
 	}
@@ -369,7 +375,7 @@ public class RecordSet extends HashMap<String, Record> {
 		String[] newRecordNames = new String[recordNames.length + 1];
 		System.arraycopy(recordNames, 0, newRecordNames, 0, recordNames.length);
 		newRecordNames[recordNames.length] = newRecordName;
-		recordNames = newRecordNames;
+		recordNames = newRecordNames.clone();
 	}
 
 	/**
@@ -487,12 +493,22 @@ public class RecordSet extends HashMap<String, Record> {
 			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[i]);
 		}
-		if (log.isLoggable(Level.FINE)) {
-			for (String key : recordNames) {
-				log.fine(newRecordSet.get(key).getName());
-			}
-		}
+		
+		if(log.isLoggable(Level.FINE)) printRecordNames("createRecordSet", newRecordSet.getRecordNames());
 		return newRecordSet;
+	}
+
+	/**
+	 * print record names array
+	 * @param recordNames
+	 */
+	private static void printRecordNames(String methodName, String[] recordNames) {
+		StringBuilder sb = new StringBuilder().append(methodName + " " + "\n");
+		for (int i=0; i<recordNames.length; ++i){
+			sb.append(recordNames[i]).append(" - ");
+		}
+		sb.delete(sb.length()-3, sb.length());
+		log.info(sb.toString());
 	}
 
 	/**
@@ -589,7 +605,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check if all records from this record set are displayable, starts calcualation if not
 	 */
 	public void setAllDisplayable() {
-		for (String recordKey : this.recordNames) {
+		for (String recordKey : recordNames) {
 			this.get(recordKey).setDisplayable(true);
 		}
 	}
@@ -798,8 +814,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
 		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
 		// iterate children and set min/max values
-		for (int i = 0; i < this.recordNames.length; i++) {
-			Record record = this.get(this.recordNames[i]);
+		for (String recordKey : recordNames) {
+			Record record = this.get(recordKey);
 			double minZoomScaleValue = record.getDisplayPointValue(zoomBounds.y, this.drawAreaBounds);
 			double maxZoomScaleValue = record.getDisplayPointValue(zoomBounds.height + zoomBounds.y, this.drawAreaBounds);
 			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
@@ -853,8 +869,8 @@ public class RecordSet extends HashMap<String, Record> {
 			this.recordZoomOffset = this.recordZoomOffset + xShift;
 		
 		// iterate children and set min/max values
-		for (int i = 0; i < this.recordNames.length; i++) {
-			Record record = this.get(this.recordNames[i]);
+		for (String recordKey : recordNames) {
+			Record record = this.get(recordKey);
 			double yShift = (record.getMaxScaleValue() - record.getMinScaleValue()) * yPercent / 100;
 			double minZoomScaleValue = record.getMinScaleValue() + yShift;
 			double maxZoomScaleValue = record.getMaxScaleValue() + yShift;
@@ -1043,15 +1059,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 * starts a thread executing the dataTable entries
 	 */
 	public void calculateDataTable() {
-		final RecordSet recordSet = this;
+		final RecordSet recordSet = this; // do not clone record set, data table of this must be modified 
+		final String[] recordNames = this.recordNames.clone();
+
 		dataTableCalcThread = new Thread() {
 			public void run() {
 				if (log.isLoggable(Level.FINE)) log.fine("entry data table calculation");
 				application.setStatusMessage(" -> berechne Datentabelle");
 
 				String channelName = recordSet.getChannelName();
-				int numberRecords = recordSet.getRecordNames().length;
-				int recordEntries = recordSet.get(recordSet.getRecordNames()[0]).size();
+				int numberRecords = recordNames.length;
+				int recordEntries = recordSet.get(recordNames[0]).size();
 				int progress = application.getProgressPercentage();
 
 				int maxWaitCounter = 10;
@@ -1071,19 +1089,20 @@ public class RecordSet extends HashMap<String, Record> {
 				if (log.isLoggable(Level.FINE)) log.fine("all records displayable now, create table");
 
 				// calculate record set internal data table
+				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", recordNames);
 				if (!recordSet.isTableDataCalculated()) {
 					if (log.isLoggable(Level.FINE)) log.fine("start build table entries");
 					double progressInterval = (60.0 - progress) / recordEntries;
 
-					IDevice device = recordSet.get(recordSet.getRecordNames()[0]).getDevice();
+					IDevice device = recordSet.get(recordNames[0]).getDevice();
 					int timeStep_ms = recordSet.getTimeStep_ms();
 					String[] recordNames = device.getMeasurementNames(Channels.getInstance().getActiveChannel().getConfigKey());
 					for (int i = 0; i < recordEntries; i++) {
 						application.setProgress(new Double(i * progressInterval + progress).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(timeStep_ms * i);
-						for (int j = 0; j < recordNames.length; ++j) {
-							dataTableRow.add(new Double(1000 * device.translateValue(channelName, recordNames[j], recordSet.get(recordNames[j]).get(i) / 1000)).intValue());
+						for (String recordKey : recordNames) {
+							dataTableRow.add(new Double(1000.0 * device.translateValue(channelName, recordKey, recordSet.get(recordKey).get(i) / 1000.0)).intValue());
 						}
 						recordSet.dataTableAddRow(dataTableRow);
 					}
