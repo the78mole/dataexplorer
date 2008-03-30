@@ -196,7 +196,7 @@ public class AkkuMasterChannelTab {
 									}
 									catch (Exception e) {
 										OpenSerialDataExplorer.getInstance().openMessageDialog("Bei der seriellen Kommunikation ist ein Fehler aufgetreten, bitte die Porteinstellung überprüfen. " 
-												+ e.getClass().getCanonicalName() + " - " + e.getMessage());
+												+ e.getClass().getSimpleName() + " - " + e.getMessage());
 									}
 									captureOnlyButton.setSelection(isCaptureOnly);
 									programmButton.setSelection(isDefinedProgram);

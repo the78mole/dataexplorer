@@ -825,7 +825,7 @@ public class UniLogDialog extends DeviceDialog {
 											}
 											catch (Exception e) {
 												stopLiveGatherButton.setEnabled(false);
-												application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !");
+												application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 											}
 										}
 									});
@@ -851,7 +851,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													log.log(Level.SEVERE, e.getMessage(), e);
-													application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+													application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 												}
 											}
 										});
@@ -872,7 +872,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													log.log(Level.SEVERE, e.getMessage(), e);
-													application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+													application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 												}
 											}
 										});
@@ -917,7 +917,7 @@ public class UniLogDialog extends DeviceDialog {
 											}
 											catch (Exception e) {
 												log.log(Level.SEVERE, e.getMessage(), e);
-												application.openMessageDialog("Bei der Löschoperation ist ein Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+												application.openMessageDialog("Bei der Löschoperation ist ein Fehler aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 												e.printStackTrace();
 											}
 											clearMemoryButton.setEnabled(true);
