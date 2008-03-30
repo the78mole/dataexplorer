@@ -149,6 +149,9 @@ public class CSVReaderWriter {
 					if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
 						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
 					}
+					// shorten the record set name to the allowed maximum
+					recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
+					
 					recordNames = device.getMeasurementNames(fileConfig);
 					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 				}
@@ -202,7 +205,7 @@ public class CSVReaderWriter {
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
 					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
-					// use only measurement which are isCalculation= false
+					// use only measurement which are isCalculation == false
 					for (int i = 0; i < sizeRecords; i++) {
 						data = dataStr[i + 1].trim().replace(',', '.');
 						double tmpDoubleValue = new Double(data).doubleValue();
@@ -250,7 +253,7 @@ public class CSVReaderWriter {
 			else if (e.getMessage().startsWith("2"))
 				msg = "Bei der geöffneten CVS Datei stimmen die Einheiten nicht mit der Konfiguration überein : " + e.getMessage().substring(1);
 			else
-				msg = "Beim Einlesen der CSV Datei ist folgender Fehler aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage();
+				msg = "Beim Einlesen der CSV Datei ist folgender Fehler aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage();
 			throw new Exception(msg);
 		}
 		finally {
@@ -349,7 +352,7 @@ public class CSVReaderWriter {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new Exception("Ein Fehler ist aufgetreten : " + e.getClass().getCanonicalName() + " - " + e.getMessage());
+			throw new Exception("Ein Fehler ist aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 		finally {
 			application.setStatusMessage("");
