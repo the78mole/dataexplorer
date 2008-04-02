@@ -44,27 +44,27 @@ import osde.ui.tab.GraphicsWindow;
  * @author Winfried Brügmann
  */
 public class CurveSelectorContextMenu {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	final static Logger									 log	= Logger.getLogger(CurveSelectorContextMenu.class.getName());
 
-	private Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
-	private MenuItem											recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
-	private MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
-	private MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
-	private MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
-	private MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
-	private MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
-	private MenuItem 											measurement, measurementRecordName, simpleMeasure, deltaMeasure;
-	private MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60;
-	private MenuItem											horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
+	Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
+	MenuItem											recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
+	MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
+	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
+	MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
+	MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
+	MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
+	MenuItem 											measurement, measurementRecordName, simpleMeasure, deltaMeasure;
+	MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60;
+	MenuItem											horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
 
-	private RecordSet											recordSet;
-	private final OpenSerialDataExplorer	application;
-	private AxisEndValuesDialog						axisEndValuesDialog;
+	RecordSet											recordSet;
+	final OpenSerialDataExplorer	application;
+	AxisEndValuesDialog						axisEndValuesDialog;
 	
-	private TableItem 										selectedItem;
+	TableItem 										selectedItem;
 	private boolean 											isRecordVisible = false;
-	private String 												recordNameKey = " ";
-	private String 												recordNameMeasurement = " ";
+	String 												recordNameKey = " ";
+	String 												recordNameMeasurement = " ";
 
 	public CurveSelectorContextMenu() {
 		super();
@@ -76,45 +76,45 @@ public class CurveSelectorContextMenu {
 		try {
 			popupmenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
-					log.finest("popupmenu MenuListener " + evt);
-					selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						recordNameKey = selectedItem.getText();
-						int type = (Integer) selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-						recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+					log.finest("popupmenu MenuListener.menuShown " + evt);
+					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
+						int type = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
+						CurveSelectorContextMenu.this.recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
 
-						if (recordSet != null) {
+						if (CurveSelectorContextMenu.this.recordSet != null) {
 							setAllEnabled(true);						
 							
-							if (recordNameKey != null && recordNameKey.length() > 1) {
-								recordName.setText(">>>>  " + recordNameKey + "  <<<<");
-								isRecordVisible = recordSet.getRecord(recordNameKey).isVisible();
-								lineVisible.setSelection(isRecordVisible);
+							if (CurveSelectorContextMenu.this.recordNameKey != null && CurveSelectorContextMenu.this.recordNameKey.length() > 1) {
+								CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<");
+								CurveSelectorContextMenu.this.setRecordVisible(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).isVisible());
+								CurveSelectorContextMenu.this.lineVisible.setSelection(isRecordVisible());
 								// check measurement selections
 								//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
 								//disable all menu items which makes only sense if record is visible
-								if(!isRecordVisible) {
-									copyCurveCompare.setEnabled(false);
+								if(!isRecordVisible()) {
+									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 								}
 							}
 							
 							// check zoom mode
-							if (recordSet.isZoomMode()) {
-								axisEndValues.setEnabled(false);
-								axisEndValues.setText("Zoommode aktiv");
+							if (CurveSelectorContextMenu.this.recordSet.isZoomMode()) {
+								CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
+								CurveSelectorContextMenu.this.axisEndValues.setText("Zoommode aktiv");
 							}
 							else {
-								axisEndValues.setEnabled(true);
-								axisEndValues.setText("Achsen-Endwerte");
+								CurveSelectorContextMenu.this.axisEndValues.setEnabled(true);
+								CurveSelectorContextMenu.this.axisEndValues.setText("Achsen-Endwerte");
 							}
 														
 							if (type == GraphicsWindow.TYPE_COMPARE){
-								copyCurveCompare.setEnabled(false);
+								CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 							}
 							
 							// disable clear, if nothing to clear
-							if (application.getCompareSet().size() == 0)
-								cleanCurveCompare.setEnabled(false);
+							if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0)
+								CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
 						}
 						else
 							setAllEnabled(false);
@@ -122,563 +122,569 @@ public class CurveSelectorContextMenu {
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("popupmenu MenuListener.menuHidden " + evt);
 				}
 			});
-			recordName = new MenuItem(popupmenu, SWT.None);
+			this.recordName = new MenuItem(popupmenu, SWT.None);
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 			
-			lineVisible = new MenuItem(popupmenu, SWT.CHECK);
-			lineVisible.setText("Kurve sichtbar");
-			lineVisible.addListener(SWT.Selection, new Listener() {
+			this.lineVisible = new MenuItem(popupmenu, SWT.CHECK);
+			this.lineVisible.setText("Kurve sichtbar");
+			this.lineVisible.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("lineVisibler Action performed!");
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						if (lineVisible.getSelection()) { // true
-							recordSet.getRecord(recordNameKey).setVisible(true);
-							selectedItem.setChecked(true);
+					log.finest("lineVisibler Action performed! " + e);
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						if (CurveSelectorContextMenu.this.lineVisible.getSelection()) { // true
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+							CurveSelectorContextMenu.this.selectedItem.setChecked(true);
 						}
 						else { // false
-							recordSet.getRecord(recordNameKey).setVisible(false);
-							selectedItem.setChecked(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(false);
+							CurveSelectorContextMenu.this.selectedItem.setChecked(false);
 						}
-						application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
 
-			lineColor = new MenuItem(popupmenu, SWT.PUSH);
-			lineColor.setText("KurvenLinienFarbe");
-			lineColor.addListener(SWT.Selection, new Listener() {
+			this.lineColor = new MenuItem(popupmenu, SWT.PUSH);
+			this.lineColor.setText("KurvenLinienFarbe");
+			this.lineColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event evt) {
 					log.finest("lineColor performed! " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						RGB rgb = application.openColorDialog();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
 							Color color = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
-							selectedItem.setForeground(color);
-							recordSet.getRecord(recordNameKey).setColor(color);
-							if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-							application.updateGraphicsWindow();
+							CurveSelectorContextMenu.this.selectedItem.setForeground(color);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setColor(color);
+							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
 					}
 				}
 			});
-			lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
-			lineWidth.setText("KurvenLinienDicke");
-			lineWidthMenu = new Menu(lineWidth);
-			lineWidth.setMenu(lineWidthMenu);
-			lineWidthMenu.addMenuListener(new MenuListener() {
+			this.lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
+			this.lineWidth.setText("KurvenLinienDicke");
+			this.lineWidthMenu = new Menu(this.lineWidth);
+			this.lineWidth.setMenu(this.lineWidthMenu);
+			this.lineWidthMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("lineWidthMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						int width = recordSet.getRecord(recordNameKey).getLineWidth();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						int width = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getLineWidth();
 						switch (width) {
 						case 1:
-							lineWidthMenuItem1.setSelection(true);
-							lineWidthMenuItem2.setSelection(false);
-							lineWidthMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(true);
+							CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 							break;
 						case 2:
-							lineWidthMenuItem1.setSelection(false);
-							lineWidthMenuItem2.setSelection(true);
-							lineWidthMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(true);
+							CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 							break;
 						case 3:
-							lineWidthMenuItem1.setSelection(false);
-							lineWidthMenuItem2.setSelection(false);
-							lineWidthMenuItem3.setSelection(true);
+							CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(true);
 							break;
 						default:
-							lineWidthMenuItem1.setSelection(false);
-							lineWidthMenuItem2.setSelection(false);
-							lineWidthMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 							break;
 						}
 					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("lineWidthMenu MenuListener " + evt);
 				}
 			});
 
-			lineWidthMenuItem1 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.gif"));
-			lineWidthMenuItem1.setText("  1");
-			lineWidthMenuItem1.addListener(SWT.Selection, new Listener() {
+			this.lineWidthMenuItem1 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
+			this.lineWidthMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.gif"));
+			this.lineWidthMenuItem1.setText("  1");
+			this.lineWidthMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("Linienedicke 1");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineWidth(1);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineWidthMenuItem2.setSelection(false);
-						lineWidthMenuItem3.setSelection(false);
+					log.finest("Linienedicke 1 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(1);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
+						CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 					}
 				}
 			});
-			lineWidthMenuItem2 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineWidth2.gif"));
-			lineWidthMenuItem2.setText("  2");
-			lineWidthMenuItem2.addListener(SWT.Selection, new Listener() {
+			this.lineWidthMenuItem2 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
+			this.lineWidthMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineWidth2.gif"));
+			this.lineWidthMenuItem2.setText("  2");
+			this.lineWidthMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("Linienedicke 2");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineWidth(2);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineWidthMenuItem1.setSelection(false);
-						lineWidthMenuItem3.setSelection(false);
+					log.finest("Linienedicke 2 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(2);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
+						CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 					}
 				}
 			});
-			lineWidthMenuItem3 = new MenuItem(lineWidthMenu, SWT.CHECK);
-			lineWidthMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineWidth3.gif"));
-			lineWidthMenuItem3.setText("  3");
-			lineWidthMenuItem3.addListener(SWT.Selection, new Listener() {
+			this.lineWidthMenuItem3 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
+			this.lineWidthMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineWidth3.gif"));
+			this.lineWidthMenuItem3.setText("  3");
+			this.lineWidthMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("Linienedicke 3");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineWidth(3);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineWidthMenuItem1.setSelection(false);
-						lineWidthMenuItem2.setSelection(false);
+					log.finest("Linienedicke 3 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(3);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
+						CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
 					}
 				}
 			});
 
-			lineType = new MenuItem(popupmenu, SWT.CASCADE);
-			lineType.setText("KurvenLinienTyp");
-			lineTypeMenu = new Menu(lineType);
-			lineType.setMenu(lineTypeMenu);
-			lineTypeMenu.addMenuListener(new MenuListener() {
+			this.lineType = new MenuItem(popupmenu, SWT.CASCADE);
+			this.lineType.setText("KurvenLinienTyp");
+			this.lineTypeMenu = new Menu(this.lineType);
+			this.lineType.setMenu(this.lineTypeMenu);
+			this.lineTypeMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("lineTypeMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						int type = recordSet.getRecord(recordNameKey).getLineStyle();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						int type = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getLineStyle();
 						switch (type) {
 						case SWT.LINE_SOLID:
-							lineTypeMenuItem1.setSelection(true);
-							lineTypeMenuItem2.setSelection(false);
-							lineTypeMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(true);
+							CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 							break;
 						case SWT.LINE_DASH:
-							lineTypeMenuItem1.setSelection(false);
-							lineTypeMenuItem2.setSelection(true);
-							lineTypeMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(true);
+							CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 							break;
 						case SWT.LINE_DOT:
-							lineTypeMenuItem1.setSelection(false);
-							lineTypeMenuItem2.setSelection(false);
-							lineTypeMenuItem3.setSelection(true);
+							CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(true);
 							break;
 						default:
-							lineTypeMenuItem1.setSelection(false);
-							lineTypeMenuItem2.setSelection(false);
-							lineTypeMenuItem3.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
+							CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 							break;
 						}
 					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("lineTypeMenu MenuListener " + evt);
 				}
 			});
 
-			lineTypeMenuItem1 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineType1.gif"));
-			lineTypeMenuItem1.setText("durchgezogen");
-			lineTypeMenuItem1.addListener(SWT.Selection, new Listener() {
+			this.lineTypeMenuItem1 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
+			this.lineTypeMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineType1.gif"));
+			this.lineTypeMenuItem1.setText("durchgezogen");
+			this.lineTypeMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("lineTypeMenuItem1");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_SOLID);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineTypeMenuItem2.setSelection(false);
-						lineTypeMenuItem3.setSelection(false);
+					log.finest("lineTypeMenuItem1 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_SOLID);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
+						CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 					}
 				}
 			});
-			lineTypeMenuItem2 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineType2.gif"));
-			lineTypeMenuItem2.setText("gestrichelt");
-			lineTypeMenuItem2.addListener(SWT.Selection, new Listener() {
+			this.lineTypeMenuItem2 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
+			this.lineTypeMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineType2.gif"));
+			this.lineTypeMenuItem2.setText("gestrichelt");
+			this.lineTypeMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("lineTypeMenuItem2");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DASH);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineTypeMenuItem1.setSelection(false);
-						lineTypeMenuItem3.setSelection(false);
+					log.finest("lineTypeMenuItem2 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_DASH);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
+						CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 					}
 				}
 			});
-			lineTypeMenuItem3 = new MenuItem(lineTypeMenu, SWT.CHECK);
-			lineTypeMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineType3.gif"));
-			lineTypeMenuItem3.setText("gepunktet");
-			lineTypeMenuItem3.addListener(SWT.Selection, new Listener() {
+			this.lineTypeMenuItem3 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
+			this.lineTypeMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineType3.gif"));
+			this.lineTypeMenuItem3.setText("gepunktet");
+			this.lineTypeMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("lineTypeMenuItem3");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setLineStyle(SWT.LINE_DOT);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
-						lineTypeMenuItem1.setSelection(false);
-						lineTypeMenuItem2.setSelection(false);
+					log.finest("lineTypeMenuItem3 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_DOT);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
+						CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
 					}
 				}
 			});
 			
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
-			axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
-			axisEndValues.setText("Achsen-Endwerte");
-			axisEndValuesMenu = new Menu(axisEndValues);
-			axisEndValues.setMenu(axisEndValuesMenu);
-			axisEndValuesMenu.addMenuListener(new MenuListener() {
+			this.axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
+			this.axisEndValues.setText("Achsen-Endwerte");
+			this.axisEndValuesMenu = new Menu(this.axisEndValues);
+			this.axisEndValues.setMenu(this.axisEndValuesMenu);
+			this.axisEndValuesMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("axisEndValuesMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						boolean isRounded = recordSet.getRecord(recordNameKey).isRoundOut();
-						boolean isStart0 = recordSet.getRecord(recordNameKey).isStartpointZero();
-						boolean isManual = recordSet.getRecord(recordNameKey).isStartEndDefined();
-						axisEndAuto.setSelection(true);
-						axisEndRound.setSelection(false);
-						axisStarts0.setSelection(false);
-						axisEndManual.setSelection(false);
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						boolean isRounded = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).isRoundOut();
+						boolean isStart0 = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).isStartpointZero();
+						boolean isManual = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).isStartEndDefined();
+						CurveSelectorContextMenu.this.axisEndAuto.setSelection(true);
+						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
+						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
+						CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 						if (isManual) {
-							axisEndAuto.setSelection(false);
-							axisEndRound.setSelection(false);
-							axisStarts0.setSelection(false);
-							axisEndManual.setSelection(true);
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
+							CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
 						}
 						if (isStart0) {
-							axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 							//axisEndRound.setSelection(false);
-							axisStarts0.setSelection(true);
-							axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.axisStarts0.setSelection(true);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 						}
 						if (isRounded) {
-							axisEndAuto.setSelection(false);
-							axisEndRound.setSelection(true);
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.axisEndRound.setSelection(true);
 							//axisStarts0.setSelection(false);
-							axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 						}
 					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("axisEndValuesMenu MenuListener " + evt);
 				}
 			});
 
-			axisEndAuto = new MenuItem(axisEndValuesMenu, SWT.CHECK);
-			axisEndAuto.setText("automatik");
-			axisEndAuto.setSelection(true);
-			axisEndAuto.addListener(SWT.Selection, new Listener() {
+			this.axisEndAuto = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
+			this.axisEndAuto.setText("automatik");
+			this.axisEndAuto.setSelection(true);
+			this.axisEndAuto.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisEndAuto");
-					if (recordNameKey != null) {
-						axisStarts0.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartpointZero(false);
-						axisEndRound.setSelection(false);
-						recordSet.getRecord(recordNameKey).setRoundOut(false);
-						axisEndManual.setSelection(false);
-						recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisEndAuto " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartpointZero(false);
+						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setRoundOut(false);
+						CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisEndRound = new MenuItem(axisEndValuesMenu, SWT.CHECK);
-			axisEndRound.setText("gerundet");
-			axisEndRound.addListener(SWT.Selection, new Listener() {
+			this.axisEndRound = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
+			this.axisEndRound.setText("gerundet");
+			this.axisEndRound.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisEndRound");
-					if (recordNameKey != null) {
-						if (axisEndRound.getSelection()) { //true
-							axisEndAuto.setSelection(false);
-							recordSet.getRecord(recordNameKey).setRoundOut(true);
-							axisEndManual.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+					log.finest("axisEndRound " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						if (CurveSelectorContextMenu.this.axisEndRound.getSelection()) { //true
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setRoundOut(true);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
 						else { // false
-							axisEndAuto.setSelection(true);
-							recordSet.getRecord(recordNameKey).setRoundOut(false);
-							axisEndManual.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(true);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setRoundOut(false);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisStarts0 = new MenuItem(axisEndValuesMenu, SWT.CHECK);
-			axisStarts0.setText("beginnt bei 0");
-			axisStarts0.addListener(SWT.Selection, new Listener() {
+			this.axisStarts0 = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
+			this.axisStarts0.setText("beginnt bei 0");
+			this.axisStarts0.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisStarts0");
-					if (recordNameKey != null) {
-						if (axisStarts0.getSelection()) { // true
-							axisEndAuto.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartpointZero(true);
-							axisEndManual.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+					log.finest("axisStarts0 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						if (CurveSelectorContextMenu.this.axisStarts0.getSelection()) { // true
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartpointZero(true);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
 						else { // false
-							axisEndAuto.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartpointZero(false);
-							axisEndManual.setSelection(false);
-							recordSet.getRecord(recordNameKey).setStartEndDefined(false, 0, 0);
+							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartpointZero(false);
+							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
+							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisEndManual = new MenuItem(axisEndValuesMenu, SWT.CHECK);
-			axisEndManual.setText("manuell");
-			axisEndManual.addListener(SWT.Selection, new Listener() {
+			this.axisEndManual = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
+			this.axisEndManual.setText("manuell");
+			this.axisEndManual.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisEndManual Action performed!");
-					if (recordNameKey != null) {
-						axisEndManual.setSelection(true);
-						axisEndAuto.setSelection(false);
-						axisStarts0.setSelection(false);
-						Record record = recordSet.getRecord(recordNameKey);
+					log.finest("axisEndManual Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
+						CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
+						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
+						Record record = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey);
 						record.setStartpointZero(false);
-						axisEndRound.setSelection(false);
+						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
 						record.setRoundOut(false);
 						double[] oldMinMax = {record.getMinScaleValue(), record.getMaxScaleValue()};
-						double[] newMinMax = axisEndValuesDialog.open(oldMinMax);
+						double[] newMinMax = CurveSelectorContextMenu.this.axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
 
-			axisNumberFormat = new MenuItem(popupmenu, SWT.CASCADE);
-			axisNumberFormat.setText("Achsen-Zahlenformat");
-			axisNumberFormatMenu = new Menu(axisNumberFormat);
-			axisNumberFormat.setMenu(axisNumberFormatMenu);
-			axisNumberFormatMenu.addMenuListener(new MenuListener() {
+			this.axisNumberFormat = new MenuItem(popupmenu, SWT.CASCADE);
+			this.axisNumberFormat.setText("Achsen-Zahlenformat");
+			this.axisNumberFormatMenu = new Menu(this.axisNumberFormat);
+			this.axisNumberFormat.setMenu(this.axisNumberFormatMenu);
+			this.axisNumberFormatMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
-					log.finest("axisNumberFormatMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						int format = recordSet.getRecord(recordNameKey).getNumberFormat();
+					log.finest("axisNumberFormatMenu MenuListener.menuShown " + evt);
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						int format = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getNumberFormat();
 						switch (format) {
 						case 0:
-							axisNumberFormat0.setSelection(true);
-							axisNumberFormat1.setSelection(false);
-							axisNumberFormat2.setSelection(false);
-							axisNumberFormat3.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(true);
+							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
 							break;
 						case 1:
-							axisNumberFormat0.setSelection(false);
-							axisNumberFormat1.setSelection(true);
-							axisNumberFormat2.setSelection(false);
-							axisNumberFormat3.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(true);
+							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
 							break;
 						default:
 						case 2:
-							axisNumberFormat0.setSelection(false);
-							axisNumberFormat1.setSelection(false);
-							axisNumberFormat2.setSelection(true);
-							axisNumberFormat3.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(true);
+							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
 							break;
 						case 3:
-							axisNumberFormat0.setSelection(false);
-							axisNumberFormat1.setSelection(false);
-							axisNumberFormat2.setSelection(false);
-							axisNumberFormat3.setSelection(true);
+							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(true);
 							break;
 						}
 					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("axisNumberFormatMenu MenuListener.menuHidden " + evt);
 				}
 			});
 
-			axisNumberFormat0 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
-			axisNumberFormat0.setText("0000");
-			axisNumberFormat0.addListener(SWT.Selection, new Listener() {
+			this.axisNumberFormat0 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
+			this.axisNumberFormat0.setText("0000");
+			this.axisNumberFormat0.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisNumberFormat0");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setNumberFormat(0);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisNumberFormat0 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(0);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisNumberFormat1 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
-			axisNumberFormat1.setText("000.0");
-			axisNumberFormat1.addListener(SWT.Selection, new Listener() {
+			this.axisNumberFormat1 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
+			this.axisNumberFormat1.setText("000.0");
+			this.axisNumberFormat1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisNumberFormat1");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setNumberFormat(1);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisNumberFormat1 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(1);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisNumberFormat2 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
-			axisNumberFormat2.setText("00.00");
-			axisNumberFormat2.addListener(SWT.Selection, new Listener() {
+			this.axisNumberFormat2 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
+			this.axisNumberFormat2.setText("00.00");
+			this.axisNumberFormat2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisNumberFormat2");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setNumberFormat(2);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisNumberFormat2 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(2);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisNumberFormat3 = new MenuItem(axisNumberFormatMenu, SWT.CHECK);
-			axisNumberFormat3.setText("0.000");
-			axisNumberFormat3.addListener(SWT.Selection, new Listener() {
+			this.axisNumberFormat3 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
+			this.axisNumberFormat3.setText("0.000");
+			this.axisNumberFormat3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisNumberFormat3");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setNumberFormat(3);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisNumberFormat3 " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(3);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
 
-			axisPosition = new MenuItem(popupmenu, SWT.CASCADE);
-			axisPosition.setText("Achsen-Position");
-			axisPositionMenu = new Menu(axisPosition);
-			axisPosition.setMenu(axisPositionMenu);
-			axisPositionMenu.addMenuListener(new MenuListener() {
+			this.axisPosition = new MenuItem(popupmenu, SWT.CASCADE);
+			this.axisPosition.setText("Achsen-Position");
+			this.axisPositionMenu = new Menu(this.axisPosition);
+			this.axisPosition.setMenu(this.axisPositionMenu);
+			this.axisPositionMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("axisPositionMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						boolean isLeft = recordSet.getRecord(recordNameKey).isPositionLeft();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						boolean isLeft = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).isPositionLeft();
 						if (isLeft) {
-							axisPositionLeft.setSelection(true);
-							axisPositionRight.setSelection(false);
+							CurveSelectorContextMenu.this.axisPositionLeft.setSelection(true);
+							CurveSelectorContextMenu.this.axisPositionRight.setSelection(false);
 						}
 						else {
-							axisPositionLeft.setSelection(false);
-							axisPositionRight.setSelection(true);
+							CurveSelectorContextMenu.this.axisPositionLeft.setSelection(false);
+							CurveSelectorContextMenu.this.axisPositionRight.setSelection(true);
 						}
 					}
 				}
 
 				public void menuHidden(MenuEvent evt) {
+					log.finest("axisPositionMenu MenuListener " + evt);
 				}
 			});
 
-			axisPositionLeft = new MenuItem(axisPositionMenu, SWT.CHECK);
-			axisPositionLeft.setText("linke Seite");
-			axisPositionLeft.addListener(SWT.Selection, new Listener() {
+			this.axisPositionLeft = new MenuItem(this.axisPositionMenu, SWT.CHECK);
+			this.axisPositionLeft.setText("linke Seite");
+			this.axisPositionLeft.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisPositionLeft Action performed!");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setPositionLeft(true);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisPositionLeft Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setPositionLeft(true);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			axisPositionRight = new MenuItem(axisPositionMenu, SWT.CHECK);
-			axisPositionRight.setText("rechte Seite");
-			axisPositionRight.addListener(SWT.Selection, new Listener() {
+			this.axisPositionRight = new MenuItem(this.axisPositionMenu, SWT.CHECK);
+			this.axisPositionRight.setText("rechte Seite");
+			this.axisPositionRight.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("axisPositionRight Action performed!");
-					if (recordNameKey != null) {
-						recordSet.getRecord(recordNameKey).setPositionLeft(false);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("axisPositionRight Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setPositionLeft(false);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
-			timeGrid = new MenuItem(popupmenu, SWT.CASCADE);
-			timeGrid.setText("Zeit-Grid(vertical)");
-			timeGridMenu = new Menu(timeGrid);
-			timeGrid.setMenu(timeGridMenu);
-			timeGridMenu.addMenuListener(new MenuListener() {
+			this.timeGrid = new MenuItem(popupmenu, SWT.CASCADE);
+			this.timeGrid.setText("Zeit-Grid(vertical)");
+			this.timeGridMenu = new Menu(this.timeGrid);
+			this.timeGrid.setMenu(this.timeGridMenu);
+			this.timeGridMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("timeGridMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						int gridType = recordSet.getTimeGridType();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						int gridType = CurveSelectorContextMenu.this.recordSet.getTimeGridType();
 						switch (gridType) {
 						case RecordSet.TIME_GRID_MAIN:
-							timeGridOff.setSelection(false);
-							timeGridMain.setSelection(true);
-							timeGridMod60.setSelection(false);
+							CurveSelectorContextMenu.this.timeGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.timeGridMain.setSelection(true);
+							CurveSelectorContextMenu.this.timeGridMod60.setSelection(false);
 							break;
 						case RecordSet.TIME_GRID_MOD60:
-							timeGridOff.setSelection(false);
-							timeGridMain.setSelection(false);
-							timeGridMod60.setSelection(true);
+							CurveSelectorContextMenu.this.timeGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.timeGridMain.setSelection(false);
 							break;
 						case RecordSet.TIME_GRID_NONE:
 						default:
-							timeGridOff.setSelection(true);
-							timeGridMain.setSelection(false);
-							timeGridMod60.setSelection(false);
+							CurveSelectorContextMenu.this.timeGridOff.setSelection(true);
+							CurveSelectorContextMenu.this.timeGridMain.setSelection(false);
+							CurveSelectorContextMenu.this.timeGridMod60.setSelection(false);
 							break;
 						}
 					}
 				}
 				public void menuHidden(MenuEvent evt) {
+					log.finest("timeGridMenu MenuListener " + evt);
 				}
 			});
 
-			timeGridOff = new MenuItem(timeGridMenu, SWT.CHECK);
-			timeGridOff.setText("aus");
-			timeGridOff.addListener(SWT.Selection, new Listener() {
+			this.timeGridOff = new MenuItem(this.timeGridMenu, SWT.CHECK);
+			this.timeGridOff.setText("aus");
+			this.timeGridOff.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("timeGridOff Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
-						application.updateGraphicsWindow();
+					log.finest("timeGridOff Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			timeGridMain = new MenuItem(timeGridMenu, SWT.CHECK);
-			timeGridMain.setText("jede Zeitmarke");
-			timeGridMain.addListener(SWT.Selection, new Listener() {
+			this.timeGridMain = new MenuItem(this.timeGridMenu, SWT.CHECK);
+			this.timeGridMain.setText("jede Zeitmarke");
+			this.timeGridMain.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("timeGridMain Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
-						application.updateGraphicsWindow();
+					log.finest("timeGridMain Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			timeGridMod60 = new MenuItem(timeGridMenu, SWT.CHECK);
-			timeGridMod60.setText("jede Zeitmarke mod 60");
-			timeGridMod60.addListener(SWT.Selection, new Listener() {
+			this.timeGridMod60 = new MenuItem(this.timeGridMenu, SWT.CHECK);
+			this.timeGridMod60.setText("jede Zeitmarke mod 60");
+			this.timeGridMod60.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("timeGridMod60 Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
-						application.updateGraphicsWindow();
+					log.finest("timeGridMod60 Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			timeGridColor = new MenuItem(timeGridMenu, SWT.PUSH);
-			timeGridColor.setText("Linienfarbe");
-			timeGridColor.addListener(SWT.Selection, new Listener() {
+			this.timeGridColor = new MenuItem(this.timeGridMenu, SWT.PUSH);
+			this.timeGridColor.setText("Linienfarbe");
+			this.timeGridColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("timeGridColor Action performed!");
-					if (recordNameKey != null) {
-						RGB rgb = application.openColorDialog();
+					log.finest("timeGridColor Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
-							recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-							application.updateGraphicsWindow();
+							CurveSelectorContextMenu.this.recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
 					}
 				}
@@ -696,93 +702,94 @@ public class CurveSelectorContextMenu {
 //				}
 //			});
 			
-			horizontalGrid = new MenuItem(popupmenu, SWT.CASCADE);
-			horizontalGrid.setText("Kurven-Grid(horizontal)");
-			horizontalGridMenu = new Menu(horizontalGrid);
-			horizontalGrid.setMenu(horizontalGridMenu);
-			horizontalGridMenu.addMenuListener(new MenuListener() {
+			this.horizontalGrid = new MenuItem(popupmenu, SWT.CASCADE);
+			this.horizontalGrid.setText("Kurven-Grid(horizontal)");
+			this.horizontalGridMenu = new Menu(this.horizontalGrid);
+			this.horizontalGrid.setMenu(this.horizontalGridMenu);
+			this.horizontalGridMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("horizontalGridMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						horizontalGridRecordName.setText("gesetzt -> " + recordSet.getHorizontalGridRecordName());
-						int gridType = recordSet.getHorizontalGridType();
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						CurveSelectorContextMenu.this.horizontalGridRecordName.setText("gesetzt -> " + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName());
+						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
-							horizontalGridOff.setSelection(false);
-							horizontalGridEveryTick.setSelection(true);
-							horizontalGridEverySecond.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(true);
+							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(false);
 							break;
 						case RecordSet.HORIZONTAL_GRID_SECOND:
-							horizontalGridOff.setSelection(false);
-							horizontalGridEveryTick.setSelection(false);
-							horizontalGridEverySecond.setSelection(true);
+							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(true);
 							break;
 						case RecordSet.HORIZONTAL_GRID_NONE:
 						default:
-							horizontalGridOff.setSelection(true);
-							horizontalGridEveryTick.setSelection(false);
-							horizontalGridEverySecond.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(true);
+							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(false);
+							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(false);
 							break;
 						}
 					}
 				}
 				public void menuHidden(MenuEvent evt) {
+					log.finest("horizontalGridMenu MenuListener " + evt);
 				}
 			});
 
-			horizontalGridRecordName = new MenuItem(horizontalGridMenu, SWT.NONE);
+			this.horizontalGridRecordName = new MenuItem(this.horizontalGridMenu, SWT.NONE);
 
-			new MenuItem(horizontalGridMenu, SWT.SEPARATOR);
+			new MenuItem(this.horizontalGridMenu, SWT.SEPARATOR);
 			
-			horizontalGridOff = new MenuItem(horizontalGridMenu, SWT.CHECK);
-			horizontalGridOff.setText("aus");
-			horizontalGridOff.addListener(SWT.Selection, new Listener() {
+			this.horizontalGridOff = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
+			this.horizontalGridOff.setText("aus");
+			this.horizontalGridOff.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("horizontalGridOff Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("horizontalGridOff Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			horizontalGridEveryTick = new MenuItem(horizontalGridMenu, SWT.CHECK);
-			horizontalGridEveryTick.setText("jede Zeitmarke");
-			horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
+			this.horizontalGridEveryTick = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
+			this.horizontalGridEveryTick.setText("jede Zeitmarke");
+			this.horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("horizontalGridMain Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						recordSet.setHorizontalGridRecordKey(recordNameKey);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("horizontalGridMain Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			horizontalGridEverySecond = new MenuItem(horizontalGridMenu, SWT.CHECK);
-			horizontalGridEverySecond.setText("jede zweite Zeitmarke");
-			horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
+			this.horizontalGridEverySecond = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
+			this.horizontalGridEverySecond.setText("jede zweite Zeitmarke");
+			this.horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("horizontalGridMod60 Action performed!");
-					if (recordNameKey != null) {
-						recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
-						recordSet.setHorizontalGridRecordKey(recordNameKey);
-						if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					log.finest("horizontalGridMod60 Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
-			horizontalGridColor = new MenuItem(horizontalGridMenu, SWT.PUSH);
-			horizontalGridColor.setText("Linienfarbe");
-			horizontalGridColor.addListener(SWT.Selection, new Listener() {
+			this.horizontalGridColor = new MenuItem(this.horizontalGridMenu, SWT.PUSH);
+			this.horizontalGridColor.setText("Linienfarbe");
+			this.horizontalGridColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("horizontalGridColor Action performed!");
-					if (recordNameKey != null) {
-						RGB rgb = application.openColorDialog();
+					log.finest("horizontalGridColor Action performed! " + e);
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
-							recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-							if (!isRecordVisible) recordSet.getRecord(recordNameKey).setVisible(true);
-							application.updateGraphicsWindow();
+							CurveSelectorContextMenu.this.recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
 					}
 				}
@@ -802,62 +809,63 @@ public class CurveSelectorContextMenu {
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
-			measurement = new MenuItem(popupmenu, SWT.CASCADE);
-			measurement.setText("Kurven vermessen");
-			measurementMenu = new Menu(horizontalGrid);
-			measurement.setMenu(measurementMenu);
-			measurementMenu.addMenuListener(new MenuListener() {
+			this.measurement = new MenuItem(popupmenu, SWT.CASCADE);
+			this.measurement.setText("Kurven vermessen");
+			this.measurementMenu = new Menu(this.horizontalGrid);
+			this.measurement.setMenu(this.measurementMenu);
+			this.measurementMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.finest("measurementMenu MenuListener " + evt);
-					if (selectedItem != null && !selectedItem.isDisposed()) {
-						measurementRecordName.setText("gesetzt -> " + recordNameMeasurement);
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						CurveSelectorContextMenu.this.measurementRecordName.setText("gesetzt -> " + CurveSelectorContextMenu.this.recordNameMeasurement);
 					}
 				}
 				public void menuHidden(MenuEvent evt) {
+					log.finest("measurementMenu MenuListener " + evt);
 				}
 			});
 
-			measurementRecordName = new MenuItem(measurementMenu, SWT.NONE);
+			this.measurementRecordName = new MenuItem(this.measurementMenu, SWT.NONE);
 			
-			new MenuItem(measurementMenu, SWT.SEPARATOR);
+			new MenuItem(this.measurementMenu, SWT.SEPARATOR);
 			
-			simpleMeasure = new MenuItem(measurementMenu, SWT.CHECK);
-			simpleMeasure.setText("Kurvenpunkt messen");
-			simpleMeasure.addSelectionListener(new SelectionAdapter() {
+			this.simpleMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
+			this.simpleMeasure.setText("Kurvenpunkt messen");
+			this.simpleMeasure.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					log.finest("measure.widgetSelected, event=" + evt);
-					if (!isRecordVisible) {
-						recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					if (!isRecordVisible()) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
-					if (isMeasurementWhileNameChanged(recordNameKey) || simpleMeasure.getSelection() == true) {
-						application.setMeasurementActive(recordNameKey, true);
-						simpleMeasure.setSelection(true);
-						deltaMeasure.setSelection(false);
+					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.simpleMeasure.getSelection() == true) {
+						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
+						CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
+						CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 					}
 					else {
-						application.setMeasurementActive(recordNameKey, false);
-						application.setStatusMessage("");
+						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
+						CurveSelectorContextMenu.this.application.setStatusMessage("");
 					}
 				}
 			});
-			deltaMeasure = new MenuItem(measurementMenu, SWT.CHECK);
-			deltaMeasure.setText("Punktdifferenz messen");
-			deltaMeasure.addSelectionListener(new SelectionAdapter() {
+			this.deltaMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
+			this.deltaMeasure.setText("Punktdifferenz messen");
+			this.deltaMeasure.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					log.finest("deltaMeasure.widgetSelected, event=" + evt);
-					if (!isRecordVisible) {
-						recordSet.getRecord(recordNameKey).setVisible(true);
-						application.updateGraphicsWindow();
+					if (!isRecordVisible()) {
+						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
-					if (isMeasurementWhileNameChanged(recordNameKey) || deltaMeasure.getSelection() == true) {
-						application.setDeltaMeasurementActive(recordNameKey, true);
-						deltaMeasure.setSelection(true);
-						simpleMeasure.setSelection(false);
+					if (isMeasurementWhileNameChanged(CurveSelectorContextMenu.this.recordNameKey) || CurveSelectorContextMenu.this.deltaMeasure.getSelection() == true) {
+						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, true);
+						CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);
+						CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
 					}
 					else {
-						application.setDeltaMeasurementActive(recordNameKey, false);
-						application.setStatusMessage("");
+						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
+						CurveSelectorContextMenu.this.application.setStatusMessage("");
 					}
 				}
 			});
@@ -865,35 +873,33 @@ public class CurveSelectorContextMenu {
 			
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
-			copyCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
-			copyCurveCompare.setText("Kopiere Kurvenvergleich");
-			copyCurveCompare.addListener(SWT.Selection, new Listener() {
+			this.copyCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
+			this.copyCurveCompare.setText("Kopiere Kurvenvergleich");
+			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("copyCurveCompare Action performed!");
+					log.finest("copyCurveCompare Action performed! " + e);
 					String newRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (newRecordKey != null && recordSet.get(newRecordKey).isVisible()) {
-						RecordSet compareSet = application.getCompareSet();
+					if (newRecordKey != null && CurveSelectorContextMenu.this.recordSet.get(newRecordKey).isVisible()) {
+						RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 						boolean isComparable = true;
-						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != recordSet.getTimeStep_ms()) {
-							application
-									.openMessageDialog("Zeitbasis der Kurven, die verglichen werden sollen passt nicht zusammen! Vermutlich wurden sie mit unterschiedlichen Geräten aufgenommen. Das ist zu Zeit noch nicht unterstützt, da hier eine Umrechnung auf eine einheitliche Zeitbasis stattfinden muss.");
+						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != CurveSelectorContextMenu.this.recordSet.getTimeStep_ms()) {
+							CurveSelectorContextMenu.this.application.openMessageDialog("Zeitbasis der Kurven, die verglichen werden sollen passt nicht zusammen! Vermutlich wurden sie mit unterschiedlichen Geräten aufgenommen. Das ist zu Zeit noch nicht unterstützt, da hier eine Umrechnung auf eine einheitliche Zeitbasis stattfinden muss.");
 							isComparable = false;
 							return;
 						}
-						if (!compareSet.isEmpty() && !compareSet.getRecordNames()[0].startsWith(newRecordKey)) {
-							application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getRecordNames()[0].split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
+						if (!compareSet.isEmpty() && !compareSet.getFirstRecordName().startsWith(newRecordKey)) {
+							CurveSelectorContextMenu.this.application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getFirstRecordName().split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
 							isComparable = false;
 							return;
 						}
 						if (compareSet.isEmpty() || isComparable) {
 							// while adding a new curve to compare set - reset the zoom mode
-							application.setCompareWindowGraphicsMode(GraphicsWindow.MODE_RESET ,false);
+							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsWindow.MODE_RESET ,false);
 							
-							compareSet.setTimeStep_ms(recordSet.getTimeStep_ms());
+							compareSet.setTimeStep_ms(CurveSelectorContextMenu.this.recordSet.getTimeStep_ms());
 							String recordkey = newRecordKey + "_" + compareSet.size();
-							compareSet.addRecordName(recordkey);
-							compareSet.put(recordkey, recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
-							compareSet.get(recordkey).setChannelConfigKey(recordSet.get(newRecordKey).getChannelConfigKey());
+							compareSet.put(recordkey, CurveSelectorContextMenu.this.recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
+							compareSet.get(recordkey).setChannelConfigKey(CurveSelectorContextMenu.this.recordSet.get(newRecordKey).getChannelConfigKey());
 							compareSet.get(recordkey).setVisible(true); // if a non visible record added
 							int maxRecordSize = compareSet.getMaxSize();
 							double oldMinValue = compareSet.getMinValue();
@@ -919,20 +925,20 @@ public class CurveSelectorContextMenu {
 								}
 							}
 
-							application.updateCompareWindow();
+							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
-					else if( newRecordKey != null) application.openMessageDialog("Die Kurve sollte sichtbar sein, bevor man sie in den Kurvenvergleich kopiert!");
+					else if( newRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog("Die Kurve sollte sichtbar sein, bevor man sie in den Kurvenvergleich kopiert!");
 				}
 			});
-			cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
-			cleanCurveCompare.setText("Lösche Kurvenvergleich");
-			cleanCurveCompare.addListener(SWT.Selection, new Listener() {
+			this.cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
+			this.cleanCurveCompare.setText("Lösche Kurvenvergleich");
+			this.cleanCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.finest("cleanCurveCompare Action performed!");
-					RecordSet compareSet = application.getCompareSet();
+					log.finest("cleanCurveCompare Action performed! " + e);
+					RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 					compareSet.clear();
-					application.updateCompareWindow();
+					CurveSelectorContextMenu.this.application.updateCompareWindow();
 				}
 			});
 		}
@@ -941,33 +947,47 @@ public class CurveSelectorContextMenu {
 		}
 	}
 	
-	private void setAllEnabled(boolean enabled) {
-		lineVisible.setEnabled(enabled);
-		lineColor.setEnabled(enabled);
-		lineWidth.setEnabled(enabled);
-		lineType.setEnabled(enabled);
-		axisEndValues.setEnabled(enabled);
-		axisNumberFormat.setEnabled(enabled);
-		axisPosition.setEnabled(enabled);
-		timeGrid.setEnabled(enabled);
-		horizontalGrid.setEnabled(enabled);
-		measurement.setEnabled(enabled);
-		copyCurveCompare.setEnabled(enabled);
-		cleanCurveCompare.setEnabled(enabled);
+	void setAllEnabled(boolean enabled) {
+		this.lineVisible.setEnabled(enabled);
+		this.lineColor.setEnabled(enabled);
+		this.lineWidth.setEnabled(enabled);
+		this.lineType.setEnabled(enabled);
+		this.axisEndValues.setEnabled(enabled);
+		this.axisNumberFormat.setEnabled(enabled);
+		this.axisPosition.setEnabled(enabled);
+		this.timeGrid.setEnabled(enabled);
+		this.horizontalGrid.setEnabled(enabled);
+		this.measurement.setEnabled(enabled);
+		this.copyCurveCompare.setEnabled(enabled);
+		this.cleanCurveCompare.setEnabled(enabled);
 	}
 
 	/**
 	 * check measurement record name and reset if changed
 	 */
-	private boolean isMeasurementWhileNameChanged(String tmpRecordNameMeasurement) {
+	boolean isMeasurementWhileNameChanged(String tmpRecordNameMeasurement) {
 		boolean isChanged = false;
-		if (!recordNameMeasurement.equals(tmpRecordNameMeasurement) && recordNameMeasurement.length() > 1) {
-			application.setMeasurementActive(recordNameMeasurement, false);
-			application.setDeltaMeasurementActive(recordNameMeasurement, false);
-			application.setStatusMessage("");
+		if (!this.recordNameMeasurement.equals(tmpRecordNameMeasurement) && this.recordNameMeasurement.length() > 1) {
+			this.application.setMeasurementActive(this.recordNameMeasurement, false);
+			this.application.setDeltaMeasurementActive(this.recordNameMeasurement, false);
+			this.application.setStatusMessage("");
 			isChanged = true;
 		}
-		recordNameMeasurement = tmpRecordNameMeasurement;
+		this.recordNameMeasurement = tmpRecordNameMeasurement;
 		return isChanged;
+	}
+
+	/**
+	 * @param enabled the isRecordVisible to set
+	 */
+	public void setRecordVisible(boolean enabled) {
+		this.isRecordVisible = enabled;
+	}
+
+	/**
+	 * @return the isRecordVisible
+	 */
+	public boolean isRecordVisible() {
+		return this.isRecordVisible;
 	}
 }

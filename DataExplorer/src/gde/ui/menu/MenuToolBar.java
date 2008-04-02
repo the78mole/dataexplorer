@@ -52,45 +52,44 @@ import osde.ui.tab.GraphicsWindow;
  * @author Winfried Brügmann
  */
 public class MenuToolBar {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 
-	private Point													size;
-	private Composite											recordSelectComposite;
-	private Composite											channelSelectComposite;
-	private CoolItem											dataCoolItem;
-	private ToolBar												portToolBar;
-	private CoolItem											portCoolItem;
-	private ToolBar												deviceToolBar;
-	private CoolItem											deviceCoolItem;
+	Point													size;
+	Composite											recordSelectComposite;
+	Composite											channelSelectComposite;
+	CoolItem											dataCoolItem;
+	ToolBar												portToolBar;
+	CoolItem											portCoolItem;
+	ToolBar												deviceToolBar;
+	CoolItem											deviceCoolItem;
 
-	private CoolBar												coolBar;
-	private CoolItem											menuCoolItem;
-	private ToolItem											toolBoxToolItem;
-	private ToolItem											nextDeviceToolItem;
-	private ToolItem											prevDeviceToolItem;
-	private ToolItem											deviceSelectToolItem;
-	private ToolItem											saveAsToolItem;
-	private ToolItem											settingsToolItem;
-	private ToolItem											saveToolItem;
-	private ToolItem											openToolItem;
-	private ToolItem											newToolItem;
-	private ToolBar												fileToolBar;
-	private ToolItem											fitIntoItem;
-	private ToolItem											panItem;
-	private ToolItem											zoomWindowItem;
-	private ToolBar												zoomToolBar;
-	private CoolItem											zoomCoolItem;
+	CoolBar												coolBar;
+	CoolItem											menuCoolItem;
+	ToolItem											toolBoxToolItem;
+	ToolItem											nextDeviceToolItem;
+	ToolItem											prevDeviceToolItem;
+	ToolItem											deviceSelectToolItem;
+	ToolItem											saveAsToolItem;
+	ToolItem											settingsToolItem;
+	ToolItem											saveToolItem;
+	ToolItem											openToolItem;
+	ToolItem											newToolItem;
+	ToolBar												fileToolBar;
+	ToolItem											fitIntoItem;
+	ToolItem											panItem;
+	ToolItem											zoomWindowItem;
+	ToolBar												zoomToolBar;
+	CoolItem											zoomCoolItem;
 
-	private ToolItem											portOpenCloseItem;
-	private Composite											dataBarComposite;
-	private ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, deleteRecord, editRecord;
-	private CCombo												channelSelectCombo, recordSelectCombo;
-	private ToolBar												channelToolBar, recordToolBar;
-	@SuppressWarnings("unused")
-	private ToolItem											separator;
+	ToolItem											portOpenCloseItem;
+	Composite											dataBarComposite;
+	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, deleteRecord, editRecord;
+	CCombo												channelSelectCombo, recordSelectCombo;
+	ToolBar												channelToolBar, recordToolBar;
+	ToolItem											separator;
 
-	private final OpenSerialDataExplorer	application;
-	private final Channels								channels;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
 
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
 		this.application = parent;
@@ -99,116 +98,116 @@ public class MenuToolBar {
 	}
 
 	public void init() {
-		coolBar = new CoolBar(this.application, SWT.NONE);
-		SWTResourceManager.registerResourceUser(coolBar);
-		coolBar.setSize(800, 100);
+		this.coolBar = new CoolBar(this.application, SWT.NONE);
+		SWTResourceManager.registerResourceUser(this.coolBar);
+		this.coolBar.setSize(800, 100);
 		create();
 	}
 
 	public void create() {
 		{ // begin file cool item
-			menuCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.menuCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin file tool bar
-				fileToolBar = new ToolBar(coolBar, SWT.NONE);
-				menuCoolItem.setControl(fileToolBar);
+				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.menuCoolItem.setControl(this.fileToolBar);
 				//fileToolBar.setSize(116, 29);
 				{
-					newToolItem = new ToolItem(fileToolBar, SWT.PUSH);
-					newToolItem.setToolTipText("Löscht die aktuellen Aufzeichnungen und legt einen leeren Datensatz an");
-					newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif"));
-					newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
-					newToolItem.addSelectionListener(new SelectionAdapter() {
+					this.newToolItem = new ToolItem(this.fileToolBar, SWT.PUSH);
+					this.newToolItem.setToolTipText("Löscht die aktuellen Aufzeichnungen und legt einen leeren Datensatz an");
+					this.newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif"));
+					this.newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
+					this.newToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("newToolItem.widgetSelected, event=" + evt);
-							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
+							MenuToolBar.log.finest("newToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
 						}
 					});
 				}
 				{
-					openToolItem = new ToolItem(fileToolBar, SWT.NONE);
-					openToolItem.setToolTipText("Verwirft den aktuellen Datensatz und  öffnet eine neue Datei mit neuem Inhalt");
-					openToolItem.setImage(SWTResourceManager.getImage("osde/resource/Open.gif"));
-					openToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
-					openToolItem.addSelectionListener(new SelectionAdapter() {
+					this.openToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.openToolItem.setToolTipText("Verwirft den aktuellen Datensatz und  öffnet eine neue Datei mit neuem Inhalt");
+					this.openToolItem.setImage(SWTResourceManager.getImage("osde/resource/Open.gif"));
+					this.openToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
+					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("openToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for openToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							application.getMenuBar().importFileCVS("Import CSV raw", true, true);
+							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							MenuToolBar.this.application.getMenuBar().importFileCVS("Import CSV raw", true);
 						}
 					});
 				}
 				{
-					saveToolItem = new ToolItem(fileToolBar, SWT.NONE);
-					saveToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen in eine Datei");
-					saveToolItem.setImage(SWTResourceManager.getImage("osde/resource/Save.gif"));
-					saveToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
-					saveToolItem.addSelectionListener(new SelectionAdapter() {
+					this.saveToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.saveToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen in eine Datei");
+					this.saveToolItem.setImage(SWTResourceManager.getImage("osde/resource/Save.gif"));
+					this.saveToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
+					this.saveToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("saveToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for saveToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							MenuToolBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
 				{
-					saveAsToolItem = new ToolItem(fileToolBar, SWT.NONE);
-					saveAsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
-					saveAsToolItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAs.gif"));
-					saveAsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
-					saveAsToolItem.addSelectionListener(new SelectionAdapter() {
+					this.saveAsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.saveAsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
+					this.saveAsToolItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAs.gif"));
+					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
+					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveAsToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt);
 							//TODO add your code for saveAsToolItem.widgetSelected
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							MenuToolBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
 				{
-					settingsToolItem = new ToolItem(fileToolBar, SWT.NONE);
-					settingsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
-					settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif"));
-					settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
-					settingsToolItem.addSelectionListener(new SelectionAdapter() {
+					this.settingsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.settingsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
+					this.settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif"));
+					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
+					this.settingsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveAsToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt);
 							// check if other none modal dialog is open
-							DeviceDialog deviceDialog = application.getDeviceDialog();
+							DeviceDialog deviceDialog = MenuToolBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
-								application.openSettingsDialog();
-								application.setStatusMessage("");
+								MenuToolBar.this.application.openSettingsDialog();
+								MenuToolBar.this.application.setStatusMessage("");
 							}
 							else
-								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
+								MenuToolBar.this.application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
 						}
 					});
 				}
 			} // end file tool bar
-			fileToolBar.pack();
-			size = fileToolBar.getSize();
-			menuCoolItem.setSize(size);
-			menuCoolItem.setPreferredSize(size);
-			menuCoolItem.setMinimumSize(size);
-			log.fine("fileToolBar.size = " + size);
+			this.fileToolBar.pack();
+			this.size = this.fileToolBar.getSize();
+			this.menuCoolItem.setSize(this.size);
+			this.menuCoolItem.setPreferredSize(this.size);
+			this.menuCoolItem.setMinimumSize(this.size);
+			MenuToolBar.log.fine("fileToolBar.size = " + this.size);
 		} // end file cool item
 
 		{ // begin device cool item
-			deviceCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.deviceCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin device tool bar
-				deviceToolBar = new ToolBar(coolBar, SWT.NONE);
-				deviceCoolItem.setControl(deviceToolBar);
+				this.deviceToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.deviceCoolItem.setControl(this.deviceToolBar);
 				//deviceToolBar.setSize(120, 29);
 				{
-					deviceSelectToolItem = new ToolItem(deviceToolBar, SWT.NONE);
-					deviceSelectToolItem.setToolTipText("Geräteauswahl mit Einstellungen");
-					deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif"));
-					deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
-					deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
+					this.deviceSelectToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.deviceSelectToolItem.setToolTipText("Geräteauswahl mit Einstellungen");
+					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif"));
+					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
+					this.deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("deviceToolItem.widgetSelected, event=" + evt);
-							DeviceSelectionDialog deviceSelection = application.getDeviceSelectionDialog();
+							MenuToolBar.log.finest("deviceToolItem.widgetSelected, event=" + evt);
+							DeviceSelectionDialog deviceSelection = MenuToolBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelection.checkDataSaved()) {
 								deviceSelection.open();
 							}
@@ -216,420 +215,421 @@ public class MenuToolBar {
 					});
 				}
 				{
-					prevDeviceToolItem = new ToolItem(deviceToolBar, SWT.NONE);
-					prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-					prevDeviceToolItem.setToolTipText("Schalte zum verhergehenden Gerät");
-					prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-					prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
+					this.prevDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
+					this.prevDeviceToolItem.setToolTipText("Schalte zum verhergehenden Gerät");
+					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+					this.prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("prevDeviceToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("prevDeviceToolItem.widgetSelected, event=" + evt);
 							// allow device switch only if port not connected
-							if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) {
+							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
+									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
 								DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
 									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-									int size = deviceSelect.getActiveDevices().size();
-									if (selection > 0 && selection <= size) {
+									int tmpSize = deviceSelect.getActiveDevices().size();
+									if (selection > 0 && selection <= tmpSize) {
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection - 1));
 									}
 									else
-										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
-									
+										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(tmpSize - 1));
+
 									// if a device tool box is open, dispose it
-									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
-										application.getDeviceDialog().dispose();
+									if (MenuToolBar.this.application.getDeviceDialog() != null && !MenuToolBar.this.application.getDeviceDialog().isDisposed()) {
+										MenuToolBar.this.application.getDeviceDialog().dispose();
 									}
-									
+
 									deviceSelect.setActiveConfig(deviceConfig);
 									deviceSelect.setupDevice();
 								}
 							}
 							else {
-								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuToolBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
 							}
 						}
 					});
 				}
 				{
-					nextDeviceToolItem = new ToolItem(deviceToolBar, SWT.NONE);
-					nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-					nextDeviceToolItem.setToolTipText("Schalte zum nachfolgenden Gerät");
-					nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-					nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
+					this.nextDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
+					this.nextDeviceToolItem.setToolTipText("Schalte zum nachfolgenden Gerät");
+					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+					this.nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("nextDeviceToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("nextDeviceToolItem.widgetSelected, event=" + evt);
 							// allow device switch only if port not connected
-							if (application.getActiveDevice() == null || application.getActiveDevice().getSerialPort() != null && !application.getActiveDevice().getSerialPort().isConnected()) {
+							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
+									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
 								DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
 									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-									int size = deviceSelect.getActiveDevices().size() - 1;
-									if (selection >= 0 && selection < size)
+									int tmpSize = deviceSelect.getActiveDevices().size() - 1;
+									if (selection >= 0 && selection < tmpSize)
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection + 1));
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
-									
+
 									// if a device tool box is open, dispose it
-									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
-										application.getDeviceDialog().dispose();
+									if (MenuToolBar.this.application.getDeviceDialog() != null && !MenuToolBar.this.application.getDeviceDialog().isDisposed()) {
+										MenuToolBar.this.application.getDeviceDialog().dispose();
 									}
-									
+
 									deviceSelect.setActiveConfig(deviceConfig);
 									deviceSelect.setupDevice();
 								}
 							}
 							else {
-								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuToolBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
 							}
 						}
 					});
 				}
 				{
-					toolBoxToolItem = new ToolItem(deviceToolBar, SWT.NONE);
-					toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif"));
-					toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
-					toolBoxToolItem.setToolTipText("Gerätedialog öffnen");
-					toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
+					this.toolBoxToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif"));
+					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+					this.toolBoxToolItem.setToolTipText("Gerätedialog öffnen");
+					this.toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("toolBoxToolItem.widgetSelected, event=" + evt);
-							if (application.getDeviceDialog() != null) {
-								application.getDeviceDialog().open();
+							MenuToolBar.log.finest("toolBoxToolItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.this.application.getDeviceDialog() != null) {
+								MenuToolBar.this.application.getDeviceDialog().open();
 							}
 							else {
-								application.getDeviceSelectionDialog().open();
+								MenuToolBar.this.application.getDeviceSelectionDialog().open();
 							}
 						}
 					});
 				}
 			} // end device tool bar
-			deviceToolBar.pack();
-			size = deviceToolBar.getSize();
-			deviceCoolItem.setSize(size);
-			deviceCoolItem.setPreferredSize(size);
-			deviceCoolItem.setMinimumSize(size);
+			this.deviceToolBar.pack();
+			this.size = this.deviceToolBar.getSize();
+			this.deviceCoolItem.setSize(this.size);
+			this.deviceCoolItem.setPreferredSize(this.size);
+			this.deviceCoolItem.setMinimumSize(this.size);
 		} // end device cool item
 		{ // begin zoom cool item
-			zoomCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{ // begin zoom tool bar
-				zoomToolBar = new ToolBar(coolBar, SWT.NONE);
-				zoomCoolItem.setControl(zoomToolBar);
+				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.zoomCoolItem.setControl(this.zoomToolBar);
 				//zoomToolBar.setSize(90, 29);
 				{
-					zoomWindowItem = new ToolItem(zoomToolBar, SWT.NONE);
-					zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
-					zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
-					zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
-					zoomWindowItem.addSelectionListener(new SelectionAdapter() {
+					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);
+					this.zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
+					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
+					this.zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
+					this.zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("zoomWindowItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("zoomWindowItem.widgetSelected, event=" + evt);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
 						}
 					});
 				}
 				{
-					panItem = new ToolItem(zoomToolBar, SWT.NONE);
-					panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif"));
-					panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
-					panItem.setToolTipText("Verschieben");
-					panItem.addSelectionListener(new SelectionAdapter() {
+					this.panItem = new ToolItem(this.zoomToolBar, SWT.NONE);
+					this.panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif"));
+					this.panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
+					this.panItem.setToolTipText("Verschieben");
+					this.panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("resizeItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("resizeItem.widgetSelected, event=" + evt);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
 						}
 					});
 				}
 				{
-					fitIntoItem = new ToolItem(zoomToolBar, SWT.NONE);
-					fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif"));
-					fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
-					fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
-					fitIntoItem.addSelectionListener(new SelectionAdapter() {
+					this.fitIntoItem = new ToolItem(this.zoomToolBar, SWT.NONE);
+					this.fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif"));
+					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
+					this.fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
+					this.fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("fitIntoItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_RESET ,false);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("fitIntoItem.widgetSelected, event=" + evt);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
 						}
 					});
 				}
 			} // end zoom tool bar
-			zoomToolBar.pack();
-			size = zoomToolBar.getSize();
-			zoomCoolItem.setSize(size);
-			zoomCoolItem.setPreferredSize(size);
-			zoomCoolItem.setMinimumSize(size);
+			this.zoomToolBar.pack();
+			this.size = this.zoomToolBar.getSize();
+			this.zoomCoolItem.setSize(this.size);
+			this.zoomCoolItem.setPreferredSize(this.size);
+			this.zoomCoolItem.setMinimumSize(this.size);
 		} // end zoom cool item
 
 		{ // begin port cool item
-			portCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.portCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{
-				portToolBar = new ToolBar(coolBar, SWT.NONE);
-				portCoolItem.setControl(portToolBar);
+				this.portToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.portCoolItem.setControl(this.portToolBar);
 				//portToolBar.setSize(129, 29);
 				{
-					portOpenCloseItem = new ToolItem(portToolBar, SWT.NONE);
-					portOpenCloseItem.setToolTipText("Seriellen Port Öffnen, um eine Datenaufnahme zu ermöglichen");
-					portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
-					portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-					portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
-					portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
+					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
+					this.portOpenCloseItem.setToolTipText("Seriellen Port Öffnen, um eine Datenaufnahme zu ermöglichen");
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
+					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("portOpenCloseItem.widgetSelected, event=" + evt);
-							application.openCloseSerialPort();
+							MenuToolBar.log.finest("portOpenCloseItem.widgetSelected, event=" + evt);
+							MenuToolBar.this.application.openCloseSerialPort();
 						}
 					});
 				}
 			}
-			portToolBar.pack();
-			size = portToolBar.getSize();
-			portCoolItem.setSize(size);
-			portCoolItem.setPreferredSize(size);
-			portCoolItem.setMinimumSize(size);
+			this.portToolBar.pack();
+			this.size = this.portToolBar.getSize();
+			this.portCoolItem.setSize(this.size);
+			this.portCoolItem.setPreferredSize(this.size);
+			this.portCoolItem.setMinimumSize(this.size);
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
-			dataCoolItem = new CoolItem(coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.dataCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
 			{
-				dataBarComposite = new Composite(coolBar, SWT.NONE);
+				this.dataBarComposite = new Composite(this.coolBar, SWT.NONE);
 				RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				dataBarComposite.setLayout(composite1Layout1);
-				dataCoolItem.setControl(dataBarComposite);
+				this.dataBarComposite.setLayout(composite1Layout1);
+				this.dataCoolItem.setControl(this.dataBarComposite);
 				{
-					channelSelectComposite = new Composite(dataBarComposite, SWT.NONE);
+					this.channelSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
 					RowData composite1LData = new RowData();
 					composite1LData.width = 150;
 					composite1LData.height = 24;
 					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					channelSelectComposite.setLayout(composite1Layout);
-					channelSelectComposite.setLayoutData(composite1LData);
+					this.channelSelectComposite.setLayout(composite1Layout);
+					this.channelSelectComposite.setLayoutData(composite1LData);
 					{
-						channelSelectCombo = new CCombo(channelSelectComposite, SWT.BORDER | SWT.LEFT);
-						channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" });
-						channelSelectCombo.select(0);
-						channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/eine Konfiguration aus der angezeigt werden soll");
+						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
+						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" });
+						this.channelSelectCombo.select(0);
+						this.channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/eine Konfiguration aus der angezeigt werden soll");
 						RowData channelSelectComboLData = new RowData();
 						channelSelectComboLData.width = 140;
 						channelSelectComboLData.height = 18;
-						channelSelectCombo.setLayoutData(channelSelectComboLData);
-						channelSelectCombo.setEditable(false);
-						channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-						channelSelectCombo.addSelectionListener(new SelectionAdapter() {
+						this.channelSelectCombo.setLayoutData(channelSelectComboLData);
+						this.channelSelectCombo.setEditable(false);
+						this.channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("kanalCombo.widgetSelected, event=" + evt);
-								channels.switchChannel(channelSelectCombo.getText());
+								MenuToolBar.log.finest("kanalCombo.widgetSelected, event=" + evt);
+								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 							}
 						});
 					}
 					{
-						channelToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
+						this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
 						{
-							prevChannel = new ToolItem(channelToolBar, SWT.NONE);
-							prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-							prevChannel.setToolTipText("Ausgang/Konfiguration zurück");
-							prevChannel.setEnabled(false);
-							prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-							prevChannel.addSelectionListener(new SelectionAdapter() {
+							this.prevChannel = new ToolItem(this.channelToolBar, SWT.NONE);
+							this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
+							this.prevChannel.setToolTipText("Ausgang/Konfiguration zurück");
+							this.prevChannel.setEnabled(false);
+							this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							this.prevChannel.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("prevChannel.widgetSelected, event=" + evt);
-									int selectionIndex = channelSelectCombo.getSelectionIndex();
-									if (selectionIndex > 0) channelSelectCombo.select(selectionIndex - 1);
-									if (selectionIndex == 1) prevChannel.setEnabled(false);
-									selectionIndex = channelSelectCombo.getSelectionIndex();
-									nextChannel.setEnabled(true);
-									channels.switchChannel(channelSelectCombo.getText());
+									MenuToolBar.log.finest("prevChannel.widgetSelected, event=" + evt);
+									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+									if (selectionIndex > 0) MenuToolBar.this.channelSelectCombo.select(selectionIndex - 1);
+									if (selectionIndex == 1) MenuToolBar.this.prevChannel.setEnabled(false);
+									selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+									MenuToolBar.this.nextChannel.setEnabled(true);
+									MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 								}
 							});
 						}
 						{
-							nextChannel = new ToolItem(channelToolBar, SWT.NONE);
-							nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-							nextChannel.setToolTipText("Ausgang/Konfiguration vor");
-							nextChannel.setEnabled(false);
-							nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-							nextChannel.addSelectionListener(new SelectionAdapter() {
+							this.nextChannel = new ToolItem(this.channelToolBar, SWT.NONE);
+							this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
+							this.nextChannel.setToolTipText("Ausgang/Konfiguration vor");
+							this.nextChannel.setEnabled(false);
+							this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							this.nextChannel.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("nextChannel.widgetSelected, event=" + evt);
-									int selectionIndex = channelSelectCombo.getSelectionIndex();
-									int maxIndex = channelSelectCombo.getItemCount() - 1;
+									MenuToolBar.log.finest("nextChannel.widgetSelected, event=" + evt);
+									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+									int maxIndex = MenuToolBar.this.channelSelectCombo.getItemCount() - 1;
 									if (maxIndex <= 0) {
-										nextChannel.setEnabled(false);
-										prevChannel.setEnabled(false);
+										MenuToolBar.this.nextChannel.setEnabled(false);
+										MenuToolBar.this.prevChannel.setEnabled(false);
 									}
 									else {
-										if (selectionIndex < maxIndex) channelSelectCombo.select(selectionIndex + 1);
-										if (selectionIndex == maxIndex - 1) nextChannel.setEnabled(false);
-										prevChannel.setEnabled(true);
+										if (selectionIndex < maxIndex) MenuToolBar.this.channelSelectCombo.select(selectionIndex + 1);
+										if (selectionIndex == maxIndex - 1) MenuToolBar.this.nextChannel.setEnabled(false);
+										MenuToolBar.this.prevChannel.setEnabled(true);
 									}
-									channels.switchChannel(channelSelectCombo.getText());
+									MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 								}
 							});
 						}
 					}
-					channelToolBar.pack();
+					this.channelToolBar.pack();
 					{
 						RowData composite2LData = new RowData();
 						composite2LData.width = 250;
 						composite2LData.height = 24;
-						recordSelectComposite = new Composite(dataBarComposite, SWT.NONE);
+						this.recordSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
 						RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						recordSelectComposite.setLayout(composite2Layout);
-						recordSelectComposite.setLayoutData(composite2LData);
+						this.recordSelectComposite.setLayout(composite2Layout);
+						this.recordSelectComposite.setLayoutData(composite2LData);
 						{
-							recordSelectCombo = new CCombo(recordSelectComposite, SWT.BORDER);
+							this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER);
 							FormLayout aufnahmeComboLayout = new FormLayout();
-							recordSelectCombo.setLayout(aufnahmeComboLayout);
-							recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
-							recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
-							recordSelectCombo.setTextLimit(30);
+							this.recordSelectCombo.setLayout(aufnahmeComboLayout);
+							this.recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
+							this.recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
+							this.recordSelectCombo.setTextLimit(30);
 							RowData recordSelectComboLData = new RowData();
 							recordSelectComboLData.width = 240;
 							recordSelectComboLData.height = 18;
-							recordSelectCombo.setLayoutData(recordSelectComboLData);
-							recordSelectCombo.setEditable(false);
-							recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							recordSelectCombo.addSelectionListener(new SelectionAdapter() {
+							this.recordSelectCombo.setLayoutData(recordSelectComboLData);
+							this.recordSelectCombo.setEditable(false);
+							this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+							this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("recordSelectCombo.widgetSelected, event=" + evt);
-									Channel activeChannel = channels.getActiveChannel();
-									if (activeChannel != null)
-										activeChannel.switchRecordSet(recordSelectCombo.getText());
+									MenuToolBar.log.finest("recordSelectCombo.widgetSelected, event=" + evt);
+									Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
+									if (activeChannel != null) activeChannel.switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
 								}
 							});
-							recordSelectCombo.addKeyListener(new KeyAdapter() {
+							this.recordSelectCombo.addKeyListener(new KeyAdapter() {
 								public void keyPressed(KeyEvent evt) {
-									log.finest("recordSelectCombo.keyPressed, event=" + evt);
+									MenuToolBar.log.finest("recordSelectCombo.keyPressed, event=" + evt);
 									if (evt.character == SWT.CR) {
-										Channel activeChannel = channels.getActiveChannel();
+										Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 										if (activeChannel != null) {
 											String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
-											String newRecordSetName = recordSelectCombo.getText();
-											log.fine("newRecordSetName = " + newRecordSetName);
-											String[] recordSetNames = recordSelectCombo.getItems();
+											String newRecordSetName = MenuToolBar.this.recordSelectCombo.getText();
+											MenuToolBar.log.fine("newRecordSetName = " + newRecordSetName);
+											String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
 											for (int i = 0; i < recordSetNames.length; i++) {
 												if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
 											}
-											recordSelectCombo.setEditable(false);
-											recordSelectCombo.setItems(recordSetNames);
-											RecordSet recordSet = channels.getActiveChannel().get(oldRecordSetName);
+											MenuToolBar.this.recordSelectCombo.setEditable(false);
+											MenuToolBar.this.recordSelectCombo.setItems(recordSetNames);
+											RecordSet recordSet = MenuToolBar.this.channels.getActiveChannel().get(oldRecordSetName);
 											recordSet.setName(newRecordSetName);
 											activeChannel.put(newRecordSetName, recordSet);
 											activeChannel.remove(oldRecordSetName);
 											activeChannel.getRecordSetNames();
-											channels.getActiveChannel().switchRecordSet(newRecordSetName);
+											MenuToolBar.this.channels.getActiveChannel().switchRecordSet(newRecordSetName);
 										}
 									}
 								}
 							});
 						}
-						recordSelectComposite.pack();
+						this.recordSelectComposite.pack();
 					}
 					{
-						recordToolBar = new ToolBar(dataBarComposite, SWT.FLAT);
+						this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
 						{
-							prevRecord = new ToolItem(recordToolBar, SWT.NONE);
-							prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-							prevRecord.setToolTipText("vorhergehender Datensatz");
-							prevRecord.setEnabled(false);
-							prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-							prevRecord.addSelectionListener(new SelectionAdapter() {
+							this.prevRecord = new ToolItem(this.recordToolBar, SWT.NONE);
+							this.prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
+							this.prevRecord.setToolTipText("vorhergehender Datensatz");
+							this.prevRecord.setEnabled(false);
+							this.prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							this.prevRecord.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("prevRecord.widgetSelected, event=" + evt);
-									int selectionIndex = recordSelectCombo.getSelectionIndex();
-									if (selectionIndex > 0) recordSelectCombo.select(selectionIndex - 1);
-									if (selectionIndex == 1) prevRecord.setEnabled(false);
-									nextRecord.setEnabled(true);
-									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
+									MenuToolBar.log.finest("prevRecord.widgetSelected, event=" + evt);
+									int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
+									if (selectionIndex > 0) MenuToolBar.this.recordSelectCombo.select(selectionIndex - 1);
+									if (selectionIndex == 1) MenuToolBar.this.prevRecord.setEnabled(false);
+									MenuToolBar.this.nextRecord.setEnabled(true);
+									MenuToolBar.this.channels.getActiveChannel().switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
 								}
 							});
 						}
 						{
-							nextRecord = new ToolItem(recordToolBar, SWT.NONE);
-							nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-							nextRecord.setToolTipText("nächster Datensatz");
-							nextRecord.setEnabled(false);
-							nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-							nextRecord.addSelectionListener(new SelectionAdapter() {
+							this.nextRecord = new ToolItem(this.recordToolBar, SWT.NONE);
+							this.nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
+							this.nextRecord.setToolTipText("nächster Datensatz");
+							this.nextRecord.setEnabled(false);
+							this.nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							this.nextRecord.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("nextRecord.widgetSelected, event=" + evt);
-									int selectionIndex = recordSelectCombo.getSelectionIndex();
-									int maxIndex = recordSelectCombo.getItemCount() - 1;
+									MenuToolBar.log.finest("nextRecord.widgetSelected, event=" + evt);
+									int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
+									int maxIndex = MenuToolBar.this.recordSelectCombo.getItemCount() - 1;
 									if (maxIndex <= 0) {
-										nextRecord.setEnabled(false);
-										prevRecord.setEnabled(false);
+										MenuToolBar.this.nextRecord.setEnabled(false);
+										MenuToolBar.this.prevRecord.setEnabled(false);
 									}
 									else {
-										if (selectionIndex < maxIndex) recordSelectCombo.select(selectionIndex + 1);
-										if (selectionIndex == maxIndex - 1) nextRecord.setEnabled(false);
-										prevRecord.setEnabled(true);
+										if (selectionIndex < maxIndex) MenuToolBar.this.recordSelectCombo.select(selectionIndex + 1);
+										if (selectionIndex == maxIndex - 1) MenuToolBar.this.nextRecord.setEnabled(false);
+										MenuToolBar.this.prevRecord.setEnabled(true);
 									}
-									channels.getActiveChannel().switchRecordSet(recordSelectCombo.getText());
+									MenuToolBar.this.channels.getActiveChannel().switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
 								}
 							});
 						}
-						recordToolBar.pack();
+						this.recordToolBar.pack();
 					}
 					{
-						separator = new ToolItem(recordToolBar, SWT.SEPARATOR);
+						this.separator = new ToolItem(this.recordToolBar, SWT.SEPARATOR);
 					}
 					{
-						deleteRecord = new ToolItem(recordToolBar, SWT.NONE);
-						deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
-						deleteRecord.setToolTipText("löscht den aktiven Datensatz");
-						deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
-						deleteRecord.addSelectionListener(new SelectionAdapter() {
+						this.deleteRecord = new ToolItem(this.recordToolBar, SWT.NONE);
+						this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
+						this.deleteRecord.setToolTipText("löscht den aktiven Datensatz");
+						this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
+						this.deleteRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("deleteAufnahme.widgetSelected, event=" + evt);
-								Channel activeChannel = channels.getActiveChannel();
+								MenuToolBar.log.finest("deleteAufnahme.widgetSelected, event=" + evt);
+								Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									RecordSet recordSet = activeChannel.getActiveRecordSet();
 									if (recordSet != null) {
 										String deleteRecordSetName = recordSet.getName();
 										// before deletion set new active record set
 										String newRecorKey = null;
-										int selectionIndex = recordSelectCombo.getSelectionIndex();
+										int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
 										if ((selectionIndex - 1) > 0)
-											newRecorKey = recordSelectCombo.getItem(selectionIndex - 1);
-										else if ((selectionIndex - 1) == 0 && recordSelectCombo.getItemCount() > 2) newRecorKey = recordSelectCombo.getItem(selectionIndex + 1);
-										;
+											newRecorKey = MenuToolBar.this.recordSelectCombo.getItem(selectionIndex - 1);
+										else if ((selectionIndex - 1) == 0 && MenuToolBar.this.recordSelectCombo.getItemCount() > 2)
+											newRecorKey = MenuToolBar.this.recordSelectCombo.getItem(selectionIndex + 1);
 										if (newRecorKey != null) activeChannel.setActiveRecordSet(newRecorKey);
 										// ready for deletion
 										activeChannel.get(deleteRecordSetName).clear();
 										activeChannel.remove(deleteRecordSetName);
-										log.fine("deleted " + deleteRecordSetName);
+										MenuToolBar.log.fine("deleted " + deleteRecordSetName);
 										updateRecordSetSelectCombo();
-										application.updateDataTable();
+										MenuToolBar.this.application.updateDataTable();
 									}
 								}
 							}
 						});
 					}
 					{
-						editRecord = new ToolItem(recordToolBar, SWT.NONE);
-						editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
-						editRecord.setToolTipText("umbenennen des aktiven Datensatznamen");
-						editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
-						editRecord.addSelectionListener(new SelectionAdapter() {
+						this.editRecord = new ToolItem(this.recordToolBar, SWT.NONE);
+						this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
+						this.editRecord.setToolTipText("umbenennen des aktiven Datensatznamen");
+						this.editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
+						this.editRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("editAufnahme.widgetSelected, event=" + evt);
-								recordSelectCombo.setEditable(true);
-								recordSelectCombo.setFocus();
+								MenuToolBar.log.finest("editAufnahme.widgetSelected, event=" + evt);
+								MenuToolBar.this.recordSelectCombo.setEditable(true);
+								MenuToolBar.this.recordSelectCombo.setFocus();
 								// begin here text can be edited
 							}
 						});
 					}
-					channelSelectComposite.pack();
+					this.channelSelectComposite.pack();
 				}
 			}
-			dataBarComposite.pack();
-			int height = size.y + 2;
-			size = dataBarComposite.getSize();
-			log.fine("pre dataBarComposite.size = " + size);
-			dataBarComposite.setSize(size.x, height);
-			size = dataBarComposite.getSize();
-			log.fine("post dataBarComposite.size = " + size);
-			dataCoolItem.setSize(size);
-			dataCoolItem.setPreferredSize(size);
-			dataCoolItem.setMinimumSize(size);
+			this.dataBarComposite.pack();
+			int height = this.size.y + 2;
+			this.size = this.dataBarComposite.getSize();
+			MenuToolBar.log.fine("pre dataBarComposite.size = " + this.size);
+			this.dataBarComposite.setSize(this.size.x, height);
+			this.size = this.dataBarComposite.getSize();
+			MenuToolBar.log.fine("post dataBarComposite.size = " + this.size);
+			this.dataCoolItem.setSize(this.size);
+			this.dataCoolItem.setPreferredSize(this.size);
+			this.dataCoolItem.setMinimumSize(this.size);
 		} // end record cool item
 	}
 
@@ -641,15 +641,15 @@ public class MenuToolBar {
 		final String recordSetKey = newRecordSetName;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				Vector<String> newRecordSetItems = new Vector<String>(recordSelectCombo.getItems().length);
-				String[] recordSetNames = recordSelectCombo.getItems();
-				int index = recordSelectCombo.getSelectionIndex();
-				for (int i = 0; i < recordSetNames.length; i++) {
-					if (recordSetNames[i].length() > 3) newRecordSetItems.add(recordSetNames[i]);
+				Vector<String> newRecordSetItems = new Vector<String>(MenuToolBar.this.recordSelectCombo.getItems().length);
+				String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
+				int index = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
+				for (String element : recordSetNames) {
+					if (element.length() > 3) newRecordSetItems.add(element);
 				}
 				newRecordSetItems.add(recordSetKey);
-				recordSelectCombo.setItems(newRecordSetItems.toArray(new String[1]));
-				recordSelectCombo.select(index);
+				MenuToolBar.this.recordSelectCombo.setItems(newRecordSetItems.toArray(new String[1]));
+				MenuToolBar.this.recordSelectCombo.select(index);
 				updateRecordSetSelectCombo();
 				updateChannelToolItems();
 			}
@@ -660,7 +660,7 @@ public class MenuToolBar {
 	 * updates the channel select combo according the active channel
 	 */
 	public void updateChannelSelector() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doUpdateChannelSelector();
 		}
 		else {
@@ -675,21 +675,21 @@ public class MenuToolBar {
 	/**
 	 * execute the channel selector update
 	 */
-	private void doUpdateChannelSelector() {
+	void doUpdateChannelSelector() {
 		int activeChannelNumber = 0;
-		if (channels.size() > 0) {
-			String[] channelNames = new String[channels.size()];
-			String activeChannelName = channels.getActiveChannel().getName();
+		if (this.channels.size() > 0) {
+			String[] channelNames = new String[this.channels.size()];
+			String activeChannelName = this.channels.getActiveChannel().getName();
 			for (int i = 0; i < channelNames.length; i++) {
-				channelNames[i] = channels.get(i + 1).getName();
+				channelNames[i] = this.channels.get(i + 1).getName();
 				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
 			}
-			channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
+			this.channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
 		else { // no channel
-			channelSelectCombo.setItems( new String[] {""});
+			this.channelSelectCombo.setItems(new String[] { "" });
 		}
-		channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
+		this.channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
 	}
 
@@ -697,12 +697,12 @@ public class MenuToolBar {
 	 * updates the record set select combo according the active record set
 	 */
 	public String[] updateRecordSetSelectCombo() {
-		final String[] recordSetNames = channels.getActiveChannel().getRecordSetNames();
-		if (Thread.currentThread().getId() == application.getThreadId()) {
+		final String[] recordSetNames = this.channels.getActiveChannel().getRecordSetNames();
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doUpdateRecordSetSelectCombo(recordSetNames);
 		}
 		else {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					doUpdateRecordSetSelectCombo(recordSetNames);
 				}
@@ -714,54 +714,54 @@ public class MenuToolBar {
 	/**
 	 * @param recordSetNames
 	 */
-	private void doUpdateRecordSetSelectCombo(final String[] recordSetNames) {
+	void doUpdateRecordSetSelectCombo(final String[] recordSetNames) {
 		if (recordSetNames != null && recordSetNames.length > 0 && recordSetNames[0] != null) {
-			Channel activeChannel = channels.getActiveChannel();
+			Channel activeChannel = this.channels.getActiveChannel();
 			String activeRecord = activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : recordSetNames[0];
-			recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
+			this.recordSelectCombo.setItems(recordSetNames); //new String[] { "1) Datensatz" }); // "2) Flugaufzeichnung", "3) laden" });
 			for (int i = 0; i < recordSetNames.length; i++) {
-				if (recordSetNames[i].equals(activeRecord)) recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
+				if (recordSetNames[i].equals(activeRecord)) this.recordSelectCombo.select(i); // aufnahmeCombo.setText("1) Datensatz");
 			}
 		}
 		else {
-			recordSelectCombo.setItems(new String[0]);
-			recordSelectCombo.setText("");
+			this.recordSelectCombo.setItems(new String[0]);
+			this.recordSelectCombo.setText("");
 		}
 		updateRecordToolItems();
-		application.updateGraphicsWindow();
+		this.application.updateGraphicsWindow();
 	}
 
 	/**
 	 * updates the netxtRecord , prevRecord tool items
 	 */
 	public void updateRecordToolItems() {
-		int numberRecords = channels.getActiveChannel().getRecordSetNames().length;
+		int numberRecords = this.channels.getActiveChannel().getRecordSetNames().length;
 		if (numberRecords <= 1) {
-			nextRecord.setEnabled(false);
-			prevRecord.setEnabled(false);
+			this.nextRecord.setEnabled(false);
+			this.prevRecord.setEnabled(false);
 		}
 		else {
-			int index = recordSelectCombo.getSelectionIndex();
-			int maxIndex = recordSelectCombo.getItemCount() - 1;
+			int index = this.recordSelectCombo.getSelectionIndex();
+			int maxIndex = this.recordSelectCombo.getItemCount() - 1;
 			if (numberRecords == 2 && index == 0) {
-				nextRecord.setEnabled(true);
-				prevRecord.setEnabled(false);
+				this.nextRecord.setEnabled(true);
+				this.prevRecord.setEnabled(false);
 			}
 			else if (numberRecords == 2 && index == 1) {
-				nextRecord.setEnabled(false);
-				prevRecord.setEnabled(true);
+				this.nextRecord.setEnabled(false);
+				this.prevRecord.setEnabled(true);
 			}
 			if (numberRecords >= 2 && index == 0) {
-				nextRecord.setEnabled(true);
-				prevRecord.setEnabled(false);
+				this.nextRecord.setEnabled(true);
+				this.prevRecord.setEnabled(false);
 			}
 			else if (numberRecords >= 2 && index == maxIndex) {
-				nextRecord.setEnabled(false);
-				prevRecord.setEnabled(true);
+				this.nextRecord.setEnabled(false);
+				this.prevRecord.setEnabled(true);
 			}
 			else {
-				nextRecord.setEnabled(true);
-				prevRecord.setEnabled(true);
+				this.nextRecord.setEnabled(true);
+				this.prevRecord.setEnabled(true);
 			}
 		}
 	}
@@ -769,34 +769,34 @@ public class MenuToolBar {
 	/**
 	 * 
 	 */
-	private void doUpdateChannelToolItems() {
-		int numberChannels = channels.size();
+	void doUpdateChannelToolItems() {
+		int numberChannels = this.channels.size();
 		if (numberChannels <= 1) {
-			nextChannel.setEnabled(false);
-			prevChannel.setEnabled(false);
+			this.nextChannel.setEnabled(false);
+			this.prevChannel.setEnabled(false);
 		}
 		else {
-			int index = channelSelectCombo.getSelectionIndex();
-			int maxIndex = channelSelectCombo.getItemCount() - 1;
+			int index = this.channelSelectCombo.getSelectionIndex();
+			int maxIndex = this.channelSelectCombo.getItemCount() - 1;
 			if (numberChannels == 2 && index == 0) {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(false);
+				this.nextChannel.setEnabled(true);
+				this.prevChannel.setEnabled(false);
 			}
 			else if (numberChannels == 2 && index == 1) {
-				nextChannel.setEnabled(false);
-				prevChannel.setEnabled(true);
+				this.nextChannel.setEnabled(false);
+				this.prevChannel.setEnabled(true);
 			}
 			if (numberChannels >= 2 && index == 0) {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(false);
+				this.nextChannel.setEnabled(true);
+				this.prevChannel.setEnabled(false);
 			}
 			else if (numberChannels >= 2 && index == maxIndex) {
-				nextChannel.setEnabled(false);
-				prevChannel.setEnabled(true);
+				this.nextChannel.setEnabled(false);
+				this.prevChannel.setEnabled(true);
 			}
 			else {
-				nextChannel.setEnabled(true);
-				prevChannel.setEnabled(true);
+				this.nextChannel.setEnabled(true);
+				this.prevChannel.setEnabled(true);
 			}
 		}
 	}
@@ -805,7 +805,7 @@ public class MenuToolBar {
 	 * updates the netxtChannel , prevChannel tool items
 	 */
 	public void updateChannelToolItems() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doUpdateChannelToolItems();
 		}
 		else {
@@ -823,40 +823,40 @@ public class MenuToolBar {
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (isOpenStatus) {
-			portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
-			portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
-			portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
+			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
+			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
+			this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
 			//portOpenCloseLabel.setText("Port schliessen");
 		}
 		else {
-			if (!application.isDisposed()) {
-				portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-				portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
-				portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
+			if (!this.application.isDisposed()) {
+				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
+				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
+				this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
 				//portOpenCloseLabel.setText("Port öffnen         ");
 			}
 		}
 	}
 
 	public CCombo getChannelSelectCombo() {
-		return channelSelectCombo;
+		return this.channelSelectCombo;
 	}
 
 	public CCombo getRecordSelectCombo() {
-		return recordSelectCombo;
+		return this.recordSelectCombo;
 	}
 
 	public void enableDeviceSwitchButtons(boolean enabled) {
-		prevDeviceToolItem.setEnabled(enabled);
-		nextDeviceToolItem.setEnabled(enabled);
+		this.prevDeviceToolItem.setEnabled(enabled);
+		this.nextDeviceToolItem.setEnabled(enabled);
 		updateChannelSelector();
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void initGUI() {
 		try {
 			{
-				application.setSize(800, 200);
+				this.application.setSize(800, 200);
 			}
 		}
 		catch (Exception e) {

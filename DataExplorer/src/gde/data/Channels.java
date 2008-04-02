@@ -29,7 +29,7 @@ import osde.ui.OpenSerialDataExplorer;
  */
 public class Channels extends HashMap<Integer, Channel> {
 	final static long											serialVersionUID		= 26031957;
-	private Logger												log									= Logger.getLogger(this.getClass().getName());
+	final static Logger										log									= Logger.getLogger(Channels.class.getName());
 
 	private static Channels								channles						= null;
 	private String												fileDescription			= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -70,9 +70,9 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * singleton
 	 * @param initialCapacity
 	 */
-	private Channels(OpenSerialDataExplorer application, int initialCapacity) {
+	private Channels(OpenSerialDataExplorer currentApplication, int initialCapacity) {
 		super(initialCapacity);
-		this.application = application;
+		this.application = currentApplication;
 	}
 		
 	/**
@@ -98,7 +98,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @return array with channel names
 	 */
 	public String[] getChannelNames() {
-		return application.getMenuToolBar().getChannelSelectCombo().getItems();
+		return this.application.getMenuToolBar().getChannelSelectCombo().getItems();
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
-		for (String channelName : application.getMenuToolBar().getChannelSelectCombo().getItems()) {
+		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {
 			sb.append(channelName.split(":")[1]).append(", ");
 		}
 		return sb.toString();
@@ -136,9 +136,9 @@ public class Channels extends HashMap<Integer, Channel> {
 			if (recordSet != null) recordSet.reset();
 			if (channelNumber != this.getActiveChannelNumber()) {
 				this.setActiveChannelNumber(channelNumber);
-				application.getMenuToolBar().updateChannelToolItems();
+				this.application.getMenuToolBar().updateChannelToolItems();
 				if(recordSetKey == null || recordSetKey.length() < 1)
-					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getRealRecordSetNames()[0]); // set record set to the first
+					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getFirstRecordSetName()); // set record set to the first
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 			}
@@ -146,15 +146,15 @@ public class Channels extends HashMap<Integer, Channel> {
 				log.fine("nothing to do selected channel == active channel");
 			}
 			// update viewable
-			application.getMenuToolBar().updateChannelSelector();
-			application.getMenuToolBar().updateRecordSetSelectCombo();
-			application.updateGraphicsWindow();
-			application.updateDigitalWindow();
-			application.updateAnalogWindow();
-			application.updateCellVoltageWindow();
-			application.updateDataTable();
-			application.updateFileCommentWindow();
-			application.updateRecordCommentWindow();
+			this.application.getMenuToolBar().updateChannelSelector();
+			this.application.getMenuToolBar().updateRecordSetSelectCombo();
+			this.application.updateGraphicsWindow();
+			this.application.updateDigitalWindow();
+			this.application.updateAnalogWindow();
+			this.application.updateCellVoltageWindow();
+			this.application.updateDataTable();
+			this.application.updateFileCommentWindow();
+			this.application.updateRecordCommentWindow();
 		}
 	}
 
@@ -162,21 +162,21 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @return the activeChannelNumber
 	 */
 	public int getActiveChannelNumber() {
-		return activeChannelNumber;
+		return this.activeChannelNumber;
 	}
 
 	/**
-	 * @param activeChannelNumber the activeChannelNumber to set
+	 * @param newActiveChannelNumber the activeChannelNumber to set
 	 */
-	public void setActiveChannelNumber(int activeChannelNumber) {
-		this.activeChannelNumber = activeChannelNumber;
+	public void setActiveChannelNumber(int newActiveChannelNumber) {
+		this.activeChannelNumber = newActiveChannelNumber;
 	}
 
 	/**
 	 * @return activeChannel
 	 */
 	public Channel getActiveChannel() {
-		return this.get(activeChannelNumber);
+		return this.get(this.activeChannelNumber);
 	}
 
 	/**
@@ -204,11 +204,11 @@ public class Channels extends HashMap<Integer, Channel> {
 	}
 
 	public String getFileDescription() {
-		return fileDescription;
+		return this.fileDescription;
 	}
 
-	public void setFileDescription(String fileDescription) {
-		this.fileDescription = fileDescription;
+	public void setFileDescription(String newFileDescription) {
+		this.fileDescription = newFileDescription;
 	}
 	
 	/**

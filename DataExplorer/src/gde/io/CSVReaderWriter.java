@@ -91,44 +91,44 @@ public class CSVReaderWriter {
 		Channel activeChannel = null;
 
 		try {
-			application.setStatusMessage("Lese CVS Datei " + filePath);
-			
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
+			activeChannel = channels.getActiveChannel();
 
-			int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
-			StringBuilder headerStringConf = new StringBuilder().append(lineSep);
-			StringBuilder keys = new StringBuilder();
-			String[] recordKeys = null;
-			String fileConfig = null;
+			if (activeChannel != null) {
+				application.setStatusMessage("Lese CVS Datei " + filePath);
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
+				int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
+				StringBuilder headerStringConf = new StringBuilder().append(lineSep);
+				StringBuilder keys = new StringBuilder();
+				String[] recordKeys = null;
+				String fileConfig = null;
+				while ((line = reader.readLine()) != null) {
+					if (isDeviceName) {
+						// check for device name in first line
+						String activeDeviceName = application.getActiveDevice().getName();
+						String fileDeviceName = line.split("" + separator)[0].trim();
+						log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
 
-			while ((line = reader.readLine()) != null) {
-				if (isDeviceName) {
-					// check for device name in first line
-					String activeDeviceName = application.getActiveDevice().getName();
-					String fileDeviceName = line.split(""+separator)[0].trim();
-					log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
-					
-					if (activeDeviceName.equals(fileDeviceName)) {
-						isDeviceName = false;
-					}
-					else {
-						throw new Exception("0"); // mismatch device name
-					}
-					
-					String activeConfig = channels.getActiveChannel().getConfigKey();
-					fileConfig = line.split(""+separator).length > 1 ? line.split(""+separator)[1].trim() : null;
-					log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
-					if(fileConfig == null) {
-						fileConfig = activeConfig;
-						log.fine("using as file channel name = " + fileConfig);
-					}
-					else if (!activeConfig.equals(fileConfig)) {
-						String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
-						int answer = application.openYesNoCancelMessageDialog(msg);
+						if (activeDeviceName.equals(fileDeviceName)) {
+							isDeviceName = false;
+						}
+						else {
+							throw new Exception("0"); // mismatch device name
+						}
+
+						String activeConfig = channels.getActiveChannel().getConfigKey();
+						fileConfig = line.split("" + separator).length > 1 ? line.split("" + separator)[1].trim() : null;
+						log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
+						if (fileConfig == null) {
+							fileConfig = activeConfig;
+							log.fine("using as file channel name = " + fileConfig);
+						}
+						else if (!activeConfig.equals(fileConfig)) {
+							String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
+							int answer = application.openYesNoCancelMessageDialog(msg);
 							if (answer == SWT.YES) {
 								log.fine("SWT.YES");
 								int channelNumber = channels.getChannelNumber(fileConfig);
-								if (channelNumber != 0) {  // 0 channel configuration does not exist
+								if (channelNumber != 0) { // 0 channel configuration does not exist
 									channels.setActiveChannelNumber(channelNumber);
 									channels.switchChannel(channelNumber, "");
 									application.getMenuToolBar().updateChannelSelector();
@@ -144,92 +144,92 @@ public class CSVReaderWriter {
 								log.fine("SWT.CANCEL");
 								return null;
 							}
-					}
-					activeChannel = channels.getActiveChannel();
-					if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
-						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
-					}
-					// shorten the record set name to the allowed maximum
-					recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
-					
-					recordNames = device.getMeasurementNames(fileConfig);
-					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
-				}
-				else if (!isData) {
-					// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
-					String[] header = line.split(";");
-					sizeRecords = header.length - 1;
-					int countNotMeasurement = 0;
-					for (String recordKey : recordNames) {
-						MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
-						headerStringConf.append(measurement.getName()).append(separator);
+						}
+						if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+							recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
+						}
+						// shorten the record set name to the allowed maximum
+						recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
 
-						if (!measurement.isCalculation()) {
-							keys.append(measurement.getName()).append(separator);
-							++countNotMeasurement;			// update count for possible raw
-						}
-						if (!isRaw) // absolute
-							recordSet.get(recordKey).setDisplayable(true);	// all data available 
+						recordNames = device.getMeasurementNames(fileConfig);
+						recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 					}
-					// for raw data check if measurements which !isCalculation match number of entries in header line
-					// first simple check, but name must not match, count only numbers
-					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) { 
-						throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
-					}
-					else {
-						int match = 0;  // check match of the measurement units, relevant for absolute import 
-						if(isRaw) recordKeys = keys.toString().split("" + separator);
-						else recordKeys = recordNames;
-						
-						StringBuilder unitCompare = new StringBuilder().append(lineSep);
-						for (int i = 1; i < header.length; i++) {
-							String recordKey = recordKeys[i - 1];
-							String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
-							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
-							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
-							unitCompare.append(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit).append(lineSep);
-							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
+					else if (!isData) {
+						// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
+						String[] header = line.split(";");
+						sizeRecords = header.length - 1;
+						int countNotMeasurement = 0;
+						for (String recordKey : recordNames) {
+							MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
+							headerStringConf.append(measurement.getName()).append(separator);
+
+							if (!measurement.isCalculation()) {
+								keys.append(measurement.getName()).append(separator);
+								++countNotMeasurement; // update count for possible raw
+							}
+							if (!isRaw) // absolute
+								recordSet.get(recordKey).setDisplayable(true); // all data available 
 						}
-						log.fine(unitCompare.toString());
-						if (match != header.length - 1) {
-							throw new Exception("2" + unitCompare.toString()); // mismatch data header units
+						// for raw data check if measurements which !isCalculation match number of entries in header line
+						// first simple check, but name must not match, count only numbers
+						if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) {
+							throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
 						}
+						else {
+							int match = 0; // check match of the measurement units, relevant for absolute import 
+							if (isRaw)
+								recordKeys = keys.toString().split("" + separator);
+							else
+								recordKeys = recordNames;
+
+							StringBuilder unitCompare = new StringBuilder().append(lineSep);
+							for (int i = 1; i < header.length; i++) {
+								String recordKey = recordKeys[i - 1];
+								String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
+								String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
+								String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
+								unitCompare.append(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit).append(lineSep);
+								if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
+							}
+							log.fine(unitCompare.toString());
+							if (match != header.length - 1) {
+								throw new Exception("2" + unitCompare.toString()); // mismatch data header units
+							}
+						}
+						isData = true;
 					}
-					isData = true;
+					else { // isData use only recordKeys
+						// 0; 14,780;  0,598;  1,000;  8,838;  0,002
+						String[] dataStr = line.split("" + separator);
+						String data = dataStr[0].trim().replace(',', '.');
+						new_time_ms = (int) (new Double(data).doubleValue() * 1000);
+						timeStep_ms = new_time_ms - old_time_ms;
+						old_time_ms = new_time_ms;
+						if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
+						// use only measurement which are isCalculation == false
+						for (int i = 0; i < sizeRecords; i++) {
+							data = dataStr[i + 1].trim().replace(',', '.');
+							double tmpDoubleValue = new Double(data).doubleValue();
+							double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
+							int point = (int) dPoint;
+							if (log.isLoggable(Level.FINE)) {
+								sb.append("recordKeys[" + i + "] = ").append(recordKeys[i]).append(" = ").append(point).append(lineSep);
+							}
+							recordSet.getRecord(recordKeys[i]).add(point);
+							if (log.isLoggable(Level.FINE)) log.fine("recordKeys[" + i + "] = " + recordKeys[i]);
+						}
+						if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+					}
 				}
-				else { // isData use only recordKeys
-					// 0; 14,780;  0,598;  1,000;  8,838;  0,002
-					String[] dataStr = line.split("" + separator);
-					String data = dataStr[0].trim().replace(',', '.');
-					new_time_ms = (int)(new Double(data).doubleValue() * 1000);
-					timeStep_ms = new_time_ms - old_time_ms;
-					old_time_ms = new_time_ms;
-					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
-					// use only measurement which are isCalculation == false
-					for (int i = 0; i < sizeRecords; i++) {
-						data = dataStr[i + 1].trim().replace(',', '.');
-						double tmpDoubleValue = new Double(data).doubleValue();
-						double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
-						int point = (int) dPoint;
-						if (log.isLoggable(Level.FINE)) {
-							sb.append("recordKeys[" + i + "] = ").append(recordKeys[i]).append(" = ").append(point).append(lineSep);
-						}
-						recordSet.getRecord(recordKeys[i]).add(point);
-						if (log.isLoggable(Level.FINE)) log.fine("recordKeys[" + i + "] = " + recordKeys[i]);
-					}
-					if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
-				}
+				// set time base in msec
+				recordSet.setTimeStep_ms(timeStep_ms);
+				recordSet.setSaved(true);
+				log.fine("timeStep_ms = " + timeStep_ms);
+				activeChannel.put(recordSetName, recordSet);
+				activeChannel.switchRecordSet(recordSetName);
+				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				reader.close();
 			}
-			// set time base in msec
-			recordSet.setTimeStep_ms(timeStep_ms);
-			recordSet.setSaved(true);
-			log.fine("timeStep_ms = " + timeStep_ms);
-			
-			activeChannel.put(recordSetName, recordSet);
-			activeChannel.switchRecordSet(recordSetName);
-			activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-
-			reader.close();
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -310,7 +310,7 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
-			int recordEntries = recordSet.getRecord(recordSet.getRecordNames()[0]).size();
+			int recordEntries = recordSet.getRecord(recordSet.getFirstRecordName()).size();
 			double stausIncrement = recordEntries/100.0;
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();

@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import osde.config.Settings;
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
@@ -43,12 +42,12 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public abstract class DeviceSerialPort implements SerialPortEventListener {
-	private static Logger					log								= Logger.getLogger(DeviceSerialPort.class.getName());
+	final static Logger					log								= Logger.getLogger(DeviceSerialPort.class.getName());
 
 	protected final DeviceConfiguration			deviceConfig;
 	protected final OpenSerialDataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
-	protected boolean												isConnected				= false;
+	private boolean												isConnected				= false;
 	private String													serialPortStr			= "";
 	private Thread													closeThread;
 	
@@ -93,9 +92,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 
 	@SuppressWarnings("unchecked")
-	public DeviceSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
-		this.deviceConfig = deviceConfig;
-		this.application = application;
+	public DeviceSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
+		this.deviceConfig = currentDeviceConfig;
+		this.application = currentApplication;
 	}
 
 	public static Vector<String> listConfiguredSerialPorts() {
@@ -129,16 +128,17 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	private static Vector<String> getAvailablePorts(Vector<String> availablePorts, String serialPortPrefix, int startIndex, int searchCounter) {
 		String serialPortStr;
+		int index = startIndex;
 		CommPortIdentifier.getPortIdentifiers(); // initializes serial port
 		// find all available serial ports
-		for (; startIndex < searchCounter; startIndex++) {
-			serialPortStr = serialPortPrefix + startIndex;
-			CommPortIdentifier portId;
+		for (; index < searchCounter; index++) {
+			serialPortStr = serialPortPrefix + index;
+			CommPortIdentifier tmpPortId;
 			try {
-				portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
-				if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL && !portId.isCurrentlyOwned()) {
+				tmpPortId = CommPortIdentifier.getPortIdentifier(serialPortStr);
+				if (tmpPortId.getPortType() == CommPortIdentifier.PORT_SERIAL && !tmpPortId.isCurrentlyOwned()) {
 					try {
-						((SerialPort) portId.open("OpenSerialDataExplorer", 2000)).close();
+						((SerialPort) tmpPortId.open("OpenSerialDataExplorer", 2000)).close();
 						availablePorts.add(serialPortStr);
 						log.fine("Found port: " + serialPortStr);
 					}
@@ -156,14 +156,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	/**
 	 * check if a configures serial port string matches actual available ports
-	 * @param serialPortStr
+	 * @param newSerialPortStr
 	 * @param availableSerialPorts
 	 * @return true if given port string matches one of the available once
 	 */
-	private boolean isMatchAvailablePorts(String serialPortStr, Vector<String> availableSerialPorts) {
+	private boolean isMatchAvailablePorts(String newSerialPortStr, Vector<String> availableSerialPorts) {
 		boolean match = false;
 		for (String availablePort : availableSerialPorts) {
-			if (availablePort.equals(serialPortStr)) {
+			if (availablePort.equals(newSerialPortStr)) {
 				match = true;
 				break;
 			}
@@ -175,19 +175,19 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		// Initialize serial port
 		try {
 			Settings settings = Settings.getInstance();
-			serialPortStr = settings.isGlobalSerialPort() ? settings.getSerialPort() : deviceConfig.getPort();
+			this.serialPortStr = settings.isGlobalSerialPort() ? settings.getSerialPort() : this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
 			Vector<String> availableSerialPorts = listConfiguredSerialPorts();
-			if (serialPortStr == null || serialPortStr.length() < 4 || !isMatchAvailablePorts(serialPortStr, availableSerialPorts)) {
+			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availableSerialPorts)) {
 				// no serial port is selected, if only one serial port is available choose this one
 				if (availableSerialPorts.size() >= 1) {
-					serialPortStr = availableSerialPorts.firstElement();
+					this.serialPortStr = availableSerialPorts.firstElement();
 					if (settings.isGlobalSerialPort())
-						settings.setSerialPort(serialPortStr);
+						settings.setSerialPort(this.serialPortStr);
 					else
-						deviceConfig.setPort(serialPortStr);
+						this.deviceConfig.setPort(this.serialPortStr);
 					
-					deviceConfig.storeDeviceProperties();
+					this.deviceConfig.storeDeviceProperties();
 				}
 				else {
 //					application.openMessageDialog("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
@@ -195,47 +195,47 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					throw new ApplicationConfigurationException("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
 				}
 			}
-			log.fine(String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", serialPortStr, deviceConfig.getBaudeRate(), deviceConfig.getDataBits(), deviceConfig.getStopBits(), deviceConfig.getParity(), deviceConfig.getFlowCtrlMode(), deviceConfig.isRTS(), deviceConfig.isDTR()));
-			portId = CommPortIdentifier.getPortIdentifier(serialPortStr);
-			serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 2000);
+			log.fine(String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR()));
+			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
+			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 2000);
 			// set port parameters
-			serialPort.setInputBufferSize(4096);
-			serialPort.setOutputBufferSize(4096);
-			serialPort.setSerialPortParams(deviceConfig.getBaudeRate(), deviceConfig.getDataBits(), deviceConfig.getStopBits(), deviceConfig.getParity());
-			serialPort.setFlowControlMode(deviceConfig.getFlowCtrlMode());
-			serialPort.setRTS(deviceConfig.isRTS());
-			serialPort.setDTR(deviceConfig.isDTR());
+			this.serialPort.setInputBufferSize(4096);
+			this.serialPort.setOutputBufferSize(4096);
+			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity());
+			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode());
+			this.serialPort.setRTS(this.deviceConfig.isRTS());
+			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
-			serialPort.addEventListener(this);
+			this.serialPort.addEventListener(this);
 			// activate the DATA_AVAILABLE notifier to read available data
-			serialPort.notifyOnDataAvailable(true);
+			this.serialPort.notifyOnDataAvailable(true);
 
 			// init in and out stream for writing and reading
-			inputStream = serialPort.getInputStream();
-			outputStream = serialPort.getOutputStream();
+			this.inputStream = this.serialPort.getInputStream();
+			this.outputStream = this.serialPort.getOutputStream();
 
-			this.isConnected = true;
-			if (application != null) application.setPortConnected(true);
-			return serialPort;
+			this.setConnected(true);
+			if (this.application != null) this.application.setPortConnected(true);
+			return this.serialPort;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			if (serialPort != null) serialPort.close();
+			if (this.serialPort != null) this.serialPort.close();
 			throw e;
 		}
 	}
 
 	public synchronized void write(byte[] buf) throws IOException {
-		if (!isReadBufferEmpty) {
-			int num = inputStream.available();
-			String msg = " -> " + num + " left bytes -> " + inputStream.read(new byte[num]);
-			isReadBufferEmpty = true;
+		if (!this.isReadBufferEmpty) {
+			int num = this.inputStream.available();
+			String msg = " -> " + num + " left bytes -> " + this.inputStream.read(new byte[num]);
+			this.isReadBufferEmpty = true;
 			log.warning(msg);
 			//throw new IOException("ERROR: read buffer is not empty, please get previous data before send new command !" + msg);
 		}
 
 		try {
-			if (application != null) application.setSerialTxOn();
+			if (this.application != null) this.application.setSerialTxOn();
 
 			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
@@ -243,14 +243,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				for (int i = 0; i < buf.length; i++) {
 					sb.append(String.format("%02X ", buf[i]));
 				}
-				sb.append(" to port ").append(serialPort.getName()).append(newLine);
+				sb.append(" to port ").append(this.serialPort.getName()).append(newLine);
 				log.fine(sb.toString());
 			}
 
 			// write string to serial port
-			outputStream.write(buf);
-			outputStream.flush();
-			if (application != null) application.setSerialTxOff();
+			this.outputStream.write(buf);
+			this.outputStream.flush();
+			if (this.application != null) this.application.setSerialTxOff();
 		}
 		catch (IOException e) {
 			throw e;
@@ -273,8 +273,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		case SerialPortEvent.DATA_AVAILABLE:
 			// we get here if data has been received
 			try {
-				this.numBytesAvailable = inputStream.available();
-				if (this.numBytesAvailable > 0) isReadBufferEmpty = false;
+				this.numBytesAvailable = this.inputStream.available();
+				if (this.numBytesAvailable > 0) this.isReadBufferEmpty = false;
 				if (log.isLoggable(Level.FINER)) {
 					log.finer("inputStream numBytesAvailable = " + this.numBytesAvailable);
 				}
@@ -292,14 +292,16 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int retryCounter = 5;
 
 		try {
-			if (application != null) application.setSerialRxOn();
+			if (this.application != null) this.application.setSerialRxOn();
 
 			wait4Bytes(bytes, timeoutInSeconds);
 
-			while (bytes != (readBytes += inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes)) && retryCounter-- > 0)
-				;
-			isReadBufferEmpty = true;
-			this.setNumBytesAvailable(0); 
+			while (bytes != readBytes && retryCounter-- > 0)
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+			
+			this.isReadBufferEmpty = true;
+			this.numBytesAvailable = 0;
+			//this.setNumBytesAvailable(0); 
 
 			if (readBytes != bytes) {
 				throw new IOException("Warning: missed expected number of bytes to be read");
@@ -314,7 +316,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				log.fine(sb.toString());
 			}
 
-			if (application != null) application.setSerialRxOff();
+			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -332,13 +334,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 */
 	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws IOException {
-		int counter = timeoutInSeconds * 1000;
+		int counter = timeoutInSeconds * 100000;
 		int resBytes = 0;
 		try {
 			// wait until readbuffer has been filled by eventListener
-			Thread.sleep(1);
 			while (this.numBytesAvailable < numBytes) {
-				Thread.sleep(1);
+				Thread.sleep(0, 10);
 				counter--;
 				if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
 				if (counter <= 0) throw new IOException("Error: can not read result during given timeout !");
@@ -400,59 +401,59 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public void checkForLeftBytes() throws ReadWriteOutOfSyncException, IOException {
 		//check available bytes in receive buffer == 0
-		if (log.isLoggable(Level.FINER)) log.finer("inputStream available bytes = " + inputStream.available());
-		if (inputStream.available() != 0) throw new ReadWriteOutOfSyncException("receive buffer not empty");
+		if (log.isLoggable(Level.FINER)) log.finer("inputStream available bytes = " + this.inputStream.available());
+		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException("receive buffer not empty");
 	}
 
 	/**
 	* function clear/reset receive buffer
 	*/
 	public void resetReceiveBuffer() {
-		isReadBufferEmpty = true;
+		this.isReadBufferEmpty = true;
 		this.setNumBytesAvailable(0);
 	}
 
 	public synchronized void close() {
 		log.info("entry");
-		closeThread = new Thread() { 
+		this.closeThread = new Thread() { 
 			public void run() { 
 				log.info("entry");
-				if (isConnected && serialPort != null) {
+				if (isConnected() && DeviceSerialPort.this.serialPort != null) {
 					try {
 						Thread.sleep(2);
-						byte[] buf = new byte[inputStream.available()];
-						if (buf.length > 0) inputStream.read(buf);
+						byte[] buf = new byte[getInputStream().available()];
+						if (buf.length > 0) getInputStream().read(buf);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
 					log.info("before close");
-					serialPort.close();
+					DeviceSerialPort.this.serialPort.close();
 					log.info("after close");
-					isConnected = false;
-					if (application != null) application.setPortConnected(false);
+					setConnected(false);
+					if (DeviceSerialPort.this.application != null) DeviceSerialPort.this.application.setPortConnected(false);
 					log.info("exit");
 				}
 			}
 		};
-		closeThread.start();
+		this.closeThread.start();
 		log.info("exit, close thread started");
 	}
 
 	public InputStream getInputStream() {
-		return inputStream;
+		return this.inputStream;
 	}
 
 	public OutputStream getOutputStream() {
-		return outputStream;
+		return this.outputStream;
 	}
 
-	public synchronized void setNumBytesAvailable(int numBytesAvailable) {
-		this.numBytesAvailable = numBytesAvailable;
+	public synchronized void setNumBytesAvailable(int newNumBytesAvailable) {
+		this.numBytesAvailable = newNumBytesAvailable;
 	}
 
 	public boolean isConnected() {
-		return isConnected;
+		return this.isConnected;
 	}
 	
 	/**
@@ -467,24 +468,37 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * method to gather data from device, implementation is individual for device
-	 * @param channel signature if device has more than one or required by device
+	 * sample method to gather data from device, implementation is individual for device
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws Exception
 	 */
-	public abstract  HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws Exception;
+	//public HashMap<String, Object> getData(byte[] channelSignature) throws Exception;
+	//public HashMap<String, Object> getData(int datagramNumber, Picolario device, String configurationKey) throws Exception {
+	//public HashMap<String, Object> getData(byte[] channel, int recordNumber, String channelConfigKey) throws Exception {
+//	public HashMap<String, Object> getData(IDevice device) {
+//		HashMap<String, Object> dataMap = new HashMap<String, Object>();
+//		dataMap.put(device.getChannelName(1), new Object());
+//		return dataMap;
+//	}
 
 	/**
 	 * @return the serialPortStr
 	 */
 	public String getSerialPortStr() {
-		return serialPortStr == null ? deviceConfig.getPort() : this.serialPortStr;
+		return this.serialPortStr == null ? this.deviceConfig.getPort() : this.serialPortStr;
 	}
 
 	/**
-	 * @param serialPortStr the serialPortStr to set
+	 * @param newSerialPortStr the serialPortStr to set
 	 */
-	public void setSerialPortStr(String serialPortStr) {
-		this.serialPortStr = serialPortStr;
+	public void setSerialPortStr(String newSerialPortStr) {
+		this.serialPortStr = newSerialPortStr;
+	}
+
+	/**
+	 * @param enabled the isConnected to set
+	 */
+	public void setConnected(boolean enabled) {
+		this.isConnected = enabled;
 	}
 }

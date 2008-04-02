@@ -66,7 +66,7 @@ public class TimeBaseType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -90,7 +90,7 @@ public class TimeBaseType {
      *     
      */
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     /**
@@ -114,7 +114,7 @@ public class TimeBaseType {
      *     
      */
     public String getUnit() {
-        return unit;
+        return this.unit;
     }
 
     /**
@@ -138,7 +138,7 @@ public class TimeBaseType {
      *     
      */
     public BigInteger getTimeStep() {
-        return timeStep;
+        return this.timeStep;
     }
 
     /**

@@ -38,9 +38,9 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
-	private Logger log = Logger.getLogger(this.getClass().getName());
+	final static Logger log = Logger.getLogger(AboutDialog.class.getName());
 
-	private Shell dialogShell;
+	Shell dialogShell;
 	private Text aboutText;
 	private Button ok;
 	private Text infoText;
@@ -68,14 +68,14 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	public void open() {
 		try {
 			Shell parent = getParent();
-			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg"));
-			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setLayout(new FormLayout());
-			dialogShell.layout();
-			dialogShell.pack();			
-			dialogShell.setSize(650, 430);
-			dialogShell.setText("About Dialog");
+			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg"));
+			SWTResourceManager.registerResourceUser(this.dialogShell);
+			this.dialogShell.setLayout(new FormLayout());
+			this.dialogShell.layout();
+			this.dialogShell.pack();			
+			this.dialogShell.setSize(650, 430);
+			this.dialogShell.setText("About Dialog");
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
@@ -83,13 +83,13 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.left =  new FormAttachment(0, 1000, 20);
 				infoTextLData.top =  new FormAttachment(0, 1000, 111);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
-				infoText = new Text(dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
-				infoText.setLayoutData(infoTextLData);
-				infoText.setText("Der OpenSerialDataExplorer ist ein Werkzeug zu aufnehmen, betrachten und auswerten von Daten aus Geräten, die über eine serielle Schnittstelle erreichbar sind. Geräte könne Datenlogger, Messgeräte, Ladegeräte oder ähnliches sein."
+				this.infoText = new Text(this.dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
+				this.infoText.setLayoutData(infoTextLData);
+				this.infoText.setText("Der OpenSerialDataExplorer ist ein Werkzeug zu aufnehmen, betrachten und auswerten von Daten aus Geräten, die über eine serielle Schnittstelle erreichbar sind. Geräte könne Datenlogger, Messgeräte, Ladegeräte oder ähnliches sein."
 						+ System.getProperty("line.separator") + "Open Serial Data Explorer benutzt für die serielle Kommunikation die freie Implementierung des unter GPL stehenden RXTXComm Paketes und die grafische Benutzeroberfläche (GUI) basiert auf dem aus der Eclipse Welt kommenden Software Widged Toolkit (SWT)." 
 						+ System.getProperty("line.separator") + "Die Software wurde sorgfältig getestet. Trotzdem könnte es durch Fehlbedienung der angeschlossenen Geräte zu beschädigungen kommen. Die Benutung erfolgt auf eigenes Risiko, ein Schadensersatz wir in keinem Fall geleistet." 
 						+ System.getProperty("line.separator") + "Bei der Benutzung können dem Anwender Fehler auffallen oder Verbesserungsvorschläge einfallen. Über einen Mitteilung solcher Umstände bin ich dankbar (winfried@bruegmaenner.de). Eine umgehende Beseitigung von Fehlern oder das Einbauen von Vergesserungen kann aber nicht garantiert werden, da es sich hier um ein reines Freizeitprojekt handelt.");
-				infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData versionLData = new FormData();
@@ -98,10 +98,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.left =  new FormAttachment(0, 1000, 20);
 				versionLData.top =  new FormAttachment(0, 1000, 72);
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
-				version = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
-				version.setLayoutData(versionLData);
-				version.setText("Version 0.70");
-				version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.version = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+				this.version.setLayoutData(versionLData);
+				this.version.setText("Version 0.70");
+				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData okLData = new FormData();
@@ -110,13 +110,13 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				okLData.left =  new FormAttachment(0, 1000, 147);
 				okLData.bottom =  new FormAttachment(1000, 1000, -12);
 				okLData.right =  new FormAttachment(1000, 1000, -154);
-				ok = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				ok.setLayoutData(okLData);
-				ok.setText("OK");
-				ok.addSelectionListener(new SelectionAdapter() {
+				this.ok = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.ok.setLayoutData(okLData);
+				this.ok.setText("OK");
+				this.ok.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.finest("ok.widgetSelected, event="+evt);
-						dialogShell.dispose();
+						AboutDialog.this.dialogShell.dispose();
 					}
 				});
 			}
@@ -127,17 +127,17 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.left =  new FormAttachment(0, 1000, 20);
 				aboutTextLData.top =  new FormAttachment(0, 1000, 21);
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
-				aboutText = new Text(dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
-				aboutText.setLayoutData(aboutTextLData);
-				aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false));
-				aboutText.setText("Open Serial Data Explorer");
-				aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
+				this.aboutText = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+				this.aboutText.setLayoutData(aboutTextLData);
+				this.aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false));
+				this.aboutText.setText("Open Serial Data Explorer");
+				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
 			}
-			dialogShell.setLocation(getParent().toDisplay(100, 100));
-			dialogShell.open();
-			Display display = dialogShell.getDisplay();
-			while (!dialogShell.isDisposed()) {
+			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+			this.dialogShell.open();
+			Display display = this.dialogShell.getDisplay();
+			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch())
 					display.sleep();
 			}

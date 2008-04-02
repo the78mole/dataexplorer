@@ -30,23 +30,22 @@ import java.util.logging.Logger;
  */
 public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;
-	private Logger				log								= Logger.getLogger(this.getClass().getName());
+	static final Logger		log								= Logger.getLogger(GraphicsTemplate.class.getName());
 	private final String	fileSep						= System.getProperty("file.separator");
 
 	private boolean				isAvailable				= false;
 	private boolean				isSaved						= false;																				// indicates if template is saved to file
 	private String				defaultFileName;
-	private String				newFileName;
+	private String				selectedFileName;
 	private String				currentFileFilePath;
 	private String				templatePath;
 	private String				templateFilePath;
 
 	/**
 	 * constructor using the application home path and the device signature as initialization parameter
-	 * @param applHomePath - full qualified application home path
 	 * @param deviceSignature - device signature as String (Picolario_K1)
 	 */
-	public GraphicsTemplate(String applHomePath, String deviceSignature) {
+	public GraphicsTemplate(String deviceSignature) {
 		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
@@ -57,14 +56,14 @@ public class GraphicsTemplate extends Properties {
 	 * @return the isAvailable
 	 */
 	public boolean isAvailable() {
-		return isAvailable;
+		return this.isAvailable;
 	}
 
 	/**
 	 * @return the isSaved
 	 */
 	public boolean isSaved() {
-		return isSaved;
+		return this.isSaved;
 	}
 
 	/**
@@ -72,11 +71,11 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			currentFileFilePath = this.templatePath + fileSep + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
-			log.fine("opening template file " + currentFileFilePath);
-			this.loadFromXML(new FileInputStream(new File(currentFileFilePath)));
-			isAvailable = true;
-			log.fine("template file successful loaded " + currentFileFilePath);
+			this.currentFileFilePath = this.templatePath + this.fileSep + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			log.fine("opening template file " + this.currentFileFilePath);
+			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
+			this.isAvailable = true;
+			log.fine("template file successful loaded " + this.currentFileFilePath);
 		}
 		catch (InvalidPropertiesFormatException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -97,10 +96,10 @@ public class GraphicsTemplate extends Properties {
 				tmpPath.mkdir();
 			}
 
-			currentFileFilePath = this.templatePath + fileSep + ((this.newFileName == null) ? this.defaultFileName : this.newFileName);
-			this.storeToXML(new FileOutputStream(new File(currentFileFilePath)), "-- OpenSerialDataExplorer GraphicsTemplate --");
-			isSaved = true;
-			newFileName = null;
+			this.currentFileFilePath = this.templatePath + this.fileSep + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- OpenSerialDataExplorer GraphicsTemplate --");
+			this.isSaved = true;
+			this.selectedFileName = null;
 		}
 		catch (InvalidPropertiesFormatException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -111,31 +110,31 @@ public class GraphicsTemplate extends Properties {
 	}
 
 	/**
-	 * @param isSaved the isSaved to set
+	 * @param newValue the isSaved to set
 	 */
-	public void setSaved(boolean isSaved) {
-		this.isSaved = isSaved;
+	public void setSaved(boolean newValue) {
+		this.isSaved = newValue;
 	}
 
 	/**
 	 * @return the newFileName
 	 */
 	public String getNewFileName() {
-		return newFileName;
+		return this.selectedFileName;
 	}
 
 	/**
 	 * @param newFileName the newFileName to set
 	 */
 	public void setNewFileName(String newFileName) {
-		this.newFileName = newFileName;
+		this.selectedFileName = newFileName;
 	}
 
 	/**
 	 * @return the usedFileName
 	 */
 	public String getCurrentFilePath() {
-		return currentFileFilePath;
+		return this.currentFileFilePath;
 	}
 
 }

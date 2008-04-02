@@ -72,8 +72,8 @@ public class DesktopType {
      * 
      */
     public List<PropertyType> getProperty() {
-        if (property == null) {
-            property = new ArrayList<PropertyType>();
+        if (this.property == null) {
+        	this.property = new ArrayList<PropertyType>();
         }
         return this.property;
     }

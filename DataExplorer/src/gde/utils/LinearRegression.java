@@ -31,32 +31,34 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class LinearRegression extends CalculationThread {
-	private Logger	log	= Logger.getLogger(RecordSet.class.getName());
+	final static Logger	logLin	= Logger.getLogger(LinearRegression.class.getName());
 
 	/**
 	 * constructor where calculation required parameters are given as parameter
-	 * @param recordSet
-	 * @param sourceRecordKey
-	 * @param targetRecordKey
+	 * @param currentRecordSet
+	 * @param inRecordKey
+	 * @param outRecordKey
+	 * @param calcIntervalSec
 	 */
-	public LinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
-		super(recordSet, sourceRecordKey, targetRecordKey, calcInterval_sec);
+	public LinearRegression(RecordSet currentRecordSet, String inRecordKey, String outRecordKey, int calcIntervalSec) {
+		super(currentRecordSet, inRecordKey, outRecordKey, calcIntervalSec);
 	}
 
 	/**
 	 * method which do the slope calculation on base of linear regression
 	 */
+	@Override
 	public void run() {
-		if (recordSet == null || sourceRecordKey == null || targetRecordKey == null) {
-			log.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
+		if (this.recordSet == null || this.sourceRecordKey == null || this.targetRecordKey == null) {
+			LinearRegression.logLin.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
 			return;
 		}
-		log.fine("start data calculation for record = " + targetRecordKey);
+		LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey);
 
-		Record record = recordSet.get(targetRecordKey);
-		Record recordHeight = recordSet.get(sourceRecordKey);
-		int time_ms = recordSet.getTimeStep_ms();
-		int pointsPerInterval = calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
+		Record record = this.recordSet.get(this.targetRecordKey);
+		Record recordHeight = this.recordSet.get(this.sourceRecordKey);
+		int time_ms = this.recordSet.getTimeStep_ms();
+		int pointsPerInterval = this.calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
 		int pointInterval = 2;
 
 		int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
@@ -74,10 +76,10 @@ public class LinearRegression extends CalculationThread {
 			ssXX = ssXX + (((0.05 * i) - avgX) * ((0.05 * i) - avgX));
 		}
 		ssXX = ssXX / pointsPerInterval;
-		if (log.isLoggable(Level.FINEST)) log.finest("avgX = " + avgX + " ssXX = " + ssXX);
+		if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("avgX = " + avgX + " ssXX = " + ssXX);
 
 		--modCounter;
-		while (modCounter > 0 && !threadStop) {
+		while (modCounter > 0 && !this.threadStop) {
 			// calculate avg y
 			double avgY = 0.0;
 			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
@@ -107,20 +109,20 @@ public class LinearRegression extends CalculationThread {
 			}
 			counter = counter + pointInterval;
 
-			if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
+			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
 			--modCounter;
 		}
 		// fill the rest of the curve to make equal lenght
 		for (int i = counter - pointInterval; i < recordHeight.size(); i++) {
 			record.add(0);
 		}
-		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
+		if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
-		if (record.isVisible()) application.updateGraphicsWindow();
-		
+		if (record.isVisible()) this.application.updateGraphicsWindow();
+
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-		log.fine("finished data calculation for record = " + targetRecordKey);
+		LinearRegression.logLin.fine("finished data calculation for record = " + this.targetRecordKey);
 	}
 
 }

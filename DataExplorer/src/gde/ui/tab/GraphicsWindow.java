@@ -67,7 +67,7 @@ import osde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class GraphicsWindow {
-	private Logger												log											= Logger.getLogger(this.getClass().getName());
+	final static Logger	log	= Logger.getLogger(GraphicsWindow.class.getName());
 
 	public static final int								TYPE_NORMAL							= 0;
 	public static final int								TYPE_COMPARE						= 1;
@@ -80,98 +80,98 @@ public class GraphicsWindow {
 	public final static int								MODE_PAN								= 4;
 	
 
-	private final TabFolder								displayTab;
-	private SashForm											graphicSashForm;
+	final TabFolder								displayTab;
+	SashForm											graphicSashForm;
 	// Curve Selector Table with popup menu
-	private Composite											curveSelector;
-	private CLabel												curveSelectorHeader;
-	private Table													curveSelectorTable;
-	private TableColumn										tableSelectorColumn;
-	private TabItem												graphic;
-	private Menu													popupmenu;
-	private CurveSelectorContextMenu			contextMenu;
+	Composite											curveSelector;
+	CLabel												curveSelectorHeader;
+	Table													curveSelectorTable;
+	TableColumn										tableSelectorColumn;
+	TabItem												graphic;
+	Menu													popupmenu;
+	CurveSelectorContextMenu			contextMenu;
 	
 	// drawing canvas
-	private Canvas												graphicCanvas;
+	Canvas												graphicCanvas;
 
-	private final OpenSerialDataExplorer	application;
-	private final Channels								channels;
-	private final String									name;
-	private final TimeLine								timeLine								= new TimeLine();
-	private final int											type;
-	private boolean												isCurveSelectorEnabled	= true;
-	private int 													selectorHeaderWidth;
-	private int 													selectorColumnWidth;
-	private int[] 												sashformWeights 				= new int[] {100,1000};
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
+	final String									name;
+	final TimeLine								timeLine								= new TimeLine();
+	final int											type;
+	boolean												isCurveSelectorEnabled	= true;
+	int 													selectorHeaderWidth;
+	int 													selectorColumnWidth;
+	int[] 												sashformWeights 				= new int[] {100,1000};
 	
-	private int														xDown = 0;
-	private int														xUp = 0;
-	private int														xLast = 0;
-	private int														yDown = 0;
-	private int														yUp = 0;
-	private int														yLast = 0;
-	private int														offSetX, offSetY;
-	private Image 												curveArea;
-	private GC 														curveAreaGC;
-	private Rectangle											curveAreaBounds;
-	private GC 														canvasGC;
+	int														xDown = 0;
+	int														xUp = 0;
+	int														xLast = 0;
+	int														yDown = 0;
+	int														yUp = 0;
+	int														yLast = 0;
+	int														offSetX, offSetY;
+	Image 												curveArea;
+	GC 														curveAreaGC;
+	Rectangle											curveAreaBounds;
+	GC 														canvasGC;
 	
-	private boolean												isLeftMouseMeasure = false;
-	private boolean												isRightMouseMeasure = false;
-	private int 													xPosMeasure = 0, yPosMeasure = 0;
-	private int														xPosDelta = 0, yPosDelta = 0;
+	boolean												isLeftMouseMeasure = false;
+	boolean												isRightMouseMeasure = false;
+	int 													xPosMeasure = 0, yPosMeasure = 0;
+	int														xPosDelta = 0, yPosDelta = 0;
 
-	private boolean												isZoomMouse = false;
+	boolean												isZoomMouse = false;
 	
-	private boolean												isPanMouse = false;
-	private int														xDeltaPan = 0;
-	private int														yDeltaPan = 0;
+	boolean												isPanMouse = false;
+	int														xDeltaPan = 0;
+	int														yDeltaPan = 0;
 
-	public GraphicsWindow(TabFolder displayTab, int type, String name) {
-		this.displayTab = displayTab;
-		this.type = type;
-		this.name = name;
+	public GraphicsWindow(TabFolder currentDisplayTab, int currentType, String useName) {
+		this.displayTab = currentDisplayTab;
+		this.type = currentType;
+		this.name = useName;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		graphic = new TabItem(displayTab, SWT.NONE);
-		graphic.setText(name);
-		SWTResourceManager.registerResourceUser(graphic);
+		this.graphic = new TabItem(this.displayTab, SWT.NONE);
+		this.graphic.setText(this.name);
+		SWTResourceManager.registerResourceUser(this.graphic);
 		
 		{ // graphicSashForm
-			graphicSashForm = new SashForm(displayTab, SWT.HORIZONTAL);
-			graphic.setControl(graphicSashForm);
+			this.graphicSashForm = new SashForm(this.displayTab, SWT.HORIZONTAL);
+			this.graphic.setControl(this.graphicSashForm);
 			{ // curveSelector
-				curveSelector = new Composite(graphicSashForm, SWT.BORDER);
+				this.curveSelector = new Composite(this.graphicSashForm, SWT.BORDER);
 				FormLayout curveSelectorLayout = new FormLayout();
-				curveSelector.setLayout(curveSelectorLayout);
+				this.curveSelector.setLayout(curveSelectorLayout);
 				GridData curveSelectorLData = new GridData();
-				curveSelector.setLayoutData(curveSelectorLData);
-				curveSelector.addHelpListener(new HelpListener() {
+				this.curveSelector.setLayoutData(curveSelectorLData);
+				this.curveSelector.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.finer("curveSelector.helpRequested");
-						application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_41.html");
+						log.finer("curveSelector.helpRequested " + evt);
+						GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_41.html");
 					}
 				});
 				{
-					curveSelectorHeader = new CLabel(curveSelector, SWT.NONE);
-					curveSelectorHeader.setText("Kurvenselektor");
-					curveSelectorHeader.pack();
-					selectorHeaderWidth = curveSelectorHeader.getSize().x + 10;
+					this.curveSelectorHeader = new CLabel(this.curveSelector, SWT.NONE);
+					this.curveSelectorHeader.setText("Kurvenselektor");
+					this.curveSelectorHeader.pack();
+					this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x + 10;
 					//curveSelectorHeader.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					FormData curveSelectorHeaderLData = new FormData();
-					curveSelectorHeaderLData.width = selectorHeaderWidth;
+					curveSelectorHeaderLData.width = this.selectorHeaderWidth;
 					curveSelectorHeaderLData.height = 24;
 					curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 0);
 					curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 3);
-					curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
-					curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
+					this.curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					curveSelectorTable = new Table(curveSelector, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
-					curveSelectorTable.setLinesVisible(true);
+					this.curveSelectorTable = new Table(this.curveSelector, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
+					this.curveSelectorTable.setLinesVisible(true);
 					FormData curveTableLData = new FormData();
 					curveTableLData.width = 82;
 					curveTableLData.height = 457;
@@ -179,14 +179,14 @@ public class GraphicsWindow {
 					curveTableLData.top = new FormAttachment(0, 1000, 37);
 					curveTableLData.bottom = new FormAttachment(1000, 1000, 0);
 					curveTableLData.right = new FormAttachment(1000, 1000, 0);
-					curveSelectorTable.setLayoutData(curveTableLData);
+					this.curveSelectorTable.setLayoutData(curveTableLData);
 
-					popupmenu = new Menu(application.getShell(), SWT.POP_UP);
-					curveSelectorTable.setMenu(popupmenu);
-					curveSelectorTable.layout();
-					contextMenu = new CurveSelectorContextMenu();
-					contextMenu.createMenu(popupmenu);
-					curveSelectorTable.addPaintListener(new PaintListener() {
+					this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+					this.curveSelectorTable.setMenu(this.popupmenu);
+					this.curveSelectorTable.layout();
+					this.contextMenu = new CurveSelectorContextMenu();
+					this.contextMenu.createMenu(this.popupmenu);
+					this.curveSelectorTable.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finest("curveTable.paintControl, event=" + evt);
 							//int selectorColumnWidth = graphicSashForm.getSize().x / 10;
@@ -194,311 +194,100 @@ public class GraphicsWindow {
 							//tableSelectorColumn.setWidth(selectorColumnWidth);
 						}
 					});
-					curveSelectorTable.addSelectionListener(new SelectionAdapter() {
+					this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("curveTable.widgetSelected, event=" + evt);
 							TableItem item = (TableItem) evt.item;
 							String recordName = ((TableItem) evt.item).getText();
 							log.fine("selected = " + recordName);
-							popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
-							popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
+							GraphicsWindow.this.popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
+							GraphicsWindow.this.popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
 							if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
 								Record activeRecord;
-								switch (type) {
+								switch (GraphicsWindow.this.type) {
 								case TYPE_COMPARE:
-									activeRecord = application.getCompareSet().getRecord(recordName);
+									activeRecord = GraphicsWindow.this.application.getCompareSet().getRecord(recordName);
 									break;
 
 								default:
-									activeRecord = channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
+									activeRecord = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
 									break;
 								}
 								if (item.getChecked()) {
 									activeRecord.setVisible(true);
-									popupmenu.getItem(0).setSelection(true);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
-									item.setData(WINDOW_TYPE, type);
-									graphicCanvas.redraw();
-									application.updateDigitalWindow();
-									application.updateAnalogWindow();
-									application.updateCellVoltageWindow();
-									application.updateFileCommentWindow();
-									application.updateRecordCommentWindow();
+									GraphicsWindow.this.popupmenu.getItem(0).setSelection(true);
+									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+									item.setData(WINDOW_TYPE, GraphicsWindow.this.type);
+									GraphicsWindow.this.graphicCanvas.redraw();
+									GraphicsWindow.this.application.updateDigitalWindow();
+									GraphicsWindow.this.application.updateAnalogWindow();
+									GraphicsWindow.this.application.updateCellVoltageWindow();
+									GraphicsWindow.this.application.updateFileCommentWindow();
+									GraphicsWindow.this.application.updateRecordCommentWindow();
 								}
 								else {
 									activeRecord.setVisible(false);
-									popupmenu.getItem(0).setSelection(false);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-									item.setData(WINDOW_TYPE, type);
-									graphicCanvas.redraw();
-									application.updateDigitalWindow();
-									application.updateAnalogWindow();
-									application.updateCellVoltageWindow();
-									application.updateFileCommentWindow();
-									application.updateRecordCommentWindow();
+									GraphicsWindow.this.popupmenu.getItem(0).setSelection(false);
+									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+									item.setData(WINDOW_TYPE, GraphicsWindow.this.type);
+									GraphicsWindow.this.graphicCanvas.redraw();
+									GraphicsWindow.this.application.updateDigitalWindow();
+									GraphicsWindow.this.application.updateAnalogWindow();
+									GraphicsWindow.this.application.updateCellVoltageWindow();
+									GraphicsWindow.this.application.updateFileCommentWindow();
+									GraphicsWindow.this.application.updateRecordCommentWindow();
 								}
 							}
 						}
 					});
 					{
-						tableSelectorColumn = new TableColumn(curveSelectorTable, SWT.LEFT);
-						tableSelectorColumn.setWidth(selectorColumnWidth);
+						this.tableSelectorColumn = new TableColumn(this.curveSelectorTable, SWT.LEFT);
+						this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
 					}
 				}
 			} // curveSelector
 			{ // graphicCanvas
-				graphicCanvas = new Canvas(graphicSashForm, SWT.NONE);
+				this.graphicCanvas = new Canvas(this.graphicSashForm, SWT.NONE);
 				FillLayout graphicCanvasLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				graphicCanvas.setLayout(graphicCanvasLayout);
-				graphicCanvas.addHelpListener(new HelpListener() {
+				this.graphicCanvas.setLayout(graphicCanvasLayout);
+				this.graphicCanvas.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.finer("graphicCanvas.helpRequested");
-						if(type == GraphicsWindow.TYPE_NORMAL)
-							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_4.html");
+						log.finer("graphicCanvas.helpRequested " + evt);
+						if(GraphicsWindow.this.type == GraphicsWindow.TYPE_NORMAL)
+							GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_4.html");
 						else
-							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_9.html");
+							GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_9.html");
 					}
 				});
-				graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
+				this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 					public void mouseMove(MouseEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseMove = " + evt);
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : application.getCompareSet();
-							if (recordSet != null && curveArea != null) {
-								String configKey = recordSet.getChannelName();
-								Point point = checkCurveBounds(evt.x, evt.y);
-								evt.x = point.x;
-								evt.y = point.y;
-
-								String measureRecordKey = recordSet.getRecordKeyMeasurement();
-								canvasGC.setLineWidth(1);
-								canvasGC.setLineStyle(SWT.LINE_DASH);
-
-								if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-									try {
-										if (isZoomMouse && recordSet.isZoomMode()) {
-											if (log.isLoggable(Level.FINER)) log.finer(String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", xDown, evt.x, xLast, yDown, evt.y, yLast));
-
-											//clean obsolete rectangle
-											int left = xLast - xDown > 0 ? xDown : xLast;
-											int top = yLast - yDown > 0 ? yDown : yLast;
-											int width = xLast - xDown > 0 ? xLast - xDown : xDown - xLast;
-											int height = yLast - yDown > 0 ? yLast - yDown : yDown - yLast;
-											if (log.isLoggable(Level.FINER)) log.finer("clean left = " + left + " top = " + top + " width = " + width + " height = " + height);
-											eraseHorizontalLine(top, left, width + 1, 1);
-											eraseVerticalLine(left, top, height + 1, 1);
-											eraseHorizontalLine(top + height, left + 1, width, 1);
-											eraseVerticalLine(left + width, top + 1, height, 1);
-
-											left = evt.x - xDown > 0 ? xDown + offSetX : evt.x + offSetX;
-											top = evt.y - yDown > 0 ? yDown + offSetY : evt.y + offSetY;
-											width = evt.x - xDown > 0 ? evt.x - xDown : xDown - evt.x;
-											height = evt.y - yDown > 0 ? evt.y - yDown : yDown - evt.y;
-											if (log.isLoggable(Level.FINER)) log.finer("draw  left = " + (left - offSetX) + " top = " + (top - offSetY) + " width = " + width + " height = " + height);
-											canvasGC.drawRectangle(left, top, width, height);
-
-											/* detect directions to enable same behavior as LogView
-											if (xDown < evt.x && yDown < evt.y) { //top left -> bottom right
-											}
-											else if (xDown < evt.x && yDown > evt.y) { // bottom left -> top right
-											}
-											if (xDown > evt.x && yDown < evt.y) { //top right -> left bottom
-											}
-											if (xDown > evt.x && yDown > evt.y) { // bottom left -> top right
-											}
-											*/
-											xLast = evt.x;
-											yLast = evt.y;
-										}
-										else if (isLeftMouseMeasure) {
-											Record record = recordSet.getRecord(measureRecordKey);
-											// clear old measure lines
-											eraseVerticalLine(xPosMeasure, 0, curveAreaBounds.height, 1);
-											//no change don't needs to be calculated, but the calculation limits to bounds
-											yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-											eraseHorizontalLine(yPosMeasure, 0, curveAreaBounds.width, 1);
-
-											if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-												// clear old delta measure lines
-												eraseVerticalLine(xPosDelta, 0, curveAreaBounds.height, 1);
-												//no change don't needs to be calculated, but the calculation limits to bounds
-												yPosDelta = record.getDisplayPointDataValue(xPosDelta, curveAreaBounds);
-												eraseHorizontalLine(yPosDelta, 0, curveAreaBounds.width, 1);
-
-												canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-												drawVerticalLine(xPosDelta, 0, curveAreaBounds.height);
-												drawHorizontalLine(yPosDelta, 0, curveAreaBounds.width);
-												canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-											}
-											// all obsolete lines are cleaned up now draw new position marker
-											xPosMeasure = evt.x; // evt.x is already relative to curve area
-											drawVerticalLine(xPosMeasure, 0, curveAreaBounds.height);
-											yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-											drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
-											if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-												StringBuilder sb = new StringBuilder();
-												sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ")
-														.append(record.getUnit());
-												sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(record.getUnit()).append(
-														"/sec");
-												application.setStatusMessage(sb.toString());
-											}
-											else {
-												application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " " + record.getUnit() + " - ("
-														+ recordSet.getDisplayPointTime(xPosMeasure) + ") ");
-											}
-										}
-										else if (isRightMouseMeasure) {
-											Record record = recordSet.getRecord(measureRecordKey);
-											// clear old delta measure lines
-											eraseVerticalLine(xPosDelta, 0, curveAreaBounds.height, 1);
-											//no change don't needs to be calculated, but the calculation limits to bounds
-											yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-											eraseHorizontalLine(yPosDelta, 0, curveAreaBounds.width, 1);
-
-											// clear old measure lines
-											eraseVerticalLine(xPosMeasure, 0, curveAreaBounds.height, 1);
-											//no change don't needs to be calculated, but the calculation limits to bounds
-											yPosDelta = record.getDisplayPointDataValue(xPosDelta, curveAreaBounds);
-											eraseHorizontalLine(yPosMeasure, 0, curveAreaBounds.width, 1);
-
-											// always needs to draw measurement pointer
-											drawVerticalLine(xPosMeasure, 0, curveAreaBounds.height);
-											//no change don't needs to be calculated yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-											drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
-
-											// update the new delta position
-											xPosDelta = evt.x; // evt.x is already relative to curve area
-											canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-											drawVerticalLine(xPosDelta, 0, curveAreaBounds.height);
-											yPosDelta = record.getDisplayPointDataValue(xPosDelta, curveAreaBounds);
-											drawHorizontalLine(yPosDelta, 0, curveAreaBounds.width);
-											canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-
-											StringBuilder sb = new StringBuilder();
-											sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(
-													record.getDevice().getMeasurementUnit(configKey, measureRecordKey));
-											sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(
-													record.getDevice().getMeasurementUnit(configKey, measureRecordKey)).append("/sec");
-											application.setStatusMessage(sb.toString());
-										}
-										else if (isPanMouse) {
-											xDeltaPan = (xLast != 0 && xLast != evt.x) ? (xDeltaPan + (xLast < evt.x ? -1 : 1)) : 0;
-											yDeltaPan = (yLast != 0 && yLast != evt.y) ? (yDeltaPan + (yLast < evt.y ? 1 : -1)) : 0;
-											if (log.isLoggable(Level.FINER)) log.finer(" xDeltaPan = " + xDeltaPan + " yDeltaPan = " + yDeltaPan);
-											if ((xDeltaPan != 0 && xDeltaPan % 5 == 0) || (yDeltaPan != 0 && yDeltaPan % 5 == 0)) {
-												recordSet.shift(xDeltaPan, yDeltaPan); // 10% each direction
-												graphicCanvas.redraw();
-												xDeltaPan = yDeltaPan = 0;
-											}
-											xLast = evt.x;
-											yLast = evt.y;
-										}
-									}
-									catch (RuntimeException e) {
-										log.log(Level.WARNING, "mouse pointer out of range", e);
-									}
-								}
-								else if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey))) {
-									if (xPosMeasure + 1 >= evt.x && xPosMeasure - 1 <= evt.x || xPosDelta + 1 >= evt.x && xPosDelta - 1 <= evt.x) { // snap mouse pointer
-										graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif"));
-									}
-									else {
-										graphicCanvas.setCursor(application.getCursor());
-									}
-								}
-								else if (isZoomMouse && !isPanMouse) {
-									graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
-								}
-								else if (isPanMouse) {
-									graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/Hand.gif"));
-								}
-								else {
-									graphicCanvas.setCursor(application.getCursor());
-								}
-							}
-						}
+						mouseMoveAction(evt);
 					}
 				});
-				graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
+				this.graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseExit(MouseEvent evt) {
 						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseExit, event="+evt);
-						graphicCanvas.setCursor(application.getCursor());
+						GraphicsWindow.this.graphicCanvas.setCursor(GraphicsWindow.this.application.getCursor());
 					}
 				});
-				graphicCanvas.addMouseListener(new MouseAdapter() {
+				this.graphicCanvas.addMouseListener(new MouseAdapter() {
 					public void mouseDown(MouseEvent evt) {
 						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseDown, event="+evt);
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : application.getCompareSet();
-							if (curveArea != null && recordSet != null) {
-								String measureRecordKey = recordSet.getRecordKeyMeasurement();
-								Point point = checkCurveBounds(evt.x, evt.y);
-								xDown = point.x;
-								yDown = point.y;
-
-								if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey)) && xPosMeasure + 1 >= xDown
-										&& xPosMeasure - 1 <= xDown) { // snap mouse pointer
-									isLeftMouseMeasure = true;
-									isRightMouseMeasure = false;
-								}
-								else if (measureRecordKey != null && recordSet.isDeltaMeasurementMode(measureRecordKey) && xPosDelta + 1 >= xDown && xPosDelta - 1 <= xDown) { // snap mouse pointer
-									isRightMouseMeasure = true;
-									isLeftMouseMeasure = false;
-								}
-								else {
-									isLeftMouseMeasure = false;
-									isRightMouseMeasure = false;
-								}
-								if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + isLeftMouseMeasure + " isMouseDeltaMeasure = " + isRightMouseMeasure);
-							}
-						}
+						mouseDownAction(evt);
 					}
 					public void mouseUp(MouseEvent evt) {
 						if(log.isLoggable(Level.FINEST)) log.finest("graphicCanvas.mouseUp, event="+evt);
-						Channel activeChannel = Channels.getInstance().getActiveChannel();
-						if (activeChannel != null) {
-							RecordSet recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-							if (curveArea != null && recordSet != null) {
-								Point point = checkCurveBounds(evt.x, evt.y);
-								xUp = point.x;
-								yUp = point.y;
-
-								if (isZoomMouse) {
-									// sort the zoom values
-									int xStart = xDown < xUp ? xDown : xUp;
-									int xEnd = xDown > xUp ? xDown + 1 : xUp + 1;
-									int yMin = curveAreaBounds.height - 1 - (yDown > yUp ? yDown : yUp);
-									int yMax = curveAreaBounds.height - (yDown < yUp ? yDown : yUp);
-									if (log.isLoggable(Level.FINER)) log.finer("zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax);
-									if (xEnd - xStart > 5 && yMax - yMin > 5) {
-										recordSet.setZoomOffsetAndWidth(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-										graphicCanvas.redraw();
-									}
-								}
-								else if (isLeftMouseMeasure) {
-									isLeftMouseMeasure = false;
-									//application.setStatusMessage("");
-								}
-								else if (isRightMouseMeasure) {
-									isRightMouseMeasure = false;
-									//application.setStatusMessage("");
-								}
-								if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + isLeftMouseMeasure + " isMouseDeltaMeasure = " + isRightMouseMeasure);
-							}
-						}
+						mouseUpAction(evt);
 					}
 				});
-				graphicCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-				graphicCanvas.addPaintListener(new PaintListener() {
+				this.graphicCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+				this.graphicCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						drawAreaPaintControl(evt);
 					}
 				});
 			} // graphicCanvas
-			//graphicSashForm.setWeights(new int[] { 10, 100 }); // 10:100  -> 9 == width required for curveSelectorTable
 		} // graphicSashForm
 	}
 
@@ -506,11 +295,11 @@ public class GraphicsWindow {
 	 * this method is called in case of an paint event (redraw) and draw the containing records 
 	 * @param evt
 	 */
-	private void drawAreaPaintControl(PaintEvent evt) {
+	void drawAreaPaintControl(PaintEvent evt) {
 		log.finest("drawAreaPaintControl.paintControl, event=" + evt);
 		// Get the canvas and its dimensions
 		Canvas canvas = (Canvas) evt.widget;
-		canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + type);
+		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + this.type);
 
 		Point canvasSize = canvas.getSize();
 		int maxX = canvasSize.x - 5; // enable a small gap if no axis is shown 
@@ -518,16 +307,16 @@ public class GraphicsWindow {
 		log.fine("canvas size = " + maxX + " x " + maxY);
 
 		RecordSet recordSet = null;
-		switch (type) {
+		switch (this.type) {
 		case TYPE_COMPARE:
-			if (application.getCompareSet() != null && application.getCompareSet().size() > 0) {
-				recordSet = application.getCompareSet();
+			if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
+				recordSet = this.application.getCompareSet();
 			}
 			break;
 
 		default: // TYPE_NORMAL
-			if (channels.getActiveChannel() != null && channels.getActiveChannel().getActiveRecordSet() != null) {
-				recordSet = channels.getActiveChannel().getActiveRecordSet();
+			if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
+				recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			}
 			break;
 		}
@@ -547,7 +336,7 @@ public class GraphicsWindow {
 	 * @param maxY
 	 */
 	private void drawCurves(RecordSet recordSet, int maxX, int maxY) {
-		int[] timeScale = timeLine.getScaleMaxTimeNumber(recordSet);
+		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
 		int maxTimeNumber = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
@@ -555,8 +344,7 @@ public class GraphicsWindow {
 		//prepare measurement scales
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		String[] recordNames = recordSet.getRecordNames();
-		for (String string : recordNames) {
+		for (String string : recordSet.getRecordNames()) {
 			if (recordSet.getRecord(string).isVisible() && recordSet.getRecord(string).isDisplayable()) {
 				if (recordSet.getRecord(string).isPositionLeft())
 					numberCurvesLeft++;
@@ -579,20 +367,20 @@ public class GraphicsWindow {
 		int startTime, endTime;
 		// Calculate the horizontal area to used for plotting graphs
 		int maxTime = maxTimeNumber; // alle 10 min/sec eine Markierung
-		Point pt = canvasGC.textExtent("000,00");
+		Point pt = this.canvasGC.textExtent("000,00");
 		dataScaleWidth = pt.x + pt.y * 2 + 5;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
-		x0 = (int) maxX - (maxX - spaceLeft) + 5;
-		int xMax = (int) maxX - spaceRight;
+		x0 = maxX - (maxX - spaceLeft) + 5;
+		int xMax = maxX - spaceRight;
 		int fitTimeWidth = (xMax - x0) - ((xMax - x0) % 10); // make time line modulo 10 to enable every 10 min/sec a tick mark
 		width = fitTimeWidth;
 		xMax = x0 + width;
 		int verticalSpace = 3 * pt.y;// space used for text and scales with description or legend
 		int spaceTop = 20;
 		int spaceBot = verticalSpace;
-		y0 = (int) maxY - spaceBot;
-		int yMax = (int) maxY - (maxY - spaceTop);
+		y0 = maxY - spaceBot;
+		int yMax = maxY - (maxY - spaceTop);
 		height = (y0 - yMax) - (y0 - yMax) % 10;
 		yMax = y0 - height;
 		if (log.isLoggable(Level.FINE)) log.fine("draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth);
@@ -601,36 +389,36 @@ public class GraphicsWindow {
 		if (log.isLoggable(Level.FINE)) log.fine("curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height);
 		startTime = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTime = startTime + maxTime;
-		timeLine.drawTimeLine(recordSet, canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
-		curveArea = SWTResourceManager.getImage(width, height);
-		curveAreaGC = SWTResourceManager.getGC(curveArea);
-		curveAreaBounds = curveArea.getBounds();
+		this.curveArea = SWTResourceManager.getImage(width, height);
+		this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
+		this.curveAreaBounds = this.curveArea.getBounds();
 		
 		// clear the image
-		curveAreaGC.setBackground(canvasGC.getBackground());
-		curveAreaGC.fillRectangle(curveArea.getBounds());
+		this.curveAreaGC.setBackground(this.canvasGC.getBackground());
+		this.curveAreaGC.fillRectangle(this.curveArea.getBounds());
 		
 		// draw draw area bounding 
-		curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-		curveAreaGC.drawLine(0, 0, width, 0);
-		curveAreaGC.drawLine(0, 0, 0, height-1);
-		curveAreaGC.drawLine(width-1, 0, width-1, height-1);
+		this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+		this.curveAreaGC.drawLine(0, 0, width, 0);
+		this.curveAreaGC.drawLine(0, 0, 0, height-1);
+		this.curveAreaGC.drawLine(width-1, 0, width-1, height-1);
 
 		// prepare grid lines
-		offSetX = x0;
-		offSetY = y0-height;
+		this.offSetX = x0;
+		this.offSetY = y0-height;
 		int[] dash = {10, 10};
 		
 		// check for activated time grid
 		if (recordSet.getTimeGridType() > 0) 
-			drawTimeGrid(recordSet, curveAreaGC, offSetX , height, dash);
+			drawTimeGrid(recordSet, this.curveAreaGC, this.offSetX , height, dash);
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
 		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
-		String[] recordSetNames = recordSet.getRecordNames();
+		String[] recordSetNames = recordSet.getRecordNames().clone();
 		// sort the record set names to get the one which makes the grid lines drawn first
 		for (int i = 0; i < recordSetNames.length; i++) {
 			if (recordSetNames[i].equals(curveGridRecordName)) {
@@ -646,24 +434,24 @@ public class GraphicsWindow {
 			log.fine("drawing record = " + actualRecord.getName() + "-" + actualRecord.isVisible() +  "-" + actualRecord.isDisplayable());
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (isActualRecordEnabled)
-				CurveUtils.drawScale(actualRecord, canvasGC, x0, y0, width, height, dataScaleWidth);
+				CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);
 			
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
-				drawCurveGrid(recordSet, curveAreaGC, offSetY, width, dash);
+				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, dash);
 			
 			if (isActualRecordEnabled)
-				CurveUtils.drawCurve(actualRecord, curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
 		}
 		
 		
-		canvasGC.drawImage(curveArea, offSetX, offSetY);
+		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
 		
 
 		if (startTime != 0) { // scaled window 
 			String strStartTime = "Ausschnittsbeginn bei " + TimeLine.getFomatedTime(recordSet.getStartTime());
-			Point point = canvasGC.textExtent(strStartTime);
+			Point point = this.canvasGC.textExtent(strStartTime);
 			int yPosition = (int)(y0 + pt.y * 2.5);
-			canvasGC.drawText(strStartTime, 10, yPosition - point.y/2);
+			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y/2);
 		}
 	}
 
@@ -671,10 +459,11 @@ public class GraphicsWindow {
 	 * draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale 
 	 * @param recordSet
 	 * @param gc the graphics context to be used
+	 * @param useOffsetY the offset in vertical direction
 	 * @param width
 	 * @param dash to be used for the custom line style
 	 */
-	private void drawCurveGrid(RecordSet recordSet, GC gc, int offSetY, int width, int[] dash) {
+	private void drawCurveGrid(RecordSet recordSet, GC gc, int useOffSetY, int width, int[] dash) {
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
@@ -682,7 +471,7 @@ public class GraphicsWindow {
 		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
 		for (int i = 0; i<horizontalGridVector.size() - 1; i+=recordSet.getHorizontalGridType()) {
 			int y = horizontalGridVector.get(i);
-			gc.drawLine(0, y-offSetY, width - 1, y-offSetY);
+			gc.drawLine(0, y-useOffSetY, width - 1, y-useOffSetY);
 		}
 	}
 
@@ -693,12 +482,12 @@ public class GraphicsWindow {
 	 * @param height
 	 * @param dash to be used for the custom line style
 	 */
-	public void drawTimeGrid(RecordSet recordSet, GC gc, int offSetX, int height, int[] dash) {
+	public void drawTimeGrid(RecordSet recordSet, GC gc, int useOffSetX, int height, int[] dash) {
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getColorTimeGrid());
 		for (Integer x : recordSet.getTimeGrid()) {
-			gc.drawLine(x-offSetX, 0, x-offSetX, height-1);
+			gc.drawLine(x-useOffSetX, 0, x-useOffSetX, height-1);
 		}
 	}
 
@@ -706,15 +495,15 @@ public class GraphicsWindow {
 	 * redraws the graphics canvas as well as the curve selector table
 	 */
 	public void redrawGraphics() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			updateCurveSelectorTable();
-			graphicCanvas.redraw();
+			this.graphicCanvas.redraw();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					updateCurveSelectorTable();
-					graphicCanvas.redraw();
+					GraphicsWindow.this.graphicCanvas.redraw();
 				}
 			});
 		}
@@ -724,7 +513,7 @@ public class GraphicsWindow {
 	 * method to update the curves displayed in the curve selector panel 
 	 */
 	public void updateCurveSelectorTable() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doUpdateCurveSelectorTable();
 		}
 		else {
@@ -739,21 +528,21 @@ public class GraphicsWindow {
 	/**
 	 * executes the update of the curve selector table
 	 */
-	private void doUpdateCurveSelectorTable() {
-		IDevice device = application.getActiveDevice();
-		int itemWidth = selectorHeaderWidth;
-		RecordSet recordSet = type == TYPE_NORMAL ? channels.getActiveChannel().getActiveRecordSet() : application.getCompareSet();
-		if (isCurveSelectorEnabled && recordSet != null && device != null) {
-			curveSelectorTable.removeAll();
-			curveSelectorHeader.pack(true);
-			itemWidth = selectorHeaderWidth = curveSelectorHeader.getSize().x;
+	void doUpdateCurveSelectorTable() {
+		IDevice device = this.application.getActiveDevice();
+		int itemWidth = this.selectorHeaderWidth;
+		RecordSet recordSet = this.type == TYPE_NORMAL ? this.channels.getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
+		if (this.isCurveSelectorEnabled && recordSet != null && device != null) {
+			this.curveSelectorTable.removeAll();
+			this.curveSelectorHeader.pack(true);
+			itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
 
 			String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
 			for (int i = 0; i < recordSet.size(); i++) {
 				Record record;
-				switch (type) {
+				switch (this.type) {
 				case TYPE_COMPARE:
-					String recordKey = recordSet.getRecordNames()[0].split("_")[0];
+					String recordKey = recordSet.getFirstRecordName().split("_")[0];
 					record = recordSet.getRecord(recordKey + "_" + i);
 					break;
 
@@ -763,9 +552,9 @@ public class GraphicsWindow {
 				}
 				if (log.isLoggable(Level.FINER)) log.finer(record.getName());
 
-				TableItem item = new TableItem(curveSelectorTable, SWT.NULL);
+				TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 				item.setForeground(record.getColor());
-				item.setText(type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
+				item.setText(this.type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
 				//curveSelectorTable.pack();
 				//log.info(item.getText() + " " + item.getBounds().width);
 				if (itemWidth < item.getBounds().width) itemWidth = item.getBounds().width;
@@ -774,52 +563,54 @@ public class GraphicsWindow {
 				if (record.isDisplayable()) {
 					if (record.isVisible()) {
 						item.setChecked(true);
-						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) true);
-						item.setData(WINDOW_TYPE, type);
+						item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+						item.setData(WINDOW_TYPE, this.type);
 					}
 					else {
 						item.setChecked(false);
-						item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-						item.setData(WINDOW_TYPE, type);
+						item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+						item.setData(WINDOW_TYPE, this.type);
 					}
 				}
 				else {
 					item.setChecked(false);
-					item.setData(OpenSerialDataExplorer.OLD_STATE, (boolean) false);
-					item.setData(WINDOW_TYPE, type);
+					item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+					item.setData(WINDOW_TYPE, this.type);
 					item.dispose();
 				}
 			}
 		}
 		else
-			curveSelectorTable.removeAll();
+			this.curveSelectorTable.removeAll();
 
-		selectorColumnWidth = itemWidth + 30;
+		this.selectorColumnWidth = itemWidth + 30;
 		if (log.isLoggable(Level.FINER)) {
-			log.finer("curveSelectorTable width = " + selectorColumnWidth);
-			log.finer("graphicSashForm width = " + graphicSashForm.getSize().x);
+			log.finer("curveSelectorTable width = " + this.selectorColumnWidth);
+			log.finer("graphicSashForm width = " + this.graphicSashForm.getSize().x);
 		}
-		int sashformWidth = graphicSashForm.getSize().x > 100 ? graphicSashForm.getSize().x : selectorColumnWidth * 10;
-		curveSelectorHeader.setSize(selectorColumnWidth, curveSelectorHeader.getSize().y);
-		tableSelectorColumn.setWidth(selectorColumnWidth);
-		sashformWeights = new int[] {selectorColumnWidth, sashformWidth - selectorColumnWidth};
-		graphicSashForm.setWeights(sashformWeights);
+		if (this.isCurveSelectorEnabled) {
+			int sashformWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : this.selectorColumnWidth * 10;
+			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
+			this.sashformWeights = new int[] { this.selectorColumnWidth, sashformWidth - this.selectorColumnWidth };
+			this.graphicSashForm.setWeights(this.sashformWeights);
+		}
 }
 
 	public Canvas getGraphicCanvas() {
-		return graphicCanvas;
+		return this.graphicCanvas;
 	}
 
 	public boolean isCurveSelectorEnabled() {
-		return isCurveSelectorEnabled;
+		return this.isCurveSelectorEnabled;
 	}
 
-	public void setCurveSelectorEnabled(boolean isCurveSelectorEnabled) {
-		this.isCurveSelectorEnabled = isCurveSelectorEnabled;
+	public void setCurveSelectorEnabled(boolean enabled) {
+		this.isCurveSelectorEnabled = enabled;
 	}
 
 	public SashForm getGraphicSashForm() {
-		return graphicSashForm;
+		return this.graphicSashForm;
 	}
 
 	/**
@@ -832,47 +623,47 @@ public class GraphicsWindow {
 		
 		// get the record set to work with
 		boolean isGraphicsWindow = this.type == GraphicsWindow.TYPE_NORMAL;
-		RecordSet recordSet = isGraphicsWindow ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : application.getCompareSet();
+		RecordSet recordSet = isGraphicsWindow ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
 		String measureRecordKey = recordSet.getRecordKeyMeasurement();
 		Record record = recordSet.get(measureRecordKey);
 		
 		// set the gc properties
-		canvasGC.setLineWidth(1);
-		canvasGC.setLineStyle(SWT.LINE_DASH);
-		canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		this.canvasGC.setLineWidth(1);
+		this.canvasGC.setLineStyle(SWT.LINE_DASH);
+		this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		
 		if (recordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
-			xPosMeasure = isRefresh ? xPosMeasure : curveAreaBounds.width / 4;
-			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-			log.fine("initial xPosMeasure = " + xPosMeasure + " yPosMeasure = " + yPosMeasure);
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
+			this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
+			log.fine("initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure);
 
-			drawVerticalLine(xPosMeasure, 0, curveAreaBounds.height);
-			drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
+			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
-			application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(yPosMeasure, curveAreaBounds) + " " + record.getUnit() + " - (" + recordSet.getDisplayPointTime(xPosMeasure) + ") ");
+			this.application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(this.yPosMeasure, this.curveAreaBounds) + " " + record.getUnit() + " - (" + recordSet.getDisplayPointTime(this.xPosMeasure) + ") ");
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-			xPosMeasure = isRefresh ? xPosMeasure : curveAreaBounds.width / 4;
-			yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
+			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
+			this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
 
 			// measure position
-			drawVerticalLine(xPosMeasure, 0, curveAreaBounds.height);
-			drawHorizontalLine(yPosMeasure, 0, curveAreaBounds.width);
+			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 			
 			// delta position
-			xPosDelta = isRefresh ? xPosDelta : curveAreaBounds.width / 3 * 2;
-			yPosDelta = record.getDisplayPointDataValue(xPosDelta, curveAreaBounds);
+			this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
+			this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
 			
-			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-			drawVerticalLine(xPosDelta, 0, curveAreaBounds.height);
-			drawHorizontalLine(yPosDelta, 0, curveAreaBounds.width);
-			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
+			drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			StringBuilder sb = new StringBuilder();
-			sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(yPosMeasure - yPosDelta, curveAreaBounds)).append(" ").append(record.getUnit());
-			sb.append(" ===> ").append(record.getSlopeValue(new Point(xPosDelta - xPosMeasure, yPosMeasure - yPosDelta), curveAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
-			application.setStatusMessage(sb.toString());
+			sb.append(" ").append(record.getName()). append(" (delta) = ").append(record.getDisplayDeltaValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds)).append(" ").append(record.getUnit());
+			sb.append(" ===> ").append(record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds)).append(" ").append(record.getUnit()).append("/sec");
+			this.application.setStatusMessage(sb.toString());
 		}
 	}
 	
@@ -884,7 +675,7 @@ public class GraphicsWindow {
 	 * @param length
 	 */
 	private void drawVerticalLine(int posFromLeft, int posFromTop, int length) {
-		canvasGC.drawLine(posFromLeft+offSetX, posFromTop+offSetY, posFromLeft+offSetX, posFromTop+offSetY+length-1);
+		this.canvasGC.drawLine(posFromLeft+this.offSetX, posFromTop+this.offSetY, posFromLeft+this.offSetX, posFromTop+this.offSetY+length-1);
 	}
 	
 	/**
@@ -895,7 +686,7 @@ public class GraphicsWindow {
 	 * @param length
 	 */
 	private void drawHorizontalLine(int posFromTop, int posFromLeft, int length) {
-		canvasGC.drawLine(posFromLeft+offSetX, posFromTop+offSetY, posFromLeft+offSetX+length-1, posFromTop+offSetY);
+		this.canvasGC.drawLine(posFromLeft+this.offSetX, posFromTop+this.offSetY, posFromLeft+this.offSetX+length-1, posFromTop+this.offSetY);
 	}
 
 	/**
@@ -906,7 +697,7 @@ public class GraphicsWindow {
 	 * @param lineWidth
 	 */
 	private void eraseVerticalLine(int posFromLeft, int posFromTop, int length, int lineWidth) {
-		canvasGC.drawImage(curveArea, posFromLeft, posFromTop, lineWidth, length, posFromLeft+offSetX, posFromTop+offSetY, lineWidth, length);
+		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, lineWidth, length, posFromLeft+this.offSetX, posFromTop+this.offSetY, lineWidth, length);
 	}
 
 	/**
@@ -917,28 +708,28 @@ public class GraphicsWindow {
 	 * @param lineWidth
 	 */
 	private void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
-		canvasGC.drawImage(curveArea, posFromLeft, posFromTop, length, lineWidth, posFromLeft+offSetX, posFromTop+offSetY, length, lineWidth);
+		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, length, lineWidth, posFromLeft+this.offSetX, posFromTop+this.offSetY, length, lineWidth);
 	}
 
 	/**
 	 * clean (old) measurement pointer - check pointer in curve area
 	 */
 	public void cleanMeasurementPointer() {
-		if ((xPosMeasure != 0 && (xPosMeasure < offSetX || xPosMeasure > offSetX + curveAreaBounds.width))
-				|| (yPosMeasure != 0 && (yPosMeasure < offSetY || yPosMeasure > offSetY + curveAreaBounds.height))
-				|| (xPosDelta != 0 && (xPosDelta < offSetX || xPosDelta > offSetX + curveAreaBounds.width))
-				|| (yPosDelta != 0 && (yPosDelta < offSetY || yPosDelta > offSetY + curveAreaBounds.height))	) {
+		if ((this.xPosMeasure != 0 && (this.xPosMeasure < this.offSetX || this.xPosMeasure > this.offSetX + this.curveAreaBounds.width))
+				|| (this.yPosMeasure != 0 && (this.yPosMeasure < this.offSetY || this.yPosMeasure > this.offSetY + this.curveAreaBounds.height))
+				|| (this.xPosDelta != 0 && (this.xPosDelta < this.offSetX || this.xPosDelta > this.offSetX + this.curveAreaBounds.width))
+				|| (this.yPosDelta != 0 && (this.yPosDelta < this.offSetY || this.yPosDelta > this.offSetY + this.curveAreaBounds.height))	) {
 			this.redrawGraphics();
-			xPosMeasure = xPosDelta = 0;
+			this.xPosMeasure = this.xPosDelta = 0;
 		}
 		else {
-			if (xPosMeasure > 0) {
-				eraseVerticalLine(xPosMeasure, 0, curveAreaBounds.height, 1);
-				eraseHorizontalLine(yPosMeasure, 0, curveAreaBounds.width, 1);
+			if (this.xPosMeasure > 0) {
+				eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
+				eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 			}
-			if (xPosDelta > 0) {
-				eraseVerticalLine(xPosDelta, 0, curveAreaBounds.height, 1);
-				eraseHorizontalLine(yPosDelta, 0, curveAreaBounds.width, 1);
+			if (this.xPosDelta > 0) {
+				eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+				eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 			}
 		}
 	}
@@ -948,7 +739,7 @@ public class GraphicsWindow {
 	 * @return the type TYPE_NORMALE | TYPE_COMPARE
 	 */
 	public int getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -988,7 +779,7 @@ public class GraphicsWindow {
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
-			application.setStatusMessage("");
+			this.application.setStatusMessage("");
 			break;
 		}
 	}
@@ -999,20 +790,20 @@ public class GraphicsWindow {
 	 */
 	private Point checkCurveBounds(int xPos, int yPos) {
 		if(log.isLoggable(Level.FINER)) log.finer("in  xPos = " + xPos + " yPos = " + yPos);
-		xPos = xPos - offSetX;
-		yPos = yPos - offSetY;
+		int tmpxPos = xPos - this.offSetX;
+		int tmpyPos = yPos - this.offSetY;
 		int minX = 0;
-		int maxX = curveAreaBounds.width - 1;
+		int maxX = this.curveAreaBounds.width - 1;
 		int minY = 0;
-		int maxY = curveAreaBounds.height - 1;
-		if (xPos < minX || xPos > maxX) {
-			xPos = xPos < minX ? minX : maxX;
+		int maxY = this.curveAreaBounds.height - 1;
+		if (tmpxPos < minX || xPos > maxX) {
+			tmpxPos = tmpxPos < minX ? minX : maxX;
 		}
-		if (yPos < minY || yPos > maxY) {
-			yPos = yPos < minY ? minY : maxY;
+		if (tmpyPos < minY || yPos > maxY) {
+			tmpyPos = tmpyPos < minY ? minY : maxY;
 		}
 		if(log.isLoggable(Level.FINER)) log.finer("out xPos = " + xPos + " yPos = " + yPos);
-		return new Point(xPos, yPos);
+		return new Point(tmpxPos, tmpyPos);
 	}
 
 	/**
@@ -1020,5 +811,236 @@ public class GraphicsWindow {
 	 */
 	public int[] getSashformWeights() {
 		return this.sashformWeights;
+	}
+
+	/**
+	 * @param evt
+	 */
+	void mouseMoveAction(MouseEvent evt) {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
+			if (recordSet != null && this.curveArea != null) {
+				String configKey = recordSet.getChannelName();
+				Point point = checkCurveBounds(evt.x, evt.y);
+				evt.x = point.x;
+				evt.y = point.y;
+
+				String measureRecordKey = recordSet.getRecordKeyMeasurement();
+				this.canvasGC.setLineWidth(1);
+				this.canvasGC.setLineStyle(SWT.LINE_DASH);
+
+				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+					try {
+						if (this.isZoomMouse && recordSet.isZoomMode()) {
+							if (log.isLoggable(Level.FINER)) log.finer(String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast));
+
+							//clean obsolete rectangle
+							int left = this.xLast - this.xDown > 0 ? this.xDown : this.xLast;
+							int top = this.yLast - this.yDown > 0 ? this.yDown : this.yLast;
+							int width = this.xLast - this.xDown > 0 ? this.xLast - this.xDown : this.xDown - this.xLast;
+							int height = this.yLast - this.yDown > 0 ? this.yLast - this.yDown : this.yDown - this.yLast;
+							if (log.isLoggable(Level.FINER)) log.finer("clean left = " + left + " top = " + top + " width = " + width + " height = " + height);
+							eraseHorizontalLine(top, left, width + 1, 1);
+							eraseVerticalLine(left, top, height + 1, 1);
+							eraseHorizontalLine(top + height, left + 1, width, 1);
+							eraseVerticalLine(left + width, top + 1, height, 1);
+
+							left = evt.x - this.xDown > 0 ? this.xDown + this.offSetX : evt.x + this.offSetX;
+							top = evt.y - this.yDown > 0 ? this.yDown + this.offSetY : evt.y + this.offSetY;
+							width = evt.x - this.xDown > 0 ? evt.x - this.xDown : this.xDown - evt.x;
+							height = evt.y - this.yDown > 0 ? evt.y - this.yDown : this.yDown - evt.y;
+							if (log.isLoggable(Level.FINER)) log.finer("draw  left = " + (left - this.offSetX) + " top = " + (top - this.offSetY) + " width = " + width + " height = " + height);
+							this.canvasGC.drawRectangle(left, top, width, height);
+
+							/* detect directions to enable same behavior as LogView
+							if (xDown < evt.x && yDown < evt.y) { //top left -> bottom right
+							}
+							else if (xDown < evt.x && yDown > evt.y) { // bottom left -> top right
+							}
+							if (xDown > evt.x && yDown < evt.y) { //top right -> left bottom
+							}
+							if (xDown > evt.x && yDown > evt.y) { // bottom left -> top right
+							}
+							*/
+							this.xLast = evt.x;
+							this.yLast = evt.y;
+						}
+						else if (this.isLeftMouseMeasure) {
+							Record record = recordSet.getRecord(measureRecordKey);
+							// clear old measure lines
+							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
+							//no change don't needs to be calculated, but the calculation limits to bounds
+							this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
+							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+
+							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
+								// clear old delta measure lines
+								eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+								//no change don't needs to be calculated, but the calculation limits to bounds
+								this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
+								eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+
+								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+								drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
+								drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+							}
+							// all obsolete lines are cleaned up now draw new position marker
+							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
+							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+							this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
+							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
+								StringBuilder sb = new StringBuilder();
+								sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds)).append(" ")
+										.append(record.getUnit());
+								sb.append(" ===> ").append(record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds)).append(" ").append(record.getUnit()).append(
+										"/sec");
+								this.application.setStatusMessage(sb.toString());
+							}
+							else {
+								this.application.setStatusMessage("  " + record.getName() + " = " + record.getDisplayPointValueString(this.yPosMeasure, this.curveAreaBounds) + " " + record.getUnit() + " - ("
+										+ recordSet.getDisplayPointTime(this.xPosMeasure) + ") ");
+							}
+						}
+						else if (this.isRightMouseMeasure) {
+							Record record = recordSet.getRecord(measureRecordKey);
+							// clear old delta measure lines
+							eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
+							//no change don't needs to be calculated, but the calculation limits to bounds
+							this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
+							eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+
+							// clear old measure lines
+							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
+							//no change don't needs to be calculated, but the calculation limits to bounds
+							this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
+							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+
+							// always needs to draw measurement pointer
+							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
+							//no change don't needs to be calculated yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
+							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+
+							// update the new delta position
+							this.xPosDelta = evt.x; // evt.x is already relative to curve area
+							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
+							this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
+							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+
+							StringBuilder sb = new StringBuilder();
+							sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds)).append(" ").append(
+									record.getDevice().getMeasurementUnit(configKey, measureRecordKey));
+							sb.append(" ===> ").append(record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds)).append(" ").append(
+									record.getDevice().getMeasurementUnit(configKey, measureRecordKey)).append("/sec");
+							this.application.setStatusMessage(sb.toString());
+						}
+						else if (this.isPanMouse) {
+							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
+							this.yDeltaPan = (this.yLast != 0 && this.yLast != evt.y) ? (this.yDeltaPan + (this.yLast < evt.y ? 1 : -1)) : 0;
+							if (log.isLoggable(Level.FINER)) log.finer(" xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan);
+							if ((this.xDeltaPan != 0 && this.xDeltaPan % 5 == 0) || (this.yDeltaPan != 0 && this.yDeltaPan % 5 == 0)) {
+								recordSet.shift(this.xDeltaPan, this.yDeltaPan); // 10% each direction
+								this.graphicCanvas.redraw();
+								this.xDeltaPan = this.yDeltaPan = 0;
+							}
+							this.xLast = evt.x;
+							this.yLast = evt.y;
+						}
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, "mouse pointer out of range", e);
+					}
+				}
+				else if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey))) {
+					if (this.xPosMeasure + 1 >= evt.x && this.xPosMeasure - 1 <= evt.x || this.xPosDelta + 1 >= evt.x && this.xPosDelta - 1 <= evt.x) { // snap mouse pointer
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif"));
+					}
+					else {
+						this.graphicCanvas.setCursor(this.application.getCursor());
+					}
+				}
+				else if (this.isZoomMouse && !this.isPanMouse) {
+					this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
+				}
+				else if (this.isPanMouse) {
+					this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/Hand.gif"));
+				}
+				else {
+					this.graphicCanvas.setCursor(this.application.getCursor());
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param evt
+	 */
+	void mouseDownAction(MouseEvent evt) {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
+			if (this.curveArea != null && recordSet != null) {
+				String measureRecordKey = recordSet.getRecordKeyMeasurement();
+				Point point = checkCurveBounds(evt.x, evt.y);
+				this.xDown = point.x;
+				this.yDown = point.y;
+
+				if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey)) && this.xPosMeasure + 1 >= this.xDown
+						&& this.xPosMeasure - 1 <= this.xDown) { // snap mouse pointer
+					this.isLeftMouseMeasure = true;
+					this.isRightMouseMeasure = false;
+				}
+				else if (measureRecordKey != null && recordSet.isDeltaMeasurementMode(measureRecordKey) && this.xPosDelta + 1 >= this.xDown && this.xPosDelta - 1 <= this.xDown) { // snap mouse pointer
+					this.isRightMouseMeasure = true;
+					this.isLeftMouseMeasure = false;
+				}
+				else {
+					this.isLeftMouseMeasure = false;
+					this.isRightMouseMeasure = false;
+				}
+				if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure);
+			}
+		}
+	}
+
+	/**
+	 * @param evt
+	 */
+	void mouseUpAction(MouseEvent evt) {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
+			if (this.curveArea != null && recordSet != null) {
+				Point point = checkCurveBounds(evt.x, evt.y);
+				this.xUp = point.x;
+				this.yUp = point.y;
+
+				if (this.isZoomMouse) {
+					// sort the zoom values
+					int xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
+					int xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp + 1;
+					int yMin = this.curveAreaBounds.height - 1 - (this.yDown > this.yUp ? this.yDown : this.yUp);
+					int yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
+					if (log.isLoggable(Level.FINER)) log.finer("zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax);
+					if (xEnd - xStart > 5 && yMax - yMin > 5) {
+						recordSet.setZoomOffsetAndWidth(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+						this.graphicCanvas.redraw();
+					}
+				}
+				else if (this.isLeftMouseMeasure) {
+					this.isLeftMouseMeasure = false;
+					//application.setStatusMessage("");
+				}
+				else if (this.isRightMouseMeasure) {
+					this.isRightMouseMeasure = false;
+					//application.setStatusMessage("");
+				}
+				if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure);
+			}
+		}
 	}
 }

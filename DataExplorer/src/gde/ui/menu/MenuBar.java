@@ -49,54 +49,54 @@ import osde.ui.tab.GraphicsWindow;
  * @author Winfried Brügmann
  */
 public class MenuBar {
-	private Logger												log			= Logger.getLogger(this.getClass().getName());
-	private final String									fileSep	= System.getProperty("file.separator");
+	final static Logger						log			= Logger.getLogger(MenuBar.class.getName());
+	private final String					fileSep	= System.getProperty("file.separator");
 
-	static Display												display;
-	static Shell													shell;
-	private MenuItem											fileMenuItem;
-	private Menu													fileMenu;
-	private MenuItem											openFileMenuItem;
-	private MenuItem											historyFileMenuItem;
-	private MenuItem											toolBoxDeviceMenuItem, portMenuItem;
-	private MenuItem											aboutMenuItem;
-	private MenuItem											contentsMenuItem, webCheckMenuItem;
-	private Menu													helpMenu;
-	private MenuItem											helpMenuItem;
-	private MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
-	private MenuItem											recordCommentMenuItem;
-	private MenuItem											curveSelectionMenuItem;
-	private Menu													viewMenu;
-	private MenuItem											viewMenuItem;
-	private Menu													graphicsMenu;
-	private MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveGraphicsTemplateItem, restoreGraphicsTemplateItem;
-	private MenuItem											csvExportMenuItem1, csvExportMenuItem2;
-	private MenuItem											nextDeviceMenuItem;
-	private MenuItem											prevDeviceMenuItem;
-	private MenuItem											selectDeviceMenuItem;
-	private Menu													deviceMenu;
-	private MenuItem											deviceMenuItem;
-	private MenuItem											copyTableMenuItem;
-	private MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
-	private Menu													editMenu;
-	private MenuItem											editMenuItem;
-	private MenuItem											exitMenuItem;
-	private MenuItem											preferencesFileMenuItem;
-	private Menu													exportMenu;
-	private MenuItem											exportFileMenuItem;
-	private MenuItem											csvImportMenuItem1, csvImportMenuItem2;
-	private Menu													importMenu;
-	private MenuItem											importFileMenuItem;
-	private Menu													fileHistoryMenu;
-	private MenuItem											saveAsFileMenuItem;
-	private MenuItem											saveFileMenuItem;
-	private MenuItem											newFileMenuItem;
-	private final Menu										parent;
-	private final OpenSerialDataExplorer	application;
-	private final Channels								channels;
+	static Display								display;
+	static Shell									shell;
+	MenuItem											fileMenuItem;
+	Menu													fileMenu;
+	MenuItem											openFileMenuItem;
+	MenuItem											historyFileMenuItem;
+	MenuItem											toolBoxDeviceMenuItem, portMenuItem;
+	MenuItem											aboutMenuItem;
+	MenuItem											contentsMenuItem, webCheckMenuItem;
+	Menu													helpMenu;
+	MenuItem											helpMenuItem;
+	MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
+	MenuItem											recordCommentMenuItem;
+	MenuItem											curveSelectionMenuItem;
+	Menu													viewMenu;
+	MenuItem											viewMenuItem;
+	Menu													graphicsMenu;
+	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem											csvExportMenuItem1, csvExportMenuItem2;
+	MenuItem											nextDeviceMenuItem;
+	MenuItem											prevDeviceMenuItem;
+	MenuItem											selectDeviceMenuItem;
+	Menu													deviceMenu;
+	MenuItem											deviceMenuItem;
+	MenuItem											copyTableMenuItem;
+	MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
+	Menu													editMenu;
+	MenuItem											editMenuItem;
+	MenuItem											exitMenuItem;
+	MenuItem											preferencesFileMenuItem;
+	Menu													exportMenu;
+	MenuItem											exportFileMenuItem;
+	MenuItem											csvImportMenuItem1, csvImportMenuItem2;
+	Menu													importMenu;
+	MenuItem											importFileMenuItem;
+	Menu													fileHistoryMenu;
+	MenuItem											saveAsFileMenuItem;
+	MenuItem											saveFileMenuItem;
+	MenuItem											newFileMenuItem;
+	final Menu										parent;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
 
-	public MenuBar(OpenSerialDataExplorer application, Menu menuParent) {
-		this.application = application;
+	public MenuBar(OpenSerialDataExplorer currentApplication, Menu menuParent) {
+		this.application = currentApplication;
 		this.parent = menuParent;
 		this.channels = Channels.getInstance();
 	}
@@ -106,305 +106,306 @@ public class MenuBar {
 	 */
 	public void create() {
 		{
-			fileMenuItem = new MenuItem(parent, SWT.CASCADE);
-			fileMenuItem.setText("Datei");
-			fileMenuItem.addHelpListener(new HelpListener() {
+			this.fileMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.fileMenuItem.setText("Datei");
+			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("fileMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_3.html");
+					MenuBar.log.fine("fileMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_3.html");
 				}
 			});
 			{
-				fileMenu = new Menu(fileMenuItem);
+				this.fileMenu = new Menu(this.fileMenuItem);
 				{
-					newFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					newFileMenuItem.setText("Neu");
-					newFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
-					newFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.newFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.newFileMenuItem.setText("Neu");
+					this.newFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
+					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("newFileMenuItem.widgetSelected, event=" + evt);
-							application.getDeviceSelectionDialog().setupDataChannels(application.getActiveDevice());
+							MenuBar.log.finest("newFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
 						}
 					});
 				}
 				{
-					openFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					openFileMenuItem.setText("Öffnen");
-					openFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
-					openFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.openFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.openFileMenuItem.setText("Öffnen");
+					this.openFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
+					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("openFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
 							//TODO implement data file format and set ending as file open dialog filter 
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							importFileCVS("Import CSV raw", true, true);
+							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							importFileCVS("Import CSV raw", true);
 						}
 					});
 				}
 				{
-					saveFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					saveFileMenuItem.setText("Speichern");
-					saveFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
-					saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.saveFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.saveFileMenuItem.setText("Speichern");
+					this.saveFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
+					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
 							//TODO implement data file format and set ending as file save dialog filter 
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							MenuBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
 				{
-					saveAsFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					saveAsFileMenuItem.setText("Speichern unter ...");
-					saveAsFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
-					saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.saveAsFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.saveAsFileMenuItem.setText("Speichern unter ...");
+					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
+					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt);
 							//TODO implement data file format and set ending as file save dialog filter 
-							application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
+							MenuBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
 						}
 					});
 				}
 				{
-					historyFileMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
-					historyFileMenuItem.setText("Historie");
-					historyFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.historyFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
+					this.historyFileMenuItem.setText("Historie");
+					this.historyFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("historyFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("historyFileMenuItem.widgetSelected, event=" + evt);
 							//TODO add your code for historyFileMenuItem.widgetSelected
-							application.openMessageDialog("Diese Implementierung fehlt noch :-(, Einträge werden aber schon angehängt");
+							MenuBar.this.application.openMessageDialog("Diese Implementierung fehlt noch :-(, Einträge werden aber schon angehängt");
 						}
 					});
 					{
-						fileHistoryMenu = new Menu(historyFileMenuItem);
-						historyFileMenuItem.setMenu(fileHistoryMenu);
+						this.fileHistoryMenu = new Menu(this.historyFileMenuItem);
+						this.historyFileMenuItem.setMenu(this.fileHistoryMenu);
 					}
 				}
 				{
-					new MenuItem(fileMenu, SWT.SEPARATOR);
+					new MenuItem(this.fileMenu, SWT.SEPARATOR);
 				}
 				{
-					importFileMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
-					importFileMenuItem.setText("Import");
+					this.importFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
+					this.importFileMenuItem.setText("Import");
 					{
-						importMenu = new Menu(importFileMenuItem);
-						importFileMenuItem.setMenu(importMenu);
+						this.importMenu = new Menu(this.importFileMenuItem);
+						this.importFileMenuItem.setMenu(this.importMenu);
 						{
-							csvImportMenuItem1 = new MenuItem(importMenu, SWT.PUSH);
-							csvImportMenuItem1.setText("CSV absolut");
-							csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
+							this.csvImportMenuItem1 = new MenuItem(this.importMenu, SWT.PUSH);
+							this.csvImportMenuItem1.setText("CSV absolut");
+							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
-									importFileCVS("Import CSV absolut", false, true);
+									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
+									importFileCVS("Import CSV absolut", false);
 								}
 							});
 						}
 						{
-							csvImportMenuItem2 = new MenuItem(importMenu, SWT.PUSH);
-							csvImportMenuItem2.setText("CSV raw");
-							csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
+							this.csvImportMenuItem2 = new MenuItem(this.importMenu, SWT.PUSH);
+							this.csvImportMenuItem2.setText("CSV raw");
+							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
-									importFileCVS("Import CSV raw", true, true);
+									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt);
+									importFileCVS("Import CSV raw", true);
 								}
 							});
 						}
 					}
 				}
 				{
-					exportFileMenuItem = new MenuItem(fileMenu, SWT.CASCADE);
-					exportFileMenuItem.setText("Export");
+					this.exportFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
+					this.exportFileMenuItem.setText("Export");
 					{
-						exportMenu = new Menu(exportFileMenuItem);
-						exportFileMenuItem.setMenu(exportMenu);
+						this.exportMenu = new Menu(this.exportFileMenuItem);
+						this.exportFileMenuItem.setMenu(this.exportMenu);
 						{
-							csvExportMenuItem1 = new MenuItem(exportMenu, SWT.CASCADE);
-							csvExportMenuItem1.setText("CSV absolut");
-							csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
+							this.csvExportMenuItem1 = new MenuItem(this.exportMenu, SWT.CASCADE);
+							this.csvExportMenuItem1.setText("CSV absolut");
+							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
+									MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
 									exportFileCVS("Export CSV absolut", false);
 								}
 							});
 						}
 					}
 					{
-						csvExportMenuItem2 = new MenuItem(exportMenu, SWT.CASCADE);
-						csvExportMenuItem2.setText("CSV raw");
-						csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
+						this.csvExportMenuItem2 = new MenuItem(this.exportMenu, SWT.CASCADE);
+						this.csvExportMenuItem2.setText("CSV raw");
+						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
+								MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt);
 								exportFileCVS("Export CSV raw", true);
 							}
 						});
 					}
 				}
 				{
-					new MenuItem(fileMenu, SWT.SEPARATOR);
+					new MenuItem(this.fileMenu, SWT.SEPARATOR);
 				}
 				{
-					preferencesFileMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					preferencesFileMenuItem.setText("Einstellungen");
-					preferencesFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
-					preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.preferencesFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.preferencesFileMenuItem.setText("Einstellungen");
+					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
+					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("preferencesFileMenuItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("preferencesFileMenuItem.widgetSelected, event=" + evt);
 							// check if other none modal dialog is open
-							DeviceDialog deviceDialog = application.getDeviceDialog();
+							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
-								application.openSettingsDialog();
-								application.setStatusMessage("");
+								MenuBar.this.application.openSettingsDialog();
+								MenuBar.this.application.setStatusMessage("");
 							}
 							else
-								application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
+								MenuBar.this.application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
 						}
 					});
 				}
 				{
-					new MenuItem(fileMenu, SWT.SEPARATOR);
+					new MenuItem(this.fileMenu, SWT.SEPARATOR);
 				}
 				{
-					exitMenuItem = new MenuItem(fileMenu, SWT.PUSH);
-					exitMenuItem.setText("Exit");
-					exitMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.exitMenuItem.setText("Exit");
+					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("exitMenuItem.widgetSelected, event=" + evt);
-							DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+							MenuBar.log.finest("exitMenuItem.widgetSelected, event=" + evt);
+							DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelect.checkDataSaved()) {
-								parent.getParent().dispose();
+								MenuBar.this.parent.getParent().dispose();
 							}
 						}
 					});
 				}
-				fileMenuItem.setMenu(fileMenu);
+				this.fileMenuItem.setMenu(this.fileMenu);
 			}
 		}
 		{
-			editMenuItem = new MenuItem(parent, SWT.CASCADE);
-			editMenuItem.setText("Bearbeiten");
-			editMenuItem.addHelpListener(new HelpListener() {
+			this.editMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.editMenuItem.setText("Bearbeiten");
+			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("editMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_31.html");
+					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_31.html");
 				}
 			});
 			{
-				editMenu = new Menu(editMenuItem);
-				editMenuItem.setMenu(editMenu);
+				this.editMenu = new Menu(this.editMenuItem);
+				this.editMenuItem.setMenu(this.editMenu);
 				{
-					activateZoomGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
-					activateZoomGraphicMenuItem.setText("Zoom Graphikfenster aktivieren");
-					activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
-					activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.activateZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.activateZoomGraphicMenuItem.setText("Zoom Graphikfenster aktivieren");
+					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
+					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("activateZoomGraphicMenuItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
+							MenuBar.log.finest("activateZoomGraphicMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
 						}
 					});
 				}
 				{
-					resetZoomGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
-					resetZoomGraphicMenuItem.setText("Zoom Graphikfenster zurücksetzen");
-					resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
-					resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.resetZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.resetZoomGraphicMenuItem.setText("Zoom Graphikfenster zurücksetzen");
+					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
+					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("resetZoomGraphicMenuItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_RESET ,false);						}
-					});
-				}
-				{
-					panGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
-					panGraphicMenuItem.setText("Inhalt Graphikfenster verschieben");
-					panGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
-					panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.finest("panGraphicMenuItem.widgetSelected, event=" + evt);
-							application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+							MenuBar.log.finest("resetZoomGraphicMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
 						}
 					});
 				}
 				{
-					new MenuItem(editMenu, SWT.SEPARATOR);
-				}
-				{
-					copyGraphicMenuItem = new MenuItem(editMenu, SWT.PUSH);
-					copyGraphicMenuItem.setText("Kopiere Graphikfenster");
-					copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
-					copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.panGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.panGraphicMenuItem.setText("Inhalt Graphikfenster verschieben");
+					this.panGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
+					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("copyGraphicMenuItem.widgetSelected, event=" + evt);
-//							Clipboard clipboard = new Clipboard(display);
-//			        RTFTransfer rftTransfer = RTFTransfer.getInstance();
-//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
-//			        clipboard.dispose();
+							MenuBar.log.finest("panGraphicMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
 						}
 					});
 				}
 				{
-					copyTableMenuItem = new MenuItem(editMenu, SWT.PUSH);
-					copyTableMenuItem.setText("Kopiere Tabelle");
-					copyTableMenuItem.setEnabled(false); //TODO enable after implementation
-					copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
+					new MenuItem(this.editMenu, SWT.SEPARATOR);
+				}
+				{
+					this.copyGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyGraphicMenuItem.setText("Kopiere Graphikfenster");
+					this.copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
+					this.copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("copyTableMenuItem.widgetSelected, event=" + evt);
-//							Clipboard clipboard = new Clipboard(display);
-//			        TextTransfer transfer = TextTransfer.getInstance();
-//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
-//			        clipboard.dispose();						}
+							MenuBar.log.finest("copyGraphicMenuItem.widgetSelected, event=" + evt);
+							//							Clipboard clipboard = new Clipboard(display);
+							//			        RTFTransfer rftTransfer = RTFTransfer.getInstance();
+							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
+							//			        clipboard.dispose();
+						}
+					});
+				}
+				{
+					this.copyTableMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyTableMenuItem.setText("Kopiere Tabelle");
+					this.copyTableMenuItem.setEnabled(false); //TODO enable after implementation
+					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.finest("copyTableMenuItem.widgetSelected, event=" + evt);
+							//							Clipboard clipboard = new Clipboard(display);
+							//			        TextTransfer transfer = TextTransfer.getInstance();
+							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
+							//			        clipboard.dispose();						}
 						}
 					});
 				}
 			}
 		}
 		{
-			deviceMenuItem = new MenuItem(parent, SWT.CASCADE);
-			deviceMenuItem.setText("Gerät");
-			deviceMenuItem.addHelpListener(new HelpListener() {
+			this.deviceMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.deviceMenuItem.setText("Gerät");
+			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("deviceMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_32.html");
+					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_32.html");
 				}
 			});
 			{
-				deviceMenu = new Menu(deviceMenuItem);
-				deviceMenuItem.setMenu(deviceMenu);
+				this.deviceMenu = new Menu(this.deviceMenuItem);
+				this.deviceMenuItem.setMenu(this.deviceMenu);
 				{
-					toolBoxDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					toolBoxDeviceMenuItem.setText("Geräte ToolBox");
-					toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
-					toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.toolBoxDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.toolBoxDeviceMenuItem.setText("Geräte ToolBox");
+					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
-							application.openDeviceDialog();
+							MenuBar.log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.openDeviceDialog();
 						}
 					});
 				}
 				{
-					new MenuItem(deviceMenu, SWT.SEPARATOR);
+					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
 				}
 				{
-					portMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					portMenuItem.setText("Port öffnen");
-					portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
-					portMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.portMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.portMenuItem.setText("Port öffnen");
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
+					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
-							application.openCloseSerialPort();		
+							MenuBar.log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.openCloseSerialPort();
 						}
 					});
 				}
 				{
-					new MenuItem(deviceMenu, SWT.SEPARATOR);
+					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
 				}
 				{
-					selectDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					selectDeviceMenuItem.setText("Gerät auswählen");
-					selectDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
-					selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.selectDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.selectDeviceMenuItem.setText("Gerät auswählen");
+					this.selectDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
+					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
-							DeviceSelectionDialog deviceSelection = application.getDeviceSelectionDialog();
+							MenuBar.log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
+							DeviceSelectionDialog deviceSelection = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelection.checkDataSaved()) {
 								deviceSelection.open();
 							}
@@ -412,15 +413,15 @@ public class MenuBar {
 					});
 				}
 				{
-					prevDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					prevDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
-					prevDeviceMenuItem.setText("vorheriges Gerät");
-					prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.prevDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.prevDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+					this.prevDeviceMenuItem.setText("vorheriges Gerät");
+					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("prevDeviceMenuItem.widgetSelected, event=" + evt);
-							if (application.getActiveDevice().getSerialPort() == null || !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
+							MenuBar.log.finest("prevDeviceMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
 									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
 									int size = deviceSelect.getActiveDevices().size();
@@ -429,32 +430,32 @@ public class MenuBar {
 									}
 									else
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
-									
+
 									// if a device tool box is open, dispose it
-									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
-										application.getDeviceDialog().dispose();
+									if (MenuBar.this.application.getDeviceDialog() != null && !MenuBar.this.application.getDeviceDialog().isDisposed()) {
+										MenuBar.this.application.getDeviceDialog().dispose();
 									}
-									
+
 									deviceSelect.setActiveConfig(deviceConfig);
 									deviceSelect.setupDevice();
 								}
 							}
 							else {
-								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
 							}
 						}
 					});
 				}
 				{
-					nextDeviceMenuItem = new MenuItem(deviceMenu, SWT.PUSH);
-					nextDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
-					nextDeviceMenuItem.setText("nächstes Gerät");
-					nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.nextDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.nextDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+					this.nextDeviceMenuItem.setText("nächstes Gerät");
+					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("nextDeviceMenuItem.widgetSelected, event=" + evt);
-							if (application.getActiveDevice().getSerialPort() == null || !application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
+							MenuBar.log.finest("nextDeviceMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
-								DeviceSelectionDialog deviceSelect = application.getDeviceSelectionDialog();
+								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
 									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
 									int size = deviceSelect.getActiveDevices().size() - 1;
@@ -464,16 +465,16 @@ public class MenuBar {
 										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
 
 									// if a device tool box is open, dispose it
-									if (application.getDeviceDialog() != null && !application.getDeviceDialog().isDisposed()) {
-										application.getDeviceDialog().dispose();
+									if (MenuBar.this.application.getDeviceDialog() != null && !MenuBar.this.application.getDeviceDialog().isDisposed()) {
+										MenuBar.this.application.getDeviceDialog().dispose();
 									}
-									
+
 									deviceSelect.setActiveConfig(deviceConfig);
 									deviceSelect.setupDevice();
 								}
 							}
 							else {
-								application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
 							}
 						}
 					});
@@ -481,59 +482,60 @@ public class MenuBar {
 			}
 		}
 		{
-			graphicsMenuItem = new MenuItem(parent, SWT.CASCADE);
-			graphicsMenuItem.setText("Graphikvorlagen");
-			graphicsMenuItem.addHelpListener(new HelpListener() {
+			this.graphicsMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.graphicsMenuItem.setText("Graphikvorlagen");
+			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("graphicsMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_33.html");
+					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_33.html");
 				}
 			});
 			{
-				graphicsMenu = new Menu(graphicsMenuItem);
-				graphicsMenuItem.setMenu(graphicsMenu);
+				this.graphicsMenu = new Menu(this.graphicsMenuItem);
+				this.graphicsMenuItem.setMenu(this.graphicsMenu);
 				{
-					saveDefaultGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					saveDefaultGraphicsTemplateItem.setText("Graphikvorlage sichern");
-					saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+					this.saveDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
+					this.saveDefaultGraphicsTemplateItem.setText("Graphikvorlage sichern");
+					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
-							channels.getActiveChannel().saveTemplate();
+							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
+							MenuBar.this.channels.getActiveChannel().saveTemplate();
 						}
 					});
 				}
 				{
-					saveGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					saveGraphicsTemplateItem.setText("Graphikvorlage sichern unter..");
-					saveGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+					this.saveGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
+					this.saveGraphicsTemplateItem.setText("Graphikvorlage sichern unter..");
+					this.saveGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
-							log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath());
-							FileDialog fileDialog = application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
+							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
+							MenuBar.log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath());
+							FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
 									.getGraphicsTemplatePath());
-							Channel activeChannel = channels.getActiveChannel();
+							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
-							log.fine("templateFilePath = " + fileDialog.getFileName());
+							MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.setNewFileName(fileDialog.getFileName());
 							activeChannel.saveTemplate();
 						}
 					});
 				}
 				{
-					restoreGraphicsTemplateItem = new MenuItem(graphicsMenu, SWT.PUSH);
-					restoreGraphicsTemplateItem.setText("Graphikvorlage laden");
-					restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+					this.restoreGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
+					this.restoreGraphicsTemplateItem.setText("Graphikvorlage laden");
+					this.restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt);
-							log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
-							FileDialog fileDialog = application.openFileOpenDialog("Lade GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath());
-							Channel activeChannel = channels.getActiveChannel();
+							MenuBar.log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt);
+							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
+							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog("Lade GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
+									.getGraphicsTemplatePath());
+							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(fileDialog.getFileName());
-							log.fine("templateFilePath = " + fileDialog.getFileName());
+							MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
-								channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
+								MenuBar.this.channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
 							}
 						}
 					});
@@ -541,158 +543,158 @@ public class MenuBar {
 			}
 		}
 		{
-			viewMenuItem = new MenuItem(parent, SWT.CASCADE);
-			viewMenuItem.setText("Ansicht");
-			viewMenuItem.addHelpListener(new HelpListener() {
+			this.viewMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.viewMenuItem.setText("Ansicht");
+			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("viewMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
 				}
 			});
 			{
-				viewMenu = new Menu(viewMenuItem);
-				viewMenuItem.setMenu(viewMenu);
+				this.viewMenu = new Menu(this.viewMenuItem);
+				this.viewMenuItem.setMenu(this.viewMenu);
 				{
-					curveSelectionMenuItem = new MenuItem(viewMenu, SWT.CHECK);
-					curveSelectionMenuItem.setText("Kurvenauswahl");
-					curveSelectionMenuItem.setSelection(true);
-					curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.curveSelectionMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.curveSelectionMenuItem.setText("Kurvenauswahl");
+					this.curveSelectionMenuItem.setSelection(true);
+					this.curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt);
-							if (curveSelectionMenuItem.getSelection()) {
-								application.setCurveSelectorEnabled(true);
+							MenuBar.log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.curveSelectionMenuItem.getSelection()) {
+								MenuBar.this.application.setCurveSelectorEnabled(true);
 							}
 							else {
-								application.setCurveSelectorEnabled(false);
+								MenuBar.this.application.setCurveSelectorEnabled(false);
 							}
 						}
 					});
 				}
 				{
-					recordCommentMenuItem = new MenuItem(viewMenu, SWT.CHECK);
-					recordCommentMenuItem.setText("Datensatzkommentar");
-					recordCommentMenuItem.setSelection(false);
-					recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.recordCommentMenuItem.setText("Datensatzkommentar");
+					this.recordCommentMenuItem.setSelection(false);
+					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("dataCommentMenuItem.widgetSelected, event=" + evt);
-							if (recordCommentMenuItem.getSelection()) {
-								application.setRecordCommentEnabled(true);
-								application.updateDisplayTab();
+							MenuBar.log.finest("dataCommentMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
+								MenuBar.this.application.setRecordCommentEnabled(true);
+								MenuBar.this.application.updateDisplayTab();
 							}
 							else {
-								application.setRecordCommentEnabled(false);
-								application.updateDisplayTab();
+								MenuBar.this.application.setRecordCommentEnabled(false);
+								MenuBar.this.application.updateDisplayTab();
 							}
 						}
 					});
 				}
 				{
-					new MenuItem(viewMenu, SWT.SEPARATOR);
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
 				}
 				{
-					graphicTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					graphicTabMenuItem.setText("Graphikansicht");
-					graphicTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.graphicTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.graphicTabMenuItem.setText("Graphikansicht");
+					this.graphicTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("graphicTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_GRAPHIC);
+							MenuBar.log.finest("graphicTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_GRAPHIC);
 						}
 					});
 				}
 				{
-					dataTableTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					dataTableTabMenuItem.setText("Tabellenansicht");
-					dataTableTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.dataTableTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.dataTableTabMenuItem.setText("Tabellenansicht");
+					this.dataTableTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("dataTableTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DATA_TABLE);
+							MenuBar.log.finest("dataTableTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DATA_TABLE);
 						}
 					});
 				}
 				{
-					analogTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					analogTabMenuItem.setText("Analoganzeige");
-					analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.analogTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.analogTabMenuItem.setText("Analoganzeige");
+					this.analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("analogTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_ANALOG);
+							MenuBar.log.finest("analogTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_ANALOG);
 						}
 					});
 				}
 				{
-					digitalTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					digitalTabMenuItem.setText("Zahlenanzeige");
-					digitalTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.digitalTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.digitalTabMenuItem.setText("Zahlenanzeige");
+					this.digitalTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("digitalTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DIGITAL);
+							MenuBar.log.finest("digitalTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DIGITAL);
 						}
 					});
 				}
 				{
-					recordSetCommentTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					recordSetCommentTabMenuItem.setText("Datensatzkommentar");
-					recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.recordSetCommentTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.recordSetCommentTabMenuItem.setText("Datensatzkommentar");
+					this.recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMMENT);
+							MenuBar.log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMMENT);
 						}
 					});
 				}
 				{
-					compareTabMenuItem = new MenuItem(viewMenu, SWT.PUSH);
-					compareTabMenuItem.setText("Kurvenvergleich");
-					compareTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.compareTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.compareTabMenuItem.setText("Kurvenvergleich");
+					this.compareTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("compareTabMenuItem.widgetSelected, event=" + evt);
-							application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMPARE);
+							MenuBar.log.finest("compareTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMPARE);
 						}
 					});
 				}
 			}
 		}
 		{
-			helpMenuItem = new MenuItem(parent, SWT.CASCADE);
-			helpMenuItem.setText("Hilfe");
-			helpMenuItem.addHelpListener(new HelpListener() {
+			this.helpMenuItem = new MenuItem(this.parent, SWT.CASCADE);
+			this.helpMenuItem.setText("Hilfe");
+			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("helpMenuItem.helpRequested, event="+evt);
-					application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt);
+					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
 				}
 			});
 			{
-				helpMenu = new Menu(helpMenuItem);
+				this.helpMenu = new Menu(this.helpMenuItem);
 				{
-					contentsMenuItem = new MenuItem(helpMenu, SWT.PUSH);
-					contentsMenuItem.setText("Inhalt");
-					contentsMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.contentsMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
+					this.contentsMenuItem.setText("Inhalt");
+					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("contentsMenuItem.widgetSelected, event=" + evt);
-							application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo.html");
+							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo.html");
 						}
 					});
 				}
 				{
-					webCheckMenuItem = new MenuItem(helpMenu, SWT.PUSH);
-					webCheckMenuItem.setText("Versioncheck");
-					webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.webCheckMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
+					this.webCheckMenuItem.setText("Versioncheck");
+					this.webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("webCheckMenuItem.widgetSelected, event=" + evt);
-							application.openWebBrowser("http://bruegmaenner.de/de/winfried/osde/Download.html");
+							MenuBar.log.finest("webCheckMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.openWebBrowser("http://bruegmaenner.de/de/winfried/osde/Download.html");
 						}
 					});
 				}
 				{
-					aboutMenuItem = new MenuItem(helpMenu, SWT.PUSH);
-					aboutMenuItem.setText("About");
-					aboutMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.aboutMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
+					this.aboutMenuItem.setText("About");
+					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("aboutMenuItem.widgetSelected, event=" + evt);
-							application.openAboutDialog();
+							MenuBar.log.finest("aboutMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.openAboutDialog();
 						}
 					});
 				}
-				helpMenuItem.setMenu(helpMenu);
+				this.helpMenuItem.setMenu(this.helpMenu);
 			}
 		}
 	}
@@ -702,11 +704,11 @@ public class MenuBar {
 	 * @param newFileName
 	 */
 	public void addSubHistoryMenuItem(String newFileName) {
-		MenuItem historyImportMenuItem = new MenuItem(fileHistoryMenu, SWT.PUSH);
+		MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
 		historyImportMenuItem.setText(newFileName);
 		historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
-				log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
+				MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
 				// TODO implement 
 			}
 		});
@@ -716,19 +718,17 @@ public class MenuBar {
 	 * handles the import of an CVS file
 	 * @param dialogName
 	 * @param isRaw
-	 * @param isFromFile
 	 */
-	public void importFileCVS(String dialogName, boolean isRaw, boolean isFromFile) {
+	public void importFileCVS(String dialogName, boolean isRaw) {
 		try {
-			IDevice activeDevice = application.getActiveDevice();
+			IDevice activeDevice = this.application.getActiveDevice();
 			if (activeDevice == null) throw new ApplicationConfigurationException("Vor dem Import bitte erst ein Gerät auswählen !");
-			String fileSep = System.getProperty("file.separator");
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = application.getActiveDevice() != null ? fileSep + application.getActiveDevice().getName() : "";
-			String path = deviceSetting.getDataFilePath() + devicePath + fileSep;
-			FileDialog csvFileDialog = application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
+			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+			String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+			FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
 			if (csvFileDialog.getFileName().length() > 4) {
-				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+				String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
 				String fileName = csvFileDialog.getFileName();
 				fileName = fileName.substring(0, fileName.indexOf('.'));
 				addSubHistoryMenuItem(csvFileDialog.getFileName());
@@ -737,7 +737,7 @@ public class MenuBar {
 			}
 		}
 		catch (Exception e) {
-			application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+			this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 
@@ -749,38 +749,38 @@ public class MenuBar {
 	public void exportFileCVS(String dialogName, boolean isRaw) {
 		try {
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = application.getActiveDevice() != null ? fileSep + application.getActiveDevice().getName() : "";
-			String path = deviceSetting.getDataFilePath() + devicePath + fileSep;
-			FileDialog csvFileDialog = application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
+			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+			String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+			FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
 			if (csvFileDialog.getFileName().length() > 4) {
-				Channel activeChannel = channels.getActiveChannel();
+				Channel activeChannel = this.channels.getActiveChannel();
 				if (activeChannel == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
 				String recordSetKey = activeRecordSet.getName();
-				String csvFilePath = csvFileDialog.getFilterPath() + fileSep + csvFileDialog.getFileName();
+				String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
 				addSubHistoryMenuItem(csvFileDialog.getFileName());
 				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
 			}
 		}
 		catch (Exception e) {
-			application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+			this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * this function must only called by application which make secure to choose the right thread
 	 * @param isOpenStatus
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (isOpenStatus) {
-			portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif"));
-			portMenuItem.setText("Port schliessen");
+			this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif"));
+			this.portMenuItem.setText("Port schliessen");
 		}
 		else {
-			if (!application.isDisposed()) {
-				portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
-				portMenuItem.setText("Port öffnen");
+			if (!this.application.isDisposed()) {
+				this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif"));
+				this.portMenuItem.setText("Port öffnen");
 			}
 		}
 	}
@@ -790,6 +790,6 @@ public class MenuBar {
 	 * @param selected
 	 */
 	public void setRecordCommentMenuItemSelection(boolean selected) {
-		recordCommentMenuItem.setSelection(selected);
+		this.recordCommentMenuItem.setSelection(selected);
 	}
 }

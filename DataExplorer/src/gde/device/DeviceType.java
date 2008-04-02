@@ -73,7 +73,7 @@ public class DeviceType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -97,7 +97,7 @@ public class DeviceType {
      *     
      */
     public String getManufacturer() {
-        return manufacturer;
+        return this.manufacturer;
     }
 
     /**
@@ -121,7 +121,7 @@ public class DeviceType {
      *     
      */
     public String getManufacturerURL() {
-        return manufacturerURL;
+        return this.manufacturerURL;
     }
 
     /**
@@ -145,7 +145,7 @@ public class DeviceType {
      *     
      */
     public String getGroup() {
-        return group;
+        return this.group;
     }
 
     /**
@@ -169,7 +169,7 @@ public class DeviceType {
      *     
      */
     public String getImage() {
-        return image;
+        return this.image;
     }
 
     /**
@@ -189,7 +189,7 @@ public class DeviceType {
      * 
      */
     public boolean isUsage() {
-        return usage;
+        return this.usage;
     }
 
     /**

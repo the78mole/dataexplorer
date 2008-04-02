@@ -22,8 +22,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -43,22 +43,22 @@ import osde.ui.SWTResourceManager;
  */
 public class FileCommentWindow {
 
-	private Logger					log	= Logger.getLogger(this.getClass().getName());
+	final static Logger					log	= Logger.getLogger(FileCommentWindow.class.getName());
 
-	private TabItem					commentTab;
-	private Composite				commentMainComposite;
-	private CLabel 					infoLabel;
-	private Text						fileCommentText;
+	TabItem					commentTab;
+	Composite				commentMainComposite;
+	CLabel 					infoLabel;
+	Text						fileCommentText;
 
-	private final Channels	channels;
-	private final TabFolder	displayTab;
+	final Channels	channels;
+	final TabFolder	displayTab;
 
 	/**
 	 * constructor with TabFolder parent
-	 * @param displayTab
+	 * @param currentDisplayTab
 	 */
-	public FileCommentWindow(TabFolder displayTab) {
-		this.displayTab = displayTab;
+	public FileCommentWindow(TabFolder currentDisplayTab) {
+		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
@@ -66,57 +66,55 @@ public class FileCommentWindow {
 	 * method to create the window and register required event listener
 	 */
 	public void create() {
-		commentTab = new TabItem(displayTab, SWT.NONE);
-		commentTab.setText("Dateikommentar");
-		SWTResourceManager.registerResourceUser(commentTab);
+		this.commentTab = new TabItem(this.displayTab, SWT.NONE);
+		this.commentTab.setText("Dateikommentar");
+		SWTResourceManager.registerResourceUser(this.commentTab);
 
 		{
-			commentMainComposite = new Composite(displayTab, SWT.NONE);
-			commentTab.setControl(commentMainComposite);
-			commentMainComposite.setLayout(null);
-			commentMainComposite.addPaintListener(new PaintListener() {
+			this.commentMainComposite = new Composite(this.displayTab, SWT.NONE);
+			this.commentTab.setControl(this.commentMainComposite);
+			this.commentMainComposite.setLayout(null);
+			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("cellVoltageMainComposite.paintControl, event=" + evt);
-					Point mainSize = commentMainComposite.getSize();
+					Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
 					//log.info("mainSize = " + mainSize.toString());
 					Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
 							, mainSize.x * 90/100, mainSize.y * 80/100);
 					//log.info("cover bounds = " + bounds.toString());
-					infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
-					fileCommentText.setBounds(bounds);
+					FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
+					FileCommentWindow.this.fileCommentText.setBounds(bounds);
 				}
 			});
 			{
-				infoLabel = new CLabel(commentMainComposite, SWT.LEFT);
-				infoLabel.setText("Dateikommentar");
-				infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
-				infoLabel.setBounds(50, 10, 500, 26);
+				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
+				this.infoLabel.setText("Dateikommentar");
+				this.infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+				this.infoLabel.setBounds(50, 10, 500, 26);
 			}
-			commentMainComposite.addPaintListener(new PaintListener() {
+			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.finer("commentMainComposite.paintControl, event=" + evt);
-					fileCommentText.setText(channels.getFileDescription());
+					FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
 				}
 			});
 			{
-				fileCommentText = new Text(commentMainComposite, SWT.LEFT | SWT.TOP | SWT.MULTI | SWT.WRAP | SWT.BORDER);
-				fileCommentText.setText("Dateikommentar : ");
-				fileCommentText.setBounds(50, 40, 500, 300);
-				fileCommentText.setText(channels.getFileDescription());
-				fileCommentText.addHelpListener(new HelpListener() {
+				this.fileCommentText = new Text(this.commentMainComposite, SWT.LEFT | SWT.TOP | SWT.MULTI | SWT.WRAP | SWT.BORDER);
+				this.fileCommentText.setText("Dateikommentar : ");
+				this.fileCommentText.setBounds(50, 40, 500, 300);
+				this.fileCommentText.setText(this.channels.getFileDescription());
+				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.finer("fileCommentText.helpRequested");
+						log.finer("fileCommentText.helpRequested " + evt);
 						OpenSerialDataExplorer.getInstance().openHelpDialog("OpenSerialDataExplorer", "HelpInfo_10.html");
 					}
 				});
-				fileCommentText.addKeyListener(new KeyListener() {
+				this.fileCommentText.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
 						log.finest("recordSelectCombo.keyPressed, event=" + evt);
 						if (evt.character == SWT.CR) {
-								channels.setFileDescription(fileCommentText.getText());
+								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
 						}
-					}
-					public void keyReleased(KeyEvent evt) {
 					}
 				});
 			}
@@ -124,8 +122,8 @@ public class FileCommentWindow {
 	}
 	
 	public void update() {
-		if (channels.getActiveChannel() != null) {
-			fileCommentText.setText(channels.getFileDescription());
+		if (this.channels.getActiveChannel() != null) {
+			this.fileCommentText.setText(this.channels.getFileDescription());
 		}
 	}
 }

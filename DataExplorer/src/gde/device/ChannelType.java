@@ -74,8 +74,8 @@ public class ChannelType {
      * 
      */
     public List<MeasurementType> getMeasurement() {
-        if (measurement == null) {
-            measurement = new ArrayList<MeasurementType>();
+        if (this.measurement == null) {
+        	this.measurement = new ArrayList<MeasurementType>();
         }
         return this.measurement;
     }
@@ -89,7 +89,7 @@ public class ChannelType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -113,7 +113,7 @@ public class ChannelType {
      *     
      */
     public ChannelTypes getType() {
-        return type;
+        return this.type;
     }
 
     /**

@@ -39,30 +39,30 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class DataTableWindow {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	final static Logger					  log	= Logger.getLogger(DataTableWindow.class.getName());
 
-	private TabItem												table;
-	private Table													dataTable;
-	private TableColumn										timeColumn;
+	TabItem												table;
+	Table													dataTable;
+	TableColumn										timeColumn;
 
-	private final OpenSerialDataExplorer	application;
-	private final Channels								channels;
-	private final TabFolder								tabFolder;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
+	final TabFolder								tabFolder;
 
-	public DataTableWindow(OpenSerialDataExplorer application, TabFolder dataTab) {
-		this.application = application;
+	public DataTableWindow(OpenSerialDataExplorer currenApplication, TabFolder dataTab) {
+		this.application = currenApplication;
 		this.tabFolder = dataTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		table = new TabItem(tabFolder, SWT.NONE);
-		table.setText("Tabelle");
+		this.table = new TabItem(this.tabFolder, SWT.NONE);
+		this.table.setText("Tabelle");
 		{
-			dataTable = new Table(tabFolder, SWT.BORDER);
-			table.setControl(dataTable);
-			dataTable.setLinesVisible(true);
-			dataTable.setHeaderVisible(true);
+			this.dataTable = new Table(this.tabFolder, SWT.BORDER);
+			this.table.setControl(this.dataTable);
+			this.dataTable.setLinesVisible(true);
+			this.dataTable.setHeaderVisible(true);
 		}
 	}
 
@@ -71,21 +71,21 @@ public class DataTableWindow {
 	 */
 	public void setHeader() {
 		// clean old header
-		dataTable.removeAll();
-		TableColumn[] columns = dataTable.getColumns();
+		this.dataTable.removeAll();
+		TableColumn[] columns = this.dataTable.getColumns();
 		for (TableColumn tableColumn : columns) {
 			tableColumn.dispose();
 		}
 
 		int extentFactor = 9;
 		String time = "Zeit [sec]";
-		timeColumn = new TableColumn(dataTable, SWT.CENTER);
-		timeColumn.setWidth(time.length() * extentFactor);
-		timeColumn.setText(time);
+		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
+		this.timeColumn.setWidth(time.length() * extentFactor);
+		this.timeColumn.setText(time);
 
 		// set the new header line
-		IDevice device = application.getActiveDevice();
-		Channel activeChannel = channels.getActiveChannel();
+		IDevice device = this.application.getActiveDevice();
+		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			String channelConfigKey = activeChannel.getConfigKey();
 			String[] measurements = device.getMeasurementNames(channelConfigKey);
@@ -93,12 +93,12 @@ public class DataTableWindow {
 				MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
 				StringBuilder sb = new StringBuilder();
 				sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append("]");
-				TableColumn column = new TableColumn(dataTable, SWT.CENTER);
+				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 				column.setWidth(sb.length() * extentFactor);
 				column.setText(sb.toString());
 			}
 			if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding
-				TableColumn column = new TableColumn(dataTable, SWT.CENTER);
+				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 				column.setWidth(100);
 			}
 		}
@@ -107,26 +107,26 @@ public class DataTableWindow {
 	/**
 	 * method to update the data table pain with actual record data 
 	 */
-	public void updateDataTable(final Channel channel, final RecordSet recordSet) {
+	public void updateDataTable(final RecordSet recordSet) {
 
 		if (recordSet.isTableDisplayable() && recordSet.isTableDataCalculated()) {
 			if (log.isLoggable(Level.FINE)) log.fine("entry data table update");
-			application.setStatusMessage(" -> erneuere Datentabelle");				
-			application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+			this.application.setStatusMessage(" -> erneuere Datentabelle");				
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
 			// cleanup old data table
-			dataTable.removeAll();
+			this.dataTable.removeAll();
 
 			// display data table
 			try {
 				int recordEntries = recordSet.getNumberDataTableRows();
-				int progressStart = application.getProgressPercentage();
+				int progressStart = this.application.getProgressPercentage();
 				double progressInterval = (100.0 - progressStart) / recordEntries;
 				TableItem item;
 				
 				for (int i = 0; i < recordEntries; i++) {
-					application.setProgress(new Double(i * progressInterval + progressStart).intValue());
-					item = new TableItem(dataTable, SWT.RIGHT);
+					this.application.setProgress(new Double(i * progressInterval + progressStart).intValue());
+					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataPoints(i));
 				}
 				//dataTable.setVisible(true);
@@ -135,17 +135,17 @@ public class DataTableWindow {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 
-			application.setProgress(100);
-			application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-			application.setStatusMessage(" ");
+			this.application.setProgress(100);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			this.application.setStatusMessage(" ");
 			if (log.isLoggable(Level.FINE)) log.fine("exit data table update");
 		}
 	}
 	
 	public void cleanTable(boolean isDisabled) {
-		dataTable.removeAll();
+		this.dataTable.removeAll();
 		if (isDisabled) {
-			TableItem item = new TableItem(dataTable, SWT.RIGHT);
+			TableItem item = new TableItem(this.dataTable, SWT.RIGHT);
 			item.setText(new String[] {"Die", "Anzeige",  "ist",  "ausgeschaltet!"});
 		}
 	}

@@ -64,7 +64,7 @@ public class TimeOutType {
      *     
      */
     public BigInteger getRTOCharDelayTime() {
-        return rtoCharDelayTime;
+        return this.rtoCharDelayTime;
     }
 
     /**
@@ -88,7 +88,7 @@ public class TimeOutType {
      *     
      */
     public BigInteger getRTOExtraDelayTime() {
-        return rtoExtraDelayTime;
+        return this.rtoExtraDelayTime;
     }
 
     /**
@@ -112,7 +112,7 @@ public class TimeOutType {
      *     
      */
     public BigInteger getWTOCharDelayTime() {
-        return wtoCharDelayTime;
+        return this.wtoCharDelayTime;
     }
 
     /**
@@ -136,7 +136,7 @@ public class TimeOutType {
      *     
      */
     public BigInteger getWTOExtraDelayTime() {
-        return wtoExtraDelayTime;
+        return this.wtoExtraDelayTime;
     }
 
     /**

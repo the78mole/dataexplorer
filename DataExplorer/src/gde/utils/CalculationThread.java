@@ -26,7 +26,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public abstract class CalculationThread extends Thread {
-	protected Logger												log					= Logger.getLogger(this.getClass().getName());
+	final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
 
 	protected static String									newLine			= System.getProperty("line.separator");
 	
@@ -43,16 +43,17 @@ public abstract class CalculationThread extends Thread {
 
 	/**
 	 * constructor where calculation required parameters are given as parameter
-	 * @param recordSet
-	 * @param sourceRecordKey
-	 * @param targetRecordKey
+	 * @param currentRecordSet
+	 * @param inRecordKey
+	 * @param outRecordKey
+	 * @param calcIntervalSec
 	 */
-	public CalculationThread(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
+	public CalculationThread(RecordSet currentRecordSet, String inRecordKey, String outRecordKey, int calcIntervalSec) {
 		super();
-		this.recordSet = recordSet;
-		this.sourceRecordKey = sourceRecordKey;
-		this.targetRecordKey = targetRecordKey;
-		this.calcInterval_sec = calcInterval_sec;
+		this.recordSet = currentRecordSet;
+		this.sourceRecordKey = inRecordKey;
+		this.targetRecordKey = outRecordKey;
+		this.calcInterval_sec = calcIntervalSec;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
@@ -62,41 +63,41 @@ public abstract class CalculationThread extends Thread {
 	public abstract void run();
 
 	/**
-	 * @param recordSet the recordSet to set
+	 * @param newRecordSet the recordSet to set
 	 */
-	public void setRecordSet(RecordSet recordSet) {
-		this.recordSet = recordSet;
+	public void setRecordSet(RecordSet newRecordSet) {
+		this.recordSet = newRecordSet;
 	}
 
-	public void setThreadStop(boolean threadStop) {
-		this.threadStop = threadStop;
-	}
-
-	/**
-	 * @param sourceRecordKey the sourceRecordKey to set
-	 */
-	public void setSourceRecordKey(String sourceRecordKey) {
-		this.sourceRecordKey = sourceRecordKey;
+	public void setThreadStop(boolean doStop) {
+		this.threadStop = doStop;
 	}
 
 	/**
-	 * @param targetRecordKey the targetRecordKey to set
+	 * @param inRecordKey the sourceRecordKey to set
 	 */
-	public void setTargetRecordKey(String targetRecordKey) {
-		this.targetRecordKey = targetRecordKey;
+	public void setSourceRecordKey(String inRecordKey) {
+		this.sourceRecordKey = inRecordKey;
+	}
+
+	/**
+	 * @param outRecordKey the targetRecordKey to set
+	 */
+	public void setTargetRecordKey(String outRecordKey) {
+		this.targetRecordKey = outRecordKey;
 	}
 
 	/**
 	 * @return the calcInterval_sec
 	 */
 	public int getCalcInterval_sec() {
-		return calcInterval_sec;
+		return this.calcInterval_sec;
 	}
 
 	/**
-	 * @param calcInterval_sec the calcInterval_sec to set
+	 * @param calcIntervalSec the calcInterval_sec to set
 	 */
-	public void setCalcInterval_sec(int calcInterval_sec) {
-		this.calcInterval_sec = calcInterval_sec;
+	public void setCalcInterval_sec(int calcIntervalSec) {
+		this.calcInterval_sec = calcIntervalSec;
 	}
 }

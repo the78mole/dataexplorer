@@ -56,7 +56,7 @@ public class DataBlockType {
      *     
      */
     public BigInteger getSize() {
-        return size;
+        return this.size;
     }
 
     /**
@@ -80,7 +80,7 @@ public class DataBlockType {
      *     
      */
     public ChecksumType getCheckSum() {
-        return checkSum;
+        return this.checkSum;
     }
 
     /**
@@ -104,7 +104,7 @@ public class DataBlockType {
      *     
      */
     public Byte getEndingByte() {
-        return endingByte;
+        return this.endingByte;
     }
 
     /**

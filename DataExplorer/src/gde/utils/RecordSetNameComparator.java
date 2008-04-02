@@ -43,10 +43,9 @@ public class RecordSetNameComparator implements Comparator<String> {
 				else 
 					return 0;
 			}
-			else {
-				//... If no number, sort alphabetically.
-				return nameA.compareToIgnoreCase(nameB);
-			}
+
+			//... If no number, sort alphabetically.
+			return nameA.compareToIgnoreCase(nameB);
 		}
 		catch (Exception e) {
 			// NumberFormatException, sort alphabetically.

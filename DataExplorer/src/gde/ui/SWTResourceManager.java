@@ -57,7 +57,7 @@ public class SWTResourceManager {
 	@SuppressWarnings("unchecked")
 	private static HashMap resources = new HashMap();
 	@SuppressWarnings("unchecked")
-	private static Vector users = new Vector();
+	static Vector users = new Vector();
 	private static SWTResourceManager instance = new SWTResourceManager();
 
 	private static DisposeListener disposeListener = new DisposeListener() {
@@ -152,8 +152,7 @@ public class SWTResourceManager {
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
-			if (img != null)
-				resources.put(key, img);
+			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -169,8 +168,7 @@ public class SWTResourceManager {
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
-			if (img != null)
-				resources.put(key, img);
+			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -210,10 +208,8 @@ public class SWTResourceManager {
 				// Create the vertical image
 				Image vertical = new Image(Display.getDefault(), dd);
 				if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
-				if (vertical != null) {
-					resources.put(key, vertical);
-					resultImg = vertical;
-				}
+				resources.put(key, vertical);
+				resultImg = vertical;
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -230,8 +226,7 @@ public class SWTResourceManager {
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), imageData);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
-			if (img != null)
-				resources.put(key, img);
+			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -242,15 +237,14 @@ public class SWTResourceManager {
 	@SuppressWarnings("unchecked")
 	public static Image getImage(String url) {
 		try {
-			url = url.replace('\\', '/');
-			if (url.startsWith("/"))
-				url = url.substring(1);
-			if (resources.containsKey(url))
-				return (Image) resources.get(url);
-			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(url));
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + url);
-			if (img != null)
-				resources.put(url, img);
+			String tmpUrl = url.replace('\\', '/');
+			if (tmpUrl.startsWith("/"))
+				tmpUrl = tmpUrl.substring(1);
+			if (resources.containsKey(tmpUrl))
+				return (Image) resources.get(tmpUrl);
+			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl);
+			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -294,12 +288,12 @@ public class SWTResourceManager {
 	@SuppressWarnings("unchecked")
 	public static Cursor getCursor(String url) {
 		try {
-			url = url.replace('\\', '/');
-			if (url.startsWith("/")) url = url.substring(1);
-			if (resources.containsKey(url)) return (Cursor) resources.get(url);
-			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(url));
+			String tmpUrl = url.replace('\\', '/');
+			if (tmpUrl.startsWith("/")) tmpUrl = tmpUrl.substring(1);
+			if (resources.containsKey(tmpUrl)) return (Cursor) resources.get(tmpUrl);
+			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);
-			if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + url);
+			if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + tmpUrl);
 			resources.put(url, cursor);
 			return cursor;
 		}

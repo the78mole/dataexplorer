@@ -39,87 +39,85 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class DigitalDisplay extends Composite {
-	private Logger					log	= Logger.getLogger(this.getClass().getName());
+	final static Logger			log	= Logger.getLogger(DigitalDisplay.class.getName());
 
-	private CLabel					textDigitalLabel;
-	private CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
-	private Composite				minMaxComposite;
+	CLabel					textDigitalLabel;
+	CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
+	Composite				minMaxComposite;
 
-	private final Channels	channels;
-	private final String		recordKey;
-	private final IDevice		device;
+	final Channels	channels;
+	final String		recordKey;
+	final IDevice		device;
 
-	public DigitalDisplay(Composite digitalWindow, String recordKey, IDevice device) {
+	public DigitalDisplay(Composite digitalWindow, String currentRecordKey, IDevice currentDevice) {
 		super(digitalWindow, SWT.BORDER);
 		FillLayout digitalComposite1Layout = new FillLayout(SWT.VERTICAL);
 		this.setLayout(digitalComposite1Layout);
-		this.recordKey = recordKey;
-		this.device = device;
+		this.recordKey = currentRecordKey;
+		this.device = currentDevice;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
 		{
-			textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
-			textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			textDigitalLabel.addPaintListener(new PaintListener() {
+			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
+			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
+			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.finest("textDigitalLabel.paintControl, event=" + evt);
-					Channel activeChannel = channels.getActiveChannel();
+					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							log.fine("update label for " + recordKey);
-							textDigitalLabel.setText(activeRecordSet.get(recordKey).getName() + " [ " + activeRecordSet.get(recordKey).getUnit() + " ]");
+							log.fine("update label for " + DigitalDisplay.this.recordKey);
+							DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
 						}
 					}
 				}
 			});
 		}
 		{
-			actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			actualDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			actualDigitalLabel.setText("00,00");
-			actualDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 72, 0, false, false));
-			actualDigitalLabel.addPaintListener(new PaintListener() {
+			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
+			this.actualDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.actualDigitalLabel.setText("00,00");
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 72, 0, false, false));
+			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
 					log.finest("digitalLabel.paintControl, event=" + evt);
-					Channel activeChannel = channels.getActiveChannel();
+					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							String channelConfigKey = activeRecordSet.getChannelName();
-							if (activeRecordSet != null) {
-								Record record = activeRecordSet.getRecord(recordKey);
+								Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 								if (record != null) {
 									CLabel label = (CLabel) evt.widget;
 									label.setForeground(record.getColor());
 									DecimalFormat df = record.getDecimalFormat();
-									actualDigitalLabel.setText(df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
-									maxDigitalLabel.setText("MAX : " + df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.getMaxValue()) / 1000.0)));
-									minDigitalLabel.setText("MIN : " + df.format(device.translateValue(channelConfigKey, recordKey, new Double(record.getMinValue()) / 1000.0)));
+									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
+									DigitalDisplay.this.maxDigitalLabel.setText("MAX : " + df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.getMaxValue()) / 1000.0)));
+									DigitalDisplay.this.minDigitalLabel.setText("MIN : " + df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.getMinValue()) / 1000.0)));
 								}
-							}
 						}
 					}
 				}
 			});
 		}
 		{
-			minMaxComposite = new Composite(this, SWT.NONE);
+			this.minMaxComposite = new Composite(this, SWT.NONE);
 			FillLayout digitalComposite1Layout = new FillLayout(SWT.HORIZONTAL);
-			minMaxComposite.setLayout(digitalComposite1Layout);
+			this.minMaxComposite.setLayout(digitalComposite1Layout);
 
-			minDigitalLabel = new CLabel(minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
-			minDigitalLabel.setText("MIN : 00,00");
-			minDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
-			minDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.minDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
+			this.minDigitalLabel.setText("MIN : 00,00");
+			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+			this.minDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
-			maxDigitalLabel = new CLabel(minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
-			maxDigitalLabel.setText("MAX : 00,00");
-			maxDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
-			maxDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
+			this.maxDigitalLabel.setText("MAX : 00,00");
+			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+			this.maxDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		}
 	}
 
@@ -127,6 +125,6 @@ public class DigitalDisplay extends Composite {
 	 * @return the digitalLabel
 	 */
 	public CLabel getDigitalLabel() {
-		return actualDigitalLabel;
+		return this.actualDigitalLabel;
 	}
 }

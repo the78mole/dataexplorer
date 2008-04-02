@@ -35,7 +35,7 @@ import osde.ui.OpenSerialDataExplorer;
  */
 public class Record extends Vector<Integer> {
 	static final long						serialVersionUID			= 26031957;
-	private Logger							log										= Logger.getLogger(this.getClass().getName());
+	static final Logger					log										= Logger.getLogger(Record.class.getName());
 
 	private String							name;																																// MessgrößeX Höhe
 	private String							unit;																																// Einheit m
@@ -65,10 +65,10 @@ public class Record extends Vector<Integer> {
 	private boolean							isStartpointZero			= false;
 	private boolean							isStartEndDefined			= false;
 	private int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
-	private double							maxScaleValue					= maxValue;																		// overwrite calculated boundaries
-	private double							minScaleValue					= minValue;
-	private double							maxZoomScaleValue		= maxScaleValue;
-	private double							minZoomScaleValue		= minScaleValue;
+	private double							maxScaleValue					= this.maxValue;																		// overwrite calculated boundaries
+	private double							minScaleValue					= this.minValue;
+	private double							maxZoomScaleValue		= this.maxScaleValue;
+	private double							minZoomScaleValue		= this.minScaleValue;
 
 	private double							displayScaleFactorTime;
 	private double							displayScaleFactorValue;
@@ -99,22 +99,23 @@ public class Record extends Vector<Integer> {
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
-	 * @param name
-	 * @param unit
-	 * @param symbol
-	 * @param factor
+	 * @param newName
+	 * @param newUnit
+	 * @param newSymbol
+	 * @param newFactor
+	 * @param newTimeStep_ms
 	 * @param initialCapacity
 	 */
-	public Record(String name, String symbol, String unit, boolean isActive, double offset, double factor, int timeStep_ms, int initialCapacity) {
+	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, double newOffset, double newFactor, int newTimeStep_ms, int initialCapacity) {
 		super(initialCapacity);
-		this.name = name;
-		this.symbol = symbol;
-		this.unit = unit;
-		this.offset = offset;
-		this.factor = factor;
-		this.isActive = isActive;
-		this.timeStep_ms = timeStep_ms;
-		this.isDisplayable = isActive ? true : false;
+		this.name = newName;
+		this.symbol = newSymbol;
+		this.unit = newUnit;
+		this.offset = newOffset;
+		this.factor = newFactor;
+		this.isActive = isActiveValue;
+		this.timeStep_ms = newTimeStep_ms;
+		this.isDisplayable = isActiveValue ? true : false;
 		this.df = new DecimalFormat("0.0");
 		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 	}
@@ -162,52 +163,52 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	public synchronized void add(int point) {
-		if (isEmpty) {
-			minValue = maxValue = point;
-			isEmpty = false;
+		if (this.isEmpty) {
+			this.minValue = this.maxValue = point;
+			this.isEmpty = false;
 		}
 		else {
-			if (point > maxValue) maxValue = point;
-			if (point < minValue) minValue = point;
+			if (point > this.maxValue) this.maxValue = point;
+			if (point < this.minValue) this.minValue = point;
 		}
 		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point);
 		this.add(new Integer(point));
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getUnit() {
-		return unit;
+		return this.unit;
 	}
 
 	public String getSymbol() {
-		return symbol;
+		return this.symbol;
 	}
 
 	public double getFactor() {
-		return factor;
+		return this.factor;
 	}
 
 	public double getOffset() {
-		return offset;
+		return this.offset;
 	}
 
 	public boolean isVisible() {
-		return isVisible;
+		return this.isVisible;
 	}
 
-	public void setVisible(boolean isVisible) {
-		this.isVisible = isVisible;
+	public void setVisible(boolean enabled) {
+		this.isVisible = enabled;
 	}
 
 	public int getMaxValue() {
-			return maxValue;
+			return this.maxValue;
 	}
 
 	public int getMinValue() {
-			return minValue;
+			return this.minValue;
 	}
 
 	/**
@@ -246,16 +247,17 @@ public class Record extends Vector<Integer> {
 	 */
 	public Integer get(int index) {
 		int size = super.size();
-		if(parent.isZoomMode()) {
-			index = index + parent.getRecordZoomOffset();
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
+		int currentIndex = index;
+		if(this.parent.isZoomMode()) {
+			currentIndex = currentIndex + this.parent.getRecordZoomOffset();
+			currentIndex = currentIndex > (size-1) ? (size-1) : currentIndex;
+			currentIndex = currentIndex < 0 ? 0 : currentIndex;
 		}
 		else {
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
+			currentIndex = currentIndex > (size-1) ? (size-1) : currentIndex;
+			currentIndex = currentIndex < 0 ? 0 : currentIndex;
 		}
-		return size != 0 ? super.get(index) : 0;
+		return size != 0 ? super.get(currentIndex) : 0;
 	}
 	
 	/**
@@ -263,116 +265,119 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer elementAt(int index) {
-		if(parent.isZoomMode())
-			return super.elementAt(index + parent.getRecordZoomOffset());
+		Integer value;
+		if(this.parent.isZoomMode())
+			value = super.elementAt(index + this.parent.getRecordZoomOffset());
 		else
-			return super.elementAt(index);
+			value = super.elementAt(index);
+		
+		return value;
 	}
 	
 	public boolean isPositionLeft() {
-		return isPositionLeft;
+		return this.isPositionLeft;
 	}
 
-	public void setPositionLeft(boolean isPositionLeft) {
-		this.isPositionLeft = isPositionLeft;
+	public void setPositionLeft(boolean enabled) {
+		this.isPositionLeft = enabled;
 	}
 
 	public Color getColor() {
-		return color;
+		return this.color;
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
+	public void setColor(Color newColor) {
+		this.color = newColor;
 	}
 
 	public boolean isRoundOut() {
-		return parent.isZoomMode() ? false : isRoundOut;
+		return this.parent.isZoomMode() ? false : this.isRoundOut;
 	}
 
-	public void setRoundOut(boolean isRoundOut) {
-		this.isRoundOut = isRoundOut;
+	public void setRoundOut(boolean enabled) {
+		this.isRoundOut = enabled;
 	}
 
 	public boolean isStartpointZero() {
-		return parent.isZoomMode() ? false : isStartpointZero;
+		return this.parent.isZoomMode() ? false : this.isStartpointZero;
 	}
 
-	public void setStartpointZero(boolean isStartpointZero) {
-		this.isStartpointZero = isStartpointZero;
+	public void setStartpointZero(boolean enabled) {
+		this.isStartpointZero = enabled;
 	}
 
 	public boolean isStartEndDefined() {
-		return parent.isZoomMode() ? true : isStartEndDefined;
+		return this.parent.isZoomMode() ? true : this.isStartEndDefined;
 	}
 
 	/**
 	 * sets the min-max values as displayed 4.0 - 200.5
-	 * @param isStartEndDefined
+	 * @param enabled
 	 * @param newMinScaleValue
 	 * @param newMaxScaleValue
 	 */
-	public void setStartEndDefined(boolean isStartEndDefined, double newMinScaleValue, double newMaxScaleValue) {
-		this.isStartEndDefined = isStartEndDefined;
-		if (isStartEndDefined) {
+	public void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue) {
+		this.isStartEndDefined = enabled;
+		if (enabled) {
 			this.maxScaleValue = newMaxScaleValue;
 			this.minScaleValue = newMinScaleValue;
 		}
 		else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
 				this.channelConfigKey = this.parent.getChannelName();
-			this.maxScaleValue = device.translateValue(channelConfigKey, this.name, maxValue/1000);
-			this.minScaleValue = device.translateValue(channelConfigKey, this.name, minValue/1000);
+			this.maxScaleValue = this.device.translateValue(this.channelConfigKey, this.name, this.maxValue/1000.0);
+			this.minScaleValue = this.device.translateValue(this.channelConfigKey, this.name, this.minValue/1000.0);
 		}
 	}
 
 	public void setMinScaleValue(double newMinScaleValue) {
-		if (parent.isZoomMode())
+		if (this.parent.isZoomMode())
 			this.minZoomScaleValue = newMinScaleValue;
 		else
 			this.minScaleValue = newMinScaleValue;
 	}
 
 	public void setMaxScaleValue(double newMaxScaleValue) {
-		if (parent.isZoomMode())
+		if (this.parent.isZoomMode())
 			this.maxZoomScaleValue = newMaxScaleValue;
 		else
 			this.maxScaleValue = newMaxScaleValue;
 	}
 
 	public int getLineWidth() {
-		return lineWidth;
+		return this.lineWidth;
 	}
 
-	public void setLineWidth(int lineWidth) {
-		this.lineWidth = lineWidth;
+	public void setLineWidth(int newLineWidth) {
+		this.lineWidth = newLineWidth;
 	}
 
 	public int getLineStyle() {
-		return lineStyle;
+		return this.lineStyle;
 	}
 
-	public void setLineStyle(int lineStyle) {
-		this.lineStyle = lineStyle;
+	public void setLineStyle(int newLineStyle) {
+		this.lineStyle = newLineStyle;
 	}
 
 	public int getNumberFormat() {
-		return numberFormat;
+		return this.numberFormat;
 	}
 
-	public void setNumberFormat(int numberFormat) {
-		this.numberFormat = numberFormat;
-		switch (numberFormat) {
+	public void setNumberFormat(int newNumberFormat) {
+		this.numberFormat = newNumberFormat;
+		switch (newNumberFormat) {
 		case 0:
-			df.applyPattern("0");
+			this.df.applyPattern("0");
 			break;
 		case 1:
-			df.applyPattern("0.0");
+			this.df.applyPattern("0.0");
 			break;
 		default:
-			df.applyPattern("0.00");
+			this.df.applyPattern("0.00");
 			break;
 		case 3:
-			df.applyPattern("0.000");
+			this.df.applyPattern("0.000");
 			break;
 		}
 	}
@@ -381,80 +386,80 @@ public class Record extends Vector<Integer> {
 	 * @return the parent
 	 */
 	public RecordSet getParent() {
-		return parent;
+		return this.parent;
 	}
 
 	/**
-	 * @param parent the parent to set
+	 * @param currentParent the parent to set
 	 */
-	public void setParent(RecordSet parent) {
+	public void setParent(RecordSet currentParent) {
 		if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
-			this.channelConfigKey = parent.getChannelName();
-		this.parent = parent;
+			this.channelConfigKey = currentParent.getChannelName();
+		this.parent = currentParent;
 	}
 
 	/**
 	 * @return the isDisplayable
 	 */
 	public boolean isDisplayable() {
-		return isDisplayable;
+		return this.isDisplayable;
 	}
 
 	/**
-	 * @param isDisplayable the isDisplayable to set
+	 * @param enabled the isDisplayable to set
 	 */
-	public void setDisplayable(boolean isDisplayable) {
-		this.isDisplayable = isDisplayable;
+	public void setDisplayable(boolean enabled) {
+		this.isDisplayable = enabled;
 	}
 
 	/**
 	 * @return the isActive
 	 */
 	public boolean isActive() {
-		return isActive;
+		return this.isActive;
 	}
 
 	/**
 	 * @return the maxScaleValue
 	 */
 	public double getMaxScaleValue() {
-		return parent.isZoomMode() ? this.maxZoomScaleValue : this.maxScaleValue;
+		return this.parent.isZoomMode() ? this.maxZoomScaleValue : this.maxScaleValue;
 	}
 
 	/**
 	 * @return the minScaleValue
 	 */
 	public double getMinScaleValue() {
-		return parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
+		return this.parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
 	public int getTimeStep_ms() {
-		return timeStep_ms;
+		return this.timeStep_ms;
 	}
 
 	public DecimalFormat getDecimalFormat() {
-		return df;
+		return this.df;
 	}
 
 	/**
 	 * @return the keyName
 	 */
 	public String getKeyName() {
-		return keyName;
+		return this.keyName;
 	}
 
 	/**
-	 * @param keyName the keyName to set
+	 * @param newKeyName the keyName to set
 	 */
-	public void setKeyName(String keyName) {
-		this.keyName = keyName;
+	public void setKeyName(String newKeyName) {
+		this.keyName = newKeyName;
 	}
 
 	/**
 	 * @return the device
 	 */
 	public IDevice getDevice() {
-		return device;
+		return this.device;
 	}
 	
 	/**
@@ -480,7 +485,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
-		scaledIndex = parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - parent.getRecordZoomOffset() -1 : scaledIndex;
+		scaledIndex = this.parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - this.parent.getRecordZoomOffset() -1 : scaledIndex;
 		if (log.isLoggable(Level.FINER))log.finer("scaledIndex = " + scaledIndex);
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
@@ -496,10 +501,13 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public String getDisplayPointValueString(int yPos, Rectangle drawAreaBounds) {
-		if(parent.isZoomMode())
-			return df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		String displayPointValue;
+		if(this.parent.isZoomMode())
+			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		else
-			return df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+			displayPointValue = this.df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		
+		return displayPointValue;
 	}
 
 	/**
@@ -509,10 +517,13 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public double getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
-		if(parent.isZoomMode())
-			return this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
+		double value;
+		if(this.parent.isZoomMode())
+			value = this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
 		else
-			return this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
+			value = this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
+		
+		return value;
 	}
 
 	/**
@@ -522,10 +533,13 @@ public class Record extends Vector<Integer> {
 	 * @return formated value
 	 */
 	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
-		if(parent.isZoomMode())
-			return df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
+		String textValue;
+		if(this.parent.isZoomMode())
+			textValue = this.df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
 		else
-			return df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+			textValue = this.df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
+	
+		return textValue;
 	}
 	
 	/**
@@ -537,35 +551,35 @@ public class Record extends Vector<Integer> {
 	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
 		if(log.isLoggable(Level.FINE)) log.fine("" + points.toString());
 		double measureDelta;
-		if(parent.isZoomMode())
+		if(this.parent.isZoomMode())
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
 		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta);
-		return df.format(measureDelta / timeDelta);
+		return this.df.format(measureDelta / timeDelta);
 	}
 	
 	/**
 	 * @return the displayScaleFactorTime
 	 */
 	public double getDisplayScaleFactorTime() {
-		return displayScaleFactorTime;
+		return this.displayScaleFactorTime;
 	}
 
 	/**
-	 * @param displayScaleFactorTime the displayScaleFactorTime to set
+	 * @param newDisplayScaleFactorTime the displayScaleFactorTime to set
 	 */
-	public void setDisplayScaleFactorTime(double displayScaleFactorTime) {
-		this.displayScaleFactorTime = displayScaleFactorTime;
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", displayScaleFactorTime));
+	public void setDisplayScaleFactorTime(double newDisplayScaleFactorTime) {
+		this.displayScaleFactorTime = newDisplayScaleFactorTime;
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime));
 	}
 
 	/**
 	 * @return the displayScaleFactorValue
 	 */
 	public double getDisplayScaleFactorValue() {
-		return displayScaleFactorValue;
+		return this.displayScaleFactorValue;
 	}
 
 	/**
@@ -573,89 +587,89 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
 
 	}
 
 	/**
-	 * @param minDisplayValue the minDisplayValue to set
+	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
-	public void setMinDisplayValue(double minDisplayValue) {
-		this.minDisplayValue = minDisplayValue;
+	public void setMinDisplayValue(double newMinDisplayValue) {
+		this.minDisplayValue = newMinDisplayValue;
 	}
 
 	/**
-	 * @param maxDisplayValue the maxDisplayValue to set
+	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
-	public void setMaxDisplayValue(double maxDisplayValue) {
-		this.maxDisplayValue = maxDisplayValue;
+	public void setMaxDisplayValue(double newMaxDisplayValue) {
+		this.maxDisplayValue = newMaxDisplayValue;
 	}
 
 	/**
 	 * @return the minDisplayValue
 	 */
 	public double getMinDisplayValue() {
-		return minDisplayValue;
+		return this.minDisplayValue;
 	}
 
 	/**
 	 * @return the maxDisplayValue
 	 */
 	public double getMaxDisplayValue() {
-		return maxDisplayValue;
+		return this.maxDisplayValue;
 	}
 
 	/**
 	 * set min and max scale values for zoomed mode
-	 * @param minZoomScaleValue
-	 * @param maxZoomScaleValue
+	 * @param newMinZoomScaleValue
+	 * @param newMaxZoomScaleValue
 	 */
-	public void setMinMaxZoomScaleValues(double minZoomScaleValue, double maxZoomScaleValue) {
-		this.minZoomScaleValue				= minZoomScaleValue;
-		this.maxZoomScaleValue				= maxZoomScaleValue;
-		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + minScaleValue + "/"  + minZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + maxScaleValue + "/"  + maxZoomScaleValue);
+	public void setMinMaxZoomScaleValues(double newMinZoomScaleValue, double newMaxZoomScaleValue) {
+		this.minZoomScaleValue				= newMinZoomScaleValue;
+		this.maxZoomScaleValue				= newMaxZoomScaleValue;
+		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue);
 	}
 
 	/**
 	 * @return the isMeasurementMode
 	 */
 	public boolean isMeasurementMode() {
-		return isMeasurementMode;
+		return this.isMeasurementMode;
 	}
 
 	/**
-	 * @param isMeasurementMode the isMeasurementMode to set
+	 * @param enabled the isMeasurementMode to set
 	 */
-	public void setMeasurementMode(boolean isMeasurementMode) {
-		this.isMeasurementMode = isMeasurementMode;
+	public void setMeasurementMode(boolean enabled) {
+		this.isMeasurementMode = enabled;
 	}
 
 	/**
 	 * @return the isDeltaMeasurementMode
 	 */
 	public boolean isDeltaMeasurementMode() {
-		return isDeltaMeasurementMode;
+		return this.isDeltaMeasurementMode;
 	}
 
 	/**
-	 * @param isDeltaMeasurementMode the isDeltaMeasurementMode to set
+	 * @param enabled the isDeltaMeasurementMode to set
 	 */
-	public void setDeltaMeasurementMode(boolean isDeltaMeasurementMode) {
-		this.isDeltaMeasurementMode = isDeltaMeasurementMode;
+	public void setDeltaMeasurementMode(boolean enabled) {
+		this.isDeltaMeasurementMode = enabled;
 	}
 
 	/**
 	 * @return the parentName
 	 */
 	public String getChannelConfigKey() {
-		return channelConfigKey;
+		return this.channelConfigKey;
 	}
 
 	/**
-	 * @param channelConfigKey the channelConfigKey to set
+	 * @param newChannelConfigKey the channelConfigKey to set
 	 */
-	public void setChannelConfigKey(String channelConfigKey) {
-		this.channelConfigKey = channelConfigKey;
+	public void setChannelConfigKey(String newChannelConfigKey) {
+		this.channelConfigKey = newChannelConfigKey;
 	}
 
 	/**

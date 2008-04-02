@@ -45,11 +45,11 @@ public enum DataTypes {
     private final String value;
 
     DataTypes(String v) {
-        value = v;
+    	this.value = v;
     }
 
     public String value() {
-        return value;
+        return this.value;
     }
 
     public static DataTypes fromValue(String v) {

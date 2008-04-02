@@ -58,19 +58,19 @@ public class PropertyType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
      * Sets the value of the name property.
      * 
-     * @param value
+     * @param newValue
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setName(String newValue) {
+        this.name = newValue;
     }
 
     /**
@@ -82,19 +82,19 @@ public class PropertyType {
      *     
      */
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     /**
      * Sets the value of the value property.
      * 
-     * @param value
+     * @param newValue
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setValue(String newValue) {
+        this.value = newValue;
     }
 
     /**
@@ -106,19 +106,19 @@ public class PropertyType {
      *     
      */
     public DataTypes getType() {
-        return type;
+        return this.type;
     }
 
     /**
      * Sets the value of the type property.
      * 
-     * @param value
+     * @param newValue
      *     allowed object is
      *     {@link DataTypes }
      *     
      */
-    public void setType(DataTypes value) {
-        this.type = value;
+    public void setType(DataTypes newValue) {
+        this.type = newValue;
     }
 
     /**
@@ -130,19 +130,19 @@ public class PropertyType {
      *     
      */
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     /**
      * Sets the value of the description property.
      * 
-     * @param value
+     * @param newValue
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setDescription(String value) {
-        this.description = value;
+    public void setDescription(String newValue) {
+        this.description = newValue;
     }
 
 }

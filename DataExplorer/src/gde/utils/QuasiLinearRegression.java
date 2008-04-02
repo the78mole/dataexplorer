@@ -29,35 +29,36 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class QuasiLinearRegression extends CalculationThread {
-	private Logger	log	= Logger.getLogger(this.getClass().getName());
+	final static Logger	logQl	= Logger.getLogger(QuasiLinearRegression.class.getName());
 
 	/**
 	 * constructor where calculation required parameters are given as parameter
-	 * @param recordSet
-	 * @param sourceRecordKey
-	 * @param targetRecordKey
+	 * @param currentRecordSet
+	 * @param inRecordKey
+	 * @param outRecordKey
+	 * @param calcIntervalSec
 	 */
-	public QuasiLinearRegression(RecordSet recordSet, String sourceRecordKey, String targetRecordKey, int calcInterval_sec) {
-		super(recordSet, sourceRecordKey, targetRecordKey, calcInterval_sec);
+	public QuasiLinearRegression(RecordSet currentRecordSet, String inRecordKey, String outRecordKey, int calcIntervalSec) {
+		super(currentRecordSet, inRecordKey, outRecordKey, calcIntervalSec);
 	}
-
 
 	/**
 	 * method which do the slope calculation on base of linear regression
 	 */
+	@Override
 	public void run() {
-		if (recordSet == null || sourceRecordKey == null || targetRecordKey == null) {
-			log.warning("Die Steigung kann nicht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
+		if (this.recordSet == null || this.sourceRecordKey == null || this.targetRecordKey == null) {
+			QuasiLinearRegression.logQl.warning("Die Steigung kann nicht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
 			return;
 		}
-		log.fine("start data calculation for record = " + targetRecordKey);
+		QuasiLinearRegression.logQl.fine("start data calculation for record = " + this.targetRecordKey);
 
-		Record record = recordSet.get(targetRecordKey);
+		Record record = this.recordSet.get(this.targetRecordKey);
 		record.clear();
-		Record recordHeight = recordSet.get(sourceRecordKey);
+		Record recordHeight = this.recordSet.get(this.sourceRecordKey);
 
-		int time_ms = recordSet.getTimeStep_ms();
-		int pointsPerInterval = calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
+		int time_ms = this.recordSet.getTimeStep_ms();
+		int pointsPerInterval = this.calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
 		int pointInterval = 2;
 
 		int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
@@ -65,7 +66,7 @@ public class QuasiLinearRegression extends CalculationThread {
 		int counter = (recordHeight.size() % pointsPerInterval) + (pointInterval / 2);
 		int padding = pointsPerInterval / 2 - pointInterval;
 		// padding data points which does not fit into interval
-		for (int i = 0; i < counter+padding; i++) { // 0,5 sec
+		for (int i = 0; i < counter + padding; i++) { // 0,5 sec
 			record.add(0);
 		}
 
@@ -82,10 +83,10 @@ public class QuasiLinearRegression extends CalculationThread {
 			ssXX = ssXX + (((1 / 0.05 * i) - avgX) * ((1 / 0.05 * i) - avgX));
 		}
 		ssXX = ssXX / pointsPerInterval;
-		if (log.isLoggable(Level.FINEST)) log.finest("avgX = " + avgX + " ssXX = " + ssXX);
+		if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.finest("avgX = " + avgX + " ssXX = " + ssXX);
 
 		--modCounter;
-		while (modCounter > 0 && !threadStop) {
+		while (modCounter > 0 && !this.threadStop) {
 			// calculate avg y
 			double avgY = 0.0;
 			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
@@ -115,20 +116,20 @@ public class QuasiLinearRegression extends CalculationThread {
 			}
 			counter = counter + pointInterval;
 
-			if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
+			if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
 			--modCounter;
 		}
 		// pad the rest of the curve to make equal size
-		for (int i = record.size()-1; i < recordHeight.size()-1; i++) {
+		for (int i = record.size() - 1; i < recordHeight.size() - 1; i++) {
 			record.add(0);
 		}
-		if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter);
+		if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.fine("counter = " + counter + " modCounter = " + modCounter);
 
 		record.setDisplayable(true);
-		if (record.isVisible()) application.updateGraphicsWindow();
-		
+		if (record.isVisible()) this.application.updateGraphicsWindow();
+
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-		log.fine("finished data calculation for record = " + targetRecordKey);
+		QuasiLinearRegression.logQl.fine("finished data calculation for record = " + this.targetRecordKey);
 	}
 
 }

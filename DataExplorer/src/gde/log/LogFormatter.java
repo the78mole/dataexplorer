@@ -52,17 +52,17 @@ public class LogFormatter extends Formatter {
 	public synchronized String format(LogRecord record) {
 		//StringBuilder sb = new StringBuilder();
 		// Minimize memory allocations here.
-		dat.setTime(record.getMillis());
-		args[0] = dat;
-		args[1] = record.getThreadID();
-		args[2] = record.getLoggerName();
-		args[3] = record.getSourceMethodName();
-		args[4] = record.getMessage();
+		this.dat.setTime(record.getMillis());
+		this.args[0] = this.dat;
+		this.args[1] = record.getThreadID();
+		this.args[2] = record.getLoggerName();
+		this.args[3] = record.getSourceMethodName();
+		this.args[4] = record.getMessage();
 		StringBuffer text = new StringBuffer();
-		if (formatter == null) {
-		    formatter = new MessageFormat(format);
+		if (this.formatter == null) {
+			this.formatter = new MessageFormat(format);
 		}
-		formatter.format(args, text, null);
+		this.formatter.format(this.args, text, null);
 		//sb.append(text).append(" ").append(tf.format(dat)).append(" ");
 		//sb.append(String.format(" %06X ", ));
 		//sb.append(record.getLoggerName()).append('.');

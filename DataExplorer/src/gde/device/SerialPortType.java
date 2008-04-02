@@ -90,7 +90,7 @@ public class SerialPortType {
      *     
      */
     public String getPort() {
-        return port;
+        return this.port;
     }
 
     /**
@@ -114,7 +114,7 @@ public class SerialPortType {
      *     
      */
     public BigInteger getBaudeRate() {
-        return baudeRate;
+        return this.baudeRate;
     }
 
     /**
@@ -138,7 +138,7 @@ public class SerialPortType {
      *     
      */
     public BigInteger getDataBits() {
-        return dataBits;
+        return this.dataBits;
     }
 
     /**
@@ -162,7 +162,7 @@ public class SerialPortType {
      *     
      */
     public StopBitsType getStopBits() {
-        return stopBits;
+        return this.stopBits;
     }
 
     /**
@@ -186,7 +186,7 @@ public class SerialPortType {
      *     
      */
     public ParityType getParity() {
-        return parity;
+        return this.parity;
     }
 
     /**
@@ -210,7 +210,7 @@ public class SerialPortType {
      *     
      */
     public FlowControlType getFlowControlMode() {
-        return flowControlMode;
+        return this.flowControlMode;
     }
 
     /**
@@ -230,7 +230,7 @@ public class SerialPortType {
      * 
      */
     public boolean isIsRTS() {
-        return isRTS;
+        return this.isRTS;
     }
 
     /**
@@ -246,7 +246,7 @@ public class SerialPortType {
      * 
      */
     public boolean isIsDTR() {
-        return isDTR;
+        return this.isDTR;
     }
 
     /**
@@ -266,7 +266,7 @@ public class SerialPortType {
      *     
      */
     public TimeOutType getTimeOut() {
-        return timeOut;
+        return this.timeOut;
     }
 
     /**
@@ -290,7 +290,7 @@ public class SerialPortType {
      *     
      */
     public DataBlockType getDataBlock() {
-        return dataBlock;
+        return this.dataBlock;
     }
 
     /**

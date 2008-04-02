@@ -68,7 +68,7 @@ public class MeasurementType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -92,7 +92,7 @@ public class MeasurementType {
      *     
      */
     public String getSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
     /**
@@ -116,7 +116,7 @@ public class MeasurementType {
      *     
      */
     public String getUnit() {
-        return unit;
+        return this.unit;
     }
 
     /**
@@ -140,7 +140,7 @@ public class MeasurementType {
      *     
      */
     public boolean isActive() {
-        return active != null ? active : false;
+        return this.active != null ? this.active : false;
     }
 
     /**
@@ -190,8 +190,8 @@ public class MeasurementType {
      * 
      */
     public List<PropertyType> getProperty() {
-        if (property == null) {
-            property = new ArrayList<PropertyType>();
+        if (this.property == null) {
+        	this.property = new ArrayList<PropertyType>();
         }
         return this.property;
     }
@@ -216,15 +216,15 @@ public class MeasurementType {
   	 * @return PropertyType object
   	 */
   	public PropertyType getProperty(String propertyKey) {
-  		PropertyType property = null;
+  		PropertyType tmpProperty = null;
   		List<PropertyType> properties = this.getProperty();
   		for (PropertyType propertyType : properties) {
   			if(propertyType.getName().equals(propertyKey)) {
-  				property = propertyType;
+  				tmpProperty = propertyType;
   				break;
   			}
   		}
-  		return property;
+  		return tmpProperty;
   	}
 
   	/**
@@ -232,11 +232,12 @@ public class MeasurementType {
   	 * @return the offset, if property does not exist return 0.0 as default value
   	 */
   	public double getOffset() {
-  		PropertyType property = this.getProperty(IDevice.OFFSET);
-  		if (property == null) // property does not exist
-  			return 0.0;
-  		else
-  			return new Double(property.getValue()).doubleValue();
+  		double value = 0.0;
+  		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
+  		if (tmpProperty != null) 
+  			value = new Double(tmpProperty.getValue()).doubleValue();
+  		
+  		return value;
   	}
 
   	/**
@@ -244,12 +245,12 @@ public class MeasurementType {
   	 * @param offset the offset to set
   	 */
   	public void setOffset(double offset) {
-  		PropertyType property = this.getProperty(IDevice.OFFSET);
-  		if (property == null) {
+  		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
+  		if (tmpProperty == null) {
   			createProperty(IDevice.OFFSET, DataTypes.DOUBLE, offset);
   		}
   		else {
-  			property.setValue("" + offset);
+  			tmpProperty.setValue("" + offset);
   		}
   	}
 
@@ -258,11 +259,12 @@ public class MeasurementType {
   	 * @return the factor, if property does not exist return 1.0 as default value
   	 */
   	public double getFactor() {
-  		PropertyType property = getProperty(IDevice.FACTOR);
-  		if (property == null) // property does not exist
-  			return 1.0;
-  		else
-  			return new Double(property.getValue()).doubleValue();
+  		double value = 1.0;
+  		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
+  		if (tmpProperty != null)
+  			value = new Double(tmpProperty.getValue()).doubleValue();
+  		
+  		return value;
   	}
 
   	/**
@@ -270,12 +272,12 @@ public class MeasurementType {
  		 * @param factor the offset to set
   	 */
   	public void setFactor(double factor) {
-  		PropertyType property = this.getProperty(IDevice.FACTOR);
-  		if (property == null) {
+  		PropertyType tmpProperty = this.getProperty(IDevice.FACTOR);
+  		if (tmpProperty == null) {
   			createProperty(IDevice.FACTOR, DataTypes.DOUBLE, factor);
   		}
   		else {
-  			property.setValue("" + factor);
+  			tmpProperty.setValue("" + factor);
   		}
   	}
 }

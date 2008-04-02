@@ -55,10 +55,10 @@ public abstract class DeviceDialog extends Dialog{
 	 */
 	public void dispose() {
 		if (this.isClosePossible) {
-			dialogShell.dispose();
-			application.setStatusMessage("");
+			this.dialogShell.dispose();
+			this.application.setStatusMessage("");
 		}
-		else application.setStatusMessage(disposeDisabledMessage, SWT.COLOR_RED);
+		else this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
 	}
 
 	public void close() {
@@ -70,20 +70,41 @@ public abstract class DeviceDialog extends Dialog{
 	 * implement all cleanup operation in a disposeListener method
 	 */
 	public boolean isDisposed() {
-		return dialogShell != null ? dialogShell.isDisposed() : true;
+		return this.dialogShell != null ? this.dialogShell.isDisposed() : true;
 	}
 
 	/**
 	 * default method to drive visibility of a dialog shell
 	 */
 	public void setVisible(boolean value) {
-		dialogShell.setVisible(value);
+		this.dialogShell.setVisible(value);
 	}
 
 	/**
 	 * default method to set the focus of a dialog shell
 	 */
 	public boolean setFocus() {
-		return dialogShell != null ? dialogShell.setFocus() : false;
+		return this.dialogShell != null ? this.dialogShell.setFocus() : false;
+	}
+
+	/**
+	 * @return the dialogShell
+	 */
+	public Shell getDialogShell() {
+		return this.dialogShell;
+	}
+
+	/**
+	 * @return the isClosePossible
+	 */
+	public boolean isClosePossible() {
+		return this.isClosePossible;
+	}
+
+	/**
+	 * @param enabled the boolean isClosePossible value to set
+	 */
+	public void setClosePossible(boolean enabled) {
+		this.isClosePossible = enabled;
 	}
 }

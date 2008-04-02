@@ -69,7 +69,7 @@ public class DevicePropertiesType {
      *     
      */
     public DeviceType getDevice() {
-        return device;
+        return this.device;
     }
 
     /**
@@ -93,7 +93,7 @@ public class DevicePropertiesType {
      *     
      */
     public SerialPortType getSerialPort() {
-        return serialPort;
+        return this.serialPort;
     }
 
     /**
@@ -117,7 +117,7 @@ public class DevicePropertiesType {
      *     
      */
     public TimeBaseType getTimeBase() {
-        return timeBase;
+        return this.timeBase;
     }
 
     /**
@@ -155,8 +155,8 @@ public class DevicePropertiesType {
      * 
      */
     public List<ChannelType> getChannel() {
-        if (channel == null) {
-            channel = new ArrayList<ChannelType>();
+        if (this.channel == null) {
+        	this.channel = new ArrayList<ChannelType>();
         }
         return this.channel;
     }
@@ -170,7 +170,7 @@ public class DevicePropertiesType {
      *     
      */
     public DesktopType getDesktop() {
-        return desktop;
+        return this.desktop;
     }
 
     /**

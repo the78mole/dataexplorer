@@ -39,67 +39,67 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class DigitalWindow {
-	private Logger													log	= Logger.getLogger(this.getClass().getName());
+	final static Logger							log	= Logger.getLogger(DigitalWindow.class.getName());
 
-	private Composite												digitalMainComposite;
-	private TabItem													digitalTab;
-	private HashMap<String, DigitalDisplay>	displays;
-	private CLabel													infoText;
-	private FillLayout 											digitalMainCompositeLayout;
-	private String 													info = "Die Anzeige ist ausgeschaltet!";
+	Composite												digitalMainComposite;
+	TabItem													digitalTab;
+	HashMap<String, DigitalDisplay>	displays;
+	CLabel													infoText;
+	FillLayout 											digitalMainCompositeLayout;
+	String 													info = "Die Anzeige ist ausgeschaltet!";
 
-	private final Channels									channels;
-	private final TabFolder									displayTab;
-	private RecordSet												oldRecordSet;
-	private Channel													oldChannel;
-	private String[] 												oldRecordsToDisplay;
+	final Channels									channels;
+	final TabFolder									displayTab;
+	RecordSet												oldRecordSet;
+	Channel													oldChannel;
+	String[] 												oldRecordsToDisplay;
 
-	public DigitalWindow(TabFolder displayTab) {
-		this.displayTab = displayTab;
+	public DigitalWindow(TabFolder currentDisplayTab) {
+		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		digitalTab = new TabItem(displayTab, SWT.NONE);
-		digitalTab.setText("Digital");
-		SWTResourceManager.registerResourceUser(digitalTab);
+		this.digitalTab = new TabItem(this.displayTab, SWT.NONE);
+		this.digitalTab.setText("Digital");
+		SWTResourceManager.registerResourceUser(this.digitalTab);
 		
-		displays = new HashMap<String, DigitalDisplay>(3);
+		this.displays = new HashMap<String, DigitalDisplay>(3);
 		{
-			digitalMainComposite = new Composite(displayTab, SWT.NONE);
-			digitalTab.setControl(digitalMainComposite);
-			digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
-			digitalMainComposite.setLayout(null);
-			digitalMainComposite.addPaintListener(new PaintListener() {
+			this.digitalMainComposite = new Composite(this.displayTab, SWT.NONE);
+			this.digitalTab.setControl(this.digitalMainComposite);
+			this.digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
+			this.digitalMainComposite.setLayout(null);
+			this.digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("digitalMainComposite.paintControl, event=" + evt);
 					update();
 				}
 			});
-			setActiveInfoText(info);
-			infoText.addPaintListener(new PaintListener() {
+			setActiveInfoText(this.info);
+			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("infoText.paintControl, event=" + evt);
 					update();
 				}
 			});
 			
-			digitalMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			digitalMainComposite.layout();
+			this.digitalMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.digitalMainComposite.layout();
 		}
 	}
 
 	/**
 	 * create new info text
 	 */
-	private void setActiveInfoText(String info) {
-		if (infoText == null || infoText.isDisposed()) {
-			digitalMainComposite.setLayout(null);
-			infoText = new CLabel(digitalMainComposite, SWT.LEFT);
-			infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			infoText.setBounds(10, 10, 200, 30);
-			infoText.setText(info);
+	private void setActiveInfoText(String udateInfo) {
+		if (this.infoText == null || this.infoText.isDisposed()) {
+			this.digitalMainComposite.setLayout(null);
+			this.infoText = new CLabel(this.digitalMainComposite, SWT.LEFT);
+			this.infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+			this.infoText.setBounds(10, 10, 200, 30);
+			this.infoText.setText(udateInfo);
 		}
 	}
 
@@ -107,11 +107,11 @@ public class DigitalWindow {
 	 * method to update the window with its children
 	 */
 	public void updateChilds() {
-		RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
+		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 			for (String recordKey : activeRecordKeys) {
-				DigitalDisplay display = displays.get(recordKey);
+				DigitalDisplay display = this.displays.get(recordKey);
 				if (display != null) display.getDigitalLabel().redraw();
 			}
 		}
@@ -121,57 +121,57 @@ public class DigitalWindow {
 	 * method to update digital window by adding removing digital displays
 	 */
 	public void update() {
-		Channel activeChannel = channels.getActiveChannel();
+		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.get(recordSet.getRecordNames()[0]).getDevice().isDigitalTabRequested()) {
+			if (recordSet != null && recordSet.get(recordSet.getFirstRecordName()).getDevice().isDigitalTabRequested()) {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
 		
 				// if recordSet name signature changed new displays need to be created
-				boolean isUpdateRequired = oldRecordSet == null || !recordSet.getName().equals(oldRecordSet.getName())
-				|| oldChannel == null  || !oldChannel.getName().equals(activeChannel.getName())
-						|| (recordsToDisplay.length != oldRecordsToDisplay.length);
+				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
+				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
+						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
 				log.fine("isUpdateRequired = " + isUpdateRequired);
 				if (isUpdateRequired) {
 					// remove the info text 
-					if (!infoText.isDisposed()) infoText.dispose();
+					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// set layout 
-					digitalMainComposite.setLayout(digitalMainCompositeLayout);
+					this.digitalMainComposite.setLayout(this.digitalMainCompositeLayout);
 					// cleanup
-					for (String recordKey : displays.keySet().toArray(new String[0])) {
-						DigitalDisplay display = displays.get(recordKey);
+					for (String recordKey : this.displays.keySet().toArray(new String[0])) {
+						DigitalDisplay display = this.displays.get(recordKey);
 						if (display != null) {
 							if (!display.isDisposed()) display.dispose();
-							displays.remove(recordKey);
+							this.displays.remove(recordKey);
 						}
 					}
 					// add new
 					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
-						DigitalDisplay display = new DigitalDisplay(digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
+						DigitalDisplay display = new DigitalDisplay(this.digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.fine("created digital display for " + recordKey);
-						displays.put(recordKey, display);
+						this.displays.put(recordKey, display);
 					}
-					oldRecordSet = recordSet;
-					oldRecordsToDisplay = recordsToDisplay;
+					this.oldRecordSet = recordSet;
+					this.oldRecordsToDisplay = recordsToDisplay;
 				}
 			}
 			else { // clean up after device switched
-				for (String recordKey : displays.keySet().toArray(new String[0])) {
-					DigitalDisplay display = displays.get(recordKey);
+				for (String recordKey : this.displays.keySet().toArray(new String[0])) {
+					DigitalDisplay display = this.displays.get(recordKey);
 					if (display != null) {
 						log.fine("clean child " + recordKey);
 						if (!display.isDisposed()) display.dispose();
-						displays.remove(recordKey);
+						this.displays.remove(recordKey);
 					}
 				}
-				if (recordSet != null && !recordSet.get(recordSet.getRecordNames()[0]).getDevice().isDigitalTabRequested())
-					if (infoText.isDisposed()) setActiveInfoText(info);
-					else infoText.setText(info);
+				if (recordSet != null && !recordSet.get(recordSet.getFirstRecordName()).getDevice().isDigitalTabRequested())
+					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
+					else this.infoText.setText(this.info);
 			}
-			oldChannel = activeChannel;
-			digitalMainComposite.layout();
+			this.oldChannel = activeChannel;
+			this.digitalMainComposite.layout();
 		}
 	}
 }

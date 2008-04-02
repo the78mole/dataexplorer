@@ -130,12 +130,12 @@ public class DeviceConfiguration {
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();
 
-		this.elememt = (JAXBElement<DevicePropertiesType>)unmarshaller.unmarshal(this.xmlFile);
-		this.deviceProps = elememt.getValue();
-		this.device = deviceProps.getDevice();
-		this.serialPort = deviceProps.getSerialPort();
-		this.timeBase = deviceProps.getTimeBase();
-		this.desktop = deviceProps.getDesktop();
+		this.elememt = (JAXBElement<DevicePropertiesType>)this.unmarshaller.unmarshal(this.xmlFile);
+		this.deviceProps = this.elememt.getValue();
+		this.device = this.deviceProps.getDevice();
+		this.serialPort = this.deviceProps.getSerialPort();
+		this.timeBase = this.deviceProps.getTimeBase();
+		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
 		
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
@@ -154,35 +154,24 @@ public class DeviceConfiguration {
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
 		this.timeBase = deviceConfig.timeBase;	
-		this.desktop = deviceProps.getDesktop();
+		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = deviceConfig.isChangePropery;
 
 		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
 	}
 
-//	public DeviceConfiguration(DeviceType device, SerialPortType serialPort, TimeBaseType timeBase, HashMap<String, ChannelType> channels) {
-//		this.device = device;
-//		this.serialPort = serialPort;
-//		this.timeBase = timeBase;
-//		for (int i = 1; i <= channels.size(); ++i) {
-//			this.channels.put(i, channels.get(i));
-//		}
-//
-//		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
-//	}
-
 	/**
 	 * writes updated device properties XML
 	 */
 	public void storeDeviceProperties() {
-		if (isChangePropery) {
+		if (this.isChangePropery) {
 			try {
-		    marshaller.marshal(this.elememt,  new FileOutputStream(this.xmlFile));
+				this.marshaller.marshal(this.elememt,  new FileOutputStream(this.xmlFile));
 			}
 			catch (Throwable t) {
 				log.log(Level.SEVERE, t.getMessage(), t);
 			}
-			isChangePropery = false;
+			this.isChangePropery = false;
 		}
 	}
 
@@ -190,21 +179,21 @@ public class DeviceConfiguration {
 	 * @return the device
 	 */
 	public DeviceType getDeviceType() {
-		return device;
+		return this.device;
 	}
 
 	/**
 	 * @return the serialPort
 	 */
 	public SerialPortType getSerialPortType() {
-		return serialPort;
+		return this.serialPort;
 	}
 
 	/**
 	 * @return the timeBase
 	 */
 	public TimeBaseType getTimeBaseType() {
-		return timeBase;
+		return this.timeBase;
 	}
 
 	public boolean isUsed() {
@@ -507,10 +496,10 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey) {
-		measurementKey = measurementKey.split("_")[0];
+		String tmpMeasurementKey = measurementKey.split("_")[0];
 		MeasurementType measurement = null;
 		for (MeasurementType meas : this.getChannel(channelConfigKey).getMeasurement()) {
-			if (meas.getName().equals(measurementKey)) {
+			if (meas.getName().equals(tmpMeasurementKey)) {
 				measurement = meas;
 				break;
 			}
@@ -586,7 +575,7 @@ public class DeviceConfiguration {
 				sb.append(measurementType.getName()).append(";");
 			}
 		}
-		return sb.toString().split(";");
+		return sb.toString().split(";").clone();
 	}
 
 	/**
@@ -616,11 +605,12 @@ public class DeviceConfiguration {
 	 */
 	public double getMeasurementOffset(String channelConfigKey, String measurementKey) {
 		if(log.isLoggable(Level.FINER)) log.finer("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.OFFSET);
-		if (property == null) // property does not exist
-			return 0.0;
-		else
-			return new Double(property.getValue()).doubleValue();
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		
+		return value;
 	}
 
 	/**
@@ -648,11 +638,12 @@ public class DeviceConfiguration {
 	 */
 	public double getMeasurementFactor(String channelConfigKey, String measurementKey) {
 		if(log.isLoggable(Level.FINER)) log.finer("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.FACTOR);
-		if (property == null) // property does not exist
-			return 1.0;
-		else
-			return new Double(property.getValue()).doubleValue();
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		
+		return value;
 	}
 
 	/**
@@ -680,18 +671,19 @@ public class DeviceConfiguration {
 	 */
 	public double getMeasurementReduction(String channelConfigKey, String measurementKey) {
 		if(log.isLoggable(Level.FINER)) log.finer("get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
+		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.REDUCTION);
-		if (property == null) // property does not exist
-			return 0.0;
-		else
-			return new Double(property.getValue()).doubleValue();
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		
+		return value;
 	}
 
 	/**
 	 * set new value for factor at the specified measurement (offset + (value - reduction) * factor)
 	 * @param channelConfigKey
 	 * @param measurementKey
-	 * @param factor the offset to set
+	 * @param reduction of the direct measured value
 	 */
 	public void setMeasurementReduction(String channelConfigKey, String measurementKey, double reduction) {
 		if(log.isLoggable(Level.FINER)) log.finer("set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementKey).getName()); 
@@ -776,16 +768,16 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param isChangePropery the isChangePropery to set
+	 * @param enabled the isChangePropery to set
 	 */
-	public void setChangePropery(boolean isChangePropery) {
-		this.isChangePropery = isChangePropery;
+	public void setChangePropery(boolean enabled) {
+		this.isChangePropery = enabled;
 	}
 
 	/**
 	 * @return the isChangePropery
 	 */
 	public boolean isChangePropery() {
-		return isChangePropery;
+		return this.isChangePropery;
 	}
 }
