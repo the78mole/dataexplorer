@@ -16,15 +16,12 @@
 ****************************************************************************************/
 package osde.device.htronic;
 
-import gnu.io.NoSuchPortException;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -33,16 +30,16 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class AkkuMasterC4SerialPort extends DeviceSerialPort {
-	private Logger							log															= Logger.getLogger(this.getClass().getName());
+	final static Logger					log															= Logger.getLogger(AkkuMasterC4SerialPort.class.getName());
 
-	public static final String	PROCESS_NAME										= "Prozessname";																// "4 ) Laden" = AkkuMaster aktiv Laden
-	public static final String	PROCESS_ERROR_NO								= "Fehlernummer";															// "0" = kein Fehler
-	public static final String	PROCESS_VOLTAGE									= "Akkuspannung";															// [mV]
-	public static final String	PROCESS_CURRENT									= "Prozesssstrom";															// [mA] 	(laden/entladen)
-	public static final String	PROCESS_CAPACITY								= "Prozesskapazität";													// [mAh] (laden/entladen)
-	public static final String	PROCESS_POWER										= "Leistung";																	// [mW]			
-	public static final String	PROCESS_ENERGIE									= "Energie";																		// [mWh]			
-	public static final String	PROCESS_TIME										= "Prozesszeit";																// [msec]		
+	public static final String	PROCESS_NAME										= "Prozessname";																						// "4 ) Laden" = AkkuMaster aktiv Laden
+	public static final String	PROCESS_ERROR_NO								= "Fehlernummer";																					// "0" = kein Fehler
+	public static final String	PROCESS_VOLTAGE									= "Akkuspannung";																					// [mV]
+	public static final String	PROCESS_CURRENT									= "Prozesssstrom";																					// [mA] 	(laden/entladen)
+	public static final String	PROCESS_CAPACITY								= "Prozesskapazität";																			// [mAh] (laden/entladen)
+	public static final String	PROCESS_POWER										= "Leistung";																							// [mW]			
+	public static final String	PROCESS_ENERGIE									= "Energie";																								// [mWh]			
+	public static final String	PROCESS_TIME										= "Prozesszeit";																						// [msec]		
 
 	public static final String	VERSION_NUMBER									= "Versionsnummer";
 	public static final String	VERSION_DATE										= "Datum";
@@ -55,45 +52,45 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public static final byte		channel_4[]											= new byte[] { (byte) 0xC0 };
 
 	// data type command description
-	private final byte					readVersion[]										= new byte[] { 0x16 };
-	private final byte					readConfiguration[]							= new byte[] { 0x11 };													// Lese eingestellte Werte
-	private final byte					readMeasuredValues[]						= new byte[] { 0x12 };													// Lese gemessene Werte
-	private final byte					readAdjustedValues[]						= new byte[] { 0x21 };													// Lese eingestellte Werte zus. Parameter
-	private final byte					setNewProgramm									= 0x14;																				// Schreibe Ladeparameter
-	private final byte					setMomoryCycleSleep							= 0x24;																				// Schreibe Ladeparameterzusätzliche Parameter 
-	private final byte					startProgram										= 0x15;																				// Start 
-	private final byte					stopProgram											= 0x13;																				// Stop 
-	private final byte					okStartProgram									= 0x19;																				// OK 
+	final byte									readVersion[]										= new byte[] { 0x16 };
+	final byte									readConfiguration[]							= new byte[] { 0x11 };																			// Lese eingestellte Werte
+	final byte									readMeasuredValues[]						= new byte[] { 0x12 };																			// Lese gemessene Werte
+	final byte									readAdjustedValues[]						= new byte[] { 0x21 };																			// Lese eingestellte Werte zus. Parameter
+	final byte									setNewProgramm									= 0x14;																										// Schreibe Ladeparameter
+	final byte									setMomoryCycleSleep							= 0x24;																										// Schreibe Ladeparameterzusätzliche Parameter 
+	final byte									startProgram										= 0x15;																										// Start 
+	final byte									stopProgram											= 0x13;																										// Stop 
+	final byte									okStartProgram									= 0x19;																										// OK 
 
 	// data type answer description
-	private byte								version[]												= new byte[11];
-	private byte								configuration[]									= new byte[14];
-	private byte								measuredValues[]								= new byte[16];
-	private byte								adjustedValues[]								= new byte[5];
-	private byte								ok															= 0x00;
+	byte												version[]												= new byte[11];
+	byte												configuration[]									= new byte[14];
+	byte												measuredValues[]								= new byte[16];
+	byte												adjustedValues[]								= new byte[5];
+	byte												ok															= 0x00;
 
 	// status AkkuMaster C4 device
-	private final byte					stateWaiting										= 0x00;																				//OOH = warte auf Kommando
-	private final byte					stateCharge											= 0x01;																				//OIH = Laden
-	private final byte					stateDischarge									= 0x02;																				//02H = Entladen
-	private final byte					stateKeepCharge									= 0x04;																				//04H = Erhaltungsladen
-	private final byte					stateDeviceActive								= (byte) 0x80;																	//80H = Akkumaster aktiv
+	final byte									stateWaiting										= 0x00;																										//OOH = warte auf Kommando
+	final byte									stateCharge											= 0x01;																										//OIH = Laden
+	final byte									stateDischarge									= 0x02;																										//02H = Entladen
+	final byte									stateKeepCharge									= 0x04;																										//04H = Erhaltungsladen
+	final byte									stateDeviceActive								= (byte) 0x80;																							//80H = Akkumaster aktiv
 
 	// program numbers
-	private final byte					programChargeOnly								= 0x01;																				//OIH = Nur laden
-	private final byte					programDischargeOnly						= 0x02;																				//02H = Nur entladen
-	private final byte					programDischargeCharge					= 0x03;																				//03H = entladen / laden
-	private final byte					programChargeDischargeCharge		= 0x04;																				//04H = laden / entladen / laden
-	private final byte					programDischargeChargeTwoTimes	= 0x05;																				//05H = 2 * entladen / laden
-	private final byte					programFormUp										= 0x06;																				//06H = Formieren
-	private final byte					programOverWinter								= 0x07;																				//07H = Überwintern
-	private final byte					programRefresh									= 0x08;																				//08H = Auffrischen
-	private final byte					programDiagnostic								= 0x09;																				//09H = Akkudiagnose
+	final byte									programChargeOnly								= 0x01;																										//OIH = Nur laden
+	final byte									programDischargeOnly						= 0x02;																										//02H = Nur entladen
+	final byte									programDischargeCharge					= 0x03;																										//03H = entladen / laden
+	final byte									programChargeDischargeCharge		= 0x04;																										//04H = laden / entladen / laden
+	final byte									programDischargeChargeTwoTimes	= 0x05;																										//05H = 2 * entladen / laden
+	final byte									programFormUp										= 0x06;																										//06H = Formieren
+	final byte									programOverWinter								= 0x07;																										//07H = Überwintern
+	final byte									programRefresh									= 0x08;																										//08H = Auffrischen
+	final byte									programDiagnostic								= 0x09;																										//09H = Akkudiagnose
 
 	// supportzed accu type
-	private final byte					typeNC													= 0x00;																				//OOH = NC
-	private final byte					typeNiMh												= 0x01;																				//OIH = NMH
-	private final byte					typePB													= 0x02;																				//02H = PB
+	final byte									typeNC													= 0x00;																										//OOH = NC
+	final byte									typeNiMh												= 0x01;																										//OIH = NMH
+	final byte									typePB													= 0x02;																										//02H = PB
 
 	//	// Zellenzahl:
 	//	private byte							numberCells[]										= new byte[1];								//OIH = 1 Zellen . . . OCH = 12 Zellen
@@ -131,8 +128,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	//	// Verbleibende Wartezeit bis Formieren wiederholt wird
 	//	private byte							formUpLatencyTime[]							= new byte[2];								//1 bit = 1 Minute
 
-	public AkkuMasterC4SerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
-		super(deviceConfig, application);
+	public AkkuMasterC4SerialPort(DeviceConfiguration actualDeviceConfig, OpenSerialDataExplorer currentApplication) {
+		super(actualDeviceConfig, currentApplication);
 	}
 
 	/**
@@ -141,13 +138,13 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void ok(byte[] channel) throws IOException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(okStartProgram + channel[0]).byteValue();
+		command[0] = new Integer(this.okStartProgram + channel[0]).byteValue();
 
 		this.write(command);
 		byte[] answer = this.read(2, 5);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
-		if (answer[1] != ok) throw new IOException("command OK failed");
+		if (answer[1] != this.ok) throw new IOException("command OK failed");
 	}
 
 	/**
@@ -156,13 +153,13 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void start(byte[] channel) throws IOException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(startProgram + channel[0]).byteValue();
+		command[0] = new Integer(this.startProgram + channel[0]).byteValue();
 
 		this.write(command);
 		byte[] answer = this.read(2, 5);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
-		if (answer[1] != ok) throw new IOException("command START failed");
+		if (answer[1] != this.ok) throw new IOException("command START failed");
 	}
 
 	/**
@@ -171,13 +168,13 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void stop(byte[] channel) throws IOException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(stopProgram + channel[0]).byteValue();
+		command[0] = new Integer(this.stopProgram + channel[0]).byteValue();
 
 		this.write(command);
 		byte[] answer = this.read(2, 5);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
-		if (answer[1] != ok) throw new IOException("command STOP failed");
+		if (answer[1] != this.ok) throw new IOException("command STOP failed");
 	}
 
 	/**
@@ -188,7 +185,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public synchronized void writeNewProgram(byte[] channel, int programNumber, int waitTime_days, int akkuTyp, int cellCount, int akkuCapacity, int dischargeCurrent_mA, int chargeCurrent_mA)
 			throws IOException {
 		byte[] command = new byte[11];
-		command[0] = new Integer(setNewProgramm + channel[0]).byteValue();
+		command[0] = new Integer(this.setNewProgramm + channel[0]).byteValue();
 		command[1] = new Integer(programNumber).byteValue();
 		command[2] = new Integer(waitTime_days).byteValue();
 		command[3] = new Integer(akkuTyp).byteValue();
@@ -207,7 +204,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		byte[] answer = this.read(2, 5);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
-		if (answer[1] != ok) throw new IOException("command WRITE NEW PROGRAM failed");
+		if (answer[1] != this.ok) throw new IOException("command WRITE NEW PROGRAM failed");
 	}
 
 	/**
@@ -220,7 +217,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void setMemoryNumberCycleCoundSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException {
 		byte[] command = new byte[5];
-		command[0] = new Integer(setMomoryCycleSleep + channel[0]).byteValue();
+		command[0] = new Integer(this.setMomoryCycleSleep + channel[0]).byteValue();
 		command[1] = new Integer(memoryNumber).byteValue();
 		command[2] = new Integer(cycleCount).byteValue();
 		command[3] = new Integer(((sleepTime_min >> 8) & 0xFF)).byteValue();
@@ -230,7 +227,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		byte[] answer = this.read(2, 5);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
-		if (answer[1] != ok) throw new IOException("command setMemoryNumberCycleCoundSleepTime failed");
+		if (answer[1] != this.ok) throw new IOException("command setMemoryNumberCycleCoundSleepTime failed");
 	}
 
 	/**
@@ -243,53 +240,53 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * [5] int 		Errechnete Leistung					[mW]			
 	 * [6] int		Errechnete Energie					[mWh]			
 	 * [7] int		Prozesszeit									[msec]			
-	 * @param channel signature if device has more than one or required by device
+	 * @param channelSignature signature if device has more than one or required by device
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws Exception {
+	public synchronized HashMap<String, Object> getData(byte[] channelSignature) throws Exception {
 		boolean isActive = true;
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
 		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 			}
 
-			String[] configuration = getConfiguration(channel);
-			String[] measurements = getMeasuredValues(channel);
+			String[] currentConfiguration = getConfiguration(channelSignature);
+			String[] currentMeasurements = getMeasuredValues(channelSignature);
 
-			values.put(PROCESS_NAME, configuration[0].split(" ")[0]); // AkkuMaster aktiv
-			values.put(PROCESS_ERROR_NO, new Integer(configuration[1].split(" ")[0])); // Aktuelle Fehlernummer
-			values.put(PROCESS_VOLTAGE, new Integer(measurements[2].split(" ")[0])); // Aktuelle Akkuspannung
+			values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0]); // AkkuMaster aktiv
+			values.put(AkkuMasterC4SerialPort.PROCESS_ERROR_NO, new Integer(currentConfiguration[1].split(" ")[0])); // Aktuelle Fehlernummer
+			values.put(AkkuMasterC4SerialPort.PROCESS_VOLTAGE, new Integer(currentMeasurements[2].split(" ")[0])); // Aktuelle Akkuspannung
 
-			switch (new Integer(configuration[0].split(" ")[0])) {
+			switch (new Integer(currentConfiguration[0].split(" ")[0])) {
 			case 1:
-				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Laden");
-				values.put(PROCESS_CURRENT, new Integer(configuration[7].split(" ")[0])); // eingestellter Ladestrom
-				values.put(PROCESS_CAPACITY, new Integer(measurements[1].split(" ")[0])); // Aktuelle Ladekapazität
+				values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + " Laden");
+				values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, new Integer(currentConfiguration[7].split(" ")[0])); // eingestellter Ladestrom
+				values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer(currentMeasurements[1].split(" ")[0])); // Aktuelle Ladekapazität
 				break;
 			case 2:
-				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Entladen");
-				values.put(PROCESS_CURRENT, new Integer(configuration[6].split(" ")[0])); // eingestellter Entladestrom
-				values.put(PROCESS_CAPACITY, new Integer(measurements[0].split(" ")[0])); // Aktuelle Entladekapazität
+				values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + " Entladen");
+				values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, new Integer(currentConfiguration[6].split(" ")[0])); // eingestellter Entladestrom
+				values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer(currentMeasurements[0].split(" ")[0])); // Aktuelle Entladekapazität
 				break;
 			case 3:
-				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " Erhaltungsladen");
-				values.put(PROCESS_CAPACITY, new Integer("0"));
+				values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + " Erhaltungsladen");
+				values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer("0"));
 				break;
 			default:
 				isActive = false;
-				values.put(PROCESS_NAME, configuration[0].split(" ")[0] + " AkkuMaster_inactiv");
-				values.put(PROCESS_CAPACITY, new Integer("0"));
+				values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + " AkkuMaster_inactiv");
+				values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer("0"));
 				break;
 			}
 
 			if (isActive) {
-				int voltage = (Integer) values.get(PROCESS_VOLTAGE);
-				values.put(PROCESS_POWER, new Integer(voltage * (Integer) values.get(PROCESS_CURRENT))); // Errechnete Leistung	[mW]
-				values.put(PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+				int voltage = (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE);
+				values.put(AkkuMasterC4SerialPort.PROCESS_POWER, new Integer(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CURRENT))); // Errechnete Leistung	[mW]
+				values.put(AkkuMasterC4SerialPort.PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
 			}
 
 		}
@@ -304,7 +301,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	}
 
 	public void setStatus() throws IOException {
-		this.write(readConfiguration);
+		this.write(this.readConfiguration);
 		this.configuration = this.read(14, 5);
 	}
 
@@ -326,8 +323,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		String[] configStrings = new String[9];
 		byte readConfigOfChannel[] = new byte[1];
 
-		int a = (int) readConfiguration[0];
-		int b = (int) channel[0];
+		int a = this.readConfiguration[0];
+		int b = channel[0];
 		readConfigOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readConfigOfChannel);
 		this.configuration = this.read(14, 5);
@@ -335,14 +332,14 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		if (this.configuration[0] != readConfigOfChannel[0]) throw new IOException("command to answer missmatch");
 
 		// status
-		byte state = (byte) (this.configuration[1] - stateDeviceActive);
-		if (state == stateWaiting)
+		byte state = (byte) (this.configuration[1] - this.stateDeviceActive);
+		if (state == this.stateWaiting)
 			configStrings[0] = "0 Akkumaster_inaktiv"; // warte auf Kommando
-		else if (state == stateCharge)
+		else if (state == this.stateCharge)
 			configStrings[0] = "1 Laden";
-		else if (state == stateDischarge)
+		else if (state == this.stateDischarge)
 			configStrings[0] = "2 Entladen";
-		else if (state == stateKeepCharge)
+		else if (state == this.stateKeepCharge)
 			configStrings[0] = "3 Erhaltungsladen";
 		else
 			configStrings[0] = "8 Akkumaster_aktiv"; // Pausentimer ?
@@ -352,34 +349,34 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 		// program number
 		byte program = this.configuration[3];
-		if (program == programChargeOnly)
+		if (program == this.programChargeOnly)
 			configStrings[2] = "1 Laden";
-		else if (program == programDischargeOnly)
+		else if (program == this.programDischargeOnly)
 			configStrings[2] = "2 Entladen";
-		else if (program == programDischargeCharge)
+		else if (program == this.programDischargeCharge)
 			configStrings[2] = "3 Entladen-Laden";
-		else if (program == programChargeDischargeCharge)
+		else if (program == this.programChargeDischargeCharge)
 			configStrings[2] = "4 Laden-Entladen-Laden";
-		else if (program == programDischargeChargeTwoTimes)
+		else if (program == this.programDischargeChargeTwoTimes)
 			configStrings[2] = "5 Entladen-Laden-Entladen-Laden";
-		else if (program == programFormUp)
+		else if (program == this.programFormUp)
 			configStrings[2] = "6 Formieren";
-		else if (program == programOverWinter)
+		else if (program == this.programOverWinter)
 			configStrings[2] = "7 Überwintern";
-		else if (program == programRefresh)
+		else if (program == this.programRefresh)
 			configStrings[2] = "8 Auffrischen";
-		else if (program == programDiagnostic)
+		else if (program == this.programDiagnostic)
 			configStrings[2] = "9 Akkudiagnose";
 		else
 			configStrings[2] = "Unbekannt";
 
 		// Akku-Typ:
 		byte accuTyp = this.configuration[4];
-		if (accuTyp == typeNC)
+		if (accuTyp == this.typeNC)
 			configStrings[3] = "0 NickelCadmium";
-		else if (accuTyp == typeNiMh)
+		else if (accuTyp == this.typeNiMh)
 			configStrings[3] = "1 NickelMetallHydrid";
-		else if (accuTyp == typePB)
+		else if (accuTyp == this.typePB)
 			configStrings[3] = "2 Blei";
 		else
 			configStrings[3] = "Unbekannt";
@@ -388,23 +385,23 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		configStrings[4] = this.configuration[5] + " Zellen";
 
 		// nominale Akku Kapazität:
-		int accuCapacity = ((int) this.configuration[6] & 0xFF) << 8;
-		accuCapacity += ((int) this.configuration[7] & 0xFF) << 0;
+		int accuCapacity = (this.configuration[6] & 0xFF) << 8;
+		accuCapacity += (this.configuration[7] & 0xFF) << 0;
 		configStrings[5] = accuCapacity + " mAh"; // (2A Variante)
 
 		// Entladestrom 
-		int current = ((int) this.configuration[8] & 0xFF) << 8;
-		current += ((int) this.configuration[9] & 0xFF) << 0;
+		int current = (this.configuration[8] & 0xFF) << 8;
+		current += (this.configuration[9] & 0xFF) << 0;
 		configStrings[6] = current + " mA Entladestrom"; // (2A Variante)
 
 		// Ladestrom
-		current = ((int) this.configuration[10] & 0xFF) << 8;
-		current += ((int) this.configuration[11] & 0xFF) << 0;
+		current = (this.configuration[10] & 0xFF) << 8;
+		current += (this.configuration[11] & 0xFF) << 0;
 		configStrings[7] = current + " mA Ladestrom"; // (2A Variante)
 
 		// Wartezeit:
-		int latencyTime = ((int) this.configuration[12] & 0xFF) << 8;
-		latencyTime += ((int) this.configuration[13] & 0xFF) << 0;
+		int latencyTime = (this.configuration[12] & 0xFF) << 8;
+		latencyTime += (this.configuration[13] & 0xFF) << 0;
 		configStrings[8] = latencyTime + " Minute"; //1 bit = 1 Minute
 
 		return configStrings;
@@ -422,8 +419,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		String[] adjustments = new String[3];
 		byte readAdjustmentsOfChannel[] = new byte[1];
 
-		int a = (int) readAdjustedValues[0];
-		int b = (int) channel[0];
+		int a = this.readAdjustedValues[0];
+		int b = channel[0];
 		readAdjustmentsOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readAdjustmentsOfChannel);
 		this.adjustedValues = this.read(5, 5);
@@ -437,8 +434,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		adjustments[1] = this.adjustedValues[2] + " Anzahl eingestellter Wiederholungen";
 
 		// tatsächlicher Ladestrom
-		int current = ((int) this.adjustedValues[3] & 0xFF) << 8;
-		current += ((int) this.adjustedValues[4] & 0xFF) << 0;
+		int current = (this.adjustedValues[3] & 0xFF) << 8;
+		current += (this.adjustedValues[4] & 0xFF) << 0;
 		adjustments[2] = current + " mA Ladestrom";
 
 		return adjustments;
@@ -464,8 +461,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		String[] measurements = new String[11];
 		byte readValuesOfChannel[] = new byte[1];
 
-		int a = (int) readMeasuredValues[0];
-		int b = (int) channel[0];
+		int a = this.readMeasuredValues[0];
+		int b = channel[0];
 		readValuesOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readValuesOfChannel);
 		this.measuredValues = this.read(16, 5);
@@ -473,16 +470,16 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		if (this.measuredValues[0] != readValuesOfChannel[0]) throw new IOException("command to answer missmatch");
 
 		// Aktuelle Entladekapazität des Akkus
-		int current = ((int) this.measuredValues[1] & 0xFF) << 8;
-		current += ((int) this.measuredValues[2] & 0xFF) << 0;
+		int current = (this.measuredValues[1] & 0xFF) << 8;
+		current += (this.measuredValues[2] & 0xFF) << 0;
 		measurements[0] = current + " mAh Entladekapazität";
 		//Aktuelle Ladekapazität des Akkus
-		current = ((int) this.measuredValues[3] & 0xFF) << 8;
-		current += ((int) this.measuredValues[4] & 0xFF) << 0;
+		current = (this.measuredValues[3] & 0xFF) << 8;
+		current += (this.measuredValues[4] & 0xFF) << 0;
 		measurements[1] = current + " mAh Ladekapazität";
 		// Aktuelle Akkuspannung
-		int voltage = ((int) this.measuredValues[5] & 0xFF) << 8;
-		voltage += ((int) this.measuredValues[6] & 0xFF) << 0;
+		int voltage = (this.measuredValues[5] & 0xFF) << 8;
+		voltage += (this.measuredValues[6] & 0xFF) << 0;
 		measurements[2] = voltage * 10 / 2 + " mV Spannung";
 
 		// Entladezeit Stunden
@@ -502,8 +499,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		measurements[9] = this.measuredValues[13] + " Ladecyclen";
 
 		// Verbleibende Wartezeit bis Formieren wiederholt wird
-		int latencyCycleTime = ((int) this.measuredValues[14] & 0xFF) << 8;
-		latencyCycleTime += ((int) this.measuredValues[15] & 0xFF) << 0;
+		int latencyCycleTime = (this.measuredValues[14] & 0xFF) << 8;
+		latencyCycleTime += (this.measuredValues[15] & 0xFF) << 0;
 		measurements[10] = latencyCycleTime + " Minuten verbleibende Wartezeit bis Formieren wiederholt wird";
 
 		return measurements;
@@ -521,44 +518,44 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public synchronized HashMap<String, Object> getVersion() throws Exception {
 		HashMap<String, Object> result = new HashMap<String, Object>(4);
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 			}
 
-			this.write(readVersion);
+			this.write(this.readVersion);
 			this.version = this.read(11, 5);
 
 			// Versionsnummer der Software
-			String versionsNummer = new Integer(version[1]).toString();
+			String versionsNummer = new Integer(this.version[1]).toString();
 			// Versionsindex der Software
-			String versionsIndex = new Integer(version[2]).toString();
-			result.put(VERSION_NUMBER, versionsNummer + "." + versionsIndex);
+			String versionsIndex = new Integer(this.version[2]).toString();
+			result.put(AkkuMasterC4SerialPort.VERSION_NUMBER, versionsNummer + "." + versionsIndex);
 
 			// Datum der Software Tag
-			String day = new Integer(version[3]).toString();
+			String day = new Integer(this.version[3]).toString();
 			// Datum der Software Monat
-			String month = new Integer(version[4]).toString();
-			int iYear = ((int) version[5] & 0xFF) << 8;
-			iYear += ((int) version[6] & 0xFF) << 0;
+			String month = new Integer(this.version[4]).toString();
+			int iYear = (this.version[5] & 0xFF) << 8;
+			iYear += (this.version[6] & 0xFF) << 0;
 			// Datum der Software Jahr
 			String year = new Integer(iYear).toString();
-			result.put(VERSION_DATE, day + "." + month + "." + year);
+			result.put(AkkuMasterC4SerialPort.VERSION_DATE, day + "." + month + "." + year);
 
 			// Stromvariante OOH = 0,5A Variante; 01 H = 2A Variante
-			if (version[7] == 0x00)
-				result.put(VERSION_TYPE_CURRENT, "0,5A");
-			else if (version[7] == 0x01)
-				result.put(VERSION_TYPE_CURRENT, "2,0A");
+			if (this.version[7] == 0x00)
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "0,5A");
+			else if (this.version[7] == 0x01)
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "2,0A");
 			else
-				result.put(VERSION_TYPE_CURRENT, "?,?A");
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "?,?A");
 
 			// Frontplattenvariante 0OH = 6 Tasten; 01 H = 4 Tasten (turned around ?)
-			if (version[8] == 0x00)
-				result.put(VERSION_TYPE_FRONT, "4 Tasten");
-			else if (version[8] == 0x01)
-				result.put(VERSION_TYPE_FRONT, "6 Tasten");
+			if (this.version[8] == 0x00)
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "4 Tasten");
+			else if (this.version[8] == 0x01)
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "6 Tasten");
 			else
-				result.put(VERSION_TYPE_FRONT, "? Tasten");
+				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "? Tasten");
 
 		}
 		catch (Exception e) {

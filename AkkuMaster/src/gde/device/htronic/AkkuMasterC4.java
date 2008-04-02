@@ -37,13 +37,13 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
-	private Logger									log										= Logger.getLogger(this.getClass().getName());
+	final static Logger														log									= Logger.getLogger(AkkuMasterC4.class.getName());
 
-	private final OpenSerialDataExplorer application;
-	private final AkkuMasterC4Dialog	dialog;
-	private final AkkuMasterC4SerialPort serialPort;
-	private final Channels channels;
-	private HashMap<String, AkkuMasterCalculationThread>	calculationThreads = new HashMap<String, AkkuMasterCalculationThread>();
+	final OpenSerialDataExplorer									application;
+	final AkkuMasterC4Dialog											dialog;
+	final AkkuMasterC4SerialPort									serialPort;
+	final Channels																channels;
+	HashMap<String, AkkuMasterCalculationThread>	calculationThreads	= new HashMap<String, AkkuMasterCalculationThread>();
 
 	/**
 	 * constructor using the device properties file for initialization
@@ -52,10 +52,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException 
 	 * @throws NoSuchPortException 
 	 */
-	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
+	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new AkkuMasterC4SerialPort(this, application);
+		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
 	}
@@ -65,10 +65,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param deviceConfig device configuration
 	 * @throws NoSuchPortException 
 	 */
-	public AkkuMasterC4(DeviceConfiguration deviceConfig) throws NoSuchPortException {
+	public AkkuMasterC4(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new AkkuMasterC4SerialPort(this, application);
+		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
 	}
@@ -77,10 +77,11 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String configKey, String recordKey, double value) {
+	public double translateValue(@SuppressWarnings("unused")
+	String configKey, String recordKey, double value) {
 		double newValue = value;
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", recordKey, value));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
 		return newValue;
 	}
 
@@ -88,10 +89,11 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String configKey, String recordKey, double value) {
+	public double reverseTranslateValue(@SuppressWarnings("unused")
+	String configKey, String recordKey, double value) {
 		double newValue = value;
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", recordKey, value));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
 		return newValue;
 	}
 
@@ -108,14 +110,14 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 				for (String recordKey : recordNames) {
 					MeasurementType measurement = this.getMeasurement(recordSet.getChannelName(), recordKey);
 					if (measurement.isCalculation()) {
-						log.fine(recordKey);
-						calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, channels.getActiveChannel().getActiveRecordSet()));
-						calculationThreads.get(recordKey).start();
+						AkkuMasterC4.log.fine(recordKey);
+						this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+						this.calculationThreads.get(recordKey).start();
 					}
 				}
 			}
 			catch (RuntimeException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+				AkkuMasterC4.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -124,14 +126,14 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @return the device dialog
 	 */
 	public AkkuMasterC4Dialog getDialog() {
-		return dialog;
+		return this.dialog;
 	}
 
 	/**
 	 * @return the device serialPort
 	 */
 	public AkkuMasterC4SerialPort getSerialPort() {
-		return serialPort;
+		return this.serialPort;
 	}
 
 }

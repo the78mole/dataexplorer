@@ -44,183 +44,176 @@ import osde.device.DeviceDialog;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
  * @author Winfried Brügmann
  */
 public class PicolarioDialog extends DeviceDialog {
-	private Logger										log										= Logger.getLogger(this.getClass().getName());
+	final static Logger				log								= Logger.getLogger(PicolarioDialog.class.getName());
 
-	private Group											numberAvailableRecorsSetsGroup1;
-	private Button										queryAvailableRecordSetButton;
-	private CLabel										numberAvailableRecordSetsLabel;
-	private String										numberAvailable				= "0";
+	Group											numberAvailableRecorsSetsGroup1;
+	Button										queryAvailableRecordSetButton;
+	CLabel										numberAvailableRecordSetsLabel;
+	String										numberAvailable		= "0";
 
-	private CTabFolder 								configTabFolder;
-	private CTabItem									configTabItem1, configTabItem2;
-	private PicolarioConfigTab				configTab1, configTab2;
+	CTabFolder								configTabFolder;
+	CTabItem									configTabItem1, configTabItem2;
+	PicolarioConfigTab				configTab1, configTab2;
 
-	private Group											readDataGroup3;
-	private Button										readSingle;
-	private Button 										closeButton;
-	private Button										stopButton;
-	private CLabel										alreadyRedLabel;
-	private CLabel 										alreadyRedDataSetsLabel;
-	private CLabel 										redDataSets;
-	private Button										switchRecordSetButton;
-	private Button										readAllRecords;
-	private CLabel										numberRedTelegramLabel;
-	private CCombo										recordSetSelectCombo;
-	private String										redDatagrams					= "0";
-	private String										redDataSetsText				= "0";
-	private boolean 									doSwtichRecordSet = false;
+	Group											readDataGroup3;
+	Button										readSingle;
+	Button										closeButton;
+	Button										stopButton;
+	CLabel										alreadyRedLabel;
+	CLabel										alreadyRedDataSetsLabel;
+	CLabel										redDataSets;
+	Button										switchRecordSetButton;
+	Button										readAllRecords;
+	CLabel										numberRedTelegramLabel;
+	CCombo										recordSetSelectCombo;
+	String										redDatagrams			= "0";
+	String										redDataSetsText		= "0";
+	boolean										doSwtichRecordSet	= false;
 
-	private final Settings						settings;
-	private final Picolario						device;
-	private final PicolarioSerialPort	serialPort;
-	private OpenSerialDataExplorer		application;
-	private DataGathererThread				gatherThread;
+	final Settings						settings;
+	final Picolario						device;
+	final PicolarioSerialPort	serialPort;
+	OpenSerialDataExplorer		application;
+	DataGathererThread				gatherThread;
 
 	/**
 	 * constructor initialize all variables required
 	 * @param parent Shell
-	 * @param device Picolario class implementation == IDevice
+	 * @param useDevice Picolario class implementation == IDevice
 	 */
-	public PicolarioDialog(Shell parent, Picolario device) {
+	public PicolarioDialog(Shell parent, Picolario useDevice) {
 		super(parent);
-		this.device = device;
-		this.serialPort = device.getSerialPort();
+		this.device = useDevice;
+		this.serialPort = useDevice.getSerialPort();
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.settings = Settings.getInstance();
 	}
 
+	@Override
 	public void open() {
-		log.fine("dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed()));
-		if (dialogShell == null || dialogShell.isDisposed()) {
+		log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed()));
+		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
-				dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			else
-				dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
-			
-			SWTResourceManager.registerResourceUser(dialogShell);
-			dialogShell.setLayout(null);
-			dialogShell.layout();
-			dialogShell.pack();
-			dialogShell.setSize(344, 580);
-			dialogShell.setText("Picolario ToolBox");
-			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
-			dialogShell.addDisposeListener(new DisposeListener() {
+				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
+
+			SWTResourceManager.registerResourceUser(this.dialogShell);
+			this.dialogShell.setLayout(null);
+			this.dialogShell.layout();
+			this.dialogShell.pack();
+			this.dialogShell.setSize(344, 580);
+			this.dialogShell.setText("Picolario ToolBox");
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.fine("dialogShell.widgetDisposed, event=" + evt);
-					if (gatherThread != null && gatherThread.isAlive()) gatherThread.setThreadStop(true);
+					if (PicolarioDialog.this.gatherThread != null && PicolarioDialog.this.gatherThread.isAlive()) PicolarioDialog.this.gatherThread.setThreadStop(true);
 				}
 			});
-			dialogShell.addPaintListener(new PaintListener() {
+			this.dialogShell.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+					log.finest("dialogShell.paintControl, event=" + evt);
+					PicolarioDialog.this.configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 				}
 			});
-			dialogShell.addHelpListener(new HelpListener() {
+			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					application.openHelpDialog("Picolario", "HelpInfo.html");
+					log.finest("dialogShell.helpRequested, event=" + evt);
+					PicolarioDialog.this.application.openHelpDialog("Picolario", "HelpInfo.html");
 				}
 			});
 			{
-				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				closeButton.setText("Schliessen");
-				closeButton.setBounds(67, 507, 203, 25);
-				closeButton.addSelectionListener(new SelectionAdapter() {
+				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.closeButton.setText("Schliessen");
+				this.closeButton.setBounds(67, 507, 203, 25);
+				this.closeButton.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						log.fine("closeButton.widgetSelected, event="+evt);
+						log.fine("closeButton.widgetSelected, event=" + evt);
 						dispose();
 					}
 				});
 			}
-			
+
 			{ // group 1
-				numberAvailableRecorsSetsGroup1 = new Group(dialogShell, SWT.NONE);
-				numberAvailableRecorsSetsGroup1.setLayout(null);
-				numberAvailableRecorsSetsGroup1.setText("Anzahl Aufzeichnungen");
-				numberAvailableRecorsSetsGroup1.setBounds(12, 5, 312, 61);
+				this.numberAvailableRecorsSetsGroup1 = new Group(this.dialogShell, SWT.NONE);
+				this.numberAvailableRecorsSetsGroup1.setLayout(null);
+				this.numberAvailableRecorsSetsGroup1.setText("Anzahl Aufzeichnungen");
+				this.numberAvailableRecorsSetsGroup1.setBounds(12, 5, 312, 61);
 				{
-					queryAvailableRecordSetButton = new Button(numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
-					queryAvailableRecordSetButton.setText("Anzahl der Aufzeichnungen auslesen");
-					queryAvailableRecordSetButton.setBounds(8, 25, 230, 25);
-					queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
+					this.queryAvailableRecordSetButton = new Button(this.numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
+					this.queryAvailableRecordSetButton.setText("Anzahl der Aufzeichnungen auslesen");
+					this.queryAvailableRecordSetButton.setBounds(8, 25, 230, 25);
+					this.queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt);
 							try {
-								if (serialPort != null) {
-									isClosePossible = false;
-									int availableRecords = serialPort.readNumberAvailableRecordSets();
-									numberAvailable = new Integer(availableRecords).toString();
-									numberAvailableRecordSetsLabel.setText(numberAvailable);
+								if (PicolarioDialog.this.serialPort != null) {
+									PicolarioDialog.this.setClosePossible(false);
+									int availableRecords = PicolarioDialog.this.serialPort.readNumberAvailableRecordSets();
+									PicolarioDialog.this.numberAvailable = new Integer(availableRecords).toString();
+									PicolarioDialog.this.numberAvailableRecordSetsLabel.setText(PicolarioDialog.this.numberAvailable);
 									setRecordSetSelection(availableRecords, 0);
-									readSingle.setEnabled(true);
-									readAllRecords.setEnabled(true);
+									PicolarioDialog.this.readSingle.setEnabled(true);
+									PicolarioDialog.this.readAllRecords.setEnabled(true);
 									resetTelegramLabel();
 									resetDataSetsLabel();
-									isClosePossible = true;
+									PicolarioDialog.this.setClosePossible(true);
 								}
 							}
 							catch (Exception e) {
-								serialPort.close();
-								application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
-								application.getDeviceSelectionDialog().open();
+								PicolarioDialog.this.serialPort.close();
+								PicolarioDialog.this.application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
+								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
 							}
 						}
 					});
 				}
 				{
-					numberAvailableRecordSetsLabel = new CLabel(numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
-					numberAvailableRecordSetsLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-					numberAvailableRecordSetsLabel.setBounds(255, 25, 29, 22);
+					this.numberAvailableRecordSetsLabel = new CLabel(this.numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
+					this.numberAvailableRecordSetsLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					this.numberAvailableRecordSetsLabel.setBounds(255, 25, 29, 22);
 				}
 			} // end group1
-			
+
 			{ // config tab 2
-				configTabFolder = new CTabFolder(dialogShell, SWT.BORDER);
+				this.configTabFolder = new CTabFolder(this.dialogShell, SWT.BORDER);
 
-				if (device.getChannelCount() > 0) {
-					configTabItem1 = new CTabItem(configTabFolder, SWT.NONE);
-					configTabItem1.setText(device.getChannelName(1));
-					configTab1 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(1));
-					configTabItem1.setControl(configTab1);
+				if (this.device.getChannelCount() > 0) {
+					this.configTabItem1 = new CTabItem(this.configTabFolder, SWT.NONE);
+					this.configTabItem1.setText(this.device.getChannelName(1));
+					this.configTab1 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(1));
+					this.configTabItem1.setControl(this.configTab1);
 				}
-				if (device.getChannelCount() > 1) {
-					configTabItem2 = new CTabItem(configTabFolder, SWT.NONE);
-					configTabItem2.setText(device.getChannelName(2));
-					configTab2 = new PicolarioConfigTab(configTabFolder, device, device.getChannelName(2));
-					configTabItem2.setControl(configTab2);
+				if (this.device.getChannelCount() > 1) {
+					this.configTabItem2 = new CTabItem(this.configTabFolder, SWT.NONE);
+					this.configTabItem2.setText(this.device.getChannelName(2));
+					this.configTab2 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(2));
+					this.configTabItem2.setControl(this.configTab2);
 				}
 
-				configTabFolder.setSelection(0);
-				configTabFolder.setBounds(12, 72, 312, 208);
-				configTabFolder.addSelectionListener(new SelectionAdapter() {
+				this.configTabFolder.setSelection(0);
+				this.configTabFolder.setBounds(12, 72, 312, 208);
+				this.configTabFolder.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("configTabFolder.widgetSelected, event="+evt);
-						int channelNumber = configTabFolder.getSelectionIndex() + 1;
-						String configKey = channelNumber + " : " + ((CTabItem)evt.item).getText();
+						log.finest("configTabFolder.widgetSelected, event=" + evt);
+						int channelNumber = PicolarioDialog.this.configTabFolder.getSelectionIndex() + 1;
+						String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText();
 						Channels channels = Channels.getInstance();
 						Channel activeChannel = channels.getActiveChannel();
-						log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
 						if (activeChannel != null) {
+							log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-							if (activeRecordSet!= null && !activeChannel.getName().trim().equals(configKey)) {
-								int answer = application.openYesNoMessageDialog("Soll der aktuelle Datensatz in die selektierte Konfiguration verschoben werden ?");
+							if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
+								int answer = PicolarioDialog.this.application.openYesNoMessageDialog("Soll der aktuelle Datensatz in die selektierte Konfiguration verschoben werden ?");
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
 									log.fine("move record set " + recordSetKey + " to configuration " + configKey);
@@ -233,120 +226,125 @@ public class PicolarioDialog extends DeviceDialog {
 					}
 				});
 			} // config tab 2
-			
+
 			{ // group 3
-				readDataGroup3 = new Group(dialogShell, SWT.NONE);
-				readDataGroup3.setLayout(null);
-				readDataGroup3.setText("Aufzeichnungen auslesen");
-				readDataGroup3.setBounds(12, 286, 312, 208);
+				this.readDataGroup3 = new Group(this.dialogShell, SWT.NONE);
+				this.readDataGroup3.setLayout(null);
+				this.readDataGroup3.setText("Aufzeichnungen auslesen");
+				this.readDataGroup3.setBounds(12, 286, 312, 208);
 				{
-					readSingle = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					readSingle.setText("angewählte Aufzeichnungen auslesen");
-					readSingle.setBounds(8, 54, 236, 25);
-					readSingle.setEnabled(false);
-					readSingle.addSelectionListener(new SelectionAdapter() {
+					this.readSingle = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
+					this.readSingle.setText("angewählte Aufzeichnungen auslesen");
+					this.readSingle.setBounds(8, 54, 236, 25);
+					this.readSingle.setEnabled(false);
+					this.readSingle.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("ausleseButton.widgetSelected, event=" + evt);
-							isClosePossible = false;
-							queryAvailableRecordSetButton.setEnabled(false);
-							readSingle.setEnabled(false);
-							readAllRecords.setEnabled(false);
-							stopButton.setEnabled(true);
-							gatherThread = new DataGathererThread(application, device, serialPort, new String[] { recordSetSelectCombo.getText() });
-							gatherThread.start();
+							PicolarioDialog.this.setClosePossible(false);
+							PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(false);
+							PicolarioDialog.this.readSingle.setEnabled(false);
+							PicolarioDialog.this.readAllRecords.setEnabled(false);
+							PicolarioDialog.this.stopButton.setEnabled(true);
+							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort,
+									new String[] { PicolarioDialog.this.recordSetSelectCombo.getText() });
+							PicolarioDialog.this.gatherThread.start();
 							log.fine("gatherThread.run() - executing");
 						} // end widget selected
 					}); // end selection adapter
 				}
 				{
-					readAllRecords = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					readAllRecords.setBounds(8, 112, 292, 25);
-					readAllRecords.setText("alle Aufzeichnungen hintereinander auslesen");
-					readAllRecords.setEnabled(false);
-					readAllRecords.addSelectionListener(new SelectionAdapter() {
+					this.readAllRecords = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
+					this.readAllRecords.setBounds(8, 112, 292, 25);
+					this.readAllRecords.setText("alle Aufzeichnungen hintereinander auslesen");
+					this.readAllRecords.setEnabled(false);
+					this.readAllRecords.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("readAllRecords.widgetSelected, event=" + evt);
-							isClosePossible = false;
-							queryAvailableRecordSetButton.setEnabled(false);
-							readAllRecords.setEnabled(false);
-							readSingle.setEnabled(false);
-							stopButton.setEnabled(true);
-							String[] itemNames = recordSetSelectCombo.getItems();
-							gatherThread = new DataGathererThread(application, device, serialPort, itemNames);
-							gatherThread.start();
+							PicolarioDialog.this.setClosePossible(false);
+							PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(false);
+							PicolarioDialog.this.readAllRecords.setEnabled(false);
+							PicolarioDialog.this.readSingle.setEnabled(false);
+							PicolarioDialog.this.stopButton.setEnabled(true);
+							String[] itemNames = PicolarioDialog.this.recordSetSelectCombo.getItems();
+							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort, itemNames);
+							PicolarioDialog.this.gatherThread.start();
 							log.fine("gatherThread.run() - executing");
 						}
 					});
 				}
 				{
-					recordSetSelectCombo = new CCombo(readDataGroup3, SWT.BORDER | SWT.RIGHT);
-					recordSetSelectCombo.setText("0");
-					recordSetSelectCombo.setBounds(252, 56, 45, 22);
+					this.recordSetSelectCombo = new CCombo(this.readDataGroup3, SWT.BORDER | SWT.RIGHT);
+					this.recordSetSelectCombo.setText("0");
+					this.recordSetSelectCombo.setBounds(252, 56, 45, 22);
 				}
 				{
-					numberRedTelegramLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					numberRedTelegramLabel.setBounds(10, 82, 234, 26);
-					numberRedTelegramLabel.setText("Anzahl ausgelesener Telegramme :");
-					numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
+					this.numberRedTelegramLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
+					this.numberRedTelegramLabel.setBounds(10, 82, 234, 26);
+					this.numberRedTelegramLabel.setText("Anzahl ausgelesener Telegramme :");
+					this.numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
 				}
 				{
-					alreadyRedLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					alreadyRedLabel.setBounds(244, 82, 56, 26);
-					alreadyRedLabel.setText(redDatagrams);
+					this.alreadyRedLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
+					this.alreadyRedLabel.setBounds(244, 82, 56, 26);
+					this.alreadyRedLabel.setText(this.redDatagrams);
 				}
 				{
-					stopButton = new Button(readDataGroup3, SWT.PUSH | SWT.CENTER);
-					stopButton.setText("S T O P");
-					stopButton.setEnabled(false);
-					stopButton.setBounds(81, 171, 150, 26);
-					stopButton.addSelectionListener(new SelectionAdapter() {
+					this.stopButton = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
+					this.stopButton.setText("S T O P");
+					this.stopButton.setEnabled(false);
+					this.stopButton.setBounds(81, 171, 150, 26);
+					this.stopButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("stopButton.widgetSelected, event=" + evt);
-							gatherThread.setThreadStop(true);
-							isClosePossible = true;
+							PicolarioDialog.this.gatherThread.setThreadStop(true);
+							PicolarioDialog.this.setClosePossible(true);
 						}
 					});
 				}
 				{
-					alreadyRedDataSetsLabel = new CLabel(readDataGroup3, SWT.RIGHT);
-					alreadyRedDataSetsLabel.setBounds(10, 139, 234, 26);
-					alreadyRedDataSetsLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
-					alreadyRedDataSetsLabel.setText("aktuelle Datensatznummer :");
+					this.alreadyRedDataSetsLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
+					this.alreadyRedDataSetsLabel.setBounds(10, 139, 234, 26);
+					this.alreadyRedDataSetsLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
+					this.alreadyRedDataSetsLabel.setText("aktuelle Datensatznummer :");
 				}
 				{
-					redDataSets = new CLabel(readDataGroup3, SWT.RIGHT);
-					redDataSets.setBounds(244, 139, 56, 26);
-					redDataSets.setText(redDataSetsText);
+					this.redDataSets = new CLabel(this.readDataGroup3, SWT.RIGHT);
+					this.redDataSets.setBounds(244, 139, 56, 26);
+					this.redDataSets.setText(this.redDataSetsText);
 				}
 				{
-					switchRecordSetButton = new Button(readDataGroup3, SWT.CHECK | SWT.CENTER);
-					switchRecordSetButton.setBounds(13, 25, 288, 17);
-					switchRecordSetButton.setText("Datensatz nach Auslesen sofort anzeigen");
-					switchRecordSetButton.setSelection(doSwtichRecordSet);
-					switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
+					this.switchRecordSetButton = new Button(this.readDataGroup3, SWT.CHECK | SWT.CENTER);
+					this.switchRecordSetButton.setBounds(13, 25, 288, 17);
+					this.switchRecordSetButton.setText("Datensatz nach Auslesen sofort anzeigen");
+					this.switchRecordSetButton.setSelection(this.doSwtichRecordSet);
+					this.switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("switchRecordSetButton.widgetSelected, event=" + evt);
-							doSwtichRecordSet = switchRecordSetButton.getSelection();
+							PicolarioDialog.this.doSwtichRecordSet = PicolarioDialog.this.switchRecordSetButton.getSelection();
 						}
 					});
 				}
 			} // end group 3
-			
-			dialogShell.setLocation(getParent().toDisplay(100, 100));
-			dialogShell.open();
+
+			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+			this.dialogShell.open();
 		}
 		else {
-			dialogShell.setVisible(true);
-			dialogShell.setActive();
+			this.dialogShell.setVisible(true);
+			this.dialogShell.setActive();
 		}
-		Display display = dialogShell.getDisplay();
-		while (!dialogShell.isDisposed()) {
+		Display display = this.dialogShell.getDisplay();
+		while (!this.dialogShell.isDisposed()) {
 			if (!display.readAndDispatch()) display.sleep();
 		}
 	}
 
 	public void setAvailableRecordSets(int number) {
-		numberAvailableRecordSetsLabel.setText(new Integer(number).toString());
+		this.numberAvailableRecordSetsLabel.setText(new Integer(number).toString());
 	}
 
 	/**
@@ -359,26 +357,26 @@ public class PicolarioDialog extends DeviceDialog {
 		for (int i = 0; i < items; i++) {
 			itemNames[i] = new Integer(i + 1).toString();
 		}
-		recordSetSelectCombo.setItems(itemNames);
-		recordSetSelectCombo.select(index);
-		recordSetSelectCombo.setVisibleItemCount(items);
+		this.recordSetSelectCombo.setItems(itemNames);
+		this.recordSetSelectCombo.select(index);
+		this.recordSetSelectCombo.setVisibleItemCount(items);
 	}
 
 	/**
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetTelegramLabel() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			redDatagrams = "0";
-			alreadyRedLabel.setText(redDatagrams);
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.redDatagrams = "0";
+			this.alreadyRedLabel.setText(this.redDatagrams);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					if (!application.getDeviceDialog().isDisposed()) {
-						if (!application.getDeviceDialog().isDisposed()) {
-							redDatagrams = "0";
-							alreadyRedLabel.setText(redDatagrams);
+					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+						if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+							PicolarioDialog.this.redDatagrams = "0";
+							PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
 						}
 					}
 				}
@@ -391,33 +389,33 @@ public class PicolarioDialog extends DeviceDialog {
 	 * @param newValue
 	 */
 	public void setAlreadyRedText(final int newValue) {
-		redDatagrams = new Integer(newValue).toString();
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			alreadyRedLabel.setText(redDatagrams);
+		this.redDatagrams = new Integer(newValue).toString();
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.alreadyRedLabel.setText(this.redDatagrams);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					if (!application.getDeviceDialog().isDisposed()) alreadyRedLabel.setText(redDatagrams);
+					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
 				}
 			});
 		}
 	}
-	
+
 	/**
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetDataSetsLabel() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			redDataSetsText = "0";
-			redDataSets.setText(redDataSetsText);
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.redDataSetsText = "0";
+			this.redDataSets.setText(this.redDataSetsText);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					if (!application.getDeviceDialog().isDisposed()) {
-						redDataSetsText = "0";
-						redDataSets.setText(redDataSetsText);
+					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+						PicolarioDialog.this.redDataSetsText = "0";
+						PicolarioDialog.this.redDataSets.setText(PicolarioDialog.this.redDataSetsText);
 					}
 				}
 			});
@@ -429,15 +427,15 @@ public class PicolarioDialog extends DeviceDialog {
 	 * @param newValue
 	 */
 	public void setAlreadyRedDataSets(final String newValue) {
-		redDataSetsText = newValue;
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			redDataSets.setText(newValue);
+		this.redDataSetsText = newValue;
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.redDataSets.setText(newValue);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					if (!application.getDeviceDialog().isDisposed()) {
-						redDataSets.setText(newValue);
+					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+						PicolarioDialog.this.redDataSets.setText(newValue);
 					}
 				}
 			});
@@ -448,33 +446,33 @@ public class PicolarioDialog extends DeviceDialog {
 	 * function to enable all the read data read buttons, normally called after data gathering finished
 	 */
 	public void enableReadButtons() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			queryAvailableRecordSetButton.setEnabled(true);
-			readSingle.setEnabled(true);
-			readAllRecords.setEnabled(true);
-			stopButton.setEnabled(false);
-			isClosePossible = true;
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.queryAvailableRecordSetButton.setEnabled(true);
+			this.readSingle.setEnabled(true);
+			this.readAllRecords.setEnabled(true);
+			this.stopButton.setEnabled(false);
+			this.isClosePossible = true;
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					if (!application.getDeviceDialog().isDisposed()) {
-						queryAvailableRecordSetButton.setEnabled(true);
-						readSingle.setEnabled(true);
-						readAllRecords.setEnabled(true);
-						stopButton.setEnabled(false);
-						isClosePossible = true;
+					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+						PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
+						PicolarioDialog.this.readSingle.setEnabled(true);
+						PicolarioDialog.this.readAllRecords.setEnabled(true);
+						PicolarioDialog.this.stopButton.setEnabled(false);
+						PicolarioDialog.this.setClosePossible(true);
 					}
 				}
 			});
 		}
 	}
-	
+
 	/**
 	 * @return the doSwtichRecordSet
 	 */
 	public boolean isDoSwtichRecordSet() {
-		return doSwtichRecordSet;
+		return this.doSwtichRecordSet;
 	}
-	
+
 }

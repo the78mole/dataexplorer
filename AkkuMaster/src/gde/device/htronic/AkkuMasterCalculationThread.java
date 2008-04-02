@@ -28,68 +28,69 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class AkkuMasterCalculationThread extends Thread {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	final static Logger						log	= Logger.getLogger(AkkuMasterCalculationThread.class.getName());
 
-	private String												recordKey;
-	private RecordSet											recordSet;
-	private final OpenSerialDataExplorer	application;
+	String												recordKey;
+	RecordSet											recordSet;
+	final OpenSerialDataExplorer	application;
 
 	/**
 	 * constructor using the recordKey and recordSet for initialization
-	 * @param recordKey as String
-	 * @param recordSet as RecordSet
+	 * @param useRecordKey as String
+	 * @param useRecordSet as RecordSet
 	 */
-	public AkkuMasterCalculationThread(String recordKey, RecordSet recordSet) {
-		this.recordKey = recordKey;
-		this.recordSet = recordSet;
+	public AkkuMasterCalculationThread(String useRecordKey, RecordSet useRecordSet) {
+		this.recordKey = useRecordKey;
+		this.recordSet = useRecordSet;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	/**
 	 * constructor using the recordKey and recordSet for initialization, a thread name can be given
 	 * @param name
-	 * @param recordKey as String
-	 * @param recordSet as RecordSet
+	 * @param useRecordKey as String
+	 * @param useRecordSet as RecordSet
 	 */
-	public AkkuMasterCalculationThread(String name, String recordKey, RecordSet recordSet) {
+	public AkkuMasterCalculationThread(String name, String useRecordKey, RecordSet useRecordSet) {
 		super(name);
-		this.recordKey = recordKey;
-		this.recordSet = recordSet;
+		this.recordKey = useRecordKey;
+		this.recordSet = useRecordSet;
 		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	/**
 	 * method which do the calculation
 	 */
+	@Override
 	public void run() {
-		log.fine("start data calculation for record = " + recordKey);
-		Record record = recordSet.get(recordKey);
-		String[] measurements = record.getDevice().getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+		AkkuMasterCalculationThread.log.fine("start data calculation for record = " + this.recordKey);
+		Record record = this.recordSet.get(this.recordKey);
+		String[] measurements = record.getDevice().getMeasurementNames(this.recordSet.getChannelName()); // 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 		//		values[5] = new Integer(new Integer(values[2]).intValue() * new Integer(values[3]).intValue()).toString(); // Errechnete Leistung	[mW]
 		//		values[6] = new Integer(new Integer(values[2]).intValue() * new Integer(values[4]).intValue()).toString(); // Errechnete Energie	[mWh]
-		if (recordKey.equals(measurements[3])) {									// 3=Leistung
-			Record recordVoltage = recordSet.get(measurements[0]);	// 0=Spannung
-			Record recordCurrent = recordSet.get(measurements[1]);	// 1=Strom
+		if (this.recordKey.equals(measurements[3])) { // 3=Leistung
+			Record recordVoltage = this.recordSet.get(measurements[0]); // 0=Spannung
+			Record recordCurrent = this.recordSet.get(measurements[1]); // 1=Strom
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (AkkuMasterCalculationThread.log.isLoggable(Level.FINEST)) AkkuMasterCalculationThread.log.finest("adding value = " + record.get(i));
 			}
 			record.setDisplayable(true);
 		}
-		else if (recordKey.equals(measurements[4])) {							// 4=Energie
-			Record recordVoltage = recordSet.get(measurements[0]);	// 0=Spannung
-			Record recordCharge = recordSet.get(measurements[2]);		// 2=Ladung
+		else if (this.recordKey.equals(measurements[4])) { // 4=Energie
+			Record recordVoltage = this.recordSet.get(measurements[0]); // 0=Spannung
+			Record recordCharge = this.recordSet.get(measurements[2]); // 2=Ladung
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0) * 1000.0).intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (AkkuMasterCalculationThread.log.isLoggable(Level.FINEST)) AkkuMasterCalculationThread.log.finest("adding value = " + record.get(i));
 			}
 			record.setDisplayable(true);
 		}
 		else
-			log.warning("only supported records are " + measurements[3] + ", " + measurements[4]);
+			AkkuMasterCalculationThread.log.warning("only supported records are " + measurements[3] + ", " + measurements[4]);
 
 		//recordSet.updateDataTable();
-		application.updateGraphicsWindow();
-		log.fine("finished data calculation for record = " + recordKey);
+		this.application.updateGraphicsWindow();
+		AkkuMasterCalculationThread.log.fine("finished data calculation for record = " + this.recordKey);
 	}
 }

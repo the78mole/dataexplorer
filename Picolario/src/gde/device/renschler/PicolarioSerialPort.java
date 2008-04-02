@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.exception.ReadWriteOutOfSyncException;
 import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
@@ -37,22 +36,22 @@ import osde.utils.Checksum;
  * @author Winfried Brügmann
  */
 public class PicolarioSerialPort extends DeviceSerialPort {
-	private Logger							log											= Logger.getLogger(this.getClass().getName());
+	final static Logger	log											= Logger.getLogger(PicolarioSerialPort.class.getName());
 
-	private boolean 						isTransmitFinished = false;
+	boolean							isTransmitFinished			= false;
 
 	// Datentyp Kommando Beschreibung
-	private final byte					readNumberRecordSets[]	= new byte[] { (byte) 0xAA, (byte) 0xAA };
-	private final byte					readRecordSets[]				= new byte[] { (byte) 0xAA, (byte) 0x00 };
+	final byte					readNumberRecordSets[]	= new byte[] { (byte) 0xAA, (byte) 0xAA };
+	final byte					readRecordSets[]				= new byte[] { (byte) 0xAA, (byte) 0x00 };
 
 	/**
 	 * PicolarioSerialPort constructor
-	 * @param deviceConfig
-	 * @param application
+	 * @param currentDeviceConfig
+	 * @param currentApplication
 	 * @throws NoSuchPortException
 	 */
-	public PicolarioSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
-		super(deviceConfig, application);
+	public PicolarioSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
+		super(currentDeviceConfig, currentApplication);
 	}
 
 	/**
@@ -64,21 +63,21 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		int recordSets = 0;
 		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 			}
 
-			this.write(readNumberRecordSets);
+			this.write(this.readNumberRecordSets);
 			Thread.sleep(30);
-			this.write(readNumberRecordSets);
+			this.write(this.readNumberRecordSets);
 
 			byte[] answer = this.read(4, 2);
 
-			if (answer[0] != readNumberRecordSets[0] && answer[2] != readNumberRecordSets[0])
+			if (answer[0] != this.readNumberRecordSets[0] && answer[2] != this.readNumberRecordSets[0])
 				throw new IOException("command to answer missmatch");
-			else
-				recordSets = (int) (answer[1] & 0xFF);
+
+			recordSets = (answer[1] & 0xFF);
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -94,25 +93,25 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	/**
 	 * method to receive full set of Picolario data
 	 * @param datagramNumber
-	 * @return hash map contining gathered data points (voltage and height in separate vector)
+	 * @return hash map containing gathered data points (voltage and height in separate vector)
 	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int datagramNumber, IDevice device, String channelConfigKey) throws Exception {
+	public HashMap<String, Object> getData(int datagramNumber, Picolario device, String configurationKey) throws Exception {
 		Vector<Integer> height = new Vector<Integer>(100);
 		Vector<Integer> voltage = new Vector<Integer>(100);
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		boolean isGoodPackage = true;
 		byte[] readBuffer;
 		int numberRed = 0;
-		byte[] readRecordSetsWithNumber = new byte[] { readRecordSets[0], (byte) datagramNumber, readRecordSets[0], (byte) datagramNumber };
+		byte[] readRecordSetsWithNumber = new byte[] { this.readRecordSets[0], (byte) datagramNumber, this.readRecordSets[0], (byte) datagramNumber };
 
 		try {
 			write(readRecordSetsWithNumber);
-			isTransmitFinished = false;
+			this.isTransmitFinished = false;
 
 			Thread.sleep(20); // wait for 20 ms since it makes no sense to check receive buffer earlier
 
-			while (!isTransmitFinished) {
+			while (!this.isTransmitFinished) {
 
 				int numberAvailableBytes = waitForStabelReceiveBuffer(31, 1);
 
@@ -139,7 +138,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 						//acknowledge request next
 						this.write(new byte[] { readBuffer[readBuffer.length - 1], readBuffer[readBuffer.length - 1] });
 						// update the dialog
-						if (device != null) ((PicolarioDialog) device.getDialog()).setAlreadyRedText(numberRed++);
+						device.getDialog().setAlreadyRedText(numberRed++);
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
@@ -150,11 +149,11 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					}
 				}
 				else {
-					isTransmitFinished = checkTransmissionFinished(31, 1);
+					this.isTransmitFinished = checkTransmissionFinished(31, 1);
 				}
 			} // end while receive loop
 
-			String[] measurements = device.getMeasurementNames(device.getChannelName(1)); // 0=Spannung, 1=Höhe, 2=Steigrate
+			String[] measurements = device.getMeasurementNames(configurationKey); // 0=Spannung, 1=Höhe, 2=Steigrate
 			data.put(measurements[0], voltage);
 			data.put(measurements[1], height);
 		}
@@ -183,29 +182,31 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * function check good package, set isGoodPackage throws read/write out of sync exception
 	 * @throws ReadWriteOutOfSyncException 
 	 */
-	private boolean checkGoodPackage(byte[] readBuffer, int maxBytes, int modulo) throws ReadWriteOutOfSyncException {
+	private boolean checkGoodPackage(byte[] readBuffer, int maxBytes, int modulo) {
 		boolean isGoodPackage = false;
 		if (readBuffer.length == maxBytes)
 			isGoodPackage = true;
-		else if (readBuffer.length < maxBytes && (readBuffer.length - 1) % modulo == 0) isGoodPackage = true;
-		else isGoodPackage = verifyChecksum(readBuffer);
+		else if (readBuffer.length < maxBytes && (readBuffer.length - 1) % modulo == 0)
+			isGoodPackage = true;
+		else
+			isGoodPackage = verifyChecksum(readBuffer);
 
 		return isGoodPackage;
 	}
-	
+
 	/**
 	 * method to check telegram trailing checksum
 	 * @param readBuffer byte array
 	 * @return boolean value comparing last value of the byte array with the XOR checksum
 	 */
 	private boolean verifyChecksum(final byte[] readBuffer) {
-		return readBuffer[readBuffer.length-1] == Checksum.XOR(readBuffer);
+		return readBuffer[readBuffer.length - 1] == Checksum.XOR(readBuffer);
 	}
 
 	/**
-	 * @param isTransmitFinished the isTransmitFinished to set
+	 * @param enabled the isTransmitFinished to set
 	 */
-	public void setTransmitFinished(boolean isTransmitFinished) {
-		this.isTransmitFinished = isTransmitFinished;
+	public void setTransmitFinished(boolean enabled) {
+		this.isTransmitFinished = enabled;
 	}
 }

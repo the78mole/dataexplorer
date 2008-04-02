@@ -16,8 +16,6 @@
 ****************************************************************************************/
 package osde.device.renschler;
 
-import gnu.io.NoSuchPortException;
-
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,26 +37,25 @@ import osde.utils.QuasiLinearRegression;
  * @author Winfried Brügmann
  */
 public class Picolario extends DeviceConfiguration implements IDevice {
-	private Logger												log								= Logger.getLogger(this.getClass().getName());
+	final static Logger						log								= Logger.getLogger(Picolario.class.getName());
 
-	public final static String						DO_NO_ADAPTION		= "do_no_adaption";
-	public final static String						DO_OFFSET_HEIGHT	= "do_offset_height";
-	public final static String						DO_SUBTRACT_FIRST	= "do_subtract_first";
-	public final static String						DO_SUBTRACT_LAST	= "subtract_last";
+	public final static String		DO_NO_ADAPTION		= "do_no_adaption";
+	public final static String		DO_OFFSET_HEIGHT	= "do_offset_height";
+	public final static String		DO_SUBTRACT_FIRST	= "do_subtract_first";
+	public final static String		DO_SUBTRACT_LAST	= "subtract_last";
 
-	private final OpenSerialDataExplorer	application;
-	private final PicolarioDialog					dialog;
-	private final PicolarioSerialPort			serialPort;
-	private final Channels								channels;
-	private CalculationThread							slopeCalculationThread;
+	final OpenSerialDataExplorer	application;
+	final PicolarioDialog					dialog;
+	final PicolarioSerialPort			serialPort;
+	final Channels								channels;
+	CalculationThread							slopeCalculationThread;
 
 	/**
 	 * @param iniFile
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
-	 * @throws NoSuchPortException 
 	 */
-	public Picolario(String iniFile) throws FileNotFoundException, JAXBException, NoSuchPortException {
+	public Picolario(String iniFile) throws FileNotFoundException, JAXBException {
 		super(iniFile);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
@@ -69,9 +66,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
-	 * @throws NoSuchPortException 
 	 */
-	public Picolario(DeviceConfiguration deviceConfig) throws NoSuchPortException {
+	public Picolario(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
@@ -84,46 +80,46 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", recordKey, value));
+
 		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
 		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
 		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
-		
+
 		// height calculation need special procedure
-		if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
+		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
 			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-			
-			if(subtractFirst) {
+
+			if (subtractFirst) {
 				// get the record set to be used
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-				
+				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+
 				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
 			}
 			else if (subtractLast) {
 				// get the record set to be used
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-				
+				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+
 				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
 			}
 			else
 				reduction = 0;
 		}
-		
+
 		// slope calculation needs height factor
-		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
-			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]); 
+		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
+			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]);
 		}
-		
+
 		double newValue = offset + (value - reduction) * factor;
-		
-		if(log.isLoggable(Level.FINER)) log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+
+		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
 		return newValue;
 	}
 
@@ -132,32 +128,32 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		if(log.isLoggable(Level.FINEST)) log.finest(String.format("input value for %s - %f", recordKey, value));
-		
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", recordKey, value));
+
 		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
 		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
 		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
 		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
-		
+
 		// height calculation need special procedure
-		if (recordKey.startsWith(measurements[1])) {	// 1=Höhe
+		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
 			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-			
-			if(subtractFirst) {
+
+			if (subtractFirst) {
 				// get the record set to be used
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-				
+				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+
 				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
 			}
 			else if (subtractLast) {
 				// get the record set to be used
-				RecordSet recordSet = channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = application.getCompareSet();
-				
+				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+
 				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
 			}
 			else
@@ -165,13 +161,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 
 		// slope calculation needs height factor
-		else if (recordKey.startsWith(measurements[2])) {		// 2=Steigung
-			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]); 
+		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
+			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]);
 		}
-		
-		double newValue = (value - offset)/factor + reduction;
 
-		if(log.isLoggable(Level.FINER)) log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+		double newValue = (value - offset) / factor + reduction;
+
+		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
 		return newValue;
 	}
 
@@ -188,11 +184,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
 				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_TYPE);
 				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
-					slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+					this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				else
-					slopeCalculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+					this.slopeCalculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 
-				slopeCalculationThread.start();
+				this.slopeCalculationThread.start();
 			}
 		}
 	}
@@ -201,13 +197,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return the dialog
 	 */
 	public PicolarioDialog getDialog() {
-		return dialog;
+		return this.dialog;
 	}
 
 	/**
 	 * @return the serialPort
 	 */
 	public PicolarioSerialPort getSerialPort() {
-		return serialPort;
+		return this.serialPort;
 	}
 }

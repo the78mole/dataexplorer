@@ -54,7 +54,7 @@ public class AkkuMasterC4Test {
 			TimerTask timerTask = new TimerTask() {
 				public void run() {
 					try {
-						akkuMaster.print(akkuMaster.getData(AkkuMasterC4SerialPort.channel_1, 0, null, ""));
+						akkuMaster.print(akkuMaster.getData(AkkuMasterC4SerialPort.channel_1));
 						
 //						System.out.println("Ausgang 1");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_1));

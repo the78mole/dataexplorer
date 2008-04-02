@@ -16,9 +16,9 @@
 ****************************************************************************************/
 package osde.device.renschler;
 
+import gnu.io.SerialPort;
 import osde.device.DeviceConfiguration;
 import osde.serial.DeviceSerialPort;
-import gnu.io.SerialPort;
 
 /**
  * Test class for PicolarioSerialPort
@@ -41,7 +41,7 @@ public class PicolarioSerialPortTest {
 			SerialPort serialPort = picolario.open();
 
 			picolario.readNumberAvailableRecordSets();
-			picolario.print(picolario.getData(null, 1, null, ""));
+			picolario.print(picolario.getData(1, null, ""));
 			System.out.println();
 
 			serialPort.close();

@@ -34,28 +34,28 @@ import osde.utils.QuasiLinearRegression;
  * @author Winfied Brügmann
  */
 public class DataGathererThread extends Thread {
-	private Logger									log							= Logger.getLogger(this.getClass().getName());
+	final static Logger				log							= Logger.getLogger(DataGathererThread.class.getName());
 
-	private OpenSerialDataExplorer		application;
-	private String[]									datagramNumbers;
-	private final String							RECORD_SET_NAME	= ") Flugaufzeichnung";
-	private final String							configKey;
-	private final PicolarioSerialPort	serialPort;
-	private final PicolarioDialog			dialog;
-	private final Picolario						device;
-	private CalculationThread					calculationThread;
-	private boolean										threadStop			= false;
+	OpenSerialDataExplorer		application;
+	String[]									datagramNumbers;
+	final String							RECORD_SET_NAME	= ") Flugaufzeichnung";
+	final String							configKey;
+	final PicolarioSerialPort	serialPort;
+	final PicolarioDialog			dialog;
+	final Picolario						device;
+	CalculationThread					calculationThread;
+	boolean										threadStop			= false;
 
 	/**
 	 * 
 	 */
-	public DataGathererThread(OpenSerialDataExplorer application, Picolario device, PicolarioSerialPort serialPort, String[] datagramNumbers) {
-		this.application = application;
-		this.device = device;
-		this.serialPort = serialPort;
-		this.dialog = device.getDialog();
-		this.datagramNumbers = datagramNumbers;
-		this.configKey = device.getChannelName(1);
+	public DataGathererThread(OpenSerialDataExplorer currentApplication, Picolario currentDevice, PicolarioSerialPort currentSerialPort, String[] useDatagramNumbers) {
+		this.application = currentApplication;
+		this.device = currentDevice;
+		this.serialPort = currentSerialPort;
+		this.dialog = currentDevice.getDialog();
+		this.datagramNumbers = useDatagramNumbers;
+		this.configKey = currentDevice.getChannelName(1);
 	}
 
 	/**
@@ -67,29 +67,28 @@ public class DataGathererThread extends Thread {
 	public void run() {
 		boolean isPortOpenedByMe = false;
 		try {
-			log.fine("entry data gatherer");
+			DataGathererThread.log.fine("entry data gatherer");
 			Channel channel = Channels.getInstance().getActiveChannel();
-			String[] measurements = device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
+			String[] measurements = this.device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
 
-
-			dialog.resetDataSetsLabel();
+			this.dialog.resetDataSetsLabel();
 			if (!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				isPortOpenedByMe = true;
 			}
 
-			for (int j = 0; j < datagramNumbers.length && !threadStop; ++j) {
-				dialog.resetTelegramLabel();
-				dialog.setAlreadyRedDataSets(datagramNumbers[j]);
-				HashMap<String, Object> data = serialPort.getData(null, new Integer(datagramNumbers[j]).intValue(), device, configKey);
-				recordSetKey = (channel.size() + 1) + RECORD_SET_NAME;
-				channel.put(recordSetKey, RecordSet.createRecordSet(configKey, recordSetKey, application.getActiveDevice(), true, false));
-				log.fine(recordSetKey + " created");
+			for (int j = 0; j < this.datagramNumbers.length && !this.threadStop; ++j) {
+				this.dialog.resetTelegramLabel();
+				this.dialog.setAlreadyRedDataSets(this.datagramNumbers[j]);
+				HashMap<String, Object> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device, this.configKey);
+				recordSetKey = (channel.size() + 1) + this.RECORD_SET_NAME;
+				channel.put(recordSetKey, RecordSet.createRecordSet(this.configKey, recordSetKey, this.application.getActiveDevice(), true, false));
+				DataGathererThread.log.fine(recordSetKey + " created");
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
-				Vector<Integer> voltage = (Vector<Integer>)data.get(measurements[0]); // 0=Spannung
-				Vector<Integer> height = (Vector<Integer>)data.get(measurements[1]);	// 1=Höhe
+				Vector<Integer> voltage = (Vector<Integer>) data.get(measurements[0]); // 0=Spannung
+				Vector<Integer> height = (Vector<Integer>) data.get(measurements[1]); // 1=Höhe
 
 				for (int i = 0; i < height.size(); i++) {
 					int[] points = new int[recordSet.size() - 1];
@@ -100,33 +99,32 @@ public class DataGathererThread extends Thread {
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				PropertyType property = device.getMeasruementProperty(configKey, measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
+				PropertyType property = this.device.getMeasruementProperty(this.configKey, measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
-				calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
-				calculationThread.start();
+				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				this.calculationThread.start();
 
-				application.getMenuToolBar().addRecordSetName(recordSetKey);
-				if (channel.getRecordSetNames().length <= 1 || dialog.isDoSwtichRecordSet())
-					channel.switchRecordSet(recordSetKey);
+				this.application.getMenuToolBar().addRecordSetName(recordSetKey);
+				if (channel.getRecordSetNames().length <= 1 || this.dialog.isDoSwtichRecordSet()) channel.switchRecordSet(recordSetKey);
 
 				// update the progress bar reading one after the other only
 				channel.get(recordSetKey).setAllDisplayable();
 			}// end for
-			dialog.enableReadButtons();
-			log.fine("exit data gatherer");
+			this.dialog.enableReadButtons();
+			DataGathererThread.log.fine("exit data gatherer");
 
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !");
+			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !");
 		}
 		finally {
 			if (isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()
 
-	public void setThreadStop(boolean threadStop) {
-		this.threadStop = threadStop;
+	public void setThreadStop(boolean enable) {
+		this.threadStop = enable;
 		this.serialPort.setTransmitFinished(true);
 	}
 
