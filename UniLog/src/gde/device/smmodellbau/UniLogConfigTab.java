@@ -28,127 +28,118 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * Configuration tab container, adjustment of all active and dependent measurements
+ * @author Winfried Brügmann
+ */
 public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 	{
 		SWTResourceManager.registerResourceUser(this);
 	}
 
-	private Logger												log									= Logger.getLogger(this.getClass().getName());
+	final static Logger						log									= Logger.getLogger(UniLogConfigTab.class.getName());
 
-	private CLabel												receiverVoltageSymbol, receiverVoltageUnit;
-	private CLabel												voltageUnit;
-	private CLabel												currentUnit;
-	private CLabel												revolutionSymbol, revolutionUnit;
-	private CLabel												heightSymbol, heightUnit;
-	private Button												a23ExternModus;
-	private CLabel												axName, axUnit, axOffset, axFactor;
-	private Button												a1UniLogModus;
-	private Button												a23InternModus;
-	private CLabel												prop100WUnit, numCellLabel;
-	private Group													axModusGroup;
-	private Group													powerGroup;
-	private Text													prop100WInput, numCellInput;
-	private Text													a1Unit;
-	private CLabel												etaUnit;
-	private CLabel												etaSymbol;
-	private CLabel												slopeUnit;
-	private CLabel												slopeSymbol;
-	private CLabel												etaButton;
-	private CLabel												slopeLabel;
-	private Button												a3Button;
-	private Button												a1Button;
-	private Button												a2Button;
-	private Button												reveiverVoltageButton;
-	private Button												revolutionButton;
-	private Button												heightButton;
-	private CLabel												capacityLabel;
-	private Button												currentButton;
-	private Button												voltageButton;
-	private Text													a1Factor, a2Factor, a3Factor;
-	private Text													a1Offset, a2Offset, a3Offset;
-	private Text													a3Unit;
-	private Text													a2Unit;
-	private CLabel												voltagePerCellUnit;
-	private CLabel												voltagePerCellSymbol;
-	private CLabel												voltageSymbol;
-	private CLabel												energyUnit;
-	private CLabel												currentSymbol;
-	private CLabel												energySymbol;
-	private CLabel												powerUnit;
-	private CLabel												powerSymbol;
-	private CLabel												capacityUnit;
-	private CLabel												capacitySymbol;
-	private CLabel												voltagePerCellLabel;
-	private CLabel												energyLabel;
-	private CLabel												powerLabel;
-	private Text													a3Text;
-	private Text													a2Text;
-	private Text													a1Text;
-	private CLabel												prop100WLabel;
-	private Button												setConfigButton;
+	CLabel												receiverVoltageSymbol, receiverVoltageUnit;
+	CLabel												voltageUnit;
+	CLabel												currentUnit;
+	CLabel												revolutionSymbol, revolutionUnit;
+	CLabel												heightSymbol, heightUnit;
+	Button												a23ExternModus;
+	CLabel												axName, axUnit, axOffset, axFactor;
+	Button												a1UniLogModus;
+	Button												a23InternModus;
+	CLabel												prop100WUnit, numCellLabel;
+	Group													axModusGroup;
+	Group													powerGroup;
+	Text													prop100WInput, numCellInput;
+	Text													a1Unit;
+	CLabel												etaUnit;
+	CLabel												etaSymbol;
+	CLabel												slopeUnit;
+	CLabel												slopeSymbol;
+	CLabel												etaButton;
+	CLabel												slopeLabel;
+	Button												a3Button;
+	Button												a1Button;
+	Button												a2Button;
+	Button												reveiverVoltageButton;
+	Button												revolutionButton;
+	Button												heightButton;
+	CLabel												capacityLabel;
+	Button												currentButton;
+	Button												voltageButton;
+	Text													a1Factor, a2Factor, a3Factor;
+	Text													a1Offset, a2Offset, a3Offset;
+	Text													a3Unit;
+	Text													a2Unit;
+	CLabel												voltagePerCellUnit;
+	CLabel												voltagePerCellSymbol;
+	CLabel												voltageSymbol;
+	CLabel												energyUnit;
+	CLabel												currentSymbol;
+	CLabel												energySymbol;
+	CLabel												powerUnit;
+	CLabel												powerSymbol;
+	CLabel												capacityUnit;
+	CLabel												capacitySymbol;
+	CLabel												voltagePerCellLabel;
+	CLabel												energyLabel;
+	CLabel												powerLabel;
+	Text													a3Text;
+	Text													a2Text;
+	Text													a1Text;
+	CLabel												prop100WLabel;
+	Button												setConfigButton;
 
 	// values manipulated by editing
-	private boolean												isActiveUe					= false;
-	private boolean												isActiveU						= false;
-	private boolean												isActiveI						= false;
-	private boolean												isActiveRPM					= false;
-	private Button updateGraphicsButton;
-	private boolean												isActiveHeight			= false;
-	private int														prop100WValue				= 3400;
-	private int														numCellValue				= 12;
-	private String												slopeTypeSelection	= CalculationThread.REGRESSION_TYPE_CURVE;
-	private int														slopeTimeSelection;
-	private boolean												isA1ModusAvailable	= false;
-	private boolean												isActiveA1					= false;
-	private boolean												isActiveA2					= false;
-	private boolean												isActiveA3					= false;
-	private String												nameA1							= "-";
-	private String												nameA2							= "-";
-	private String												nameA3							= "-";
-	private String												unitA1							= "-";
-	private String												unitA2							= "-";
-	private String												unitA3							= "-";
-	private double												offsetA1						= 0.0;
-	private double												offsetA2						= 0.0;
-	private double												offsetA3						= 0.0;
-	private double												factorA1						= 1.0;
-	private double												factorA2						= 1.0;
-	private double												factorA3						= 1.0;
-	private String												configName;																												// tabName
+	boolean												isActiveUe					= false;
+	boolean												isActiveU						= false;
+	boolean												isActiveI						= false;
+	boolean												isActiveRPM					= false;
+	Button												updateGraphicsButton;
+	boolean												isActiveHeight			= false;
+	int														prop100WValue				= 3400;
+	int														numCellValue				= 12;
+	String												slopeTypeSelection	= CalculationThread.REGRESSION_TYPE_CURVE;
+	int														slopeTimeSelection;
+	boolean												isA1ModusAvailable	= false;
+	boolean												isActiveA1					= false;
+	boolean												isActiveA2					= false;
+	boolean												isActiveA3					= false;
+	String												nameA1							= "-";
+	String												nameA2							= "-";
+	String												nameA3							= "-";
+	String												unitA1							= "-";
+	String												unitA2							= "-";
+	String												unitA3							= "-";
+	double												offsetA1						= 0.0;
+	double												offsetA2						= 0.0;
+	double												offsetA3						= 0.0;
+	double												factorA1						= 1.0;
+	double												factorA2						= 1.0;
+	double												factorA3						= 1.0;
+	String												configName;																															// tabName
 
-	private CLabel												calculationTypeLabel;
-	private CCombo												slopeCalculationTypeCombo;
-	private CCombo												regressionTime;
+	CLabel												calculationTypeLabel;
+	CCombo												slopeCalculationTypeCombo;
+	CCombo												regressionTime;
 
-	private final UniLogDialog						dialog;
-	private final UniLog									device;																														// get device specific things, get serial port, ...
-	private final OpenSerialDataExplorer	application;
+	final UniLogDialog						dialog;
+	final UniLog									device;																																	// get device specific things, get serial port, ...
+	final OpenSerialDataExplorer	application;
 
 	/**
 	 * panel tab describing a configuration
 	 * @param parent
-	 * @param device
+	 * @param useDevice
 	 * @param tabName
 	 */
-	public UniLogConfigTab(Composite parent, UniLog device, String tabName) {
+	public UniLogConfigTab(Composite parent, UniLog useDevice, String tabName) {
 		super(parent, SWT.NONE);
-		this.device = device;
+		this.device = useDevice;
 		this.configName = tabName;
-		this.dialog = device.getDialog();
+		this.dialog = useDevice.getDialog();
 		this.application = OpenSerialDataExplorer.getInstance();
 		initEditable();
 		initGUI();
@@ -162,638 +153,644 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			{
 				this.setLayout(null);
 				{
-					powerGroup = new Group(this, SWT.NONE);
-					powerGroup.setBounds(5, 2, 299, 331);
-					powerGroup.setLayout(null);
-					powerGroup.setText("Versorgung/Antrieb/Höhe");
-					powerGroup.setToolTipText("Hier bitte alle Datenkanäle auswählen, die angezeigt werden sollen");
-					powerGroup.addPaintListener(new PaintListener() {
+					this.powerGroup = new Group(this, SWT.NONE);
+					this.powerGroup.setBounds(5, 2, 299, 331);
+					this.powerGroup.setLayout(null);
+					this.powerGroup.setText("Versorgung/Antrieb/Höhe");
+					this.powerGroup.setToolTipText("Hier bitte alle Datenkanäle auswählen, die angezeigt werden sollen");
+					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("powerGroup.paintControl, event=" + evt);
-							String recordKey = device.getMeasurementNames(configName)[0];
-							MeasurementType measurement = device.getMeasurement(configName, recordKey);
-							reveiverVoltageButton.setSelection(isActiveUe);
-							reveiverVoltageButton.setText(measurement.getName());
-							receiverVoltageSymbol.setText(measurement.getSymbol());
-							receiverVoltageUnit.setText("[" + measurement.getUnit() + "]");
+							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt);
+							String recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[0];
+							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.reveiverVoltageButton.setSelection(UniLogConfigTab.this.isActiveUe);
+							UniLogConfigTab.this.reveiverVoltageButton.setText(measurement.getName());
+							UniLogConfigTab.this.receiverVoltageSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.receiverVoltageUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[1];
-							measurement = device.getMeasurement(configName, recordKey);
-							voltageButton.setSelection(isActiveU);
-							voltageButton.setText(measurement.getName());
-							voltageSymbol.setText(measurement.getSymbol());
-							voltageUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[1];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.voltageButton.setSelection(UniLogConfigTab.this.isActiveU);
+							UniLogConfigTab.this.voltageButton.setText(measurement.getName());
+							UniLogConfigTab.this.voltageSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.voltageUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[2];
-							measurement = device.getMeasurement(configName, recordKey);
-							currentButton.setSelection(isActiveI);
-							currentButton.setText(measurement.getName());
-							currentSymbol.setText(" " + measurement.getSymbol());
-							currentUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[2];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.currentButton.setSelection(UniLogConfigTab.this.isActiveI);
+							UniLogConfigTab.this.currentButton.setText(measurement.getName());
+							UniLogConfigTab.this.currentSymbol.setText(" " + measurement.getSymbol());
+							UniLogConfigTab.this.currentUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[3];
-							measurement = device.getMeasurement(configName, recordKey);
-							capacityLabel.setText(measurement.getName());
-							capacitySymbol.setText(measurement.getSymbol());
-							capacityUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[3];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.capacityLabel.setText(measurement.getName());
+							UniLogConfigTab.this.capacitySymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.capacityUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[4];
-							measurement = device.getMeasurement(configName, recordKey);
-							powerLabel.setText(measurement.getName());
-							powerSymbol.setText(measurement.getSymbol());
-							powerUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[4];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.powerLabel.setText(measurement.getName());
+							UniLogConfigTab.this.powerSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.powerUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[5];
-							measurement = device.getMeasurement(configName, recordKey);
-							energyLabel.setText(measurement.getName());
-							energySymbol.setText(measurement.getSymbol());
-							energyUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[5];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.energyLabel.setText(measurement.getName());
+							UniLogConfigTab.this.energySymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.energyUnit.setText("[" + measurement.getUnit() + "]");
 
 							// capacity, power, energy
-							updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
+							updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 
 							// number cells voltagePerCell
-							recordKey = device.getMeasurementNames(configName)[6];
-							measurement = device.getMeasurement(configName, recordKey);
-							voltagePerCellLabel.setText(measurement.getName());
-							voltagePerCellSymbol.setText(measurement.getSymbol());
-							voltagePerCellUnit.setText("[" + measurement.getUnit() + "]");
-							numCellInput.setText(" " + numCellValue);
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.voltagePerCellLabel.setText(measurement.getName());
+							UniLogConfigTab.this.voltagePerCellSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.voltagePerCellUnit.setText("[" + measurement.getUnit() + "]");
+							UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
 
-							recordKey = device.getMeasurementNames(configName)[7];
-							measurement = device.getMeasurement(configName, recordKey);
-							revolutionButton.setSelection(isActiveRPM);
-							revolutionButton.setText(measurement.getName());
-							revolutionSymbol.setText(measurement.getSymbol());
-							revolutionUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[7];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.revolutionButton.setSelection(UniLogConfigTab.this.isActiveRPM);
+							UniLogConfigTab.this.revolutionButton.setText(measurement.getName());
+							UniLogConfigTab.this.revolutionSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.revolutionUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[8];
-							measurement = device.getMeasurement(configName, recordKey);
-							etaButton.setText(measurement.getName());
-							etaSymbol.setText(measurement.getSymbol());
-							etaUnit.setText("[" + measurement.getUnit() + "]");
-							prop100WInput.setText(" " + prop100WValue);
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.etaButton.setText(measurement.getName());
+							UniLogConfigTab.this.etaSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.etaUnit.setText("[" + measurement.getUnit() + "]");
+							UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
 
 							// n100W value, eta calculation 										
-							updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
+							updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
+									&& UniLogConfigTab.this.revolutionButton.getSelection());
 
-							recordKey = device.getMeasurementNames(configName)[9];
-							measurement = device.getMeasurement(configName, recordKey);
-							heightButton.setSelection(isActiveHeight);
-							heightButton.setText(measurement.getName());
-							heightSymbol.setText(measurement.getSymbol());
-							heightUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[9];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.heightButton.setSelection(UniLogConfigTab.this.isActiveHeight);
+							UniLogConfigTab.this.heightButton.setText(measurement.getName());
+							UniLogConfigTab.this.heightSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.heightUnit.setText("[" + measurement.getUnit() + "]");
 
-							recordKey = device.getMeasurementNames(configName)[10];
-							measurement = device.getMeasurement(configName, recordKey);
-							slopeLabel.setText(measurement.getName());
-							slopeSymbol.setText(measurement.getSymbol());
-							slopeUnit.setText("[" + measurement.getUnit() + "]");
+							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[10];
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							UniLogConfigTab.this.slopeLabel.setText(measurement.getName());
+							UniLogConfigTab.this.slopeSymbol.setText(measurement.getSymbol());
+							UniLogConfigTab.this.slopeUnit.setText("[" + measurement.getUnit() + "]");
 
-							updateHeightDependent(heightButton.getSelection());
+							updateHeightDependent(UniLogConfigTab.this.heightButton.getSelection());
 
-							regressionTime.select(slopeTimeSelection - 1);
+							UniLogConfigTab.this.regressionTime.select(UniLogConfigTab.this.slopeTimeSelection - 1);
 
-							slopeCalculationTypeCombo.select(slopeTypeSelection.equals(CalculationThread.REGRESSION_TYPE_CURVE) ? 1 : 0);
+							UniLogConfigTab.this.slopeCalculationTypeCombo.select(UniLogConfigTab.this.slopeTypeSelection.equals(CalculationThread.REGRESSION_TYPE_CURVE) ? 1 : 0);
 						}
 					});
 					{
-						reveiverVoltageButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						reveiverVoltageButton.setBounds(23, 20, 132, 18);
-						reveiverVoltageButton.addSelectionListener(new SelectionAdapter() {
+						this.reveiverVoltageButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.reveiverVoltageButton.setBounds(23, 20, 132, 18);
+						this.reveiverVoltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("reveiverVoltageButton.widgetSelected, event=" + evt);
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("reveiverVoltageButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						receiverVoltageSymbol = new CLabel(powerGroup, SWT.NONE);
-						receiverVoltageSymbol.setBounds(158, 18, 40, 20);
+						this.receiverVoltageSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.receiverVoltageSymbol.setBounds(158, 18, 40, 20);
 					}
 					{
-						receiverVoltageUnit = new CLabel(powerGroup, SWT.NONE);
-						receiverVoltageUnit.setBounds(198, 18, 40, 20);
+						this.receiverVoltageUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.receiverVoltageUnit.setBounds(198, 18, 40, 20);
 					}
 					{
-						voltageButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						voltageButton.setBounds(23, 42, 120, 18);
-						voltageButton.addSelectionListener(new SelectionAdapter() {
+						this.voltageButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.voltageButton.setBounds(23, 42, 120, 18);
+						this.voltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("voltageButton.widgetSelected, event=" + evt);
-								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
-								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("voltageButton.widgetSelected, event=" + evt);
+								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
+								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
+										&& UniLogConfigTab.this.revolutionButton.getSelection());
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						voltageSymbol = new CLabel(powerGroup, SWT.NONE);
-						voltageSymbol.setBounds(158, 40, 40, 20);
+						this.voltageSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.voltageSymbol.setBounds(158, 40, 40, 20);
 					}
 					{
-						voltageUnit = new CLabel(powerGroup, SWT.NONE);
-						voltageUnit.setBounds(198, 40, 40, 20);
+						this.voltageUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.voltageUnit.setBounds(198, 40, 40, 20);
 					}
 					{
-						currentButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						currentButton.setBounds(23, 64, 120, 18);
-						currentButton.addSelectionListener(new SelectionAdapter() {
+						this.currentButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.currentButton.setBounds(23, 64, 120, 18);
+						this.currentButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("currentButton.widgetSelected, event=" + evt);
-								updateStateVoltageAndCurrentDependent(voltageButton.getSelection() && currentButton.getSelection());
-								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt);
+								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
+								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
+										&& UniLogConfigTab.this.revolutionButton.getSelection());
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						currentSymbol = new CLabel(powerGroup, SWT.NONE);
-						currentSymbol.setBounds(158, 62, 30, 18);
+						this.currentSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.currentSymbol.setBounds(158, 62, 30, 18);
 					}
 					{
-						currentUnit = new CLabel(powerGroup, SWT.NONE);
-						currentUnit.setBounds(198, 62, 62, 20);
+						this.currentUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.currentUnit.setBounds(198, 62, 62, 20);
 					}
 					{
-						capacityLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						capacityLabel.setBounds(37, 86, 120, 20);
+						this.capacityLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.capacityLabel.setBounds(37, 86, 120, 20);
 					}
 					{
-						capacitySymbol = new CLabel(powerGroup, SWT.NONE);
-						capacitySymbol.setBounds(158, 84, 40, 20);
+						this.capacitySymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.capacitySymbol.setBounds(158, 84, 40, 20);
 					}
 					{
-						capacityUnit = new CLabel(powerGroup, SWT.NONE);
-						capacityUnit.setBounds(198, 84, 40, 20);
+						this.capacityUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.capacityUnit.setBounds(198, 84, 40, 20);
 					}
 					{
-						powerLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						powerLabel.setBounds(37, 108, 120, 20);
+						this.powerLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.powerLabel.setBounds(37, 108, 120, 20);
 					}
 					{
-						powerSymbol = new CLabel(powerGroup, SWT.NONE);
-						powerSymbol.setBounds(158, 106, 40, 20);
+						this.powerSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.powerSymbol.setBounds(158, 106, 40, 20);
 					}
 					{
-						powerUnit = new CLabel(powerGroup, SWT.NONE);
-						powerUnit.setBounds(198, 106, 40, 20);
+						this.powerUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.powerUnit.setBounds(198, 106, 40, 20);
 					}
 					{
-						energyLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						energyLabel.setBounds(37, 130, 120, 20);
+						this.energyLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.energyLabel.setBounds(37, 130, 120, 20);
 					}
 					{
-						energySymbol = new CLabel(powerGroup, SWT.NONE);
-						energySymbol.setBounds(158, 128, 40, 20);
+						this.energySymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.energySymbol.setBounds(158, 128, 40, 20);
 					}
 					{
-						energyUnit = new CLabel(powerGroup, SWT.NONE);
-						energyUnit.setBounds(198, 128, 40, 20);
+						this.energyUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.energyUnit.setBounds(198, 128, 40, 20);
 					}
 					{
-						voltagePerCellLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						voltagePerCellLabel.setBounds(37, 152, 120, 20);
+						this.voltagePerCellLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.voltagePerCellLabel.setBounds(37, 152, 120, 20);
 					}
 					{
-						voltagePerCellSymbol = new CLabel(powerGroup, SWT.NONE);
-						voltagePerCellSymbol.setBounds(158, 150, 40, 20);
+						this.voltagePerCellSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.voltagePerCellSymbol.setBounds(158, 150, 40, 20);
 					}
 					{
-						voltagePerCellUnit = new CLabel(powerGroup, SWT.NONE);
-						voltagePerCellUnit.setBounds(198, 150, 40, 20);
+						this.voltagePerCellUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.voltagePerCellUnit.setBounds(198, 150, 40, 20);
 					}
 					{
-						numCellLabel = new CLabel(powerGroup, SWT.LEFT);
-						numCellLabel.setBounds(37, 172, 118, 18);
-						numCellLabel.setText("Anzahl Akkuzellen");
+						this.numCellLabel = new CLabel(this.powerGroup, SWT.LEFT);
+						this.numCellLabel.setBounds(37, 172, 118, 18);
+						this.numCellLabel.setText("Anzahl Akkuzellen");
 					}
 					{
-						numCellInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
-						numCellInput.setBounds(158, 173, 40, 20);
-						numCellInput.setToolTipText("Hier die Anzahl der Akkuzellen einsetzen");
-						numCellInput.addKeyListener(new KeyAdapter() {
+						this.numCellInput = new Text(this.powerGroup, SWT.LEFT | SWT.BORDER);
+						this.numCellInput.setBounds(158, 173, 40, 20);
+						this.numCellInput.setToolTipText("Hier die Anzahl der Akkuzellen einsetzen");
+						this.numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("numCellInput.keyReleased, event=" + evt);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("numCellInput.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									setConfigButton.setEnabled(true);
-									numCellValue = new Integer(numCellInput.getText().trim());
-									numCellInput.setText(" " + numCellValue);
-									device.setMeasurementPropertyValue(configName, device.getMeasurementNames(configName)[6], UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, numCellValue);
+									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
+									UniLogConfigTab.this.device.setMeasurementPropertyValue(UniLogConfigTab.this.configName, UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6],
+											UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
 								}
 							}
 						});
 					}
 					{
-						revolutionButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						revolutionButton.setBounds(23, 196, 135, 18);
-						revolutionButton.addSelectionListener(new SelectionAdapter() {
+						this.revolutionButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.revolutionButton.setBounds(23, 196, 135, 18);
+						this.revolutionButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("revolutionButton.widgetSelected, event=" + evt);
-								updateStateVoltageCurrentRevolutionDependent(voltageButton.getSelection() && currentButton.getSelection() && revolutionButton.getSelection());
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("revolutionButton.widgetSelected, event=" + evt);
+								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
+										&& UniLogConfigTab.this.revolutionButton.getSelection());
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						revolutionSymbol = new CLabel(powerGroup, SWT.NONE);
-						revolutionSymbol.setBounds(158, 194, 40, 20);
+						this.revolutionSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.revolutionSymbol.setBounds(158, 194, 40, 20);
 					}
 					{
-						revolutionUnit = new CLabel(powerGroup, SWT.NONE);
-						revolutionUnit.setBounds(198, 194, 40, 20);
+						this.revolutionUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.revolutionUnit.setBounds(198, 194, 40, 20);
 					}
 					{
-						prop100WLabel = new CLabel(powerGroup, SWT.LEFT);
-						prop100WLabel.setBounds(37, 216, 118, 18);
-						prop100WLabel.setText("Propeller n100W");
+						this.prop100WLabel = new CLabel(this.powerGroup, SWT.LEFT);
+						this.prop100WLabel.setBounds(37, 216, 118, 18);
+						this.prop100WLabel.setText("Propeller n100W");
 					}
 					{
-						prop100WInput = new Text(powerGroup, SWT.LEFT | SWT.BORDER);
-						prop100WInput.setBounds(158, 217, 40, 20);
-						prop100WInput.setToolTipText("Hier die Derhzahl des Propellers bei 100 Watt einsetzen");
-						prop100WInput.addKeyListener(new KeyAdapter() {
+						this.prop100WInput = new Text(this.powerGroup, SWT.LEFT | SWT.BORDER);
+						this.prop100WInput.setBounds(158, 217, 40, 20);
+						this.prop100WInput.setToolTipText("Hier die Derhzahl des Propellers bei 100 Watt einsetzen");
+						this.prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("prop100WInput.keyReleased, event=" + evt);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("prop100WInput.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									setConfigButton.setEnabled(true);
-									prop100WValue = new Integer(prop100WInput.getText().trim());
-									prop100WInput.setText(" " + prop100WValue);
-									device.setMeasurementPropertyValue(configName, device.getMeasurementNames(configName)[8], UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, prop100WValue);
+									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
+									UniLogConfigTab.this.device.setMeasurementPropertyValue(UniLogConfigTab.this.configName, UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8],
+											UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 								}
 							}
 						});
 					}
 					{
-						prop100WUnit = new CLabel(powerGroup, SWT.NONE);
-						prop100WUnit.setBounds(198, 216, 88, 20);
-						prop100WUnit.setText("100W  * 1/min");
+						this.prop100WUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.prop100WUnit.setBounds(198, 216, 88, 20);
+						this.prop100WUnit.setText("100W  * 1/min");
 					}
 					{
-						etaButton = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						etaButton.setBounds(37, 240, 108, 20);
+						this.etaButton = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.etaButton.setBounds(37, 240, 108, 20);
 					}
 					{
-						etaSymbol = new CLabel(powerGroup, SWT.NONE);
-						etaSymbol.setBounds(158, 239, 40, 20);
+						this.etaSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.etaSymbol.setBounds(158, 239, 40, 20);
 					}
 					{
-						etaUnit = new CLabel(powerGroup, SWT.NONE);
-						etaUnit.setBounds(198, 238, 40, 20);
+						this.etaUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.etaUnit.setBounds(198, 238, 40, 20);
 					}
 					{
-						heightButton = new Button(powerGroup, SWT.CHECK | SWT.LEFT);
-						heightButton.setBounds(23, 262, 120, 18);
-						heightButton.addSelectionListener(new SelectionAdapter() {
+						this.heightButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.heightButton.setBounds(23, 262, 120, 18);
+						this.heightButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("heightButton.widgetSelected, event=" + evt);
-								updateHeightDependent(heightButton.getSelection());
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("heightButton.widgetSelected, event=" + evt);
+								updateHeightDependent(UniLogConfigTab.this.heightButton.getSelection());
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						heightSymbol = new CLabel(powerGroup, SWT.NONE);
-						heightSymbol.setBounds(158, 260, 40, 20);
+						this.heightSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.heightSymbol.setBounds(158, 260, 40, 20);
 					}
 					{
-						heightUnit = new CLabel(powerGroup, SWT.NONE);
-						heightUnit.setBounds(198, 260, 40, 20);
+						this.heightUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.heightUnit.setBounds(198, 260, 40, 20);
 					}
 					{
-						slopeLabel = new CLabel(powerGroup, SWT.CHECK | SWT.LEFT);
-						slopeLabel.setBounds(37, 282, 120, 19);
+						this.slopeLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
+						this.slopeLabel.setBounds(37, 282, 120, 19);
 					}
 					{
-						slopeSymbol = new CLabel(powerGroup, SWT.NONE);
-						slopeSymbol.setBounds(158, 282, 40, 20);
+						this.slopeSymbol = new CLabel(this.powerGroup, SWT.NONE);
+						this.slopeSymbol.setBounds(158, 282, 40, 20);
 					}
 					{
-						slopeUnit = new CLabel(powerGroup, SWT.NONE);
-						slopeUnit.setBounds(198, 282, 40, 20);
+						this.slopeUnit = new CLabel(this.powerGroup, SWT.NONE);
+						this.slopeUnit.setBounds(198, 282, 40, 20);
 					}
 					{
-						calculationTypeLabel = new CLabel(powerGroup, SWT.NONE);
-						calculationTypeLabel.setBounds(48, 304, 79, 20);
-						calculationTypeLabel.setText("Berechnung");
+						this.calculationTypeLabel = new CLabel(this.powerGroup, SWT.NONE);
+						this.calculationTypeLabel.setBounds(48, 304, 79, 20);
+						this.calculationTypeLabel.setText("Berechnung");
 					}
 					{
-						slopeCalculationTypeCombo = new CCombo(powerGroup, SWT.BORDER);
-						slopeCalculationTypeCombo.setBounds(133, 304, 97, 20);
-						slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE });
-						slopeCalculationTypeCombo.setToolTipText("Hier den Berechnungstyp einstellen");
-						slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
+						this.slopeCalculationTypeCombo = new CCombo(this.powerGroup, SWT.BORDER);
+						this.slopeCalculationTypeCombo.setBounds(133, 304, 97, 20);
+						this.slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE });
+						this.slopeCalculationTypeCombo.setToolTipText("Hier den Berechnungstyp einstellen");
+						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt);
-								if (slopeCalculationTypeCombo.getSelectionIndex() == 1)
-									slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt);
+								if (UniLogConfigTab.this.slopeCalculationTypeCombo.getSelectionIndex() == 1)
+									UniLogConfigTab.this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 								else
-									slopeTypeSelection = CalculationThread.REGRESSION_TYPE_LINEAR;
+									UniLogConfigTab.this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_LINEAR;
 
-								setConfigButton.setEnabled(true);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						regressionTime = new CCombo(powerGroup, SWT.BORDER);
-						regressionTime.setBounds(232, 304, 61, 20);
-						regressionTime.setItems(new String[] { " 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s",
+						this.regressionTime = new CCombo(this.powerGroup, SWT.BORDER);
+						this.regressionTime.setBounds(232, 304, 61, 20);
+						this.regressionTime.setItems(new String[] { " 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s",
 								"19 s", "20 s" });
-						regressionTime.setToolTipText("Hier die Regressionszeit in Sekunden einstellen");
-						regressionTime.addSelectionListener(new SelectionAdapter() {
+						this.regressionTime.setToolTipText("Hier die Regressionszeit in Sekunden einstellen");
+						this.regressionTime.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("regressionTime.widgetSelected, event=" + evt);
-								slopeTimeSelection = regressionTime.getSelectionIndex() + 1;
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("regressionTime.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.slopeTimeSelection = UniLogConfigTab.this.regressionTime.getSelectionIndex() + 1;
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 				}
 				{
-					axModusGroup = new Group(this, SWT.NONE);
-					axModusGroup.setLayout(null);
-					axModusGroup.setText("A* Konfiguration");
-					axModusGroup.setBounds(313, 2, 310, 193);
-					axModusGroup.setToolTipText("Hier bitte die Konfiguration für die A* Ausgange festlegen");
-					axModusGroup.addPaintListener(new PaintListener() {
+					this.axModusGroup = new Group(this, SWT.NONE);
+					this.axModusGroup.setLayout(null);
+					this.axModusGroup.setText("A* Konfiguration");
+					this.axModusGroup.setBounds(313, 2, 310, 193);
+					this.axModusGroup.setToolTipText("Hier bitte die Konfiguration für die A* Ausgange festlegen");
+					this.axModusGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("axModusGroup.paintControl, event=" + evt);
-							a1Button.setSelection(isActiveA1);
-							a1Text.setText(nameA1);
-							a1Unit.setText("[" + unitA1 + "]");
-							a1Offset.setText(String.format("%.2f", offsetA1));
-							a1Factor.setText(String.format("%.2f", factorA1));
+							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("axModusGroup.paintControl, event=" + evt);
+							UniLogConfigTab.this.a1Button.setSelection(UniLogConfigTab.this.isActiveA1);
+							UniLogConfigTab.this.a1Text.setText(UniLogConfigTab.this.nameA1);
+							UniLogConfigTab.this.a1Unit.setText("[" + UniLogConfigTab.this.unitA1 + "]");
+							UniLogConfigTab.this.a1Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA1));
+							UniLogConfigTab.this.a1Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA1));
 
-							a2Button.setSelection(isActiveA2);
-							a2Text.setText(nameA2);
-							a2Unit.setText("[" + unitA2 + "]");
-							a2Offset.setText(String.format("%.2f", offsetA2));
-							a2Factor.setText(String.format("%.2f", factorA2));
+							UniLogConfigTab.this.a2Button.setSelection(UniLogConfigTab.this.isActiveA2);
+							UniLogConfigTab.this.a2Text.setText(UniLogConfigTab.this.nameA2);
+							UniLogConfigTab.this.a2Unit.setText("[" + UniLogConfigTab.this.unitA2 + "]");
+							UniLogConfigTab.this.a2Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA2));
+							UniLogConfigTab.this.a2Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA2));
 
-							a3Button.setSelection(isActiveA3);
-							a3Text.setText(nameA3);
-							a3Unit.setText("[" + unitA3 + "]");
-							a3Offset.setText(String.format("%.2f", offsetA3));
-							a3Factor.setText(String.format("%.2f", factorA3));
+							UniLogConfigTab.this.a3Button.setSelection(UniLogConfigTab.this.isActiveA3);
+							UniLogConfigTab.this.a3Text.setText(UniLogConfigTab.this.nameA3);
+							UniLogConfigTab.this.a3Unit.setText("[" + UniLogConfigTab.this.unitA3 + "]");
+							UniLogConfigTab.this.a3Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA3));
+							UniLogConfigTab.this.a3Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA3));
 						}
 					});
 					{
-						a1UniLogModus = new Button(axModusGroup, SWT.PUSH | SWT.CENTER);
-						a1UniLogModus.setBounds(7, 20, 290, 25);
-						a1UniLogModus.setText("A1 Vorgabe aus UniLog Einstellung");
-						a1UniLogModus.addSelectionListener(new SelectionAdapter() {
+						this.a1UniLogModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
+						this.a1UniLogModus.setBounds(7, 20, 290, 25);
+						this.a1UniLogModus.setText("A1 Vorgabe aus UniLog Einstellung");
+						this.a1UniLogModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1UniLogModus.widgetSelected, event=" + evt);
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1UniLogModus.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 								try {
-									if (!isA1ModusAvailable) {
-										dialog.updateConfigurationValues(device.getSerialPort().readConfiguration());
+									if (!UniLogConfigTab.this.isA1ModusAvailable) {
+										UniLogConfigTab.this.dialog.updateConfigurationValues(UniLogConfigTab.this.device.getSerialPort().readConfiguration());
 									}
-									a1Text.setText(UniLogDialog.A1_MODUS[dialog.getSelectionIndexA1ModusCombo()]);
+									UniLogConfigTab.this.a1Text.setText(UniLogDialog.A1_MODUS[UniLogConfigTab.this.dialog.getSelectionIndexA1ModusCombo()]);
 								}
 								catch (Exception e) {
-									application.openMessageDialog(e.getMessage());
+									UniLogConfigTab.this.application.openMessageDialog(e.getMessage());
 								}
 							}
 						});
 					}
 					{
-						axName = new CLabel(axModusGroup, SWT.LEFT);
-						axName.setBounds(47, 50, 116, 18);
-						axName.setText("Bezeichnung");
-						axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axName = new CLabel(this.axModusGroup, SWT.LEFT);
+						this.axName.setBounds(47, 50, 116, 18);
+						this.axName.setText("Bezeichnung");
+						this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
 					{
-						axUnit = new CLabel(axModusGroup, SWT.LEFT);
-						axUnit.setBounds(160, 50, 45, 20);
-						axUnit.setText("Einheit");
-						axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axUnit = new CLabel(this.axModusGroup, SWT.LEFT);
+						this.axUnit.setBounds(160, 50, 45, 20);
+						this.axUnit.setText("Einheit");
+						this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
 					{
-						axOffset = new CLabel(axModusGroup, SWT.LEFT);
-						axOffset.setBounds(209, 50, 46, 20);
-						axOffset.setText("Offset");
-						axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axOffset = new CLabel(this.axModusGroup, SWT.LEFT);
+						this.axOffset.setBounds(209, 50, 46, 20);
+						this.axOffset.setText("Offset");
+						this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
 					{
-						axFactor = new CLabel(axModusGroup, SWT.LEFT);
-						axFactor.setBounds(255, 50, 50, 20);
-						axFactor.setText("Factor");
-						axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axFactor = new CLabel(this.axModusGroup, SWT.LEFT);
+						this.axFactor.setBounds(255, 50, 50, 20);
+						this.axFactor.setText("Factor");
+						this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
 					}
 					{
-						a1Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a1Button.setBounds(4, 71, 41, 18);
-						a1Button.setText("A1");
-						a1Button.addSelectionListener(new SelectionAdapter() {
+						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
+						this.a1Button.setBounds(4, 71, 41, 18);
+						this.a1Button.setText("A1");
+						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1ValueButton.widgetSelected, event=" + evt);
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a1Text = new Text(axModusGroup, SWT.BORDER);
-						a1Text.setBounds(49, 72, 116, 18);
-						a1Text.setToolTipText("Name vom A1 Ausgang");
-						a1Text.addKeyListener(new KeyAdapter() {
+						this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
+						this.a1Text.setBounds(49, 72, 116, 18);
+						this.a1Text.setToolTipText("Name vom A1 Ausgang");
+						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Text.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a1Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
-						a1Unit.setBounds(165, 72, 40, 18);
-						a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
-						a1Unit.addKeyListener(new KeyAdapter() {
+						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
+						this.a1Unit.setBounds(165, 72, 40, 18);
+						this.a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a1Offset = new Text(axModusGroup, SWT.BORDER);
-						a1Offset.setBounds(205, 72, 50, 18);
-						a1Offset.addKeyListener(new KeyAdapter() {
+						this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
+						this.a1Offset.setBounds(205, 72, 50, 18);
+						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a1Factor = new Text(axModusGroup, SWT.BORDER);
-						a1Factor.setBounds(255, 72, 50, 18);
-						a1Factor.addKeyListener(new KeyAdapter() {
+						this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
+						this.a1Factor.setBounds(255, 72, 50, 18);
+						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a1Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a2Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a2Button.setBounds(4, 93, 41, 18);
-						a2Button.setText("A2");
-						a2Button.addSelectionListener(new SelectionAdapter() {
+						this.a2Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
+						this.a2Button.setBounds(4, 93, 41, 18);
+						this.a2Button.setText("A2");
+						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a2ValueButton.widgetSelected, event=" + evt);
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a2Text = new Text(axModusGroup, SWT.BORDER);
-						a2Text.setBounds(49, 93, 116, 18);
-						a2Text.setToolTipText("Name vom A2 Ausgang");
-						a2Text.addKeyListener(new KeyAdapter() {
+						this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
+						this.a2Text.setBounds(49, 93, 116, 18);
+						this.a2Text.setToolTipText("Name vom A2 Ausgang");
+						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a2Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Text.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a2Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
-						a2Unit.setBounds(165, 93, 40, 18);
-						a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
-						a2Unit.addKeyListener(new KeyAdapter() {
+						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
+						this.a2Unit.setBounds(165, 93, 40, 18);
+						this.a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a2Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a2Offset = new Text(axModusGroup, SWT.BORDER);
-						a2Offset.setBounds(205, 93, 50, 18);
-						a2Offset.addKeyListener(new KeyAdapter() {
+						this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
+						this.a2Offset.setBounds(205, 93, 50, 18);
+						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a2Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a2Factor = new Text(axModusGroup, SWT.BORDER);
-						a2Factor.setBounds(255, 93, 50, 18);
-						a2Factor.addKeyListener(new KeyAdapter() {
+						this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
+						this.a2Factor.setBounds(255, 93, 50, 18);
+						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a2Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a3Button = new Button(axModusGroup, SWT.CHECK | SWT.LEFT);
-						a3Button.setBounds(4, 115, 41, 18);
-						a3Button.setText("A3");
-						a3Button.addSelectionListener(new SelectionAdapter() {
+						this.a3Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
+						this.a3Button.setBounds(4, 115, 41, 18);
+						this.a3Button.setText("A3");
+						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a3ValueButton.widgetSelected, event=" + evt);
-								setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a3Text = new Text(axModusGroup, SWT.BORDER);
-						a3Text.setBounds(49, 115, 116, 18);
-						a3Text.setToolTipText("Name vom A3 Ausgang");
-						a3Text.addKeyListener(new KeyAdapter() {
+						this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
+						this.a3Text.setBounds(49, 115, 116, 18);
+						this.a3Text.setToolTipText("Name vom A3 Ausgang");
+						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a3Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Text.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a3Unit = new Text(axModusGroup, SWT.CENTER | SWT.BORDER);
-						a3Unit.setBounds(165, 115, 40, 18);
-						a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
-						a3Unit.addKeyListener(new KeyAdapter() {
+						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
+						this.a3Unit.setBounds(165, 115, 40, 18);
+						this.a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a3Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a3Offset = new Text(axModusGroup, SWT.BORDER);
-						a3Offset.setBounds(205, 115, 50, 18);
-						a3Offset.addKeyListener(new KeyAdapter() {
+						this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
+						this.a3Offset.setBounds(205, 115, 50, 18);
+						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a3Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a3Factor = new Text(axModusGroup, SWT.BORDER);
-						a3Factor.setBounds(255, 115, 50, 18);
-						a3Factor.addKeyListener(new KeyAdapter() {
+						this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
+						this.a3Factor.setBounds(255, 115, 50, 18);
+						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a3Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) setConfigButton.setEnabled(true);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt);
+								if (evt.character == SWT.CR) UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a23InternModus = new Button(axModusGroup, SWT.PUSH | SWT.CENTER);
-						a23InternModus.setBounds(7, 153, 146, 25);
-						a23InternModus.setText("A2/3 Vorgabe intern");
-						a23InternModus.addSelectionListener(new SelectionAdapter() {
+						this.a23InternModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
+						this.a23InternModus.setBounds(7, 153, 146, 25);
+						this.a23InternModus.setText("A2/3 Vorgabe intern");
+						this.a23InternModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a23InternModus.widgetSelected, event=" + evt);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23InternModus.widgetSelected, event=" + evt);
 								setA23Defaults('I');
-								setConfigButton.setEnabled(true);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 					{
-						a23ExternModus = new Button(axModusGroup, SWT.PUSH | SWT.CENTER);
-						a23ExternModus.setBounds(159, 153, 139, 26);
-						a23ExternModus.setText("A2/3 Vorgabe extern");
-						a23ExternModus.addSelectionListener(new SelectionAdapter() {
+						this.a23ExternModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
+						this.a23ExternModus.setBounds(159, 153, 139, 26);
+						this.a23ExternModus.setText("A2/3 Vorgabe extern");
+						this.a23ExternModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (log.isLoggable(Level.FINEST)) log.finest("a23ExternModus.widgetSelected, event=" + evt);
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23ExternModus.widgetSelected, event=" + evt);
 								setA23Defaults('E');
-								setConfigButton.setEnabled(true);
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
 						});
 					}
 				}
 				{
-					setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					setConfigButton.setBounds(366, 226, 210, 30);
-					setConfigButton.setText("Konfiguration speichern");
-					setConfigButton.setEnabled(false);
-					setConfigButton.addSelectionListener(new SelectionAdapter() {
+					this.setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
+					this.setConfigButton.setBounds(366, 226, 210, 30);
+					this.setConfigButton.setText("Konfiguration speichern");
+					this.setConfigButton.setEnabled(false);
+					this.setConfigButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("setConfigButton.widgetSelected, event=" + evt);
+							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("setConfigButton.widgetSelected, event=" + evt);
 							collectAndUpdateConfiguration();
-							setConfigButton.setEnabled(false);
-							updateGraphicsButton.setEnabled(true);
+							UniLogConfigTab.this.setConfigButton.setEnabled(false);
+							UniLogConfigTab.this.updateGraphicsButton.setEnabled(true);
 						}
 					});
 				}
 				{
-					updateGraphicsButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					updateGraphicsButton.setBounds(366, 275, 210, 30);
-					updateGraphicsButton.setText("Neuberechnung");
-					updateGraphicsButton.setEnabled(false);
-					updateGraphicsButton.addSelectionListener(new SelectionAdapter() {
+					this.updateGraphicsButton = new Button(this, SWT.PUSH | SWT.CENTER);
+					this.updateGraphicsButton.setBounds(366, 275, 210, 30);
+					this.updateGraphicsButton.setText("Neuberechnung");
+					this.updateGraphicsButton.setEnabled(false);
+					this.updateGraphicsButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.finest("setConfigButton.widgetSelected, event=" + evt);
-							updateGraphicsButton.setEnabled(false);
+							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("setConfigButton.widgetSelected, event=" + evt);
+							UniLogConfigTab.this.updateGraphicsButton.setEnabled(false);
 							Channel activeChannel = Channels.getInstance().getActiveChannel();
 							if (activeChannel != null) {
 								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 								if (activeRecordSet != null) {
 									activeRecordSet.setRecalculation(true);
-									device.makeInActiveDisplayable(activeRecordSet);
+									UniLogConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 								}
 							}
 						}
@@ -811,28 +808,28 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * enable voltage, current, revolution dependent measurement fields
 	 * @param enabled
 	 */
-	private void updateStateVoltageCurrentRevolutionDependent(boolean enabled) {
-		prop100WLabel.setEnabled(enabled);
-		prop100WInput.setEnabled(enabled);
-		prop100WUnit.setEnabled(enabled);
-		etaButton.setEnabled(enabled);
-		etaSymbol.setEnabled(enabled);
-		etaUnit.setEnabled(enabled);
+	void updateStateVoltageCurrentRevolutionDependent(boolean enabled) {
+		this.prop100WLabel.setEnabled(enabled);
+		this.prop100WInput.setEnabled(enabled);
+		this.prop100WUnit.setEnabled(enabled);
+		this.etaButton.setEnabled(enabled);
+		this.etaSymbol.setEnabled(enabled);
+		this.etaUnit.setEnabled(enabled);
 		if (enabled) {
-			prop100WLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			prop100WInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			prop100WUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			etaButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			etaSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			etaUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.prop100WLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.prop100WInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.prop100WUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.etaButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.etaSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.etaUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		}
 		else {
-			prop100WLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			prop100WInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			prop100WUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			etaButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			etaSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			etaUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.prop100WLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.prop100WInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.prop100WUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.etaButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.etaSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.etaUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		}
 	}
 
@@ -840,25 +837,25 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * enable height measurement dependent fields
 	 * @param enabled
 	 */
-	private void updateHeightDependent(boolean enabled) {
-		slopeLabel.setEnabled(enabled);
-		slopeSymbol.setEnabled(enabled);
-		slopeUnit.setEnabled(enabled);
+	void updateHeightDependent(boolean enabled) {
+		this.slopeLabel.setEnabled(enabled);
+		this.slopeSymbol.setEnabled(enabled);
+		this.slopeUnit.setEnabled(enabled);
 		if (enabled) {
-			slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		}
 		else {
-			slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.slopeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.slopeSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.slopeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.calculationTypeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		}
 	}
 
@@ -866,7 +863,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * load default values for A2 and A3 fields
 	 * @param internExtern 'I' intern / 'E' external sensor
 	 */
-	private void setA23Defaults(int internExtern) {
+	void setA23Defaults(int internExtern) {
 		String[] a2Values;
 		String[] a3Values;
 		switch (internExtern) {
@@ -880,137 +877,137 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			a3Values = new String[] { "TempIntern", "A3", "°C", "0.0", "1.0" };
 			break;
 		}
-		a2Text.setText(a2Values[0]);
-		a2Unit.setText(a2Values[2]);
-		a2Offset.setText(a2Values[3]);
-		a2Factor.setText(a2Values[4]);
+		this.a2Text.setText(a2Values[0]);
+		this.a2Unit.setText(a2Values[2]);
+		this.a2Offset.setText(a2Values[3]);
+		this.a2Factor.setText(a2Values[4]);
 
-		a3Text.setText(a3Values[0]);
-		a3Unit.setText(a3Values[2]);
-		a3Offset.setText(a3Values[3]);
-		a3Factor.setText(a3Values[4]);
+		this.a3Text.setText(a3Values[0]);
+		this.a3Unit.setText(a3Values[2]);
+		this.a3Offset.setText(a3Values[3]);
+		this.a3Factor.setText(a3Values[4]);
 	}
 
 	/**
 	 * enable or disable voltage and current dependent measurement fields
 	 * @param enabled true | false
 	 */
-	private void updateStateVoltageAndCurrentDependent(boolean enabled) {
-		capacityLabel.setEnabled(enabled);
-		capacitySymbol.setEnabled(enabled);
-		capacityUnit.setEnabled(enabled);
-		powerLabel.setEnabled(enabled);
-		powerUnit.setEnabled(enabled);
-		powerSymbol.setEnabled(enabled);
-		energyLabel.setEnabled(enabled);
-		energyUnit.setEnabled(enabled);
-		energySymbol.setEnabled(enabled);
-		voltagePerCellLabel.setEnabled(enabled);
-		voltagePerCellUnit.setEnabled(enabled);
-		voltagePerCellSymbol.setEnabled(enabled);
-		numCellLabel.setEnabled(enabled);
-		numCellInput.setEnabled(enabled);
+	void updateStateVoltageAndCurrentDependent(boolean enabled) {
+		this.capacityLabel.setEnabled(enabled);
+		this.capacitySymbol.setEnabled(enabled);
+		this.capacityUnit.setEnabled(enabled);
+		this.powerLabel.setEnabled(enabled);
+		this.powerUnit.setEnabled(enabled);
+		this.powerSymbol.setEnabled(enabled);
+		this.energyLabel.setEnabled(enabled);
+		this.energyUnit.setEnabled(enabled);
+		this.energySymbol.setEnabled(enabled);
+		this.voltagePerCellLabel.setEnabled(enabled);
+		this.voltagePerCellUnit.setEnabled(enabled);
+		this.voltagePerCellSymbol.setEnabled(enabled);
+		this.numCellLabel.setEnabled(enabled);
+		this.numCellInput.setEnabled(enabled);
 		if (enabled) {
-			capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			energyLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			energyUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			energySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			voltagePerCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			voltagePerCellUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			voltagePerCellSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			numCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			numCellInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.energyLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.energyUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.energySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.voltagePerCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.voltagePerCellUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.voltagePerCellSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.numCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.numCellInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		}
 		else {
-			capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			energyLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			energyUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			energySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			voltagePerCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			voltagePerCellUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			voltagePerCellSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			numCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			numCellInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.energyLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.energyUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.energySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.voltagePerCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.voltagePerCellUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.voltagePerCellSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.numCellLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.numCellInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		}
 	}
 
 	/**
 	 * collect all configuration relevant data and update device configuration
 	 */
-	private void collectAndUpdateConfiguration() {
-		String measurementKey = device.getMeasurementNames(configName)[0];
-		MeasurementType measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(reveiverVoltageButton.getSelection());
+	void collectAndUpdateConfiguration() {
+		String measurementKey = this.device.getMeasurementNames(this.configName)[0];
+		MeasurementType measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.reveiverVoltageButton.getSelection());
 
-		measurementKey = device.getMeasurementNames(configName)[1];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(voltageButton.getSelection());
+		measurementKey = this.device.getMeasurementNames(this.configName)[1];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.voltageButton.getSelection());
 
-		measurementKey = device.getMeasurementNames(configName)[2];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(currentButton.getSelection());
+		measurementKey = this.device.getMeasurementNames(this.configName)[2];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.currentButton.getSelection());
 
-		measurementKey = device.getMeasurementNames(configName)[6]; // 6=votagePerCell
-		device.setMeasurementPropertyValue(configName, measurementKey, UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, numCellValue);
+		measurementKey = this.device.getMeasurementNames(this.configName)[6]; // 6=votagePerCell
+		this.device.setMeasurementPropertyValue(this.configName, measurementKey, UniLogDialog.NUMBER_CELLS, DataTypes.INTEGER, this.numCellValue);
 
-		measurementKey = device.getMeasurementNames(configName)[7];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(revolutionButton.getSelection());
-		
-		measurementKey = device.getMeasurementNames(configName)[8]; // 8=efficiency
-		device.setMeasurementPropertyValue(configName, measurementKey, UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, prop100WValue);
+		measurementKey = this.device.getMeasurementNames(this.configName)[7];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.revolutionButton.getSelection());
 
-		measurementKey = device.getMeasurementNames(configName)[9];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(heightButton.getSelection());
+		measurementKey = this.device.getMeasurementNames(this.configName)[8]; // 8=efficiency
+		this.device.setMeasurementPropertyValue(this.configName, measurementKey, UniLogDialog.PROP_N_100_WATT, DataTypes.INTEGER, this.prop100WValue);
 
-		measurementKey = device.getMeasurementNames(configName)[10]; // 10=slope
-		device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, slopeTypeSelection);
-		device.setMeasurementPropertyValue(configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, slopeTimeSelection);
+		measurementKey = this.device.getMeasurementNames(this.configName)[9];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.heightButton.getSelection());
 
-		measurementKey = device.getMeasurementNames(configName)[11];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a1Button.getSelection());
-		measurement.setName(a1Text.getText().trim());
-		measurement.setUnit(a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(a1Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(a1Factor.getText().replace(',', '.').trim()));
+		measurementKey = this.device.getMeasurementNames(this.configName)[10]; // 10=slope
+		this.device.setMeasurementPropertyValue(this.configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, this.slopeTypeSelection);
+		this.device.setMeasurementPropertyValue(this.configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, this.slopeTimeSelection);
 
-		measurementKey = device.getMeasurementNames(configName)[12];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a2Button.getSelection());
-		measurement.setName(a2Text.getText().trim());
-		measurement.setUnit(a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(a2Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(a2Factor.getText().replace(',', '.').trim()));
+		measurementKey = this.device.getMeasurementNames(this.configName)[11];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.a1Button.getSelection());
+		measurement.setName(this.a1Text.getText().trim());
+		measurement.setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(this.a1Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a1Factor.getText().replace(',', '.').trim()));
 
-		measurementKey = device.getMeasurementNames(configName)[13];
-		measurement = device.getMeasurement(configName, measurementKey);
-		measurement.setActive(a3Button.getSelection());
-		measurement.setName(a3Text.getText().trim());
-		measurement.setUnit(a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(a3Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(a3Factor.getText().replace(',', '.').trim()));
+		measurementKey = this.device.getMeasurementNames(this.configName)[12];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.a2Button.getSelection());
+		measurement.setName(this.a2Text.getText().trim());
+		measurement.setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(this.a2Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a2Factor.getText().replace(',', '.').trim()));
 
-		device.setChangePropery(true);
-		device.storeDeviceProperties();
+		measurementKey = this.device.getMeasurementNames(this.configName)[13];
+		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement.setActive(this.a3Button.getSelection());
+		measurement.setName(this.a3Text.getText().trim());
+		measurement.setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+		measurement.setOffset(new Double(this.a3Offset.getText().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a3Factor.getText().replace(',', '.').trim()));
+
+		this.device.setChangePropery(true);
+		this.device.storeDeviceProperties();
 	}
 
 	/**
-	 * @param isA1ModusAvailable the isA1ModusAvailable to set
+	 * @param enable the isA1ModusAvailable to set
 	 */
-	public void setA1ModusAvailable(boolean isA1ModusAvailable) {
-		this.isA1ModusAvailable = isA1ModusAvailable;
+	public void setA1ModusAvailable(boolean enable) {
+		this.isA1ModusAvailable = enable;
 	}
 
 	/**
@@ -1021,80 +1018,80 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	}
 
 	/**
-	 * @param configName the configName to set
+	 * @param newConfigName the configName to set
 	 */
-	public void setConfigName(String configName) {
-		this.configName = configName;
+	public void setConfigName(String newConfigName) {
+		this.configName = newConfigName;
 	}
 
 	/**
 	 * retrieve initial values from device properties file for editable fields
 	 */
 	private void initEditable() {
-		String recordKey = device.getMeasurementNames(configName)[0];
-		MeasurementType measurement = device.getMeasurement(configName, recordKey);
-		isActiveUe = measurement.isActive();
+		String recordKey = this.device.getMeasurementNames(this.configName)[0];
+		MeasurementType measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveUe = measurement.isActive();
 
-		recordKey = device.getMeasurementNames(configName)[1];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveU = measurement.isActive();
+		recordKey = this.device.getMeasurementNames(this.configName)[1];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveU = measurement.isActive();
 
-		recordKey = device.getMeasurementNames(configName)[2];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveI = measurement.isActive();
+		recordKey = this.device.getMeasurementNames(this.configName)[2];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveI = measurement.isActive();
 
-		measurement = device.getMeasurement(configName, recordKey);
-		recordKey = device.getMeasurementNames(configName)[6];
-		PropertyType property = device.getMeasruementProperty(configName, recordKey, UniLogDialog.NUMBER_CELLS);
-		numCellValue = property != null ? new Integer(property.getValue()) : 4;
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		recordKey = this.device.getMeasurementNames(this.configName)[6];
+		PropertyType property = this.device.getMeasruementProperty(this.configName, recordKey, UniLogDialog.NUMBER_CELLS);
+		this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
 
-		recordKey = device.getMeasurementNames(configName)[7];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveRPM = measurement.isActive();
+		recordKey = this.device.getMeasurementNames(this.configName)[7];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveRPM = measurement.isActive();
 
-		recordKey = device.getMeasurementNames(configName)[8];
-		measurement = device.getMeasurement(configName, recordKey);
-		property = device.getMeasruementProperty(configName, recordKey, UniLogDialog.PROP_N_100_WATT);
-		prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+		recordKey = this.device.getMeasurementNames(this.configName)[8];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		property = this.device.getMeasruementProperty(this.configName, recordKey, UniLogDialog.PROP_N_100_WATT);
+		this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
 
-		recordKey = device.getMeasurementNames(configName)[9];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveHeight = measurement.isActive();
+		recordKey = this.device.getMeasurementNames(this.configName)[9];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveHeight = measurement.isActive();
 
-		PropertyType typeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_TYPE);
+		PropertyType typeSelection = this.device.getMeasruementProperty(this.configName, this.device.getMeasurementNames(this.configName)[10], CalculationThread.REGRESSION_TYPE);
 		if (typeSelection == null)
-			slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
+			this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 		else
-			slopeTypeSelection = typeSelection.getValue(); // CalculationThread.REGRESSION_TYPE_*
+			this.slopeTypeSelection = typeSelection.getValue(); // CalculationThread.REGRESSION_TYPE_*
 
-		PropertyType timeSelection = device.getMeasruementProperty(configName, device.getMeasurementNames(configName)[10], CalculationThread.REGRESSION_INTERVAL_SEC);
+		PropertyType timeSelection = this.device.getMeasruementProperty(this.configName, this.device.getMeasurementNames(this.configName)[10], CalculationThread.REGRESSION_INTERVAL_SEC);
 		if (timeSelection == null)
-			slopeTimeSelection = 4;
+			this.slopeTimeSelection = 4;
 		else
-			slopeTimeSelection = new Integer(timeSelection.getValue());
+			this.slopeTimeSelection = new Integer(timeSelection.getValue());
 
-		recordKey = device.getMeasurementNames(configName)[11];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveA1 = measurement.isActive();
-		nameA1 = measurement.getName();
-		unitA1 = measurement.getUnit();
-		offsetA1 = device.getMeasurementOffset(configName, recordKey);
-		factorA1 = device.getMeasurementFactor(configName, recordKey);
+		recordKey = this.device.getMeasurementNames(this.configName)[11];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveA1 = measurement.isActive();
+		this.nameA1 = measurement.getName();
+		this.unitA1 = measurement.getUnit();
+		this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
+		this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
 
-		recordKey = device.getMeasurementNames(configName)[12];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveA2 = measurement.isActive();
-		nameA2 = measurement.getName();
-		unitA2 = measurement.getUnit();
-		offsetA2 = device.getMeasurementOffset(configName, recordKey);
-		factorA2 = device.getMeasurementFactor(configName, recordKey);
+		recordKey = this.device.getMeasurementNames(this.configName)[12];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveA2 = measurement.isActive();
+		this.nameA2 = measurement.getName();
+		this.unitA2 = measurement.getUnit();
+		this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
+		this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
 
-		recordKey = device.getMeasurementNames(configName)[13];
-		measurement = device.getMeasurement(configName, recordKey);
-		isActiveA3 = measurement.isActive();
-		nameA3 = measurement.getName();
-		unitA3 = measurement.getUnit();
-		offsetA3 = device.getMeasurementOffset(configName, recordKey);
-		factorA3 = device.getMeasurementFactor(configName, recordKey);
+		recordKey = this.device.getMeasurementNames(this.configName)[13];
+		measurement = this.device.getMeasurement(this.configName, recordKey);
+		this.isActiveA3 = measurement.isActive();
+		this.nameA3 = measurement.getName();
+		this.unitA3 = measurement.getUnit();
+		this.offsetA3 = this.device.getMeasurementOffset(this.configName, recordKey);
+		this.factorA3 = this.device.getMeasurementFactor(this.configName, recordKey);
 	}
 }

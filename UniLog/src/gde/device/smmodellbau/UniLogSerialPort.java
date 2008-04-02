@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.exception.CheckSumMissmatchException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
@@ -20,71 +19,70 @@ import osde.utils.Checksum;
  * @author Winfried Brügmann
  */
 public class UniLogSerialPort extends DeviceSerialPort {
-	private static Logger					log											= Logger.getLogger(UniLogSerialPort.class.getName());
+	final static Logger					log											= Logger.getLogger(UniLogSerialPort.class.getName());
 
 	public final static String 		NUMBER_RECORD						= "number_record";
 	public final static String 		TIME_MILLI_SEC					= "time_ms";
 	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3";
 	
-	private final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
-	private final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
-	private final static byte[]		COMMAND_READ_DATA				= { 0x6C };		// 'l' UniLog read request, answer is one data set (telegram)
-	private final static byte[]		COMMAND_REPEAT					= { 0x77 };		// 'w' repeat data transmission, UniLog re-send same data set (telegram)
-	private final static byte[]		COMMAND_DELETE					= { (byte) 0xC0, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 };
-	private final static byte[]		COMMAND_QUERY_CONFIG		= { (byte) 0xC0, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	private final static byte[]		COMMAND_LIVE_VALUES			= { 0x76 };		// 'v' query UniLog live values
-	private final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
-	private final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
+	final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
+	final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
+	final static byte[]		COMMAND_READ_DATA				= { 0x6C };		// 'l' UniLog read request, answer is one data set (telegram)
+	final static byte[]		COMMAND_REPEAT					= { 0x77 };		// 'w' repeat data transmission, UniLog re-send same data set (telegram)
+	final static byte[]		COMMAND_DELETE					= { (byte) 0xC0, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 };
+	final static byte[]		COMMAND_QUERY_CONFIG		= { (byte) 0xC0, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	final static byte[]		COMMAND_LIVE_VALUES			= { 0x76 };		// 'v' query UniLog live values
+	final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
+	final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
 
 	@SuppressWarnings("unused")
-	private final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
+	final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
 	@SuppressWarnings("unused")
-	public final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
+	final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
 	
-	private final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
-	private final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
-	private final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
+	final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
+	final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
+	final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
 
-	public final static int				DATA_LENGTH_BYTES				= 24;			//TODO exchange with deviceConfig.get()
+	final static int			DATA_LENGTH_BYTES				= 24;			//TODO exchange with deviceConfig.get()
 	
-	private boolean 							isLoggingActive 				= false;
-	private boolean 							isTransmitFinished			= false;
+	boolean 							isLoggingActive 				= false;
+	boolean 							isTransmitFinished			= false;
 	
-	private int 									reveiceErrors 					= 0;
+	int 									reveiceErrors 					= 0;
 
 	/**
 	 * constructor of default implementation
-	 * @param deviceConfig - required by super class to initialize the serial communication port
-	 * @param application - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
+	 * @param actualDeviceConfig - required by super class to initialize the serial communication port
+	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 * @throws NoSuchPortException
 	 */
-	public UniLogSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
-		super(deviceConfig, application);
+	public UniLogSerialPort(DeviceConfiguration actualDeviceConfig, OpenSerialDataExplorer currentApplication) {
+		super(actualDeviceConfig, currentApplication);
 	}
 
 	/**
 	 * method to gather data from device, implementation is individual for device
-	 * @param channel signature if device has more than one or required by device
+	 * @param dialog to update displays at device dialog like progress bar, ...
 	 * @return map containing gathered data - this can individual specified per device
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public synchronized HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice device, String channelConfigKey) throws IOException {
+	public HashMap<String, Object> getData(UniLogDialog dialog) throws Exception {
 		boolean isPortOpenedByMe = false;
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
 		
-		UniLogDialog dialog = (UniLogDialog)device.getDialog();
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 			}
-			reveiceErrors = 0;
+			this.reveiceErrors = 0;
 
 			// check data ready for read operation
 			if (this.waitDataReady()) {
-				// query config to have actual values -> get number of entries to calculate percentage and progress bar
+				// query configuration to have actual values -> get number of entries to calculate percentage and progress bar
 				this.write(COMMAND_QUERY_CONFIG);
 				readBuffer = this.read(DATA_LENGTH_BYTES, 3);
 				verifyChecksum(readBuffer);
@@ -96,7 +94,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
 
-				if (application != null) dialog.setReadDataProgressBar(0);
+				if (dialog != null) dialog.setReadDataProgressBar(0);
 				Vector<byte[]> telegrams = new Vector<byte[]>();
 				int numberRecordSet = 1;
 				int counter = 0;
@@ -116,11 +114,11 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 					++counter;
 					
-					if (application != null) {
+					if (dialog != null) {
 						dialog.setReadDataProgressBar(new Double(counter * progressFactor).intValue());
-						dialog.updateDataGatherProgress(counter, numberRecordSet, reveiceErrors);
+						dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors);
 					}
-					if (isTransmitFinished) {
+					if (this.isTransmitFinished) {
 						log.log(Level.WARNING, "transmission stopped by user");
 						break;
 					}
@@ -154,7 +152,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			
 			// give it another try
 			if (!isChecksumOK(readBuffer)) {
-				++reveiceErrors;
+				++this.reveiceErrors;
 				this.write(COMMAND_REPEAT);
 				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
@@ -176,7 +174,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public synchronized byte[] queryLiveData() throws Exception {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		try {
-			if (this.isConnected) {
+			if (this.isConnected()) {
 				this.write(COMMAND_LIVE_VALUES);
 				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 				
@@ -206,14 +204,14 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public synchronized boolean startLogging() throws Exception {
 		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 				//waitDataReady();
 			}
 
 			this.write(COMMAND_START_LOGGING);
-			isLoggingActive = true;
+			this.isLoggingActive = true;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -223,7 +221,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		finally {
 			if (isPortOpenedByMe) this.close();
 		}
-		return isLoggingActive;
+		return this.isLoggingActive;
 	}
 	
 	/**
@@ -234,7 +232,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public synchronized boolean stopLogging() throws Exception {
 		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected) {
+			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 				//waitDataReady();
@@ -250,7 +248,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		finally {
 			if (isPortOpenedByMe) this.close();
 		}
-		return !isLoggingActive;
+		return !this.isLoggingActive;
 	}
 	
 	/**
@@ -261,7 +259,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public synchronized boolean clearMemory() throws Exception {
 		boolean success = false;
 		try {
-			if (!this.isConnected) { // port may not used by other
+			if (!this.isConnected()) { // port may not used by other
 				this.open();
 				// check data ready for read operation
 				if (this.waitDataReady()) {
@@ -330,7 +328,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		boolean isPortOpenedByMe = false;
 		try {
-			if(!this.isConnected) {
+			if(!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
 			}
@@ -443,7 +441,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true for checksum match
 	 * @throws CheckSumMissmatchException 
 	 */
-	private boolean isChecksumOK(byte[] readBuffer) throws CheckSumMissmatchException {
+	private boolean isChecksumOK(byte[] readBuffer) {
 		int checkSum = 0;
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
@@ -455,10 +453,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	}
 
 	/**
-	 * @param isTransmitFinished the isTransmitFinished to set
+	 * @param isFinished the isTransmitFinished to set
 	 */
-	public void setTransmitFinished(boolean isTransmitFinished) {
-		this.isTransmitFinished = isTransmitFinished;
+	public void setTransmitFinished(boolean isFinished) {
+		this.isTransmitFinished = isFinished;
 	}
 
 	/**

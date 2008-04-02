@@ -26,24 +26,23 @@ import osde.utils.QuasiLinearRegression;
  * @author Winfried Bruegmann
  */
 public class UniLog extends DeviceConfiguration implements IDevice {
-	private Logger																		log									= Logger.getLogger(this.getClass().getName());
+	final static Logger						log	= Logger.getLogger(UniLog.class.getName());
 
-	private final OpenSerialDataExplorer							application;
-	private final UniLogSerialPort										serialPort;
-	private final UniLogDialog												dialog;
-	private CalculationThread													slopeCalculationThread;
-	
+	final OpenSerialDataExplorer	application;
+	final UniLogSerialPort				serialPort;
+	final UniLogDialog						dialog;
+	CalculationThread							slopeCalculationThread;
+
 	/**
 	 * constructor using properties file
 	 * @param deviceProperties
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
-	 * @throws NoSuchPortException 
 	 */
-	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
+	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = this.application != null ? new UniLogSerialPort(this, application) : new UniLogSerialPort(this, null);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
@@ -52,10 +51,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param deviceConfig device configuration
 	 * @throws NoSuchPortException 
 	 */
-	public UniLog(DeviceConfiguration deviceConfig) throws NoSuchPortException {
+	public UniLog(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = this.application != null ? new UniLogSerialPort(this, application) : new UniLogSerialPort(this, null);
+		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
@@ -80,7 +79,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// do some calculation
 		return newValues;
 	}
-	
+
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
@@ -100,21 +99,21 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int displayableCounter = 0;
 
 			// check if measurements isActive == false and set to isDisplayable == false
-			for (int j = 0; j < measurements.length; j++) {
-				record = recordSet.get(measurements[j]);
+			for (String element : measurements) {
+				record = recordSet.get(element);
 				if (record.isActive()) {
 					++displayableCounter;
 				}
 				else {
-					record.setDisplayable(false); 		// force recalculation
+					record.setDisplayable(false); // force recalculation
 					if (!recordSet.isRecalculation()) {
-						record.setVisible(false);  			// required for to enable different configurations (import)
+						record.setVisible(false); // required for to enable different configurations (import)
 					}
 				}
 			}
-			
+
 			recordKey = measurements[3]; // 3=capacity [Ah]
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
@@ -123,16 +122,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				for (int i = 0; i < recordCurrent.size(); i++) {
 					capacity = i > 0 ? capacity + ((1.0 * recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
 					record.add(capacity.intValue());
-					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+					if (UniLog.log.isLoggable(Level.FINEST)) UniLog.log.finest("adding value = " + record.get(i));
 				}
 				if (recordCurrent.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			
+
 			recordKey = measurements[4]; // 4=power [W]
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 
@@ -140,16 +139,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					record.add(new Double(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
-					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+					if (UniLog.log.isLoggable(Level.FINEST)) UniLog.log.finest("adding value = " + record.get(i));
 				}
-				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()){
+				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			
+
 			recordKey = measurements[5]; // 5=energy [Wh]
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
@@ -157,18 +156,18 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
 				Double power = 0.0;
 				for (int i = 0; i < recordVoltage.size(); i++) {
-					power = i > 0 ? power + ((recordVoltage.get(i)/1000.0) * (recordCurrent.get(i)/1000.0) * (timeStep_ms/3600.0)) : 0.0;
+					power = i > 0 ? power + ((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
 					record.add(power.intValue());
-					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+					if (UniLog.log.isLoggable(Level.FINEST)) UniLog.log.finest("adding value = " + record.get(i));
 				}
 				if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			
+
 			recordKey = measurements[6]; // 6=votagePerCell
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
@@ -176,16 +175,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				int numberCells = property != null ? new Integer(property.getValue()) : 4;
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
-					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+					if (UniLog.log.isLoggable(Level.FINEST)) UniLog.log.finest("adding value = " + record.get(i));
 				}
 				if (recordVoltage.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			
+
 			recordKey = measurements[8]; // 8=efficiency
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
@@ -193,19 +192,19 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
 				int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 				for (int i = 0; i < recordRevolution.size(); i++) {
-					double motorPower = Math.pow((recordRevolution.get(i)/1000.0*4.64)/prop_n100W, 3)*1000.0; 
-					double eta = (recordPower.get(i)) > motorPower ? (motorPower*100.0)/recordPower.get(i) : 0;
+					double motorPower = Math.pow((recordRevolution.get(i) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+					double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0;
 					record.add(new Double(eta * 1000).intValue());
-					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+					if (UniLog.log.isLoggable(Level.FINEST)) UniLog.log.finest("adding value = " + record.get(i));
 				}
 				if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			
+
 			recordKey = measurements[10]; // 10=slope
-			if(log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (UniLog.log.isLoggable(Level.FINE)) UniLog.log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				// calculate the values required				
@@ -213,21 +212,21 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_TYPE);
 				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
-					slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+					this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 				else
-					slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
-					
-				slopeCalculationThread.start();
+					this.slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+
+				this.slopeCalculationThread.start();
 				if (recordSet.get(measurements[9]).isDisplayable()) {
 					record.setDisplayable(true);
 					++displayableCounter;
 				}
 			}
-			log.fine("displayableCounter = " + displayableCounter);
+			UniLog.log.fine("displayableCounter = " + displayableCounter);
 			recordSet.setConfiguredDisplayable(displayableCounter);
 
-			application.updateGraphicsWindow();
-			log.fine("finished data calculation for record = " + recordKey);
+			this.application.updateGraphicsWindow();
+			UniLog.log.fine("finished data calculation for record = " + recordKey);
 		}
 	}
 
@@ -235,14 +234,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return the dialog
 	 */
 	public UniLogDialog getDialog() {
-		return dialog;
+		return this.dialog;
 	}
 
 	/**
 	 * @return the serialPort
 	 */
 	public UniLogSerialPort getSerialPort() {
-		return serialPort;
+		return this.serialPort;
 	}
 
 }

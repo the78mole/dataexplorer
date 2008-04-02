@@ -16,8 +16,6 @@
 ****************************************************************************************/
 package osde.device.wb;
 
-import gnu.io.NoSuchPortException;
-
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
@@ -33,35 +31,33 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class Simulator extends DeviceConfiguration implements IDevice {
-	private Logger												log	= Logger.getLogger(this.getClass().getName());
+	final static Logger						log	= Logger.getLogger(Simulator.class.getName());
 
-	private final OpenSerialDataExplorer application;
-	private final SimulatorSerialPort serialPort;
-	private final SimulatorDialog	dialog;
-	
+	final OpenSerialDataExplorer	application;
+	final SimulatorSerialPort			serialPort;
+	final SimulatorDialog					dialog;
+
 	/**
 	 * constructor using properties file
 	 * @param deviceProperties
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
-	 * @throws NoSuchPortException 
 	 */
-	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException, NoSuchPortException {
+	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new SimulatorSerialPort(this, application);
+		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 	}
 
 	/**
 	 * constructor using existing device configuration
-	 * @param deviceConfig device configuration
-	 * @throws NoSuchPortException 
+	 * @param deviceConfig device configuration 
 	 */
-	public Simulator(DeviceConfiguration deviceConfig) throws NoSuchPortException {
+	public Simulator(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new SimulatorSerialPort(this, application);
+		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 	}
 
@@ -72,7 +68,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(String channelConfigKey, String recordKey, double value) {
 		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
-		log.fine("newValue = " + newValues);
+		Simulator.log.fine("newValue = " + newValues);
 		// do some calculation
 		return newValues;
 	}
@@ -87,7 +83,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		// do some calculation
 		return newValues;
 	}
-		
+
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
@@ -97,20 +93,21 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
+		log.fine("working with " + recordSet.getName());
 	}
 
 	/**
 	 * @return the dialog
 	 */
 	public SimulatorDialog getDialog() {
-		return dialog;
+		return this.dialog;
 	}
 
 	/**
 	 * @return the serialPort
 	 */
 	public SimulatorSerialPort getSerialPort() {
-		return serialPort;
+		return this.serialPort;
 	}
 
 }

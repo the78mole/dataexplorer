@@ -16,14 +16,11 @@
 ****************************************************************************************/
 package osde.device.wb;
 
-import gnu.io.NoSuchPortException;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -33,33 +30,31 @@ import osde.ui.OpenSerialDataExplorer;
  */
 public class SimulatorSerialPort extends DeviceSerialPort {
 
-	private int			lastRecord	= -1;
-	private int	lastVoltage	= 0;
-	private int	lastCurrent	= 0;
-	private int xBound = 0;
+	int	lastRecord	= -1;
+	int	lastVoltage	= 0;
+	int	lastCurrent	= 0;
+	int	xBound			= 0;
 
 	/**
 	 * constructor of default implementation
-	 * @param deviceConfig - required by super class to initialize the serial communication port
-	 * @param application - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
-	 * @throws NoSuchPortException
+	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
+	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public SimulatorSerialPort(DeviceConfiguration deviceConfig, OpenSerialDataExplorer application) throws NoSuchPortException {
-		super(deviceConfig, application);
+	public SimulatorSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
+		super(currentDeviceConfig, currentApplication);
 	}
 
 	/**
 	 * method to gather data from device, implementation is individual for device
-	 * @param channel signature if device has more than one or required by device
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(byte[] channel, int recordNumber, IDevice dialog, String channelConfigKey) throws IOException {
-		if (recordNumber != lastRecord) {
-			lastRecord = recordNumber;
-			lastVoltage = 0;
-			lastCurrent = 0;
-			xBound = 0;
+	public HashMap<String, Object> getData(int recordNumber, String channelConfigKey) throws Exception {
+		if (recordNumber != this.lastRecord) {
+			this.lastRecord = recordNumber;
+			this.lastVoltage = 0;
+			this.lastCurrent = 0;
+			this.xBound = 0;
 		}
 
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -67,16 +62,16 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 		Vector<Integer> current = new Vector<Integer>();
 
 		//int xBound = new Double(Math.random() * 1000000).intValue();
-		xBound = xBound + 100;
-		lastVoltage = xBound / 2;
-		int yBound = deviceConfig.getDataBlockSize();
-		for (int i = 0; i < deviceConfig.getDataBlockSize(); i++) {
-			current.add(i * 3000 + lastCurrent);
-			voltage.add(getNormalizedSine(i, xBound / 2, yBound) - lastVoltage);
+		this.xBound = this.xBound + 100;
+		this.lastVoltage = this.xBound / 2;
+		int yBound = this.deviceConfig.getDataBlockSize();
+		for (int i = 0; i < this.deviceConfig.getDataBlockSize(); i++) {
+			current.add(i * 3000 + this.lastCurrent);
+			voltage.add(getNormalizedSine(i, this.xBound / 2, yBound) - this.lastVoltage);
 		}
-		lastCurrent = yBound * 3000;
+		this.lastCurrent = yBound * 3000;
 
-		String[] measurements = deviceConfig.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Strom
+		String[] measurements = this.deviceConfig.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Strom
 		data.put(measurements[0], voltage);
 		data.put(measurements[1], current);
 		return data;
