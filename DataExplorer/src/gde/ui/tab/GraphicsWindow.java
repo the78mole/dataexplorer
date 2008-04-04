@@ -344,9 +344,11 @@ public class GraphicsWindow {
 		//prepare measurement scales
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		for (String string : recordSet.getRecordNames()) {
-			if (recordSet.getRecord(string).isVisible() && recordSet.getRecord(string).isDisplayable()) {
-				if (recordSet.getRecord(string).isPositionLeft())
+		for (String recordKey : recordSet.getRecordNames()) {
+			Record tmpRecord = recordSet.getRecord(recordKey);
+			if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+				log.fine("==>>" + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable());
+				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
 					numberCurvesRight++;
@@ -354,7 +356,7 @@ public class GraphicsWindow {
 		}
 		if (recordSet.isCompareSet()) {
 			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
-			numberCurvesRight = numberCurvesRight > 0 ? 1 : 0;
+			if (numberCurvesLeft == 0) numberCurvesRight = numberCurvesRight > 0 ? 1 : 0;
 		}
 		log.fine("nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight);
 
