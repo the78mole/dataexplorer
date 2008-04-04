@@ -106,7 +106,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
 
-				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
 			}
 			else
 				reduction = 0;

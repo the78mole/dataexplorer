@@ -220,6 +220,7 @@ public class PicolarioDialog extends DeviceDialog {
 									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
+									PicolarioDialog.this.dialogShell.redraw();
 								}
 							}
 						}

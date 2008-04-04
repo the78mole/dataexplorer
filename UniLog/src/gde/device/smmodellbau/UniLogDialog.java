@@ -953,6 +953,11 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.fine("move record set " + recordSetKey + " to configuration " + configKey);
 											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
 											activeChannel.remove(recordSetKey);
+											
+											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
+											activeRecordSet.setRecalculation(true);
+											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
+											
 											channels.switchChannel(channelNumber, recordSetKey);
 										}
 									}
@@ -1210,12 +1215,15 @@ public class UniLogDialog extends DeviceDialog {
 	 * @param redTelegrams
 	 * @param numReadErrors
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int progress) {
 		this.numberRedDataSetsText = "" + redTelegrams;
 		this.numberActualDataSetsText = "" + numberRecordSet;
 		this.numberReadErrorText = "" + numReadErrors;
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
+				int tmpValue = progress < 0 ? 0 : progress;
+				tmpValue = progress > 100 ? 100 : progress;
+				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
 				UniLogDialog.this.redDataSetLabel.setText(UniLogDialog.this.numberRedDataSetsText);
 				UniLogDialog.this.actualDataSetNumber.setText(UniLogDialog.this.numberActualDataSetsText);
 				UniLogDialog.this.numberReadErrorLabel.setText(UniLogDialog.this.numberReadErrorText);

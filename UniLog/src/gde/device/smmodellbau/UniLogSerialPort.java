@@ -74,6 +74,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
 		try {
+			log.fine("start");
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
@@ -87,14 +88,14 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				readBuffer = this.read(DATA_LENGTH_BYTES, 3);
 				verifyChecksum(readBuffer);
 				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-				log.fine("memoryUsed = " + memoryUsed);
+				log.finer("memoryUsed = " + memoryUsed);
 				double progressFactor = 100.0 / memoryUsed;
-				log.fine("progressFactor = " + progressFactor);
+				log.finer("progressFactor = " + progressFactor);
 
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
 
-				if (dialog != null) dialog.setReadDataProgressBar(0);
+				dialog.setReadDataProgressBar(0);
 				Vector<byte[]> telegrams = new Vector<byte[]>();
 				int numberRecordSet = 1;
 				int counter = 0;
@@ -114,10 +115,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 					++counter;
 					
-					if (dialog != null) {
-						dialog.setReadDataProgressBar(new Double(counter * progressFactor).intValue());
-						dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors);
-					}
+					dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, new Double(counter * progressFactor).intValue());
+
 					if (this.isTransmitFinished) {
 						log.log(Level.WARNING, "transmission stopped by user");
 						break;
@@ -134,6 +133,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		}
 		finally {
 			if(isPortOpenedByMe) this.close();
+			log.fine("stop");
 		}
 		return dataCollection;
 	}
@@ -148,13 +148,13 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		try {
 			this.write(COMMAND_READ_DATA);
-			readBuffer = this.read(DATA_LENGTH_BYTES, 2);
+			readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 			
 			// give it another try
 			if (!isChecksumOK(readBuffer)) {
 				++this.reveiceErrors;
 				this.write(COMMAND_REPEAT);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
 		}
@@ -176,7 +176,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		try {
 			if (this.isConnected()) {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 				
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
@@ -445,9 +445,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		int checkSum = 0;
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
-		log.finer("checkSum = " + checkSum);
 		checkSumLast2Bytes = ((readBuffer[DATA_LENGTH_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATA_LENGTH_BYTES - 1] & 0xFF);
-		log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes);
+		if(log.isLoggable(Level.FINER)) log.finer("checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes);
 
 		return (checkSum == checkSumLast2Bytes);
 	}
