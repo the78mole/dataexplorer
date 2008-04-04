@@ -132,6 +132,7 @@ public class CSVReaderWriter {
 									channels.setActiveChannelNumber(channelNumber);
 									channels.switchChannel(channelNumber, "");
 									application.getMenuToolBar().updateChannelSelector();
+									activeChannel = channels.getActiveChannel();
 								}
 								else
 									throw new Exception("Die Konfiguration aus der Datei entspricht keiner aktuell vorhandenen :\n" + fileConfig + " != " + channels.getChannelNamesToString());
