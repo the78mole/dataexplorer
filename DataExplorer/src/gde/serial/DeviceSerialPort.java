@@ -249,7 +249,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 			// write string to serial port
 			this.outputStream.write(buf);
-			this.outputStream.flush();
+			//this.outputStream.flush();
 			if (this.application != null) this.application.setSerialTxOff();
 		}
 		catch (IOException e) {
@@ -296,16 +296,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 			wait4Bytes(bytes, timeoutInSeconds);
 
-			while (bytes != readBytes && retryCounter-- > 0)
+			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+			}
 			
 			this.isReadBufferEmpty = true;
 			this.numBytesAvailable = 0;
-			//this.setNumBytesAvailable(0); 
-
-			if (readBytes != bytes) {
-				throw new IOException("Warning: missed expected number of bytes to be read");
-			}
 
 			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
@@ -334,12 +330,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 */
 	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws IOException {
-		int counter = timeoutInSeconds * 100000;
+		int counter = timeoutInSeconds * 1000000;
 		int resBytes = 0;
 		try {
 			// wait until readbuffer has been filled by eventListener
 			while (this.numBytesAvailable < numBytes) {
-				Thread.sleep(0, 10);
+				Thread.sleep(0, 1);
 				counter--;
 				if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
 				if (counter <= 0) throw new IOException("Error: can not read result during given timeout !");
