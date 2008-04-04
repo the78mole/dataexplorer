@@ -538,13 +538,15 @@ public class RecordSet extends HashMap<String, Record> {
 		int value = -1;
 		if (isLeft) {
 			for (String recordName : getRecordNames()) {
-				if (this.get(recordName).isPositionLeft() && this.get(recordName).isVisible()) ++value;
+				Record tmpRecord = this.get(recordName);
+				if (tmpRecord.isPositionLeft() && tmpRecord.isVisible() && tmpRecord.isDisplayable()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
 		else {
 			for (String recordName : getRecordNames()) {
-				if (!this.get(recordName).isPositionLeft() && this.get(recordName).isVisible()) ++value;
+				Record tmpRecord = this.get(recordName);
+				if (!tmpRecord.isPositionLeft() && tmpRecord.isVisible() && tmpRecord.isDisplayable()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
