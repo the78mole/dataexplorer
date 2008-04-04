@@ -99,7 +99,7 @@ public class CellVoltageDisplay extends Composite {
 					int top = delta.intValue();
 
 					rect = new Rectangle(0, top, rect.width, height);
-					log.info("fill rect = " + rect.toString() + " parent.getVoltageDelta() = " + CellVoltageDisplay.this.parent.getVoltageDelta());
+					log.fine("fill rect = " + rect.toString() + " parent.getVoltageDelta() = " + CellVoltageDisplay.this.parent.getVoltageDelta());
 
 					if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4200)
 						gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
@@ -131,7 +131,7 @@ public class CellVoltageDisplay extends Composite {
 	public void update() {
 		log.fine("CellVoltageDisplay.paintControl, voltage = " + this.voltage);
 		Point mainSize = this.mainComposite.getSize();
-		log.info("mainSize = " + mainSize.toString());
+		log.fine("mainSize = " + mainSize.toString());
 		int width = mainSize.x;
 		int height = mainSize.y;
 		
@@ -143,7 +143,7 @@ public class CellVoltageDisplay extends Composite {
 		this.actualDigitalLabel.setSize(width, 60);
 		
 		Rectangle rect = new Rectangle(0, 120, width, height-120);
-		log.info("cellCanvas = " + rect);
+		log.fine("cellCanvas = " + rect);
 		this.cellCanvas.setBounds(rect);
 	}
 }

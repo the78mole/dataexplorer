@@ -127,7 +127,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
 		this.dataTable = new Vector<Vector<Integer>>(); 
-		printRecordNames("RecordSet.RecordSet()", this.recordNames);
 	}
 
 	/**
@@ -187,11 +186,23 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelName = newChannelName;
+		
 		for (String recordKey : this.keySet()) {
 			this.get(recordKey).setChannelConfigKey(newChannelName);
 		}
-
-		this.recordNames = 	recordSet.recordNames.clone();
+		String[] oldRecordNames = recordSet.recordNames;
+		String[] newRecordNames = recordSet.get(recordSet.getFirstRecordName()).getDevice().getMeasurementNames(newChannelName);
+		for (int i = 0; i < newRecordNames.length; i++) {
+			if (!oldRecordNames[i].equals(newRecordNames[i])){
+				// add the old record with new name
+				this.put(newRecordNames[i], this.getRecord(oldRecordNames[i]).clone(newRecordNames[i]));
+				// remove the old record
+				this.remove(oldRecordNames[i]);
+			}
+		}
+		// update record names
+		this.recordNames = 	newRecordNames.clone();
+		
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
 		this.isSaved = recordSet.isSaved;
@@ -274,7 +285,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws Exception 
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) throws Exception {
-		RecordSet.printRecordNames("addPoints", this.recordNames);
 		if (points.length == this.recordNames.length) {
 			for (int i = 0; i < points.length; i++) {
 				Record record = this.getRecord(this.recordNames[i]);
@@ -1076,9 +1086,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * starts a thread executing the dataTable entries
 	 */
 	public void calculateDataTable() {
-		//final RecordSet recordSet = this; // do not clone record set, data table of this must be modified 
-		//final String[] recordNames = this.recordNames.clone();
-		printRecordNames("calculateDataTable()", this.recordNames);
 
 		this.dataTableCalcThread = new Thread() {
 			final Logger									logger				= Logger.getLogger(Thread.class.getName());
@@ -1093,7 +1100,6 @@ public class RecordSet extends HashMap<String, Record> {
 				int numberRecords = getRecordNamesLength();
 				int recordEntries = get(getFirstRecordName()).size();
 				int progress = this.application2.getProgressPercentage();
-				printRecordNames("Thread.run()", this.recordKeys);
 
 				int maxWaitCounter = 10;
 				int sleepTime = numberRecords*recordEntries/100;

@@ -124,7 +124,7 @@ public class CellVoltageWindow {
 		if (recordSet != null && voltageValues.length == this.displays.size()) { // channel does not have a record set yet
 			for (int i=0; i<this.displays.size() && i<voltageValues.length; ++i) {
 				this.displays.get(i).setVoltage(i+1, voltageValues[i]);
-				log.info("setVoltage cell " + i);
+				log.fine("setVoltage cell " + i);
 			}
 		}
 		else {

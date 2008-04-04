@@ -138,7 +138,7 @@ public class Record extends Vector<Integer> {
 		this.df = (DecimalFormat) record.df.clone();
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
-		this.color = record.color;
+		this.color = new Color(record.color.getDevice(), record.color.getRGB());
 		this.lineWidth = record.lineWidth;
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
@@ -156,6 +156,15 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record clone() {
 		return new Record(this);
+	}
+
+	/**
+	 * overwritten clone method used to move records to other configuration, where measurement signature does not match the source
+	 */
+	public Record clone(String newName) {
+		Record newRecord = new Record(this);
+		newRecord.name = newName;
+		return newRecord;
 	}
 
 	/**
@@ -417,6 +426,13 @@ public class Record extends Vector<Integer> {
 	 */
 	public boolean isActive() {
 		return this.isActive;
+	}
+
+	/**
+	 * set isActive value
+	 */
+	public void setActive(boolean newValue) {
+		this.isActive = newValue;
 	}
 
 	/**
