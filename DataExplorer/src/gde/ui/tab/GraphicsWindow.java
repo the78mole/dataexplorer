@@ -496,13 +496,13 @@ public class GraphicsWindow {
 	 */
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			updateCurveSelectorTable();
+			doUpdateCurveSelectorTable();
 			this.graphicCanvas.redraw();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					updateCurveSelectorTable();
+					doUpdateCurveSelectorTable();
 					GraphicsWindow.this.graphicCanvas.redraw();
 				}
 			});
@@ -537,7 +537,7 @@ public class GraphicsWindow {
 			this.curveSelectorHeader.pack(true);
 			itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
 
-			String[] recordKeys = device.getMeasurementNames(recordSet.getChannelName());
+			String[] recordKeys = recordSet.getRecordNames();
 			for (int i = 0; i < recordSet.size(); i++) {
 				Record record;
 				switch (this.type) {
