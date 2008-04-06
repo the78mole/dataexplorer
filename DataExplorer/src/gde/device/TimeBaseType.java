@@ -9,6 +9,7 @@
 package osde.device;
 
 import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -55,7 +56,7 @@ public class TimeBaseType {
     protected String unit;
     @XmlElement(required = true)
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger timeStep;
+    protected String timeStep;
 
     /**
      * Gets the value of the name property.
@@ -137,8 +138,8 @@ public class TimeBaseType {
      *     {@link BigInteger }
      *     
      */
-    public BigInteger getTimeStep() {
-        return this.timeStep;
+    public Double getTimeStep() {
+        return new Double(this.timeStep);
     }
 
     /**
@@ -149,8 +150,10 @@ public class TimeBaseType {
      *     {@link BigInteger }
      *     
      */
-    public void setTimeStep(BigInteger value) {
-        this.timeStep = value;
+    public void setTimeStep(double value) {
+    		if (value % 1 == 0) this.timeStep = String.format("%.0f", value);
+    		else								this.timeStep = String.format("%.2f", value);
+        
     }
 
 }
