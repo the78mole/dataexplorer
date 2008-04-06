@@ -170,7 +170,7 @@ public class PicolarioDialog extends DeviceDialog {
 							}
 							catch (Exception e) {
 								PicolarioDialog.this.serialPort.close();
-								PicolarioDialog.this.application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.");
+								PicolarioDialog.this.application.openMessageDialog("Das angeschlossene Gerät antwortet nich auf dem seriellen Port, bitte die Portauswahl überprüfen.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
 							}
 						}
@@ -220,7 +220,7 @@ public class PicolarioDialog extends DeviceDialog {
 									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
-									PicolarioDialog.this.dialogShell.redraw();
+									PicolarioDialog.this.getDialogShell().redraw();
 								}
 							}
 						}
@@ -367,22 +367,16 @@ public class PicolarioDialog extends DeviceDialog {
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetTelegramLabel() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.redDatagrams = "0";
-			this.alreadyRedLabel.setText(this.redDatagrams);
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
-						if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
-							PicolarioDialog.this.redDatagrams = "0";
-							PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
-						}
+						PicolarioDialog.this.redDatagrams = "0";
+						PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**
@@ -391,36 +385,25 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedText(final int newValue) {
 		this.redDatagrams = new Integer(newValue).toString();
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.alreadyRedLabel.setText(this.redDatagrams);
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
-				}
-			});
-		}
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
+			}
+		});
 	}
 
 	/**
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetDataSetsLabel() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.redDataSetsText = "0";
-			this.redDataSets.setText(this.redDataSetsText);
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
-						PicolarioDialog.this.redDataSetsText = "0";
-						PicolarioDialog.this.redDataSets.setText(PicolarioDialog.this.redDataSetsText);
-					}
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+					PicolarioDialog.this.redDataSetsText = "0";
+					PicolarioDialog.this.redDataSets.setText(PicolarioDialog.this.redDataSetsText);
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**
@@ -429,18 +412,13 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedDataSets(final String newValue) {
 		this.redDataSetsText = newValue;
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.redDataSets.setText(newValue);
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
-						PicolarioDialog.this.redDataSets.setText(newValue);
-					}
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
+					PicolarioDialog.this.redDataSets.setText(newValue);
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**

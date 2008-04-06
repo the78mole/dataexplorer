@@ -25,6 +25,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.PropertyType;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
@@ -91,10 +92,10 @@ public class DataGathererThread extends Thread {
 				Vector<Integer> height = (Vector<Integer>) data.get(measurements[1]); // 1=Höhe
 
 				for (int i = 0; i < height.size(); i++) {
-					int[] points = new int[recordSet.size() - 1];
+					int[] points = new int[recordSet.size()];
 					points[0] = voltage.get(i).intValue(); // Spannung, wie ausgelesen						
 					points[1] = height.get(i).intValue(); // Höhe, wie ausgelesen
-					//points[2] = 0; // Steigrate -> isCalculation
+					points[2] = 0; // Steigrate -> isCalculation
 
 					recordSet.addPoints(points, false);
 				}
@@ -114,9 +115,13 @@ public class DataGathererThread extends Thread {
 			DataGathererThread.log.fine("exit data gatherer");
 
 		}
+		catch (DataInconsitsentException e) {
+			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog("Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+		}
 		catch (Exception e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !");
+			this.application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 		finally {
 			if (isPortOpenedByMe) this.serialPort.close();

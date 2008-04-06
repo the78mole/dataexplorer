@@ -48,6 +48,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -258,7 +259,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeCombo = new CCombo(this.dialogShell, SWT.NONE);
 					this.timeCombo.setLayoutData(timeComboLData);
 					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" });
-					this.timeCombo.setText(new Integer(this.device.getTimeStep_ms()).toString());
+					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms()));
 					this.timeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -329,7 +330,7 @@ public class SimulatorDialog extends DeviceDialog {
 
 							// prepare timed data gatherer thread
 							int delay = 0;
-							int period = SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize();
+							int period = new Double(SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize()).intValue();
 							log.fine("timer period = " + period + " ms");
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
@@ -355,7 +356,7 @@ public class SimulatorDialog extends DeviceDialog {
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
 											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
-											recordSet.setTimeStep_ms(SimulatorDialog.this.device.getTimeStep_ms());
+											recordSet.setTimeStep_ms(new Double(SimulatorDialog.this.device.getTimeStep_ms()));
 											recordSet.setAllDisplayable();
 											SimulatorDialog.this.channel.applyTemplate(this.recordSetKey);
 
@@ -392,6 +393,12 @@ public class SimulatorDialog extends DeviceDialog {
 										SimulatorDialog.this.application.updateGraphicsWindow();
 										SimulatorDialog.this.application.updateDigitalWindowChilds();
 										SimulatorDialog.this.application.updateAnalogWindowChilds();
+									}
+									catch (DataInconsitsentException e) {
+										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
+										if (SimulatorDialog.this.timer != null) SimulatorDialog.this.timer.cancel();
+										SimulatorDialog.log.log(Level.SEVERE, e.getMessage(), e);
+										SimulatorDialog.this.application.openMessageDialog("Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);

@@ -80,6 +80,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			recordSets = (answer[1] & 0xFF);
 		}
 		catch (Exception e) {
+			this.close();
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
