@@ -878,8 +878,8 @@ public class CurveSelectorContextMenu {
 			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.finest("copyCurveCompare Action performed! " + e);
-					String newRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (newRecordKey != null && CurveSelectorContextMenu.this.recordSet.get(newRecordKey).isVisible()) {
+					String oldRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					if (oldRecordKey != null && CurveSelectorContextMenu.this.recordSet.get(oldRecordKey).isVisible()) {
 						RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 						boolean isComparable = true;
 						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != CurveSelectorContextMenu.this.recordSet.getTimeStep_ms()) {
@@ -887,8 +887,8 @@ public class CurveSelectorContextMenu {
 							isComparable = false;
 							return;
 						}
-						if (!compareSet.isEmpty() && !compareSet.getFirstRecordName().startsWith(newRecordKey)) {
-							CurveSelectorContextMenu.this.application.openMessageDialog("Type der Kurven (" + newRecordKey + "-" + compareSet.getFirstRecordName().split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
+						if (!compareSet.isEmpty() && !compareSet.getFirstRecordName().startsWith(oldRecordKey)) {
+							CurveSelectorContextMenu.this.application.openMessageDialog("Type der Kurven (" + oldRecordKey + "-" + compareSet.getFirstRecordName().split("_")[0] + "), die verglichen werden sollen passen nicht zusammen!");
 							isComparable = false;
 							return;
 						}
@@ -897,10 +897,13 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsWindow.MODE_RESET ,false);
 							
 							compareSet.setTimeStep_ms(CurveSelectorContextMenu.this.recordSet.getTimeStep_ms());
-							String recordkey = newRecordKey + "_" + compareSet.size();
-							compareSet.put(recordkey, CurveSelectorContextMenu.this.recordSet.get(newRecordKey).clone()); // will delete channelConfigKey
-							compareSet.get(recordkey).setChannelConfigKey(CurveSelectorContextMenu.this.recordSet.get(newRecordKey).getChannelConfigKey());
-							compareSet.get(recordkey).setVisible(true); // if a non visible record added
+							String newRecordkey = oldRecordKey + "_" + compareSet.size();
+							Record oldRecord = CurveSelectorContextMenu.this.recordSet.get(oldRecordKey);
+							compareSet.put(newRecordkey, oldRecord.clone()); // will delete channelConfigKey
+							Record newRecord = compareSet.get(newRecordkey);
+							newRecord.setChannelConfigKey(oldRecord.getChannelConfigKey());
+							newRecord.setName(newRecordkey);
+							newRecord.setVisible(true); // if a non visible record added
 							int maxRecordSize = compareSet.getMaxSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
@@ -928,7 +931,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
-					else if( newRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog("Die Kurve sollte sichtbar sein, bevor man sie in den Kurvenvergleich kopiert!");
+					else if( oldRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog("Die Kurve sollte sichtbar sein, bevor man sie in den Kurvenvergleich kopiert!");
 				}
 			});
 			this.cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);

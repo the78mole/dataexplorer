@@ -556,7 +556,7 @@ public class GraphicsWindow {
 
 				TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 				item.setForeground(record.getColor());
-				item.setText(this.type == TYPE_NORMAL ? record.getName() : record.getName() + "_" + i);
+				item.setText(record.getName());
 				//curveSelectorTable.pack();
 				//log.info(item.getText() + " " + item.getBounds().width);
 				if (itemWidth < item.getBounds().width) itemWidth = item.getBounds().width;
