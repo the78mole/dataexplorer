@@ -85,7 +85,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (this.waitDataReady()) {
 				// query configuration to have actual values -> get number of entries to calculate percentage and progress bar
 				this.write(COMMAND_QUERY_CONFIG);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 3);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 				verifyChecksum(readBuffer);
 				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 				log.finer("memoryUsed = " + memoryUsed);
@@ -339,7 +339,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_CONFIG);
-					readBuffer = this.read(DATA_LENGTH_BYTES, 5);
+					readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
