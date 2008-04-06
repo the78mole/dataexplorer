@@ -330,17 +330,22 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 */
 	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws IOException {
-		int counter = timeoutInSeconds * 1000000;
+		int counter = timeoutInSeconds * 1000;
 		int resBytes = 0;
 		try {
 			// wait until readbuffer has been filled by eventListener
 			while (this.numBytesAvailable < numBytes) {
 				Thread.sleep(0, 1);
 				counter--;
-				if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
-				if (counter <= 0) throw new IOException("Error: can not read result during given timeout !");
+				//if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
+				if (counter <= 0) {
+					this.close();
+					IOException e = new IOException("Error: can not read result during given timeout !");
+					log.log(Level.SEVERE, e.getMessage(), e);
+					throw e;
+				}
 			}
-			if(log.isLoggable(Level.FINER)) log.finer("inputStream numBytesAvailable = " + (resBytes = this.numBytesAvailable));
+			//if(log.isLoggable(Level.FINER)) log.finer("inputStream numBytesAvailable = " + (resBytes = this.numBytesAvailable));
 		}
 		catch (InterruptedException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -358,7 +363,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int waitForStabelReceiveBuffer(int expectedBytes, int timeout_sec) throws InterruptedException, TimeOutException {
 
-		int timeCounter = timeout_sec * 1000/2; // 2 msec per time interval
+		int timeCounter = timeout_sec * 1000;
 		int stableCounter = 50;
 		boolean isStable = false;
 		boolean isTimedOut = false;
@@ -367,7 +372,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int byteCounter = this.numBytesAvailable;
 		Thread.sleep(15);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			Thread.sleep(2); // 2 ms
+			Thread.sleep(0, 10); // 10 ns
 
 			if (byteCounter == this.numBytesAvailable)
 				--stableCounter;
@@ -379,11 +384,16 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			byteCounter = this.numBytesAvailable;
 			--timeCounter;
 
-			if (log.isLoggable(Level.FINER)) {
-				log.finer("stableCounter = " + stableCounter);
-				log.finer(" timeCounter = " + timeCounter);
+//			if (log.isLoggable(Level.FINER)) {
+//				log.finer("stableCounter = " + stableCounter);
+//				log.finer(" timeCounter = " + timeCounter);
+//			}
+			if (timeCounter == 0) {
+				this.close();
+				TimeOutException e = new TimeOutException("can not receive data in given time");
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
 			}
-			if (timeCounter == 0) throw new TimeOutException("can not receive data in given time");
 
 		} // end while
 
