@@ -58,8 +58,8 @@ public class TimeLine {
 		int numberOfPoints = recordSet.getSize();
 		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms());
 
-		long totalTime_msec = recordSet.getTimeStep_ms() * (numberOfPoints - 1);
-		long totalTime_sec = recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000;
+		long totalTime_msec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1)).longValue();
+		long totalTime_sec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000.0).longValue();
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		if (TimeLine.log.isLoggable(Level.FINE))
@@ -292,8 +292,8 @@ public class TimeLine {
 	 * converts a given time in m_sec into time format used for time scale 
 	 * @return converted time value
 	 */
-	public static int convertTimeInFormatNumber(long time_ms, int timeFormat) {
-		long time_sec = time_ms / 1000;
+	public static int convertTimeInFormatNumber(double time_ms, int timeFormat) {
+		long time_sec = new Double(time_ms / 1000.0).longValue();
 		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
 		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
 		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms);
@@ -312,7 +312,7 @@ public class TimeLine {
 			result = new Long(time_sec).intValue();
 			break;
 		default: // TIME_LINE_MSEC
-			result = new Long(time_ms).intValue();
+			result = new Double(time_ms).intValue();
 			break;
 		}
 		return result;
@@ -323,10 +323,10 @@ public class TimeLine {
 	 * @param milliSeconds
 	 * @return string of time value in simple date format HH:mm:ss:SSS
 	 */
-	public static String getFomatedTime(int milliSeconds) {
+	public static String getFomatedTime(double milliSeconds) {
 		String time = "0";
 		if (milliSeconds >= 0) {
-			long lSeconds = milliSeconds / 1000;
+			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
 			milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;
@@ -334,11 +334,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d [ss:SSS]", lSeconds, milliSeconds);
+				time = String.format("%02d:%03d [ss:SSS]", lSeconds, new Double(milliSeconds).intValue());
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, milliSeconds);
+				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, new Double(milliSeconds).intValue());
 			else
-				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, milliSeconds);
+				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue());
 		}
 		return time;
 	}

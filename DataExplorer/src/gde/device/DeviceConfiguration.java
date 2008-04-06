@@ -234,13 +234,13 @@ public class DeviceConfiguration {
 		return this.device.getImage();
 	}
 
-	public int getTimeStep_ms() {
-		return this.timeBase.getTimeStep().intValue();
+	public Double getTimeStep_ms() {
+		return this.timeBase.getTimeStep();
 	}
 
-	public void setTimeStep_ms(int newTimeStep_ms) {
+	public void setTimeStep_ms(double newTimeStep_ms) {
 		this.isChangePropery = true;
-		this.timeBase.setTimeStep(new BigInteger("" + newTimeStep_ms));
+		this.timeBase.setTimeStep(newTimeStep_ms);
 	}
 
 	public String getPort() {

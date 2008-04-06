@@ -57,8 +57,8 @@ public class LinearRegression extends CalculationThread {
 
 		Record record = this.recordSet.get(this.targetRecordKey);
 		Record recordHeight = this.recordSet.get(this.sourceRecordKey);
-		int time_ms = this.recordSet.getTimeStep_ms();
-		int pointsPerInterval = this.calcInterval_sec * 1000 / time_ms; // 4000ms/50ms/point -> 80 points per interval
+		double time_ms = this.recordSet.getTimeStep_ms();
+		int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
 		int pointInterval = 2;
 
 		int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;

@@ -116,12 +116,12 @@ public interface IDevice {
 	/**
 	 * @return time step in ms
 	 */
-	public int getTimeStep_ms();
+	public Double getTimeStep_ms();
 	
 	/**
 	 * set new time step in ms
 	 */
-	public void setTimeStep_ms(int newTimeStep_ms);
+	public void setTimeStep_ms(double newTimeStep_ms);
 	
 	/**
 	 * @return the port configured for the device
