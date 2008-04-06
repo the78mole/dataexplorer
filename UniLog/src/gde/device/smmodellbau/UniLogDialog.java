@@ -139,9 +139,27 @@ public class UniLogDialog extends DeviceDialog {
 	UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 
 	String												statusText								= "";
+
 	String												serialNumber							= "";
 	String												unilogVersion							= "";
+	int														memoryUsed								= 0;
 	String												memoryUsedPercent					= "0";
+	int														timeIntervalPosition			= 0;
+	boolean												isMotorPole								= false;
+	boolean												isPropBlade								= false;
+	int														countMotorPole						= 0;
+	int														countPropBlade						= 0;
+	boolean												isAutoStartCurrent				= false;
+	int														currentAutoStart					= 0;
+	boolean												isAutStartRx							= false;
+	boolean												isRxOn										= false;
+	int														rxAutoStartValue					= 0;
+	boolean												isImpulseAutoStartTime		= false;
+	int														impulseAutoStartTime_sec	= 0;
+	int														currentSensorPosition			= 0;
+	int														modusA1Position						= 0;
+	double												gearRatio									= 1.0;
+
 	int														sliderPosition						= 50;
 	String[]											configurationNames				= new String[] { " Konfig 1" };
 	String												numberRedDataSetsText			= "0";
@@ -260,6 +278,29 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
 							this.configMainComosite.setLayout(null);
+							this.configMainComosite.addPaintListener(new PaintListener() {
+								public void paintControl(PaintEvent evt) {
+									UniLogDialog.log.finer("configMainComosite.paintControl " + evt);
+									switch (new Double(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue()) {
+									case 1: // 1/16 sec
+										UniLogDialog.this.timeIntervalCombo.select(0);
+										break;
+									case 2: // 1/8 sec
+										UniLogDialog.this.timeIntervalCombo.select(1);
+										break;
+									default:
+									case 4: // 1/4 sec
+										UniLogDialog.this.timeIntervalCombo.select(2);
+										break;
+									case 8: // 1/2 sec
+										UniLogDialog.this.timeIntervalCombo.select(3);
+										break;
+									case 16: // 1 sec
+										UniLogDialog.this.timeIntervalCombo.select(4);
+										break;
+									}
+								}
+							});
 							{
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.statusGroup.setLayout(null);
@@ -549,6 +590,7 @@ public class UniLogDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeRateCombo.widgetSelected, event=" + evt);
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
+											updateTimeStep_ms(UniLogDialog.this.timeIntervalCombo.getSelectionIndex());
 										}
 									});
 								}
@@ -953,11 +995,11 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.fine("move record set " + recordSetKey + " to configuration " + configKey);
 											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
 											activeChannel.remove(recordSetKey);
-											
+
 											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
 											activeRecordSet.setRecalculation(true);
 											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
-											
+
 											channels.switchChannel(channelNumber, recordSetKey);
 										}
 									}
@@ -991,8 +1033,8 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void updateConfigurationValues(byte[] readBuffer) {
 		//status field
-		int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-		UniLogDialog.log.finer("memoryUsed = " + memoryUsed);
+		this.memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
+		UniLogDialog.log.finer("memoryUsed = " + this.memoryUsed);
 
 		this.unilogVersion = String.format("v%.2f", new Double(readBuffer[8] & 0xFF) / 100);
 		UniLogDialog.log.finer("unilogVersion = " + this.unilogVersion);
@@ -1003,38 +1045,41 @@ public class UniLogDialog extends DeviceDialog {
 		if (memoryDeleted > 0)
 			tmpMemoryUsed = 0;
 		else
-			tmpMemoryUsed = memoryUsed;
+			tmpMemoryUsed = this.memoryUsed;
 		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / UniLogDialog.WERTESAETZE_MAX);
 		UniLogDialog.log.finer("memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + UniLogDialog.WERTESAETZE_MAX + ")");
 		this.memUsagePercent.setText(this.memoryUsedPercent);
 
 		// timer interval
-		int timeIntervalPosition = readBuffer[10] & 0xFF;
-		UniLogDialog.log.finer("timeIntervalPosition = " + timeIntervalPosition + " timeInterval = ");
-		this.timeIntervalCombo.select(timeIntervalPosition);
+		this.timeIntervalPosition = readBuffer[10] & 0xFF;
+		UniLogDialog.log.finer("timeIntervalPosition = " + this.timeIntervalPosition + " timeInterval = ");
+		if (this.timeIntervalPosition != this.timeIntervalCombo.getSelectionIndex()) {
+			this.timeIntervalCombo.select(this.timeIntervalPosition);
+			updateTimeStep_ms(this.timeIntervalPosition);
+		}
 
 		// motor/prop
-		boolean isMotorPole = false;
-		boolean isPropBlade = false;
-		int countMotorPole = 0;
-		int countPropBlade = 0;
+		this.isMotorPole = false;
+		this.isPropBlade = false;
+		this.countMotorPole = 0;
+		this.countPropBlade = 0;
 		if ((readBuffer[11] & 0x80) == 0) {
-			isPropBlade = true;
+			this.isPropBlade = true;
 		}
 		else {
-			isMotorPole = true;
+			this.isMotorPole = true;
 		}
-		countPropBlade = readBuffer[11] & 0x7F;
-		countMotorPole = (readBuffer[11] & 0x7F) * 2;
-		UniLogDialog.log.finer("isPropBlade = " + isPropBlade + " countPropBlade = " + countPropBlade);
-		UniLogDialog.log.finer("isMotorPole = " + isMotorPole + " countMotorPole = " + countMotorPole);
-		this.numberPolsButton.setSelection(isMotorPole);
-		this.numberPropButton.setSelection(isPropBlade);
+		this.countPropBlade = readBuffer[11] & 0x7F;
+		this.countMotorPole = (readBuffer[11] & 0x7F) * 2;
+		UniLogDialog.log.finer("isPropBlade = " + this.isPropBlade + " countPropBlade = " + this.countPropBlade);
+		UniLogDialog.log.finer("isMotorPole = " + this.isMotorPole + " countMotorPole = " + this.countMotorPole);
+		this.numberPolsButton.setSelection(this.isMotorPole);
+		this.numberPropButton.setSelection(this.isPropBlade);
 		//motorPoleCombo.setItems(new String[] {"2", "4", "6", "8", "10", "12", "14", "16"});
-		this.motorPoleCombo.select(countMotorPole / 2 - 1);
+		this.motorPoleCombo.select(this.countMotorPole / 2 - 1);
 		//numbeProbCombo.setItems(new String[] {"1", "2", "3", "4"});
-		this.numbeProbCombo.select(countPropBlade - 1);
-		if (isMotorPole) {
+		this.numbeProbCombo.select(this.countPropBlade - 1);
+		if (this.isMotorPole) {
 			this.numbeProbCombo.setEnabled(false);
 			this.motorPoleCombo.setEnabled(true);
 		}
@@ -1043,55 +1088,55 @@ public class UniLogDialog extends DeviceDialog {
 			this.motorPoleCombo.setEnabled(false);
 		}
 
-		boolean isAutoStartCurrent = false;
-		int currentAutoStart = 0;
+		this.isAutoStartCurrent = false;
+		this.currentAutoStart = 0;
 		if ((readBuffer[12] & 0x80) != 0) {
-			isAutoStartCurrent = true;
+			this.isAutoStartCurrent = true;
 		}
-		currentAutoStart = readBuffer[12] & 0x7F;
-		UniLogDialog.log.finer("isAutoStartCurrent = " + isAutoStartCurrent + " currentAutoStart = " + currentAutoStart);
-		this.currentTriggerButton.setSelection(isAutoStartCurrent);
-		this.currentTriggerCombo.select(currentAutoStart - 1);
+		this.currentAutoStart = readBuffer[12] & 0x7F;
+		UniLogDialog.log.finer("isAutoStartCurrent = " + this.isAutoStartCurrent + " currentAutoStart = " + this.currentAutoStart);
+		this.currentTriggerButton.setSelection(this.isAutoStartCurrent);
+		this.currentTriggerCombo.select(this.currentAutoStart - 1);
 
-		boolean isAutStartRx = false;
-		boolean isRxOn = false;
-		int rxAutoStartValue = 0;
+		this.isAutStartRx = false;
+		this.isRxOn = false;
+		this.rxAutoStartValue = 0;
 		if ((readBuffer[13] & 0x80) != 0) {
-			isAutStartRx = true;
+			this.isAutStartRx = true;
 		}
-		rxAutoStartValue = (readBuffer[13] & 0x7F); // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
-		this.impulseTriggerCombo.select(rxAutoStartValue - 11);
-		this.impulseTriggerButton.setSelection(isAutStartRx);
-		UniLogDialog.log.finer("isAutStartRx = " + isAutStartRx + " isRxOn = " + isRxOn + " rxAutoStartValue = " + rxAutoStartValue);
+		this.rxAutoStartValue = (readBuffer[13] & 0x7F); // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
+		this.impulseTriggerCombo.select(this.rxAutoStartValue - 11);
+		this.impulseTriggerButton.setSelection(this.isAutStartRx);
+		UniLogDialog.log.finer("isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue);
 
-		boolean isImpulseAutoStartTime = false;
-		int impulseAutoStartTime_sec = 0;
+		this.isImpulseAutoStartTime = false;
+		this.impulseAutoStartTime_sec = 0;
 		if ((readBuffer[14] & 0x80) != 0) {
-			isImpulseAutoStartTime = true;
+			this.isImpulseAutoStartTime = true;
 		}
-		impulseAutoStartTime_sec = readBuffer[14] & 0x7F;
-		UniLogDialog.log.finer("isAutoStartTime = " + isImpulseAutoStartTime + " timeAutoStart_sec = " + impulseAutoStartTime_sec);
-		this.timeTriggerButton.setSelection(isImpulseAutoStartTime);
-		this.timeTriggerCombo.select(impulseAutoStartTime_sec + 1);
-		this.timeTriggerCombo.setText(String.format("%4s", impulseAutoStartTime_sec));
+		this.impulseAutoStartTime_sec = readBuffer[14] & 0x7F;
+		UniLogDialog.log.finer("isAutoStartTime = " + this.isImpulseAutoStartTime + " timeAutoStart_sec = " + this.impulseAutoStartTime_sec);
+		this.timeTriggerButton.setSelection(this.isImpulseAutoStartTime);
+		this.timeTriggerCombo.select(this.impulseAutoStartTime_sec + 1);
+		this.timeTriggerCombo.setText(String.format("%4s", this.impulseAutoStartTime_sec));
 
-		int currentSensorPosition = readBuffer[15] & 0xFF;
-		UniLogDialog.log.finer("currentSensor = " + currentSensorPosition);
-		this.sensorCurrentCombo.select(currentSensorPosition);
+		this.currentSensorPosition = readBuffer[15] & 0xFF;
+		UniLogDialog.log.finer("currentSensor = " + this.currentSensorPosition);
+		this.sensorCurrentCombo.select(this.currentSensorPosition);
 
 		this.serialNumber = "" + (((readBuffer[16] & 0xFF) << 8) + (readBuffer[17] & 0xFF));
 		UniLogDialog.log.finer("serialNumber = " + this.serialNumber);
 		this.snLabel.setText(this.serialNumber);
 
-		int modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
-		UniLogDialog.log.finer("modusA1 = " + modusA1Position);
-		this.a1ModusCombo.select(modusA1Position);
+		this.modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
+		UniLogDialog.log.finer("modusA1 = " + this.modusA1Position);
+		this.a1ModusCombo.select(this.modusA1Position);
 
 		// skip 19, 20 not used
 
-		double gearRatio = (readBuffer[21] & 0xFF) / 10.0;
-		UniLogDialog.log.finer(String.format("gearRatio = %.1f", gearRatio));
-		this.gearFactorCombo.setText(String.format(" %.1f  :  1", gearRatio));
+		this.gearRatio = (readBuffer[21] & 0xFF) / 10.0;
+		UniLogDialog.log.finer(String.format("gearRatio = %.1f", this.gearRatio));
+		this.gearFactorCombo.setText(String.format(" %.1f  :  1", this.gearRatio));
 
 		if (this.configTab1 != null) this.configTab1.setA1ModusAvailable(true);
 		if (this.configTab2 != null) this.configTab2.setA1ModusAvailable(true);
@@ -1305,6 +1350,31 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public int getSelectionIndexA1ModusCombo() {
 		return this.a1ModusCombo.getSelectionIndex();
+	}
+
+	/**
+	 * update the used timeStep_ms, this is used for all type of calculations
+	 * @param timeIntervalIndex the index of the TIME_INTERVAL array
+	 */
+	void updateTimeStep_ms(int timeIntervalIndex) {
+		switch (timeIntervalIndex) {
+		case 0: // 1/16 sec
+			this.device.setTimeStep_ms(1000.0 / 16);
+			break;
+		case 1: // 1/8 sec
+			this.device.setTimeStep_ms(1000.0 / 8);
+			break;
+		default:
+		case 2: // 1/4 sec
+			this.device.setTimeStep_ms(1000.0 / 4);
+			break;
+		case 3: // 1/2 sec
+			this.device.setTimeStep_ms(1000.0 / 2);
+			break;
+		case 4: // 1 sec
+			this.device.setTimeStep_ms(1000.0 / 1);
+			break;
+		}
 	}
 
 }
