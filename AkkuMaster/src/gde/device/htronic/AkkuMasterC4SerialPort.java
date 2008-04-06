@@ -141,7 +141,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		command[0] = new Integer(this.okStartProgram + channel[0]).byteValue();
 
 		this.write(command);
-		byte[] answer = this.read(2, 5);
+		byte[] answer = this.read(2, 2);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != this.ok) throw new IOException("command OK failed");
@@ -156,7 +156,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		command[0] = new Integer(this.startProgram + channel[0]).byteValue();
 
 		this.write(command);
-		byte[] answer = this.read(2, 5);
+		byte[] answer = this.read(2, 2);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != this.ok) throw new IOException("command START failed");
@@ -171,7 +171,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		command[0] = new Integer(this.stopProgram + channel[0]).byteValue();
 
 		this.write(command);
-		byte[] answer = this.read(2, 5);
+		byte[] answer = this.read(2, 2);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != this.ok) throw new IOException("command STOP failed");
@@ -201,7 +201,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		command[10] = new Integer(chargeCurrent_mA & 0xFF).byteValue();
 
 		this.write(command);
-		byte[] answer = this.read(2, 5);
+		byte[] answer = this.read(2, 2);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != this.ok) throw new IOException("command WRITE NEW PROGRAM failed");
@@ -224,7 +224,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		command[4] = new Integer(sleepTime_min & 0xFF).byteValue();
 
 		this.write(command);
-		byte[] answer = this.read(2, 5);
+		byte[] answer = this.read(2, 2);
 
 		if (answer[0] != command[0]) throw new IOException("command to answer missmatch");
 		if (answer[1] != this.ok) throw new IOException("command setMemoryNumberCycleCoundSleepTime failed");
@@ -302,7 +302,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 	public void setStatus() throws IOException {
 		this.write(this.readConfiguration);
-		this.configuration = this.read(14, 5);
+		this.configuration = this.read(14, 2);
 	}
 
 	/**
@@ -327,7 +327,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		int b = channel[0];
 		readConfigOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readConfigOfChannel);
-		this.configuration = this.read(14, 5);
+		this.configuration = this.read(14, 2);
 
 		if (this.configuration[0] != readConfigOfChannel[0]) throw new IOException("command to answer missmatch");
 
@@ -423,7 +423,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		int b = channel[0];
 		readAdjustmentsOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readAdjustmentsOfChannel);
-		this.adjustedValues = this.read(5, 5);
+		this.adjustedValues = this.read(5, 2);
 
 		if (this.adjustedValues[0] != readAdjustmentsOfChannel[0]) throw new IOException("command to answer missmatch");
 
@@ -465,7 +465,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		int b = channel[0];
 		readValuesOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readValuesOfChannel);
-		this.measuredValues = this.read(16, 5);
+		this.measuredValues = this.read(16, 2);
 
 		if (this.measuredValues[0] != readValuesOfChannel[0]) throw new IOException("command to answer missmatch");
 
@@ -523,7 +523,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 			}
 
 			this.write(this.readVersion);
-			this.version = this.read(11, 5);
+			this.version = this.read(11, 2);
 
 			// Versionsnummer der Software
 			String versionsNummer = new Integer(this.version[1]).toString();
