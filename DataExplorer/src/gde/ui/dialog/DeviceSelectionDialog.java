@@ -454,7 +454,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.this.portDescription.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setItems(DeviceSelectionDialog.this.availablePorts.toArray(new String[DeviceSelectionDialog.this.availablePorts.size()]));
-											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.settings.getSerialPort());
+											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
 											DeviceSelectionDialog.this.portSelectCombo.select(index != -1 ? index : 0);
 										}
 									}
