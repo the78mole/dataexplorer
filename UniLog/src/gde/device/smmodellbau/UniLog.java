@@ -117,8 +117,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				else {
 					record.setDisplayable(false); // force recalculation
+					record.clear();
 					if (!recordSet.isRecalculation()) {
-						record.setVisible(false); // required for to enable different configurations (import)
+						record.setVisible(false); // required for to enable different configuration (import, measurement names)
 					}
 				}
 			}
@@ -128,10 +129,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
-				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
+				double timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
 				Double capacity = 0.0;
 				for (int i = 0; i < recordCurrent.size(); i++) {
-					capacity = i > 0 ? capacity + ((1.0 * recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
+					capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
 					record.add(capacity.intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}
@@ -164,7 +165,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (!record.isDisplayable()) {
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
-				int timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
+				double timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
 				Double power = 0.0;
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					power = i > 0 ? power + ((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
@@ -204,7 +205,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 				for (int i = 0; i < recordRevolution.size(); i++) {
 					double motorPower = Math.pow((recordRevolution.get(i) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-					double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0;
+					double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
 					record.add(new Double(eta * 1000).intValue());
 					if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
 				}

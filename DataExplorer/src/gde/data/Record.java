@@ -40,7 +40,7 @@ public class Record extends Vector<Integer> {
 	private String							name;																																// MessgrößeX Höhe
 	private String							unit;																																// Einheit m
 	private String							symbol;																															// Symbol h
-	private int									timeStep_ms;
+	private double							timeStep_ms;
 
 	private double							factor								= 1.0;																				// offset + factor * x
 	private double							offset								= 0;																					// offset + factor * x
@@ -106,7 +106,7 @@ public class Record extends Vector<Integer> {
 	 * @param newTimeStep_ms
 	 * @param initialCapacity
 	 */
-	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, double newOffset, double newFactor, int newTimeStep_ms, int initialCapacity) {
+	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, double newOffset, double newFactor, double newTimeStep_ms, int initialCapacity) {
 		super(initialCapacity);
 		this.name = newName;
 		this.symbol = newSymbol;
@@ -188,6 +188,10 @@ public class Record extends Vector<Integer> {
 		return this.name;
 	}
 
+	public void setName(String newName) {
+		this.name = newName;
+	}
+	
 	public String getUnit() {
 		return this.unit;
 	}
@@ -449,7 +453,7 @@ public class Record extends Vector<Integer> {
 		return this.parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
-	public int getTimeStep_ms() {
+	public double getTimeStep_ms() {
 		return this.timeStep_ms;
 	}
 
