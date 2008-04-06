@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Display;
 
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.TimeLine;
 
@@ -48,7 +49,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private final OpenSerialDataExplorer	application;																													// pointer to main application
 	private final Channels								channels;
 	private String[]											recordNames;																													// Spannung, Strom, ..
-	private int														timeStep_ms						= 0;																						// Zeitbasis der Messpunkte
+	private double												timeStep_ms						= 0;																						// Zeitbasis der Messpunkte
 	private static final DateFormat				dateFormat						= new SimpleDateFormat("HH:mm:ss");
 	private String												recordSetDescription	= dateFormat.format(new Date().getTime());
 	private boolean												isSaved								= false;																				// indicates if the record set is saved to file
@@ -116,7 +117,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 * @param initialCapacity thie initial size of the data hash map
 	 */
-	public RecordSet(String newChannelName, String newName, String[] newRecordNames, int newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
+	public RecordSet(String newChannelName, String newName, String[] newRecordNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
 		super(initialCapacity);
 		this.channelName = newChannelName;
 		this.name = newName;
@@ -139,7 +140,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	public RecordSet(String newChannelName, String newName, String[] newRecordNames, int newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
+	public RecordSet(String newChannelName, String newName, String[] newRecordNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super();
 		this.channelName = newChannelName;
 		this.name = newName;
@@ -161,7 +162,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isRawValue
 	 * @param isCompareSetValue
 	 */
-	public RecordSet(String newChannelName, String newName, int newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
+	public RecordSet(String newChannelName, String newName, double newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
 		super();
 		this.channelName = newChannelName;
 		this.name = newName;
@@ -187,9 +188,14 @@ public class RecordSet extends HashMap<String, Record> {
 		this.channels = recordSet.channels;
 		this.channelName = newChannelName;
 		
+		// update child records to new channel or configuration key and to the new parent
 		for (String recordKey : this.keySet()) {
-			this.get(recordKey).setChannelConfigKey(newChannelName);
+			Record tmpRecord = this.get(recordKey);
+			tmpRecord.setChannelConfigKey(newChannelName);
+			tmpRecord.setParent(this);
 		}
+		
+		// check if there is a miss match of measurement names and correct if required
 		String[] oldRecordNames = recordSet.recordNames;
 		String[] newRecordNames = recordSet.get(recordSet.getFirstRecordName()).getDevice().getMeasurementNames(newChannelName);
 		for (int i = 0; i < newRecordNames.length; i++) {
@@ -200,6 +206,7 @@ public class RecordSet extends HashMap<String, Record> {
 				this.remove(oldRecordNames[i]);
 			}
 		}
+		
 		// update record names
 		this.recordNames = 	newRecordNames.clone();
 		
@@ -299,7 +306,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else 
-			throw new Exception("RecordSet.addPoints - points.length != recordNames.length");
+			throw new DataInconsitsentException("RecordSet.addPoints - points.length != recordNames.length");
 	}
 	
 	/**
@@ -313,7 +320,7 @@ public class RecordSet extends HashMap<String, Record> {
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
 			if (value != 0) dataTableRow.add(value);
-			else 						dataTableRow.add(this.get(this.recordNames[0]).size() * this.getTimeStep_ms());
+			else 						dataTableRow.add(new Double(this.get(this.recordNames[0]).size() * this.getTimeStep_ms()).intValue());
 			for (int i=0; i<this.recordNames.length; ++i) {
 				dataTableRow.add(0);
 			}
@@ -375,7 +382,7 @@ public class RecordSet extends HashMap<String, Record> {
 		return dfValues.toArray(new String[this.size() + 1]);
 	}
 
-	public int getTimeStep_ms() {
+	public double getTimeStep_ms() {
 		return this.timeStep_ms;
 	}
 
@@ -581,7 +588,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @param newTimeStep_ms the timeStep_ms to set
 	 */
-	public void setTimeStep_ms(int newTimeStep_ms) {
+	public void setTimeStep_ms(double newTimeStep_ms) {
 		this.timeStep_ms = newTimeStep_ms;
 	}
 
@@ -805,7 +812,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
 	public void setZoomMode(boolean zoomModeEnabled) {
-		if (!zoomModeEnabled) {
+		if (zoomModeEnabled) {
 			this.recordZoomOffset = 0;
 			
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
@@ -874,10 +881,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return string of time value in simple date format HH:ss:mm:SSS
 	 */
 	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTime((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms());
+		return TimeLine.getFomatedTime(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms()).intValue());
 	}
 
-	public int getStartTime() {
+	public double getStartTime() {
 		return this.isZoomMode ? this.recordZoomOffset * this.timeStep_ms : 0;
 	}
 
@@ -1129,7 +1136,7 @@ public class RecordSet extends HashMap<String, Record> {
 					for (int i = 0; i < recordEntries; i++) {
 						this.application2.setProgress(new Double(i * progressInterval + progress).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
-						dataTableRow.add(getTimeStep_ms() * i);
+						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
 							dataTableRow.add(new Double(1000.0 * device.translateValue(channelConfigKey, recordKey, get(recordKey).get(i) / 1000.0)).intValue());
 						}
