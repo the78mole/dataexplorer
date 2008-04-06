@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -476,7 +477,7 @@ public class AkkuMasterChannelTab {
 									getChannels().switchChannel(getChannel().getName());
 									// prepare timed data gatherer thread
 									int delay = 0;
-									int period = AkkuMasterChannelTab.this.application.getActiveDevice().getTimeStep_ms(); // repeat every 10 sec.
+									int period = AkkuMasterChannelTab.this.application.getActiveDevice().getTimeStep_ms().intValue(); // repeat every 10 sec.
 									setTimer(new Timer());
 									setTimerTask(new TimerTask() {
 										HashMap<String, Object>	data; // [8]
@@ -591,11 +592,17 @@ public class AkkuMasterChannelTab {
 													AkkuMasterChannelTab.this.application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
 												}
 											}
+											catch (DataInconsitsentException e) {
+												// exception is logged where it is thrown first log.log(Level.SEVERE, e.getMessage(), e);
+												setCollectData(false);
+												stopTimer();
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog("Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+											}
 											catch (Exception e) {
 												// exception is logged where it is thrown first log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.");
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog("Das angeschlossenen Gerät meldet einen Fehlerstatus, bitte überprüfen.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 											}
 										}
 									});
