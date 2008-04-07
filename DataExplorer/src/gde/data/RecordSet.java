@@ -320,7 +320,7 @@ public class RecordSet extends HashMap<String, Record> {
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
 			if (value != 0) dataTableRow.add(value);
-			else 						dataTableRow.add(new Double(this.get(this.recordNames[0]).size() * this.getTimeStep_ms()).intValue());
+			else 						dataTableRow.add(new Double(this.getRecordDataSize() * this.getTimeStep_ms()).intValue());
 			for (int i=0; i<this.recordNames.length; ++i) {
 				dataTableRow.add(0);
 			}
@@ -652,19 +652,25 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * query the size of record set for time unit calculation
+	 * query the size of record set child record 
 	 * - compare set not zoomed will return the size of the largest record
-	 * - normal record set will return the size of the data vector
+	 * - normal record set will return the size of the data vector of first active in recordNames
 	 * - zoomed set will return size of zoomOffset + zoomWith
 	 * @return the size of data point to calculate the time unit
 	 */
-	public int getSize() {
-		int size;
-		if (this.isCompareSet)
+	public int getRecordDataSize() {
+		int size = 0;
+		if (this.isCompareSet) {
 			size = this.isZoomMode ? this.recordZoomSize : this.maxSize;
-		else
-			size = this.get(this.recordNames[0]).size();
-		
+		}
+		else {
+			for (String recordKey : this.recordNames) {
+				if (get(recordKey).isActive()) {
+					size = get(recordKey).size();
+					break;
+				}
+			}
+		}
 		return size;
 	}
 
@@ -872,7 +878,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return position integer value
 	 */
 	public int getPointIndexFromDisplayPoint(int xPos) {
-		return new Double(1.0 * xPos * this.get(this.recordNames[0]).size() / this.drawAreaBounds.width).intValue();
+		return new Double(1.0 * xPos * this.getRecordDataSize() / this.drawAreaBounds.width).intValue();
 	}
 	
 	/**
@@ -1107,7 +1113,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 				String channelConfigKey = getChannelName();
 				int numberRecords = getRecordNamesLength();
-				int recordEntries = get(getFirstRecordName()).size();
+				int recordEntries = getRecordDataSize();
 				int progress = this.application2.getProgressPercentage();
 
 				int maxWaitCounter = 10;
