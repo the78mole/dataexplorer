@@ -148,7 +148,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			// update viewable
 			this.application.getMenuToolBar().updateChannelSelector();
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			this.application.updateGraphicsWindow();
+			this.getActiveChannel().applyTemplate(recordSetKey); //this.application.updateGraphicsWindow();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
 			this.application.updateCellVoltageWindow();
