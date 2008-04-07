@@ -117,7 +117,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				else {
 					record.setDisplayable(false); // force recalculation
-					record.clear();
 					if (!recordSet.isRecalculation()) {
 						record.setVisible(false); // required for to enable different configuration (import, measurement names)
 					}
@@ -128,6 +127,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
+				record.clear();
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				double timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
 				Double capacity = 0.0;
@@ -146,7 +146,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
-
+				record.clear();
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				for (int i = 0; i < recordVoltage.size(); i++) {
@@ -163,6 +163,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
+				record.clear();
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 				double timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
@@ -182,6 +183,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
+				record.clear();
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
 				int numberCells = property != null ? new Integer(property.getValue()) : 4;
@@ -199,6 +201,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
+				record.clear();
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
 				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
@@ -219,7 +222,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
-				// calculate the values required				
+				record.clear();
 				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_TYPE);
