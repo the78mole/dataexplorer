@@ -79,11 +79,10 @@ public class CSVReaderWriter {
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
-		String recordSetName = "1) " + recordSetNameExtend;
+		String recordSetName = null;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		IDevice device = application.getActiveDevice();
-		String[] recordNames = null;
 		int sizeRecords = 0;
 		boolean isDeviceName = true;
 		boolean isData = false;
@@ -101,61 +100,64 @@ public class CSVReaderWriter {
 				StringBuilder keys = new StringBuilder();
 				String[] recordKeys = null;
 				String fileConfig = null;
-				while ((line = reader.readLine()) != null) {
-					if (isDeviceName) {
-						// check for device name in first line
-						String activeDeviceName = application.getActiveDevice().getName();
-						String fileDeviceName = line.split("" + separator)[0].trim();
-						log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
+				
+				// check for device name and channel or configuration in first line
+				while ((line = reader.readLine()) != null && isDeviceName) {
+					String activeDeviceName = application.getActiveDevice().getName();
+					String fileDeviceName = line.split("" + separator)[0].trim();
+					log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
 
-						if (activeDeviceName.equals(fileDeviceName)) {
-							isDeviceName = false;
+					if (activeDeviceName.equals(fileDeviceName)) {
+						isDeviceName = false;
+					}
+					else {
+						throw new Exception("0"); // mismatch device name
+					}
+
+					String activeConfig = channels.getActiveChannel().getConfigKey();
+					fileConfig = line.split("" + separator).length > 1 ? line.split("" + separator)[1].trim() : null;
+					log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
+					if (fileConfig == null) {
+						fileConfig = activeConfig;
+						log.fine("using as file channel name = " + fileConfig);
+					}
+					else if (!activeConfig.equals(fileConfig)) {
+						String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
+						int answer = application.openYesNoCancelMessageDialog(msg);
+						if (answer == SWT.YES) {
+							log.fine("SWT.YES");
+							int channelNumber = channels.getChannelNumber(fileConfig);
+							if (channelNumber != 0) { // 0 channel configuration does not exist
+								channels.setActiveChannelNumber(channelNumber);
+								channels.switchChannel(channelNumber, "");
+								application.getMenuToolBar().updateChannelSelector();
+								activeChannel = channels.getActiveChannel();
+							}
+							else
+								throw new Exception("Die Konfiguration aus der Datei entspricht keiner aktuell vorhandenen :\n" + fileConfig + " != " + channels.getChannelNamesToString());
+						}
+						else if (answer == SWT.NO) {
+							log.fine("SWT.NO");
+							fileConfig = channels.getActiveChannel().getConfigKey();
 						}
 						else {
-							throw new Exception("0"); // mismatch device name
+							log.fine("SWT.CANCEL");
+							return null;
 						}
-
-						String activeConfig = channels.getActiveChannel().getConfigKey();
-						fileConfig = line.split("" + separator).length > 1 ? line.split("" + separator)[1].trim() : null;
-						log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig);
-						if (fileConfig == null) {
-							fileConfig = activeConfig;
-							log.fine("using as file channel name = " + fileConfig);
-						}
-						else if (!activeConfig.equals(fileConfig)) {
-							String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
-							int answer = application.openYesNoCancelMessageDialog(msg);
-							if (answer == SWT.YES) {
-								log.fine("SWT.YES");
-								int channelNumber = channels.getChannelNumber(fileConfig);
-								if (channelNumber != 0) { // 0 channel configuration does not exist
-									channels.setActiveChannelNumber(channelNumber);
-									channels.switchChannel(channelNumber, "");
-									application.getMenuToolBar().updateChannelSelector();
-									activeChannel = channels.getActiveChannel();
-								}
-								else
-									throw new Exception("Die Konfiguration aus der Datei entspricht keiner aktuell vorhandenen :\n" + fileConfig + " != " + channels.getChannelNamesToString());
-							}
-							else if (answer == SWT.NO) {
-								log.fine("SWT.NO");
-								fileConfig = channels.getActiveChannel().getConfigKey();
-							}
-							else {
-								log.fine("SWT.CANCEL");
-								return null;
-							}
-						}
-						if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
-							recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
-						}
-						// shorten the record set name to the allowed maximum
-						recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
-
-						recordNames = device.getMeasurementNames(fileConfig);
-						recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 					}
-					else if (!isData) {
+				} // end isDeviceName
+					
+				if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+					recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
+					// shorten the record set name to the allowed maximum
+					recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
+
+					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
+
+					String[] recordNames = recordSet.getRecordNames();
+
+					//
+					while ((line = reader.readLine()) != null && !isData) {
 						// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
 						String[] header = line.split(";");
 						sizeRecords = header.length - 1;
@@ -164,6 +166,7 @@ public class CSVReaderWriter {
 							MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
 							headerStringConf.append(measurement.getName()).append(separator);
 
+							log.fine(measurement.getName() + " isCalculation = " + measurement.isCalculation());
 							if (!measurement.isCalculation()) {
 								keys.append(measurement.getName()).append(separator);
 								++countNotMeasurement; // update count for possible raw
@@ -176,13 +179,18 @@ public class CSVReaderWriter {
 						if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) {
 							throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
 						}
-						else {
-							int match = 0; // check match of the measurement units, relevant for absolute import 
-							if (isRaw)
-								recordKeys = keys.toString().split("" + separator);
-							else
-								recordKeys = recordNames;
 
+						int match = 0; // check match of the measurement units, relevant for absolute import 
+						
+						if (isRaw)
+							recordNames = recordKeys = keys.toString().split("" + separator);
+						else
+							recordKeys = recordNames;
+
+						// check units for absolute (!raw) data only
+						// absolute data will not have any calculation
+						// unit for raw data might not meaningful which require some calculation to get a unit
+						if (!isRaw) {
 							StringBuilder unitCompare = new StringBuilder().append(lineSep);
 							for (int i = 1; i < header.length; i++) {
 								String recordKey = recordKeys[i - 1];
@@ -198,9 +206,10 @@ public class CSVReaderWriter {
 							}
 						}
 						isData = true;
-					}
-					else { // isData use only recordKeys
-						// 0; 14,780;  0,598;  1,000;  8,838;  0,002
+					} // while !isData
+
+					// get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
+					while ((line = reader.readLine()) != null && isData) {
 						String[] dataStr = line.split("" + separator);
 						String data = dataStr[0].trim().replace(',', '.');
 						new_time_ms = (int) (new Double(data).doubleValue() * 1000);
@@ -214,21 +223,22 @@ public class CSVReaderWriter {
 							double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
 							int point = (int) dPoint;
 							if (log.isLoggable(Level.FINE)) {
-								sb.append("recordKeys[" + i + "] = ").append(recordKeys[i]).append(" = ").append(point).append(lineSep);
+								sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep);
 							}
-							recordSet.getRecord(recordKeys[i]).add(point);
-							if (log.isLoggable(Level.FINE)) log.fine("recordKeys[" + i + "] = " + recordKeys[i]);
+							recordSet.getRecord(recordNames[i]).add(point);
+							if (log.isLoggable(Level.FINE)) log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]);
 						}
 						if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 					}
+
+					// set time base in msec
+					recordSet.setTimeStep_ms(timeStep_ms);
+					recordSet.setSaved(true);
+					log.fine("timeStep_ms = " + timeStep_ms);
+					activeChannel.put(recordSetName, recordSet);
+					activeChannel.switchRecordSet(recordSetName);
+					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				}
-				// set time base in msec
-				recordSet.setTimeStep_ms(timeStep_ms);
-				recordSet.setSaved(true);
-				log.fine("timeStep_ms = " + timeStep_ms);
-				activeChannel.put(recordSetName, recordSet);
-				activeChannel.switchRecordSet(recordSetName);
-				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				reader.close();
 			}
 		}
@@ -311,7 +321,7 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
-			int recordEntries = recordSet.getRecord(recordSet.getFirstRecordName()).size();
+			int recordEntries = recordSet.getRecordDataSize();
 			double stausIncrement = recordEntries/100.0;
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
