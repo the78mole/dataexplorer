@@ -36,7 +36,6 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.device.ChannelTypes;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.ui.OpenSerialDataExplorer;
@@ -102,7 +101,7 @@ public class CSVReaderWriter {
 				String fileConfig = null;
 				
 				// check for device name and channel or configuration in first line
-				while ((line = reader.readLine()) != null && isDeviceName) {
+				while (isDeviceName && (line = reader.readLine()) != null) {
 					String activeDeviceName = application.getActiveDevice().getName();
 					String fileDeviceName = line.split("" + separator)[0].trim();
 					log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName);
@@ -111,7 +110,7 @@ public class CSVReaderWriter {
 						isDeviceName = false;
 					}
 					else {
-						throw new Exception("0"); // mismatch device name
+						throw new Exception("0" + lineSep + "erste Zeile der Datei => " + line); // mismatch device name
 					}
 
 					String activeConfig = channels.getActiveChannel().getConfigKey();
@@ -146,99 +145,99 @@ public class CSVReaderWriter {
 						}
 					}
 				} // end isDeviceName
+				log.fine("device name check ok, channel/configuration ok");
 					
-				if (activeChannel.getActiveRecordSet() != null || activeChannel.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
-					recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
-					// shorten the record set name to the allowed maximum
-					recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
+				recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
+				// shorten the record set name to the allowed maximum
+				recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
 
-					recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
+				recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 
-					String[] recordNames = recordSet.getRecordNames();
+				String[] recordNames = recordSet.getRecordNames();
 
-					//
-					while ((line = reader.readLine()) != null && !isData) {
-						// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
-						String[] header = line.split(";");
-						sizeRecords = header.length - 1;
-						int countNotMeasurement = 0;
-						for (String recordKey : recordNames) {
-							MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
-							headerStringConf.append(measurement.getName()).append(separator);
+				//
+				while (!isData && (line = reader.readLine()) != null) {
+					// second line -> Zeit [s];Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]
+					String[] header = line.split(";");
+					sizeRecords = header.length - 1;
+					int countNotMeasurement = 0;
+					for (String recordKey : recordNames) {
+						MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
+						headerStringConf.append(measurement.getName()).append(separator);
 
-							log.fine(measurement.getName() + " isCalculation = " + measurement.isCalculation());
-							if (!measurement.isCalculation()) {
-								keys.append(measurement.getName()).append(separator);
-								++countNotMeasurement; // update count for possible raw
-							}
-							if (!isRaw) // absolute
-								recordSet.get(recordKey).setDisplayable(true); // all data available 
+						log.fine(measurement.getName() + " isCalculation = " + measurement.isCalculation());
+						if (!measurement.isCalculation()) {
+							keys.append(measurement.getName()).append(separator);
+							++countNotMeasurement; // update count for possible raw
 						}
-						// for raw data check if measurements which !isCalculation match number of entries in header line
-						// first simple check, but name must not match, count only numbers
-						if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) {
-							throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
-						}
-
-						int match = 0; // check match of the measurement units, relevant for absolute import 
-						
-						if (isRaw)
-							recordNames = recordKeys = keys.toString().split("" + separator);
-						else
-							recordKeys = recordNames;
-
-						// check units for absolute (!raw) data only
-						// absolute data will not have any calculation
-						// unit for raw data might not meaningful which require some calculation to get a unit
-						if (!isRaw) {
-							StringBuilder unitCompare = new StringBuilder().append(lineSep);
-							for (int i = 1; i < header.length; i++) {
-								String recordKey = recordKeys[i - 1];
-								String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
-								String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
-								String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
-								unitCompare.append(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit).append(lineSep);
-								if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
-							}
-							log.fine(unitCompare.toString());
-							if (match != header.length - 1) {
-								throw new Exception("2" + unitCompare.toString()); // mismatch data header units
-							}
-						}
-						isData = true;
-					} // while !isData
-
-					// get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
-					while ((line = reader.readLine()) != null && isData) {
-						String[] dataStr = line.split("" + separator);
-						String data = dataStr[0].trim().replace(',', '.');
-						new_time_ms = (int) (new Double(data).doubleValue() * 1000);
-						timeStep_ms = new_time_ms - old_time_ms;
-						old_time_ms = new_time_ms;
-						if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
-						// use only measurement which are isCalculation == false
-						for (int i = 0; i < sizeRecords; i++) {
-							data = dataStr[i + 1].trim().replace(',', '.');
-							double tmpDoubleValue = new Double(data).doubleValue();
-							double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
-							int point = (int) dPoint;
-							if (log.isLoggable(Level.FINE)) {
-								sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep);
-							}
-							recordSet.getRecord(recordNames[i]).add(point);
-							if (log.isLoggable(Level.FINE)) log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]);
-						}
-						if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+						if (!isRaw) // absolute
+							recordSet.get(recordKey).setDisplayable(true); // all data available 
+					}
+					// for raw data check if measurements which !isCalculation match number of entries in header line
+					// first simple check, but name must not match, count only numbers
+					if (sizeRecords != countNotMeasurement && isRaw || sizeRecords != recordNames.length && !isRaw) {
+						throw new Exception("1" + headerStringConf.toString() + lineSep + keys.toString()); // mismatch data signature length
 					}
 
-					// set time base in msec
-					recordSet.setTimeStep_ms(timeStep_ms);
-					recordSet.setSaved(true);
-					log.fine("timeStep_ms = " + timeStep_ms);
-					activeChannel.put(recordSetName, recordSet);
-					activeChannel.switchRecordSet(recordSetName);
-					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+					int match = 0; // check match of the measurement units, relevant for absolute import 
+
+					if (isRaw)
+						recordNames = recordKeys = keys.toString().split("" + separator);
+					else
+						recordKeys = recordNames;
+
+					// check units for absolute (!raw) data only
+					// absolute data will not have any calculation
+					// unit for raw data might not meaningful which require some calculation to get a unit
+					if (!isRaw) {
+						StringBuilder unitCompare = new StringBuilder().append(lineSep);
+						for (int i = 1; i < header.length; i++) {
+							String recordKey = recordKeys[i - 1];
+							String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
+							String[] inMeasurement = header[i].trim().replace('[', ';').replace(']', ';').split(";");
+							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
+							unitCompare.append(recordKey + " inUnit = " + inUnit + " - expectUnit = " + expectUnit).append(lineSep);
+							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match;
+						}
+						log.fine(unitCompare.toString());
+						if (match != header.length - 1) {
+							throw new Exception("2" + unitCompare.toString()); // mismatch data header units
+						}
+					}
+					isData = true;
+				} // while !isData
+
+				// get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
+				while ((line = reader.readLine()) != null && isData) {
+					String[] dataStr = line.split("" + separator);
+					String data = dataStr[0].trim().replace(',', '.');
+					new_time_ms = (int) (new Double(data).doubleValue() * 1000);
+					timeStep_ms = new_time_ms - old_time_ms;
+					old_time_ms = new_time_ms;
+					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
+					// use only measurement which are isCalculation == false
+					for (int i = 0; i < sizeRecords; i++) {
+						data = dataStr[i + 1].trim().replace(',', '.');
+						double tmpDoubleValue = new Double(data).doubleValue();
+						double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
+						int point = (int) dPoint;
+						if (log.isLoggable(Level.FINE)) {
+							sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep);
+						}
+						recordSet.getRecord(recordNames[i]).add(point);
+						if (log.isLoggable(Level.FINE)) log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]);
+					}
+					if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 				}
+
+				// set time base in msec
+				recordSet.setTimeStep_ms(timeStep_ms);
+				recordSet.setSaved(true);
+				log.fine("timeStep_ms = " + timeStep_ms);
+				activeChannel.put(recordSetName, recordSet);
+				activeChannel.switchRecordSet(recordSetName);
+				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+
 				reader.close();
 			}
 		}
@@ -258,7 +257,7 @@ public class CSVReaderWriter {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			String msg = null;
 			if (e.getMessage().startsWith("0"))
-				msg = "Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät";
+				msg = "Die geöffnete CSV Datei entspricht nicht dem eingestellten Gerät" + e.getMessage().substring(1);
 			else if (e.getMessage().startsWith("1"))
 				msg = "Die geöffnete CSV Datei entspricht nicht der Messgrößensignatur des eingestellten Gerätes (vermutlich raw/absolute) :" + e.getMessage().substring(1);
 			else if (e.getMessage().startsWith("2"))
