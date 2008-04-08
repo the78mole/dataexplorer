@@ -111,7 +111,7 @@ public class MenuBar {
 			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("fileMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_3.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_3.html");
 				}
 			});
 			{
@@ -286,7 +286,7 @@ public class MenuBar {
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_31.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_31.html");
 				}
 			});
 			{
@@ -364,7 +364,7 @@ public class MenuBar {
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_32.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_32.html");
 				}
 			});
 			{
@@ -487,7 +487,7 @@ public class MenuBar {
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_33.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_33.html");
 				}
 			});
 			{
@@ -548,7 +548,7 @@ public class MenuBar {
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_34.html");
 				}
 			});
 			{
@@ -659,7 +659,7 @@ public class MenuBar {
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt);
-					MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_34.html");
+					MenuBar.this.application.openHelpDialog("", "HelpInfo_34.html");
 				}
 			});
 			{
@@ -670,7 +670,7 @@ public class MenuBar {
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo.html");
+							MenuBar.this.application.openHelpDialog("", "HelpInfo.html");
 						}
 					});
 				}

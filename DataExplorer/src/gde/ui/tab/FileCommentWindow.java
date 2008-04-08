@@ -106,7 +106,7 @@ public class FileCommentWindow {
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						log.finer("fileCommentText.helpRequested " + evt);
-						OpenSerialDataExplorer.getInstance().openHelpDialog("OpenSerialDataExplorer", "HelpInfo_10.html");
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html");
 					}
 				});
 				this.fileCommentText.addKeyListener(new KeyAdapter() {

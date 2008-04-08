@@ -152,7 +152,7 @@ public class GraphicsWindow {
 				this.curveSelector.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						log.finer("curveSelector.helpRequested " + evt);
-						GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_41.html");
+						GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_41.html");
 					}
 				});
 				{
@@ -254,9 +254,9 @@ public class GraphicsWindow {
 					public void helpRequested(HelpEvent evt) {
 						log.finer("graphicCanvas.helpRequested " + evt);
 						if(GraphicsWindow.this.type == GraphicsWindow.TYPE_NORMAL)
-							GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_4.html");
+							GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_4.html");
 						else
-							GraphicsWindow.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_9.html");
+							GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_9.html");
 					}
 				});
 				this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {

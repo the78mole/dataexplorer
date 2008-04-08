@@ -207,7 +207,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.fine("dialogShell.helpRequested, event="+evt);
-					DeviceSelectionDialog.this.application.openHelpDialog("OpenSerialDataExplorer", "HelpInfo_2.html");
+					DeviceSelectionDialog.this.application.openHelpDialog("", "HelpInfo_2.html");
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
