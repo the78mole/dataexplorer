@@ -277,7 +277,7 @@ public class SettingsDialog extends Dialog {
 					this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 					this.useGlobalSerialPort.setText(" globale serielle Port Konfiguration ");
 					this.useGlobalSerialPort.setToolTipText("Steht dieser Schalter angewählt wird Anwendungsweit nur ein serieller Port verwendet, sonst wird pro Gerät eine eigene Portkonfiguration verwendet");
-					this.useGlobalSerialPort.setBounds(15, 19, 251, 20);
+					this.useGlobalSerialPort.setBounds(15, 19, 225, 20);
 					this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
@@ -293,7 +293,7 @@ public class SettingsDialog extends Dialog {
 				}
 				{
 					this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
-					this.serialPort.setBounds(269, 19, 84, 20);
+					this.serialPort.setBounds(240, 19, 130, 20);
 					this.serialPort.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.finest("serialPort.widgetSelected, event=" + evt);
@@ -304,7 +304,7 @@ public class SettingsDialog extends Dialog {
 				{
 					this.Port = new CLabel(this.serialPortGroup, SWT.NONE);
 					this.Port.setText("serieller Port");
-					this.Port.setBounds(356, 19, 81, 22);
+					this.Port.setBounds(370, 19, 81, 22);
 				}
 			} // end serial port group
 			{ // begin logging group
