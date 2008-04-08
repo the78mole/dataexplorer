@@ -130,14 +130,11 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
 		log.fine("switching to channel " + channelNumber);		
-		Channel activeChannel = this.getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet recordSet = activeChannel.getActiveRecordSet();
-			if (recordSet != null) recordSet.reset();
+		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber()) {
 				this.setActiveChannelNumber(channelNumber);
 				this.application.getMenuToolBar().updateChannelToolItems();
-				if(recordSetKey == null || recordSetKey.length() < 1)
+				if (recordSetKey == null || recordSetKey.length() < 1)
 					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getFirstRecordSetName()); // set record set to the first
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
@@ -145,17 +142,29 @@ public class Channels extends HashMap<Integer, Channel> {
 			else {
 				log.fine("nothing to do selected channel == active channel");
 			}
-			// update viewable
-			this.application.getMenuToolBar().updateChannelSelector();
-			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			this.getActiveChannel().applyTemplate(recordSetKey); //this.application.updateGraphicsWindow();
-			this.application.updateDigitalWindow();
-			this.application.updateAnalogWindow();
-			this.application.updateCellVoltageWindow();
-			this.application.updateDataTable();
-			this.application.updateFileCommentWindow();
-			this.application.updateRecordCommentWindow();
+			Channel activeChannel = this.getActiveChannel();
+			if (activeChannel != null) {
+				RecordSet recordSet = activeChannel.getActiveRecordSet();
+				if (recordSet != null) recordSet.reset();
+				// update viewable
+				this.application.getMenuToolBar().updateChannelSelector();
+				this.application.getMenuToolBar().updateRecordSetSelectCombo();
+
+				if (recordSetKey == null || recordSetKey.length() > 1)
+					this.getActiveChannel().applyTemplate(recordSetKey);
+				else
+					this.application.updateGraphicsWindow();
+
+				this.application.updateDigitalWindow();
+				this.application.updateAnalogWindow();
+				this.application.updateCellVoltageWindow();
+				this.application.updateDataTable();
+				this.application.updateFileCommentWindow();
+				this.application.updateRecordCommentWindow();
+			}
 		}
+		else
+			this.application.openMessageDialogAsync("Gewählte Kanal/Konfiguration ungültig für das aktive Gerät !");
 	}
 
 	/**
