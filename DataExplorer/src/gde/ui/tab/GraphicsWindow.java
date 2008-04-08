@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -411,7 +412,7 @@ public class GraphicsWindow {
 		// prepare grid lines
 		this.offSetX = x0;
 		this.offSetY = y0-height;
-		int[] dash = {10, 10};
+		int[] dash = Settings.getInstance().getGridDashStyle();
 		
 		// check for activated time grid
 		if (recordSet.getTimeGridType() > 0) 
@@ -466,6 +467,7 @@ public class GraphicsWindow {
 	 * @param dash to be used for the custom line style
 	 */
 	private void drawCurveGrid(RecordSet recordSet, GC gc, int useOffSetY, int width, int[] dash) {
+		gc.setLineWidth(1);
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
@@ -485,6 +487,7 @@ public class GraphicsWindow {
 	 * @param dash to be used for the custom line style
 	 */
 	public void drawTimeGrid(RecordSet recordSet, GC gc, int useOffSetX, int height, int[] dash) {
+		gc.setLineWidth(1);
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getColorTimeGrid());
