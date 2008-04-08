@@ -217,11 +217,11 @@ public class Record extends Vector<Integer> {
 	}
 
 	public int getMaxValue() {
-			return this.maxValue;
+			return this.maxValue == this.minValue ? this.maxValue + 100 : this.maxValue;
 	}
 
 	public int getMinValue() {
-			return this.minValue;
+			return this.minValue == this.maxValue ? this.minValue - 100 : this.minValue;
 	}
 
 	/**
