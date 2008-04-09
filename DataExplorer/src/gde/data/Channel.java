@@ -230,9 +230,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				record.setPositionLeft(new Boolean(this.template.getProperty(recordName + Record.IS_POSITION_LEFT, "true")).booleanValue());
 				int r, g, b;
 				String color = this.template.getProperty(recordName + Record.COLOR, "128,128,255");
-				r = new Integer(color.split(",")[0]).intValue();
-				g = new Integer(color.split(",")[1]).intValue();
-				b = new Integer(color.split(",")[2]).intValue();
+				r = new Integer(color.split(",")[0].trim()).intValue();
+				g = new Integer(color.split(",")[1].trim()).intValue();
+				b = new Integer(color.split(",")[2].trim()).intValue();
 				record.setColor(SWTResourceManager.getColor(r, g, b));
 				record.setLineWidth(new Integer(this.template.getProperty(recordName + Record.LINE_WITH, "1")).intValue());
 				record.setLineStyle(new Integer(this.template.getProperty(recordName + Record.LINE_STYLE, "" + SWT.LINE_SOLID)).intValue());
@@ -243,17 +243,17 @@ public class Channel extends HashMap<String, RecordSet> {
 				record.setNumberFormat(new Integer(this.template.getProperty(recordName + Record.NUMBER_FORMAT, "1")).intValue());
 				// time grid
 				color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128");
-				r = new Integer(color.split(",")[0]).intValue();
-				g = new Integer(color.split(",")[1]).intValue();
-				b = new Integer(color.split(",")[2]).intValue();
+				r = new Integer(color.split(",")[0].trim()).intValue();
+				g = new Integer(color.split(",")[1].trim()).intValue();
+				b = new Integer(color.split(",")[2].trim()).intValue();
 				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setTimeGridLineStyle(new Integer(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, "" + SWT.LINE_DOT)).intValue());
 				recordSet.setTimeGridType(new Integer(this.template.getProperty(RecordSet.TIME_GRID_STATE, "0")).intValue());
 				// curve grid
 				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128");
-				r = new Integer(color.split(",")[0]).intValue();
-				g = new Integer(color.split(",")[1]).intValue();
-				b = new Integer(color.split(",")[2]).intValue();
+				r = new Integer(color.split(",")[0].trim()).intValue();
+				g = new Integer(color.split(",")[1].trim()).intValue();
+				b = new Integer(color.split(",")[2].trim()).intValue();
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYSLE, "" + SWT.LINE_DOT)).intValue());
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_STATE, "0")).intValue());

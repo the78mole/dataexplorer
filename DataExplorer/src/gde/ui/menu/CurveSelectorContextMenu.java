@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -59,12 +60,14 @@ public class CurveSelectorContextMenu {
 
 	RecordSet											recordSet;
 	final OpenSerialDataExplorer	application;
+	final Settings								settings = Settings.getInstance();
 	AxisEndValuesDialog						axisEndValuesDialog;
 	
 	TableItem 										selectedItem;
-	private boolean 											isRecordVisible = false;
+	boolean 											isRecordVisible = false;
 	String 												recordNameKey = " ";
 	String 												recordNameMeasurement = " ";
+	int 													windowType = GraphicsWindow.TYPE_NORMAL;
 
 	public CurveSelectorContextMenu() {
 		super();
@@ -80,8 +83,8 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
-						int type = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-						CurveSelectorContextMenu.this.recordSet = (type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
+						CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
+						CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
 
 						if (CurveSelectorContextMenu.this.recordSet != null) {
 							setAllEnabled(true);						
@@ -108,7 +111,7 @@ public class CurveSelectorContextMenu {
 								CurveSelectorContextMenu.this.axisEndValues.setText("Achsen-Endwerte");
 							}
 														
-							if (type == GraphicsWindow.TYPE_COMPARE){
+							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 								CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 							}
 							
@@ -650,6 +653,9 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_NONE);
+						}
 					}
 				}
 			});
@@ -661,6 +667,9 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MAIN);
+						}
 					}
 				}
 			});
@@ -672,6 +681,9 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MOD60);
+						}
 					}
 				}
 			});
@@ -685,6 +697,9 @@ public class CurveSelectorContextMenu {
 						if (rgb != null) {
 							CurveSelectorContextMenu.this.recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+								CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							}
 						}
 					}
 				}
@@ -750,6 +765,9 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
+						}
 					}
 				}
 			});
@@ -763,6 +781,9 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
+						}
 					}
 				}
 			});
@@ -776,6 +797,9 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
+						}
 					}
 				}
 			});
@@ -790,6 +814,10 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+							
+							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+								CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							}
 						}
 					}
 				}
@@ -904,6 +932,14 @@ public class CurveSelectorContextMenu {
 							newRecord.setChannelConfigKey(oldRecord.getChannelConfigKey());
 							newRecord.setName(newRecordkey);
 							newRecord.setVisible(true); // if a non visible record added
+							
+							if (compareSet.size() == 1) {	//set grid line mode and color from settings (previous compare behavior)
+								compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
+								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
+								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
+								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
+								compareSet.setHorizontalGridRecordKey(newRecordkey);
+							}
 							int maxRecordSize = compareSet.getMaxSize();
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
