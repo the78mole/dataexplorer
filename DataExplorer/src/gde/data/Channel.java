@@ -345,6 +345,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
 			activeChannel.applyTemplate(recordSetKey); // updates graphics window
+			recordSet.reset();
+			this.application.resetGraphicsWindowZoomAndMeasurement();
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();

@@ -372,7 +372,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int byteCounter = this.numBytesAvailable;
 		Thread.sleep(15);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			Thread.sleep(0, 10); // 10 ns
+			Thread.sleep(2); // 2 ms
 
 			if (byteCounter == this.numBytesAvailable)
 				--stableCounter;

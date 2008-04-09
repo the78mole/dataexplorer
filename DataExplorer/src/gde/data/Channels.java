@@ -146,6 +146,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
 				if (recordSet != null) recordSet.reset();
+				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();

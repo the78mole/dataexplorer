@@ -357,7 +357,7 @@ public class GraphicsWindow {
 		}
 		if (recordSet.isCompareSet()) {
 			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
-			if (numberCurvesLeft == 0) numberCurvesRight = numberCurvesRight > 0 ? 1 : 0;
+			numberCurvesRight = numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
 		log.fine("nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight);
 
@@ -801,13 +801,13 @@ public class GraphicsWindow {
 		int maxX = this.curveAreaBounds.width - 1;
 		int minY = 0;
 		int maxY = this.curveAreaBounds.height - 1;
-		if (tmpxPos < minX || xPos > maxX) {
+		if (tmpxPos < minX || tmpxPos > maxX) {
 			tmpxPos = tmpxPos < minX ? minX : maxX;
 		}
-		if (tmpyPos < minY || yPos > maxY) {
+		if (tmpyPos < minY || tmpyPos > maxY) {
 			tmpyPos = tmpyPos < minY ? minY : maxY;
 		}
-		if(log.isLoggable(Level.FINER)) log.finer("out xPos = " + xPos + " yPos = " + yPos);
+		if(log.isLoggable(Level.FINER)) log.finer("out xPos = " + tmpxPos + " yPos = " + tmpyPos);
 		return new Point(tmpxPos, tmpyPos);
 	}
 

@@ -792,4 +792,14 @@ public class MenuBar {
 	public void setRecordCommentMenuItemSelection(boolean selected) {
 		this.recordCommentMenuItem.setSelection(selected);
 	}
+	
+	/**
+	 * set the state of device switch menu
+	 * @param enabled
+	 */
+	public void enableDeviceSwitchButtons(boolean enabled) {
+		this.prevDeviceMenuItem.setEnabled(enabled);
+		this.nextDeviceMenuItem.setEnabled(enabled);
+	}
+
 }

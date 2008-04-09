@@ -164,7 +164,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				if (files[i].endsWith(".xml")) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
 					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + fileSep + files[i]);
-					if (devConfig.getName().equals(this.activeDeviceName)) { // define the active device after re-start
+					if (devConfig.getName().equals(this.activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
 						this.selectedActiveDeviceConfig = devConfig;
 					}
 					// add the active once into the active device vector
@@ -188,6 +188,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
+		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 
 	public void open() {
@@ -454,8 +455,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.this.portDescription.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setItems(DeviceSelectionDialog.this.availablePorts.toArray(new String[DeviceSelectionDialog.this.availablePorts.size()]));
-											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
-											DeviceSelectionDialog.this.portSelectCombo.select(index != -1 ? index : 0);
+											int portIndex = 0;
+											if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0)
+												portIndex = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
+											DeviceSelectionDialog.this.portSelectCombo.select(portIndex);
 										}
 									}
 								});
@@ -792,6 +795,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.deviceSlider.setMaximum(this.activeDevices.size());
 			this.deviceSlider.setSelection(this.activeDevices.indexOf(this.activeDeviceName));
 			log.fine("activeDevices.size() " + this.activeDevices.size());
+			if (this.activeDevices.size() > 1) 	this.application.enableDeviceSwitchButtons(true);
+			else																this.application.enableDeviceSwitchButtons(false);
+
 		}
 		else { // no active device
 			this.selectedActiveDeviceConfig = null;
@@ -1032,6 +1038,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		};
 		this.listPortsThread.start();
 
+	}
+	
+	/**
+	 * query the number of configured active devices 
+	 * @return number of active devices
+	 */
+	public int getNumberOfActiveDevices() {
+		return this.activeDevices.size();
 	}
 }
 
