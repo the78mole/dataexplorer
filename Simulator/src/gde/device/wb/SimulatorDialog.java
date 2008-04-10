@@ -270,6 +270,7 @@ public class SimulatorDialog extends DeviceDialog {
 					});
 				}
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt);
 						//TODO check if some thing to do before exiting
@@ -278,14 +279,14 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						System.out.println("dialogShell.keyReleased, event=" + evt);
+						log.fine("dialogShell.keyReleased, event=" + evt);
 						//TODO add your code for dialogShell.keyReleased
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						System.out.println("dialogShell.helpRequested, event=" + evt);
-						//TODO add your code for dialogShell.helpRequested
+						log.fine("dialogShell.helpRequested, event=" + evt);
+						SimulatorDialog.this.application.openHelpDialog("Simulator", "HelpInfo.html");
 					}
 				});
 				{
