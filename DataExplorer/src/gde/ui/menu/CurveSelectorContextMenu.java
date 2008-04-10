@@ -110,6 +110,14 @@ public class CurveSelectorContextMenu {
 								CurveSelectorContextMenu.this.axisEndValues.setEnabled(true);
 								CurveSelectorContextMenu.this.axisEndValues.setText("Achsen-Endwerte");
 							}
+							
+							// check if record switched and measurement mode needs to be reset
+							if (!CurveSelectorContextMenu.this.recordSet.isMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement) && !CurveSelectorContextMenu.this.recordSet.isDeltaMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)) {
+								CurveSelectorContextMenu.this.recordNameMeasurement = " ";
+								CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
+								CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
+
+							}
 														
 							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 								CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);

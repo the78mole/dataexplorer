@@ -818,9 +818,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
 	public void setZoomMode(boolean zoomModeEnabled) {
-		if (zoomModeEnabled) {
-			this.recordZoomOffset = 0;
-			
+		this.recordZoomOffset = 0;
+		if (zoomModeEnabled) {			
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				this.recordZoomSize = this.isCompareSet ? this.getMaxSize() : this.get(this.recordNames[0]).realSize();
 				// iterate children and reset min/max values

@@ -142,7 +142,13 @@ public class Channel extends HashMap<String, RecordSet> {
 		return this.keySet().toArray( new String[1]);
 	}
 
+	/**
+	 * query the first record set name, in case of ChannelTypes.TYPE_CONFIG the first entry of keySet might returned
+	 */ 
 	public String getFirstRecordSetName() {
+		if (this.type == ChannelTypes.TYPE_CONFIG.ordinal() && this.keySet() != null)
+			return this.keySet().toArray(new String[1])[0];
+		
 		return this.getRecordSetNames()[0];
 	}
 	
@@ -344,9 +350,9 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
-			activeChannel.applyTemplate(recordSetKey); // updates graphics window
 			recordSet.reset();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
+			activeChannel.applyTemplate(recordSetKey); // updates graphics window
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
