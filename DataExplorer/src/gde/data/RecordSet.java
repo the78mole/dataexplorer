@@ -427,7 +427,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.maxSize = 0;
 		this.maxValue = -20000;
 		this.minValue = 20000;
-		this.reset();
+		this.resetZoomAndMeasurement();
 	}
 
 	public String getName() {
@@ -818,8 +818,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
 	public void setZoomMode(boolean zoomModeEnabled) {
-		this.recordZoomOffset = 0;
-		if (zoomModeEnabled) {			
+		if (!this.isZoomMode) {			
+			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				this.recordZoomSize = this.isCompareSet ? this.getMaxSize() : this.get(this.recordNames[0]).realSize();
 				// iterate children and reset min/max values
@@ -829,14 +829,25 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 		}
+		if (!zoomModeEnabled) { // reset
+			this.recordZoomOffset = 0;
+		}
 		this.isZoomMode = zoomModeEnabled;
 	}
 
 	/**
 	 * reset the record set in viewpoint of measurement and zooming
 	 */
-	public void reset() {
+	public void resetZoomAndMeasurement() {
 		this.setZoomMode(false);
+		this.setMeasurementMode(this.recordKeyMeasurement, false);
+		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
+	}
+
+	/**
+	 * reset the record set in viewpoint of measurement
+	 */
+	public void resetMeasurement() {
 		this.setMeasurementMode(this.recordKeyMeasurement, false);
 		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
 	}

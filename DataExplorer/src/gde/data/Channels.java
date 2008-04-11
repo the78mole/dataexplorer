@@ -118,7 +118,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public synchronized void switchChannel(String channelName) {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) recordSet.reset();
+		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 		
 		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue(), "");
 	}
@@ -145,7 +145,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
-				if (recordSet != null) recordSet.reset();
+				if (recordSet != null) recordSet.resetZoomAndMeasurement();
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
 				this.application.getMenuToolBar().updateChannelSelector();

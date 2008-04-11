@@ -785,6 +785,7 @@ public class GraphicsWindow {
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
 			this.application.setStatusMessage("");
+			this.redrawGraphics();
 			break;
 		}
 	}

@@ -337,7 +337,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	void updateForSwitchRecordSet(final Channel activeChannel, final String recordSetKey) {
 		//reset old record set before switching
 		RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
-		if (oldRecordSet != null) oldRecordSet.reset();
+		if (oldRecordSet != null) oldRecordSet.resetZoomAndMeasurement();
 
 		RecordSet recordSet = activeChannel.get(recordSetKey);
 		if (recordSet == null) { //activeChannel do not have this record set, try to switch
@@ -350,7 +350,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
-			recordSet.reset();
+			recordSet.resetZoomAndMeasurement();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
 			activeChannel.applyTemplate(recordSetKey); // updates graphics window
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
