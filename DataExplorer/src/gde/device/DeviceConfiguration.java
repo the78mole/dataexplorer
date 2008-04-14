@@ -448,6 +448,13 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * @return the channel measurements by given channel configuration key (name)
+	 */
+	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey) {
+		return this.getChannel(channelConfigKey).getMeasurement();
+	}
+	
+	/**
 	 * @return the number of measurements of a channel by given channel number
 	 */
 	public int getNumberOfMeasurements(int channelNumber) {
