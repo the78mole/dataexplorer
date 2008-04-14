@@ -199,7 +199,15 @@ public interface IDevice {
 	 */
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey);
 
-		/**
+	/**
+	 * get the properties from a channel/configuration and record key name 
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return
+	 */
+	public List<PropertyType> getProperties(String channelConfigKey, String measurementKey);
+
+	/**
 	 * @return the number of measurements of a channel, assume channels have different number of measurements
 	 */
 	public int getNumberOfMeasurements(String channelConfigKey);

@@ -192,6 +192,7 @@ public class RecordSet extends HashMap<String, Record> {
 			Record tmpRecord = this.get(recordKey);
 			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
+			tmpRecord.replaceProperties(tmpRecord.getDevice().getProperties(newChannelConfiguration, recordKey));
 		}
 		
 		// check if there is a miss match of measurement names and correction required
@@ -248,10 +249,10 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * overwritten clone method used to move record sets to other configuration or channel
-	 * @param newChannelName according the new configuration
+	 * @param newChannelConfiguration 
 	 */
-	public RecordSet clone(String newChannelName) {
-		return new RecordSet(this, newChannelName);
+	public RecordSet clone(String newChannelConfiguration) {
+		return new RecordSet(this, newChannelConfiguration);
 	}
 
 	/**

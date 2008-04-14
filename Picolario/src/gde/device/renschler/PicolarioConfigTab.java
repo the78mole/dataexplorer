@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Label;
 
 import osde.data.Channel;
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DataTypes;
 import osde.device.IDevice;
@@ -69,7 +70,9 @@ public class PicolarioConfigTab extends Composite {
 	CLabel												calculationTypeLabel;
 	CCombo												slopeCalculationTypeCombo;
 	CCombo												regressionTime;
+	Button 												makePersitentButton;
 
+	boolean												isConfigChanged 			= false;
 	String												heightDataUnit				= "m";																									// Meter is default
 	boolean												doNoAdation						= false;
 	boolean												doHeightAdaption			= false;																								// indicates to adapt height values
@@ -105,7 +108,7 @@ public class PicolarioConfigTab extends Composite {
 		try {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
-			this.setSize(310, 180);
+			this.setSize(310, 210);
 			{
 				this.setLayout(null);
 				FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -127,6 +130,8 @@ public class PicolarioConfigTab extends Composite {
 							PicolarioConfigTab.this.slopeUnit.setText("[" + PicolarioConfigTab.this.slopeDataUnit + "]");
 							PicolarioConfigTab.this.regressionTime.select(PicolarioConfigTab.this.slopeTimeSelection - 1);
 							PicolarioConfigTab.this.slopeCalculationTypeCombo.select(PicolarioConfigTab.this.slopeTypeSelection.equals(CalculationThread.REGRESSION_TYPE_CURVE) ? 1 : 0);
+							
+							PicolarioConfigTab.this.makePersitentButton.setEnabled(PicolarioConfigTab.this.isConfigChanged);
 						}
 					});
 					{
@@ -145,23 +150,10 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractFirst = false;
 								PicolarioConfigTab.this.doSubtractLast = false;
 								PicolarioConfigTab.this.doOffsetHeight = false;
-
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doNoAdation);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractFirst);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractLast);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doOffsetHeight);
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
 								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE,
-										PicolarioConfigTab.this.heightOffsetValue);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								PicolarioConfigTab.this.application.updateGraphicsWindow();
+
+								updateRecordProperties();
 							}
 						});
 					}
@@ -182,19 +174,10 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractFirst = true;
 								PicolarioConfigTab.this.doSubtractLast = false;
 								PicolarioConfigTab.this.doOffsetHeight = false;
-
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN, false);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, true);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN, false);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN, false);
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
 								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE,
-										PicolarioConfigTab.this.heightOffsetValue);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								PicolarioConfigTab.this.application.updateGraphicsWindow();
+
+								updateRecordProperties();
 							}
 						});
 					}
@@ -214,23 +197,10 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractFirst = false;
 								PicolarioConfigTab.this.doSubtractLast = true;
 								PicolarioConfigTab.this.doOffsetHeight = false;
-
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doNoAdation);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractFirst);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractLast);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doOffsetHeight);
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
 								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE,
-										PicolarioConfigTab.this.heightOffsetValue);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								PicolarioConfigTab.this.application.updateGraphicsWindow();
+
+								updateRecordProperties();
 							}
 						});
 					}
@@ -253,20 +223,7 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractLast = false;
 								PicolarioConfigTab.this.heightOffsetValue = new Double(PicolarioConfigTab.this.heightOffset.getText()).doubleValue();
 
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doNoAdation);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractFirst);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doSubtractLast);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,
-										PicolarioConfigTab.this.doOffsetHeight);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE,
-										PicolarioConfigTab.this.heightOffsetValue);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								PicolarioConfigTab.this.application.updateGraphicsWindow();
+								updateRecordProperties();
 							}
 						});
 					}
@@ -285,12 +242,17 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.log.finest("heightOffset.widgetSelected, event=" + evt);
 								PicolarioConfigTab.this.heightOffsetValue = new Double(heightOffsetValues[PicolarioConfigTab.this.heightOffset.getSelectionIndex()]).doubleValue();
 
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-								MeasurementType measurement = PicolarioConfigTab.this.device.getMeasurement(PicolarioConfigTab.this.configName, measurementKey);
-								measurement.setOffset(PicolarioConfigTab.this.heightOffsetValue);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								PicolarioConfigTab.this.application.updateGraphicsWindow();
+								Channel activeChannel = Channels.getInstance().getActiveChannel();
+								if (activeChannel != null) {
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									if (activeRecordSet != null) {
+										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+										Record activeRecord = activeRecordSet.get(measurementKey);
+										activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
+										PicolarioConfigTab.this.application.updateGraphicsWindow();
+									}
+								}
+								PicolarioConfigTab.this.isConfigChanged = true;
 							}
 						});
 						this.heightOffset.addKeyListener(new KeyAdapter() {
@@ -302,17 +264,22 @@ public class PicolarioConfigTab extends Composite {
 									try {
 										PicolarioConfigTab.this.heightOffsetValue = new Double(PicolarioConfigTab.this.heightOffset.getText().replace(',', '.')).doubleValue();
 
-										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
-										MeasurementType measurement = PicolarioConfigTab.this.device.getMeasurement(PicolarioConfigTab.this.configName, measurementKey);
-										measurement.setOffset(PicolarioConfigTab.this.heightOffsetValue);
-										PicolarioConfigTab.this.device.setChangePropery(true);
-										PicolarioConfigTab.this.device.storeDeviceProperties();
-										PicolarioConfigTab.this.application.updateGraphicsWindow();
+										Channel activeChannel = Channels.getInstance().getActiveChannel();
+										if (activeChannel != null) {
+											RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+											if (activeRecordSet != null) {
+												String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+												Record activeRecord = activeRecordSet.get(measurementKey);
+												activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
+												PicolarioConfigTab.this.application.updateGraphicsWindow();
+											}
+										}
 									}
 									catch (NumberFormatException e) {
 										PicolarioConfigTab.log.log(Level.WARNING, e.getMessage(), e);
 										PicolarioConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getMessage());
 									}
+									PicolarioConfigTab.this.isConfigChanged = true;
 								}
 							}
 						});
@@ -338,6 +305,11 @@ public class PicolarioConfigTab extends Composite {
 						this.slopeName.setText("Steigung");
 					}
 					{
+						this.slopeUnit = new CLabel(this.heightAdaptionGroup, SWT.NONE);
+						this.slopeUnit.setBounds(90, 127, 60, 20);
+						this.slopeUnit.setText("[m/s]");
+					}
+					{
 						this.slopeCalculationTypeCombo = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.slopeCalculationTypeCombo.setBounds(140, 151, 97, 20);
 						this.slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE });
@@ -351,14 +323,18 @@ public class PicolarioConfigTab extends Composite {
 								else
 									PicolarioConfigTab.this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_LINEAR;
 
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING,
-										PicolarioConfigTab.this.slopeTypeSelection);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
-								RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-								activeRecordSet.get(measurementKey).setDisplayable(false);
-								PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
+								Channel activeChannel = Channels.getInstance().getActiveChannel();
+								if (activeChannel != null) {
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									if (activeRecordSet != null) {
+										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
+										Record activeRecord = activeRecordSet.get(measurementKey);
+										activeRecord.getProperty(CalculationThread.REGRESSION_TYPE).setValue(PicolarioConfigTab.this.slopeTypeSelection);
+										activeRecord.setDisplayable(false);
+										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
+									}
+								}
+								PicolarioConfigTab.this.isConfigChanged = true;
 							}
 						});
 					}
@@ -374,26 +350,47 @@ public class PicolarioConfigTab extends Composite {
 								if (PicolarioConfigTab.log.isLoggable(Level.FINEST)) PicolarioConfigTab.log.finest("regressionTime.widgetSelected, event=" + evt);
 								PicolarioConfigTab.this.slopeTimeSelection = PicolarioConfigTab.this.regressionTime.getSelectionIndex() + 1;
 
-								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER,
-										PicolarioConfigTab.this.slopeTimeSelection);
-								PicolarioConfigTab.this.device.setChangePropery(true);
-								PicolarioConfigTab.this.device.storeDeviceProperties();
 								Channel activeChannel = Channels.getInstance().getActiveChannel();
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null) {
-										activeRecordSet.get(measurementKey).setDisplayable(false);
+										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
+										Record activeRecord = activeRecordSet.get(measurementKey);
+										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection);
+										activeRecord.setDisplayable(false);
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 									}
 								}
+								PicolarioConfigTab.this.isConfigChanged = true;
 							}
 						});
 					}
 					{
-						this.slopeUnit = new CLabel(this.heightAdaptionGroup, SWT.NONE);
-						this.slopeUnit.setBounds(90, 130, 60, 20);
-						this.slopeUnit.setText("[m/s]");
+						this.makePersitentButton = new Button(this.heightAdaptionGroup, SWT.PUSH | SWT.CENTER);
+						this.makePersitentButton.setBounds(10, 177, 295, 25);
+						this.makePersitentButton.setText("Einstellungen als Vorgabe übernehmen");
+						this.makePersitentButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								log.finest("makePersitentButton.widgetSelected, event=" + evt);
+								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doNoAdation);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractFirst);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doSubtractLast);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doOffsetHeight);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, IDevice.OFFSET, DataTypes.DOUBLE, PicolarioConfigTab.this.heightOffsetValue);
+
+								measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING,	PicolarioConfigTab.this.slopeTypeSelection);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, PicolarioConfigTab.this.slopeTimeSelection);
+								
+								PicolarioConfigTab.this.device.setChangePropery(true);
+								PicolarioConfigTab.this.device.storeDeviceProperties();
+								
+								PicolarioConfigTab.this.isConfigChanged = false;
+								PicolarioConfigTab.this.makePersitentButton.setEnabled(PicolarioConfigTab.this.isConfigChanged);
+							}
+						});
 					}
 				}
 
@@ -511,6 +508,28 @@ public class PicolarioConfigTab extends Composite {
 	 */
 	public String getHeightDataUnit() {
 		return this.heightDataUnit;
+	}
+
+	/**
+	 * updates record internal properties and redraw the graphics
+	 */
+	void updateRecordProperties() {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+				Record activeRecord = activeRecordSet.get(measurementKey);
+				activeRecord.getProperty(Picolario.DO_NO_ADAPTION).setValue(""+PicolarioConfigTab.this.doNoAdation);
+				activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST).setValue(""+PicolarioConfigTab.this.doSubtractFirst);
+				activeRecord.getProperty(Picolario.DO_SUBTRACT_LAST).setValue(""+PicolarioConfigTab.this.doSubtractLast);
+				activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT).setValue(""+PicolarioConfigTab.this.doOffsetHeight);
+				activeRecord.getProperty(IDevice.OFFSET).setValue(""+PicolarioConfigTab.this.heightOffsetValue);
+				PicolarioConfigTab.this.application.updateGraphicsWindow();
+			}
+		}
+		this.isConfigChanged = true;
+		this.makePersitentButton.setEnabled(this.isConfigChanged);
 	}
 
 }

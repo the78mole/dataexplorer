@@ -515,6 +515,16 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * get the properties from a channel/configuration and record key name 
+	 * @param channelConfigKey
+	 * @param measurementKey
+	 * @return
+	 */
+	public List<PropertyType> getProperties(String channelConfigKey, String measurementKey) {
+		return this.getMeasurement(channelConfigKey, measurementKey).getProperty();
+	}
+	
+	/**
 	 * set new name of specified measurement
 	 * @param channelConfigKey
 	 * @param measurementKey

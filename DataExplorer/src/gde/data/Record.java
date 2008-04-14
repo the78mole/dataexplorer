@@ -28,7 +28,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import osde.device.DataTypes;
 import osde.device.IDevice;
+import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -199,7 +201,18 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * get property with given property type key (IDevice.OFFSET, ...)
+	 * replace the properties to enable channel/configuration switch
+	 * @param newProperties
+	 */
+	public void replaceProperties(List<PropertyType> newProperties) {
+		this.properties = new ArrayList<PropertyType>();
+		for (PropertyType property : newProperties) {
+			this.properties.add(property.clone());
+		}
+	}
+	
+	/**
+	 * get property reference using given property type key (IDevice.OFFSET, ...)
 	 * @param propertyKey
 	 * @return PropertyType
 	 */
@@ -213,6 +226,21 @@ public class Record extends Vector<Integer> {
 		}
 		return property;
 	}
+	
+	/**
+	 * create a property and return the reference
+	 * @param propertyKey
+	 * @param type
+	 * @return created property with associated propertyKey
+	 */
+	private PropertyType createProperty(String propertyKey, DataTypes type, Object value) {
+		ObjectFactory factory = new ObjectFactory();
+		PropertyType newProperty = factory.createPropertyType();
+		newProperty.setName(propertyKey);
+		newProperty.setType(type);
+		newProperty.setValue("" + value);
+		return newProperty;
+	}
 
 	public double getFactor() {
 		double value = 1.0;
@@ -222,12 +250,28 @@ public class Record extends Vector<Integer> {
 		return value;
 	}
 
+	public void setFactor(double newValue) {
+		PropertyType property = this.getProperty(IDevice.FACTOR);
+		if (property != null)
+			property.setValue(String.format("%.4f", newValue));
+		else
+			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format("%.4f", newValue)));
+	}
+
 	public double getOffset() {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		return value;
+	}
+	
+	public void setOffset(double newValue) {
+		PropertyType property = this.getProperty(IDevice.OFFSET);
+		if (property != null)
+			property.setValue(String.format("%.4f", newValue));
+		else
+			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format("%.4f", newValue)));
 	}
 
 	public double getReduction() {
@@ -238,6 +282,14 @@ public class Record extends Vector<Integer> {
 		return value;
 	}
 	
+	public void setReduction(double newValue) {
+		PropertyType property = this.getProperty(IDevice.REDUCTION);
+		if (property != null)
+			property.setValue(String.format("%.4f", newValue));
+		else
+			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format("%.4f", newValue)));
+	}
+
 	public boolean isVisible() {
 		return this.isVisible;
 	}
