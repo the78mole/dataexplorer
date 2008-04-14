@@ -100,7 +100,7 @@ public class DataGathererThread extends Thread {
 					recordSet.addPoints(points, false);
 				}
 				// start slope calculation
-				PropertyType property = this.device.getMeasruementProperty(this.configKey, measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
+				PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				this.calculationThread.start();

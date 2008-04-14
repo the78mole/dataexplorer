@@ -338,11 +338,11 @@ public class CSVReaderWriter {
 							if (record.getParent().isRaw())
 								sb.append(df3.format(new Double(record.get(i))/1000.0).replace('.', decimalSeparator)).append(separator);
 							else
-								sb.append(df3.format(device.reverseTranslateValue(recordSet.getChannelName(), record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+								sb.append(df3.format(device.reverseTranslateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(recordSet.getChannelName(), record.getName(), record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+						sb.append(df3.format(device.translateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben");

@@ -827,7 +827,6 @@ public class GraphicsWindow {
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
 			if (recordSet != null && this.curveArea != null) {
-				String configKey = recordSet.getChannelName();
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
@@ -939,9 +938,9 @@ public class GraphicsWindow {
 
 							StringBuilder sb = new StringBuilder();
 							sb.append(" ").append(record.getName()).append(" (delta) = ").append(record.getDisplayDeltaValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds)).append(" ").append(
-									record.getDevice().getMeasurementUnit(configKey, measureRecordKey));
+									record.getUnit());
 							sb.append(" ===> ").append(record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds)).append(" ").append(
-									record.getDevice().getMeasurementUnit(configKey, measureRecordKey)).append("/sec");
+									record.getUnit()).append("/sec");
 							this.application.setStatusMessage(sb.toString());
 						}
 						else if (this.isPanMouse) {

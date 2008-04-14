@@ -76,8 +76,8 @@ public class CurveUtils {
 			yMinValueDisplay = record.getMinScaleValue();
 			yMaxValueDisplay = record.getMaxScaleValue();
 			if (isRaw) {
-				yMinValue = device.reverseTranslateValue(channelConfigKey, recordName, yMinValueDisplay);
-				yMaxValue = device.reverseTranslateValue(channelConfigKey, recordName, yMaxValueDisplay);
+				yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
+				yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
 			}
 			else {
 				yMinValue = yMinValueDisplay;
@@ -89,8 +89,8 @@ public class CurveUtils {
 		else {
 			// TODO exclude imported data where values don't need correction
 			if (device != null && isRaw) { // adapt to device specific range
-				yMinValueDisplay = device.translateValue(channelConfigKey, recordName, yMinValue);
-				yMaxValueDisplay = device.translateValue(channelConfigKey, recordName, yMaxValue);
+				yMinValueDisplay = device.translateValue(record, yMinValue);
+				yMaxValueDisplay = device.translateValue(record, yMaxValue);
 			}
 
 			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling alogorithm
@@ -98,8 +98,8 @@ public class CurveUtils {
 				yMinValueDisplay = roundValues[0]; // min
 				yMaxValueDisplay = roundValues[1]; // max
 				if (isRaw) {
-					yMinValue = device.reverseTranslateValue(channelConfigKey, recordName, yMinValueDisplay);
-					yMaxValue = device.reverseTranslateValue(channelConfigKey, recordName, yMaxValueDisplay);
+					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
+					yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
 				}
 				else {
 					yMinValue = yMinValueDisplay;
@@ -116,8 +116,7 @@ public class CurveUtils {
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
 		if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
-		String measurementUnit = device != null ? device.getMeasurementUnit(channelConfigKey, recordName) : "?";
-		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + measurementUnit + "]";
+		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + record.getUnit() + "]";
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));

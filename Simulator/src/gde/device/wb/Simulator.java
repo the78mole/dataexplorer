@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
@@ -66,8 +67,8 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = this.getMeasurementOffset(channelConfigKey, recordKey) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
+	public double translateValue(Record record, double value) {
+		double newValues = record.getOffset() * 1000.0 + record.getFactor() * value;
 		Simulator.log.fine("newValue = " + newValues);
 		// do some calculation
 		return newValues;
@@ -78,8 +79,8 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - this.getMeasurementOffset(channelConfigKey, recordKey);
+	public double reverseTranslateValue(Record record, double value) {
+		double newValues = value / record.getFactor() - record.getOffset() * 1000.0;
 		// do some calculation
 		return newValues;
 	}

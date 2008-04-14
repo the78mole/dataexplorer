@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
@@ -79,19 +80,20 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", recordKey, value));
+	public double translateValue(Record record, double value) {
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
-		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
-		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
-		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
+		String[] measurements = this.getMeasurementNames(record.getParent().getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		String recordKey = record.getName();
+		double offset = record.getOffset(); // != 0 if curve has an defined offset
+		double reduction = record.getReduction();
+		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		// height calculation need special procedure
 		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
-			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
+			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
+			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
 			if (subtractFirst) {
@@ -112,9 +114,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				reduction = 0;
 		}
 
-		// slope calculation needs height factor
+		// slope calculation needs height factor for calculation
 		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]);
+			factor = this.getMeasurementFactor(record.getParent().getChannelName(), measurements[1]);
 		}
 
 		double newValue = offset + (value - reduction) * factor;
@@ -127,19 +129,20 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented (((value - offset + firstLastAdaption)/factor) + reduction)
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", recordKey, value));
+	public double reverseTranslateValue(Record record, double value) {
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Höhe, 2=Steigung
-		double offset = this.getMeasurementOffset(channelConfigKey, recordKey); // != 0 if curve has an defined offset
-		double reduction = this.getMeasurementReduction(channelConfigKey, recordKey);
-		double factor = this.getMeasurementFactor(channelConfigKey, recordKey); // != 1 if a unit translation is required
+		String[] measurements = this.getMeasurementNames(record.getParent().getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		String recordKey = record.getName();
+		double offset = record.getOffset(); // != 0 if curve has an defined offset
+		double reduction = record.getReduction();
+		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		// height calculation need special procedure
 		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
-			PropertyType property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_FIRST);
+			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-			property = this.getMeasurement(channelConfigKey, recordKey).getProperty(Picolario.DO_SUBTRACT_LAST);
+			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
 			if (subtractFirst) {
@@ -160,9 +163,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				reduction = 0;
 		}
 
-		// slope calculation needs height factor
+		// slope calculation needs height factor for calculation
 		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(channelConfigKey, measurements[1]);
+			factor = this.getMeasurementFactor(record.getParent().getChannelName(), measurements[1]);
 		}
 
 		double newValue = (value - offset) / factor + reduction;
@@ -180,9 +183,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			String[] measurements = this.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			if (!recordSet.get(measurements[2]).isDisplayable()) {
 				// calculate the values required				
-				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_INTERVAL_SEC);
+				PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
-				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[2], CalculationThread.REGRESSION_TYPE);
+				property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_TYPE);
 				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 					this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				else

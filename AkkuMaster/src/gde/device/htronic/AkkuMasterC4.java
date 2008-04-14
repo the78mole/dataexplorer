@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
@@ -77,11 +78,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(@SuppressWarnings("unused")
-	String configKey, String recordKey, double value) {
+	public double translateValue(@SuppressWarnings("unused")Record record, double value) {
 		double newValue = value;
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue));
 		return newValue;
 	}
 
@@ -89,11 +89,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(@SuppressWarnings("unused")
-	String configKey, String recordKey, double value) {
+	public double reverseTranslateValue(@SuppressWarnings("unused")Record record, double value) {
 		double newValue = value;
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", recordKey, value));
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", recordKey, newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue));
 		return newValue;
 	}
 

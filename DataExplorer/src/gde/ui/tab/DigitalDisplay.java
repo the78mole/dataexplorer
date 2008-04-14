@@ -89,15 +89,14 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							String channelConfigKey = activeRecordSet.getChannelName();
 								Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 								if (record != null) {
 									CLabel label = (CLabel) evt.widget;
 									label.setForeground(record.getColor());
 									DecimalFormat df = record.getDecimalFormat();
-									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.get(record.size() - 1) / 1000.0))));
-									DigitalDisplay.this.maxDigitalLabel.setText("MAX : " + df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.getMaxValue()) / 1000.0)));
-									DigitalDisplay.this.minDigitalLabel.setText("MIN : " + df.format(DigitalDisplay.this.device.translateValue(channelConfigKey, DigitalDisplay.this.recordKey, new Double(record.getMinValue()) / 1000.0)));
+									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.get(record.size() - 1) / 1000.0))));
+									DigitalDisplay.this.maxDigitalLabel.setText("MAX : " + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMaxValue()) / 1000.0)));
+									DigitalDisplay.this.minDigitalLabel.setText("MIN : " + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMinValue()) / 1000.0)));
 								}
 						}
 					}

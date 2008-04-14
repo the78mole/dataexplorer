@@ -16,6 +16,9 @@
 ****************************************************************************************/
 package osde.device;
 
+import java.util.List;
+
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.serial.DeviceSerialPort;
 
@@ -192,6 +195,11 @@ public interface IDevice {
 	public int getChannelType(int channelNumber);
 	
 	/**
+	 * @return the channel measurements by given channel configuration key (name)
+	 */
+	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey);
+
+		/**
 	 * @return the number of measurements of a channel, assume channels have different number of measurements
 	 */
 	public int getNumberOfMeasurements(String channelConfigKey);
@@ -311,13 +319,13 @@ public interface IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(String channelConfigKey, String measurementKey, double value);
+	public double translateValue(Record record, double value);
 
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(String channelConfigKey, String measurementKey, double value);
+	public double reverseTranslateValue(Record record, double value);
 
 	/**
 	 * function to calculate values for inactive which need to be calculated records

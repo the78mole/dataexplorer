@@ -64,8 +64,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double translateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = (this.getMeasurementOffset(channelConfigKey, recordKey) * 1000) + this.getMeasurementFactor(channelConfigKey, recordKey) * value;
+	public double translateValue(Record record, double value) {
+		double newValues = (record.getOffset() * 1000.0) + record.getFactor() * value;
 		// do some calculation
 		return newValues;
 	}
@@ -75,8 +75,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	public double reverseTranslateValue(String channelConfigKey, String recordKey, double value) {
-		double newValues = value / this.getMeasurementFactor(channelConfigKey, recordKey) - (this.getMeasurementOffset(channelConfigKey, recordKey) * 1000);
+	public double reverseTranslateValue(Record record, double value) {
+		double newValues = value / record.getFactor() - (record.getOffset() * 1000.0);
 		// do some calculation
 		return newValues;
 	}
@@ -185,7 +185,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			if (!record.isDisplayable()) {
 				record.clear();
 				Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
-				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.NUMBER_CELLS);
+				PropertyType property = record.getProperty(UniLogDialog.NUMBER_CELLS);
 				int numberCells = property != null ? new Integer(property.getValue()) : 4;
 				for (int i = 0; i < recordVoltage.size(); i++) {
 					record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
@@ -204,7 +204,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				record.clear();
 				Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 				Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
-				PropertyType property = record.getDevice().getMeasruementProperty(configKey, recordKey, UniLogDialog.PROP_N_100_WATT);
+				PropertyType property = record.getProperty(UniLogDialog.PROP_N_100_WATT);
 				int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 				for (int i = 0; i < recordRevolution.size(); i++) {
 					double motorPower = Math.pow((recordRevolution.get(i) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
@@ -223,9 +223,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			if (!record.isDisplayable()) {
 				record.clear();
-				PropertyType property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_INTERVAL_SEC);
+				PropertyType property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
-				property = this.getMeasruementProperty(recordSet.getChannelName(), measurements[10], CalculationThread.REGRESSION_TYPE);
+				property = record.getProperty(CalculationThread.REGRESSION_TYPE);
 				if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 					this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 				else

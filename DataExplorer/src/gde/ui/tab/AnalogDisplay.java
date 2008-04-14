@@ -112,7 +112,6 @@ public class AnalogDisplay extends Composite {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				final String channelConfigKey = activeRecordSet.getChannelName();
 				Record record = activeRecordSet.getRecord(this.recordKey);
 				if (log.isLoggable(Level.FINER)) log.finer("record name = " + record.getName());
 
@@ -124,8 +123,8 @@ public class AnalogDisplay extends Composite {
 				}
 
 				// get min max values and check if this has been changed
-				double tmpMinValue = this.device.translateValue(channelConfigKey, this.recordKey, record.getMinValue() / 1000.0);
-				double tmpMaxValue = this.device.translateValue(channelConfigKey, this.recordKey, record.getMaxValue() / 1000.0);
+				double tmpMinValue = this.device.translateValue(record, record.getMinValue() / 1000.0);
+				double tmpMaxValue = this.device.translateValue(record, record.getMaxValue() / 1000.0);
 				double[] roundValues = CurveUtils.round(tmpMinValue, tmpMaxValue);
 				tmpMinValue = roundValues[0]; // min
 				tmpMaxValue = roundValues[1]; // max
@@ -190,7 +189,7 @@ public class AnalogDisplay extends Composite {
 				}
 				evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 
-				double tmpActualValue = this.device.translateValue(channelConfigKey, this.recordKey, new Double(record.get(record.size() - 1) / 1000.0));
+				double tmpActualValue = this.device.translateValue(record, new Double(record.get(record.size() - 1) / 1000.0));
 				if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
 				//drawTachoNeedle(evt.gc, actualValue, OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.actualValue = tmpActualValue;
