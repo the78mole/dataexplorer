@@ -17,6 +17,8 @@
 package osde.data;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +29,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import osde.device.IDevice;
+import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -37,49 +40,43 @@ public class Record extends Vector<Integer> {
 	static final long						serialVersionUID			= 26031957;
 	static final Logger					log										= Logger.getLogger(Record.class.getName());
 
-	private String							name;																																// MessgrößeX Höhe
-	private String							unit;																																// Einheit m
-	private String							symbol;																															// Symbol h
-	private double							timeStep_ms;
+	RecordSet						parent;
+	String							channelConfigKey; 		// used as channelConfigKey
+	String							keyName;
 
-	private double							factor								= 1.0;																				// offset + factor * x
-	private double							offset								= 0;																					// offset + factor * x
-	private boolean							isEmpty								= true;
-	private int									maxValue							= Integer.MIN_VALUE;		 										  // max value of the curve
-	private int									minValue							= Integer.MAX_VALUE;													// min value of the curve
+	String							name;																																// MessgrößeX Höhe
+	String							unit;																																// Einheit m
+	String							symbol;																															// Symbol h
+	boolean							isActive;
+	boolean							isDisplayable;
+	boolean							isVisible							= true;
+	List<PropertyType>	properties						= new ArrayList<PropertyType>();	// offset, factor, reduction, ...
+	boolean							isPositionLeft				= true;
+	Color								color									= OpenSerialDataExplorer.COLOR_BLUE;
+	int									lineWidth							= 1;
+	int									lineStyle							= new Integer(SWT.LINE_SOLID);
+	boolean							isRoundOut						= false;
+	boolean							isStartpointZero			= false;
+	boolean							isStartEndDefined			= false;
+	DecimalFormat				df;
+	int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
+	int									maxValue							= Integer.MIN_VALUE;		 										  // max value of the curve
+	int									minValue							= Integer.MAX_VALUE;													// min value of the curve
+	double							maxScaleValue					= this.maxValue;																		// overwrite calculated boundaries
+	double							minScaleValue					= this.minValue;
+	double							maxZoomScaleValue		= this.maxScaleValue;
+	double							minZoomScaleValue		= this.minScaleValue;
 
-	private RecordSet						parent;
-	private String							channelConfigKey; 		// used as channelConfigKey
-	private String							keyName;
-	private boolean							isActive;
-	private boolean							isDisplayable;
-	private DecimalFormat				df;
-
-	//TODO to be set by loaded graphic template
-	private boolean							isVisible							= true;
-	private boolean							isPositionLeft				= true;
-	private Color								color									= OpenSerialDataExplorer.COLOR_BLUE;
-	private int									lineWidth							= 1;
-	private int									lineStyle							= new Integer(SWT.LINE_SOLID);
-	private boolean							isRoundOut						= false;
-	private boolean							isStartpointZero			= false;
-	private boolean							isStartEndDefined			= false;
-	private int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
-	private double							maxScaleValue					= this.maxValue;																		// overwrite calculated boundaries
-	private double							minScaleValue					= this.minValue;
-	private double							maxZoomScaleValue		= this.maxScaleValue;
-	private double							minZoomScaleValue		= this.minScaleValue;
-
-	private double							displayScaleFactorTime;
-	private double							displayScaleFactorValue;
-	private double							minDisplayValue;									// min value in device units, correspond to draw area
-	private double							maxDisplayValue;									// max value in device units, correspond to draw area
+	double							displayScaleFactorTime;
+	double							displayScaleFactorValue;
+	double							minDisplayValue;									// min value in device units, correspond to draw area
+	double							maxDisplayValue;									// max value in device units, correspond to draw area
 
 	// measurement
-	private boolean							isMeasurementMode				= false;
-	private boolean							isDeltaMeasurementMode	= false;
+	boolean							isMeasurementMode				= false;
+	boolean							isDeltaMeasurementMode	= false;
 	
-	private final IDevice				device;																															// record need to know its device to calculate data from raw
+	final IDevice				device;																															// record need to know its device to calculate data from raw
 
 	public final static String	IS_ACTIVE							= "_isActive";																// active means this measurement can be red from device, other wise its calculated
 	public final static String	IS_DIPLAYABLE					= "_isDisplayable";														// true for all active records, true for passive records when data calculated
@@ -102,21 +99,22 @@ public class Record extends Vector<Integer> {
 	 * @param newName
 	 * @param newUnit
 	 * @param newSymbol
-	 * @param newFactor
-	 * @param newTimeStep_ms
+	 * @param isActiveValue
+	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
-	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, double newOffset, double newFactor, double newTimeStep_ms, int initialCapacity) {
+	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
 		this.name = newName;
 		this.symbol = newSymbol;
 		this.unit = newUnit;
-		this.offset = newOffset;
-		this.factor = newFactor;
 		this.isActive = isActiveValue;
-		this.timeStep_ms = newTimeStep_ms;
 		this.isDisplayable = isActiveValue ? true : false;
+		for (PropertyType property : newProperties) {
+			this.properties.add(property.clone());
+		}
 		this.df = new DecimalFormat("0.0");
+		this.numberFormat = 1;
 		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 	}
 
@@ -129,13 +127,15 @@ public class Record extends Vector<Integer> {
 		this.symbol = record.symbol;
 		this.unit = record.unit;
 		this.isActive = record.isActive;
-		this.offset = record.offset;
-		this.factor = record.factor;
-		this.timeStep_ms = record.timeStep_ms;
 		this.isDisplayable = record.isDisplayable;
+		this.properties = new ArrayList<PropertyType>();
+		for (PropertyType property : record.properties) {
+			this.properties.add(property.clone());
+		}
 		this.maxValue = record.maxValue;
 		this.minValue = record.minValue;
 		this.df = (DecimalFormat) record.df.clone();
+		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
 		this.color = new Color(record.color.getDevice(), record.color.getRGB());
@@ -143,7 +143,6 @@ public class Record extends Vector<Integer> {
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
 		this.isStartpointZero = record.isStartpointZero;
-		this.numberFormat = record.numberFormat;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
 		this.device = record.device;
@@ -172,9 +171,8 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	public synchronized void add(int point) {
-		if (this.isEmpty) {
+		if (this.size() == 0) {
 			this.minValue = this.maxValue = point;
-			this.isEmpty = false;
 		}
 		else {
 			if (point > this.maxValue) this.maxValue = point;
@@ -200,14 +198,46 @@ public class Record extends Vector<Integer> {
 		return this.symbol;
 	}
 
+	/**
+	 * get property with given property type key (IDevice.OFFSET, ...)
+	 * @param propertyKey
+	 * @return PropertyType
+	 */
+	public PropertyType getProperty(String propertyKey) {
+		PropertyType property = null;
+		for (PropertyType propertyType : this.properties) {
+			if(propertyType.getName().equals(propertyKey)) {
+				property = propertyType;
+				break;
+			}
+		}
+		return property;
+	}
+
 	public double getFactor() {
-		return this.factor;
+		double value = 1.0;
+		PropertyType property = this.getProperty(IDevice.FACTOR);
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		return value;
 	}
 
 	public double getOffset() {
-		return this.offset;
+		double value = 0.0;
+		PropertyType property = this.getProperty(IDevice.OFFSET);
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		return value;
 	}
 
+	public double getReduction() {
+		double value = 0.0;
+		PropertyType property = this.getProperty(IDevice.REDUCTION);
+		if (property != null)
+			value = new Double(property.getValue()).doubleValue();
+		return value;
+	}
+	
 	public boolean isVisible() {
 		return this.isVisible;
 	}
@@ -338,8 +368,8 @@ public class Record extends Vector<Integer> {
 		else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
 				this.channelConfigKey = this.parent.getChannelName();
-			this.maxScaleValue = this.device.translateValue(this.channelConfigKey, this.name, this.maxValue/1000.0);
-			this.minScaleValue = this.device.translateValue(this.channelConfigKey, this.name, this.minValue/1000.0);
+			this.maxScaleValue = this.device.translateValue(this, this.maxValue/1000.0);
+			this.minScaleValue = this.device.translateValue(this, this.minValue/1000.0);
 		}
 	}
 
@@ -454,7 +484,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public double getTimeStep_ms() {
-		return this.timeStep_ms;
+		return this.parent.getTimeStep_ms();
 	}
 
 	public DecimalFormat getDecimalFormat() {
@@ -492,7 +522,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
-		returnPoint.x = new Double((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
+		returnPoint.x = new Double((xDisplayOffset + (this.getTimeStep_ms() * index) * this.displayScaleFactorTime)).intValue();
 		returnPoint.y = new Double(yDisplayOffset - 1 - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}

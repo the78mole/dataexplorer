@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.data;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,87 +40,87 @@ import osde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class RecordSet extends HashMap<String, Record> {
-	private static final long							serialVersionUID			= 26031957;
-	private static Logger									log										= Logger.getLogger(RecordSet.class.getName());
+	static final long							serialVersionUID			= 26031957;
+	static Logger									log										= Logger.getLogger(RecordSet.class.getName());
+	final DecimalFormat						df 										= new DecimalFormat("0.000");
 	
-	private String												name;																																// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
-	private final String									channelName;
-	private final OpenSerialDataExplorer	application;																													// pointer to main application
-	private final Channels								channels;
-	private String[]											recordNames;																													// Spannung, Strom, ..
-	private double												timeStep_ms						= 0;																						// Zeitbasis der Messpunkte
-	private static final DateFormat				dateFormat						= new SimpleDateFormat("HH:mm:ss");
-	private String												recordSetDescription	= dateFormat.format(new Date().getTime());
-	private boolean												isSaved								= false;																				// indicates if the record set is saved to file
-	private boolean												isRaw									= false;																				// indicates imported file with raw data, no translation at all
-	private boolean												isFromFile						= false;																				// indicates that this record set was created by loading data from file
-	private boolean												isRecalculation				= false;																				// indicates record is modified and need re-calculation
-	private Rectangle											drawAreaBounds;
-	private final DecimalFormat						df = new DecimalFormat("0.000");
-
-	private Thread												dataTableCalcThread;
-	private Vector<Vector<Integer>>				dataTable;
-	private boolean												isTableDataCalculated = false;  // value to manage only one time calculation
-	private boolean												isTableDisplayable		= true;		// value to suppress table data calculation(live view)
+	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	final String									channelName;
+	String[]											recordNames;										// Spannung, Strom, ..
+	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
+	String												recordSetDescription	= new SimpleDateFormat("HH:mm:ss").format(new Date().getTime());
+	boolean												isSaved								= false;	// indicates if the record set is saved to file
+	boolean												isRaw									= false;	// indicates imported file with raw data, no translation at all
+	boolean												isFromFile						= false;	// indicates that this record set was created by loading data from file
+	boolean												isRecalculation				= false;	// indicates record is modified and need re-calculation
+	Rectangle											drawAreaBounds;
+	
+	Thread												dataTableCalcThread;
+	Vector<Vector<Integer>>				dataTable;
+	boolean												isTableDataCalculated = false;  // value to manage only one time calculation
+	boolean												isTableDisplayable		= true;		// value to suppress table data calculation(live view)
 	
 	//in compare set x min/max and y max (time) might be different
-	private boolean												isCompareSet					= false;
-	private int														maxSize								= 0;																						// number of data point * time step = total time
-	private double												maxValue							= -20000;
-	private double												minValue 							= 20000;										// min max value
+	boolean												isCompareSet					= false;
+	int														maxSize								= 0;			// number of data point * time step = total time
+	double												maxValue							= -20000;
+	double												minValue 							= 20000;	// min max value
 	
 	//zooming
-	private int 													zoomLevel 						= 0; // 0 == not zoomed
-	private boolean 											isZoomMode = false;
-	private int														recordZoomOffset;
-	private int														recordZoomSize;
+	int 													zoomLevel 						= 0; 			// 0 == not zoomed
+	boolean 											isZoomMode = false;
+	int														recordZoomOffset;
+	int														recordZoomSize;
 	
 	// measurement
-	private String 												recordKeyMeasurement;
+	String 												recordKeyMeasurement;
 	
-	public static final String 						TIME 									= "time";
-	public static final String						TIME_GRID_STATE				= "RecordSet_timeGridState";
-	public static final String						TIME_GRID_COLOR				= "RecordSet_timeGridColor";
-	public static final String						TIME_GRID_LINE_STYLE	= "RecordSet_timeGridLineStyle";
-	public static final int								TIME_GRID_NONE				= 0;																						// no time grid
-	public static final int								TIME_GRID_MAIN				= 1;																						// each main tickmark
-	public static final int								TIME_GRID_MOD60				= 2;																						// each mod60 tickmark
-	private int														timeGridType					= TIME_GRID_NONE;
-	private Vector<Integer>								timeGrid 							= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
-	private Color													timeGridColor					= OpenSerialDataExplorer.COLOR_GREY;
-	private int														timeGridLineStyle			= new Integer(SWT.LINE_DOT);
+	public static final String 		TIME 									= "time";
+	public static final String		TIME_GRID_STATE				= "RecordSet_timeGridState";
+	public static final String		TIME_GRID_COLOR				= "RecordSet_timeGridColor";
+	public static final String		TIME_GRID_LINE_STYLE	= "RecordSet_timeGridLineStyle";
+	public static final int				TIME_GRID_NONE				= 0;		// no time grid
+	public static final int				TIME_GRID_MAIN				= 1;		// each main tickmark
+	public static final int				TIME_GRID_MOD60				= 2;		// each mod60 tickmark
+	int														timeGridType					= TIME_GRID_NONE;
+	Vector<Integer>								timeGrid 							= new Vector<Integer>();		// contains the time grid position, updated from TimeLine.drawTickMarks
+	Color													timeGridColor					= OpenSerialDataExplorer.COLOR_GREY;
+	int														timeGridLineStyle			= new Integer(SWT.LINE_DOT);
 	
-	public static final String						HORIZONTAL_GRID_RECORD			= "RecordSet_horizontalGridRecord";
-	public static final String						HORIZONTAL_GRID_STATE				= "RecordSet_horizontalGridState";
-	public static final String						HORIZONTAL_GRID_COLOR				= "RecordSet_horizontalGridColor";
-	public static final String						HORIZONTAL_GRID_LINE_STYSLE	= "RecordSet_horizontalGridLineStyle";
-	public static final int								HORIZONTAL_GRID_NONE				= 0;																	// no time grid
-	public static final int								HORIZONTAL_GRID_EVERY				= 1;																	// each main tickmark
-	public static final int								HORIZONTAL_GRID_SECOND			= 2;																	// each main tickmark
-	private int														horizontalGridType					= HORIZONTAL_GRID_NONE;
-	private Vector<Integer>								horizontalGrid 							= new Vector<Integer>();							// contains the time grid position, updated from TimeLine.drawTickMarks
-	private Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
-	private int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
-	private String												horizontalGridRecordKey			= "-";																	// recordNames[horizontalGridRecord]
+	public static final String		HORIZONTAL_GRID_RECORD			= "RecordSet_horizontalGridRecord";
+	public static final String		HORIZONTAL_GRID_STATE				= "RecordSet_horizontalGridState";
+	public static final String		HORIZONTAL_GRID_COLOR				= "RecordSet_horizontalGridColor";
+	public static final String		HORIZONTAL_GRID_LINE_STYSLE	= "RecordSet_horizontalGridLineStyle";
+	public static final int				HORIZONTAL_GRID_NONE				= 0;		// no time grid
+	public static final int				HORIZONTAL_GRID_EVERY				= 1;		// each main tickmark
+	public static final int				HORIZONTAL_GRID_SECOND			= 2;		// each main tickmark
+	int														horizontalGridType					= HORIZONTAL_GRID_NONE;
+	Vector<Integer>								horizontalGrid 							= new Vector<Integer>();		// contains the time grid position, updated from TimeLine.drawTickMarks
+	Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
+	int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
+	String												horizontalGridRecordKey			= "-";					// recordNames[horizontalGridRecord]
 
-	private int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
+	int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
+
+	final OpenSerialDataExplorer	application;				// pointer to main application
+	final Channels								channels;						// start point of data hierarchy
 	
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
-	 * @param newRecordNames string array of the device supported records
+	 * @param measurementNames array of the device supported measurement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
-	 * @param initialCapacity thie initial size of the data hash map
+	 * @param initialCapacity the initial size of the data hash map
 	 */
-	public RecordSet(String newChannelName, String newName, String[] newRecordNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
+	public RecordSet(String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
 		super(initialCapacity);
 		this.channelName = newChannelName;
 		this.name = newName;
-		this.recordNames = newRecordNames.clone();
+		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRawValue;
@@ -135,16 +134,16 @@ public class RecordSet extends HashMap<String, Record> {
 	 * the name is the key to access the data buffer
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
-	 * @param newRecordNames string array of the device supported records
+	 * @param measurementNames  array of the device supported measurement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	public RecordSet(String newChannelName, String newName, String[] newRecordNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
+	public RecordSet(String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super();
 		this.channelName = newChannelName;
 		this.name = newName;
-		this.recordNames = newRecordNames.clone();
+		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRawValue;
@@ -176,28 +175,29 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * copy constructor
+	 * copy constructor - used to copy a record set to another channel/configuration
 	 * @param recordSet
-	 * @param newChannelName
+	 * @param newChannelConfiguration
 	 */
-	private RecordSet(RecordSet recordSet, String newChannelName) {
+	private RecordSet(RecordSet recordSet, String newChannelConfiguration) {
 		super(recordSet);
 
 		this.name = recordSet.name;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
-		this.channelName = newChannelName;
-		
+		this.channelName = newChannelConfiguration;
+				
 		// update child records to new channel or configuration key and to the new parent
 		for (String recordKey : this.keySet()) {
 			Record tmpRecord = this.get(recordKey);
-			tmpRecord.setChannelConfigKey(newChannelName);
+			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
 		}
 		
-		// check if there is a miss match of measurement names and correct if required
+		// check if there is a miss match of measurement names and correction required
+		IDevice device = recordSet.get(recordSet.getFirstRecordName()).getDevice();
 		String[] oldRecordNames = recordSet.recordNames;
-		String[] newRecordNames = recordSet.get(recordSet.getFirstRecordName()).getDevice().getMeasurementNames(newChannelName);
+		String[] newRecordNames = device.getMeasurementNames(newChannelConfiguration);
 		for (int i = 0; i < newRecordNames.length; i++) {
 			if (!oldRecordNames[i].equals(newRecordNames[i])){
 				// add the old record with new name
@@ -206,10 +206,8 @@ public class RecordSet extends HashMap<String, Record> {
 				this.remove(oldRecordNames[i]);
 			}
 		}
-		
-		// update record names
-		this.recordNames = 	newRecordNames.clone();
-		
+		this.recordNames = newRecordNames.clone();
+
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
 		this.isSaved = recordSet.isSaved;
@@ -331,7 +329,7 @@ public class RecordSet extends HashMap<String, Record> {
 			int columnIndex = getRecordIndex(recordkey) + 1; // + time column
 			Vector<Integer> tableRow = this.dataTable.get(index);
 			if (tableRow != null) {
-				tableRow.set(columnIndex, new Double(device.translateValue(this.getChannelName(), recordkey, value)).intValue());
+				tableRow.set(columnIndex, new Double(device.translateValue(this.get(recordkey), value)).intValue());
 			}
 			else log.log(Level.WARNING, "add time point before adding other values !");
 		}
@@ -445,14 +443,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param device 
 	 */
 	public static RecordSet createRecordSet(String channelKey, String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
-		// assume all channels have the same size
-		String[] recordNames = device.getMeasurementNames(channelKey).clone();
-		RecordSet newRecordSet = new RecordSet(channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, 30);
+
+		String[] recordNames = device.getMeasurementNames(channelKey);
+		RecordSet newRecordSet = new RecordSet(channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
+
 		for (int i = 0; i < recordNames.length; i++) {
 			String recordKey = recordNames[i];
 			MeasurementType measurement = device.getMeasurement(channelKey, recordKey);
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getOffset(), 
-					measurement.getFactor(), device.getTimeStep_ms(), 5);
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getProperty(), 5);
 
 			// set color defaults
 			switch (i) {
@@ -1121,7 +1119,6 @@ public class RecordSet extends HashMap<String, Record> {
 				if (this.logger.isLoggable(Level.FINE)) this.logger.fine("entry data table calculation");
 				this.application2.setStatusMessage(" -> berechne Datentabelle");
 
-				String channelConfigKey = getChannelName();
 				int numberRecords = getRecordNamesLength();
 				int recordEntries = getRecordDataSize();
 				int progress = this.application2.getProgressPercentage();
@@ -1154,7 +1151,7 @@ public class RecordSet extends HashMap<String, Record> {
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
-							dataTableRow.add(new Double(1000.0 * device.translateValue(channelConfigKey, recordKey, get(recordKey).get(i) / 1000.0)).intValue());
+							dataTableRow.add(new Double(1000.0 * device.translateValue(get(recordKey), get(recordKey).get(i) / 1000.0)).intValue());
 						}
 						dataTableAddRow(dataTableRow);
 					}

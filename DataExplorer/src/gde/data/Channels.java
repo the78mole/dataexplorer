@@ -31,10 +31,10 @@ public class Channels extends HashMap<Integer, Channel> {
 	final static long											serialVersionUID		= 26031957;
 	final static Logger										log									= Logger.getLogger(Channels.class.getName());
 
-	private static Channels								channles						= null;
-	private String												fileDescription			= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-	private int														activeChannelNumber	= 1;																						// default at least one channel must exist
-	private final OpenSerialDataExplorer	application;
+	static Channels								channles						= null;
+	String												fileDescription			= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+	int														activeChannelNumber	= 1;																						// default at least one channel must exist
+	final OpenSerialDataExplorer	application;
 
 	/**
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application

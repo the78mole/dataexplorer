@@ -37,16 +37,16 @@ import osde.utils.RecordSetNameComparator;
  * @author Winfried Brügmann
  */
 public class Channel extends HashMap<String, RecordSet> {
-	static final long											serialVersionUID	= 26031957;
-	static final Logger										log								= Logger.getLogger(Channel.class.getName());
+	static final long							serialVersionUID	= 26031957;
+	static final Logger						log								= Logger.getLogger(Channel.class.getName());
+	static final String						fileSep = System.getProperty("file.separator");
 	
-	private static final String						fileSep = System.getProperty("file.separator");
-	private String												name;																														// 1: Ausgang
-	private final int											type;
-	private GraphicsTemplate							template;																												// graphics template holds view configuration
-	private RecordSet											activeRecordSet;
-	private final OpenSerialDataExplorer	application;
-	private Comparator<String> 						comparator = new RecordSetNameComparator();
+	String												name;																														// 1: Ausgang
+	final int											type;
+	GraphicsTemplate							template;																												// graphics template holds view configuration
+	RecordSet											activeRecordSet;
+	final OpenSerialDataExplorer	application;
+	Comparator<String> 						comparator = new RecordSetNameComparator();
 
 
 	/**
