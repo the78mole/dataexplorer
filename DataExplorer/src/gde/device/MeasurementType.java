@@ -10,6 +10,7 @@ package osde.device;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -58,6 +59,38 @@ public class MeasurementType {
     protected Boolean active;
     @XmlElement(name = "Property")
     protected List<PropertyType> property;
+        
+    /**
+     * default constructor
+     */
+    public MeasurementType() {}
+    
+    /**
+     * copy constructor
+     * @param measurement
+     */
+    private MeasurementType(MeasurementType measurement) {
+    	this.name = measurement.name;
+    	this.symbol = measurement.symbol;
+    	this.unit = measurement.unit;
+    	this.active = measurement.active;
+    	if (measurement.property != null) {
+				this.property = new ArrayList<PropertyType>();
+				for (PropertyType tmpProperty : this.property) {
+					this.property.add(tmpProperty.clone());
+				}
+			}
+    	else {
+    		this.property = null; //new ArrayList<PropertyType>();
+    	}
+    }
+    
+    /**
+     * clone method - calls the private copy constructor
+     */
+    public MeasurementType clone() {
+    	return new MeasurementType(this);
+    }
 
     /**
      * Gets the value of the name property.

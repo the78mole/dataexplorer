@@ -50,6 +50,28 @@ public class PropertyType {
     protected String description;
 
     /**
+     * default constructor
+     */
+    public PropertyType() {}
+    
+    /**
+     * copy constructor - used for clone method
+     */
+    private PropertyType(PropertyType property) {
+    	this.name = property.name;
+    	this.value = property.value;
+    	this.type = property.type;
+    	this.description = property.description;
+    }
+    
+    /**
+     * clone methods to deep copy PropertyType
+     */
+    public PropertyType clone() {
+    	return new PropertyType(this);
+    }
+    
+    /**
      * Gets the value of the name property.
      * 
      * @return
