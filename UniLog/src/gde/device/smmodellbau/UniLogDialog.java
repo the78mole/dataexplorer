@@ -62,9 +62,6 @@ public class UniLogDialog extends DeviceDialog {
 	public final static String[]	CURRENT_SENSOR						= { " 40/80A ", "  150A ", "  400A ", "    20A " };
 	public final static String[]	A1_MODUS									= { " Temperatur ", " Millivolt ", " Speed 250 ", " Speed 400 " };
 
-	public final static String		NUMBER_CELLS							= "number_cells";
-	public final static String		PROP_N_100_WATT						= "prop_n100W";
-
 	CTabItem											configTabItem1, configTabItem2, configTabItem3, configTabItem4;
 	CCombo												a1ModusCombo;
 	Group													outletA1Group;
@@ -130,9 +127,9 @@ public class UniLogDialog extends DeviceDialog {
 	Text													memoryDeleteInfo;
 
 	final Settings								settings;
-	final UniLogSerialPort				serialPort;																																																																	// open/close port execute getData()....
-	final OpenSerialDataExplorer	application;																																																																	// interaction with application instance
-	final UniLog									device;																																																																			// get device specific things, get serial port, ...
+	final UniLogSerialPort				serialPort;									// open/close port execute getData()....
+	final OpenSerialDataExplorer	application;								// interaction with application instance
+	final UniLog									device;											// get device specific things, get serial port, ...
 	DataGathererThread						gatherThread;
 	LiveGathererThread						liveThread;
 	String												liveRecordName;
@@ -220,7 +217,7 @@ public class UniLogDialog extends DeviceDialog {
 						UniLogDialog.log.fine("dialogShell.widgetDisposed, event=" + evt);
 						if (UniLogDialog.this.configTab1.getConfigButtonStatus() && UniLogDialog.this.configTab2.getConfigButtonStatus() && UniLogDialog.this.configTab3.getConfigButtonStatus()
 								&& UniLogDialog.this.configTab4.getConfigButtonStatus()) {
-							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werde ?";
+							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werden ?";
 							if (UniLogDialog.this.application.openYesNoMessageDialog(msg) == SWT.YES) {
 								UniLogDialog.log.fine("SWT.YES");
 								UniLogDialog.this.device.storeDeviceProperties();
@@ -247,7 +244,7 @@ public class UniLogDialog extends DeviceDialog {
 				});
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.helpButton.setText("Hilfe    (F1)");
+					this.helpButton.setText("Hilfe");
 					this.helpButton.setBounds(31, 374, 259, 30);
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -590,14 +587,14 @@ public class UniLogDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeRateCombo.widgetSelected, event=" + evt);
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
-											updateTimeStep_ms(UniLogDialog.this.timeIntervalCombo.getSelectionIndex());
+											UniLogDialog.this.timeIntervalPosition = UniLogDialog.this.timeIntervalCombo.getSelectionIndex();
 										}
 									});
 								}
 							}
 							{
 								this.readAdjustmentButton = new Button(this.configMainComosite, SWT.PUSH | SWT.FLAT | SWT.CENTER);
-								this.readAdjustmentButton.setText("Einstellungen auslesen");
+								this.readAdjustmentButton.setText("UniLog Einstellungen auslesen");
 								this.readAdjustmentButton.setBounds(12, 74, 300, 30);
 								this.readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -614,7 +611,7 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							{
 								this.storeAdjustmentsButton = new Button(this.configMainComosite, SWT.PUSH | SWT.CENTER);
-								this.storeAdjustmentsButton.setText("Einstellungen speichern");
+								this.storeAdjustmentsButton.setText("Einstellungen im UniLog speichern");
 								this.storeAdjustmentsButton.setBounds(335, 275, 281, 30);
 								this.storeAdjustmentsButton.setEnabled(false);
 								this.storeAdjustmentsButton.addSelectionListener(new SelectionAdapter() {
@@ -998,6 +995,7 @@ public class UniLogDialog extends DeviceDialog {
 
 											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
 											activeRecordSet.setRecalculation(true);
+											UniLogDialog.this.device.updateVisibilityStatus(activeRecordSet);
 											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
 
 											channels.switchChannel(channelNumber, recordSetKey);
@@ -1055,7 +1053,7 @@ public class UniLogDialog extends DeviceDialog {
 		UniLogDialog.log.finer("timeIntervalPosition = " + this.timeIntervalPosition + " timeInterval = ");
 		if (this.timeIntervalPosition != this.timeIntervalCombo.getSelectionIndex()) {
 			this.timeIntervalCombo.select(this.timeIntervalPosition);
-			updateTimeStep_ms(this.timeIntervalPosition);
+			//TODO check updateTimeStep_ms(this.timeIntervalPosition);
 		}
 
 		// motor/prop
