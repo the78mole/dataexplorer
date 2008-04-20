@@ -125,7 +125,7 @@ public class DigitalWindow {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.get(recordSet.getFirstRecordName()).getDevice().isDigitalTabRequested()) {
+			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
 		
 				// if recordSet name signature changed new displays need to be created
@@ -166,7 +166,7 @@ public class DigitalWindow {
 						this.displays.remove(recordKey);
 					}
 				}
-				if (recordSet != null && !recordSet.get(recordSet.getFirstRecordName()).getDevice().isDigitalTabRequested())
+				if (recordSet != null && !recordSet.getDevice().isDigitalTabRequested())
 					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
 					else this.infoText.setText(this.info);
 			}

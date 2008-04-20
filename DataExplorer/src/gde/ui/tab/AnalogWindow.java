@@ -128,7 +128,7 @@ public class AnalogWindow {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.get(recordSet.getFirstRecordName()).getDevice().isAnalogTabRequested()) {
+			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
 				log.fine(activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
@@ -169,7 +169,7 @@ public class AnalogWindow {
 						this.displays.remove(recordKey);
 					}
 				}
-				if (recordSet != null && !recordSet.get(recordSet.getFirstRecordName()).getDevice().isAnalogTabRequested())
+				if (recordSet != null && !recordSet.getDevice().isAnalogTabRequested())
 					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
 					else this.infoText.setText(this.info);
 			}

@@ -348,7 +348,7 @@ public class GraphicsWindow {
 		for (String recordKey : recordSet.getRecordNames()) {
 			Record tmpRecord = recordSet.getRecord(recordKey);
 			if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-				log.fine("==>>" + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable());
+				log.fine("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable());
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
@@ -434,7 +434,7 @@ public class GraphicsWindow {
 		// draw each record using sorted record set names
 		for (String record : recordSetNames) {
 			Record actualRecord = recordSet.getRecord(record);
-			log.fine("drawing record = " + actualRecord.getName() + "-" + actualRecord.isVisible() +  "-" + actualRecord.isDisplayable());
+			log.fine("drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() +  " isDisplayable=" + actualRecord.isDisplayable());
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (isActualRecordEnabled)
 				CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);

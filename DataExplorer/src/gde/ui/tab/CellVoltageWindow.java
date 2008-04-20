@@ -140,7 +140,7 @@ public class CellVoltageWindow {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.get(recordSet.getFirstRecordName()).getDevice().isVoltagePerCellTabRequested()) {
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
 				//int[] values = { 4180, 4150, 4190, 4200 }; // four voltage values
 				
 				//voltageDelta = calculateVoltageDelta(values);
@@ -184,7 +184,7 @@ public class CellVoltageWindow {
 						this.displays.remove(display);
 					}
 				}
-				if (recordSet != null && !recordSet.get(recordSet.getFirstRecordName()).getDevice().isVoltagePerCellTabRequested()) {
+				if (recordSet != null && !recordSet.getDevice().isVoltagePerCellTabRequested()) {
 					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
 					else this.infoText.setText(this.info);
 				}
