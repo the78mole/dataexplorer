@@ -149,7 +149,7 @@ public class CSVReaderWriter {
 					
 				recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend;
 				// shorten the record set name to the allowed maximum
-				recordSetName = recordSetName.length() <= 30 ? recordSetName : recordSetName.substring(0, 30);
+				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, 30);
 
 				recordSet = RecordSet.createRecordSet(fileConfig, recordSetName, application.getActiveDevice(), isRaw, true);
 
@@ -232,9 +232,12 @@ public class CSVReaderWriter {
 
 				// set time base in msec
 				recordSet.setTimeStep_ms(timeStep_ms);
-				recordSet.setSaved(true);
 				log.fine("timeStep_ms = " + timeStep_ms);
+				recordSet.setSaved(true);
+				
 				activeChannel.put(recordSetName, recordSet);
+				activeChannel.setActiveRecordSet(recordSetName);
+				activeChannel.applyTemplate(recordSetName);
 				activeChannel.switchRecordSet(recordSetName);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
