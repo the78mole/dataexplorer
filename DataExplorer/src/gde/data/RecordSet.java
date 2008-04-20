@@ -33,6 +33,8 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
+import osde.utils.StringHelper;
 import osde.utils.TimeLine;
 
 /**
@@ -75,8 +77,11 @@ public class RecordSet extends HashMap<String, Record> {
 	// measurement
 	String 												recordKeyMeasurement;
 	
+	public static final int				MAX_NAME_LENGTH 			= 30;
+	
+	public static final String 		TIME_STEP_MS 					= "timeStep_ms";
 	public static final String 		TIME 									= "time";
-	public static final String		TIME_GRID_STATE				= "RecordSet_timeGridState";
+	public static final String		TIME_GRID_TYPE				= "RecordSet_timeGridType";
 	public static final String		TIME_GRID_COLOR				= "RecordSet_timeGridColor";
 	public static final String		TIME_GRID_LINE_STYLE	= "RecordSet_timeGridLineStyle";
 	public static final int				TIME_GRID_NONE				= 0;		// no time grid
@@ -88,9 +93,9 @@ public class RecordSet extends HashMap<String, Record> {
 	int														timeGridLineStyle			= new Integer(SWT.LINE_DOT);
 	
 	public static final String		HORIZONTAL_GRID_RECORD			= "RecordSet_horizontalGridRecord";
-	public static final String		HORIZONTAL_GRID_STATE				= "RecordSet_horizontalGridState";
+	public static final String		HORIZONTAL_GRID_TYPE				= "RecordSet_horizontalGridType";
 	public static final String		HORIZONTAL_GRID_COLOR				= "RecordSet_horizontalGridColor";
-	public static final String		HORIZONTAL_GRID_LINE_STYSLE	= "RecordSet_horizontalGridLineStyle";
+	public static final String		HORIZONTAL_GRID_LINE_STYLE	= "RecordSet_horizontalGridLineStyle";
 	public static final int				HORIZONTAL_GRID_NONE				= 0;		// no time grid
 	public static final int				HORIZONTAL_GRID_EVERY				= 1;		// each main tickmark
 	public static final int				HORIZONTAL_GRID_SECOND			= 2;		// each main tickmark
@@ -99,11 +104,15 @@ public class RecordSet extends HashMap<String, Record> {
 	Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
 	int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
 	String												horizontalGridRecordKey			= "-";					// recordNames[horizontalGridRecord]
+	
+	private final String[] 				propertyKeys = new String[] {TIME_STEP_MS, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR};
+
 
 	int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
 
 	final OpenSerialDataExplorer	application;				// pointer to main application
 	final Channels								channels;						// start point of data hierarchy
+	final IDevice									device;
 	
 	/**
 	 * data buffers according the size of given names array, where
@@ -116,8 +125,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 * @param initialCapacity the initial size of the data hash map
 	 */
-	public RecordSet(String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
 		super(initialCapacity);
+		this.device = useDevice;
 		this.channelName = newChannelName;
 		this.name = newName;
 		this.recordNames = measurementNames.clone();
@@ -139,8 +149,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	public RecordSet(String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super();
+		this.device = useDevice;
 		this.channelName = newChannelName;
 		this.name = newName;
 		this.recordNames = measurementNames.clone();
@@ -161,8 +172,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isRawValue
 	 * @param isCompareSetValue
 	 */
-	public RecordSet(String newChannelName, String newName, double newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
 		super();
+		this.device = useDevice;
 		this.channelName = newChannelName;
 		this.name = newName;
 		this.recordNames = new String[0];
@@ -182,6 +194,7 @@ public class RecordSet extends HashMap<String, Record> {
 	private RecordSet(RecordSet recordSet, String newChannelConfiguration) {
 		super(recordSet);
 
+		this.device = recordSet.device; // this is a reference
 		this.name = recordSet.name;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
@@ -192,13 +205,12 @@ public class RecordSet extends HashMap<String, Record> {
 			Record tmpRecord = this.get(recordKey);
 			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
-			tmpRecord.replaceProperties(tmpRecord.getDevice().getProperties(newChannelConfiguration, recordKey));
+			tmpRecord.replaceProperties(this.device.getProperties(newChannelConfiguration, recordKey));
 		}
 		
 		// check if there is a miss match of measurement names and correction required
-		IDevice device = recordSet.get(recordSet.getFirstRecordName()).getDevice();
 		String[] oldRecordNames = recordSet.recordNames;
-		String[] newRecordNames = device.getMeasurementNames(newChannelConfiguration);
+		String[] newRecordNames = this.device.getMeasurementNames(newChannelConfiguration);
 		for (int i = 0; i < newRecordNames.length; i++) {
 			if (!oldRecordNames[i].equals(newRecordNames[i])){
 				// add the old record with new name
@@ -288,10 +300,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
 	 * @param doUpdate to manage display update
-	 * @throws Exception 
+	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addPoints(int[] points, boolean doUpdate) throws Exception {
-		if (points.length == this.recordNames.length) {
+	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
+		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				Record record = this.getRecord(this.recordNames[i]);
 				record.add((new Integer(points[i])).intValue());
@@ -326,11 +338,10 @@ public class RecordSet extends HashMap<String, Record> {
 			this.dataTable.add(dataTableRow);
 		}
 		else {
-			IDevice device = this.get(this.recordNames[0]).getDevice();
 			int columnIndex = getRecordIndex(recordkey) + 1; // + time column
 			Vector<Integer> tableRow = this.dataTable.get(index);
 			if (tableRow != null) {
-				tableRow.set(columnIndex, new Double(device.translateValue(this.get(recordkey), value)).intValue());
+				tableRow.set(columnIndex, new Double(this.device.translateValue(this.get(recordkey), value)).intValue());
 			}
 			else log.log(Level.WARNING, "add time point before adding other values !");
 		}
@@ -409,13 +420,42 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getActiveAndVisibleRecordNames() {
-		Vector<String> activeRecords = new Vector<String>();
+		Vector<String> activeVisibleRecords = new Vector<String>();
 		for (String recordKey : this.recordNames) {
-			if (this.get(recordKey).isActive() && this.get(recordKey).isVisible()) activeRecords.add(recordKey);
+			if (this.get(recordKey).isActive() && this.get(recordKey).isVisible()) activeVisibleRecords.add(recordKey);
 		}
-		return activeRecords.toArray(new String[1]);
+		return activeVisibleRecords.toArray(new String[0]);
 	}
 
+	/**
+	 * method to get the sorted record active names as string array
+	 * @return String[] containing record names 
+	 */
+	public String[] getActiveRecordNames() {
+		Vector<String> activeRecords = new Vector<String>();
+		for (String recordKey : this.recordNames) {
+			if (this.get(recordKey).isActive()) activeRecords.add(recordKey);
+		}
+		return activeRecords.toArray(new String[0]);
+	}
+
+	/**
+	 * method to get the sorted active or in active record names as string array
+	 *  - records which does not have inactive or active flag are calculated from active or inactive
+	 *  - all records not calculated may have the active status and must be stored
+	 * @return String[] containing record names 
+	 */
+	public String[] getNoneCalculationRecordNames() {
+		Vector<String> calculationRecords = new Vector<String>();
+		for (String recordKey : this.recordNames) {
+			MeasurementType measurement = this.device.getMeasurement(this.channelName, recordKey);
+			if (!measurement.isCalculation()) { // active or inactive 
+				calculationRecords.add(recordKey);
+			}
+		}
+		return calculationRecords.toArray(new String[0]);
+	}
+	
 	/**
 	 *	clear the record set compare view 
 	 */
@@ -444,9 +484,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param device 
 	 */
 	public static RecordSet createRecordSet(String channelKey, String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
-
+		recordName = recordName.length() <= RecordSet.MAX_NAME_LENGTH ? recordName : recordName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		
 		String[] recordNames = device.getMeasurementNames(channelKey);
-		RecordSet newRecordSet = new RecordSet(channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
+		RecordSet newRecordSet = new RecordSet(device, channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
 
 		for (int i = 0; i < recordNames.length; i++) {
 			String recordKey = recordNames[i];
@@ -1146,13 +1187,12 @@ public class RecordSet extends HashMap<String, Record> {
 					if (this.logger.isLoggable(Level.FINE)) this.logger.fine("start build table entries");
 					double progressInterval = (60.0 - progress) / recordEntries;
 
-					IDevice device = get(getFirstRecordName()).getDevice();
 					for (int i = 0; i < recordEntries; i++) {
 						this.application2.setProgress(new Double(i * progressInterval + progress).intValue());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
-							dataTableRow.add(new Double(1000.0 * device.translateValue(get(recordKey), get(recordKey).get(i) / 1000.0)).intValue());
+							dataTableRow.add(new Double(1000.0 * RecordSet.this.device.translateValue(get(recordKey), get(recordKey).get(i) / 1000.0)).intValue());
 						}
 						dataTableAddRow(dataTableRow);
 					}
@@ -1186,11 +1226,70 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setRecalculation(boolean newRecalculationValue) {
 		this.isRecalculation = newRecalculationValue;
-		IDevice device = this.get(this.recordNames[0]).getDevice();
 		String channelConfigKey = this.get(this.recordNames[0]).getChannelConfigKey();
 		for (String recordKey : this.recordNames) {
-			if (device.getMeasurement(channelConfigKey, recordKey).isCalculation())
+			if (this.device.getMeasurement(channelConfigKey, recordKey).isCalculation())
 				this.get(recordKey).resetMinMax();
+		}
+	}
+
+	/**
+	 * @return the device
+	 */
+	public IDevice getDevice() {
+		return this.device != null ? this.device : this.application.getActiveDevice();
+	}
+	/**
+	 * get all record properties in serialized form
+	 * @return serializedRecordProperties
+	 */
+	public String getSerializeProperties() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(TIME_STEP_MS).append("=").append(this.timeStep_ms).append(Record.DELIMITER);
+
+		sb.append(TIME_GRID_TYPE).append("=").append(this.timeGridType).append(Record.DELIMITER);
+		sb.append(TIME_GRID_LINE_STYLE).append("=").append(this.timeGridLineStyle).append(Record.DELIMITER);
+		sb.append(TIME_GRID_COLOR).append("=").append(this.timeGridColor.getRed()).append(",").append(this.timeGridColor.getGreen()).append(",").append(this.timeGridColor.getBlue()).append(Record.DELIMITER);
+
+		sb.append(HORIZONTAL_GRID_RECORD).append("=").append(this.horizontalGridRecordKey).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_TYPE).append("=").append(this.horizontalGridType).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_LINE_STYLE).append("=").append(this.horizontalGridLineStyle).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_COLOR).append("=").append(this.horizontalGridColor.getRed()).append(",").append(this.horizontalGridColor.getGreen()).append(",").append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
+
+		return sb.toString().endsWith(Record.DELIMITER) ? sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) : sb.toString();
+	}
+	
+	/**
+	 * set all record properties by given serialized form
+	 * @param serializedRecordSetProperties
+	 */
+	public void setDeserializedProperties(String serializedRecordSetProperties) {
+		HashMap<String, String> recordSetProps = StringHelper.splitString(serializedRecordSetProperties, Record.DELIMITER, this.propertyKeys);
+		String tmpValue = null;
+		try {
+			tmpValue = recordSetProps.get(TIME_STEP_MS);
+			if (tmpValue!=null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
+
+			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
+			if (tmpValue!=null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(TIME_GRID_LINE_STYLE);
+			if (tmpValue!=null && tmpValue.length() > 0) this.timeGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(TIME_GRID_COLOR);
+			if (tmpValue!=null && tmpValue.length() > 5) this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(",")[0]), new Integer(tmpValue.split(",")[1]), new Integer(tmpValue.split(",")[2]));
+			
+			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
+			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
+			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
+			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);
+			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(HORIZONTAL_GRID_COLOR);
+			if (tmpValue!=null && tmpValue.length() > 5) this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(",")[0]), new Integer(tmpValue.split(",")[1]), new Integer(tmpValue.split(",")[2]));
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			this.application.openMessageDialogAsync("Beim laden der Datensatzeigenschaften ist ein Fehler aufgetreten ! \n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 }

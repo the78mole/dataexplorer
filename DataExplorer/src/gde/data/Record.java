@@ -18,6 +18,8 @@ package osde.data;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -33,6 +35,8 @@ import osde.device.IDevice;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
+import osde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -41,6 +45,10 @@ import osde.ui.OpenSerialDataExplorer;
 public class Record extends Vector<Integer> {
 	static final long						serialVersionUID			= 26031957;
 	static final Logger					log										= Logger.getLogger(Record.class.getName());
+	
+	public static final String DELIMITER = "|-|";
+	public static final String END_MARKER = "|:-:|";
+
 
 	RecordSet						parent;
 	String							channelConfigKey; 		// used as channelConfigKey
@@ -78,23 +86,29 @@ public class Record extends Vector<Integer> {
 	boolean							isMeasurementMode				= false;
 	boolean							isDeltaMeasurementMode	= false;
 	
-	final IDevice				device;																															// record need to know its device to calculate data from raw
-
-	public final static String	IS_ACTIVE							= "_isActive";																// active means this measurement can be red from device, other wise its calculated
-	public final static String	IS_DIPLAYABLE					= "_isDisplayable";														// true for all active records, true for passive records when data calculated
-	public final static String	IS_VISIBLE						= "_isVisible";																// defines if data are displayed 
-	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";													// defines the side where the axis id displayed 
-	public final static String	COLOR									= "_color";																		// defines which color is used to draw the curve
+	public final static String	CONFIG_KEY						= "_channelConfigKey";	// active means this measurement can be red from device, other wise its calculated
+	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated
+	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated
+	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated
+	public final static String	IS_ACTIVE							= "_isActive";					// active means this measurement can be red from device, other wise its calculated
+	public final static String	IS_DIPLAYABLE					= "_isDisplayable";			// true for all active records, true for passive records when data calculated
+	public final static String	IS_VISIBLE						= "_isVisible";					// defines if data are displayed 
+	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";		// defines the side where the axis id displayed 
+	public final static String	COLOR									= "_color";							// defines which color is used to draw the curve
 	public final static String	LINE_WITH							= "_lineWidth";
 	public final static String	LINE_STYLE						= "_lineStyle";
-	public final static String	IS_ROUND_OUT					= "_isRoundOut";															// defines if axis values are rounded
-	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";												// defines if axis value starts at zero
-	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";												// defines that explicite end values are defined for axis
+	public final static String	IS_ROUND_OUT					= "_isRoundOut";				// defines if axis values are rounded
+	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";	// defines if axis value starts at zero
+	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";	// defines that explicit end values are defined for axis
 	public final static String	NUMBER_FORMAT					= "_numberFormat";
 	public final static String	MAX_VALUE							= "_maxValue";
-	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";															// overwritten max value
+	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";				// overwritten max value
 	public final static String	MIN_VALUE							= "_minValue";
-	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";															// overwritten min value
+	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value
+	
+	private final String[] propertyKeys = new String[] {CONFIG_KEY, NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
+			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
+
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
@@ -117,7 +131,6 @@ public class Record extends Vector<Integer> {
 		}
 		this.df = new DecimalFormat("0.0");
 		this.numberFormat = 1;
-		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 	}
 
 	/**
@@ -147,7 +160,6 @@ public class Record extends Vector<Integer> {
 		this.isStartpointZero = record.isStartpointZero;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
-		this.device = record.device;
 		this.channelConfigKey = record.channelConfigKey;
 		log.fine("channelConfigKey = " + this.channelConfigKey);
 	}
@@ -233,7 +245,7 @@ public class Record extends Vector<Integer> {
 	 * @param type
 	 * @return created property with associated propertyKey
 	 */
-	private PropertyType createProperty(String propertyKey, DataTypes type, Object value) {
+	public PropertyType createProperty(String propertyKey, DataTypes type, Object value) {
 		ObjectFactory factory = new ObjectFactory();
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
@@ -247,6 +259,8 @@ public class Record extends Vector<Integer> {
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
+		else
+			value = this.getDevice().getMeasurementFactor(this.channelConfigKey, this.name);
 		return value;
 	}
 
@@ -263,6 +277,8 @@ public class Record extends Vector<Integer> {
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
+		else
+			value = this.getDevice().getMeasurementOffset(this.channelConfigKey, this.name);
 		return value;
 	}
 	
@@ -279,6 +295,10 @@ public class Record extends Vector<Integer> {
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
+		else {
+			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.channelConfigKey, this.name, IDevice.REDUCTION);
+			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim()).doubleValue();
+		}
 		return value;
 	}
 	
@@ -420,8 +440,8 @@ public class Record extends Vector<Integer> {
 		else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
 				this.channelConfigKey = this.parent.getChannelName();
-			this.maxScaleValue = this.device.translateValue(this, this.maxValue/1000.0);
-			this.minScaleValue = this.device.translateValue(this, this.minValue/1000.0);
+			this.maxScaleValue = this.parent.getDevice().translateValue(this, this.maxValue/1000.0);
+			this.minScaleValue = this.parent.getDevice().translateValue(this, this.minValue/1000.0);
 		}
 	}
 
@@ -561,7 +581,7 @@ public class Record extends Vector<Integer> {
 	 * @return the device
 	 */
 	public IDevice getDevice() {
-		return this.device;
+		return this.parent.getDevice();
 	}
 	
 	/**
@@ -780,6 +800,112 @@ public class Record extends Vector<Integer> {
 	public void resetMinMax() {
 		this.maxValue = Integer.MIN_VALUE;
 		this.minValue = Integer.MAX_VALUE;
+	}
+	
+	/**
+	 * get all record properties in serialized form
+	 * @return serializedRecordProperties
+	 */
+	public String getSerializeProperties() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(CONFIG_KEY).append("=").append(this.channelConfigKey).append(DELIMITER);
+		sb.append(NAME).append("=").append(this.name).append(DELIMITER);
+		sb.append(UNIT).append("=").append(this.unit).append(DELIMITER);
+		sb.append(SYMBOL).append("=").append(this.symbol).append(DELIMITER);
+		sb.append(IS_ACTIVE).append("=").append(this.isActive).append(DELIMITER);
+		sb.append(IS_DIPLAYABLE).append("=").append(this.isDisplayable).append(DELIMITER);
+		sb.append(IS_VISIBLE).append("=").append(this.isVisible).append(DELIMITER);
+		sb.append(IS_POSITION_LEFT).append("=").append(this.isPositionLeft).append(DELIMITER);
+		sb.append(COLOR).append("=").append(this.color.getRed()).append(",").append(this.color.getGreen()).append(",").append(this.color.getBlue()).append(DELIMITER);
+		sb.append(LINE_WITH).append("=").append(this.lineWidth).append(DELIMITER);
+		sb.append(LINE_STYLE).append("=").append(this.lineStyle).append(DELIMITER);
+		sb.append(IS_ROUND_OUT).append("=").append(this.isRoundOut).append(DELIMITER);
+		sb.append(IS_START_POINT_ZERO).append("=").append(this.isStartpointZero).append(DELIMITER);
+		sb.append(IS_START_END_DEFINED).append("=").append(this.isStartEndDefined).append(DELIMITER);
+		sb.append(NUMBER_FORMAT).append("=").append(this.numberFormat).append(DELIMITER);
+		sb.append(MAX_VALUE).append("=").append(this.maxValue).append(DELIMITER);
+		sb.append(MIN_VALUE).append("=").append(this.minValue).append(DELIMITER);
+		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxDisplayValue).append(DELIMITER);
+		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minDisplayValue).append(DELIMITER);
+		for (PropertyType property : this.properties) {
+			sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
+		}
+		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
+	}
+	
+	/**
+	 * set all record properties by given serialized form
+	 * @param serializedRecordProperties
+	 */
+	public void setSerializedProperties(String serializedRecordProperties) {
+		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, this.propertyKeys);
+		String tmpValue = null;
+		
+		tmpValue = recordProps.get(CONFIG_KEY);
+		if (tmpValue!=null && tmpValue.length() > 0) this.channelConfigKey = tmpValue.trim();
+		//this.name =  recordProps.get(NAME); // name could be different and should be loaded by device properties XML
+		if (!recordProps.get(NAME).equals(this.name)) log.info("record name from device props = " + this.name + " not equals record name loaded from file = " + recordProps.get(NAME));
+		tmpValue = recordProps.get(UNIT);
+		if (tmpValue!=null && tmpValue.length() > 0) this.unit =  tmpValue.trim();
+		tmpValue = recordProps.get(SYMBOL);
+		if (tmpValue!=null && tmpValue.length() > 0) this.symbol =  tmpValue.trim();
+		tmpValue = recordProps.get(IS_ACTIVE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isActive =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_DIPLAYABLE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_VISIBLE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isVisible =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_POSITION_LEFT);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isPositionLeft =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_DIPLAYABLE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(COLOR);
+		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(",")[0]), new Integer(tmpValue.split(",")[1]), new Integer(tmpValue.split(",")[2]));
+		tmpValue = recordProps.get(LINE_WITH);
+		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  new Integer(tmpValue.trim()).intValue();
+		tmpValue = recordProps.get(LINE_STYLE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.lineStyle =  new Integer(tmpValue.trim()).intValue();
+		tmpValue = recordProps.get(IS_ROUND_OUT);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isRoundOut =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_START_POINT_ZERO);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isStartpointZero =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(IS_START_END_DEFINED);
+		if (tmpValue!=null && tmpValue.length() > 0) this.isStartEndDefined =  new Boolean(tmpValue.trim()).booleanValue();
+		tmpValue = recordProps.get(NUMBER_FORMAT);
+		if (tmpValue!=null && tmpValue.length() > 0) this.numberFormat =  new Integer(tmpValue.trim()).intValue();
+		tmpValue = recordProps.get(MAX_VALUE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.maxValue =  new Integer(tmpValue.trim()).intValue();
+		tmpValue = recordProps.get(MIN_VALUE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.minValue =  new Integer(tmpValue.trim()).intValue();
+		tmpValue = recordProps.get(DEFINED_MAX_VALUE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.maxScaleValue =  new Double(tmpValue.trim()).doubleValue();
+		tmpValue = recordProps.get(DEFINED_MIN_VALUE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  new Double(tmpValue.trim()).doubleValue();
+	}
+	
+	/**
+	 * set the device specific properties for this record
+	 * @param serializedProperties
+	 */
+	public void setSerializedDeviceSpecificProperties(String serializedProperties) {
+		//sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
+		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
+		Iterator<String> iterator = recordDeviceProps.keySet().iterator();
+	
+		if (iterator.hasNext()) {
+			this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
+			while (iterator.hasNext()) {
+				String propName = iterator.next();
+				String prop = recordDeviceProps.get(propName);
+				PropertyType tmpProperty = new ObjectFactory().createPropertyType();
+				tmpProperty.setName(propName);
+				String type = prop.split("=")[0].substring(1);
+				if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
+				String value = prop.split("=")[1];
+				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
+				this.properties.add(tmpProperty.clone());
+			}
+		}
 	}
 }
 
