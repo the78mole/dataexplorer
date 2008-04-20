@@ -115,8 +115,8 @@ public class PropertyType {
      *     {@link String }
      *     
      */
-    public void setValue(String newValue) {
-        this.value = newValue;
+    public void setValue(Object newValue) {
+        this.value = "" + newValue;
     }
 
     /**

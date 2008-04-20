@@ -118,7 +118,7 @@ public class LinearRegression extends CalculationThread {
 		}
 		if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter);
 
-		record.setDisplayable(true);
+		if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 		if (record.isVisible()) this.application.updateGraphicsWindow();
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();

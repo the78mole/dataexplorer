@@ -54,7 +54,7 @@ public enum DataTypes {
 
     public static DataTypes fromValue(String v) {
         for (DataTypes c: DataTypes.values()) {
-            if (c.value.equals(v)) {
+            if (c.value.equalsIgnoreCase(v)) {
                 return c;
             }
         }

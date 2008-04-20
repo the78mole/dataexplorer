@@ -125,7 +125,7 @@ public class QuasiLinearRegression extends CalculationThread {
 		}
 		if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.fine("counter = " + counter + " modCounter = " + modCounter);
 
-		record.setDisplayable(true);
+		if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 		if (record.isVisible()) this.application.updateGraphicsWindow();
 
 		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();

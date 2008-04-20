@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -521,7 +522,11 @@ public class DeviceConfiguration {
 	 * @return
 	 */
 	public List<PropertyType> getProperties(String channelConfigKey, String measurementKey) {
-		return this.getMeasurement(channelConfigKey, measurementKey).getProperty();
+		List<PropertyType> list = new ArrayList<PropertyType>();
+		MeasurementType measurement = this.getMeasurement(channelConfigKey, measurementKey);
+		if (measurement != null)
+			list = measurement.getProperty();
+		return list;
 	}
 	
 	/**
@@ -722,7 +727,7 @@ public class DeviceConfiguration {
 	 */
 	public Object getMeasurementPropertyValue(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], propertyKey);
-		return property != null ? property.getValue() : 1;
+		return property != null ? property.getValue() : "";
 	}
 	
 	/**
