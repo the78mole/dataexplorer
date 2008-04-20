@@ -336,9 +336,20 @@ public interface IDevice {
 	public double reverseTranslateValue(Record record, double value);
 
 	/**
-	 * function to calculate values for inactive which need to be calculated records
+	 * function to calculate values for inactive record which need to be calculated
+	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet);
+
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	public void updateVisibilityStatus(RecordSet recordSet);
 
 	/**
 	 * @param isChangePropery the isChangePropery to set
@@ -349,4 +360,11 @@ public interface IDevice {
 	 * writes updated device properties XML if isChangePropery == true;
 	 */
 	public void storeDeviceProperties();
+	
+	/**
+	 * query for all the property keys this device has in use
+	 * - the property keys are used to filter serialized properties form OSD data file
+	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
+	 */
+	public String[] getUsedPropertyKeys();
 }
