@@ -131,9 +131,8 @@ public class MenuToolBar {
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt);
-							//TODO add your code for openToolItem.widgetSelected
-							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							MenuToolBar.this.application.getMenuBar().importFileCVS("Import CSV raw", true);
+							//TODO check if other data unsaved 
+							MenuToolBar.this.application.getMenuBar().openFile("Öffne Datei ...");
 						}
 					});
 				}
@@ -145,9 +144,13 @@ public class MenuToolBar {
 					this.saveToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("saveToolItem.widgetSelected, event=" + evt);
-							//TODO add your code for saveToolItem.widgetSelected
-							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							MenuToolBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
+							if (activeChannel != null) {
+								if (MenuToolBar.this.channels.isSaved())
+									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern unter ...", "");
+								else
+									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern", MenuToolBar.this.channels.getFullQualifiedFileName());
+							}
 						}
 					});
 				}
@@ -159,9 +162,7 @@ public class MenuToolBar {
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt);
-							//TODO add your code for saveAsToolItem.widgetSelected
-							MenuToolBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							MenuToolBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern unter ...", "");
 						}
 					});
 				}
@@ -684,6 +685,7 @@ public class MenuToolBar {
 				channelNames[i] = this.channels.get(i + 1).getName();
 				if (channelNames[i].equals(activeChannelName)) activeChannelNumber = i;
 			}
+			this.channels.setChannelNames(channelNames);
 			this.channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
 		else { // no channel

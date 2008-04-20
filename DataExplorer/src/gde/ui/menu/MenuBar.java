@@ -139,7 +139,8 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
-							opentFile("Öffne Datei ...");
+							//TODO check if other data unsaved , clean environment or switch device
+							openFile("Öffne Datei ...");
 						}
 					});
 				}
@@ -804,7 +805,7 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void opentFile(final String dialogName) {
+	public void openFile(final String dialogName) {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
 		String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
