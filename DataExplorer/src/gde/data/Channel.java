@@ -207,13 +207,13 @@ public class Channel extends HashMap<String, RecordSet> {
 				rgb = color.getRGB().red + "," + color.getRGB().green + "," + color.getRGB().blue;
 				this.template.setProperty(RecordSet.TIME_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.TIME_GRID_LINE_STYLE, new Integer(recordSet.getLineStyleTimeGrid()).toString());
-				this.template.setProperty(RecordSet.TIME_GRID_STATE, new Integer(recordSet.getTimeGridType()).toString());
+				this.template.setProperty(RecordSet.TIME_GRID_TYPE, new Integer(recordSet.getTimeGridType()).toString());
 				// curve grid
 				color = recordSet.getHorizontalGridColor();
 				rgb = color.getRGB().red + "," + color.getRGB().green + "," + color.getRGB().blue;
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYSLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_STATE, new Integer(recordSet.getHorizontalGridType()).toString());
+				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
+				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, new Integer(recordSet.getHorizontalGridType()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, recordSet.getHorizontalGridRecordName());
 			}
 			this.template.store();
@@ -254,15 +254,15 @@ public class Channel extends HashMap<String, RecordSet> {
 				b = new Integer(color.split(",")[2].trim()).intValue();
 				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setTimeGridLineStyle(new Integer(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, "" + SWT.LINE_DOT)).intValue());
-				recordSet.setTimeGridType(new Integer(this.template.getProperty(RecordSet.TIME_GRID_STATE, "0")).intValue());
+				recordSet.setTimeGridType(new Integer(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue());
 				// curve grid
 				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128");
 				r = new Integer(color.split(",")[0].trim()).intValue();
 				g = new Integer(color.split(",")[1].trim()).intValue();
 				b = new Integer(color.split(",")[2].trim()).intValue();
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYSLE, "" + SWT.LINE_DOT)).intValue());
-				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_STATE, "0")).intValue());
+				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, "" + SWT.LINE_DOT)).intValue());
+				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue());
 				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0"));
 			}
 			log.fine("applied graphics template file " + this.template.getCurrentFilePath());
@@ -285,7 +285,6 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @return the activeRecordSet
 	 */
 	public RecordSet getActiveRecordSet() {
-		//return (this.name.startsWith(" 1 ") || this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) ? this.activeRecordSet : Channels.getInstance().get(1).getActiveRecordSet();
 		return this.activeRecordSet;
 	}
 
@@ -294,20 +293,6 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
 		this.activeRecordSet = this.get(recordSetKey);
-//		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
-//			this.activeRecordSet = this.get(recordSetKey);
-//		}
-//		else { // ChannelTypes.TYPE_CONFIG
-//			RecordSet recordSet = this.get(recordSetKey);
-//			Channels channels = Channels.getInstance();
-//			for (int i =1; i <= channels.size(); ++i) {
-//				channels.get(i).setActiveRecordSet(recordSet);
-//			}
-//		}
-//	}
-//
-//	private void setActiveRecordSet(RecordSet recordSet) {
-//		this.activeRecordSet = recordSet;
 	}
 	
 	/**
@@ -345,14 +330,16 @@ public class Channel extends HashMap<String, RecordSet> {
 			if (channelNumber > 0) {
 				Channels.getInstance().switchChannel(channelNumber, recordSetKey);
 				recordSet = activeChannel.get(recordSetKey);
-				activeChannel.applyTemplate(recordSetKey); // updates graphics window
+				//recordSet.checkAllDisplayable(); // updates graphics window
+				//activeChannel.applyTemplate(recordSetKey); // updates graphics window
 			}
 		}
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
 			recordSet.resetZoomAndMeasurement();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
-			activeChannel.applyTemplate(recordSetKey); // updates graphics window
+			recordSet.checkAllDisplayable(); // updates graphics window
+			//activeChannel.applyTemplate(recordSetKey); // updates graphics window
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
