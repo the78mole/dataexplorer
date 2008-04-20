@@ -101,7 +101,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
 
-				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
+				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
 			}
 			else if (subtractLast) {
 				// get the record set to be used
@@ -175,6 +175,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	public void updateVisibilityStatus(RecordSet recordSet) {
+		log.info("no update required for " + recordSet.getName());
+	}
+
+	/**
 	 * function to calculate values for inactive and to be calculated records
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -194,6 +206,17 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				this.slopeCalculationThread.start();
 			}
 		}
+	}
+
+	/**
+	 * query for all the property keys this device has in use
+	 * - the property keys are used to filter serialized properties form OSD data file
+	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
+	 */
+	public String[] getUsedPropertyKeys() {
+		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION, 
+				DO_NO_ADAPTION, DO_OFFSET_HEIGHT, DO_SUBTRACT_FIRST, DO_SUBTRACT_LAST,
+				CalculationThread.REGRESSION_INTERVAL_SEC, CalculationThread.REGRESSION_TYPE};
 	}
 
 	/**

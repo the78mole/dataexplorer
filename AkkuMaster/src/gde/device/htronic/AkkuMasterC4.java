@@ -97,6 +97,18 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	public void updateVisibilityStatus(RecordSet recordSet) {
+		log.info("no update required for " + recordSet.getName());
+	}
+	
+	/**
 	 * function to calculate values for inactive or to be calculated records
 	 * @param recordSet
 	 */
@@ -135,4 +147,12 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		return this.serialPort;
 	}
 
+	/**
+	 * query for all the property keys this device has in use
+	 * - the property keys are used to filter serialized properties form OSD data file
+	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
+	 */
+	public String[] getUsedPropertyKeys() {
+		return new String[0];
+	}
 }
