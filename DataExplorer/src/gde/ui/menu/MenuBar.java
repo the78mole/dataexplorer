@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
+import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -37,12 +39,13 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
-import osde.exception.ApplicationConfigurationException;
 import osde.io.CSVReaderWriter;
+import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsWindow;
+import osde.utils.FileUtils;
 
 /**
  * menu bar implementation class for the OpenSerialDataExplorer
@@ -94,6 +97,8 @@ public class MenuBar {
 	final Menu										parent;
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
+	Thread 												readerWriterThread;
+	Vector<String>								fileHistory = new Vector<String>();
 
 	public MenuBar(OpenSerialDataExplorer currentApplication, Menu menuParent) {
 		this.application = currentApplication;
@@ -134,9 +139,7 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
-							//TODO implement data file format and set ending as file open dialog filter 
-							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							importFileCVS("Import CSV raw", true);
+							opentFile("Öffne Datei ...");
 						}
 					});
 				}
@@ -147,9 +150,13 @@ public class MenuBar {
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
-							//TODO implement data file format and set ending as file save dialog filter 
-							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							MenuBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+							if (activeChannel != null) {
+								if (MenuBar.this.channels.isSaved())
+									MenuBar.this.saveOsdFile("OSD Datei - Speichern unter ...", "");
+								else
+									MenuBar.this.saveOsdFile("OSD Datei - Speichern", MenuBar.this.channels.getFullQualifiedFileName());
+							}
 						}
 					});
 				}
@@ -160,9 +167,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt);
-							//TODO implement data file format and set ending as file save dialog filter 
-							MenuBar.this.application.openMessageDialog("Entschuldigung, ein Datenformat ist noch nicht implementiert! Benutze anstatt CVS \"raw\" Format.");
-							MenuBar.this.application.getMenuBar().exportFileCVS("Export CSV raw", true);
+							MenuBar.this.saveOsdFile("OSD Datei - Speichern unter ...", "");
 						}
 					});
 				}
@@ -701,11 +706,11 @@ public class MenuBar {
 
 	/**
 	 * add history file to history menu
-	 * @param newFileName
+	 * @param addFullQualifiedFileName
 	 */
-	public void addSubHistoryMenuItem(String newFileName) {
+	public void updateSubHistoryMenuItem(String addFullQualifiedFileName) {
 		MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
-		historyImportMenuItem.setText(newFileName);
+		historyImportMenuItem.setText(addFullQualifiedFileName);
 		historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent evt) {
 				MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
@@ -719,25 +724,31 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void importFileCVS(String dialogName, boolean isRaw) {
-		try {
-			IDevice activeDevice = this.application.getActiveDevice();
-			if (activeDevice == null) throw new ApplicationConfigurationException("Vor dem Import bitte erst ein Gerät auswählen !");
-			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-			String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
-			FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
-			if (csvFileDialog.getFileName().length() > 4) {
-				String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
-				String fileName = csvFileDialog.getFileName();
-				fileName = fileName.substring(0, fileName.indexOf('.'));
-				addSubHistoryMenuItem(csvFileDialog.getFileName());
-
-				CSVReaderWriter.read(deviceSetting.getListSeparator(), csvFilePath, fileName, isRaw);
-			}
+	public void importFileCVS(String dialogName, final boolean isRaw) {
+		IDevice activeDevice = this.application.getActiveDevice();
+		if (activeDevice == null) {
+			this.application.openMessageDialog("Vor dem Import bitte erst ein Gerät auswählen !");
+			return;
 		}
-		catch (Exception e) {
-			this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.csv" }, path);
+		if (csvFileDialog.getFileName().length() > 4) {
+			final String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
+			String fileName = csvFileDialog.getFileName();
+			fileName = fileName.substring(0, fileName.indexOf('.'));
+			updateSubHistoryMenuItem(csvFileDialog.getFileName());
+
+			final char listSeparator = deviceSetting.getListSeparator();
+			final String recordSetNameExtend = fileName;
+			try {
+				CSVReaderWriter.read(listSeparator, csvFilePath, recordSetNameExtend, isRaw);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+			}
 		}
 	}
 
@@ -746,25 +757,127 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void exportFileCVS(String dialogName, boolean isRaw) {
-		try {
-			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-			String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
-			FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
-			if (csvFileDialog.getFileName().length() > 4) {
-				Channel activeChannel = this.channels.getActiveChannel();
-				if (activeChannel == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
-				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-				if (activeRecordSet == null) throw new ApplicationConfigurationException("Es gibt keine Daten, die man sichern könnte ?");
-				String recordSetKey = activeRecordSet.getName();
-				String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
-				addSubHistoryMenuItem(csvFileDialog.getFileName());
-				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
-			}
+	public void exportFileCVS(final String dialogName, final boolean isRaw) {
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog("Es gibt keine Daten, die man sichern könnte ?");
+			return;
 		}
-		catch (Exception e) {
-			this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog("Es gibt keine Daten, die man sichern könnte ?");
+			return;
+		}
+
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
+		String recordSetKey = activeRecordSet.getName();
+		final String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
+		updateSubHistoryMenuItem(csvFileDialog.getFileName());
+
+		if (csvFilePath.length() > 4) { // file name has a reasonable length
+			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + csvFilePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
+				return;
+			}
+
+			final char listSeparator = deviceSetting.getListSeparator();
+			final String recordSetName = recordSetKey;
+			this.readerWriterThread = new Thread() {
+				public void run() {
+					try {
+						CSVReaderWriter.write(listSeparator, recordSetName, csvFilePath, isRaw);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+					}
+				}
+			};
+			this.readerWriterThread.start();
+		}
+	}
+
+	/**
+	 * handles the import of an CVS file
+	 * @param dialogName
+	 * @param isRaw
+	 */
+	public void opentFile(final String dialogName) {
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+		String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
+		FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
+		if (openFileDialog.getFileName().length() > 4) {
+			final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
+			String fileName = openFileDialog.getFileName();
+			fileName = fileName.substring(0, fileName.indexOf('.'));
+			updateSubHistoryMenuItem(openFileDialog.getFileName());
+
+			this.readerWriterThread = new Thread() {
+				public void run() {
+					try {
+						OsdReaderWriter.read(openFilePath);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+					}
+				}
+			};
+			this.readerWriterThread.start();
+		}
+	}
+
+	/**
+	 * handles the save as functionality
+	 * @param dialogName
+	 * @param fileName
+	 */
+	public void saveOsdFile(final String dialogName, final String fileName) {
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog("Es gibt keine Daten, die man sichern könnte ?");
+			return;
+		}
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog("Es gibt keine Daten, die man sichern könnte ?");
+			return;
+		}
+
+		String filePath;
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+		if (fileName == null || fileName.length() < 5) {
+			FileDialog fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path);
+			filePath = fileDialog.getFilterPath() + this.fileSep + fileDialog.getFileName();
+		}
+		else {
+			filePath = path + fileName; // including ending ".osd"
+		}
+
+		if (filePath.length() > 4) { // file name has a reasonable length
+			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + filePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
+				return;
+			}
+
+			final String useFilePath = filePath;
+			this.readerWriterThread = new Thread() {
+				public void run() {
+					try {
+						OsdReaderWriter.write(useFilePath, activeChannel);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+					}
+				}
+			};
+			this.readerWriterThread.start();
+			updateSubHistoryMenuItem(useFilePath);
 		}
 	}
 

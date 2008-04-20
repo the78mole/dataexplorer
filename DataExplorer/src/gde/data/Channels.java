@@ -31,9 +31,12 @@ public class Channels extends HashMap<Integer, Channel> {
 	final static long											serialVersionUID		= 26031957;
 	final static Logger										log									= Logger.getLogger(Channels.class.getName());
 
-	static Channels								channles						= null;
-	String												fileDescription			= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-	int														activeChannelNumber	= 1;																						// default at least one channel must exist
+	static Channels								channles								= null;
+	String												fileDescription					= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+	int														activeChannelNumber			= 1;		// default at least one channel must exist
+	String[]											channelNames 						= new String[1];
+	String 												fullQualifiedFileName		= "";
+	boolean												isSaved									= false;
 	final OpenSerialDataExplorer	application;
 
 	/**
@@ -83,9 +86,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
 		boolean isFound = false;
-		String[] channelNames = getChannelNames();
-		for (String name : channelNames) {
-			if (name.split(":")[1].trim().equals(channelName)) {
+		for (String name : this.getChannelNames()) {
+			if (name != null && name.length() > 5 && name.split(":")[1].trim().equals(channelName)) {
 				isFound = true;
 				break;
 			}
@@ -98,7 +100,15 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @return array with channel names
 	 */
 	public String[] getChannelNames() {
-		return this.application.getMenuToolBar().getChannelSelectCombo().getItems();
+		//return this.application.getMenuToolBar().getChannelSelectCombo().getItems();
+		return this.channelNames;
+	}
+
+	/**
+	 * @param newChannelNames the channel names to set
+	 */
+	public void setChannelNames(String[] newChannelNames) {
+		this.channelNames = newChannelNames.clone();
 	}
 
 	/**
@@ -145,16 +155,19 @@ public class Channels extends HashMap<Integer, Channel> {
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
-				if (recordSet != null) recordSet.resetZoomAndMeasurement();
+				if (recordSet != null) {
+					recordSet.resetZoomAndMeasurement();
+					recordSet.checkAllDisplayable();
+				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 
-				if (recordSetKey == null || recordSetKey.length() > 1)
-					this.getActiveChannel().applyTemplate(recordSetKey);
-				else
-					this.application.updateGraphicsWindow();
+				//				if (recordSetKey == null || recordSetKey.length() > 1)
+				//					this.getActiveChannel().applyTemplate(recordSetKey);
+				//				else
+				//					this.application.updateGraphicsWindow();
 
 				this.application.updateDigitalWindow();
 				this.application.updateAnalogWindow();
@@ -193,6 +206,11 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * method to cleanup all child and dependent
 	 */
 	public void cleanup() {
+		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		this.activeChannelNumber	= 1;		// default at least one channel must exist
+		this.channelNames = new String[1];
+		this.fullQualifiedFileName = "";
+		this.isSaved = false;
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -236,5 +254,33 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}		
 		return sb.toString();
+	}
+
+	/**
+	 * @return the fullQualifiedFileName
+	 */
+	public String getFullQualifiedFileName() {
+		return this.fullQualifiedFileName;
+	}
+
+	/**
+	 * @param useFullQualifiedFileName the fullQualifiedFileName to set
+	 */
+	public void setFullQualifiedFileName(String useFullQualifiedFileName) {
+		this.fullQualifiedFileName = useFullQualifiedFileName.replace('\\', '/');
+	}
+
+	/**
+	 * @return the isSaved
+	 */
+	public boolean isSaved() {
+		return this.isSaved;
+	}
+
+	/**
+	 * @param value the isSaved value to set
+	 */
+	public void setSaved(boolean value) {
+		this.isSaved = value;
 	}
 }
