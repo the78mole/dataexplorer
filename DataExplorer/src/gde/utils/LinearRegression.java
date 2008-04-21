@@ -56,6 +56,7 @@ public class LinearRegression extends CalculationThread {
 		LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey);
 
 		Record record = this.recordSet.get(this.targetRecordKey);
+		record.clear(); // make sure to clean the target record before calculate new data points
 		Record recordHeight = this.recordSet.get(this.sourceRecordKey);
 		double time_ms = this.recordSet.getTimeStep_ms();
 		int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
