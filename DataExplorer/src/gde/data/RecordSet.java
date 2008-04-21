@@ -276,6 +276,7 @@ public class RecordSet extends HashMap<String, Record> {
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.recordNames) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
+			log.fine(recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable());
 		}
 
 		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable; 
