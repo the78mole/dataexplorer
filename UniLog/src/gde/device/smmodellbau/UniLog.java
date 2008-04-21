@@ -144,6 +144,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			String recordKey;
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			String[] measurements = recordSet.getRecordNames();
+			int displayableCounter = 0;
+			
+			// check if measurements isActive == false and set to isDisplayable == false
+			for (String measurementKey : measurements) {
+				record = recordSet.get(measurementKey);
+				
+				if (record.isActive()) {
+					++displayableCounter;
+				}
+			}
 
 			recordKey = measurements[3]; // 3=capacity [Ah]
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
@@ -159,6 +169,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			if (recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
+				++displayableCounter;
 			}
 
 			recordKey = measurements[4]; // 4=power [W]
@@ -173,6 +184,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
+				++displayableCounter;
 			}
 
 			recordKey = measurements[5]; // 5=energy [Wh]
@@ -190,6 +202,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
+				++displayableCounter;
 			}
 
 			recordKey = measurements[6]; // 6=votagePerCell
@@ -205,6 +218,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			if (recordVoltage.isDisplayable()) {
 				record.setDisplayable(true);
+				++displayableCounter;
 			}
 
 			recordKey = measurements[8]; // 8=efficiency
@@ -223,8 +237,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 			if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
 				record.setDisplayable(true);
+				++displayableCounter;
 			}
 
+			boolean isNoSlopeCalculationStarted = true;
 			recordKey = measurements[10]; // 10=slope
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
 			record = recordSet.get(recordKey);
@@ -240,11 +256,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			this.slopeCalculationThread.start();
 			if (recordSet.get(measurements[9]).isDisplayable()) {
 				record.setDisplayable(true);
+				isNoSlopeCalculationStarted = false;
+				++displayableCounter;
 			}
-			//log.fine("displayableCounter = " + displayableCounter);
-			//recordSet.setConfiguredDisplayable(displayableCounter);
+			
+			log.fine("displayableCounter = " + displayableCounter);
+			recordSet.setConfiguredDisplayable(displayableCounter);
 
-			this.application.updateGraphicsWindow();
+			if (isNoSlopeCalculationStarted) this.application.updateGraphicsWindow();
 			log.fine("finished data calculation for record = " + recordKey);
 		}
 	}
