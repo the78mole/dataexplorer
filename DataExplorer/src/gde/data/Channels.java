@@ -141,7 +141,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public void switchChannel(int channelNumber, String recordSetKey) {
 		log.fine("switching to channel " + channelNumber);		
 		if (!(channelNumber > this.keySet().size())) {
-			if (channelNumber != this.getActiveChannelNumber()) {
+			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
 				this.setActiveChannelNumber(channelNumber);
 				this.application.getMenuToolBar().updateChannelToolItems();
 				if (recordSetKey == null || recordSetKey.length() < 1)
