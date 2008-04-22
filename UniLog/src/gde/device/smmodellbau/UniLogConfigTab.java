@@ -204,6 +204,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.energySymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.energyUnit.setText("[" + measurement.getUnit() + "]");
 
+							// capacity
+							updateStateCurrentDependent(UniLogConfigTab.this.currentButton.getSelection());
+
 							// capacity, power, energy
 							updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 
@@ -316,6 +319,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.currentButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt);
+								updateStateCurrentDependent(UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
 										&& UniLogConfigTab.this.revolutionButton.getSelection());
@@ -665,7 +669,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 										UniLogConfigTab.this.dialog.updateConfigurationValues(UniLogConfigTab.this.device.getSerialPort().readConfiguration());
 									}
 									UniLogConfigTab.this.a1Text.setText(UniLogDialog.A1_MODUS[UniLogConfigTab.this.dialog.getSelectionIndexA1ModusCombo()]);
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 								catch (Exception e) {
 									UniLogConfigTab.this.application.openMessageDialog(e.getMessage());
@@ -704,15 +708,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1ValueButton.widgetSelected, event=" + evt);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (activeRecordSet != null) {
-										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-									}
-								}
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -724,15 +720,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Text.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -745,15 +733,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -765,15 +745,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -785,15 +757,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -805,15 +769,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2ValueButton.widgetSelected, event=" + evt);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (activeRecordSet != null) {
-										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-									}
-								}
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -825,15 +781,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Text.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -846,15 +794,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -866,15 +806,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -886,15 +818,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -906,15 +830,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3ValueButton.widgetSelected, event=" + evt);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (activeRecordSet != null) {
-										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-									}
-								}
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -926,15 +842,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Text.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -947,15 +855,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -967,15 +867,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -987,15 +879,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt);
 								if (evt.character == SWT.CR) {
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-											activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-										}
-									}
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									checkUpdateAnalog();
 								}
 							}
 						});
@@ -1008,16 +892,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23InternModus.widgetSelected, event=" + evt);
 								setA23Defaults('I');
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (activeRecordSet != null) {
-										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-									}
-								}
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -1029,15 +904,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23ExternModus.widgetSelected, event=" + evt);
 								setA23Defaults('E');
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (activeRecordSet != null) {
-										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-									}
-								}
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -1182,6 +1049,33 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	}
 
 	/**
+	 * enable or disable current (and time) dependent measurement fields
+	 * @param enabled true | false
+	 */
+	void updateStateCurrentDependent(boolean enabled) {
+		if (this.channels.getActiveChannel() != null) {
+			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
+			if (activeRecordSet != null) {
+				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[3]).setDisplayable(enabled);
+			}
+		}
+		this.capacityLabel.setEnabled(enabled);
+		this.capacitySymbol.setEnabled(enabled);
+		this.capacityUnit.setEnabled(enabled);
+		if (enabled) {
+			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		}
+		else {
+			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		}
+	}
+	
+	/**
 	 * enable or disable voltage and current dependent measurement fields
 	 * @param enabled true | false
 	 */
@@ -1190,15 +1084,11 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-				activeRecordSet.get(activeRecordSet.getRecordNames()[3]).setDisplayable(enabled);
 				activeRecordSet.get(activeRecordSet.getRecordNames()[4]).setDisplayable(enabled);
 				activeRecordSet.get(activeRecordSet.getRecordNames()[5]).setDisplayable(enabled);
 				activeRecordSet.get(activeRecordSet.getRecordNames()[6]).setDisplayable(enabled);
 			}
 		}
-		this.capacityLabel.setEnabled(enabled);
-		this.capacitySymbol.setEnabled(enabled);
-		this.capacityUnit.setEnabled(enabled);
 		this.powerLabel.setEnabled(enabled);
 		this.powerUnit.setEnabled(enabled);
 		this.powerSymbol.setEnabled(enabled);
@@ -1211,9 +1101,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		this.numCellLabel.setEnabled(enabled);
 		this.numCellInput.setEnabled(enabled);
 		if (enabled) {
-			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			this.powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			this.powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			this.powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -1227,9 +1114,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.numCellInput.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		}
 		else {
-			this.capacityLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			this.capacitySymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-			this.capacityUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			this.powerLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			this.powerUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			this.powerSymbol.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -1466,5 +1350,36 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetA3 = this.device.getMeasurementOffset(this.configName, recordKey);
 			this.factorA3 = this.device.getMeasurementFactor(this.configName, recordKey);
 		}
+	}
+
+	/**
+	 * updates the analog record descriptors according input fields
+	 */
+	void checkUpdateAnalog() {
+		if (this.channels.getActiveChannel() != null) {
+			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
+			if (activeRecordSet != null) {
+				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText()));
+				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText()));
+				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(new Double(this.a3Factor.getText()));
+				UniLogConfigTab.this.application.updateGraphicsWindow();
+			}
+		}
+		this.setConfigButton.setEnabled(true);
 	}
 }

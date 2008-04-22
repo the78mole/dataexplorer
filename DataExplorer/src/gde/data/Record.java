@@ -208,10 +208,18 @@ public class Record extends Vector<Integer> {
 		return this.unit;
 	}
 
+	public void setUnit(String newUnit) {
+		this.unit = newUnit;
+	}
+
 	public String getSymbol() {
 		return this.symbol;
 	}
 
+	public void setSymbol(String newSymbol) {
+		this.symbol = newSymbol;
+	}
+	
 	/**
 	 * replace the properties to enable channel/configuration switch
 	 * @param newProperties
