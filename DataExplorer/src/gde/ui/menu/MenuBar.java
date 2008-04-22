@@ -39,6 +39,7 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
+import osde.exception.DeclinedException;
 import osde.io.CSVReaderWriter;
 import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
@@ -128,7 +129,9 @@ public class MenuBar {
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("newFileMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
+							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
+								MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
+							}
 						}
 					});
 				}
@@ -139,8 +142,9 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
-							//TODO check if other data unsaved , clean environment or switch device
-							openFile("Öffne Datei ...");
+							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
+								openFile("Öffne Datei ...");
+							}
 						}
 					});
 				}
@@ -806,28 +810,48 @@ public class MenuBar {
 	 * @param isRaw
 	 */
 	public void openFile(final String dialogName) {
-		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-		String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
-		FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
-		if (openFileDialog.getFileName().length() > 4) {
-			final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
-			String fileName = openFileDialog.getFileName();
-			fileName = fileName.substring(0, fileName.indexOf('.'));
-			updateSubHistoryMenuItem(openFileDialog.getFileName());
+		try {
+			Settings deviceSetting = Settings.getInstance();
+			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
+			if (openFileDialog.getFileName().length() > 4) {
+				final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
+				String fileName = openFileDialog.getFileName();
+				fileName = fileName.substring(0, fileName.indexOf('.'));
+				updateSubHistoryMenuItem(openFileDialog.getFileName());
+				
+				//check current device and switch if required
+				String fileDeviceName = OsdReaderWriter.getDeviceName(openFilePath);
+				String activeDeviceName = this.application.getActiveDevice().getName();
+				if (!activeDeviceName.equals(fileDeviceName)) {
+					String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
+					if (SWT.NO == this.application.openYesNoMessageDialog(msg))
+						throw new DeclinedException();
 
-			this.readerWriterThread = new Thread() {
-				public void run() {
-					try {
-						OsdReaderWriter.read(openFilePath);
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
-					}
+					this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 				}
-			};
-			this.readerWriterThread.start();
+
+				this.readerWriterThread = new Thread() {
+					public void run() {
+						try {
+							OsdReaderWriter.read(openFilePath);
+						}
+						catch (Exception e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+							MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+						}
+					}
+				};
+				this.readerWriterThread.start();
+			}
+		}
+		catch (DeclinedException e) {
+			// ignore, user has declined device switch
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 

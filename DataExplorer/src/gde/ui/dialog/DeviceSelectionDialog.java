@@ -896,6 +896,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
+	public void setupDevice(String newDeviceName) {
+		int selection = this.getActiveDevices().indexOf(newDeviceName);
+		this.setActiveConfig(this.getDevices().get(this.getActiveDevices().get(selection)));
+		this.setupDevice();
+	}
+
+	/**
+	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
+	 */
 	public void setupDevice() {
 		IDevice activeDevice = this.getInstanceOfDevice();
 		this.application.setActiveDevice(activeDevice);

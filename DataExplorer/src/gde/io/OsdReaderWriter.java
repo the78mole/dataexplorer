@@ -35,6 +35,7 @@ import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
+import osde.exception.DeclinedException;
 import osde.exception.NotSupportedFileFormat;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
@@ -65,15 +66,53 @@ public class OsdReaderWriter {
 	final static OpenSerialDataExplorer	application								= OpenSerialDataExplorer.getInstance();
 	final static Channels 							channels 									= Channels.getInstance();
 
+	
+	public static String getDeviceName(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
+		FileInputStream file_input = new FileInputStream(new File(filePath));
+		DataInputStream data_in    = new DataInputStream(file_input);
+		String fileComment = "";
+		int lineSize = 0;
+		String line;
+		
+		// first line : header with version
+		lineSize = data_in.readInt();
+		line = data_in.readUTF().substring(0, lineSize-1);	
+		log.info(line);
+		if (!OPEN_SERIAL_DATA_VERSION.equals(line))
+			throw new NotSupportedFileFormat(filePath);
+		
+		//creation time stamp
+		lineSize = data_in.readInt();
+		line = data_in.readUTF().substring(0, lineSize-1);	
+		log.info(line);
+		
+		// second line : size file comment , file comment
+		lineSize = data_in.readInt();
+		line = data_in.readUTF().substring(0, lineSize-1);	
+		fileComment = line.substring(FILE_COMMENT.length());
+		log.info(FILE_COMMENT + fileComment);
+		
+		// third line : size device name , device name
+		lineSize = data_in.readInt();
+		line = data_in.readUTF().substring(0, lineSize-1);	
+		String fileDevice = line.substring(DEVICE_NAME.length());
+		log.info(DEVICE_NAME + fileDevice);
+
+		return fileDevice;
+	}
+	
+	
 	/**
 	 * @param filePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NotSupportedFileFormat 
+	 * @throws DeclinedException 
 	 */
 	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
+		String fileComment = "";
 		String channelConfig = "";
 		String recordSetName = "";
 		String recordSetComment = "";
@@ -102,7 +141,7 @@ public class OsdReaderWriter {
 		// second line : size file comment , file comment
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
-		String fileComment = line.substring(FILE_COMMENT.length());
+		fileComment = line.substring(FILE_COMMENT.length());
 		log.info(FILE_COMMENT + fileComment);
 		
 		// third line : size device name , device name
@@ -110,7 +149,7 @@ public class OsdReaderWriter {
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		String fileDevice = line.substring(DEVICE_NAME.length());
 		log.info(DEVICE_NAME + fileDevice);
-		
+				
 		// number of record sets
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
@@ -127,7 +166,6 @@ public class OsdReaderWriter {
 		}
 
 		try { // build the data structure 
-			channels.setFullQualifiedFileName(filePath);
 			
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(CHANNEL_CONFIG);
@@ -179,9 +217,10 @@ public class OsdReaderWriter {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
-					final String useChannelConfig = firstRecordSet[0];
-					final String useRecordName = firstRecordSet[1];
-							channels.switchChannel(channels.getChannelNumber(useChannelConfig), useRecordName);
+					channels.setFullQualifiedFileName(filePath);
+					channels.setFileDescription(fileComment);
+					channels.setSaved(true);
+					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
 					

@@ -119,7 +119,9 @@ public class MenuToolBar {
 					this.newToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("newToolItem.widgetSelected, event=" + evt);
-							MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
+							if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
+								MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
+							}
 						}
 					});
 				}
@@ -131,8 +133,9 @@ public class MenuToolBar {
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt);
-							//TODO check if other data unsaved 
-							MenuToolBar.this.application.getMenuBar().openFile("Öffne Datei ...");
+							if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
+								MenuToolBar.this.application.getMenuBar().openFile("Öffne Datei ...");
+							}
 						}
 					});
 				}
