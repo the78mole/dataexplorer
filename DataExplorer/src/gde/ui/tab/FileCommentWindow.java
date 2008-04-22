@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -31,9 +32,14 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import osde.data.Channel;
 import osde.data.Channels;
+import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -49,6 +55,9 @@ public class FileCommentWindow {
 	Composite				commentMainComposite;
 	CLabel 					infoLabel;
 	Text						fileCommentText;
+	Table						recordCommentTable;
+	TableColumn			recordCommentTableHeader;
+	TableColumn			recordCommentTableHeader2;
 
 	final Channels	channels;
 	final TabFolder	displayTab;
@@ -76,14 +85,32 @@ public class FileCommentWindow {
 			this.commentMainComposite.setLayout(null);
 			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("cellVoltageMainComposite.paintControl, event=" + evt);
+					log.fine("commentMainComposite.paintControl, event=" + evt);
 					Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
 					//log.info("mainSize = " + mainSize.toString());
 					Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
-							, mainSize.x * 90/100, mainSize.y * 80/100);
+							, mainSize.x * 90/100, mainSize.y * 40/100);
 					//log.info("cover bounds = " + bounds.toString());
 					FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
 					FileCommentWindow.this.fileCommentText.setBounds(bounds);
+					FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
+					
+					bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 50/100
+							, mainSize.x * 90/100, mainSize.y * 40/100);
+					FileCommentWindow.this.recordCommentTable.setBounds(bounds);
+					FileCommentWindow.this.recordCommentTable.removeAll();
+					FileCommentWindow.this.recordCommentTableHeader2.setWidth(bounds.width-205);
+					Channel channel = Channels.getInstance().getActiveChannel();
+					TableItem item;
+					if (channel != null) {
+							HashMap<String, RecordSet> recordSets = channel.getRecordSets();
+							for (String recordSetKey : channel.getRecordSetNames()) {
+								if (recordSetKey != null) {
+									item = new TableItem(FileCommentWindow.this.recordCommentTable, SWT.LEFT);
+									item.setText(new String[] { recordSetKey, recordSets.get(recordSetKey).getRecordSetDescription() });
+								}
+							}
+					}
 				}
 			});
 			{
@@ -92,16 +119,10 @@ public class FileCommentWindow {
 				this.infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
 				this.infoLabel.setBounds(50, 10, 500, 26);
 			}
-			this.commentMainComposite.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					log.finer("commentMainComposite.paintControl, event=" + evt);
-					FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
-				}
-			});
 			{
-				this.fileCommentText = new Text(this.commentMainComposite, SWT.LEFT | SWT.TOP | SWT.MULTI | SWT.WRAP | SWT.BORDER);
+				this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER  | SWT.V_SCROLL);
 				this.fileCommentText.setText("Dateikommentar : ");
-				this.fileCommentText.setBounds(50, 40, 500, 300);
+				this.fileCommentText.setBounds(50, 40, 500, 100);
 				this.fileCommentText.setText(this.channels.getFileDescription());
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
@@ -118,6 +139,21 @@ public class FileCommentWindow {
 					}
 				});
 			}
+			{
+			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
+			this.recordCommentTable.setBounds(50, 200, 500, 100);
+			//this.table.setControl(this.dataTable);
+			this.recordCommentTable.setLinesVisible(true);
+			this.recordCommentTable.setHeaderVisible(true);
+
+			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
+			this.recordCommentTableHeader.setWidth(200);
+			this.recordCommentTableHeader.setText("Datensatzname");
+
+			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
+			this.recordCommentTableHeader2.setWidth(500);
+			this.recordCommentTableHeader2.setText("Kommentar");
+}
 		}
 	}
 	

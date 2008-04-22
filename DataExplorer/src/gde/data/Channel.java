@@ -174,8 +174,19 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public HashMap<String, RecordSet> getRecordSets() {
 		HashMap<String, RecordSet> content = new HashMap<String, RecordSet>(this.size());
-		for (String key : this.getRecordSetNames()) {
-			content.put(key, this.get(key));
+		if(this.getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			for (String key : this.getRecordSetNames()) {
+				content.put(key, this.get(key));
+			}
+		}
+		else { // ChannelTypes.TYPE_CONFIG
+			Channels channels = Channels.getInstance();
+ 			for (int i=1; i <= channels.size(); ++i) {
+ 				for (String key : channels.get(i).getUnsortedRecordSetNames()) {
+ 					log.info(key);
+ 					content.put(key, channels.get(i).get(key));
+ 				}
+			}
 		}
 		return content;
 	}
