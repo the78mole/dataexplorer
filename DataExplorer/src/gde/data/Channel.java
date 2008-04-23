@@ -183,8 +183,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			Channels channels = Channels.getInstance();
  			for (int i=1; i <= channels.size(); ++i) {
  				for (String key : channels.get(i).getUnsortedRecordSetNames()) {
- 					log.info(key);
- 					content.put(key, channels.get(i).get(key));
+ 					if (key !=null && key.length() > 1) content.put(key, channels.get(i).get(key));
  				}
 			}
 		}

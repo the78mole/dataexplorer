@@ -823,6 +823,13 @@ public class Record extends Vector<Integer> {
 		sb.append(IS_ACTIVE).append("=").append(this.isActive).append(DELIMITER);
 		sb.append(IS_DIPLAYABLE).append("=").append(this.isDisplayable).append(DELIMITER);
 		sb.append(IS_VISIBLE).append("=").append(this.isVisible).append(DELIMITER);
+		sb.append(MAX_VALUE).append("=").append(this.maxValue).append(DELIMITER);
+		sb.append(MIN_VALUE).append("=").append(this.minValue).append(DELIMITER);
+		for (PropertyType property : this.properties) {
+			sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
+		}
+		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxDisplayValue).append(DELIMITER);
+		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minDisplayValue).append(DELIMITER);
 		sb.append(IS_POSITION_LEFT).append("=").append(this.isPositionLeft).append(DELIMITER);
 		sb.append(COLOR).append("=").append(this.color.getRed()).append(",").append(this.color.getGreen()).append(",").append(this.color.getBlue()).append(DELIMITER);
 		sb.append(LINE_WITH).append("=").append(this.lineWidth).append(DELIMITER);
@@ -831,13 +838,6 @@ public class Record extends Vector<Integer> {
 		sb.append(IS_START_POINT_ZERO).append("=").append(this.isStartpointZero).append(DELIMITER);
 		sb.append(IS_START_END_DEFINED).append("=").append(this.isStartEndDefined).append(DELIMITER);
 		sb.append(NUMBER_FORMAT).append("=").append(this.numberFormat).append(DELIMITER);
-		sb.append(MAX_VALUE).append("=").append(this.maxValue).append(DELIMITER);
-		sb.append(MIN_VALUE).append("=").append(this.minValue).append(DELIMITER);
-		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxDisplayValue).append(DELIMITER);
-		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minDisplayValue).append(DELIMITER);
-		for (PropertyType property : this.properties) {
-			sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
-		}
 		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
 	}
 	
@@ -880,7 +880,7 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_START_END_DEFINED);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isStartEndDefined =  new Boolean(tmpValue.trim()).booleanValue();
 		tmpValue = recordProps.get(NUMBER_FORMAT);
-		if (tmpValue!=null && tmpValue.length() > 0) this.numberFormat =  new Integer(tmpValue.trim()).intValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.setNumberFormat(new Integer(tmpValue.trim()).intValue());
 		tmpValue = recordProps.get(MAX_VALUE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.maxValue =  new Integer(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(MIN_VALUE);
@@ -896,7 +896,6 @@ public class Record extends Vector<Integer> {
 	 * @param serializedProperties
 	 */
 	public void setSerializedDeviceSpecificProperties(String serializedProperties) {
-		//sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
 		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
 		Iterator<String> iterator = recordDeviceProps.keySet().iterator();
 	
