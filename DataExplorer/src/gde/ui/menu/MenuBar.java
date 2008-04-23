@@ -650,7 +650,7 @@ public class MenuBar {
 				}
 				{
 					this.cellVoltageTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.cellVoltageTabMenuItem.setText("Datensatzkommentar");
+					this.cellVoltageTabMenuItem.setText("Zellenspannung");
 					this.cellVoltageTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("cellVoltageTabMenuItem.widgetSelected, event=" + evt);
