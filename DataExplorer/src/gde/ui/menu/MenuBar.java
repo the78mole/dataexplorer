@@ -629,22 +629,22 @@ public class MenuBar {
 					});
 				}
 				{
-					this.analogTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.analogTabMenuItem.setText("Analoganzeige");
-					this.analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("analogTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_ANALOG);
-						}
-					});
-				}
-				{
 					this.digitalTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
 					this.digitalTabMenuItem.setText("Zahlenanzeige");
 					this.digitalTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("digitalTabMenuItem.widgetSelected, event=" + evt);
 							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DIGITAL);
+						}
+					});
+				}
+				{
+					this.analogTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.analogTabMenuItem.setText("Analoganzeige");
+					this.analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.finest("analogTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_ANALOG);
 						}
 					});
 				}
