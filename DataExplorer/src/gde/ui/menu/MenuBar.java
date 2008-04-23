@@ -16,13 +16,18 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
-import java.util.Vector;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -40,6 +45,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
 import osde.exception.DeclinedException;
+import osde.exception.NotSupportedFileFormat;
 import osde.io.CSVReaderWriter;
 import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
@@ -54,7 +60,7 @@ import osde.utils.FileUtils;
  */
 public class MenuBar {
 	final static Logger						log			= Logger.getLogger(MenuBar.class.getName());
-	private final String					fileSep	= System.getProperty("file.separator");
+	final String									fileSep	= System.getProperty("file.separator");
 
 	static Display								display;
 	static Shell									shell;
@@ -67,7 +73,7 @@ public class MenuBar {
 	MenuItem											contentsMenuItem, webCheckMenuItem;
 	Menu													helpMenu;
 	MenuItem											helpMenuItem;
-	MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
+	MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, cellVoltageTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
 	MenuItem											recordCommentMenuItem;
 	MenuItem											curveSelectionMenuItem;
 	Menu													viewMenu;
@@ -99,7 +105,6 @@ public class MenuBar {
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
 	Thread 												readerWriterThread;
-	Vector<String>								fileHistory = new Vector<String>();
 
 	public MenuBar(OpenSerialDataExplorer currentApplication, Menu menuParent) {
 		this.application = currentApplication;
@@ -122,6 +127,15 @@ public class MenuBar {
 			});
 			{
 				this.fileMenu = new Menu(this.fileMenuItem);
+				this.fileMenu.addMenuListener(new MenuListener() {
+					public void menuShown(MenuEvent evt) {
+						MenuBar.log.finest("fileMenu.handleEvent, event=" + evt);
+						MenuBar.this.updateSubHistoryMenuItem("");
+					}
+					public void menuHidden(MenuEvent evt) {
+						log.finest("fileMenu.menuHidden " + evt);
+					}
+				});
 				{
 					this.newFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
 					this.newFileMenuItem.setText("Neu");
@@ -143,7 +157,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
 							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
-								openFile("Öffne Datei ...");
+								openOsdFileDialog("Öffne Datei ...");
 							}
 						}
 					});
@@ -179,13 +193,6 @@ public class MenuBar {
 				{
 					this.historyFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
 					this.historyFileMenuItem.setText("Historie");
-					this.historyFileMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("historyFileMenuItem.widgetSelected, event=" + evt);
-							//TODO add your code for historyFileMenuItem.widgetSelected
-							MenuBar.this.application.openMessageDialog("Diese Implementierung fehlt noch :-(, Einträge werden aber schon angehängt");
-						}
-					});
 					{
 						this.fileHistoryMenu = new Menu(this.historyFileMenuItem);
 						this.historyFileMenuItem.setMenu(this.fileHistoryMenu);
@@ -642,12 +649,12 @@ public class MenuBar {
 					});
 				}
 				{
-					this.recordSetCommentTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.recordSetCommentTabMenuItem.setText("Datensatzkommentar");
-					this.recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.cellVoltageTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.cellVoltageTabMenuItem.setText("Datensatzkommentar");
+					this.cellVoltageTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMMENT);
+							MenuBar.log.finest("cellVoltageTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_CELL_VOLTAGE);
 						}
 					});
 				}
@@ -658,6 +665,16 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("compareTabMenuItem.widgetSelected, event=" + evt);
 							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMPARE);
+						}
+					});
+				}
+				{
+					this.recordSetCommentTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.recordSetCommentTabMenuItem.setText("Datensatzkommentar");
+					this.recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
+							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMMENT);
 						}
 					});
 				}
@@ -710,18 +727,47 @@ public class MenuBar {
 	}
 
 	/**
-	 * add history file to history menu
-	 * @param addFullQualifiedFileName
+	 * update file history while add history file to history menu
+	 * @param addDeviceFileName (device/filename.xyz)
 	 */
-	public void updateSubHistoryMenuItem(String addFullQualifiedFileName) {
-		MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
-		historyImportMenuItem.setText(addFullQualifiedFileName);
-		historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
-				// TODO implement 
+	public void updateSubHistoryMenuItem(final String addDeviceFileName) {
+		List<String> refFileHistory = Settings.getInstance().getFileHistory();
+		if (addDeviceFileName != null && addDeviceFileName.length() > 4) {
+			final String newhistoryEntry = addDeviceFileName.replace("\\", "\\\\"); // windows/filesep
+
+			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
+				refFileHistory.remove(newhistoryEntry);
 			}
-		});
+			refFileHistory.add(0, newhistoryEntry);
+		}
+		// clean up
+		MenuItem[] menuItems = this.fileHistoryMenu.getItems();
+		for (MenuItem menuItem : menuItems) {
+			menuItem.dispose();
+		}
+		
+		for (Iterator<String> iterator = refFileHistory.iterator(); iterator.hasNext();) {
+			String fileReference = iterator.next();
+			final MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
+			historyImportMenuItem.setText(fileReference);
+			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent evt) {
+					MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
+					String deviceFileName = historyImportMenuItem.getText();
+					String fileType = deviceFileName.substring(deviceFileName.lastIndexOf('.')+1);
+					if (fileType != null && fileType.length() > 2) {
+						if (fileType.equalsIgnoreCase("OSD")) {
+							MenuBar.log.info("opening file = " + Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+							openOsdFile(Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+						}
+					}
+					else {
+						MenuBar.this.application.openMessageDialog("Die Datei kann auf Grund der Dateiendung nicht verarbeitet werden!");
+					}
+				}
+			});
+			
+		}
 	}
 
 	/**
@@ -743,7 +789,6 @@ public class MenuBar {
 			final String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
 			String fileName = csvFileDialog.getFileName();
 			fileName = fileName.substring(0, fileName.indexOf('.'));
-			updateSubHistoryMenuItem(csvFileDialog.getFileName());
 
 			final char listSeparator = deviceSetting.getListSeparator();
 			final String recordSetNameExtend = fileName;
@@ -780,7 +825,6 @@ public class MenuBar {
 		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
 		String recordSetKey = activeRecordSet.getName();
 		final String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
-		updateSubHistoryMenuItem(csvFileDialog.getFileName());
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + csvFilePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
@@ -809,42 +853,52 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void openFile(final String dialogName) {
+	public void openOsdFileDialog(final String dialogName) {
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+		String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
+		FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
+		if (openFileDialog.getFileName().length() > 4) {
+			final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
+			String fileName = openFileDialog.getFileName();
+			fileName = fileName.substring(0, fileName.indexOf('.'));
+
+			openOsdFile(openFilePath);
+		}
+	}
+
+	/**
+	 * @param openFilePath
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotSupportedFileFormat
+	 * @throws DeclinedException
+	 */
+	void openOsdFile(final String openFilePath) {
 		try {
-			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
-			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
-			if (openFileDialog.getFileName().length() > 4) {
-				final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
-				String fileName = openFileDialog.getFileName();
-				fileName = fileName.substring(0, fileName.indexOf('.'));
-				updateSubHistoryMenuItem(openFileDialog.getFileName());
-				
-				//check current device and switch if required
-				String fileDeviceName = OsdReaderWriter.getDeviceName(openFilePath);
-				String activeDeviceName = this.application.getActiveDevice().getName();
-				if (!activeDeviceName.equals(fileDeviceName)) {
-					String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
-					if (SWT.NO == this.application.openYesNoMessageDialog(msg))
-						throw new DeclinedException();
-
-					this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
-				}
-
-				this.readerWriterThread = new Thread() {
-					public void run() {
-						try {
-							OsdReaderWriter.read(openFilePath);
-						}
-						catch (Exception e) {
-							log.log(Level.WARNING, e.getMessage(), e);
-							MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
-						}
-					}
-				};
-				this.readerWriterThread.start();
+			//check current device and switch if required
+			String fileDeviceName = OsdReaderWriter.getDeviceName(openFilePath);
+			String activeDeviceName = this.application.getActiveDevice().getName();
+			if (!activeDeviceName.equals(fileDeviceName)) {
+				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
+				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
+					throw new DeclinedException();
 			}
+			this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+
+			this.readerWriterThread = new Thread() {
+				public void run() {
+					try {
+						OsdReaderWriter.read(openFilePath);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+					}
+				}
+			};
+			this.readerWriterThread.start();
+			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + openFilePath.substring(openFilePath.lastIndexOf(this.fileSep)));
 		}
 		catch (DeclinedException e) {
 			// ignore, user has declined device switch
@@ -873,11 +927,12 @@ public class MenuBar {
 		}
 
 		String filePath;
+		FileDialog fileDialog;
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
 		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
 		if (fileName == null || fileName.length() < 5) {
-			FileDialog fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path);
+			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path);
 			filePath = fileDialog.getFilterPath() + this.fileSep + fileDialog.getFileName();
 		}
 		else {
@@ -902,7 +957,7 @@ public class MenuBar {
 				}
 			};
 			this.readerWriterThread.start();
-			updateSubHistoryMenuItem(useFilePath);
+			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf('/')));
 		}
 	}
 
