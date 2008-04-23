@@ -53,24 +53,21 @@ public class CSVReaderWriter {
 	private static String					line		= "*";
 
 	/**
-	 * @param args
+	 * read the device name from selected CSV file
+	 * @throws Exception 
 	 */
-//	public static void main(String[] args) {
-//		final String csvFile = "c:\\Documents and Settings\\brueg\\My Documents\\LogView\\Htronic Akkumaster C4\\2007-05-23-FlugakkuA 2) Laden.csv";
-//		// simulate record set of AkkuMaster C4
-//		String[] recordNames = new String[] { "Spannung", "Strom", "Ladung", "Leistung", "Energie" };
-//		String recordSetKey = "1) CSV import";
-//
-//		Channel newChannel = new Channel(1, new RecordSet(recordSetKey, recordNames, 10000));
-//
-//		// now add empty records for all of the given record names
-//		for (String key : recordNames) {
-//			newChannel.get(recordSetKey).put(key, new Record(key, "", "", 10000, 0, 0, 0, 50));
-//			newChannel.applyTemplate(newChannel.get(recordSetKey));
-//		}
-//
-//		read(';', recordSetKey, csvFile, newChannel, false);
-//	}
+	public static String read(char separator, String filePath) throws Exception {
+		BufferedReader reader; // to read the data
+
+		reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1"));
+
+		line = reader.readLine();
+		String fileDeviceName = line.split("" + separator)[0].trim();
+		log.fine("file device name = " + fileDeviceName);
+
+		reader.close();
+		return fileDeviceName;
+	}
 
 	/**
 	 * read the selected CSV file

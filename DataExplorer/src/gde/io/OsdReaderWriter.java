@@ -77,26 +77,26 @@ public class OsdReaderWriter {
 		// first line : header with version
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
-		log.info(line);
+		log.fine(line);
 		if (!OPEN_SERIAL_DATA_VERSION.equals(line))
 			throw new NotSupportedFileFormat(filePath);
 		
 		//creation time stamp
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
-		log.info(line);
+		log.fine(line);
 		
 		// second line : size file comment , file comment
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		fileComment = line.substring(FILE_COMMENT.length());
-		log.info(FILE_COMMENT + fileComment);
+		log.fine(FILE_COMMENT + fileComment);
 		
 		// third line : size device name , device name
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		String fileDevice = line.substring(DEVICE_NAME.length());
-		log.info(DEVICE_NAME + fileDevice);
+		log.fine(DEVICE_NAME + fileDevice);
 
 		return fileDevice;
 	}
@@ -129,32 +129,32 @@ public class OsdReaderWriter {
 		// first line : header with version
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
-		log.info(line);
+		log.fine(line);
 		if (!OPEN_SERIAL_DATA_VERSION.equals(line))
 			throw new NotSupportedFileFormat(filePath);
 		
 		//creation time stamp
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
-		log.info(line);
+		log.fine(line);
 		
 		// second line : size file comment , file comment
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		fileComment = line.substring(FILE_COMMENT.length());
-		log.info(FILE_COMMENT + fileComment);
+		log.fine(FILE_COMMENT + fileComment);
 		
 		// third line : size device name , device name
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		String fileDevice = line.substring(DEVICE_NAME.length());
-		log.info(DEVICE_NAME + fileDevice);
+		log.fine(DEVICE_NAME + fileDevice);
 				
 		// number of record sets
 		lineSize = data_in.readInt();
 		line = data_in.readUTF().substring(0, lineSize-1);	
 		int numberRecordSets = new Integer(line.substring(RECORD_SET_SIZE.length()).trim()).intValue();
-		log.info(RECORD_SET_SIZE + numberRecordSets);		
+		log.fine(RECORD_SET_SIZE + numberRecordSets);		
 		
 		// record sets with it properties
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
@@ -249,7 +249,7 @@ public class OsdReaderWriter {
 		data_out.writeInt(header.length());
 		data_out.writeUTF(header);	
 		filePointer += (header.length() + intSize);
-		log.info("filePointer = " + filePointer);
+		log.fine("filePointer = " + filePointer);
 		
 		//creation time stamp
 		StringBuilder sb = new StringBuilder();
@@ -258,7 +258,7 @@ public class OsdReaderWriter {
 		data_out.writeInt(sb.length());
 		data_out.writeUTF(sb.toString());
 		filePointer += (sb.length() + intSize);
-		log.info("filePointer = " + filePointer);
+		log.fine("filePointer = " + filePointer);
 		
 		// second line : size file comment , file comment
 		sb = new StringBuilder();
@@ -266,7 +266,7 @@ public class OsdReaderWriter {
 		data_out.writeInt(sb.length());
 		data_out.writeUTF(sb.toString());
 		filePointer += (sb.length() + intSize);
-		log.info("filePointer = " + filePointer);
+		log.fine("filePointer = " + filePointer);
 		
 		// third line : size device name , device name
 		sb = new StringBuilder();
@@ -274,7 +274,7 @@ public class OsdReaderWriter {
 		data_out.writeInt(sb.length());
 		data_out.writeUTF(sb.toString());
 		filePointer += (sb.length() + intSize);
-		log.info("filePointer = " + filePointer);
+		log.fine("filePointer = " + filePointer);
 		
 		// number of record sets
 		sb = new StringBuilder();
@@ -282,7 +282,7 @@ public class OsdReaderWriter {
 		data_out.writeInt(sb.length());
 		data_out.writeUTF(sb.toString());
 		filePointer += (sb.length() + intSize);
-		log.info("filePointer = " + filePointer);
+		log.fine("filePointer = " + filePointer);
 		
 		// record sets with it properties
 		StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
@@ -303,7 +303,7 @@ public class OsdReaderWriter {
 			}
 			sbs[i].append(DATA_DELIMITER).append(RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(DATA_DELIMITER);
 			filePointer += (sbs[i].length() + intSize + 10 + lineSep.length());
-			log.info("filePointer = " + filePointer);
+			log.fine("filePointer = " + filePointer);
 		}
 		int dataSize = 0;
 		for (int i=0; i<activeChannel.size(); ++i) {
@@ -315,7 +315,7 @@ public class OsdReaderWriter {
 			data_out.writeInt(sbs[i].length());
 			data_out.writeUTF(sbs[i].toString());
 			dataSize += (recordSet.getNoneCalculationRecordNames().length * intSize * recordSet.getRecordDataSize());
-			log.info("filePointer = " + (filePointer + dataSize));
+			log.fine("filePointer = " + (filePointer + dataSize));
 		}
 		
 		// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
