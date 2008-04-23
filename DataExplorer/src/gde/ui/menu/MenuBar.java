@@ -940,6 +940,7 @@ public class MenuBar {
 		}
 
 		if (filePath.length() > 4) { // file name has a reasonable length
+			if (!filePath.endsWith("*.osd") || !filePath.endsWith("*.OSD")) filePath = filePath + ".osd";
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + filePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
 				return;
 			}
