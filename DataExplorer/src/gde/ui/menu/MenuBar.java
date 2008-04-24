@@ -940,7 +940,10 @@ public class MenuBar {
 		}
 
 		if (filePath.length() > 4) { // file name has a reasonable length
-			if (!filePath.endsWith("*.osd") || !filePath.endsWith("*.OSD")) filePath = filePath + ".osd";
+			while (filePath.endsWith(".osd") || filePath.endsWith(".OSD")){
+				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
+			}
+			filePath = filePath + ".osd";
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + filePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
 				return;
 			}
@@ -958,7 +961,7 @@ public class MenuBar {
 				}
 			};
 			this.readerWriterThread.start();
-			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf('/')));
+			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf(this.fileSep)));
 		}
 	}
 

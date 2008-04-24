@@ -75,9 +75,7 @@ public class MenuToolBar {
 	ToolItem											openToolItem;
 	ToolItem											newToolItem;
 	ToolBar												fileToolBar;
-	ToolItem											fitIntoItem;
-	ToolItem											panItem;
-	ToolItem											zoomWindowItem;
+	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem;
 	ToolBar												zoomToolBar;
 	CoolItem											zoomCoolItem;
 
@@ -342,6 +340,30 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("resizeItem.widgetSelected, event=" + evt);
 							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+						}
+					});
+				}
+				{
+					this.cutLeftItem = new ToolItem(this.zoomToolBar, SWT.NONE);
+					this.cutLeftItem.setImage(SWTResourceManager.getImage("osde/resource/CutLeft.gif"));
+					this.cutLeftItem.setToolTipText("Linke Seite beschneiden (nur im Zoommodus)");
+					this.cutLeftItem.setEnabled(false);
+					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutLeftItem.widgetSelected, event=" + evt);
+						//TODO MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
+						}
+					});
+				}
+				{
+					this.cutRightItem = new ToolItem(this.zoomToolBar, SWT.NONE);
+					this.cutRightItem.setImage(SWTResourceManager.getImage("osde/resource/CutRight.gif"));
+					this.cutRightItem.setToolTipText("Rechte Seite beschneiden (nur im Zoommodus)");
+					this.cutRightItem.setEnabled(false);
+					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutRightItem.widgetSelected, event=" + evt);
+						//TODO MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
 						}
 					});
 				}
@@ -867,5 +889,15 @@ public class MenuToolBar {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * enable or disable tool bar buttons
+	 * @param enableLeft
+	 * @param enableRight
+	 */
+	public void enableCutButtons(boolean enableLeft, boolean enableRight) {
+		this.cutLeftItem.setEnabled(enableLeft);
+		this.cutRightItem.setEnabled(enableRight);
 	}
 }
