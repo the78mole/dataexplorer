@@ -785,7 +785,8 @@ public class GraphicsWindow {
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
 			this.application.setStatusMessage("");
-			this.redrawGraphics();
+			this.updateCutModeButtons();
+			//this.redrawGraphics();
 			break;
 		}
 	}
@@ -1044,7 +1045,31 @@ public class GraphicsWindow {
 					this.isRightMouseMeasure = false;
 					//application.setStatusMessage("");
 				}
+				updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure);
+			}
+		}
+	}
+
+	/**
+	 * check if cut mode can be activated
+	 * @param recordSet
+	 */
+	void updateCutModeButtons() {
+		Channel activeChannel = Channels.getInstance().getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = (this.type == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
+			if (this.curveArea != null && recordSet != null) {
+				// 
+				if (recordSet.isCutLeftEdgeEnabled()) {
+					this.application.getMenuToolBar().enableCutButtons(true, false);
+				}
+				else if (recordSet.isCutRightEdgeEnabled()) {
+					this.application.getMenuToolBar().enableCutButtons(false, true);
+				}
+				else {
+					this.application.getMenuToolBar().enableCutButtons(false, false);
+				}
 			}
 		}
 	}
