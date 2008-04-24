@@ -59,7 +59,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.type = channelType;
 		
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = this.application.getDevice().getName() + "_" + this.name.split(":")[0].trim();
+		String filename = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0].trim();
 		this.template = new GraphicsTemplate(filename);
 	}
 
@@ -75,7 +75,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.put(newRecordSet.getName(), newRecordSet);
 
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = this.application.getDevice().getName() + "_" + this.name.split(":")[0];
+		String filename = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0];
 		this.template = new GraphicsTemplate(filename);
 	}
 
@@ -340,23 +340,28 @@ public class Channel extends HashMap<String, RecordSet> {
 			if (channelNumber > 0) {
 				Channels.getInstance().switchChannel(channelNumber, recordSetKey);
 				recordSet = activeChannel.get(recordSetKey);
-				//recordSet.checkAllDisplayable(); // updates graphics window
-				//activeChannel.applyTemplate(recordSetKey); // updates graphics window
+				if (recordSet != null && recordSet.isRecalculation)
+					recordSet.checkAllDisplayable(); // updates graphics window
+				else
+					this.application.updateGraphicsWindow();
 			}
 		}
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
 			recordSet.resetZoomAndMeasurement();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
-			recordSet.checkAllDisplayable(); // updates graphics window
-			//activeChannel.applyTemplate(recordSetKey); // updates graphics window
+			if (recordSet.isRecalculation)
+				recordSet.checkAllDisplayable(); // updates graphics window
+			else
+				this.application.updateGraphicsWindow();
+			
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
 			this.application.updateCellVoltageWindow();
-			this.application.updateDataTable();
 			this.application.updateFileCommentWindow();
 			this.application.updateRecordCommentWindow();
+			this.application.updateDataTable();
 		}
 	}
 

@@ -153,7 +153,6 @@ public class Record extends Vector<Integer> {
 		this.isDisplayable = record.isDisplayable;
 		this.properties = new ArrayList<PropertyType>();
 		for (PropertyType property : record.properties) {
-			log.info("copy " + property.getName());
 			this.properties.add(property.clone());
 		}
 		this.maxValue = record.maxValue;
