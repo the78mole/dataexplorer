@@ -191,12 +191,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
-		if (recordSet.isRaw()) {
+		if (recordSet.isRaw() && recordSet.isRecalculation()) {
 			String[] measurements = recordSet.getRecordNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
-			// calculate the values required				
-			PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
+			// calculate the values required		
+			Record slopeRecord = recordSet.get(measurements[2]);
+			slopeRecord.setDisplayable(false);
+			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
-			property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_TYPE);
+			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 				this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 			else

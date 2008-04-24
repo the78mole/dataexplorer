@@ -157,24 +157,21 @@ public class Channels extends HashMap<Integer, Channel> {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
 				if (recordSet != null) {
 					recordSet.resetZoomAndMeasurement();
-					recordSet.checkAllDisplayable();
+					if (recordSet.isRecalculation)
+						recordSet.checkAllDisplayable(); // updates graphics window
+					else
+						this.application.updateGraphicsWindow();
 				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
-
-				//				if (recordSetKey == null || recordSetKey.length() > 1)
-				//					this.getActiveChannel().applyTemplate(recordSetKey);
-				//				else
-				//					this.application.updateGraphicsWindow();
-
 				this.application.updateDigitalWindow();
 				this.application.updateAnalogWindow();
 				this.application.updateCellVoltageWindow();
-				this.application.updateDataTable();
 				this.application.updateFileCommentWindow();
 				this.application.updateRecordCommentWindow();
+				this.application.updateDataTable();
 			}
 		}
 		else

@@ -430,7 +430,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											else {
 												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
 											}
+											recordSet.setRecalculationRequired();
 											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+											UniLogConfigTab.this.application.updateDataTable();
 										}
 									}
 								}
@@ -504,7 +506,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											else {
 												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
 											}
+											recordSet.setRecalculationRequired();
 											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+											UniLogConfigTab.this.application.updateDataTable();
 										}
 									}
 								}
@@ -596,7 +600,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									else {
 										record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.STRING, UniLogConfigTab.this.slopeTypeSelection);
 									}
+									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+									UniLogConfigTab.this.application.updateDataTable();
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
@@ -622,7 +628,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									else {
 										record.createProperty(CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, UniLogConfigTab.this.slopeTimeSelection);
 									}	
+									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+									UniLogConfigTab.this.application.updateDataTable();
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
@@ -935,8 +943,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							if (activeChannel != null) {
 								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 								if (activeRecordSet != null) {
-									activeRecordSet.setRecalculation(true);
+									activeRecordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
+									UniLogConfigTab.this.application.updateDataTable();
 								}
 							}
 						}

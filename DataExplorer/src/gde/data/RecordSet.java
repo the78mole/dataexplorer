@@ -54,7 +54,7 @@ public class RecordSet extends HashMap<String, Record> {
 	boolean												isSaved								= false;	// indicates if the record set is saved to file
 	boolean												isRaw									= false;	// indicates imported file with raw data, no translation at all
 	boolean												isFromFile						= false;	// indicates that this record set was created by loading data from file
-	boolean												isRecalculation				= false;	// indicates record is modified and need re-calculation
+	boolean												isRecalculation				= true;		// indicates record is modified and need re-calculation
 	Rectangle											drawAreaBounds;
 	
 	Thread												dataTableCalcThread;
@@ -674,7 +674,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check if all records from this record set are displayable, starts calcualation if not
 	 */
 	public void checkAllDisplayable() {
-		this.application.getDevice().makeInActiveDisplayable(this);
+		this.application.getActiveDevice().makeInActiveDisplayable(this);
+		this.isRecalculation = false;
 	}
 
 	/**
@@ -769,13 +770,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isCompareSet() {
 		return this.isCompareSet;
-	}
-
-	/**
-	 * @return the the zoom level
-	 */
-	public int getZoomLevel() {
-		return this.zoomLevel;
 	}
 
 	/**
@@ -1169,7 +1163,7 @@ public class RecordSet extends HashMap<String, Record> {
 				int progress = this.application2.getProgressPercentage();
 
 				int maxWaitCounter = 10;
-				int sleepTime = numberRecords*recordEntries/100;
+				int sleepTime = numberRecords*recordEntries/200;
 				while (!checkAllRecordsDisplayable() && maxWaitCounter > 0) {
 					try {
 						this.logger.fine("waiting for all records displayable");
@@ -1227,8 +1221,9 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @param newRecalculationValue the isRecalculation to set
 	 */
-	public void setRecalculation(boolean newRecalculationValue) {
-		this.isRecalculation = newRecalculationValue;
+	public void setRecalculationRequired() {
+		this.isRecalculation = true;
+		this.setTableDataCalculated(false);
 		for (String recordKey : this.recordNames) {
 			if (this.device.getMeasurement(this.channelConfigName, recordKey).isCalculation())
 				this.get(recordKey).resetMinMax();
@@ -1294,4 +1289,21 @@ public class RecordSet extends HashMap<String, Record> {
 			this.application.openMessageDialogAsync("Beim laden der Datensatzeigenschaften ist ein Fehler aufgetreten ! \n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
+	
+	/**
+	 * query if the record set is zoomed and the zoomed data extract starts at first data point
+	 * @return
+	 */
+	public boolean isCutLeftEdgeEnabled() {
+		return this.isZoomMode && (this.recordZoomOffset == 0);
+	}
+	
+	/**
+	 * query if the record set is zoomed and the zoomed data extract ends at last data point
+	 * @return
+	 */
+	public boolean isCutRightEdgeEnabled() {
+		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize == this.getRecordDataSize());
+	}
+
 }

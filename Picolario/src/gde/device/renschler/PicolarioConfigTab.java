@@ -330,8 +330,9 @@ public class PicolarioConfigTab extends Composite {
 										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.getProperty(CalculationThread.REGRESSION_TYPE).setValue(PicolarioConfigTab.this.slopeTypeSelection);
-										activeRecord.setDisplayable(false);
+										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
+										PicolarioConfigTab.this.application.updateDataTable();
 									}
 								}
 								PicolarioConfigTab.this.isConfigChanged = true;
@@ -357,8 +358,9 @@ public class PicolarioConfigTab extends Composite {
 										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection);
-										activeRecord.setDisplayable(false);
+										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
+										PicolarioConfigTab.this.application.updateDataTable();
 									}
 								}
 								PicolarioConfigTab.this.isConfigChanged = true;

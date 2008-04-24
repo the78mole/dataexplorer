@@ -994,9 +994,10 @@ public class UniLogDialog extends DeviceDialog {
 											activeChannel.remove(recordSetKey);
 
 											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
-											activeRecordSet.setRecalculation(true);
+											activeRecordSet.setRecalculationRequired();
 											UniLogDialog.this.device.updateVisibilityStatus(activeRecordSet);
 											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
+											UniLogDialog.this.application.updateDataTable();
 
 											channels.switchChannel(channelNumber, recordSetKey);
 										}
