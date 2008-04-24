@@ -117,9 +117,9 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				String[] recordNames = this.getMeasurementNames(recordSet.getChannelName());
+				String[] recordNames = this.getMeasurementNames(recordSet.getChannelConfigName());
 				for (String recordKey : recordNames) {
-					MeasurementType measurement = this.getMeasurement(recordSet.getChannelName(), recordKey);
+					MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), recordKey);
 					if (measurement.isCalculation()) {
 						AkkuMasterC4.log.fine(recordKey);
 						this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));

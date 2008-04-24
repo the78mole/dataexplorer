@@ -83,7 +83,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(record.getParent().getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
@@ -116,7 +116,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		// slope calculation needs height factor for calculation
 		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelName(), measurements[1]);
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), measurements[1]);
 		}
 
 		double newValue = offset + (value - reduction) * factor;
@@ -132,7 +132,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(record.getParent().getChannelName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		String[] measurements = this.getMeasurementNames(record.getChannelConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigung
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
@@ -165,7 +165,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		// slope calculation needs height factor for calculation
 		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelName(), measurements[1]);
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), measurements[1]);
 		}
 
 		double newValue = (value - offset) / factor + reduction;

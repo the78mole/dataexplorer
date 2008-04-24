@@ -366,7 +366,7 @@ public class SimulatorDialog extends DeviceDialog {
 												SimulatorDialog.this.application.getMenuToolBar().addRecordSetName(this.recordSetKey);
 												SimulatorDialog.this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 											}
-											log.fine("recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelName());
+											log.fine("recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 										}
 										else {
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
@@ -374,12 +374,12 @@ public class SimulatorDialog extends DeviceDialog {
 										}
 										// prepare the data for adding to record set
 										
-										this.data = SimulatorDialog.this.serialPort.getData(SimulatorDialog.this.recordNumber, recordSet.getChannelName());
+										this.data = SimulatorDialog.this.serialPort.getData(SimulatorDialog.this.recordNumber, recordSet.getChannelConfigName());
 
 										// build the point array according curves from record set
 										int[] points = new int[recordSet.size()];
 
-										String[] measurements = SimulatorDialog.this.device.getMeasurementNames(recordSet.getChannelName()); // 0=Spannung, 1=Strom
+										String[] measurements = SimulatorDialog.this.device.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Strom
 										Vector<Integer> voltage = (Vector<Integer>) this.data.get(measurements[0]);
 										Vector<Integer> current = (Vector<Integer>) this.data.get(measurements[1]);
 										Iterator<Integer> iterV = voltage.iterator();

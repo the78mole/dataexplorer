@@ -293,16 +293,16 @@ public class CSVReaderWriter {
 			RecordSet recordSet = Channels.getInstance().getActiveChannel().get(recordSetKey);
 			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 			// write device name , manufacturer, and serial port string
-			sb.append(device.getName()).append(separator).append(recordSet.getChannelName()).append(lineSep);
+			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 			writer.write(sb.toString());
 			log.fine("written header line = " + sb.toString()); 
 			
 			sb = new StringBuffer();
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
-			String[] recordNames = device.getMeasurementNames(recordSet.getChannelName());
+			String[] recordNames = device.getMeasurementNames(recordSet.getChannelConfigName());
 			for (int i = 0; i < recordNames.length; i++) {
-				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[i]);
+				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigName(), recordNames[i]);
 				log.finest("append " + recordNames[i]);
 				if (isRaw) {
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
@@ -330,9 +330,9 @@ public class CSVReaderWriter {
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
 					if (record == null)
-						throw new Exception("Es wird kein passender Record zu dem Namen " + recordNames[j] + " gefunden. Vermutlich wurde die Konfiguration \"" + recordSet.getChannelName() + "\" zwischenzeitlich verändert.");
+						throw new Exception("Es wird kein passender Record zu dem Namen " + recordNames[j] + " gefunden. Vermutlich wurde die Konfiguration \"" + recordSet.getChannelConfigName() + "\" zwischenzeitlich verändert.");
 
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelName(), recordNames[j]);
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigName(), recordNames[j]);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())

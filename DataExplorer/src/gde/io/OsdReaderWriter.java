@@ -293,7 +293,7 @@ public class OsdReaderWriter {
 			Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 			RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 			sbs[i] = new StringBuilder();
-			sbs[i].append(CHANNEL_CONFIG).append(recordSet.getChannelName()).append(DATA_DELIMITER)
+			sbs[i].append(CHANNEL_CONFIG).append(recordSet.getChannelConfigName()).append(DATA_DELIMITER)
 						.append(RECORD_SET_NAME).append(recordSet.getName()).append(DATA_DELIMITER)
 						.append(RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(DATA_DELIMITER)
 						.append(RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(DATA_DELIMITER);

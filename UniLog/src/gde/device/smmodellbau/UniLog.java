@@ -92,7 +92,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		String configKey = recordSet.getChannelName();
+		String configKey = recordSet.getChannelConfigName();
 		Record record;
 		MeasurementType measurement;
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
