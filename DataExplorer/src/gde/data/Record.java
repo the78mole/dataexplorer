@@ -49,11 +49,14 @@ public class Record extends Vector<Integer> {
 	public static final String DELIMITER = "|-|";
 	public static final String END_MARKER = "|:-:|";
 
-
-	RecordSet						parent;
+	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 		// used as channelConfigKey
 	String							keyName;
+	double							timeStep_ms						= 0;			// time base of measurement points
+	IDevice							device;
 
+	RecordSet						parent;
+	
 	String							name;																																// MessgrößeX Höhe
 	String							unit;																																// Einheit m
 	String							symbol;																															// Symbol h
@@ -86,7 +89,6 @@ public class Record extends Vector<Integer> {
 	boolean							isMeasurementMode				= false;
 	boolean							isDeltaMeasurementMode	= false;
 	
-	public final static String	CONFIG_KEY						= "_channelConfigKey";	// active means this measurement can be red from device, other wise its calculated
 	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated
 	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated
 	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated
@@ -106,7 +108,7 @@ public class Record extends Vector<Integer> {
 	public final static String	MIN_VALUE							= "_minValue";
 	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value
 	
-	private final String[] propertyKeys = new String[] {CONFIG_KEY, NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
+	private final String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
 			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
 
 
@@ -131,6 +133,12 @@ public class Record extends Vector<Integer> {
 		}
 		this.df = new DecimalFormat("0.0");
 		this.numberFormat = 1;
+		
+		// special keys for compare set record are handled with put method
+		//this.channelConfigKey;
+		//this.keyName;
+		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+		this.timeStep_ms = this.device.getTimeStep_ms();
 	}
 
 	/**
@@ -145,6 +153,7 @@ public class Record extends Vector<Integer> {
 		this.isDisplayable = record.isDisplayable;
 		this.properties = new ArrayList<PropertyType>();
 		for (PropertyType property : record.properties) {
+			log.info("copy " + property.getName());
 			this.properties.add(property.clone());
 		}
 		this.maxValue = record.maxValue;
@@ -160,8 +169,11 @@ public class Record extends Vector<Integer> {
 		this.isStartpointZero = record.isStartpointZero;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
+		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
-		log.fine("channelConfigKey = " + this.channelConfigKey);
+		this.keyName = record.keyName;
+		this.timeStep_ms = record.timeStep_ms;
+		this.device = record.device; // reference to device
 	}
 
 	/**
@@ -268,7 +280,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementFactor(this.channelConfigKey, this.name);
+			value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.name);
 		return value;
 	}
 
@@ -286,7 +298,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementOffset(this.channelConfigKey, this.name);
+			value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.name);
 		return value;
 	}
 	
@@ -304,7 +316,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else {
-			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.channelConfigKey, this.name, IDevice.REDUCTION);
+			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.name, IDevice.REDUCTION);
 			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim()).doubleValue();
 		}
 		return value;
@@ -447,7 +459,7 @@ public class Record extends Vector<Integer> {
 		}
 		else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
-				this.channelConfigKey = this.parent.getChannelName();
+				this.channelConfigKey = this.parent.getChannelConfigName();
 			this.maxScaleValue = this.parent.getDevice().translateValue(this, this.maxValue/1000.0);
 			this.minScaleValue = this.parent.getDevice().translateValue(this, this.minValue/1000.0);
 		}
@@ -517,7 +529,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setParent(RecordSet currentParent) {
 		if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
-			this.channelConfigKey = currentParent.getChannelName();
+			this.channelConfigKey = currentParent.getChannelConfigName();
 		this.parent = currentParent;
 	}
 
@@ -563,8 +575,22 @@ public class Record extends Vector<Integer> {
 		return this.parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
+	/** 
+	 * qurey time step in milli seconds, this property is hold local to be independent
+	 * @return time step in ms
+	 */
 	public double getTimeStep_ms() {
-		return this.parent.getTimeStep_ms();
+		if (this.timeStep_ms == 0)
+			this.timeStep_ms = this.parent.getTimeStep_ms();
+		return this.timeStep_ms;
+	}
+
+	/**
+	 * set the time step in milli seconds, this property is hold local to be independent
+	 * @param timeStep_ms the timeStep_ms to set
+	 */
+	void setTimeStep_ms(double newTimeStep_ms) {
+		this.timeStep_ms = newTimeStep_ms;
 	}
 
 	public DecimalFormat getDecimalFormat() {
@@ -586,10 +612,22 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
+	 * get the device to calculate or retrieve measurement properties, this property is hold local to be independent
 	 * @return the device
 	 */
 	public IDevice getDevice() {
-		return this.parent.getDevice();
+		if (this.device == null)
+			this.device = this.parent.getDevice();
+		
+		return this.device;
+	}
+
+	/**
+	 * set the device as fallback for data point calculation, this property is hold local to be independent
+	 * @param device the device to set
+	 */
+	void setDevice(IDevice useDevice) {
+		this.device = useDevice;
 	}
 	
 	/**
@@ -792,6 +830,9 @@ public class Record extends Vector<Integer> {
 	 * @return the parentName
 	 */
 	public String getChannelConfigKey() {
+		if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
+			this.channelConfigKey = this.parent.getChannelConfigName();
+
 		return this.channelConfigKey;
 	}
 
@@ -816,7 +857,6 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(CONFIG_KEY).append("=").append(this.channelConfigKey).append(DELIMITER);
 		sb.append(NAME).append("=").append(this.name).append(DELIMITER);
 		sb.append(UNIT).append("=").append(this.unit).append(DELIMITER);
 		sb.append(SYMBOL).append("=").append(this.symbol).append(DELIMITER);
@@ -849,8 +889,6 @@ public class Record extends Vector<Integer> {
 		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, this.propertyKeys);
 		String tmpValue = null;
 		
-		tmpValue = recordProps.get(CONFIG_KEY);
-		if (tmpValue!=null && tmpValue.length() > 0) this.channelConfigKey = tmpValue.trim();
 		//this.name =  recordProps.get(NAME); // name could be different and should be loaded by device properties XML
 		if (!recordProps.get(NAME).equals(this.name)) log.info("record name from device props = " + this.name + " not equals record name loaded from file = " + recordProps.get(NAME));
 		tmpValue = recordProps.get(UNIT);

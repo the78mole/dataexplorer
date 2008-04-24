@@ -47,7 +47,7 @@ public class RecordSet extends HashMap<String, Record> {
 	final DecimalFormat						df 										= new DecimalFormat("0.000");
 	
 	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
-	final String									channelName;
+	final String									channelConfigName;
 	String[]											recordNames;										// Spannung, Strom, ..
 	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
 	String												recordSetDescription	= new SimpleDateFormat("HH:mm:ss").format(new Date().getTime());
@@ -128,7 +128,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
 		super(initialCapacity);
 		this.device = useDevice;
-		this.channelName = newChannelName;
+		this.channelConfigName = newChannelName;
 		this.name = newName;
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
@@ -152,7 +152,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super();
 		this.device = useDevice;
-		this.channelName = newChannelName;
+		this.channelConfigName = newChannelName;
 		this.name = newName;
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
@@ -175,7 +175,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
 		super();
 		this.device = useDevice;
-		this.channelName = newChannelName;
+		this.channelConfigName = newChannelName;
 		this.name = newName;
 		this.recordNames = new String[0];
 		this.timeStep_ms = newTimeStep_ms;
@@ -198,7 +198,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = recordSet.name;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
-		this.channelName = newChannelConfiguration;
+		this.channelConfigName = newChannelConfiguration;
 				
 		// update child records to new channel or configuration key and to the new parent
 		for (String recordKey : this.keySet()) {
@@ -449,7 +449,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String[] getNoneCalculationRecordNames() {
 		Vector<String> calculationRecords = new Vector<String>();
 		for (String recordKey : this.recordNames) {
-			MeasurementType measurement = this.device.getMeasurement(this.channelName, recordKey);
+			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, recordKey);
 			if (!measurement.isCalculation()) { // active or inactive 
 				calculationRecords.add(recordKey);
 			}
@@ -616,14 +616,16 @@ public class RecordSet extends HashMap<String, Record> {
 	 * overwrites default HashMap method
 	 */
 	public Record put(String key, Record record) {
-		super.put(key, record);
-		record.setKeyName(key);
-		record.setParent(this);
+		super.put(key, record.clone());
+		Record newRecord = this.get(key);
+		//for compare set record following properties has to be checked at the point where
+		newRecord.setKeyName(key);
+		newRecord.setParent(this);
 		
 		// add key to recordNames[] in case of TYPE_COMPARE_SET
 		if(this.isCompareSet)
 			this.addRecordName(key);
-		return record;
+		return newRecord;
 	}
 
 	/**
@@ -1043,10 +1045,10 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the channelName
+	 * @return the channel (or) configuration name
 	 */
-	public String getChannelName() {
-		return this.channelName;
+	public String getChannelConfigName() {
+		return this.channelConfigName;
 	}
 
 	/**
@@ -1227,9 +1229,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setRecalculation(boolean newRecalculationValue) {
 		this.isRecalculation = newRecalculationValue;
-		String channelConfigKey = this.get(this.recordNames[0]).getChannelConfigKey();
 		for (String recordKey : this.recordNames) {
-			if (this.device.getMeasurement(channelConfigKey, recordKey).isCalculation())
+			if (this.device.getMeasurement(this.channelConfigName, recordKey).isCalculation())
 				this.get(recordKey).resetMinMax();
 		}
 	}
