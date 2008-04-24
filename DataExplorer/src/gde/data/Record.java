@@ -868,8 +868,8 @@ public class Record extends Vector<Integer> {
 		for (PropertyType property : this.properties) {
 			sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
 		}
-		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxDisplayValue).append(DELIMITER);
-		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minDisplayValue).append(DELIMITER);
+		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxScaleValue).append(DELIMITER);
+		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minScaleValue).append(DELIMITER);
 		sb.append(IS_POSITION_LEFT).append("=").append(this.isPositionLeft).append(DELIMITER);
 		sb.append(COLOR).append("=").append(this.color.getRed()).append(",").append(this.color.getGreen()).append(",").append(this.color.getBlue()).append(DELIMITER);
 		sb.append(LINE_WITH).append("=").append(this.lineWidth).append(DELIMITER);
