@@ -50,8 +50,6 @@ public class CurveUtils {
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		final boolean isCompareSet = record.getParent().isCompareSet();
-		final String channelConfigKey = record.getChannelConfigKey();
-		CurveUtils.log.fine("isCompareSet = " + isCompareSet + " channelConfigKey = " + channelConfigKey);
 
 		if (CurveUtils.log.isLoggable(Level.FINER)) CurveUtils.log.finer("x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace);
 		if (record.isEmpty() && !record.isDisplayable()) return; // nothing to display
