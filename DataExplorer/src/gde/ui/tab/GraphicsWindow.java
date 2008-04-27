@@ -79,6 +79,8 @@ public class GraphicsWindow {
 	public final static int								MODE_MEASURE						= 2;
 	public final static int								MODE_MEASURE_DELTA			= 3;
 	public final static int								MODE_PAN								= 4;
+	public final static int								MODE_CUT_LEFT						= 6;
+	public final static int								MODE_CUT_RIGHT					= 7;
 	
 
 	final TabFolder								displayTab;
@@ -127,6 +129,10 @@ public class GraphicsWindow {
 	boolean												isPanMouse = false;
 	int														xDeltaPan = 0;
 	int														yDeltaPan = 0;
+	
+	boolean												isLeftCutMode = false;
+	boolean 											isRightCutMode = false;
+	int														xPosCut = 0;
 
 	public GraphicsWindow(TabFolder currentDisplayTab, int currentType, String useName) {
 		this.displayTab = currentDisplayTab;
@@ -740,6 +746,52 @@ public class GraphicsWindow {
 	}
 
 	/**
+	 * draw the cut pointer for cut modes
+	 * @param mode
+	 * @param leftEnabled
+	 * @param rightEnabled
+	 */
+	public void drawCutPointer(int mode, boolean leftEnabled, boolean rightEnabled) {
+		this.setModeState(mode); // cleans old pointer if required
+		
+		// allow only get the record set to work with
+		boolean isGraphicsWindow = this.type == GraphicsWindow.TYPE_NORMAL;
+		if (isGraphicsWindow) {
+			// set the gc properties
+			this.canvasGC.setLineWidth(1);
+			this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+
+			
+
+			if (leftEnabled ){
+				this.application.setStatusMessage("  beschneide die linke Seite ! ");
+				cleanCutPointer();
+				this.xPosCut = this.curveAreaBounds.width * 1/4;
+				this.canvasGC.fillRectangle(0+this.offSetX, 0+this.offSetY, this.xPosCut, this.curveAreaBounds.height);
+				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);	
+			}
+			else if (rightEnabled) {
+				this.application.setStatusMessage("  beschneide die rechte Seite ! ");
+				cleanCutPointer();
+				this.xPosCut = this.curveAreaBounds.width * 3/4;
+				this.canvasGC.fillRectangle(this.xPosCut+this.offSetX, 0+this.offSetY, this.curveAreaBounds.width-this.xPosCut, this.curveAreaBounds.height);
+				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
+			}
+			else {
+				cleanCutPointer();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void cleanCutPointer() {
+		this.application.setStatusMessage(" ");
+		eraseVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height, 2);
+	}
+	/**
 	 * query the graphics window type
 	 * @return the type TYPE_NORMALE | TYPE_COMPARE
 	 */
@@ -778,12 +830,30 @@ public class GraphicsWindow {
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = true;
 			break;
+		case MODE_CUT_LEFT:
+			this.isZoomMouse = false;
+			this.isLeftMouseMeasure = false;
+			this.isRightMouseMeasure = false;
+			this.isPanMouse = false;
+			this.isLeftCutMode = true;
+			this.isRightCutMode = false;
+			break;
+		case MODE_CUT_RIGHT:
+			this.isZoomMouse = false;
+			this.isLeftMouseMeasure = false;
+			this.isRightMouseMeasure = false;
+			this.isPanMouse = false;
+			this.isLeftCutMode = false;
+			this.isRightCutMode = true;
+			break;
 		case MODE_RESET:
 		default:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
+			this.isLeftCutMode = false;
+			this.isRightCutMode = false;
 			this.application.setStatusMessage("");
 			this.updateCutModeButtons();
 			//this.redrawGraphics();
@@ -956,6 +1026,30 @@ public class GraphicsWindow {
 							this.xLast = evt.x;
 							this.yLast = evt.y;
 						}
+						else if (this.isLeftCutMode) { //TODO
+							// clear old cut area
+							if (evt.x < this.xPosCut) {
+								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut-evt.x+1, this.curveAreaBounds.height, evt.x+this.offSetX, this.offSetY, this.xPosCut-evt.x+1, this.curveAreaBounds.height);
+							}
+							else { // evt.x > this.xPosCut
+								this.canvasGC.fillRectangle(this.xPosCut+this.offSetX, 0+this.offSetY, evt.x-this.xPosCut, this.curveAreaBounds.height);								
+							}
+							this.xPosCut = evt.x;
+							this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+							drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);	
+						}
+						else if (this.isRightCutMode) {
+							// clear old cut lines
+							if (evt.x > this.xPosCut) {
+								this.canvasGC.drawImage(this.curveArea, this.xPosCut, 0, evt.x-this.xPosCut, this.curveAreaBounds.height, this.offSetX+this.xPosCut, this.offSetY, evt.x-this.xPosCut, this.curveAreaBounds.height);
+							}
+							else { // evt.x < this.xPosCut
+								this.canvasGC.fillRectangle(evt.x+this.offSetX, 0+this.offSetY, this.xPosCut-evt.x+1, this.curveAreaBounds.height);
+							}
+							this.xPosCut = evt.x;
+							this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+							drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
+						}
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, "mouse pointer out of range", e);
@@ -974,6 +1068,14 @@ public class GraphicsWindow {
 				}
 				else if (this.isPanMouse) {
 					this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/Hand.gif"));
+				}
+				else if (this.isLeftCutMode || this.isRightCutMode) {
+					if (this.xPosCut + 1 >= evt.x && this.xPosCut - 1 <= evt.x) { // snap mouse pointer
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif"));
+					}
+					else {
+						this.graphicCanvas.setCursor(this.application.getCursor());
+					}
 				}
 				else {
 					this.graphicCanvas.setCursor(this.application.getCursor());
@@ -1044,6 +1146,28 @@ public class GraphicsWindow {
 				else if (this.isRightMouseMeasure) {
 					this.isRightMouseMeasure = false;
 					//application.setStatusMessage("");
+				}
+				else if (this.isLeftCutMode) {
+					if( SWT.OK == this.application.openOkCancelMessageDialog("Sollen die Kurven wirklich beschnitten werden ?")) {
+						recordSet = recordSet.clone(recordSet.getPointIndexFromDisplayPoint(this.xUp), true);
+						recordSet.setRecalculationRequired();
+						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
+						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
+						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
+						this.channels.getActiveChannel().applyTemplate(recordSet.getName());
+						setModeState(MODE_RESET);
+					}
+				}
+				else if (this.isRightCutMode) {
+					if( SWT.OK == this.application.openOkCancelMessageDialog("Sollen die Kurven wirklich beschnitten werden ?")) {
+						recordSet = recordSet.clone(recordSet.getRecordZoomOffset() + recordSet.getPointIndexFromDisplayPoint(this.xUp), false);
+						recordSet.setRecalculationRequired();
+						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
+						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
+						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
+						this.channels.getActiveChannel().applyTemplate(recordSet.getName());
+						setModeState(MODE_RESET);
+						}
 				}
 				updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure);

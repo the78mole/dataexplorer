@@ -183,7 +183,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * overwritten clone method used to move records to other configuration, where measurement signature does not match the source
+	 * clone method used to move records to other configuration, where measurement signature does not match the source
 	 */
 	public Record clone(String newName) {
 		Record newRecord = new Record(this);
@@ -192,11 +192,72 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
+	 * copy constructor
+	 */
+	private Record(Record record, int dataIndex, boolean isFromBegin) {
+		//super(record); // vector
+		this.parent = record.parent;
+		this.parent.setZoomMode(false);
+		this.name = record.name;
+		this.symbol = record.symbol;
+		this.unit = record.unit;
+		this.isActive = record.isActive;
+		this.isDisplayable = record.isDisplayable;
+		this.properties = new ArrayList<PropertyType>();
+		for (PropertyType property : record.properties) {
+			this.properties.add(property.clone());
+		}
+		this.maxValue = Integer.MIN_VALUE;
+		this.minValue = Integer.MAX_VALUE;
+		this.clear();
+		this.trimToSize();
+		if (isFromBegin) {
+			for (int i = dataIndex; i < record.realSize(); i++) {
+				this.add(record.get(i).intValue());
+			}
+		}
+		else {
+			for (int i = 0; i < dataIndex; i++) {
+				this.add(record.get(i).intValue());
+			}
+		}
+		
+		this.df = (DecimalFormat) record.df.clone();
+		this.numberFormat = record.numberFormat;
+		this.isVisible = record.isVisible;
+		this.isPositionLeft = record.isPositionLeft;
+		this.color = new Color(record.color.getDevice(), record.color.getRGB());
+		this.lineWidth = record.lineWidth;
+		this.lineStyle = record.lineStyle;
+		this.isRoundOut = record.isRoundOut;
+		this.isStartpointZero = record.isStartpointZero;
+		this.maxScaleValue = this.maxValue;
+		this.minScaleValue = this.minValue;
+		// handle special keys for compare set record
+		this.channelConfigKey = record.channelConfigKey;
+		this.keyName = record.keyName;
+		this.timeStep_ms = record.timeStep_ms;
+		this.device = record.device; // reference to device
+	}
+
+	/**
+	 * clone method re-writes data points of all records of this record set
+	 * - if isFromBegin == true, the given index is the index where the record starts after this operation
+	 * - if isFromBegin == false, the given index represents the last data point index of the records.
+	 * @param dataIndex
+	 * @param isFromBegin
+	 * @return new dreated record
+	 */
+	public Record clone(int dataIndex, boolean isFromBegin) {
+		return new Record(this, dataIndex, isFromBegin);
+	}
+	
+	/**
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public synchronized void add(int point) {
-		if (this.size() == 0) {
+	public boolean add(int point) {
+		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
 		}
 		else {
@@ -204,7 +265,7 @@ public class Record extends Vector<Integer> {
 			if (point < this.minValue) this.minValue = point;
 		}
 		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point);
-		this.add(new Integer(point));
+		return this.add(new Integer(point));
 	}
 
 	public String getName() {
@@ -232,10 +293,18 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
+	 * get a reference to the record properies (offset, factor, ...)
+	 * @return list containing the properties
+	 */
+	List<PropertyType> getProperties() {
+		return this.properties;
+	}
+
+	/**
 	 * replace the properties to enable channel/configuration switch
 	 * @param newProperties
 	 */
-	public void replaceProperties(List<PropertyType> newProperties) {
+	public void setProperties(List<PropertyType> newProperties) {
 		this.properties = new ArrayList<PropertyType>();
 		for (PropertyType property : newProperties) {
 			this.properties.add(property.clone());

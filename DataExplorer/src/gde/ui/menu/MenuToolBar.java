@@ -351,7 +351,7 @@ public class MenuToolBar {
 					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutLeftItem.widgetSelected, event=" + evt);
-						//TODO MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
+							MenuToolBar.this.application.setCutModeActive(true, false);
 						}
 					});
 				}
@@ -363,8 +363,7 @@ public class MenuToolBar {
 					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutRightItem.widgetSelected, event=" + evt);
-						//TODO MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
-						}
+							MenuToolBar.this.application.setCutModeActive(false, true);						}
 					});
 				}
 				{

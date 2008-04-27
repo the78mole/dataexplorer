@@ -187,12 +187,13 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * copy constructor - used to copy a record set to another channel/configuration
+	 * copy constructor - used to copy a record set to another channel/configuration, 
+	 * wherer the configuration comming from the device properties file
 	 * @param recordSet
 	 * @param newChannelConfiguration
 	 */
 	private RecordSet(RecordSet recordSet, String newChannelConfiguration) {
-		super(recordSet);
+		super(recordSet); // hashmap
 
 		this.device = recordSet.device; // this is a reference
 		this.name = recordSet.name;
@@ -205,7 +206,7 @@ public class RecordSet extends HashMap<String, Record> {
 			Record tmpRecord = this.get(recordKey);
 			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
-			tmpRecord.replaceProperties(this.device.getProperties(newChannelConfiguration, recordKey));
+			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, recordKey));
 		}
 		
 		// check if there is a miss match of measurement names and correction required
@@ -260,11 +261,81 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * overwritten clone method used to move record sets to other configuration or channel
+	 * clone method used to move record sets to other configuration or channel
 	 * @param newChannelConfiguration 
 	 */
 	public RecordSet clone(String newChannelConfiguration) {
 		return new RecordSet(this, newChannelConfiguration);
+	}
+	/**
+	 * copy constructor - used to copy a record set to another channel/configuration, 
+	 * wherer the configuration comming from the device properties file
+	 * @param recordSet
+	 * @param newChannelConfiguration
+	 */
+	private RecordSet(RecordSet recordSet, int dataIndex, boolean isFromBegin) {
+		super(recordSet);
+
+		this.device = recordSet.device; // this is a reference
+		this.name = recordSet.name+"_";
+		this.application = recordSet.application;
+		this.channels = recordSet.channels;
+		this.channelConfigName = recordSet.channelConfigName;
+		this.recordNames = recordSet.recordNames.clone();
+				
+		// update child records
+		for (String recordKey : this.keySet()) {
+			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
+		}
+		
+		this.timeStep_ms = recordSet.timeStep_ms;
+		this.recordSetDescription = recordSet.recordSetDescription;
+		this.isSaved = recordSet.isSaved;
+		this.isRaw = recordSet.isRaw;
+		this.isFromFile = recordSet.isFromFile;
+		this.drawAreaBounds = recordSet.drawAreaBounds;
+
+		this.dataTable = new Vector<Vector<Integer>>();
+		this.isTableDataCalculated = false;
+		this.isTableDisplayable = true;
+
+		this.isCompareSet = recordSet.isCompareSet;
+
+		this.maxSize = recordSet.maxSize;
+		this.maxValue = recordSet.maxValue;
+		this.minValue = recordSet.minValue;
+
+		this.zoomLevel = 0;
+		this.isZoomMode = false;
+		this.recordZoomOffset = 0;
+		this.recordZoomSize = super.size();
+
+		this.recordKeyMeasurement = recordSet.recordKeyMeasurement;
+
+		this.timeGridType = recordSet.timeGridType;
+		this.timeGrid = new Vector<Integer>(recordSet.timeGrid);
+		this.timeGridColor = recordSet.timeGridColor;
+		this.timeGridLineStyle = recordSet.timeGridLineStyle;
+
+		this.horizontalGridType = recordSet.horizontalGridType;
+		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
+		this.horizontalGridColor = recordSet.horizontalGridColor;
+		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
+		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
+
+		this.configuredDisplayable = recordSet.configuredDisplayable;
+	}
+
+	/**
+	 * clone method re-writes data points of all records of this record set
+	 * - if isFromBegin == true, the given index is the index where the record starts after this operation
+	 * - if isFromBegin == false, the given index represents the last data point index of the records.
+	 * @param dataIndex
+	 * @param isFromBegin
+	 * @return new created record set
+	 */
+	public RecordSet clone(int dataIndex, boolean isFromBegin) {
+		return new RecordSet(this, dataIndex, isFromBegin);
 	}
 
 	/**
@@ -558,7 +629,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setPositionLeft(false); // position right
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
-			newRecordSet.put(recordNames[i], tmpRecord);
+			newRecordSet.put(recordNames[i], tmpRecord.clone());
 			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[i]);
 		}
 		
@@ -616,7 +687,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * overwrites default HashMap method
 	 */
 	public Record put(String key, Record record) {
-		super.put(key, record.clone());
+		super.put(key, record);
 		Record newRecord = this.get(key);
 		//for compare set record following properties has to be checked at the point where
 		newRecord.setKeyName(key);
@@ -1303,7 +1374,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return
 	 */
 	public boolean isCutRightEdgeEnabled() {
-		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize == this.getRecordDataSize());
+		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize()-1);
 	}
-
 }
