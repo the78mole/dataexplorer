@@ -877,7 +877,7 @@ public class MenuBar {
 	void openOsdFile(final String openFilePath) {
 		try {
 			//check current device and switch if required
-			String fileDeviceName = OsdReaderWriter.getDeviceName(openFilePath);
+			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OsdReaderWriter.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) {
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
