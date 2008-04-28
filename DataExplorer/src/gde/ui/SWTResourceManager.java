@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Pattern;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -272,6 +273,17 @@ public class SWTResourceManager {
 		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name);
 		resources.put(name, color);
 		return color;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
+		String name = "PATTERN:" + x1 + "," + y1 + "," + x2 + "," + y2 + swtColor1 + "," + alpha1 + "," + swtColor2 + "," + alpha2;
+		if (resources.containsKey(name))
+			return (Pattern) resources.get(name);
+		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), alpha1, SWTResourceManager.getColor(swtColor2), alpha2);
+		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name);
+		resources.put(name, pattern);
+		return pattern;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -768,6 +768,7 @@ public class GraphicsWindow {
 				this.application.setStatusMessage("  beschneide die linke Seite ! ");
 				cleanCutPointer();
 				this.xPosCut = this.curveAreaBounds.width * 1/4;
+				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				this.canvasGC.fillRectangle(0+this.offSetX, 0+this.offSetY, this.xPosCut, this.curveAreaBounds.height);
 				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);	
 			}
@@ -775,6 +776,7 @@ public class GraphicsWindow {
 				this.application.setStatusMessage("  beschneide die rechte Seite ! ");
 				cleanCutPointer();
 				this.xPosCut = this.curveAreaBounds.width * 3/4;
+				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				this.canvasGC.fillRectangle(this.xPosCut+this.offSetX, 0+this.offSetY, this.curveAreaBounds.width-this.xPosCut, this.curveAreaBounds.height);
 				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
 			}
@@ -1032,6 +1034,9 @@ public class GraphicsWindow {
 								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut-evt.x+1, this.curveAreaBounds.height, evt.x+this.offSetX, this.offSetY, this.xPosCut-evt.x+1, this.curveAreaBounds.height);
 							}
 							else { // evt.x > this.xPosCut
+								this.canvasGC.drawImage(this.curveArea, this.xPosCut, 0, evt.x-this.xPosCut, this.curveAreaBounds.height, this.xPosCut+this.offSetX, this.offSetY, evt.x-this.xPosCut, this.curveAreaBounds.height);
+								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
+
 								this.canvasGC.fillRectangle(this.xPosCut+this.offSetX, 0+this.offSetY, evt.x-this.xPosCut, this.curveAreaBounds.height);								
 							}
 							this.xPosCut = evt.x;
@@ -1044,6 +1049,9 @@ public class GraphicsWindow {
 								this.canvasGC.drawImage(this.curveArea, this.xPosCut, 0, evt.x-this.xPosCut, this.curveAreaBounds.height, this.offSetX+this.xPosCut, this.offSetY, evt.x-this.xPosCut, this.curveAreaBounds.height);
 							}
 							else { // evt.x < this.xPosCut
+								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut-evt.x+1, this.curveAreaBounds.height, evt.x+this.offSetX, this.offSetY, this.xPosCut-evt.x+1, this.curveAreaBounds.height);
+								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
+
 								this.canvasGC.fillRectangle(evt.x+this.offSetX, 0+this.offSetY, this.xPosCut-evt.x+1, this.curveAreaBounds.height);
 							}
 							this.xPosCut = evt.x;

@@ -224,7 +224,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
-		this.isSaved = recordSet.isSaved;
+		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
@@ -267,6 +267,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public RecordSet clone(String newChannelConfiguration) {
 		return new RecordSet(this, newChannelConfiguration);
 	}
+	
 	/**
 	 * copy constructor - used to copy a record set to another channel/configuration, 
 	 * wherer the configuration comming from the device properties file
@@ -290,7 +291,7 @@ public class RecordSet extends HashMap<String, Record> {
 		
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
-		this.isSaved = recordSet.isSaved;
+		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
