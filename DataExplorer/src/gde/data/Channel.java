@@ -383,7 +383,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 	
 	/**
-	 * @return the type
+	 * @return the type as ordinal
 	 */
 	public int getType() {
 		return this.type;
