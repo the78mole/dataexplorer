@@ -278,7 +278,7 @@ public class RecordSet extends HashMap<String, Record> {
 		super(recordSet);
 
 		this.device = recordSet.device; // this is a reference
-		this.name = recordSet.name+"_";
+		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name+"_" : recordSet.name.substring(0, MAX_NAME_LENGTH-1)+"_";
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelConfigName = recordSet.channelConfigName;
