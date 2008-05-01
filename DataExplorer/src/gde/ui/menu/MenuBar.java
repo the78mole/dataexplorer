@@ -60,7 +60,7 @@ import osde.utils.FileUtils;
  */
 public class MenuBar {
 	final static Logger						log			= Logger.getLogger(MenuBar.class.getName());
-	final String									fileSep	= System.getProperty("file.separator");
+	final String									fileSep	= "/";
 
 	static Display								display;
 	static Shell									shell;
@@ -670,7 +670,7 @@ public class MenuBar {
 				}
 				{
 					this.recordSetCommentTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.recordSetCommentTabMenuItem.setText("Datensatzkommentar");
+					this.recordSetCommentTabMenuItem.setText("Dateikommentar");
 					this.recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
