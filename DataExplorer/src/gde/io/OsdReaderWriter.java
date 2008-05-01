@@ -124,7 +124,6 @@ public class OsdReaderWriter {
 	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
-		String fileComment = "";
 		String channelConfig = "";
 		String recordSetName = "";
 		String recordSetComment = "";
@@ -206,7 +205,7 @@ public class OsdReaderWriter {
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
 					channels.setFullQualifiedFileName(filePath);
-					channels.setFileDescription(fileComment);
+					channels.setFileDescription(header.get(FILE_COMMENT));
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
@@ -324,6 +323,7 @@ public class OsdReaderWriter {
 				}
 			}
 		}
+		data_out.flush();
 		data_out.close();
 	}
 }
