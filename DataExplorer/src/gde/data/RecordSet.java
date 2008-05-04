@@ -48,6 +48,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
+	String												objectKey							= "---";
 	String[]											recordNames;										// Spannung, Strom, ..
 	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
 	String												recordSetDescription	= new SimpleDateFormat("HH:mm:ss").format(new Date().getTime());
@@ -550,6 +551,14 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = newName;
 	}
 
+	public String getObjectKey() {
+		return this.objectKey;
+	}
+
+	public void setObjectKey(String newObjectkey) {
+		this.objectKey = newObjectkey;
+	}
+
 	/**
 	 * method to create a record set with given name "1) Laden" containing records according the active device configuration
 	 * @param channelKey (name of the outlet or configuration)
@@ -560,6 +569,10 @@ public class RecordSet extends HashMap<String, Record> {
 		recordName = recordName.length() <= RecordSet.MAX_NAME_LENGTH ? recordName : recordName.substring(0, RecordSet.MAX_NAME_LENGTH);
 		
 		String[] recordNames = device.getMeasurementNames(channelKey);
+		if (recordNames.length == 1 && recordNames[0].length() < 3) { // simple check for valid record names
+			channelKey = Channels.getInstance().getChannelNames()[0].split(":")[1].trim();
+			recordNames = device.getMeasurementNames(channelKey);
+		}
 		RecordSet newRecordSet = new RecordSet(device, channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
 
 		for (int i = 0; i < recordNames.length; i++) {
