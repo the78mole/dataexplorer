@@ -118,27 +118,40 @@ public class CSVReaderWriter {
 						log.fine("using as file channel name = " + fileConfig);
 					}
 					else if (!activeConfig.equals(fileConfig)) {
-						String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
-						int answer = application.openYesNoCancelMessageDialog(msg);
-						if (answer == SWT.YES) {
-							log.fine("SWT.YES");
-							int channelNumber = channels.getChannelNumber(fileConfig);
-							if (channelNumber != 0) { // 0 channel configuration does not exist
+						//check if config exist
+						int channelNumber = channels.getChannelNumber(fileConfig);
+						if (channelNumber != 0) { // 0 channel configuration does not exist
+							String msg = "Die Kanalkonfiguration der Datei entspricht nicht der Kanalkonfiguration der Anwendung, soll auf die Dateikonfiguration umgeschaltet werden ?";
+							int answer = application.openYesNoCancelMessageDialog(msg);
+							if (answer == SWT.YES) {
+								log.fine("SWT.YES");
 								channels.setActiveChannelNumber(channelNumber);
 								channels.switchChannel(channelNumber, "");
 								application.getMenuToolBar().updateChannelSelector();
 								activeChannel = channels.getActiveChannel();
 							}
-							else
-								throw new Exception("Die Konfiguration aus der Datei entspricht keiner aktuell vorhandenen :\n" + fileConfig + " != " + channels.getChannelNamesToString());
-						}
-						else if (answer == SWT.NO) {
-							log.fine("SWT.NO");
-							fileConfig = channels.getActiveChannel().getConfigKey();
+							else if (answer == SWT.NO) {
+								log.fine("SWT.NO");
+								fileConfig = channels.getActiveChannel().getConfigKey();
+							}
+							else {
+								log.fine("SWT.CANCEL");
+								return null;
+							}
 						}
 						else {
-							log.fine("SWT.CANCEL");
-							return null;
+							String msg = "Die Kanalkonfiguration der Datei entspricht keiner aktuell vorhandenen, \n"
+									+ "soll auf die Datei zur aktuell eingestellten Kanalkonfiguration geladen werde ?\n" 
+									+ "Hinweis: Umstellen der KanalKonfiguration ist über den Gerätedialog möglich.";
+							int answer = application.openOkCancelMessageDialog(msg);
+							if (answer == SWT.OK) {
+								log.fine("SWT.OK");
+								fileConfig = channels.getActiveChannel().getConfigKey();
+							}
+							else {
+								log.fine("SWT.CANCEL");
+								return null;
+							}
 						}
 					}
 				} // end isDeviceName
