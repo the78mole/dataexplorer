@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import osde.OSDE;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -100,7 +101,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
 				this.version = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				this.version.setLayoutData(versionLData);
-				this.version.setText("Version 0.70");
+				this.version.setText(OSDE.OSDE_VERSION);
 				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
