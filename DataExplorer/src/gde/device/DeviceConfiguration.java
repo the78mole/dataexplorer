@@ -597,7 +597,7 @@ public class DeviceConfiguration {
 				sb.append(measurementType.getName()).append(";");
 			}
 		}
-		return sb.toString().split(";").clone();
+		return sb.toString().split(";");
 	}
 
 	/**
