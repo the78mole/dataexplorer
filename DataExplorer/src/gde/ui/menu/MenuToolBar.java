@@ -336,6 +336,7 @@ public class MenuToolBar {
 					this.panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif"));
 					this.panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
 					this.panItem.setToolTipText("Verschieben");
+					this.panItem.setEnabled(false);
 					this.panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("resizeItem.widgetSelected, event=" + evt);
@@ -888,6 +889,14 @@ public class MenuToolBar {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * enable pan button in zoomed mode
+	 * @param enable 
+	 */
+	public void enablePanButton(boolean enable) {
+		this.panItem.setEnabled(enable);
 	}
 	
 	/**

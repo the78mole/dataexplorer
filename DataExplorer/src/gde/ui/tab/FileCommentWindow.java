@@ -86,31 +86,7 @@ public class FileCommentWindow {
 			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("commentMainComposite.paintControl, event=" + evt);
-					Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
-					//log.info("mainSize = " + mainSize.toString());
-					Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
-							, mainSize.x * 90/100, mainSize.y * 40/100);
-					//log.info("cover bounds = " + bounds.toString());
-					FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
-					FileCommentWindow.this.fileCommentText.setBounds(bounds);
-					FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
-					
-					bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 50/100
-							, mainSize.x * 90/100, mainSize.y * 40/100);
-					FileCommentWindow.this.recordCommentTable.setBounds(bounds);
-					FileCommentWindow.this.recordCommentTable.removeAll();
-					FileCommentWindow.this.recordCommentTableHeader2.setWidth(bounds.width-205);
-					Channel channel = Channels.getInstance().getActiveChannel();
-					TableItem item;
-					if (channel != null) {
-							HashMap<String, RecordSet> recordSets = channel.getRecordSets();
-							for (String recordSetKey : channel.getRecordSetNames()) {
-								if (recordSetKey != null) {
-									item = new TableItem(FileCommentWindow.this.recordCommentTable, SWT.LEFT);
-									item.setText(new String[] { recordSetKey, recordSets.get(recordSetKey).getRecordSetDescription() });
-								}
-							}
-					}
+					updateRecordSetTable();
 				}
 			});
 			{
@@ -147,7 +123,7 @@ public class FileCommentWindow {
 			this.recordCommentTable.setHeaderVisible(true);
 
 			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
-			this.recordCommentTableHeader.setWidth(200);
+			this.recordCommentTableHeader.setWidth(250);
 			this.recordCommentTableHeader.setText("Datensatzname");
 
 			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
@@ -160,6 +136,38 @@ public class FileCommentWindow {
 	public void update() {
 		if (this.channels.getActiveChannel() != null) {
 			this.fileCommentText.setText(this.channels.getFileDescription());
+		}
+		updateRecordSetTable();
+	}
+
+	/**
+	 * update the record set enty table
+	 */
+	void updateRecordSetTable() {
+		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
+		//log.info("mainSize = " + mainSize.toString());
+		Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
+				, mainSize.x * 90/100, mainSize.y * 40/100);
+		//log.info("cover bounds = " + bounds.toString());
+		FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
+		FileCommentWindow.this.fileCommentText.setBounds(bounds);
+		FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
+		
+		bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 50/100
+				, mainSize.x * 90/100, mainSize.y * 40/100);
+		FileCommentWindow.this.recordCommentTable.setBounds(bounds);
+		FileCommentWindow.this.recordCommentTable.removeAll();
+		FileCommentWindow.this.recordCommentTableHeader2.setWidth(bounds.width-205);
+		Channel channel = Channels.getInstance().getActiveChannel();
+		TableItem item;
+		if (channel != null) {
+				HashMap<String, RecordSet> recordSets = channel.getRecordSets();
+				for (String recordSetKey : channel.getRecordSetNames()) {
+					if (recordSetKey != null) {
+						item = new TableItem(FileCommentWindow.this.recordCommentTable, SWT.LEFT);
+						item.setText(new String[] { recordSetKey, recordSets.get(recordSetKey).getRecordSetDescription() });
+					}
+				}
 		}
 	}
 }

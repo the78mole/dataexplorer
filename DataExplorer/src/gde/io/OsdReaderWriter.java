@@ -102,7 +102,7 @@ public class OsdReaderWriter {
 			while (headerCounter-- > 0) {
 				line = data_in.readUTF();
 				line = line.substring(0, line.length() - 1);
-				log.info(line);
+				log.fine(line);
 				for (String headerKey : OSD_FORMAT_HEADER_KEYS) {
 					if (line.startsWith(headerKey)) {
 						log.fine(line);
@@ -115,7 +115,7 @@ public class OsdReaderWriter {
 								line = data_in.readUTF();
 								line = line.substring(0, line.length() - 1);
 								if (line.startsWith(RECORD_SET_NAME)) {
-									log.info(line);
+									log.fine(line);
 									header.put((lastReordNumber-headerCounter)+" "+RECORD_SET_NAME, line.substring(RECORD_SET_NAME.length()));
 								}
 							}
@@ -159,7 +159,7 @@ public class OsdReaderWriter {
 		String channelType = header.get(CHANNEL_CONFIG_TYPE).trim();
 		int numberRecordSets = new Integer(header.get(RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(RECORD_SET_SIZE))
-			log.info("skip");
+			log.fine("skip");
 		
 		// record sets with it properties
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
@@ -343,7 +343,6 @@ public class OsdReaderWriter {
 			sbs[i].append(RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(lineSep);
 			//data_out.writeInt(sbs[i].length());
 			data_out.writeUTF(sbs[i].toString());
-			log.info("" + (sbs[i].toString().getBytes("UTF8").length + utfSigSize));
 			dataSize += (recordSet.getNoneCalculationRecordNames().length * intSize * recordSet.getRecordDataSize());
 			log.fine("filePointer = " + (filePointer + dataSize));
 		}

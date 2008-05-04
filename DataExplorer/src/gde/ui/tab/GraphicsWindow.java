@@ -859,10 +859,18 @@ public class GraphicsWindow {
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
 			this.application.setStatusMessage("");
-			this.updateCutModeButtons();
+			updatePanMenueButton();
+			updateCutModeButtons();
 			//this.redrawGraphics();
 			break;
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void updatePanMenueButton() {
+		this.application.getMenuToolBar().enablePanButton(this.isZoomMouse);
 	}
 
 	/**
@@ -1179,6 +1187,7 @@ public class GraphicsWindow {
 						setModeState(MODE_RESET);
 						}
 				}
+				updatePanMenueButton();
 				updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.finer("isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure);
 			}
