@@ -952,7 +952,7 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
-						OsdReaderWriter.write(useFilePath, activeChannel);
+						OsdReaderWriter.write(useFilePath, activeChannel, 1);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
