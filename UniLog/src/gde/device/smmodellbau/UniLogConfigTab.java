@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -98,7 +97,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	boolean												isActiveU						= false;
 	boolean												isActiveI						= false;
 	boolean												isActiveRPM					= false;
-	Button												updateGraphicsButton;
 	boolean												isActiveHeight			= false;
 	int														prop100WValue				= 3400;
 	int														numCellValue				= 12;
@@ -919,7 +917,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					this.setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					this.setConfigButton.setBounds(320, 226, 295, 30);
+					this.setConfigButton.setBounds(320, 250, 295, 30);
 					this.setConfigButton.setText("Einstellungen als Vorgabe übernehmen");
 					this.setConfigButton.setEnabled(false);
 					this.setConfigButton.addSelectionListener(new SelectionAdapter() {
@@ -927,27 +925,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("setConfigButton.widgetSelected, event=" + evt);
 							collectAndUpdateConfiguration();
 							UniLogConfigTab.this.setConfigButton.setEnabled(false);
-						}
-					});
-				}
-				{
-					this.updateGraphicsButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					this.updateGraphicsButton.setBounds(320, 275, 295, 30);
-					this.updateGraphicsButton.setText("Neuberechnung");
-					this.updateGraphicsButton.setEnabled(false);
-					this.updateGraphicsButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("setConfigButton.widgetSelected, event=" + evt);
-							UniLogConfigTab.this.updateGraphicsButton.setEnabled(false);
-							Channel activeChannel = Channels.getInstance().getActiveChannel();
-							if (activeChannel != null) {
-								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-								if (activeRecordSet != null) {
-									activeRecordSet.setRecalculationRequired();
-									UniLogConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
-									UniLogConfigTab.this.application.updateDataTable();
-								}
-							}
 						}
 					});
 				}
