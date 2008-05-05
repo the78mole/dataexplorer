@@ -28,8 +28,6 @@ import osde.ui.OpenSerialDataExplorer;
 public abstract class CalculationThread extends Thread {
 	final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
 
-	protected static String									newLine			= System.getProperty("line.separator");
-	
 	public static final String REGRESSION_TYPE 					= "regression_type";
 	public static final String REGRESSION_TYPE_LINEAR 	= "Linear";
 	public static final String REGRESSION_TYPE_CURVE 		= "Kurve";

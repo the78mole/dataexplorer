@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;
 	static final Logger		log								= Logger.getLogger(GraphicsTemplate.class.getName());
-	private final String	fileSep						= System.getProperty("file.separator");
+	private final String	fileSep						= Settings.FILE_SEP;
 
 	private boolean				isAvailable				= false;
 	private boolean				isSaved						= false;																				// indicates if template is saved to file

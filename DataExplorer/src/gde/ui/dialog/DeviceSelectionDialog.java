@@ -70,7 +70,7 @@ import osde.ui.SWTResourceManager;
  */
 public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	final static Logger											log	= Logger.getLogger(DeviceSelectionDialog.class.getName());
-	final static String											fileSep = System.getProperty("file.separator");
+	final static String											fileSep = Settings.FILE_SEP;
 	
 	Shell																	dialogShell;
 	CTabItem															cTabItem1;

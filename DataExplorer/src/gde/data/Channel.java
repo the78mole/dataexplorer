@@ -39,7 +39,6 @@ import osde.utils.RecordSetNameComparator;
 public class Channel extends HashMap<String, RecordSet> {
 	static final long							serialVersionUID	= 26031957;
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
-	static final String						fileSep = System.getProperty("file.separator");
 	
 	String												name;																														// 1: Ausgang
 	final int											type;
@@ -227,7 +226,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, recordSet.getHorizontalGridRecordName());
 			}
 			this.template.store();
-			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + fileSep + this.getActiveRecordSet().getName() + this.name);
+			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + Settings.FILE_SEP + this.getActiveRecordSet().getName() + this.name);
 		}
 	}
 
