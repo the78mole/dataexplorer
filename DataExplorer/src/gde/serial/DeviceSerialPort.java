@@ -47,7 +47,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	protected final DeviceConfiguration			deviceConfig;
 	protected final OpenSerialDataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
-	private boolean												isConnected				= false;
+	private boolean													isConnected				= false;
 	private String													serialPortStr			= "";
 	private Thread													closeThread;
 	
@@ -68,8 +68,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	protected boolean							hasVersion				= false;
 
 
-	private static String					newLine						= System.getProperty("line.separator");
-	
   //public static final int STOPBITS_1 = 1;
   //public static final int STOPBITS_2 = 2;
   //public static final int STOPBITS_1_5 = 3;
@@ -243,7 +241,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				for (int i = 0; i < buf.length; i++) {
 					sb.append(String.format("%02X ", buf[i]));
 				}
-				sb.append(" to port ").append(this.serialPort.getName()).append(newLine);
+				sb.append(" to port ").append(this.serialPort.getName()).append(System.getProperty("line.separator"));
 				log.fine(sb.toString());
 			}
 
