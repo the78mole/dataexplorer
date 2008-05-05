@@ -350,6 +350,7 @@ public class OsdReaderWriter {
 						data_out.writeInt(recordSet.get(recordKey).get(j));
 					}
 				}
+				recordSet.setSaved(true);
 			}
 			data_out.flush();
 			data_out.close();
