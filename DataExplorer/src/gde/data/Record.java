@@ -957,8 +957,8 @@ public class Record extends Vector<Integer> {
 		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, this.propertyKeys);
 		String tmpValue = null;
 		
-		//this.name =  recordProps.get(NAME); // name could be different and should be loaded by device properties XML
-		if (!recordProps.get(NAME).equals(this.name)) log.info("record name from device props = " + this.name + " not equals record name loaded from file = " + recordProps.get(NAME));
+		tmpValue =  recordProps.get(NAME);
+		if (tmpValue!=null && tmpValue.length() > 0) this.name =  tmpValue.trim();
 		tmpValue = recordProps.get(UNIT);
 		if (tmpValue!=null && tmpValue.length() > 0) this.unit =  tmpValue.trim();
 		tmpValue = recordProps.get(SYMBOL);
