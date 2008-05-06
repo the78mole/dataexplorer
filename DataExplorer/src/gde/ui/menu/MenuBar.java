@@ -73,8 +73,7 @@ public class MenuBar {
 	MenuItem											contentsMenuItem, webCheckMenuItem;
 	Menu													helpMenu;
 	MenuItem											helpMenuItem;
-	MenuItem											graphicTabMenuItem, dataTableTabMenuItem, digitalTabMenuItem, analogTabMenuItem, cellVoltageTabMenuItem, recordSetCommentTabMenuItem, compareTabMenuItem;
-	MenuItem											recordCommentMenuItem;
+	MenuItem											recordCommentMenuItem, graphicsHeaderMenuItem;
 	MenuItem											curveSelectionMenuItem;
 	Menu													viewMenu;
 	MenuItem											viewMenuItem;
@@ -588,18 +587,21 @@ public class MenuBar {
 					});
 				}
 				{
-					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
-					this.recordCommentMenuItem.setText("Datensatzkommentar");
-					this.recordCommentMenuItem.setSelection(false);
-					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
+				}
+				{
+					this.graphicsHeaderMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.graphicsHeaderMenuItem.setText("Graphiküberschrift");
+					this.graphicsHeaderMenuItem.setSelection(false);
+					this.graphicsHeaderMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("dataCommentMenuItem.widgetSelected, event=" + evt);
-							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
-								MenuBar.this.application.setRecordCommentEnabled(true);
+							MenuBar.log.finest("graphicsHeaderMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.graphicsHeaderMenuItem.getSelection()) {
+								MenuBar.this.application.enableGraphicsHeader(true);
 								MenuBar.this.application.updateDisplayTab();
 							}
 							else {
-								MenuBar.this.application.setRecordCommentEnabled(false);
+								MenuBar.this.application.enableGraphicsHeader(false);
 								MenuBar.this.application.updateDisplayTab();
 							}
 						}
@@ -609,72 +611,20 @@ public class MenuBar {
 					new MenuItem(this.viewMenu, SWT.SEPARATOR);
 				}
 				{
-					this.graphicTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.graphicTabMenuItem.setText("Graphikansicht");
-					this.graphicTabMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.recordCommentMenuItem.setText("Datensatzkommentar");
+					this.recordCommentMenuItem.setSelection(false);
+					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("graphicTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_GRAPHIC);
-						}
-					});
-				}
-				{
-					this.dataTableTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.dataTableTabMenuItem.setText("Tabellenansicht");
-					this.dataTableTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("dataTableTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DATA_TABLE);
-						}
-					});
-				}
-				{
-					this.digitalTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.digitalTabMenuItem.setText("Zahlenanzeige");
-					this.digitalTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("digitalTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_DIGITAL);
-						}
-					});
-				}
-				{
-					this.analogTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.analogTabMenuItem.setText("Analoganzeige");
-					this.analogTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("analogTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_ANALOG);
-						}
-					});
-				}
-				{
-					this.cellVoltageTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.cellVoltageTabMenuItem.setText("Zellenspannung");
-					this.cellVoltageTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("cellVoltageTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_CELL_VOLTAGE);
-						}
-					});
-				}
-				{
-					this.compareTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.compareTabMenuItem.setText("Kurvenvergleich");
-					this.compareTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("compareTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMPARE);
-						}
-					});
-				}
-				{
-					this.recordSetCommentTabMenuItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.recordSetCommentTabMenuItem.setText("Dateikommentar");
-					this.recordSetCommentTabMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("setCommentTabMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.switchDisplayTab(OpenSerialDataExplorer.TAB_INDEX_COMMENT);
+							MenuBar.log.finest("recordCommentMenuItem.widgetSelected, event=" + evt);
+							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
+								MenuBar.this.application.enableRecordSetComment(true);
+								MenuBar.this.application.updateDisplayTab();
+							}
+							else {
+								MenuBar.this.application.enableRecordSetComment(false);
+								MenuBar.this.application.updateDisplayTab();
+							}
 						}
 					});
 				}
@@ -988,6 +938,14 @@ public class MenuBar {
 	 */
 	public void setRecordCommentMenuItemSelection(boolean selected) {
 		this.recordCommentMenuItem.setSelection(selected);
+	}
+	
+	/**
+	 * set selection of record comment window 
+	 * @param selected
+	 */
+	public void setGraphicsHeaderMenuItemSelection(boolean selected) {
+		this.graphicsHeaderMenuItem.setSelection(selected);
 	}
 	
 	/**

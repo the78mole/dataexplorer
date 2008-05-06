@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -98,10 +100,10 @@ public class GraphicsWindow {
 	Text													recordSetHeader;
 	Text													recordSetComment;
 	Canvas												graphicCanvas;
-	Point													graphicsSize;
-	int														headerHeight						= 20;
-	int														commentHeight						= 30;
-	int														textGap									= 10;
+	int														headerHeight						= 0;
+	int														headerGap								= 0;
+	int														commentHeight						= 0;
+	int														commentGap							= 0;
 	RecordSet											oldRecordSetHeader, oldRecordSetComment;
 
 	final OpenSerialDataExplorer	application;
@@ -202,14 +204,22 @@ public class GraphicsWindow {
 					this.contextMenu.createMenu(this.popupmenu);
 					this.curveSelectorTable.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							GraphicsWindow.log.finest("curveTable.paintControl, event=" + evt);
-							System.out.println("curveSelectorTable.paintControl, event=" + evt);
-							GraphicsWindow.this.graphicsSize = GraphicsWindow.this.graphicsComposite.getSize();
-							GraphicsWindow.this.recordSetHeader.setBounds(0, GraphicsWindow.this.textGap, GraphicsWindow.this.graphicsSize.x, GraphicsWindow.this.headerHeight);
-							GraphicsWindow.this.graphicCanvas.setBounds(0, GraphicsWindow.this.textGap + GraphicsWindow.this.headerHeight, GraphicsWindow.this.graphicsSize.x, GraphicsWindow.this.graphicsSize.y
-									- (2 * GraphicsWindow.this.textGap + GraphicsWindow.this.commentHeight + GraphicsWindow.this.headerHeight));
-							GraphicsWindow.this.recordSetComment.setBounds(0, GraphicsWindow.this.textGap + GraphicsWindow.this.graphicsSize.y - GraphicsWindow.this.commentHeight,
-									GraphicsWindow.this.graphicsSize.x, GraphicsWindow.this.commentHeight);
+							GraphicsWindow.log.finest("curveSelectorTable.paintControl, event=" + evt);
+							Point graphicsSize = GraphicsWindow.this.graphicsComposite.getSize();
+							int x = 0;
+							int y = GraphicsWindow.this.headerGap;
+							int width = graphicsSize.x;
+							int height = GraphicsWindow.this.headerHeight;
+							GraphicsWindow.this.recordSetHeader.setBounds(x, y, width, height);
+							
+							y = GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight;
+							height = graphicsSize.y - (GraphicsWindow.this.headerGap + GraphicsWindow.this.commentGap + GraphicsWindow.this.commentHeight + GraphicsWindow.this.headerHeight);
+							GraphicsWindow.this.graphicCanvas.setBounds(x, y, width, height);
+							
+							y =  GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight + height;
+							height = GraphicsWindow.this.commentHeight;
+							GraphicsWindow.this.recordSetComment.setBounds(20, y, width-20, height);
+							
 							GraphicsWindow.this.recordSetComment.redraw();
 							GraphicsWindow.this.recordSetHeader.redraw();
 						}
@@ -278,11 +288,11 @@ public class GraphicsWindow {
 				});
 				{
 					this.recordSetHeader = new Text(this.graphicsComposite, SWT.SINGLE | SWT.CENTER);
-					this.recordSetHeader.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					this.recordSetHeader.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false));
 					this.recordSetHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 					this.recordSetHeader.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							System.out.println("recordSetHeader.paintControl, event=" + evt);
+							GraphicsWindow.log.finest("recordSetHeader.paintControl, event=" + evt);
 							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 								if (recordSet != null && (GraphicsWindow.this.oldRecordSetHeader == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetHeader.getName()))) {
@@ -330,22 +340,45 @@ public class GraphicsWindow {
 					});
 					this.graphicCanvas.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							System.out.println("graphicCanvas.paintControl, event=" + evt);
+							if (GraphicsWindow.log.isLoggable(Level.FINER)) GraphicsWindow.log.finer("graphicCanvas.paintControl, event=" + evt);
 							drawAreaPaintControl(evt);
 						}
 					});
 				}
 				{
-					this.recordSetComment = new Text(this.graphicsComposite, SWT.MULTI | SWT.CENTER);
+					this.recordSetComment = new Text(this.graphicsComposite, SWT.SINGLE | SWT.LEFT);
 					this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 					this.recordSetComment.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							System.out.println("recordSetHeader.paintControl, event=" + evt);
+							if (GraphicsWindow.log.isLoggable(Level.FINEST)) GraphicsWindow.log.finest("recordSetHeader.paintControl, event=" + evt);
+							GraphicsWindow.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+
 							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 								if (recordSet != null && (GraphicsWindow.this.oldRecordSetComment == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetComment.getName()))) {
 									GraphicsWindow.this.recordSetComment.setText(recordSet.getRecordSetDescription());
 									GraphicsWindow.this.oldRecordSetComment = recordSet;
+								}
+							}
+						}
+					});
+					this.recordSetComment.addHelpListener(new HelpListener() {
+						public void helpRequested(HelpEvent evt) {
+							log.finer("recordSetCommentText.helpRequested " + evt);
+							OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html");
+						}
+					});
+
+					this.recordSetComment.addKeyListener(new KeyAdapter() {
+						public void keyPressed(KeyEvent evt) {
+							log.finest("recordSetCommentText.keyPressed, event=" + evt);
+							GraphicsWindow.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
+								if (evt.character == SWT.CR) {
+									RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
+									if (recordSet != null) {
+										recordSet.setRecordSetDescription(GraphicsWindow.this.recordSetComment.getText());
+									}
 								}
 							}
 						}
@@ -474,7 +507,10 @@ public class GraphicsWindow {
 		this.curveAreaGC.fillRectangle(this.curveArea.getBounds());
 
 		// draw draw area bounding 
-		this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+		if(System.getProperty("os.name").toLowerCase().startsWith("windows")) 
+			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+		else
+			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_GREY);
 		this.curveAreaGC.drawLine(0, 0, width, 0);
 		this.curveAreaGC.drawLine(0, 0, 0, height - 1);
 		this.curveAreaGC.drawLine(width - 1, 0, width - 1, height - 1);
@@ -1282,5 +1318,35 @@ public class GraphicsWindow {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * enable display of graphics header
+	 */
+	public void enableGraphicsHeader(boolean enabled) {
+		if (enabled) {
+			this.headerGap = 5;
+			this.headerHeight = 20;
+		}
+		else {
+			this.headerGap = 0;
+			this.headerHeight = 0;
+		}
+		this.curveSelectorTable.redraw();
+	}
+
+	/**
+	 * enable display of record set comment
+	 */
+	public void enableRecordSetComment(boolean enabled) {
+		if (enabled) {
+			this.commentGap = 10;
+			this.commentHeight = 20;
+		}
+		else {
+			this.commentGap = 0;
+			this.commentHeight = 0;
+		}		
+		this.curveSelectorTable.redraw();
 	}
 }
