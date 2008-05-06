@@ -333,6 +333,12 @@ public class GraphicsWindow {
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(MODE_MEASURE, true);
 			}
+			else if (this.isLeftCutMode) {
+				drawCutPointer(MODE_CUT_LEFT, true, false);
+			}
+			else if (this.isRightCutMode) {
+				drawCutPointer(MODE_CUT_RIGHT, false, true);
+			}
 		}	
 	}
 
@@ -766,8 +772,8 @@ public class GraphicsWindow {
 
 			if (leftEnabled ){
 				this.application.setStatusMessage("  beschneide die linke Seite ! ");
-				cleanCutPointer();
-				this.xPosCut = this.curveAreaBounds.width * 1/4;
+				//cleanCutPointer();
+				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1/4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				this.canvasGC.fillRectangle(0+this.offSetX, 0+this.offSetY, this.xPosCut, this.curveAreaBounds.height);
 				this.canvasGC.setAdvanced(false);
@@ -775,8 +781,8 @@ public class GraphicsWindow {
 			}
 			else if (rightEnabled) {
 				this.application.setStatusMessage("  beschneide die rechte Seite ! ");
-				cleanCutPointer();
-				this.xPosCut = this.curveAreaBounds.width * 3/4;
+				//cleanCutPointer();
+				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 3/4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0,0,50,50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				this.canvasGC.fillRectangle(this.xPosCut+this.offSetX, 0+this.offSetY, this.curveAreaBounds.width-this.xPosCut, this.curveAreaBounds.height);
 				this.canvasGC.setAdvanced(false);
@@ -859,6 +865,7 @@ public class GraphicsWindow {
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
 			this.application.setStatusMessage("");
+			this.xPosCut = -1;
 			updatePanMenueButton();
 			updateCutModeButtons();
 			//this.redrawGraphics();
