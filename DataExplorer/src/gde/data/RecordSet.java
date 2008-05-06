@@ -49,6 +49,7 @@ public class RecordSet extends HashMap<String, Record> {
 	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
 	String												objectKey							= "---";
+	String												header 								= null;
 	String[]											recordNames;										// Spannung, Strom, ..
 	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
 	String												recordSetDescription	= new SimpleDateFormat("HH:mm:ss").format(new Date().getTime());
@@ -1389,5 +1390,13 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isCutRightEdgeEnabled() {
 		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize()-1);
+	}
+
+	public String getHeader() {
+		return this.header != null ? this.header : this.name;
+	}
+
+	void setHeader(String newHeader) {
+		this.header = newHeader;
 	}
 }

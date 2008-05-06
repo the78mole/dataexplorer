@@ -915,7 +915,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.application.updateCellVoltageWindow();
 		this.application.updateCompareWindow();
 		this.application.updateFileCommentWindow();
-		this.application.updateRecordCommentWindow();
 	}
 
 	/**
