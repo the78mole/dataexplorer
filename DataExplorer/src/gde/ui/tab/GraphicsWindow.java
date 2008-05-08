@@ -220,15 +220,7 @@ public class GraphicsWindow {
 							height = GraphicsWindow.this.commentHeight;
 							GraphicsWindow.this.recordSetComment.setBounds(20, y, width-20, height);
 							
-							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
-								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
-								if (recordSet == null) {
-									GraphicsWindow.this.recordSetComment.setText("");
-									GraphicsWindow.this.recordSetHeader.setText("");
-								}
-								GraphicsWindow.this.recordSetComment.redraw();
-								GraphicsWindow.this.recordSetHeader.redraw();
-							}
+							clearHeaderAndComment();
 						}
 					});
 					this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
@@ -1355,5 +1347,17 @@ public class GraphicsWindow {
 			this.commentHeight = 0;
 		}		
 		this.curveSelectorTable.redraw();
+	}
+
+	public void clearHeaderAndComment() {
+		if (GraphicsWindow.this.channels.getActiveChannel() != null) {
+			RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
+			if (recordSet == null) {
+				GraphicsWindow.this.recordSetComment.setText("");
+				GraphicsWindow.this.recordSetHeader.setText("");
+			}
+			GraphicsWindow.this.recordSetComment.redraw();
+			GraphicsWindow.this.recordSetHeader.redraw();
+		}
 	}
 }

@@ -152,6 +152,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			else {
 				log.fine("nothing to do selected channel == active channel");
 			}
+			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
