@@ -220,8 +220,15 @@ public class GraphicsWindow {
 							height = GraphicsWindow.this.commentHeight;
 							GraphicsWindow.this.recordSetComment.setBounds(20, y, width-20, height);
 							
-							GraphicsWindow.this.recordSetComment.redraw();
-							GraphicsWindow.this.recordSetHeader.redraw();
+							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
+								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
+								if (recordSet == null) {
+									GraphicsWindow.this.recordSetComment.setText("");
+									GraphicsWindow.this.recordSetHeader.setText("");
+								}
+								GraphicsWindow.this.recordSetComment.redraw();
+								GraphicsWindow.this.recordSetHeader.redraw();
+							}
 						}
 					});
 					this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
@@ -297,11 +304,9 @@ public class GraphicsWindow {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 								if (recordSet != null && (GraphicsWindow.this.oldRecordSetHeader == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetHeader.getName()))) {
 									GraphicsWindow.this.recordSetHeader.setText(recordSet.getHeader());
-									GraphicsWindow.this.oldRecordSetHeader = recordSet;
 								}
+								GraphicsWindow.this.oldRecordSetHeader = recordSet;
 							}
-							else
-								GraphicsWindow.this.recordSetHeader.setText("");
 						}
 					});
 				}
@@ -359,11 +364,9 @@ public class GraphicsWindow {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 								if (recordSet != null && (GraphicsWindow.this.oldRecordSetComment == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetComment.getName()))) {
 									GraphicsWindow.this.recordSetComment.setText(recordSet.getRecordSetDescription());
-									GraphicsWindow.this.oldRecordSetComment = recordSet;
 								}
+								GraphicsWindow.this.oldRecordSetComment = recordSet;
 							}
-							else
-								GraphicsWindow.this.recordSetComment.setText("");
 						}
 					});
 					this.recordSetComment.addHelpListener(new HelpListener() {
