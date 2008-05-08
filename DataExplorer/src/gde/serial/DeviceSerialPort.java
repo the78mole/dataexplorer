@@ -186,6 +186,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						this.deviceConfig.setPort(this.serialPortStr);
 					
 					this.deviceConfig.storeDeviceProperties();
+					this.application.updateTitleBar(this.deviceConfig.getName(), this.deviceConfig.getPort());
 				}
 				else {
 //					application.openMessageDialog("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
@@ -194,6 +195,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				}
 			}
 			log.fine(String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR()));
+			
 			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
 			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 2000);
 			// set port parameters
