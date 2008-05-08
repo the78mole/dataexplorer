@@ -147,10 +147,10 @@ public class MenuToolBar {
 							MenuToolBar.log.finest("saveToolItem.widgetSelected, event=" + evt);
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
-								if (MenuToolBar.this.channels.isSaved())
+								if (!activeChannel.isSaved())
 									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern unter ...", "");
 								else
-									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern", MenuToolBar.this.channels.getFullQualifiedFileName());
+									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern", activeChannel.getFileName());
 							}
 						}
 					});
@@ -538,6 +538,7 @@ public class MenuToolBar {
 											MenuToolBar.this.recordSelectCombo.setItems(recordSetNames);
 											RecordSet recordSet = MenuToolBar.this.channels.getActiveChannel().get(oldRecordSetName);
 											recordSet.setName(newRecordSetName);
+											recordSet.setHeader(newRecordSetName);
 											activeChannel.put(newRecordSetName, recordSet);
 											activeChannel.remove(oldRecordSetName);
 											activeChannel.getRecordSetNames();

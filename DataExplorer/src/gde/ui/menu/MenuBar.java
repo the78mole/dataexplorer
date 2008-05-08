@@ -41,6 +41,7 @@ import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.device.ChannelTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
@@ -170,10 +171,10 @@ public class MenuBar {
 							MenuBar.log.finest("saveFileMenuItem.widgetSelected, event=" + evt);
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
-								if (MenuBar.this.channels.isSaved())
+								if (!activeChannel.isSaved())
 									MenuBar.this.saveOsdFile("OSD Datei - Speichern unter ...", "");
 								else
-									MenuBar.this.saveOsdFile("OSD Datei - Speichern", MenuBar.this.channels.getFullQualifiedFileName());
+									MenuBar.this.saveOsdFile("OSD Datei - Speichern", activeChannel.getFileName());
 							}
 						}
 					});
@@ -834,7 +835,20 @@ public class MenuBar {
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					throw new DeclinedException();
 			}
-			this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+			}
+			else { // TYPE_OUTLET
+				String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
+				String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OsdReaderWriter.CHANNEL_CONFIG_NAME);
+				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
+					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf " + channelConfigName + " geschaltet!");
+					if (answer != SWT.OK) 
+						return;
+					
+					this.channels.get(this.channels.getChannelNumber(channelConfigName)).clear();
+				}
+			}
 
 			this.readerWriterThread = new Thread() {
 				public void run() {
@@ -893,7 +907,7 @@ public class MenuBar {
 			while (filePath.endsWith(".osd") || filePath.endsWith(".OSD")){
 				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
 			}
-			filePath = filePath + ".osd";
+			filePath = (filePath + ".osd").replace("\\", "/");
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog("Die Datei " + filePath + " existiert bereits, soll die Datei überschrieben werden ?")) {
 				return;
 			}
@@ -912,6 +926,8 @@ public class MenuBar {
 			};
 			this.readerWriterThread.start();
 			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf(this.fileSep)));
+			activeChannel.setFileName(filePath.substring(filePath.lastIndexOf(this.fileSep)+1));
+			activeChannel.setSaved(true);
 		}
 	}
 

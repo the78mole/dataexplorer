@@ -35,8 +35,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	String												fileDescription					= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 	int														activeChannelNumber			= 1;		// default at least one channel must exist
 	String[]											channelNames 						= new String[1];
-	String 												fullQualifiedFileName		= "";
-	boolean												isSaved									= false;
 	final OpenSerialDataExplorer	application;
 
 	/**
@@ -206,8 +204,6 @@ public class Channels extends HashMap<Integer, Channel> {
 		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		this.activeChannelNumber	= 1;		// default at least one channel must exist
 		this.channelNames = new String[1];
-		this.fullQualifiedFileName = "";
-		this.isSaved = false;
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -252,32 +248,12 @@ public class Channels extends HashMap<Integer, Channel> {
 		}		
 		return sb.toString();
 	}
-
-	/**
-	 * @return the fullQualifiedFileName
-	 */
-	public String getFullQualifiedFileName() {
-		return this.fullQualifiedFileName;
-	}
-
-	/**
-	 * @param useFullQualifiedFileName the fullQualifiedFileName to set
-	 */
-	public void setFullQualifiedFileName(String useFullQualifiedFileName) {
-		this.fullQualifiedFileName = useFullQualifiedFileName.replace('\\', '/');
-	}
-
-	/**
-	 * @return the isSaved
-	 */
-	public boolean isSaved() {
-		return this.isSaved;
-	}
-
-	/**
-	 * @param value the isSaved value to set
-	 */
+	
 	public void setSaved(boolean value) {
-		this.isSaved = value;
+		this.getActiveChannel().setSaved(value);
+	}
+	
+	public void setFileName(String newFileName) {
+		this.getActiveChannel().setFileName(newFileName);
 	}
 }

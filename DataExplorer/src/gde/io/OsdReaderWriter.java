@@ -57,10 +57,12 @@ public class OsdReaderWriter {
 	public static final String									DEVICE_NAME								= "DeviceName : ";
 	public static final String									CHANNEL_CONFIG_TYPE				= "Channel/Configuration Type : ";
 	public static final String									RECORD_SET_SIZE						= "NumberRecordSets : ";
+	public static final String									RECORD_SET_NAME						= "RecordSetName : ";
 	
-	static final String									RECORD_SET_NAME						= "RecordSetName : ";
-	static final String									CHANNEL_CONFIG_NAME				= "Channel/Configuration Name: ";
-	static final String									OBJECT_KEY								= "ObjectKey : ";
+	static final String													DATA_DELIMITER						= "||::||";	
+	public static final String									CHANNEL_CONFIG_NAME				= "Channel/Configuration Name: ";
+	public static final String									OBJECT_KEY								= "ObjectKey : ";
+	
 	static final String									RECORD_SET_COMMENT				= "RecordSetComment : ";
 	static final String									RECORD_SET_PROPERTIES			= "RecordSetProperties : ";
 	static final String									RECORDS_PROPERTIES				= "RecordProperties : ";
@@ -69,7 +71,6 @@ public class OsdReaderWriter {
 	static final String[]								OSD_FORMAT_HEADER_KEYS		= new String[] {CREATION_TIME_STAMP, FILE_COMMENT, DEVICE_NAME, CHANNEL_CONFIG_TYPE, RECORD_SET_SIZE};
 	static final String[]								OSD_FORMAT_DATA_KEYS			= new String[] {OBJECT_KEY, CHANNEL_CONFIG_NAME, RECORD_SET_NAME, RECORD_SET_COMMENT, RECORD_SET_PROPERTIES, RECORDS_PROPERTIES, RECORD_DATA_SIZE, RECORD_SET_DATA_POINTER};
 
-	static final String									DATA_DELIMITER						= "||::||";
 	final static String									lineSep										= "\n";	//System.getProperty("line.separator") is OS dependent
 	final static int										intSize										= Integer.SIZE/8;		// 32 bits / 8 bits per byte 
 	final static int										utfSigSize								= 2;		// 2 byte UTF line header 
@@ -168,7 +169,7 @@ public class OsdReaderWriter {
 			// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
 			line = data_in.readUTF();	
 			line = line.substring(0, line.length()-1);
-			recordSetsInfo.add(StringHelper.splitString(line, DATA_DELIMITER, OSD_FORMAT_DATA_KEYS));
+			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 
 		try { // build the data structure 
@@ -240,7 +241,7 @@ public class OsdReaderWriter {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
-					channels.setFullQualifiedFileName(filePath);
+					channels.setFileName(filePath.substring(filePath.lastIndexOf("/")+1));
 					channels.setFileDescription(header.get(FILE_COMMENT));
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
@@ -254,6 +255,14 @@ public class OsdReaderWriter {
 			e.printStackTrace();
 		}
 			return recordSet;
+	}
+
+	/**
+	 * @param line
+	 * @return
+	 */
+	public static HashMap<String, String> getRecordSetProperties(String line) {
+		return StringHelper.splitString(line, DATA_DELIMITER, OSD_FORMAT_DATA_KEYS);
 	}
 
 	/**

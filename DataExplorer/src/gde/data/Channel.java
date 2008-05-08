@@ -44,6 +44,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	final int											type;
 	GraphicsTemplate							template;																												// graphics template holds view configuration
 	RecordSet											activeRecordSet;
+	String 												fileName;
+	boolean												isSaved = false;
 	final OpenSerialDataExplorer	application;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 
@@ -392,5 +394,37 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void setName(String newName) {
 		this.name = newName;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public void setFileName(String newFileName) {
+		if(this.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+			Channels channels = Channels.getInstance();
+			for (int i = 1; i<= channels.getChannelNames().length; ++i) {
+				channels.get(i).fileName = newFileName;
+			}
+		}
+		else {
+			this.fileName = newFileName;
+		}
+	}
+
+	public boolean isSaved() {
+		return this.isSaved;
+	}
+
+	public void setSaved(boolean is_saved) {
+		if(this.getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+			Channels channels = Channels.getInstance();
+			for (int i = 1; i<= channels.getChannelNames().length; ++i) {
+				channels.get(i).isSaved = is_saved;
+			}
+		}
+		else {
+			this.isSaved = is_saved;
+		}		
 	}
 }

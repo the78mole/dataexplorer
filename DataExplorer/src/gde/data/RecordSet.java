@@ -1396,7 +1396,8 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.header != null ? this.header : this.name;
 	}
 
-	void setHeader(String newHeader) {
+	public void setHeader(String newHeader) {
 		this.header = newHeader;
+		this.application.updateHeaderText(newHeader);
 	}
 }
