@@ -300,6 +300,8 @@ public class GraphicsWindow {
 									GraphicsWindow.this.oldRecordSetHeader = recordSet;
 								}
 							}
+							else
+								GraphicsWindow.this.recordSetHeader.setText("");
 						}
 					});
 				}
@@ -360,6 +362,8 @@ public class GraphicsWindow {
 									GraphicsWindow.this.oldRecordSetComment = recordSet;
 								}
 							}
+							else
+								GraphicsWindow.this.recordSetComment.setText("");
 						}
 					});
 					this.recordSetComment.addHelpListener(new HelpListener() {
