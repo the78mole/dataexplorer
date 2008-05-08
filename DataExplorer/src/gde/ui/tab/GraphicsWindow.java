@@ -1348,6 +1348,10 @@ public class GraphicsWindow {
 		}		
 		this.curveSelectorTable.redraw();
 	}
+	
+	public void updateHeaderText(String newHeaderText) {
+		this.recordSetHeader.setText(newHeaderText);
+	}
 
 	public void clearHeaderAndComment() {
 		if (GraphicsWindow.this.channels.getActiveChannel() != null) {
