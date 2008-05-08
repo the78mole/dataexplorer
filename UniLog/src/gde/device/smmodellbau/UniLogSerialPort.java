@@ -129,7 +129,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			//throw e;
+			throw e;
 		}
 		finally {
 			if(isPortOpenedByMe) this.close();

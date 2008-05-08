@@ -603,7 +603,7 @@ public class UniLogDialog extends DeviceDialog {
 											updateConfigurationValues(UniLogDialog.this.serialPort.readConfiguration());
 										}
 										catch (Exception e) {
-											UniLogDialog.this.application.openMessageDialog(e.getMessage());
+											UniLogDialog.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 										}
 
 									}
