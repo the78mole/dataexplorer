@@ -217,8 +217,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					// update device configurations if required
 					for (String deviceKey : DeviceSelectionDialog.this.deviceConfigurations.keySet().toArray(new String[0])) {
 						DeviceConfiguration configuration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceKey);
-						if (configuration.isChangePropery()) log.fine(configuration.isChangePropery() + " update device properties for " + configuration.getName());
-						configuration.storeDeviceProperties(); // stores only if is changed
+						if (configuration.isChangePropery()) {
+							log.fine(configuration.isChangePropery() + " update device properties for " + configuration.getName());
+							configuration.storeDeviceProperties(); // stores only if is changed
+						}
 					}
 					// initialize selected device
 					if (isDeviceChanged()) {
