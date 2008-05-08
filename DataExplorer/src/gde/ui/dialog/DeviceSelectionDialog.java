@@ -1034,6 +1034,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		// execute independent from dialog UI
 		this.listPortsThread = new Thread() {
 			public void run() {
+				log.fine("updateAvailablePorts() - entry");
 				DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
 				if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 					DeviceSelectionDialog.this.dialogShell.getDisplay().asyncExec(new Runnable() {
@@ -1042,6 +1043,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 					});
 				}
+				log.fine("updateAvailablePorts() - exit");
 			}
 		};
 		this.listPortsThread.start();
