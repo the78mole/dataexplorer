@@ -805,16 +805,18 @@ public class MenuBar {
 	 * @param isRaw
 	 */
 	public void openOsdFileDialog(final String dialogName) {
-		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-		String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
-		FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
-		if (openFileDialog.getFileName().length() > 4) {
-			final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
-			String fileName = openFileDialog.getFileName();
-			fileName = fileName.substring(0, fileName.indexOf('.'));
+		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
+			Settings deviceSetting = Settings.getInstance();
+			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
+			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
+			if (openFileDialog.getFileName().length() > 4) {
+				final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
+				String fileName = openFileDialog.getFileName();
+				fileName = fileName.substring(0, fileName.indexOf('.'));
 
-			openOsdFile(openFilePath);
+				openOsdFile(openFilePath);
+			}
 		}
 	}
 
