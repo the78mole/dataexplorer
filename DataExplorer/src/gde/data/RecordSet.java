@@ -112,6 +112,11 @@ public class RecordSet extends HashMap<String, Record> {
 
 	int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
 
+	public final static String		UNSAVED_REASON_GRAPHICS 			= "Graphikeinstellungen";
+	public final static String		UNSAVED_REASON_DATA						= "Datenänderung";
+	public final static String		UNSAVED_REASON_CONFIGURATION	= "Konfigurationsänderung";
+	Vector<String>								unsaveReasons 								= new Vector<String>();
+	
 	final OpenSerialDataExplorer	application;				// pointer to main application
 	final Channels								channels;						// start point of data hierarchy
 	final IDevice									device;
@@ -732,7 +737,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newValue the isSaved to set
 	 */
 	public void setSaved(boolean newValue) {
+		if (newValue) this.unsaveReasons = new Vector<String>();
 		this.isSaved = newValue;
+	}
+
+	/**
+	 * set data unsaved with a given reason RecordSet.UNSAVED_REASON_*
+	 * @param reason
+	 */
+	public void setUnsaved(String reason) {
+		this.isSaved = false;
+		this.unsaveReasons.add(reason);
 	}
 
 	/**

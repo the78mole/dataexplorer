@@ -1020,5 +1020,13 @@ public class Record extends Vector<Integer> {
 			}
 		}
 	}
+	
+	/**
+	 * set data unsaved with a given reason
+	 * @param reason
+	 */
+	public void setUnsaved(String reason) {
+		this.parent.setUnsaved(reason);
+	}
 }
 
