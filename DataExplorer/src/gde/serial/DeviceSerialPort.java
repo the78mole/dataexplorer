@@ -178,7 +178,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			Vector<String> availableSerialPorts = listConfiguredSerialPorts();
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availableSerialPorts)) {
 				// no serial port is selected, if only one serial port is available choose this one
-				if (availableSerialPorts.size() >= 1) {
+				if (availableSerialPorts.size() == 1) {
 					this.serialPortStr = availableSerialPorts.firstElement();
 					if (settings.isGlobalSerialPort())
 						settings.setSerialPort(this.serialPortStr);
