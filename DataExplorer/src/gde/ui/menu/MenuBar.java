@@ -830,19 +830,19 @@ public class MenuBar {
 			//check current device and switch if required
 			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OsdReaderWriter.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
-			if (!activeDeviceName.equals(fileDeviceName)) {
+			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
-					throw new DeclinedException();
-			}
-			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG.ordinal()) {
+					return;
+				
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 			}
-			else { // TYPE_OUTLET
+			
+			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
 				String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OsdReaderWriter.CHANNEL_CONFIG_NAME);
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
-					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf " + channelConfigName + " geschaltet!");
+					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf die Kanalkonfiguration " + channelConfigName + " umgeschaltet, eventuell vorhandene Daten werden überschrieben !");
 					if (answer != SWT.OK) 
 						return;
 					
@@ -863,9 +863,6 @@ public class MenuBar {
 			};
 			this.readerWriterThread.start();
 			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + openFilePath.substring(openFilePath.lastIndexOf(this.fileSep)));
-		}
-		catch (DeclinedException e) {
-			// ignore, user has declined device switch
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
