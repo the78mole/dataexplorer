@@ -23,12 +23,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channel;
@@ -78,6 +80,15 @@ public class OsdReaderWriter {
 	final static OpenSerialDataExplorer	application								= OpenSerialDataExplorer.getInstance();
 	final static Channels 							channels 									= Channels.getInstance();
 
+
+	/**
+	 * get open serial data file header data
+	 * @param filePath
+	 * @return hash map containing header data as string accessible by public header keys
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotSupportedFileFormat
+	 */
 	
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
@@ -85,6 +96,14 @@ public class OsdReaderWriter {
 		return readHeader(filePath, data_in);
 	}
 
+	/**
+	 * method to read the data using a given input stream
+	 * @param filePath
+	 * @param data_in
+	 * @return
+	 * @throws IOException
+	 * @throws NotSupportedFileFormat
+	 */
 	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormat {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
@@ -136,6 +155,7 @@ public class OsdReaderWriter {
 	}	
 	
 	/**
+	 * read complete file data and display the first found record set
 	 * @param filePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
@@ -247,26 +267,28 @@ public class OsdReaderWriter {
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
-					
-			data_in.close ();
-		}
-		catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 			return recordSet;
+		}
+		finally {
+			data_in.close ();
+			data_in = null;
+			file_input = null;
+		}
 	}
 
 	/**
-	 * @param line
-	 * @return
+	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS 
+	 * @param recordSetProperties
+	 * @return hash map with string type data
 	 */
-	public static HashMap<String, String> getRecordSetProperties(String line) {
-		return StringHelper.splitString(line, DATA_DELIMITER, OSD_FORMAT_DATA_KEYS);
+	public static HashMap<String, String> getRecordSetProperties(String recordSetProperties) {
+		return StringHelper.splitString(recordSetProperties, DATA_DELIMITER, OSD_FORMAT_DATA_KEYS);
 	}
 
 	/**
 	 * write channel data to osd file format
+	 * - if channel type is TYPE_OUTLET only this channel record sets are part of the written file
+	 * - if channel type is TYPE_CONFIG all records sets of all channel configurations are written to the file
 	 * @param filePath
 	 * @param activeChannel
 	 * @param useVersion
@@ -279,94 +301,128 @@ public class OsdReaderWriter {
 			DataOutputStream data_out = new DataOutputStream(file_out);
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
 			int filePointer = 0;
-			// first line : header with version
-			String versionString = OPEN_SERIAL_DATA_VERSION + useVersion + lineSep;
-			data_out.writeUTF(versionString);
-			filePointer += utfSigSize + versionString.getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
-			//creation time stamp
-			StringBuilder sb = new StringBuilder();
-			sb.append(CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' ');
-			sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(lineSep);
-			data_out.writeUTF(sb.toString());
-			filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
-			// second line : size file comment , file comment
-			sb = new StringBuilder();
-			sb.append(FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(lineSep);
-			data_out.writeUTF(sb.toString());
-			filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
-			// third line : size device name , device name
-			sb = new StringBuilder();
-			sb.append(DEVICE_NAME).append(activeDevice.getName()).append(lineSep);
-			data_out.writeUTF(sb.toString());
-			filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
-			// fourth line : size channel/config type , channel/config type
-			sb = new StringBuilder();
-			sb.append(CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(lineSep);
-			data_out.writeUTF(sb.toString());
-			filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
-			// number of record sets
-			sb = new StringBuilder();
-			sb.append(RECORD_SET_SIZE).append(activeChannel.size()).append(lineSep);
-			data_out.writeUTF(sb.toString());
-			filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-			log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
-			// record sets with it properties
-			StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
-			String[] recordSetNames = activeChannel.getRecordSetNames();
-			// prepare all record set lines without the to be calculated data pointer
-			for (int i = 0; i < activeChannel.size(); ++i) {
-				// channel/configuration :|: record set name :|: recordSet description :|: recordSet properties :|: all records properties :|: record size :|: data begin pointer 
-				Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-				RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-				sbs[i] = new StringBuilder();
-				sbs[i].append(RECORD_SET_NAME).append(recordSet.getName()).append(DATA_DELIMITER).append(CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(DATA_DELIMITER)
-						.append(OBJECT_KEY).append(recordSet.getObjectKey()).append(DATA_DELIMITER).append(RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(DATA_DELIMITER).append(
-								RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(DATA_DELIMITER);
-				// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
-				for (String recordKey : recordSet.getRecordNames()) {
-					sbs[i].append(RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
-				}
-				sbs[i].append(DATA_DELIMITER).append(RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(DATA_DELIMITER);
-				filePointer += utfSigSize + sbs[i].toString().getBytes("UTF8").length;
-				filePointer += RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length; // pre calculated size
-				log.fine("line lenght = "
-						+ (utfSigSize + sbs[i].toString().getBytes("UTF8").length + RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length)
-						+ " filePointer = " + filePointer);
-			}
-			int dataSize = 0;
-			for (int i = 0; i < activeChannel.size(); ++i) {
-				// channel/configuration :: record set name :: recordSet description :: data pointer 
-				Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-				RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-				recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
-				sbs[i].append(RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(lineSep);
-				//data_out.writeInt(sbs[i].length());
-				data_out.writeUTF(sbs[i].toString());
-				dataSize += (recordSet.getNoneCalculationRecordNames().length * intSize * recordSet.getRecordDataSize());
-				log.fine("filePointer = " + (filePointer + dataSize));
-			}
-			// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
-			for (int i = 0; i < activeChannel.size(); ++i) {
-				Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-				RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-				for (int j = 0; j < recordSet.getRecordDataSize(); j++) {
-					for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
-						data_out.writeInt(recordSet.get(recordKey).get(j));
+			try {
+				// first line : header with version
+				String versionString = OPEN_SERIAL_DATA_VERSION + useVersion + lineSep;
+				data_out.writeUTF(versionString);
+				filePointer += utfSigSize + versionString.getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
+				//creation time stamp
+				StringBuilder sb = new StringBuilder();
+				sb.append(CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' ');
+				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(lineSep);
+				data_out.writeUTF(sb.toString());
+				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				// second line : size file comment , file comment
+				sb = new StringBuilder();
+				sb.append(FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(lineSep);
+				data_out.writeUTF(sb.toString());
+				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				// third line : size device name , device name
+				sb = new StringBuilder();
+				sb.append(DEVICE_NAME).append(activeDevice.getName()).append(lineSep);
+				data_out.writeUTF(sb.toString());
+				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				// fourth line : size channel/config type , channel/config type
+				sb = new StringBuilder();
+				sb.append(CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(lineSep);
+				data_out.writeUTF(sb.toString());
+				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				// number of record sets
+				sb = new StringBuilder();
+				sb.append(RECORD_SET_SIZE).append(activeChannel.size()).append(lineSep);
+				data_out.writeUTF(sb.toString());
+				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				// record sets with it properties
+				StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
+				String[] recordSetNames = activeChannel.getRecordSetNames();
+				// prepare all record set lines without the to be calculated data pointer
+				for (int i = 0; i < activeChannel.size(); ++i) {
+					// channel/configuration :|: record set name :|: recordSet description :|: recordSet properties :|: all records properties :|: record size :|: data begin pointer 
+					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+					sbs[i] = new StringBuilder();
+					sbs[i].append(RECORD_SET_NAME).append(recordSet.getName()).append(DATA_DELIMITER).append(CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(DATA_DELIMITER)
+							.append(OBJECT_KEY).append(recordSet.getObjectKey()).append(DATA_DELIMITER).append(RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(DATA_DELIMITER).append(
+									RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(DATA_DELIMITER);
+					// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
+					for (String recordKey : recordSet.getRecordNames()) {
+						sbs[i].append(RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 					}
+					sbs[i].append(DATA_DELIMITER).append(RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(DATA_DELIMITER);
+					filePointer += utfSigSize + sbs[i].toString().getBytes("UTF8").length;
+					filePointer += RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length; // pre calculated size
+					log.fine("line lenght = "
+							+ (utfSigSize + sbs[i].toString().getBytes("UTF8").length + RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length)
+							+ " filePointer = " + filePointer);
 				}
-				recordSet.setSaved(true);
+				int dataSize = 0;
+				for (int i = 0; i < activeChannel.size(); ++i) {
+					// channel/configuration :: record set name :: recordSet description :: data pointer 
+					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
+					sbs[i].append(RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(lineSep);
+					//data_out.writeInt(sbs[i].length());
+					data_out.writeUTF(sbs[i].toString());
+					dataSize += (recordSet.getNoneCalculationRecordNames().length * intSize * recordSet.getRecordDataSize());
+					log.fine("filePointer = " + (filePointer + dataSize));
+				}
+				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
+				for (int i = 0; i < activeChannel.size(); ++i) {
+					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+					for (int j = 0; j < recordSet.getRecordDataSize(); j++) {
+						for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
+							data_out.writeInt(recordSet.get(recordKey).get(j));
+						}
+					}
+					recordSet.setSaved(true);
+				}
 			}
-			data_out.flush();
-			data_out.close();
+			finally {
+				data_out.flush();
+				data_out.close();
+				data_out = null;
+				file_out = null;
+			}
 		}
 		else {
 			OSDEInternalException e = new OSDEInternalException("Aufruffehler : " + activeChannel + ", " + filePath + ", " + useVersion);
 			OpenSerialDataExplorer.getInstance().openMessageDialogAsync(e.getClass().getSimpleName() + " - " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * read record set data with given file seek pointer and record size
+	 * @param recordSet
+	 * @param filePath
+	 * @param recordSetDataPointer
+	 * @param recordDataSize
+	 * @throws Exception
+	 */
+	public void readRecordSetsData(RecordSet recordSet, String filePath, long recordSetDataPointer, long recordDataSize) throws Exception {
+		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r");
+		try {
+			random_in.seek(recordSetDataPointer);
+			for (int i = 0; i < recordDataSize; i++) {
+				for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
+					recordSet.get(recordKey).add(random_in.readInt());
+				}
+			}
+			channels.get(channels.getChannelNumber(recordSet.getChannelConfigName())).switchRecordSet(recordSet.getName());
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			random_in.close();
 		}
 	}
 }
