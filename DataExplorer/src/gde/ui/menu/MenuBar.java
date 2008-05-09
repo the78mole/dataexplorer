@@ -838,16 +838,18 @@ public class MenuBar {
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 			}
 			
+			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
+			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OsdReaderWriter.CHANNEL_CONFIG_NAME);
 			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
-				String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
-				String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OsdReaderWriter.CHANNEL_CONFIG_NAME);
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf die Kanalkonfiguration " + channelConfigName + " umgeschaltet, eventuell vorhandene Daten werden überschrieben !");
 					if (answer != SWT.OK) 
-						return;
-					
-					this.channels.get(this.channels.getChannelNumber(channelConfigName)).clear();
+						return;				
 				}
+			}
+			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+			for (String recordSetKey : channel.getRecordSetNames()) {
+				if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
 			}
 
 			this.readerWriterThread = new Thread() {
