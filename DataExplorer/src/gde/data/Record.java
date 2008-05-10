@@ -346,7 +346,7 @@ public class Record extends Vector<Integer> {
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		else
 			value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.name);
 		return value;
@@ -364,7 +364,7 @@ public class Record extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		else
 			value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.name);
 		return value;
@@ -382,10 +382,10 @@ public class Record extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		else {
 			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.name, IDevice.REDUCTION);
-			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim()).doubleValue();
+			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
 		}
 		return value;
 	}

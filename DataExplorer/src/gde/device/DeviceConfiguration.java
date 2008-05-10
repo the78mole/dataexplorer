@@ -630,7 +630,7 @@ public class DeviceConfiguration {
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.OFFSET);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		
 		return value;
 	}
@@ -663,7 +663,7 @@ public class DeviceConfiguration {
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.FACTOR);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		
 		return value;
 	}
@@ -696,7 +696,7 @@ public class DeviceConfiguration {
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementKey.split("_")[0], IDevice.REDUCTION);
 		if (property != null)
-			value = new Double(property.getValue()).doubleValue();
+			value = new Double(property.getValue().replace(',', '.')).doubleValue();
 		
 		return value;
 	}
