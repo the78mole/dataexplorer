@@ -273,7 +273,10 @@ public class Record extends Vector<Integer> {
 	}
 
 	public void setName(String newName) {
-		this.name = newName;
+		if (!this.name.equals(newName)) {
+			this.parent.replaceRecordName(this.name, newName);
+			this.name = newName;
+		}
 	}
 	
 	public String getUnit() {
@@ -956,9 +959,7 @@ public class Record extends Vector<Integer> {
 	public void setSerializedProperties(String serializedRecordProperties) {
 		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, this.propertyKeys);
 		String tmpValue = null;
-		
-		tmpValue =  recordProps.get(NAME);
-		if (tmpValue!=null && tmpValue.length() > 0) this.name =  tmpValue.trim();
+				
 		tmpValue = recordProps.get(UNIT);
 		if (tmpValue!=null && tmpValue.length() > 0) this.unit =  tmpValue.trim();
 		tmpValue = recordProps.get(SYMBOL);
@@ -995,7 +996,12 @@ public class Record extends Vector<Integer> {
 		if (tmpValue!=null && tmpValue.length() > 0) this.maxScaleValue =  new Double(tmpValue.trim()).doubleValue();
 		tmpValue = recordProps.get(DEFINED_MIN_VALUE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  new Double(tmpValue.trim()).doubleValue();
-	}
+
+		tmpValue =  recordProps.get(NAME);
+		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.equalsIgnoreCase(tmpValue)) {
+			this.setName(tmpValue.trim()); // might replace the record set key as well
+		}
+}
 	
 	/**
 	 * set the device specific properties for this record

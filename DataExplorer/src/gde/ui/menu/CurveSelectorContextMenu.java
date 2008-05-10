@@ -938,8 +938,8 @@ public class CurveSelectorContextMenu {
 							compareSet.put(newRecordkey, oldRecord.clone()); // will delete channelConfigKey
 							Record newRecord = compareSet.get(newRecordkey);
 							newRecord.setChannelConfigKey(oldRecord.getChannelConfigKey());
-							newRecord.setName(newRecordkey);
 							newRecord.setVisible(true); // if a non visible record added
+							newRecord.setName(newRecordkey);
 							
 							if (compareSet.size() == 1) {	//set grid line mode and color from settings (previous compare behavior)
 								compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());

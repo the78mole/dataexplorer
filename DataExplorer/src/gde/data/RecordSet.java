@@ -496,6 +496,22 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * replace a record name with a new one
+	 * @param oldRecordName
+	 * @param newRecordName
+	 */
+	public void replaceRecordName(String oldRecordName, String newRecordName) {
+		for (int i = 0; i < this.recordNames.length; i++) {
+			if (this.recordNames[i].equals(oldRecordName)) 
+				this.recordNames[i] = newRecordName;
+		}
+		if (this.get(newRecordName) == null) { // record may be created previously
+			this.put(newRecordName, this.get(oldRecordName).clone(newRecordName));
+			this.remove(oldRecordName);
+		}
+	}
+	
+	/**
 	 * method to get the sorted record active names which are visible as string array
 	 * @return String[] containing record names 
 	 */
@@ -527,10 +543,11 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public String[] getNoneCalculationRecordNames() {
 		Vector<String> calculationRecords = new Vector<String>();
-		for (String recordKey : this.recordNames) {
-			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, recordKey);
+		String[] deviceMeasurements =  this.device.getMeasurementNames(this.channelConfigName);
+		for (int i=0; i<deviceMeasurements.length; ++i) { // record names may not match device measurements
+			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, deviceMeasurements[i]);
 			if (!measurement.isCalculation()) { // active or inactive 
-				calculationRecords.add(recordKey);
+				calculationRecords.add(this.recordNames[i]);
 			}
 		}
 		return calculationRecords.toArray(new String[0]);
