@@ -20,6 +20,9 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,26 +37,34 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class StatusBar {
-	@SuppressWarnings("unused")
-	private Logger	log	= Logger.getLogger(this.getClass().getName());
+	final Logger	log	= Logger.getLogger(this.getClass().getName());
 	
-	private final Composite					statusComposite;
-	private Composite								connectionComposite;
-	private Text										txText;
-	private Text										rxText;
-	private Text										conText;
-	private CLabel									portButton;
-	private CLabel									txButton;
-	private CLabel									rxButton;
-	private Composite								comComposite;
-	private Composite								msgComposite;
-	private Label										msgLabel;
-	private ProgressBar							progressBar;
+	final Composite					statusComposite;
+	Composite								connectionComposite;
+	Text										txText;
+	Text										rxText;
+	Text										conText;
+	CLabel									portButton;
+	CLabel									txButton;
+	CLabel									rxButton;
+	Composite								comComposite;
+	Label										msgLabel;
+	ProgressBar							progressBar;
 	
-	private String blankMsg = "                                                                                                                                                                                                           ";
-
 	public StatusBar(Composite currentStatusComposite) {
 		this.statusComposite = currentStatusComposite;
+		this.statusComposite.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent evt) {
+				StatusBar.this.log.finer("statusComposite.paintControl evt=" + evt);
+				Point statusCompositeSize = StatusBar.this.statusComposite.getSize();
+				Point comCompositeSize = StatusBar.this.comComposite.getSize();
+				int offsetX = comCompositeSize.x+280;
+				int offsetY = (statusCompositeSize.y - 20) / 2;
+				int width = statusCompositeSize.x-offsetX-10;
+				StatusBar.this.msgLabel.setBounds(offsetX, offsetY, width, 20);
+				StatusBar.this.log.info("new size = " + width);
+			}
+		});
 	}
 
 	public void create() {
@@ -127,13 +138,7 @@ public class StatusBar {
 				this.progressBar.setLayoutData(progressBarLData);
 			}
 			{
-				this.msgComposite = new Composite(this.statusComposite, SWT.NONE);
-				FillLayout msgCompositeLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				this.msgComposite.setLayout(msgCompositeLayout);
-			}
-			{
-				this.msgLabel = new Label(this.msgComposite, SWT.LEFT);
-				this.msgLabel.setText(this.blankMsg);
+				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
 			}
 		}
 	}
@@ -143,7 +148,7 @@ public class StatusBar {
 	 */
 	public void setMessage(final String text, int swtColor) {
 		this.msgLabel.setForeground(SWTResourceManager.getColor(swtColor));
-		this.msgLabel.setText("   " + text);
+		this.msgLabel.setText(text);
 	}
 
 	/**
@@ -151,7 +156,7 @@ public class StatusBar {
 	 */
 	public void setMessage(final String text) {
 		this.msgLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		this.msgLabel.setText("   " + text);
+		this.msgLabel.setText(text);
 	}
 	
 	public void setProgress(final int precent) {
