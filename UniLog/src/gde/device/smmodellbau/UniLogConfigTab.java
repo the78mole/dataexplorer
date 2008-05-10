@@ -1204,131 +1204,103 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;
+		String recordKey = null;
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-		
-		String recordKey = this.device.getMeasurementNames(this.configName)[0];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			this.isActiveUe = record.isActive();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveUe = measurement.isActive();
-		}
+		if (recordSet != null) { // load all data from record set
+			String[] recordKeys = recordSet.getRecordNames();
+			
+			this.isActiveUe = recordSet.get(recordKeys[0]).isActive();
+			this.isActiveU = recordSet.get(recordKeys[1]).isActive();
+			this.isActiveI = recordSet.get(recordKeys[2]).isActive();
+			
+			property = recordSet.get(recordKeys[6]).getProperty(UniLog.NUMBER_CELLS);
+			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
+			
+			this.isActiveRPM = recordSet.get(recordKeys[7]).isActive();
+			
+			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_WATT);
+			this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+			
+			this.isActiveHeight = recordSet.get(recordKeys[9]).isActive();
 
-		recordKey = this.device.getMeasurementNames(this.configName)[1];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			this.isActiveU = record.isActive();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveU = measurement.isActive();
-		}
+			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_TYPE);
+			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
+			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
+			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
 
-		recordKey = this.device.getMeasurementNames(this.configName)[2];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			this.isActiveI = record.isActive();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveI = measurement.isActive();
-		}
-		
-		recordKey = this.device.getMeasurementNames(this.configName)[6];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			property = record.getProperty(UniLog.NUMBER_CELLS);
-		}
-		else {
-			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.NUMBER_CELLS);
-		}
-		this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
-
-		recordKey = this.device.getMeasurementNames(this.configName)[7];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			this.isActiveRPM = record.isActive();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveRPM = measurement.isActive();
-		}
-
-		recordKey = this.device.getMeasurementNames(this.configName)[8];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			property = record.getProperty(UniLog.PROP_N_100_WATT);
-		}
-		else {
-			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.PROP_N_100_WATT);
-		}
-		this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
-
-		recordKey = this.device.getMeasurementNames(this.configName)[9];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			this.isActiveHeight = record.isActive();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveHeight = measurement.isActive();
-		}
-
-		recordKey = this.device.getMeasurementNames(this.configName)[10];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			property = record.getProperty(CalculationThread.REGRESSION_TYPE);
-		}
-		else {
-			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_TYPE);
-		}
-		this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
-		
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
-			property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-		}
-		else {
-			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_INTERVAL_SEC);
-		}
-		this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
-
-		recordKey = this.device.getMeasurementNames(this.configName)[11];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
+			record = recordSet.get(recordKeys[11]);
 			this.isActiveA1 = record.isActive();
 			this.nameA1 = record.getName();
 			this.unitA1 = record.getUnit();
 			this.offsetA1 = record.getOffset();
 			this.factorA1 = record.getFactor();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveA1 = measurement.isActive();
-			this.nameA1 = measurement.getName();
-			this.unitA1 = measurement.getUnit();
-			this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
-			this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
-		}
 
-		recordKey = this.device.getMeasurementNames(this.configName)[12];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
+			record = recordSet.get(recordKeys[12]);
 			this.isActiveA2 = record.isActive();
 			this.nameA2 = record.getName();
 			this.unitA2 = record.getUnit();
 			this.offsetA2 = record.getOffset();
 			this.factorA2 = record.getFactor();
-		}
-		else {
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveA2 = measurement.isActive();
-			this.nameA2 = measurement.getName();
-			this.unitA2 = measurement.getUnit();
-			this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
-			this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
-		}
 
-		recordKey = this.device.getMeasurementNames(this.configName)[13];
-		if (recordSet != null && (record = recordSet.get(recordKey)) != null) {
+			record = recordSet.get(recordKeys[13]);
 			this.isActiveA3 = record.isActive();
 			this.nameA3 = record.getName();
 			this.unitA3 = record.getUnit();
 			this.offsetA3 = record.getOffset();
 			this.factorA3 = record.getFactor();
 		}
-		else {
+		else { // no active record, load data from device properties
+			recordKey = this.device.getMeasurementNames(this.configName)[0];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveUe = measurement.isActive();
+
+			recordKey = this.device.getMeasurementNames(this.configName)[1];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveU = measurement.isActive();
+
+			recordKey = this.device.getMeasurementNames(this.configName)[2];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveI = measurement.isActive();
+
+			recordKey = this.device.getMeasurementNames(this.configName)[6];
+			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.NUMBER_CELLS);
+			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
+
+			recordKey = this.device.getMeasurementNames(this.configName)[7];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveRPM = measurement.isActive();
+
+			recordKey = this.device.getMeasurementNames(this.configName)[8];
+			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.PROP_N_100_WATT);
+			this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+
+			recordKey = this.device.getMeasurementNames(this.configName)[9];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveHeight = measurement.isActive();
+
+			recordKey = this.device.getMeasurementNames(this.configName)[10];
+			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_TYPE);
+			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
+			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_INTERVAL_SEC);
+			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
+
+			recordKey = this.device.getMeasurementNames(this.configName)[11];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveA1 = measurement.isActive();
+			this.nameA1 = measurement.getName();
+			this.unitA1 = measurement.getUnit();
+			this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
+			this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
+
+			recordKey = this.device.getMeasurementNames(this.configName)[12];
+			measurement = this.device.getMeasurement(this.configName, recordKey);
+			this.isActiveA2 = measurement.isActive();
+			this.nameA2 = measurement.getName();
+			this.unitA2 = measurement.getUnit();
+			this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
+			this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
+
+			recordKey = this.device.getMeasurementNames(this.configName)[13];
 			measurement = this.device.getMeasurement(this.configName, recordKey);
 			this.isActiveA3 = measurement.isActive();
 			this.nameA3 = measurement.getName();
