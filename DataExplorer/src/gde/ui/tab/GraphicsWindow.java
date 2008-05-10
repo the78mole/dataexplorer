@@ -242,27 +242,32 @@ public class GraphicsWindow {
 									activeRecord = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
 									break;
 								}
-								if (item.getChecked()) {
-									activeRecord.setVisible(true);
-									GraphicsWindow.this.popupmenu.getItem(0).setSelection(true);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
-									item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
-									GraphicsWindow.this.graphicCanvas.redraw();
-									GraphicsWindow.this.application.updateDigitalWindow();
-									GraphicsWindow.this.application.updateAnalogWindow();
-									GraphicsWindow.this.application.updateCellVoltageWindow();
-									GraphicsWindow.this.application.updateFileCommentWindow();
+								if (activeRecord != null) {
+									if (item.getChecked()) {
+										activeRecord.setVisible(true);
+										GraphicsWindow.this.popupmenu.getItem(0).setSelection(true);
+										item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+										item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
+										GraphicsWindow.this.graphicCanvas.redraw();
+										GraphicsWindow.this.application.updateDigitalWindow();
+										GraphicsWindow.this.application.updateAnalogWindow();
+										GraphicsWindow.this.application.updateCellVoltageWindow();
+										GraphicsWindow.this.application.updateFileCommentWindow();
+									}
+									else {
+										activeRecord.setVisible(false);
+										GraphicsWindow.this.popupmenu.getItem(0).setSelection(false);
+										item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+										item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
+										GraphicsWindow.this.graphicCanvas.redraw();
+										GraphicsWindow.this.application.updateDigitalWindow();
+										GraphicsWindow.this.application.updateAnalogWindow();
+										GraphicsWindow.this.application.updateCellVoltageWindow();
+										GraphicsWindow.this.application.updateFileCommentWindow();
+									}
 								}
 								else {
-									activeRecord.setVisible(false);
-									GraphicsWindow.this.popupmenu.getItem(0).setSelection(false);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-									item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
-									GraphicsWindow.this.graphicCanvas.redraw();
-									GraphicsWindow.this.application.updateDigitalWindow();
-									GraphicsWindow.this.application.updateAnalogWindow();
-									GraphicsWindow.this.application.updateCellVoltageWindow();
-									GraphicsWindow.this.application.updateFileCommentWindow();
+									log.log(Level.WARNING, "GraphicsWindow.type = " + GraphicsWindow.this.type + " recordName = \"" + recordName + "\"");
 								}
 							}
 						}
