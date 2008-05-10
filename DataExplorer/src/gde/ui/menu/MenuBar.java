@@ -835,9 +835,7 @@ public class MenuBar {
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
-					return;
-				
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+					return;			
 			}
 			
 			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
@@ -848,11 +846,13 @@ public class MenuBar {
 					if (answer != SWT.OK) 
 						return;				
 				}
+				Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+				for (String recordSetKey : channel.getRecordSetNames()) {
+					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
+				}
 			}
-			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
-			for (String recordSetKey : channel.getRecordSetNames()) {
-				if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
-			}
+			else
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
 
 			this.readerWriterThread = new Thread() {
 				public void run() {
