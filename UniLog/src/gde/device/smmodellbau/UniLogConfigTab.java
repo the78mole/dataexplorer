@@ -1349,20 +1349,20 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText()));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.')));
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText()));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.')));
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText()));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(new Double(this.a3Factor.getText()));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(new Double(this.a3Factor.getText().trim().replace(',', '.')));
 				UniLogConfigTab.this.application.updateGraphicsWindow();
 			}
 		}
