@@ -62,7 +62,6 @@ public class StatusBar {
 				int offsetY = (statusCompositeSize.y - 20) / 2;
 				int width = statusCompositeSize.x-offsetX-10;
 				StatusBar.this.msgLabel.setBounds(offsetX, offsetY, width, 20);
-				StatusBar.this.log.info("new size = " + width);
 			}
 		});
 	}
