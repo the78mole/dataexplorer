@@ -141,7 +141,7 @@ public class UniLogDialog extends DeviceDialog {
 	String												unilogVersion							= "";
 	int														memoryUsed								= 0;
 	String												memoryUsedPercent					= "0";
-	int														timeIntervalPosition			= 0;
+	int														timeIntervalPosition			= -1;
 	boolean												isMotorPole								= false;
 	boolean												isPropBlade								= false;
 	int														countMotorPole						= 0;
@@ -278,24 +278,37 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									UniLogDialog.log.finer("configMainComosite.paintControl " + evt);
-									switch (new Double(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue()) {
-									case 1: // 1/16 sec
-										UniLogDialog.this.timeIntervalCombo.select(0);
-										break;
-									case 2: // 1/8 sec
-										UniLogDialog.this.timeIntervalCombo.select(1);
-										break;
-									default:
-									case 4: // 1/4 sec
-										UniLogDialog.this.timeIntervalCombo.select(2);
-										break;
-									case 8: // 1/2 sec
-										UniLogDialog.this.timeIntervalCombo.select(3);
-										break;
-									case 16: // 1 sec
-										UniLogDialog.this.timeIntervalCombo.select(4);
-										break;
+									if (UniLogDialog.this.timeIntervalPosition == -1) {
+										int selection = new Double(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue();
+										switch (selection) {
+										case 1: // 1/16 sec
+											UniLogDialog.this.timeIntervalPosition = 0;
+											break;
+										case 2: // 1/8 sec
+											UniLogDialog.this.timeIntervalPosition = 1;
+											break;
+										default:
+										case 4: // 1/4 sec
+											UniLogDialog.this.timeIntervalPosition = 2;
+											break;
+										case 8: // 1/2 sec
+											UniLogDialog.this.timeIntervalPosition = 3;
+											break;
+										case 16: // 1 sec
+											UniLogDialog.this.timeIntervalPosition = 4;
+											break;
+										case 32: // 2 sec
+											UniLogDialog.this.timeIntervalPosition = 5;
+											break;
+										case 80: // 5 sec
+											UniLogDialog.this.timeIntervalPosition = 6;
+											break;
+										case 160: // 10 sec
+											UniLogDialog.this.timeIntervalPosition = 7;
+											break;
+										}
 									}
+									UniLogDialog.this.timeIntervalCombo.select(UniLogDialog.this.timeIntervalPosition);
 								}
 							});
 							{
@@ -619,6 +632,7 @@ public class UniLogDialog extends DeviceDialog {
 										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("storeAdjustmentsButton.widgetSelected, event=" + evt);
 										try {
 											if (UniLogDialog.this.serialPort.setConfiguration(buildUpdateBuffer())) {
+												updateTimeStep_ms(UniLogDialog.this.timeIntervalPosition);
 												UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
 											}
 											else {
@@ -672,7 +686,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setLayout(null);
 								this.channleConfigGroup.setBounds(14, 12, 290, 58);
-								this.channleConfigGroup.setText("Kanalkonfiguration der Daten");
+								this.channleConfigGroup.setText("Zuerst Kanalkonfiguration der Daten wählen");
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
 									this.useConfigCombo.setBounds(24, 24, 140, 20);
@@ -681,7 +695,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.useConfigCombo.setEditable(false);
 									this.useConfigCombo.setTextLimit(18);
 									this.useConfigCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-									this.useConfigCombo.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet werden soll");
+									this.useConfigCombo.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet wird");
 									this.useConfigCombo.addKeyListener(new KeyAdapter() {
 										public void keyReleased(KeyEvent evt) {
 											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("useConfigCombo.keyReleased, event=" + evt);
@@ -1054,7 +1068,7 @@ public class UniLogDialog extends DeviceDialog {
 		UniLogDialog.log.finer("timeIntervalPosition = " + this.timeIntervalPosition + " timeInterval = ");
 		if (this.timeIntervalPosition != this.timeIntervalCombo.getSelectionIndex()) {
 			this.timeIntervalCombo.select(this.timeIntervalPosition);
-			//TODO check updateTimeStep_ms(this.timeIntervalPosition);
+			updateTimeStep_ms(this.timeIntervalPosition);
 		}
 
 		// motor/prop
@@ -1371,9 +1385,19 @@ public class UniLogDialog extends DeviceDialog {
 			this.device.setTimeStep_ms(1000.0 / 2);
 			break;
 		case 4: // 1 sec
-			this.device.setTimeStep_ms(1000.0 / 1);
+			this.device.setTimeStep_ms(1000.0 * 1);
+			break;
+		case 5: // 2 sec
+			this.device.setTimeStep_ms(1000.0 * 2);
+			break;
+		case 6: // 5 sec
+			this.device.setTimeStep_ms(1000.0 * 5);
+			break;
+		case 7: // 10 sec
+			this.device.setTimeStep_ms(1000.0 * 10);
 			break;
 		}
+		this.device.storeDeviceProperties();
 	}
 
 }
