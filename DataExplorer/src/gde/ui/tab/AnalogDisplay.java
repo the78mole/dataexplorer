@@ -49,30 +49,32 @@ import osde.utils.GraphicsUtils;
 public class AnalogDisplay extends Composite {
 	final static Logger			log								= Logger.getLogger(AnalogDisplay.class.getName());
 
-	private Canvas					tacho;
-	private CLabel					textDigitalLabel;
-	private final int				textHeight				= 30;
+	Canvas					tacho;
+	CLabel					textDigitalLabel;
+	final int				textHeight				= 30;
 
-	private Image						tachoImage;
-	private GC							tachoImageGC;
-	private Rectangle				tachoImageBounds	= new Rectangle(0, 0, 0, 0);
-	private boolean					isChanged					= false;
+	Image						tachoImage;
+	GC							tachoImageGC;
+	Rectangle				tachoImageBounds	= new Rectangle(0, 0, 0, 0);
+	int[] 					needle = {0,0,0,0,0,0,0};
 
-	private int							width							= 0;
-	private int							height						= 0;
-	private int							centerX;
-	private int							centerY;
-	private int							radius;
-	private int							angleStart;
-	private int							angleDelta;
+	int							width							= 0;
+	int							height						= 0;
+	int							centerX;
+	int							centerY;
+	int							radius;
+	int							angleStart;
+	int							angleDelta;
 
-	private double					actualValue				= 0.0;
-	private double					minValue					= 0.0;
-	private double					maxValue					= 1.0;
+	double					actualValue				= 0.0;
+	double					minValue					= 0.0;
+	double					maxValue					= 1.0;
 
-	private final Channels	channels;
-	private final String		recordKey;
-	private final IDevice		device;
+	final Channel		channel;
+	final RecordSet	recordSet;
+	final Record 		record;
+	final String		recordKey;
+	final IDevice		device;
 
 	/**
 	 * 
@@ -89,7 +91,20 @@ public class AnalogDisplay extends Composite {
 		this.setLayout(AnalogDisplayLayout);
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
-		this.channels = Channels.getInstance();
+		this.channel = Channels.getInstance().getActiveChannel();
+		if (this.channel != null) {
+			this.recordSet = this.channel.getActiveRecordSet();
+			if (this.recordSet != null) {
+				this.record = this.recordSet.get(this.recordKey);
+			}
+			else {
+				this.record = null;
+			}
+		}	
+		else {
+			this.recordSet = null;
+			this.record = null;
+		}
 	}
 
 	public void create() {
@@ -108,109 +123,112 @@ public class AnalogDisplay extends Composite {
 
 	void tachoPaintControl(PaintEvent evt) {
 		if (log.isLoggable(Level.FINEST)) log.finest("tacho.paintControl, event=" + evt);
-		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null) {
-				Record record = activeRecordSet.getRecord(this.recordKey);
-				if (log.isLoggable(Level.FINER)) log.finer("record name = " + record.getName());
+		if (this.record != null) {
+			if (log.isLoggable(Level.FINER)) log.finer("record name = " + this.recordKey);
 
-				// Get the canvas and its dimensions to check if size changed
-				Rectangle tmpTachoImageBounds = ((Canvas) evt.widget).getBounds();
-				if (this.tachoImageBounds.width != tmpTachoImageBounds.width || this.tachoImageBounds.height != tmpTachoImageBounds.height) {
-					this.tachoImageBounds = tmpTachoImageBounds;
-					setChanged(true);
-				}
+			// Get the canvas and its dimensions to check if size changed
+			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
 
-				// get min max values and check if this has been changed
-				double tmpMinValue = this.device.translateValue(record, record.getMinValue() / 1000.0);
-				double tmpMaxValue = this.device.translateValue(record, record.getMaxValue() / 1000.0);
-				double[] roundValues = CurveUtils.round(tmpMinValue, tmpMaxValue);
-				tmpMinValue = roundValues[0]; // min
-				tmpMaxValue = roundValues[1]; // max
-				if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
-					this.minValue = tmpMinValue;
-					this.maxValue = tmpMaxValue;
-					setChanged(true);
-				}
-
-				// draw new tacho only if some thing has changed
-				if (isChanged()) {
-					if (log.isLoggable(Level.FINE)) log.fine("tacho redaw required for " + this.recordKey);
-					this.width = this.tachoImageBounds.width;
-					this.height = this.tachoImageBounds.height;
-					if (log.isLoggable(Level.FINER)) log.finer("canvas size = " + this.width + " x " + this.height);
-					// get the image and prepare GC
-					this.tachoImage = SWTResourceManager.getImage(this.width, this.height, this.recordKey);
-					this.tachoImageGC = SWTResourceManager.getGC(this.tachoImage);
-					//clear image with background color
-					this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-					this.tachoImageGC.fillRectangle(0, 0, this.width, this.height);
-					String recordText = record.getName() + " [ " + record.getUnit() + " ]";
-					this.textDigitalLabel.setSize(this.width, this.textHeight);
-					this.textDigitalLabel.setText(recordText);
-					this.centerX = this.width / 2;
-					this.centerY = (int) (this.height * 0.75);
-					int radiusW = (int) (this.width / 2 * 0.80);
-					int radiusH = (int) (this.height / 2 * 0.90);
-					this.radius = radiusW < radiusH ? radiusW : radiusH;
-					this.angleStart = -20;
-					this.angleDelta = 220;
-					this.tachoImageGC.setForeground(record.getColor());
-					this.tachoImageGC.setLineWidth(4);
-					this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
-					this.tachoImageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-					int numberTicks = 10; //new Double(maxValue - minValue).intValue();
-					double deltaValue = (this.maxValue - this.minValue) / numberTicks;
-					double angleSteps = this.angleDelta * 1.0 / numberTicks;
-					int tickRadius = this.radius + 2;
-					int dxr, dxtick, dyr, dytick, dxtext, dytext;
-					this.tachoImageGC.setLineWidth(2);
-					for (int i = 0; i <= numberTicks; ++i) {
-						double angle = this.angleStart + i * angleSteps; // -20, 0, 20, 40, ...
-						dxr = new Double(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
-						dyr = new Double(tickRadius * Math.sin(angle * Math.PI / 180)).intValue();
-						dxtick = new Double((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
-						dytick = new Double((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
-						this.tachoImageGC.drawLine(this.centerX - dxtick, this.centerY - dytick, this.centerX - dxr, this.centerY - dyr);
-
-						dxtext = new Double((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
-						dytext = new Double((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
-						String valueText = record.getDecimalFormat().format(this.minValue + (i * deltaValue));
-						GraphicsUtils.drawText(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
-					}
-					// center knob
-					this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_GREY);
-					int knobRradius = (int) (this.radius * 0.1);
-					this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-					this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
-					knobRradius = (int) (this.radius / 10 * 0.1);
-					this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-				}
-				evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-
-				double tmpActualValue = this.device.translateValue(record, new Double(record.get(record.size() - 1) / 1000.0));
-				if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
-				//drawTachoNeedle(evt.gc, actualValue, OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.actualValue = tmpActualValue;
-				drawTachoNeedle(evt.gc, this.actualValue, OpenSerialDataExplorer.COLOR_BLACK);
-
-				setChanged(false);
+			// get min max values and check if this has been changed
+			double tmpMinValue = this.device.translateValue(this.record, this.record.getMinValue() / 1000.0);
+			double tmpMaxValue = this.device.translateValue(this.record, this.record.getMaxValue() / 1000.0);
+			double[] roundValues = CurveUtils.round(tmpMinValue, tmpMaxValue);
+			tmpMinValue = roundValues[0]; // min
+			tmpMaxValue = roundValues[1]; // max
+			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
+				this.minValue = tmpMinValue;
+				this.maxValue = tmpMaxValue;
+				log.info("redraw()");
+				redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
 			}
+
+			// draw new tacho
+			if (log.isLoggable(Level.FINE)) log.fine("tacho redaw required for " + this.recordKey);
+			this.width = this.tachoImageBounds.width;
+			this.height = this.tachoImageBounds.height;
+			if (log.isLoggable(Level.FINER)) log.finer("canvas size = " + this.width + " x " + this.height);
+			// get the image and prepare GC
+			this.tachoImage = SWTResourceManager.getImage(this.width, this.height, this.recordKey);
+			this.tachoImageGC = SWTResourceManager.getGC(this.tachoImage);
+			//clear image with background color
+			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.tachoImageGC.fillRectangle(0, 0, this.width, this.height);
+			String recordText = this.recordKey + " [ " + this.record.getUnit() + " ]";
+			this.textDigitalLabel.setSize(this.width, this.textHeight);
+			this.textDigitalLabel.setText(recordText);
+			this.centerX = this.width / 2;
+			this.centerY = (int) (this.height * 0.75);
+			int radiusW = (int) (this.width / 2 * 0.80);
+			int radiusH = (int) (this.height / 2 * 0.90);
+			this.radius = radiusW < radiusH ? radiusW : radiusH;
+			this.angleStart = -20;
+			this.angleDelta = 220;
+			this.tachoImageGC.setForeground(this.record.getColor());
+			this.tachoImageGC.setLineWidth(4);
+			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
+			this.tachoImageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+			int numberTicks = 10; //new Double(maxValue - minValue).intValue();
+			double deltaValue = (this.maxValue - this.minValue) / numberTicks;
+			double angleSteps = this.angleDelta * 1.0 / numberTicks;
+			int tickRadius = this.radius + 2;
+			int dxr, dxtick, dyr, dytick, dxtext, dytext;
+			this.tachoImageGC.setLineWidth(2);
+			for (int i = 0; i <= numberTicks; ++i) {
+				double angle = this.angleStart + i * angleSteps; // -20, 0, 20, 40, ...
+				dxr = new Double(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
+				dyr = new Double(tickRadius * Math.sin(angle * Math.PI / 180)).intValue();
+				dxtick = new Double((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
+				dytick = new Double((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
+				this.tachoImageGC.drawLine(this.centerX - dxtick, this.centerY - dytick, this.centerX - dxr, this.centerY - dyr);
+
+				dxtext = new Double((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
+				dytext = new Double((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
+				String valueText = this.record.getDecimalFormat().format(this.minValue + (i * deltaValue));
+				GraphicsUtils.drawText(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
+			}
+			// center knob
+			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_GREY);
+			int knobRradius = (int) (this.radius * 0.1);
+			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
+			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
+			knobRradius = (int) (this.radius / 10 * 0.1);
+			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
+
+			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
+
+			//draw the new needle if required
+			double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
+			if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
+			if (tmpActualValue != this.actualValue) {
+				this.actualValue = tmpActualValue;
+				Rectangle damageBounds = getNeedleBounds();
+				redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+			}
+
+			drawTachoNeedle(evt.gc, OpenSerialDataExplorer.COLOR_BLACK);
 		}
 	}
 
 	/**
 	 * draw tacho needle in specified color, before new needle is drawn is must be erased using the background color
+	 * - the needle polygon has to be updated prior to call this method
 	 * @param gc
-	 * @param value
 	 * @param color
 	 */
-	private void drawTachoNeedle(GC gc, double value, Color color) {
+	private void drawTachoNeedle(GC gc, Color color) {
+		gc.setBackground(color);
+		gc.setLineWidth(1);
+		gc.fillPolygon(this.needle);
+	}
+
+	/**
+	 * calculate the tacho needle ploygon using the actual measurement value
+	 */
+	public void calculateNeedle() {
 		int needleRadius = this.radius - 5;
 		int innerRadius = (int) (this.radius * 0.1) + 3;
-		double angle = this.angleStart + (value - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;
-		log.finer("angle = " + angle + " actualValue = " + value);
+		double angle = this.angleStart + (this.actualValue - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;
+		log.finer("angle = " + angle + " actualValue = " + this.actualValue);
 
 		int posXo = new Double(this.centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
 		int posYo = new Double(this.centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
@@ -220,30 +238,41 @@ public class AnalogDisplay extends Composite {
 		int posY1 = new Double(this.centerY - ((needleRadius - 30) * Math.sin((angle - 3) * Math.PI / 180))).intValue();
 		int posX2 = new Double(this.centerX - ((needleRadius - 30) * Math.cos((angle + 3) * Math.PI / 180))).intValue();
 		int posY2 = new Double(this.centerY - ((needleRadius - 30) * Math.sin((angle + 3) * Math.PI / 180))).intValue();
-		int[] needle = { posX1, posY1, posXo, posYo, posX2, posY2, posXi, posYi };
-		gc.setBackground(color);
-		gc.setLineWidth(1);
-		gc.fillPolygon(needle);
+		this.needle = new int[] { posX1, posY1, posXo, posYo, posX2, posY2, posXi, posYi };
 	}
 
 	/**
-	 * @return the tacho
+	 * updates the needle polygon and calculates the actual needle bounds to enable redraw of exact this area
+	 * @return rectangle bounds of the area where the needle is drawn 
 	 */
-	public Canvas getTacho() {
-		return this.tacho;
+	Rectangle getNeedleBounds() {
+		calculateNeedle(); // make this actual
+		
+		int x = this.needle[0], xWidth = this.needle[0];
+		int y = this.needle[1], yHeight = this.needle[1];
+		
+		for (int i = 0; i < this.needle.length; i+=2) {
+			x = x < this.needle[i] ? x : this.needle[i];
+			xWidth = xWidth > this.needle[i] ? xWidth : this.needle[i];
+		}
+		for (int i = 1; i < this.needle.length; i+=2) {
+			y = y < this.needle[i] ? y : this.needle[i];
+			yHeight = yHeight > this.needle[i] ? yHeight : this.needle[i];
+		}
+		
+		return new Rectangle(x, y, xWidth-x, yHeight-y);
 	}
-
+	
 	/**
-	 * @param enabled the isChanged to set
+	 * updates the tacho needle if position has been changed
+	 * - this may initiate redraw of the whole tacho if scale values are changed
 	 */
-	public void setChanged(boolean enabled) {
-		this.isChanged = enabled;
-	}
-
-	/**
-	 * @return the isChanged
-	 */
-	public boolean isChanged() {
-		return this.isChanged;
+	public void chaeckTachoNeedlePosition() {
+		double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
+		if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
+		if (tmpActualValue != this.actualValue) {
+			Rectangle damageBounds = getNeedleBounds(); 
+			redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+		}
 	}
 }
