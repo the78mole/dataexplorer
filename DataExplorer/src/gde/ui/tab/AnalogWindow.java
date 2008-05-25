@@ -116,7 +116,7 @@ public class AnalogWindow {
 			for (String recordKey : activeRecordKeys) {
 				AnalogDisplay display = this.displays.get(recordKey);
 				if (display != null) {
-					display.chaeckTachoNeedlePosition();
+					display.checkTachoNeedlePosition();
 				}
 			}
 		}

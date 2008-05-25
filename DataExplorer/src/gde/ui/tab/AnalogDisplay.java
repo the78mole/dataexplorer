@@ -138,7 +138,6 @@ public class AnalogDisplay extends Composite {
 			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
 				this.minValue = tmpMinValue;
 				this.maxValue = tmpMaxValue;
-				log.info("redraw()");
 				redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
 			}
 
@@ -159,7 +158,10 @@ public class AnalogDisplay extends Composite {
 			this.centerX = this.width / 2;
 			this.centerY = (int) (this.height * 0.75);
 			int radiusW = (int) (this.width / 2 * 0.80);
-			int radiusH = (int) (this.height / 2 * 0.90);
+			//int radiusH = (int) (this.height / 2 * 0.90);
+			int radiusH = this.centerY - this.textHeight - 40;
+			//log.info("radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
+			//radiusH = radiusH < radiusLimitH ? radiusH : radiusLimitH;
 			this.radius = radiusW < radiusH ? radiusW : radiusH;
 			this.angleStart = -20;
 			this.angleDelta = 220;
@@ -197,11 +199,12 @@ public class AnalogDisplay extends Composite {
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 
 			//draw the new needle if required
+			Rectangle damageBounds = getNeedleBounds();
 			double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
 			if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
 			if (tmpActualValue != this.actualValue) {
 				this.actualValue = tmpActualValue;
-				Rectangle damageBounds = getNeedleBounds();
+				damageBounds = getNeedleBounds();
 				redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
 			}
 
@@ -228,7 +231,7 @@ public class AnalogDisplay extends Composite {
 		int needleRadius = this.radius - 5;
 		int innerRadius = (int) (this.radius * 0.1) + 3;
 		double angle = this.angleStart + (this.actualValue - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;
-		log.finer("angle = " + angle + " actualValue = " + this.actualValue);
+		log.fine("angle = " + angle + " actualValue = " + this.actualValue);
 
 		int posXo = new Double(this.centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
 		int posYo = new Double(this.centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
@@ -267,7 +270,7 @@ public class AnalogDisplay extends Composite {
 	 * updates the tacho needle if position has been changed
 	 * - this may initiate redraw of the whole tacho if scale values are changed
 	 */
-	public void chaeckTachoNeedlePosition() {
+	public void checkTachoNeedlePosition() {
 		double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
 		if (log.isLoggable(Level.FINE)) log.fine(String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue));
 		if (tmpActualValue != this.actualValue) {
