@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -51,31 +52,6 @@ import osde.utils.StringHelper;
  */
 public class OsdReaderWriter {
 	final static Logger									log												= Logger.getLogger(OsdReaderWriter.class.getName());
-
-	public static final String									OPEN_SERIAL_DATA_VERSION	= "OpenSerialData version : ";
-
-	public static final String									CREATION_TIME_STAMP				= "Created : ";
-	public static final String									FILE_COMMENT							= "FileComment : ";
-	public static final String									DEVICE_NAME								= "DeviceName : ";
-	public static final String									CHANNEL_CONFIG_TYPE				= "Channel/Configuration Type : ";
-	public static final String									RECORD_SET_SIZE						= "NumberRecordSets : ";
-	public static final String									RECORD_SET_NAME						= "RecordSetName : ";
-	
-	static final String													DATA_DELIMITER						= "||::||";	
-	public static final String									CHANNEL_CONFIG_NAME				= "Channel/Configuration Name: ";
-	public static final String									OBJECT_KEY								= "ObjectKey : ";
-	
-	static final String									RECORD_SET_COMMENT				= "RecordSetComment : ";
-	static final String									RECORD_SET_PROPERTIES			= "RecordSetProperties : ";
-	static final String									RECORDS_PROPERTIES				= "RecordProperties : ";
-	static final String									RECORD_DATA_SIZE					= "RecordDataSize : ";
-	static final String									RECORD_SET_DATA_POINTER		= "RecordSetDataPointer : ";
-	static final String[]								OSD_FORMAT_HEADER_KEYS		= new String[] {CREATION_TIME_STAMP, FILE_COMMENT, DEVICE_NAME, CHANNEL_CONFIG_TYPE, RECORD_SET_SIZE};
-	static final String[]								OSD_FORMAT_DATA_KEYS			= new String[] {OBJECT_KEY, CHANNEL_CONFIG_NAME, RECORD_SET_NAME, RECORD_SET_COMMENT, RECORD_SET_PROPERTIES, RECORDS_PROPERTIES, RECORD_DATA_SIZE, RECORD_SET_DATA_POINTER};
-
-	final static String									lineSep										= "\n";	//System.getProperty("line.separator") is OS dependent
-	final static int										intSize										= Integer.SIZE/8;		// 32 bits / 8 bits per byte 
-	final static int										utfSigSize								= 2;		// 2 byte UTF line header 
 
 	final static OpenSerialDataExplorer	application								= OpenSerialDataExplorer.getInstance();
 	final static Channels 							channels 									= Channels.getInstance();
@@ -107,37 +83,37 @@ public class OsdReaderWriter {
 	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormat {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
-		int headerCounter = OSD_FORMAT_HEADER_KEYS.length+1;
+		int headerCounter = OSDE.OSD_FORMAT_HEADER_KEYS.length+1;
 		
 		line = data_in.readUTF();	
 		line = line.substring(0, line.length()-1);
 		log.fine(line);
-		if (!line.startsWith(OPEN_SERIAL_DATA_VERSION))
+		if (!line.startsWith(OSDE.OPEN_SERIAL_DATA_VERSION))
 			throw new NotSupportedFileFormat(filePath);
 		
-		int version = new Integer(line.substring(OPEN_SERIAL_DATA_VERSION.length())).intValue();
+		int version = new Integer(line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length())).intValue();
 		switch (version) {
 		case 1:
-			header.put(OPEN_SERIAL_DATA_VERSION, ""+version);
+			header.put(OSDE.OPEN_SERIAL_DATA_VERSION, ""+version);
 			
 			while (headerCounter-- > 0) {
 				line = data_in.readUTF();
 				line = line.substring(0, line.length() - 1);
 				log.fine(line);
-				for (String headerKey : OSD_FORMAT_HEADER_KEYS) {
+				for (String headerKey : OSDE.OSD_FORMAT_HEADER_KEYS) {
 					if (line.startsWith(headerKey)) {
 						log.fine(line);
 						header.put(headerKey, line.substring(headerKey.length()));
-						if (line.startsWith(RECORD_SET_SIZE)) {
-							headerCounter = new Integer(header.get(RECORD_SET_SIZE).trim()).intValue();
+						if (line.startsWith(OSDE.RECORD_SET_SIZE)) {
+							headerCounter = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
 							//read record set descriptors
 							int lastReordNumber = headerCounter;
 							while (headerCounter-- > 0) {
 								line = data_in.readUTF();
 								line = line.substring(0, line.length() - 1);
-								if (line.startsWith(RECORD_SET_NAME)) {
+								if (line.startsWith(OSDE.RECORD_SET_NAME)) {
 									log.fine(line);
-									header.put((lastReordNumber-headerCounter)+" "+RECORD_SET_NAME, line.substring(RECORD_SET_NAME.length()));
+									header.put((lastReordNumber-headerCounter)+" "+OSDE.RECORD_SET_NAME, line.substring(OSDE.RECORD_SET_NAME.length()));
 								}
 							}
 						}
@@ -178,9 +154,9 @@ public class OsdReaderWriter {
 		boolean isFirstRecordSetDisplayed = false;
 		
 		HashMap<String, String> header = getHeader(filePath);
-		String channelType = header.get(CHANNEL_CONFIG_TYPE).trim();
-		int numberRecordSets = new Integer(header.get(RECORD_SET_SIZE).trim()).intValue();
-		while(!data_in.readUTF().startsWith(RECORD_SET_SIZE))
+		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
+		int numberRecordSets = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
+		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
 			log.fine("skip");
 		
 		// record sets with it properties
@@ -195,13 +171,13 @@ public class OsdReaderWriter {
 		try { // build the data structure 
 			
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
-				channelConfig = recordSetInfo.get(CHANNEL_CONFIG_NAME);
-				recordSetName = recordSetInfo.get(RECORD_SET_NAME);
+				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
+				recordSetName = recordSetInfo.get(OSDE.RECORD_SET_NAME);
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-				recordSetComment = recordSetInfo.get(RECORD_SET_COMMENT);
-				recordSetProperties = recordSetInfo.get(RECORD_SET_PROPERTIES);
-				recordsProperties = StringHelper.splitString(recordSetInfo.get(RECORDS_PROPERTIES), Record.END_MARKER, RECORDS_PROPERTIES);
-				recordDataSize = new Long(recordSetInfo.get(RECORD_DATA_SIZE)).longValue();
+				recordSetComment = recordSetInfo.get(OSDE.RECORD_SET_COMMENT);
+				recordSetProperties = recordSetInfo.get(OSDE.RECORD_SET_PROPERTIES);
+				recordsProperties = StringHelper.splitString(recordSetInfo.get(OSDE.RECORDS_PROPERTIES), Record.END_MARKER, OSDE.RECORDS_PROPERTIES);
+				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
@@ -225,7 +201,7 @@ public class OsdReaderWriter {
 				recordSet.setRecordSetDescription(recordSetComment);
 				recordSet.setDeserializedProperties(recordSetProperties);
 				recordSet.setSaved(true);
-				recordSet.setObjectKey(recordSetInfo.get(OBJECT_KEY));
+				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 
 				//apply record sets records properties
 				String [] recordKeys = recordSet.getRecordNames();
@@ -242,14 +218,14 @@ public class OsdReaderWriter {
 
 			String[] firstRecordSet = new String[2];
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
-				channelConfig = recordSetInfo.get(CHANNEL_CONFIG_NAME);
-				recordSetName = recordSetInfo.get(RECORD_SET_NAME);
+				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
+				recordSetName = recordSetInfo.get(OSDE.RECORD_SET_NAME);
 				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 				if (firstRecordSet[0] == null || firstRecordSet[1] == null) {
 					firstRecordSet[0] = channelConfig;
 					firstRecordSet[1] = recordSetName;
 				}
-				recordDataSize = new Long(recordSetInfo.get(RECORD_DATA_SIZE)).longValue();
+				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
@@ -262,7 +238,7 @@ public class OsdReaderWriter {
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
 					channels.setFileName(filePath.substring(filePath.lastIndexOf("/")+1));
-					channels.setFileDescription(header.get(FILE_COMMENT));
+					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
@@ -282,7 +258,7 @@ public class OsdReaderWriter {
 	 * @return hash map with string type data
 	 */
 	public static HashMap<String, String> getRecordSetProperties(String recordSetProperties) {
-		return StringHelper.splitString(recordSetProperties, DATA_DELIMITER, OSD_FORMAT_DATA_KEYS);
+		return StringHelper.splitString(recordSetProperties, OSDE.DATA_DELIMITER, OSDE.OSD_FORMAT_DATA_KEYS);
 	}
 
 	/**
@@ -303,41 +279,41 @@ public class OsdReaderWriter {
 			int filePointer = 0;
 			try {
 				// first line : header with version
-				String versionString = OPEN_SERIAL_DATA_VERSION + useVersion + lineSep;
+				String versionString = OSDE.OPEN_SERIAL_DATA_VERSION + useVersion + OSDE.lineSep;
 				data_out.writeUTF(versionString);
-				filePointer += utfSigSize + versionString.getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + versionString.getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
 				//creation time stamp
 				StringBuilder sb = new StringBuilder();
-				sb.append(CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' ');
-				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(lineSep);
+				sb.append(OSDE.CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' ');
+				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(OSDE.lineSep);
 				data_out.writeUTF(sb.toString());
-				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// second line : size file comment , file comment
 				sb = new StringBuilder();
-				sb.append(FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(lineSep);
+				sb.append(OSDE.FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(OSDE.lineSep);
 				data_out.writeUTF(sb.toString());
-				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// third line : size device name , device name
 				sb = new StringBuilder();
-				sb.append(DEVICE_NAME).append(activeDevice.getName()).append(lineSep);
+				sb.append(OSDE.DEVICE_NAME).append(activeDevice.getName()).append(OSDE.lineSep);
 				data_out.writeUTF(sb.toString());
-				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
-				sb.append(CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(lineSep);
+				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(OSDE.lineSep);
 				data_out.writeUTF(sb.toString());
-				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// number of record sets
 				sb = new StringBuilder();
-				sb.append(RECORD_SET_SIZE).append(activeChannel.size()).append(lineSep);
+				sb.append(OSDE.RECORD_SET_SIZE).append(activeChannel.size()).append(OSDE.lineSep);
 				data_out.writeUTF(sb.toString());
-				filePointer += utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// record sets with it properties
 				StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
 				String[] recordSetNames = activeChannel.getRecordSetNames();
@@ -347,18 +323,18 @@ public class OsdReaderWriter {
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 					sbs[i] = new StringBuilder();
-					sbs[i].append(RECORD_SET_NAME).append(recordSet.getName()).append(DATA_DELIMITER).append(CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(DATA_DELIMITER)
-							.append(OBJECT_KEY).append(recordSet.getObjectKey()).append(DATA_DELIMITER).append(RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(DATA_DELIMITER).append(
-									RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(DATA_DELIMITER);
+					sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER).append(OSDE.CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
+							.append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(OSDE.DATA_DELIMITER).append(
+									OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
 					// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
 					for (String recordKey : recordSet.getRecordNames()) {
-						sbs[i].append(RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
+						sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 					}
-					sbs[i].append(DATA_DELIMITER).append(RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(DATA_DELIMITER);
-					filePointer += utfSigSize + sbs[i].toString().getBytes("UTF8").length;
-					filePointer += RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length; // pre calculated size
+					sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(OSDE.DATA_DELIMITER);
+					filePointer += OSDE.utfSigSize + sbs[i].toString().getBytes("UTF8").length;
+					filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.lineSep.toString().getBytes("UTF8").length; // pre calculated size
 					log.fine("line lenght = "
-							+ (utfSigSize + sbs[i].toString().getBytes("UTF8").length + RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + lineSep.toString().getBytes("UTF8").length)
+							+ (OSDE.utfSigSize + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.lineSep.toString().getBytes("UTF8").length)
 							+ " filePointer = " + filePointer);
 				}
 				int dataSize = 0;
@@ -367,10 +343,10 @@ public class OsdReaderWriter {
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
-					sbs[i].append(RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(lineSep);
+					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(OSDE.lineSep);
 					//data_out.writeInt(sbs[i].length());
 					data_out.writeUTF(sbs[i].toString());
-					dataSize += (recordSet.getNoneCalculationRecordNames().length * intSize * recordSet.getRecordDataSize());
+					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.intSize * recordSet.getRecordDataSize());
 					log.fine("filePointer = " + (filePointer + dataSize));
 				}
 				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....

@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.OSDE;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.data.Channel;
@@ -830,7 +831,7 @@ public class MenuBar {
 	void openOsdFile(final String openFilePath) {
 		try {
 			//check current device and switch if required
-			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OsdReaderWriter.DEVICE_NAME);
+			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
@@ -838,8 +839,8 @@ public class MenuBar {
 					return;			
 			}
 			
-			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OsdReaderWriter.RECORD_SET_NAME);
-			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OsdReaderWriter.CHANNEL_CONFIG_NAME);
+			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME);
+			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
 			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf die Kanalkonfiguration " + channelConfigName + " umgeschaltet, eventuell vorhandene Daten werden überschrieben !");
