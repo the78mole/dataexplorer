@@ -837,6 +837,7 @@ public class MenuBar {
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					return;			
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
 			}
 			
 			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME);
