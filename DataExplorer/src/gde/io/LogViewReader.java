@@ -3,12 +3,23 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
+import osde.data.Channel;
+import osde.data.Channels;
+import osde.data.Record;
+import osde.data.RecordSet;
+import osde.device.ChannelTypes;
+import osde.device.IDevice;
 import osde.exception.NotSupportedFileFormat;
+import osde.ui.OpenSerialDataExplorer;
+import osde.utils.StringHelper;
 
 /**
  * @author brueg
@@ -50,13 +61,152 @@ public class LogViewReader {
 	public static final String	LOV_A2_UNIT = " A2Einheit=";
 	public static final String	LOV_A3_UNIT = " A3Einheit=";
 	
-	private static Logger					log			= Logger.getLogger(LogViewReader.class.getName());
+	final static Logger									log					= Logger.getLogger(LogViewReader.class.getName());
+
+	final static OpenSerialDataExplorer	application	= OpenSerialDataExplorer.getInstance();
+	final static Channels 							channels 		= Channels.getInstance();
 
 //	private static String					lineSep	= System.getProperty("line.separator");
 //	private static DecimalFormat	df3			= new DecimalFormat("0.000");
 //	private static StringBuffer		sb;
 //	private static String					line		= "*";
 	
+	
+	/**
+	 * read complete file data and display the first found record set
+	 * @param filePath
+	 * @throws Exception 
+	 */
+	public static RecordSet read(String filePath) throws Exception {
+		FileInputStream file_input = new FileInputStream(new File(filePath));
+		DataInputStream data_in    = new DataInputStream(file_input);
+		String channelConfig = "";
+		String recordSetName = "";
+		String recordSetComment = "";
+		String recordSetProperties = "";
+		String[] recordsProperties;
+		long recordDataSize = 0;
+		Channel channel = null;
+		RecordSet recordSet = null;
+		IDevice device = OsdReaderWriter.application.getActiveDevice();
+		String line;
+		boolean isFirstRecordSetDisplayed = false;
+		
+		HashMap<String, String> header = getHeader(filePath);
+		int channelNumber = new Integer(header.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
+		String channelType = ChannelTypes.fromValue(device.getChannelName(channelNumber)).name();
+		log.info(OSDE.CHANNEL_CONFIG_TYPE + channelType);
+//	header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType);
+//	header.put(OSDE.RECORD_SET_DATA_POINTER, ""+position);
+//	sb.append(OSDE.CHANNEL_CONFIG_NAME).append(device.getChannelName(channelNumber)).append(OSDE.DATA_DELIMITER);
+
+		int numberRecordSets = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
+//		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
+//			log.fine("skip");
+		
+		// record sets with it properties
+		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
+		for (int i=0; i<numberRecordSets; ++i) {
+			// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
+			line = data_in.readUTF();	
+			line = line.substring(0, line.length()-1);
+			recordSetsInfo.add(getRecordSetProperties(line));
+		}
+
+		try { // build the data structure 
+			
+			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
+				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
+				recordSetName = recordSetInfo.get(OSDE.RECORD_SET_NAME);
+				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+				recordSetComment = recordSetInfo.get(OSDE.RECORD_SET_COMMENT);
+				recordSetProperties = recordSetInfo.get(OSDE.RECORD_SET_PROPERTIES);
+				recordsProperties = StringHelper.splitString(recordSetInfo.get(OSDE.RECORDS_PROPERTIES), Record.END_MARKER, OSDE.RECORDS_PROPERTIES);
+				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
+				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
+				channel = channels.get(channels.getChannelNumber(channelConfig));
+				if (channel == null) { // channelConfiguration not found
+					String msg = "Die Kanalkonfiguration des Datensatzes " + recordSetName + " entspricht keiner aktuell vorhandenen.\n"
+						+ "Eine Änderung von Einstellungen ist nur nach Übertrag in eine vorhandene Kanalkonfiguration möglich.\n" 
+						+ "Hinweis: Ein umstellen der KanalKonfiguration is über den Gerätedialog möglich.";
+					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
+					int newChannelNumber = channels.size()+ 1;
+					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
+					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
+					channels.put(newChannelNumber, channel);
+					Vector<String> newChannelNames = new Vector<String>();
+					for(String channelConfigKey : channels.getChannelNames()) {
+						newChannelNames.add(channelConfigKey);
+					}
+					newChannelNames.add(newChannelNumber + " : " + channelConfig);
+					channels.setChannelNames(newChannelNames.toArray(new String[1]));
+				}
+				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
+				//apply record sets properties
+				recordSet.setRecordSetDescription(recordSetComment);
+				recordSet.setDeserializedProperties(recordSetProperties);
+				recordSet.setSaved(true);
+				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
+
+				//apply record sets records properties
+				String [] recordKeys = recordSet.getRecordNames();
+				for (int i = 0; i < recordKeys.length; ++i) {
+					Record record = recordSet.get(recordKeys[i]);
+					record.setSerializedProperties(recordsProperties[i]);
+					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
+				}
+				
+				channel.put(recordSetName, recordSet);
+			}
+			OsdReaderWriter.application.getMenuToolBar().updateChannelSelector();
+			OsdReaderWriter.application.getMenuToolBar().updateRecordSetSelectCombo();
+
+			String[] firstRecordSet = new String[2];
+			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
+				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
+				recordSetName = recordSetInfo.get(OSDE.RECORD_SET_NAME);
+				recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+				if (firstRecordSet[0] == null || firstRecordSet[1] == null) {
+					firstRecordSet[0] = channelConfig;
+					firstRecordSet[1] = recordSetName;
+				}
+				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
+				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
+				channel = channels.get(channels.getChannelNumber(channelConfig));
+				recordSet = channel.get(recordSetName);
+				for (int i = 0; i < recordDataSize; i++) {
+					for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
+						recordSet.get(recordKey).add(data_in.readInt());
+					}
+				}
+				// display the first record set data while reading the rest of the data
+				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
+					isFirstRecordSetDisplayed = true;
+					channels.setFileName(filePath.substring(filePath.lastIndexOf("/")+1));
+					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
+					channels.setSaved(true);
+					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
+				}
+			}
+			return recordSet;
+		}
+		finally {
+			data_in.close ();
+			data_in = null;
+			file_input = null;
+		}
+	}
+
+
+	/**
+	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS 
+	 * @param recordSetProperties
+	 * @return hash map with string type data
+	 */
+	public static HashMap<String, String> getRecordSetProperties(String recordSetProperties) {
+		return StringHelper.splitString(recordSetProperties, OSDE.DATA_DELIMITER, OSDE.OSD_FORMAT_DATA_KEYS);
+	}
+
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -309,10 +459,12 @@ public class LogViewReader {
 	 * get LogView data file header data
 	 * @param filePath
 	 * @return hash map containing header data as string accessible by public header keys
+	 * @throws IOException 
+	 * @throws NotSupportedFileFormat 
 	 * @throws Exception 
 	 */
 	
-	public static HashMap<String, String> getHeader(final String filePath) throws Exception {
+	public static HashMap<String, String> getHeader(final String filePath) throws IOException, NotSupportedFileFormat, Exception {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
 		HashMap<String, String> header = null;
@@ -321,7 +473,14 @@ public class LogViewReader {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw e;
+			if (e instanceof IOException) {
+				throw (IOException)e;
+			}
+			else if (e instanceof NotSupportedFileFormat) {
+				throw (NotSupportedFileFormat)e;
+			}
+			else
+				throw e;
 		}
 		finally {
 			data_in.close();
@@ -355,12 +514,12 @@ public class LogViewReader {
 			header = getHeaderInfo_1_15(data_in, header);
 			header = getRecordSetInfo_1_15(data_in, header);
 		}
-		else if (useVersion.equals("1.50 BETA") || useVersion.equals("1.50 PreBETA") || useVersion.startsWith("2.0")) {
+		else if (useVersion.equals("2.0")) {
 			header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_2_0(data_in, header);
 		}
 		else {
-			NotSupportedFileFormat e = new NotSupportedFileFormat("Version = " + useVersion + " - not suported !");
+			NotSupportedFileFormat e = new NotSupportedFileFormat("Alpha/Beta Versions are not supported (1.50 ALPHA, 1.50 PreBETA, 1.50 BETA, 2.0 BETA, 2.0 BETA2, ..) - file version = " + useVersion);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -445,13 +604,6 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_1_13(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-//		int channelNumber = new Integer(header.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
-//		String channelType = ChannelTypes.fromValue(device.getChannelName(channelNumber)).name();
-//		log.info(OSDE.CHANNEL_CONFIG_TYPE + channelType);
-//		header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType);
-//		header.put(OSDE.RECORD_SET_DATA_POINTER, ""+position);
-
-		
 		long position = new Long(header.get(DATA_POINTER_POS)).longValue();
 		
 		position += data_in.skip(8);
@@ -474,10 +626,7 @@ public class LogViewReader {
 			position += data_in.read(buffer);
 			String recordSetName = new String(buffer);
 			sb.append(OSDE.RECORD_SET_NAME).append(recordSetName).append(OSDE.DATA_DELIMITER);
-			log.info(OSDE.RECORD_SET_NAME + recordSetName);
-			
-//			sb.append(OSDE.CHANNEL_CONFIG_NAME).append(device.getChannelName(channelNumber)).append(OSDE.DATA_DELIMITER);
-			
+			log.info(OSDE.RECORD_SET_NAME + recordSetName);			
 			
 			position += data_in.skipBytes(4);
 
