@@ -55,7 +55,7 @@ public class LogViewReaderTester extends TestCase {
 
 	String[] files_mixed = {
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuA.lov", 
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB.lov",
+			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-EmpfängerAA5.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-FlugakkuA.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-FlugakkuB.lov", 
@@ -65,11 +65,11 @@ public class LogViewReaderTester extends TestCase {
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02-AntriebAA8-K2.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02-AntriebTPLiPo2s2p-K2.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02SenderSubC7-K4.lov", 
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA.lov",
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB.lov", 
+			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA.lov",
+			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-09-06-Empfänger1300-K1.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/akkumaster.lov", 
-			"d:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest.lov",
+			//"d:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest.lov",
 			
 			"d:/Documents/LogView/Picolario/2006_05_12(2).lov",
 			"d:/Documents/LogView/Picolario/2006_05_12.lov",
@@ -158,17 +158,17 @@ public class LogViewReaderTester extends TestCase {
 	/**
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
 	 */
-	public final void testGetHeader_1_50() {
-		for (String filePath : this.files_1_50) {
-			try {
-				LogViewReader.getHeader(filePath);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				fail(filePath + " - " + e.getMessage());
-			}
-		}
-	}
+//	public final void testGetHeader_1_50() {
+//		for (String filePath : this.files_1_50) {
+//			try {
+//				LogViewReader.getHeader(filePath);
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//				fail(filePath + " - " + e.getMessage());
+//			}
+//		}
+//	}
 	
 	/**
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
