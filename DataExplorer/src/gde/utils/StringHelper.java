@@ -35,33 +35,33 @@ public class StringHelper {
 	 * @param hashKeys
 	 */
 	public static HashMap<String,String> splitString(String line, String delimiter, String[] hashKeys) {
-		String tmpStr = line;
 		HashMap<String,String> resultMap = new HashMap<String, String>();
-		int endindex = 0;
-		while ((endindex = tmpStr.indexOf(delimiter)) != -1) {
+		if (line != null && line.length() > 5) {
+			String tmpStr = line;
+			int endindex = 0;
+			while ((endindex = tmpStr.indexOf(delimiter)) != -1) {
+				for (String key : hashKeys) {
+					if (tmpStr.startsWith(key)) {
+						String value = tmpStr.substring(key.length(), endindex).trim();
+						if (value.startsWith("=")) value = value.substring(1).trim();
+						resultMap.put(key, value);
+						break;
+					}
+				}
+				tmpStr = tmpStr.substring(endindex + delimiter.length(), tmpStr.length());
+			}
 			for (String key : hashKeys) {
 				if (tmpStr.startsWith(key)) {
-					String value = tmpStr.substring(key.length(), endindex).trim();
-					if (value.startsWith("=")) 
-						value = value.substring(1).trim();
+					String value = tmpStr.substring(key.length()).trim();
+					if (value.startsWith("=")) value = value.substring(1).trim();
 					resultMap.put(key, value);
 					break;
 				}
 			}
-			tmpStr = tmpStr.substring(endindex + delimiter.length(), tmpStr.length());
-		}
-		for (String key : hashKeys) {
-			if (tmpStr.startsWith(key)) {
-				String value = tmpStr.substring(key.length()).trim();
-				if (value.startsWith("=")) 
-					value = value.substring(1).trim();
-				resultMap.put(key, value);
-				break;
-			}
-		}
-		if (log.isLoggable(Level.FINER)) {
-			for (String key : hashKeys) {
-				log.finer(key + " = " + resultMap.get(key));
+			if (log.isLoggable(Level.FINER)) {
+				for (String key : hashKeys) {
+					log.finer(key + " = " + resultMap.get(key));
+				}
 			}
 		}
 		return resultMap;
@@ -74,28 +74,31 @@ public class StringHelper {
 	 * @return string array with split string 
 	 */
 	public static String[] splitString(String line, String delimiter, String stripString) {
-		String tmpStr = line.endsWith(delimiter) ? line.substring(0, line.lastIndexOf(delimiter)) : line;
 		Vector<String> result = new Vector<String>();
-		int endindex = 0;
-		while ((endindex = tmpStr.indexOf(delimiter)) != -1) {
-			String tmp = tmpStr.substring(0, endindex);
-			if (tmp.startsWith(stripString)) {
-				tmp = tmp.substring(stripString.length());
+		if (line != null && line.length() > 5) {
+			String tmpStr = line.endsWith(delimiter) ? line.substring(0, line.lastIndexOf(delimiter)) : line;
+			int endindex = 0;
+			while ((endindex = tmpStr.indexOf(delimiter)) != -1) {
+				String tmp = tmpStr.substring(0, endindex);
+				if (tmp.startsWith(stripString)) {
+					tmp = tmp.substring(stripString.length());
+				}
+				else if (tmp.endsWith(stripString)) {
+					tmp = tmp.substring(0, tmp.indexOf(stripString));
+				}
+				result.add(tmp);
+				tmpStr = tmpStr.substring(endindex + delimiter.length(), tmpStr.length());
 			}
-			else if (tmp.endsWith(stripString)) {
-				tmp = tmp.substring(0, tmp.indexOf(stripString));
+			if (tmpStr.length() > 0) {
+				if (tmpStr.startsWith(stripString))
+					tmpStr = tmpStr.substring(stripString.length());
+				else if (tmpStr.endsWith(stripString)) tmpStr = tmpStr.substring(0, tmpStr.indexOf(stripString));
+				result.add(tmpStr);
 			}
-			result.add(tmp);
-			tmpStr = tmpStr.substring(endindex + delimiter.length(), tmpStr.length());
-		}
-		if (tmpStr.length() > 0) {
-			if (tmpStr.startsWith(stripString)) tmpStr = tmpStr.substring(stripString.length());
-			else if (tmpStr.endsWith(stripString)) tmpStr = tmpStr.substring(0, tmpStr.indexOf(stripString));
-			result.add(tmpStr);
-		}
-		if (log.isLoggable(Level.FINER)) {
-			for (String string : result) {
-				log.finer(stripString + " = " + string);
+			if (log.isLoggable(Level.FINER)) {
+				for (String string : result) {
+					log.finer(stripString + " = " + string);
+				}
 			}
 		}
 		return result.toArray(new String[0]);

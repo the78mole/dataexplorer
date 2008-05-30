@@ -18,6 +18,7 @@ package osde.ui.menu;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,6 +50,7 @@ import osde.device.IDevice;
 import osde.exception.DeclinedException;
 import osde.exception.NotSupportedFileFormat;
 import osde.io.CSVReaderWriter;
+import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -712,6 +714,11 @@ public class MenuBar {
 							MenuBar.log.info("opening file = " + Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
 							openOsdFile(Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
 						}
+						else if (fileType.equalsIgnoreCase("LOV")) {
+							MenuBar.log.info("opening file = " + Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+							openLovFile(Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+						}
+
 					}
 					else {
 						MenuBar.this.application.openMessageDialog("Die Datei kann auf Grund der Dateiendung nicht verarbeitet werden!");
@@ -801,7 +808,7 @@ public class MenuBar {
 	}
 
 	/**
-	 * handles the import of an CVS file
+	 * handles the file dialog od OpenSerialData file
 	 * @param dialogName
 	 * @param isRaw
 	 */
@@ -810,18 +817,24 @@ public class MenuBar {
 			Settings deviceSetting = Settings.getInstance();
 			String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
 			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + this.fileSep : deviceSetting.getDataFilePath();
-			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd" }, path);
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { "*.osd", "*.lov" }, path);
 			if (openFileDialog.getFileName().length() > 4) {
 				final String openFilePath = openFileDialog.getFilterPath() + this.fileSep + openFileDialog.getFileName();
 				String fileName = openFileDialog.getFileName();
 				fileName = fileName.substring(0, fileName.indexOf('.'));
 
-				openOsdFile(openFilePath);
+				if (openFilePath.toUpperCase().endsWith("OSD"))
+					openOsdFile(openFilePath);
+				else if (openFilePath.toUpperCase().endsWith("LOV"))
+					openLovFile(openFilePath);
+				else
+					this.application.openMessageDialog("Das Dateiformat ist nicht unterstützt - " + openFilePath);
 			}
 		}
 	}
 
 	/**
+	 * open a OpenSerialData file and load data into a cleaned device/channel
 	 * @param openFilePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
@@ -931,6 +944,67 @@ public class MenuBar {
 			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf(this.fileSep)));
 			activeChannel.setFileName(filePath.substring(filePath.lastIndexOf(this.fileSep)+1));
 			activeChannel.setSaved(true);
+		}
+	}
+
+	/**
+	 * open a LogView Data file and load data into a cleaned device/channel
+	 * @param openFilePath
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotSupportedFileFormat
+	 * @throws DeclinedException
+	 */
+	void openLovFile(final String openFilePath) {
+		try {
+			//check current device and switch if required
+			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
+			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
+			String activeDeviceName = this.application.getActiveDevice().getName();
+			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
+				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
+				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
+					return;			
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+			}
+			
+			int channelNumber = new Integer(lovHeader.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
+			IDevice activeDevice = this.application.getActiveDevice();
+			String channelType = ChannelTypes.values()[activeDevice.getChannelType(channelNumber)].name();
+			String channelConfigName = activeDevice.getChannelName(channelNumber);
+			log.info("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")");
+			
+			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
+					int answer = this.application.openOkCancelMessageDialog("Hinweis : es wird auf die Kanalkonfiguration " + channelConfigName + " umgeschaltet, eventuell vorhandene Daten werden überschrieben !");
+					if (answer != SWT.OK) 
+						return;				
+				}
+				Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+				for (String recordSetKey : channel.getRecordSetNames()) {
+					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
+				}
+			}
+			else
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+
+			this.readerWriterThread = new Thread() {
+				public void run() {
+					try {
+						LogViewReader.read(openFilePath);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+					}
+				}
+			};
+			this.readerWriterThread.start();
+			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + openFilePath.substring(openFilePath.lastIndexOf(this.fileSep)));
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 
