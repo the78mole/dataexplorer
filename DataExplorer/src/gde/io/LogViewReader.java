@@ -17,7 +17,6 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.ChannelTypes;
 import osde.device.IDevice;
-import osde.device.PropertyType;
 import osde.exception.NotSupportedFileFormat;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
@@ -31,12 +30,6 @@ public class LogViewReader {
 	final static OpenSerialDataExplorer	application	= OpenSerialDataExplorer.getInstance();
 	final static Channels 							channels 		= Channels.getInstance();
 
-//	private static String					lineSep	= System.getProperty("line.separator");
-//	private static DecimalFormat	df3			= new DecimalFormat("0.000");
-//	private static StringBuffer		sb;
-//	private static String					line		= "*";
-	
-	
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
@@ -50,7 +43,7 @@ public class LogViewReader {
 		String recordSetComment = "";
 		String recordSetProperties = "";
 		String[] recordsProperties;
-		long recordDataSize = 0;
+		int recordDataSize = 0;
 		Channel channel = null;
 		RecordSet recordSet = null;
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
@@ -72,7 +65,7 @@ public class LogViewReader {
 		for (int i=1; i<=numberRecordSets; ++i) {
 			// RecordSetName : 1) Flugaufzeichnung||::||RecordSetComment : empfangen: 12.05.2006, 20:42:52||::||RecordDataSize : 22961||::||RecordSetDataBytes : 367376
 			String recordSetInfo = header.get((i)+" " + OSDE.RECORD_SET_NAME);
-			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + OSDE.CHANNEL_CONFIG_NAME + channelConfigName;
+			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + OSDE.CHANNEL_CONFIG_NAME + header.get(OSDE.CHANNEL_CONFIG_NAME);
 			if (header.containsKey(RecordSet.TIME_STEP_MS)) {
 				recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + "=" + header.get(RecordSet.TIME_STEP_MS);
 			}
@@ -81,13 +74,14 @@ public class LogViewReader {
 			}
 			// append record properties if any available
 			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER;
-			for (int j = 0; j < device.getNumberOfMeasurements(channelConfigName); j++) {
+			for (int j = 0; j < device.getNumberOfMeasurements(device.getChannelName(channelNumber)); j++) {
 				recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + Record.END_MARKER;
 			}
 			recordSetsInfo.add(getRecordSetProperties(recordSetInfo));
 		}
 
 		try { // build the data structure 
+			long position = new Long(header.get(OSDE.DATA_POINTER_POS).trim()).longValue(); 
 			
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
@@ -144,174 +138,19 @@ public class LogViewReader {
 					firstRecordSet[0] = channelConfig;
 					firstRecordSet[1] = recordSetName;
 				}
-				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE).trim()).longValue();
+				recordDataSize = new Integer(recordSetInfo.get(OSDE.RECORD_DATA_SIZE).trim()).intValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
-				long position = new Long(header.get(OSDE.DATA_POINTER_POS).trim()).longValue(); 
 				log.info(String.format("data pointer position = 0x%x", position));
 				
-				int numberOfMeasurements = device.getNumberOfMeasurements(channelConfigName);
-				int[] points = new int[numberOfMeasurements];
-				byte[] buffer;
-				//fill int array device dependent
-				if (device.getName().equals("Picolario")) {
-					log.info("begin record set ");
+				int dataBufferSize = device.getLovDataByteSize();
+				byte[] buffer = new byte[dataBufferSize * recordDataSize];
+				log.info("data buffer size = " + buffer.length);
 
-					for (int j = 0; j < recordDataSize; j++) {
-						StringBuilder sb = new StringBuilder();
-						buffer = new byte[16];
-						position += data_in.read(buffer);
-						// calculate height values and add
-						if (((buffer[5] & 0x80) >> 7) == 0) // we have signed [feet]
-							points[1] = ((buffer[4] & 0xFF) + ((buffer[5] & 0x7F) << 8)) * 1000; // only positive part of height data
-						else
-							points[1] = (((buffer[4] & 0xFF) + ((buffer[5] & 0x7F) << 8)) * -1) * 1000; // height is negative
-
-						// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here
-						points[0] = new Integer(buffer[6]) * 1000;
-
-//						sb.append("voltage_raw = ").append(points[0]).append("(").append((int) (2.5 + (points[0] - 45) * 0.0532)).append(")");
-//						sb.append("height_raw = ").append(points[1]).append("(").append((int) (points[1] * 0.304806)).append(")").append("; ");
-//						sb.append(String.format(" 0x%X %d", position, j));
-//						log.info(sb.toString());
-
-						recordSet.addPoints(points, false);
-					}
-					log.info("end record set ");
-				}
-				else if (device.getName().equals("UniLog")) {
-					// read active measurements and calculate some others, slope calculation is extra thread
-					int timeStep_ms = 0;
-					Double capacity = 0.0;
-					Double power = 0.0;
-					StringBuilder sb = new StringBuilder();
-					String lineSep = System.getProperty("line.separator");
-					int tmpValue = 0;
-
-					position += data_in.skip(32 * 2); // skip min/max line
-
-					timeStep_ms = 0;
-					capacity = 0.0;
-					power = 0.0;
-					log.info("begin record set ");
-					for (int i = 0; i < recordDataSize; i++) {
-
-						byte[] readBuffer = new byte[32];
-						position += data_in.read(readBuffer);
-						sb = new StringBuilder();
-
-						// time milli seconds
-						if (timeStep_ms == 0) { // set time step for this record set
-							timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
-							if (timeStep_ms != 0) {
-								//recordSet.setTimeStep_ms(timeStep_ms);
-								if (log.isLoggable(Level.INFO)) sb.append("timeStep_ms = " + timeStep_ms).append(lineSep);
-							}
-						}
-
-						// voltageReceiver *** power/drive *** group
-						tmpValue = (((readBuffer[7] & 0xFF) << 8) + (readBuffer[6] & 0xFF)) & 0x0FFF;
-						points[0] = tmpValue * 10; //0=voltageReceiver						
-						if (log.isLoggable(Level.INFO)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
-
-						// voltage *** power/drive *** group
-						tmpValue = (((readBuffer[9] & 0xFF) << 8) + (readBuffer[8] & 0xFF));
-						tmpValue = tmpValue > 32768 ? tmpValue - 65536 : tmpValue;
-						points[1] = tmpValue * 10; //1=voltage
-						if (log.isLoggable(Level.INFO)) sb.append("voltage [V] = " + points[1]).append(lineSep);
-
-						// current *** power/drive *** group - asymmetric for 400 A sensor 
-						tmpValue = (((readBuffer[11] & 0xFF) << 8) + (readBuffer[10] & 0xFF));
-						tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
-						points[2] = tmpValue * 10; //2=current [A]
-						if (log.isLoggable(Level.INFO)) sb.append("current [A] = " + points[2]).append(lineSep);
-						if (points[2] > 4) {
-							points[2] = points[2];
-						}
-
-						capacity = i > 0 ? capacity + ((points[2] * timeStep_ms * 1.0) / 3600) : 0.0;
-						points[3] = capacity.intValue(); //3=capacity [mAh]
-
-						points[4] = new Double(1.0 * points[1] * points[2] / 1000.0).intValue(); //4=power [W]
-
-						power = i > 0 ? power + ((points[1] / 1000.0) * (points[2] / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
-						points[5] = power.intValue(); //5=energy [Wh]
-
-						PropertyType property = null; //recordSet.get(measurements[6]).getProperty(UniLog.NUMBER_CELLS);
-						int numCellValue = property != null ? new Integer(property.getValue()) : 4;
-						points[6] = points[1] / numCellValue; //6=votagePerCell
-
-						// revolution speed *** power/drive *** group
-						tmpValue = (((readBuffer[13] & 0xFF) << 8) + (readBuffer[12] & 0xFF));
-						tmpValue = tmpValue <= 50000 ? tmpValue : (tmpValue - 50000) * 10 + 50000;
-						points[7] = tmpValue * 1000; //7=revolutionSpeed
-						if (log.isLoggable(Level.INFO)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
-
-						property = null; //recordSet.get(measurements[8]).getProperty(UniLog.PROP_N_100_WATT);
-						int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
-						double motorPower = Math.pow((points[7] / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-						double eta = points[4] > motorPower ? (motorPower * 100.0) / points[4] : 0;
-						points[8] = new Double(eta * 1000).intValue();//8=efficiency
-
-						// height *** power/drive *** group
-						tmpValue = (((readBuffer[15] & 0xFF) << 8) + (readBuffer[14] & 0xFF)) + 20000;
-						tmpValue = tmpValue > 32768 ? tmpValue - 65536 : tmpValue;
-						points[9] = tmpValue * 100; //9=height
-						if (log.isLoggable(Level.INFO)) sb.append("height [m] = " + points[9]).append(lineSep);
-
-						points[10] = 0; //10=slope
-
-						// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
-						int a1Modus = (readBuffer[7] & 0xF0) >> 4; // 11110000
-						tmpValue = (((readBuffer[17] & 0xFF) << 8) + (readBuffer[16] & 0xFF));
-						tmpValue = tmpValue > 32768 ? tmpValue - 65536 : tmpValue;
-						points[11] = new Double(tmpValue * 100.0).intValue(); //new Double(tmpValue * 100.0 * this.a1Factor + (this.a1Offset * 1000.0)).intValue(); //11=a1Value
-						if (log.isLoggable(Level.INFO)) {
-							sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
-							sb.append("a1Value = " + points[11]).append(lineSep);
-						}
-
-						// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
-						int a2Modus = (readBuffer[4] & 0x30); // 00110000
-						if (a2Modus == 0) {
-							tmpValue = (((readBuffer[19] & 0xEF) << 8) + (readBuffer[18] & 0xFF));
-							tmpValue = tmpValue > 32768 ? (tmpValue - 65536) : tmpValue;
-							points[12] = new Double(tmpValue * 100.0).intValue(); //new Double(tmpValue * 100.0 * this.a2Factor + (this.a2Offset * 1000.0)).intValue(); //12=a2Value						if (log.isLoggable(Level.FINER)) 
-						}
-						else {
-							tmpValue = (((readBuffer[19] & 0xFF) << 8) + (readBuffer[18] & 0xFF));
-							points[12] = new Double(tmpValue * 1000).intValue(); //new Double(tmpValue * 1000 * this.a2Factor + (this.a2Offset * 1000)).intValue(); //12=a2Value
-						}
-						if (log.isLoggable(Level.INFO)) {
-							sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
-							if (a2Modus == 0)
-								sb.append("a2Value = " + points[12]).append(lineSep);
-							else
-								sb.append("impulseTime [us]= " + points[12]).append(lineSep);
-						}
-
-						// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
-						int a3Modus = (readBuffer[4] & 0xC0); // 11000000
-						tmpValue = (((readBuffer[21] & 0xEF) << 8) + (readBuffer[20] & 0xFF));
-						tmpValue = tmpValue > 32768 ? tmpValue - 65536 : tmpValue;
-						points[13] = new Double(tmpValue * 100.0).intValue(); //new Double(tmpValue * 100.0 * this.a3Factor + (this.a3Offset * 1000.0)).intValue(); //13=a3Value
-						if (log.isLoggable(Level.INFO)) {
-							sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
-							if (a3Modus == 0)
-								sb.append("a3Value = " + points[13]).append(lineSep);
-							else
-								sb.append("tempIntern = " + points[13]).append(lineSep);
-						}
-
-						recordSet.addPoints(points, false);
-						log.info(sb.toString());
-					}
-					log.info("end record set ");
-				}
-				else {
-					log.info("Device not supported");
-				}
+				data_in.readFully(buffer);
+				position += buffer.length;
+				device.addConvertedDataBufferAsDataPoints(recordSet, buffer, recordDataSize);
 
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
@@ -322,6 +161,8 @@ public class LogViewReader {
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 				channel.applyTemplate(recordSet.getName());
+				
+				log.info(String.format("data pointer position = 0x%x", position));
 			}
 			return recordSet;
 		}
@@ -519,7 +360,9 @@ public class LogViewReader {
 			int fileCommentSize = parse2Int(buffer);
 			buffer = new byte[fileCommentSize];
 			position += data_in.read(buffer);
-			log.info(new String(buffer));
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			log.info(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
 		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
 		log.info(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
@@ -544,6 +387,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
+		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
 		log.info(OSDE.DEVICE_NAME + " = " + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -552,7 +396,7 @@ public class LogViewReader {
 		log.info(String.format("position = 0x%x", position));
 
 		return header;
-	}	
+	}
 
 	/**
 	 * get the record set and dependent record parameters of format version 1.13
@@ -663,7 +507,9 @@ public class LogViewReader {
 			int fileCommentSize = parse2Int(buffer);
 			buffer = new byte[fileCommentSize];
 			position += data_in.read(buffer);
-			log.info(new String(buffer));
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			log.info(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
 		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
 		log.info(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
@@ -688,6 +534,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
+		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
 		log.info(OSDE.DEVICE_NAME + " = " + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -853,6 +700,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
+		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
 		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -922,7 +770,9 @@ public class LogViewReader {
 			fileCommentSize = parse2Int(buffer);
 			buffer = new byte[(int)fileCommentSize];
 			position += data_in.read(buffer);
-			log.info(new String(buffer));
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			log.info(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
 		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
 		log.info(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
@@ -946,6 +796,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
+		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
 		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -1103,7 +954,7 @@ public class LogViewReader {
 	 * @param buffer
 	 * @return
 	 */
-	private static int parse2Int(byte[] buffer) {
+	public static int parse2Int(byte[] buffer) {
 		switch (buffer.length) {
 		case 1:
 			return (buffer[0] & 0xff);
@@ -1119,7 +970,7 @@ public class LogViewReader {
 		}
 	}
 
-	private static long parse2Long(byte[] buffer) {
+	public static long parse2Long(byte[] buffer) {
 		long tmpLong1 = ((long)(buffer[3] & 0xff) << 24) + ((buffer[2] & 0xff) << 16) + ((buffer[1] & 0xff) << 8) + ((buffer[0] & 0xff) << 0);
 		long tmpLong2 = (((long)buffer[7] & 255) << 56) + ((long)(buffer[6] & 255) << 48) + ((long)(buffer[5] & 255) << 40) + ((long)(buffer[4] & 255) << 32);
     return  tmpLong2 + tmpLong1;

@@ -961,7 +961,7 @@ public class MenuBar {
 			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
 			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
-			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
+			if (fileDeviceName.toLowerCase().indexOf(activeDeviceName.toLowerCase()) == -1) { // new device in file
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					return;			
