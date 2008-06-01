@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.StringHelper;
 
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
@@ -32,7 +33,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	final static Logger										log									= Logger.getLogger(Channels.class.getName());
 
 	static Channels								channles								= null;
-	String												fileDescription					= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+	String												fileDescription					= StringHelper.getDate();
 	int														activeChannelNumber			= 1;		// default at least one channel must exist
 	String[]											channelNames 						= new String[1];
 	final OpenSerialDataExplorer	application;

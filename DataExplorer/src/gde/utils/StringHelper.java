@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -102,5 +104,33 @@ public class StringHelper {
 			}
 		}
 		return result.toArray(new String[0]);
+	}
+	
+	/**
+	 * method to receive formated data and time
+	 */
+	public static String getDateAndTime() {
+		return  new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime());
+	}
+	
+	/**
+	 * method to get current date
+	 */
+	public static String getDate() {
+		return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+	}
+
+	/**
+	 * remove blanks within a string
+	 * @param deviceName
+	 * @return
+	 */
+	public static String removeBlanks(String inputString) {
+		String[] tmpDev = inputString.split(" ");
+		StringBuilder sb = new StringBuilder();
+		for (String tmp : tmpDev) {
+			sb.append(tmp);
+		}
+		return sb.toString();
 	}
 }

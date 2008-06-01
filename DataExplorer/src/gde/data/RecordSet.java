@@ -17,8 +17,6 @@
 package osde.data;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -52,7 +50,7 @@ public class RecordSet extends HashMap<String, Record> {
 	String												header 								= null;
 	String[]											recordNames;										// Spannung, Strom, ..
 	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
-	String												recordSetDescription	= new SimpleDateFormat("HH:mm:ss").format(new Date().getTime());
+	String												recordSetDescription	= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	boolean												isSaved								= false;	// indicates if the record set is saved to file
 	boolean												isRaw									= false;	// indicates imported file with raw data, no translation at all
 	boolean												isFromFile						= false;	// indicates that this record set was created by loading data from file
@@ -78,6 +76,8 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	// measurement
 	String 												recordKeyMeasurement;
+	
+	public static final String		DESCRIPTION_TEXT_LEAD	= "aufgezeichnet: ";
 	
 	public static final int				MAX_NAME_LENGTH 			= 30;
 	
