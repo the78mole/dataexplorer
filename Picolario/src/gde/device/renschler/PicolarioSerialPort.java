@@ -19,7 +19,6 @@ package osde.device.renschler;
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,10 +96,8 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @return hash map containing gathered data points (voltage and height in separate vector)
 	 * @throws Exception 
 	 */
-	public HashMap<String, Object> getData(int datagramNumber, Picolario device, String configurationKey) throws Exception {
-		Vector<Integer> height = new Vector<Integer>(100);
-		Vector<Integer> voltage = new Vector<Integer>(100);
-		HashMap<String, Object> data = new HashMap<String, Object>();
+	public Vector<byte[]> getData(int datagramNumber, Picolario device) throws Exception {
+		Vector<byte[]> dataBuffer = new Vector<byte[]>(100);
 		boolean isGoodPackage = true;
 		byte[] readBuffer;
 		int numberRed = 0;
@@ -126,16 +123,8 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 
 					if (isGoodPackage) {
 						// append data to data container
-						for (int i = 0; i < readBuffer.length - 1; i = i + 3) {
-							// calculate height values and add
-							if (((readBuffer[i + 1] & 0x80) >> 7) == 0) // we have signed [feet]
-								height.add(((readBuffer[i] & 0xFF) + ((readBuffer[i + 1] & 0x7F) << 8)) * 1000); // only positive part of height data
-							else
-								height.add((((readBuffer[i] & 0xFF) + ((readBuffer[i + 1] & 0x7F) << 8)) * -1) * 1000);// height is negative
+						dataBuffer.add(readBuffer);
 
-							// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here
-							voltage.add(new Integer(readBuffer[i + 2]) * 1000);
-						}
 						//acknowledge request next
 						this.write(new byte[] { readBuffer[readBuffer.length - 1], readBuffer[readBuffer.length - 1] });
 						// update the dialog
@@ -153,16 +142,12 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					this.isTransmitFinished = checkTransmissionFinished(31, 1);
 				}
 			} // end while receive loop
-
-			String[] measurements = device.getMeasurementNames(configurationKey); // 0=Spannung, 1=Höhe, 2=Steigrate
-			data.put(measurements[0], voltage);
-			data.put(measurements[1], height);
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
-		return data;
+		return dataBuffer;
 	}
 
 	/**

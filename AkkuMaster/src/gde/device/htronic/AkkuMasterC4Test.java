@@ -44,7 +44,7 @@ public class AkkuMasterC4Test {
 			DeviceSerialPort.listConfiguredSerialPorts();
 			SerialPort serialPort = akkuMaster.open();
 
-			akkuMaster.print(akkuMaster.getVersion());
+			//akkuMaster.print(akkuMaster.getVersion());
 			System.out.println();
 
 			int delay = 10; // delay for 10 msec.
@@ -54,7 +54,7 @@ public class AkkuMasterC4Test {
 			TimerTask timerTask = new TimerTask() {
 				public void run() {
 					try {
-						akkuMaster.print(akkuMaster.getData(AkkuMasterC4SerialPort.channel_1));
+						//akkuMaster.print(akkuMaster.getData(AkkuMasterC4SerialPort.channel_1));
 						
 //						System.out.println("Ausgang 1");
 //						akkuMaster.print(akkuMaster.getConfiguration(AkkuMasterC4SerialPort.channel_1));

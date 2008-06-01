@@ -17,6 +17,7 @@
 package osde.device.wb;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -25,6 +26,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -60,6 +62,63 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
+	}
+
+	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	public int getLovDataByteSize() {
+		return 16;  // seams to be modulo 16 - 12 bytes for data, 4 bytes for telegram number
+	}
+	
+	/**
+	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
+	 */
+	public int getLovDataByteOffset() {
+		return 4; // the offset where the real data begins 
+	}
+
+	/**
+	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * this method is more usable for real logger, where data can be stored and converted in one block
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @throws DataInconsitsentException 
+	 */
+	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int offset = this.getLovDataByteOffset();
+		int size = this.getLovDataByteSize();
+		byte[] readBuffer = new byte[size];
+		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		
+		for (int i = 0; i < recordDataSize; i++) { 
+			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
+			recordSet.addPoints(converDataBytes(points, readBuffer, offset, null), false);
+		}
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param offset if there is any offset of the data within the data byte array
+	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param calcValues factor, offset, reduction, ....
+	 */
+	@SuppressWarnings("unused")
+	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {		
+		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here
+		points[0] = new Integer(dataBuffer[2 + offset]) * 1000;
+
+		// calculate height values and add
+		if (((dataBuffer[1 + offset] & 0x80) >> 7) == 0) // we have signed [feet]
+			points[1] = ((dataBuffer[offset] & 0xFF) + ((dataBuffer[1 + offset] & 0x7F) << 8)) * 1000; // only positive part of height data
+		else
+			points[1] = (((dataBuffer[offset] & 0xFF) + ((dataBuffer[1 + offset] & 0x7F) << 8)) * -1) * 1000; // height is negative
+
+		return points;
 	}
 
 	/**

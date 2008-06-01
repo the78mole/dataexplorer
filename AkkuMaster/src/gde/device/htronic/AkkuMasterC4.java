@@ -31,6 +31,7 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -72,6 +73,87 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+	}
+
+	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	public int getLovDataByteSize() {
+		return 55; // 0x33 = 51 + 4 (counter)
+	}
+	
+	/**
+	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
+	 */
+	public int getLovDataByteOffset() {
+		return 4;
+	}
+
+	/**
+	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @throws DataInconsitsentException 
+	 */
+	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int offset = this.getLovDataByteOffset();
+		int size = this.getLovDataByteSize();
+		byte[] readBuffer = new byte[size];
+		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		
+		for (int i = 0; i < recordDataSize; i++) { 
+			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
+			recordSet.addPoints(converDataBytes(points, readBuffer, offset, null), false);
+		}
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param offset if there is any offset of the data within the data byte array
+	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param calcValues factor, offset, reduction, ....
+	 */
+	@SuppressWarnings("unused")
+	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {	
+
+//		StringBuilder sb = new StringBuilder();
+//		for (byte b : dataBuffer) {
+//			sb.append(String.format("%02x", b)).append(" ");
+//		}
+//		log.info(sb.toString());
+//discharge   			      Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
+//	                      Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
+//33 00 00 00 51 82 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 ca 00 00 07 a3 01 25 19 00 00 00 01 00 3c 0d 0a 20 20 35 38 33 30 00 00 00 00 48 02 00 00             
+//offset      51 82 00 03 00 0C 08 98 02 58 02 58                      52 00 02 00 00 0B C7 00 00 0D 00 00 00 01
+//charge  				        Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
+//		                    Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
+//33 00 00 00 51 81 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 cb 07 f0 0d 02 01 25 1f 03 17 38 01 00 3c 0d 0a 20 31 38 31 30 30 00 00 00 00 13 07 00 00 
+//offset      51 81 00 03 00 0C 08 98 02 58 02 58                      52 02 85 0A 4A 0C DE 01 04 1F 04 17 1B 01
+
+		// build the point array according curves from record set
+		//int[] points = new int[getRecordSet().size()];
+		
+		HashMap<String, Object> values = new HashMap<String, Object>(7);
+		byte[] configurationBuffer	= new byte[14];
+		System.arraycopy(dataBuffer, offset, configurationBuffer, 0, configurationBuffer.length);
+		byte[] measurementsBuffer		= new byte[16];
+		System.arraycopy(dataBuffer, 23, measurementsBuffer, 0, measurementsBuffer.length);
+		values = AkkuMasterC4SerialPort.getConvertedValues(values, AkkuMasterC4SerialPort.convertConfigurationAnswer(configurationBuffer), AkkuMasterC4SerialPort.convertMeasurementValues(measurementsBuffer));
+
+
+		points[0] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
+		points[1] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
+		// display adaption * 1000  -  / 1000
+		points[2] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
+		points[3] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; //Leistung		[mW]
+		points[4] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
+		log.info(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh");
+
+		return points;
 	}
 
 	/**

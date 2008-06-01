@@ -3,6 +3,7 @@ package osde.device.smmodellbau;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +18,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
+import osde.exception.DataInconsitsentException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
@@ -29,6 +31,12 @@ import osde.utils.QuasiLinearRegression;
 public class UniLog extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(UniLog.class.getName());
 
+	public final static String		A1_FACTOR									= "a1_"+IDevice.FACTOR;
+	public final static String		A1_OFFSET									= "a1_"+IDevice.OFFSET;
+	public final static String		A2_FACTOR									= "a21_"+IDevice.FACTOR;
+	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET;
+	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR;
+	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET;
 	public final static String		NUMBER_CELLS							= "number_cells";
 	public final static String		PROP_N_100_WATT						= "prop_n100W";
 
@@ -60,6 +68,176 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
+	}
+
+	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	public int getLovDataByteSize() {
+		return 32;  // 2 bytes hight, 1 byte voltage 
+	}
+	
+	/**
+	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
+	 */
+	public int getLovDataByteOffset() {
+		return 0;
+	}
+	
+	/**
+	 * get number of data buffers with device specific information like UniLog min/max are the first two receive buffers
+	 */
+	public int getSkipBufferCount() {
+		return 2;
+	}
+
+	/**
+	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @throws DataInconsitsentException 
+	 */
+	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int timeStep_ms = 0;
+		String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
+		HashMap<String, Double> calcValues = new HashMap<String, Double>();
+		calcValues.put(A1_FACTOR, recordSet.get(measurements[11]).getFactor());
+		calcValues.put(A1_OFFSET, recordSet.get(measurements[11]).getOffset());
+		calcValues.put(A2_FACTOR, recordSet.get(measurements[12]).getFactor());
+		calcValues.put(A2_OFFSET, recordSet.get(measurements[12]).getOffset());
+		calcValues.put(A3_FACTOR, recordSet.get(measurements[13]).getFactor());
+		calcValues.put(A3_OFFSET, recordSet.get(measurements[13]).getOffset());
+		
+		int offset = this.getLovDataByteOffset();
+		int size = this.getLovDataByteSize();
+		byte[] readBuffer = new byte[size];
+		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		
+		for (int i = 2; i < recordDataSize; i++) { // skip UniLog min/max line
+			
+			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
+
+			// time milli seconds
+			if (timeStep_ms == 0) { // set time step for this record set
+				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
+				if (timeStep_ms != 0) {
+					recordSet.setTimeStep_ms(timeStep_ms);
+					if (log.isLoggable(Level.INFO)) log.info("timeStep_ms = " + timeStep_ms);
+				}
+			}
+
+			recordSet.addPoints(converDataBytes(points, readBuffer, offset, calcValues), false);
+		}
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param offset if there is any offset of the data within the data byte array
+	 * @param calcValues factor, offset, reduction, ....
+	 */
+	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {
+		StringBuilder sb = new StringBuilder();
+		String lineSep = System.getProperty("line.separator");
+		int tmpValue = 0;
+		
+		// voltageReceiver *** power/drive *** group
+		tmpValue = (((dataBuffer[7+offset] & 0xFF) << 8) + (dataBuffer[6+offset] & 0xFF)) & 0x0FFF;
+		points[0] = (tmpValue * 10); //0=voltageReceiver
+		if (log.isLoggable(Level.INFO)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
+
+		// voltage *** power/drive *** group
+		tmpValue = (((dataBuffer[9+offset] & 0xFF) << 8) + (dataBuffer[8+offset] & 0xFF));
+		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+		points[1] = (tmpValue * 10); //1=voltage
+		if (log.isLoggable(Level.INFO)) sb.append("voltage [V] = " + points[1]).append(lineSep);
+
+		// current *** power/drive *** group - asymmetric for 400 A sensor 
+		tmpValue = (((dataBuffer[11+offset] & 0xFF) << 8) + (dataBuffer[10+offset] & 0xFF));
+		tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
+		points[2] = tmpValue * 10; //2=current [A]
+		if (log.isLoggable(Level.INFO)) sb.append("current [A] = " + points[2]).append(lineSep);
+
+		//capacity = cycleCount > 0 ? capacity + ((points[2] * timeStep_ms * 1.0) / 3600) : 0.0;
+		//points[3] = capacity.intValue(); //3=capacity [Ah]
+		points[3] = 0; //3=capacity [mAh]
+
+		//points[4] = new Double(1.0 * points[1] * points[2] / 1000).intValue(); //4=power [W]
+		points[4] = 0; //4=power [W]
+
+		//points[5] = new Double(1.0 * points[1] * points[3] / 1000000).intValue(); //5=energy [Wh]
+		points[5] = 0; //5=energy [Wh]
+
+		//points[6] = points[1] / numberCells; //6=votagePerCell
+		points[6] = 0; //6=votagePerCellS
+
+		// revolution speed *** power/drive *** group
+		tmpValue = (((dataBuffer[13+offset] & 0xFF) << 8) + (dataBuffer[12+offset] & 0xFF));
+		if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
+		points[7] = (tmpValue * 1000); //7=revolutionSpeed
+		if (log.isLoggable(Level.INFO)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
+
+		//double motorPower = (points[7]*100.0)/prop100WValue;
+		//double eta = points[4] > motorPower ? (motorPower*100.0)/points[4] : 0;
+		//points[8] = new Double(eta * 1000).intValue();//8=efficiency
+		points[8] = 0; //8=efficiency
+
+		// height *** power/drive *** group
+		tmpValue = (((dataBuffer[15+offset] & 0xFF) << 8) + (dataBuffer[14+offset] & 0xFF)) + 20000;
+		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+		points[9] = (tmpValue * 100); //9=height
+		if (log.isLoggable(Level.INFO)) sb.append("height [m] = " + points[9]).append(lineSep);
+
+		points[10] = 0; //10=slope
+
+		// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
+		int a1Modus = (dataBuffer[7+offset] & 0xF0) >> 4; // 11110000
+		tmpValue = (((dataBuffer[17+offset] & 0xFF) << 8) + (dataBuffer[16+offset] & 0xFF));
+		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+		points[11] = new Double(tmpValue * 100.0 * calcValues.get(A1_FACTOR) + (calcValues.get(A1_OFFSET) * 1000.0)).intValue(); //11=a1Value
+		if (log.isLoggable(Level.INFO)) {
+			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
+			sb.append("a1Value = " + points[11]).append(lineSep);
+		}
+
+		// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
+		int a2Modus = (dataBuffer[4+offset] & 0x30); // 00110000
+		if (a2Modus == 0) {
+			tmpValue = (((dataBuffer[19+offset] & 0xEF) << 8) + (dataBuffer[18+offset] & 0xFF));
+			tmpValue = tmpValue > 32768 ? (tmpValue - 65536) : tmpValue;
+			points[12] = new Double(tmpValue * 100.0 * calcValues.get(A2_FACTOR) + (calcValues.get(A2_OFFSET) * 1000.0)).intValue(); //12=a2Value						if (log.isLoggable(Level.FINER)) 
+		}
+		else {
+			tmpValue = (((dataBuffer[19+offset] & 0xFF) << 8) + (dataBuffer[18+offset] & 0xFF));
+			points[12] = new Double(tmpValue * 1000.0 * calcValues.get(A2_FACTOR) + (calcValues.get(A2_OFFSET) * 1000)).intValue(); //12=a2Value
+		}
+		if (log.isLoggable(Level.INFO)) {
+			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
+			if (a2Modus == 0)
+				sb.append("a2Value = " + points[12]).append(lineSep);
+			else
+				sb.append("impulseTime [us]= " + points[12]).append(lineSep);
+		}
+
+		// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
+		int a3Modus = (dataBuffer[4+offset] & 0xC0); // 11000000
+		tmpValue = (((dataBuffer[21+offset] & 0xEF) << 8) + (dataBuffer[20+offset] & 0xFF));
+		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+		points[13] = new Double(tmpValue * 100.0 * calcValues.get(A3_FACTOR) + (calcValues.get(A3_OFFSET) * 1000.0)).intValue(); //13=a3Value
+		if (log.isLoggable(Level.INFO)) {
+			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
+			if (a3Modus == 0)
+				sb.append("a3Value = " + points[13]).append(lineSep);
+			else
+				sb.append("tempIntern = " + points[13]).append(lineSep);
+		}
+		
+		if (log.isLoggable(Level.INFO)) log.info(sb.toString());
+		return points;
 	}
 
 	/**
@@ -110,10 +288,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				log.info("switch " + record.getName() + " to " + measurement.isActive());
 			}	
 		}
-		// updateStateVoltageAndCurrentDependent
-		boolean enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive();
+		
+		// updateStateCurrentDependent
+		boolean enabled = recordSet.get(recordSet.getRecordNames()[2]).isActive();
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		recordSet.get(recordSet.getRecordNames()[3]).setDisplayable(enabled);
+		
+		// updateStateVoltageAndCurrentDependent
+		enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive();
+		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		recordSet.get(recordSet.getRecordNames()[4]).setDisplayable(enabled);
 		recordSet.get(recordSet.getRecordNames()[5]).setDisplayable(enabled);
 		recordSet.get(recordSet.getRecordNames()[6]).setDisplayable(enabled);

@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.device.renschler;
 
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,23 +81,23 @@ public class DataGathererThread extends Thread {
 			for (int j = 0; j < this.datagramNumbers.length && !this.threadStop; ++j) {
 				this.dialog.resetTelegramLabel();
 				this.dialog.setAlreadyRedDataSets(this.datagramNumbers[j]);
-				HashMap<String, Object> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device, this.configKey);
+				Vector<byte[]> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device);
 				recordSetKey = (channel.size() + 1) + this.RECORD_SET_NAME;
 				channel.put(recordSetKey, RecordSet.createRecordSet(this.configKey, recordSetKey, this.application.getActiveDevice(), true, false));
 				DataGathererThread.log.fine(recordSetKey + " created");
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
-				Vector<Integer> voltage = (Vector<Integer>) data.get(measurements[0]); // 0=Spannung
-				Vector<Integer> height = (Vector<Integer>) data.get(measurements[1]); // 1=Höhe
 
-				for (int i = 0; i < height.size(); i++) {
-					int[] points = new int[recordSet.size()];
-					points[0] = voltage.get(i).intValue(); // Spannung, wie ausgelesen						
-					points[1] = height.get(i).intValue(); // Höhe, wie ausgelesen
-					points[2] = 0; // Steigrate -> isCalculation
-
-					recordSet.addPoints(points, false);
+				byte[] dataBuffer = new byte[recordSet.size()];
+				int[] points = new int[this.device.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+				
+				for (byte[] reveivedBuffer : data) { // 31 or x*3 + 1
+					for (int i = 0; i < reveivedBuffer.length/3; ++i) {  // three bytes per datapoint
+						System.arraycopy(reveivedBuffer, i*3, dataBuffer, 0, 3);
+						recordSet.addPoints(this.device.converDataBytes(points, dataBuffer, 0, null), false);
+					}
 				}
+				
 				// start slope calculation
 				PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
@@ -110,6 +109,7 @@ public class DataGathererThread extends Thread {
 
 				// update the progress bar reading one after the other only
 				channel.get(recordSetKey).setAllDisplayable();
+				channel.applyTemplate(recordSetKey);
 			}// end for
 			this.dialog.enableReadButtons();
 			DataGathererThread.log.fine("exit data gatherer");
