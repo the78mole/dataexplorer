@@ -53,77 +53,73 @@ public class LinearRegression extends CalculationThread {
 			LinearRegression.logLin.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
 			return;
 		}
-		LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey);
-
-		Record record = this.recordSet.get(this.targetRecordKey);
-		record.clear(); // make sure to clean the target record before calculate new data points
-		Record recordHeight = this.recordSet.get(this.sourceRecordKey);
-		double time_ms = this.recordSet.getTimeStep_ms();
-		int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
-		int pointInterval = 2;
-
-		int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
-		// fill mod interval + pontInterval / 2
-		int counter = (recordHeight.size() % pointsPerInterval) + (pointInterval / 2);
-		for (int i = 0; i < counter; i++) { // 0,5 sec
-			record.add(0);
-		}
-
-		// calculate avg x
-		double avgX = (pointsPerInterval - 1) * time_ms / 1000.0 / pointsPerInterval; // 9 * 0.05 / 10; --> 0,05 
-		// (xi - avgX)*(xi - avgX)
-		double ssXX = 0.0; // 10 sec = 0.053025;
-		for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-			ssXX = ssXX + (((0.05 * i) - avgX) * ((0.05 * i) - avgX));
-		}
-		ssXX = ssXX / pointsPerInterval;
-		if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("avgX = " + avgX + " ssXX = " + ssXX);
-
-		--modCounter;
-		while (modCounter > 0 && !this.threadStop) {
-			// calculate avg y
-			double avgY = 0.0;
+		synchronized (REGRESSION_INTERVAL_SEC) {
+			LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey);
+			Record record = this.recordSet.get(this.targetRecordKey);
+			record.clear(); // make sure to clean the target record before calculate new data points
+			Record recordHeight = this.recordSet.get(this.sourceRecordKey);
+			double time_ms = this.recordSet.getTimeStep_ms();
+			int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
+			int pointInterval = 2;
+			int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
+			// fill mod interval + pontInterval / 2
+			int counter = (recordHeight.size() % pointsPerInterval) + (pointInterval / 2);
+			for (int i = 0; i < counter; i++) { // 0,5 sec
+				record.add(0);
+			}
+			// calculate avg x
+			double avgX = (pointsPerInterval - 1) * time_ms / 1000.0 / pointsPerInterval; // 9 * 0.05 / 10; --> 0,05 
+			// (xi - avgX)*(xi - avgX)
+			double ssXX = 0.0; // 10 sec = 0.053025;
 			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-				avgY = avgY + (recordHeight.get(i + counter));
+				ssXX = ssXX + (((0.05 * i) - avgX) * ((0.05 * i) - avgX));
 			}
-			avgY = avgY / pointsPerInterval;
-
-			// (yi - avgY)
-			double sumYi_avgY = 0.0;
-			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-				sumYi_avgY = sumYi_avgY + ((recordHeight.get(i + counter)) - avgY);
-			}
-			sumYi_avgY = sumYi_avgY / pointsPerInterval;
-
-			// (xi - avgX)*(yi - avgY)
-			double ssXY = 0.0;
-			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-				ssXY = ssXY + (((0.05 * i) - avgX) * ((recordHeight.get(i + counter)) - avgY));
-			}
-			ssXY = ssXY / pointsPerInterval;
-
-			int slope = 0;
-			// ad point over pointInterval only
-			for (int i = 0; i < pointInterval; i++) { // 0,5 sec
-				slope = new Double(ssXY / ssXX).intValue(); // slope = ssXY / ssXX;
-				record.add(slope);
-			}
-			counter = counter + pointInterval;
-
-			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
+			ssXX = ssXX / pointsPerInterval;
+			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("avgX = " + avgX + " ssXX = " + ssXX);
 			--modCounter;
-		}
-		// fill the rest of the curve to make equal lenght
-		for (int i = counter - pointInterval; i < recordHeight.size(); i++) {
-			record.add(0);
-		}
-		if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter);
+			while (modCounter > 0 && !this.threadStop) {
+				// calculate avg y
+				double avgY = 0.0;
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
+					avgY = avgY + (recordHeight.get(i + counter));
+				}
+				avgY = avgY / pointsPerInterval;
 
-		if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
-		if (record.isVisible()) this.application.updateGraphicsWindow();
+				// (yi - avgY)
+				double sumYi_avgY = 0.0;
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
+					sumYi_avgY = sumYi_avgY + ((recordHeight.get(i + counter)) - avgY);
+				}
+				sumYi_avgY = sumYi_avgY / pointsPerInterval;
 
-		OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-		LinearRegression.logLin.fine("finished data calculation for record = " + this.targetRecordKey);
+				// (xi - avgX)*(yi - avgY)
+				double ssXY = 0.0;
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
+					ssXY = ssXY + (((0.05 * i) - avgX) * ((recordHeight.get(i + counter)) - avgY));
+				}
+				ssXY = ssXY / pointsPerInterval;
+
+				int slope = 0;
+				// ad point over pointInterval only
+				for (int i = 0; i < pointInterval; i++) { // 0,5 sec
+					slope = new Double(ssXY / ssXX).intValue(); // slope = ssXY / ssXX;
+					record.add(slope);
+				}
+				counter = counter + pointInterval;
+
+				if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
+				--modCounter;
+			}
+			// fill the rest of the curve to make equal lenght
+			for (int i = counter - pointInterval; i < recordHeight.size(); i++) {
+				record.add(0);
+			}
+			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter);
+			if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
+			if (record.isVisible()) this.application.updateGraphicsWindow();
+			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
+			LinearRegression.logLin.fine("finished data calculation for record = " + this.targetRecordKey);
+		}
 	}
 
 }
