@@ -60,8 +60,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.type = channelType;
 		
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0].trim();
-		this.template = new GraphicsTemplate(filename);
+		String templateFileName = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0].trim();
+		this.template = new GraphicsTemplate(templateFileName);
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.put(newRecordSet.getName(), newRecordSet);
 
 		this.application = OpenSerialDataExplorer.getInstance();
-		String filename = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0];
-		this.template = new GraphicsTemplate(filename);
+		String templateFileName = this.application.getActiveDevice().getName() + "_" + this.name.split(":")[0];
+		this.template = new GraphicsTemplate(templateFileName);
 	}
 
 	/**
@@ -461,6 +461,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		else {
 			this.fileName = newFileName;
 		}
+		if (this.fileName != null && this.fileName.length() > 4) application.updateTitleBar(application.getActiveDevice().getName(), application.getActiveDevice().getPort());
 	}
 
 	public boolean isSaved() {
