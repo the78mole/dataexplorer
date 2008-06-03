@@ -60,6 +60,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.exception.NotSupportedException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -897,11 +898,21 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
+	 * @throws NotSupportedException 
 	 */
-	public void setupDevice(String newDeviceName) {
+	public void setupDevice(String newDeviceName) throws NotSupportedException {
 		int selection = this.getActiveDevices().indexOf(newDeviceName);
-		this.setActiveConfig(this.getDevices().get(this.getActiveDevices().get(selection)));
-		this.setupDevice();
+		if (selection != -1 && this.getDevices().containsKey(newDeviceName)) {
+			this.setActiveConfig(this.getDevices().get(this.getActiveDevices().get(selection)));
+			this.setupDevice();
+		}
+		else {
+			String msg = "Für das ausgewählte Gerät liegt keine Gerätekonfiguration vor - " + newDeviceName + " !";
+			NotSupportedException e = new NotSupportedException(msg);
+			log.log(Level.WARNING, e.getMessage(), e);
+			throw e;
+		}
+			
 	}
 
 	/**

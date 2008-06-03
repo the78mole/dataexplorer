@@ -35,27 +35,43 @@ public class LogViewReaderTester extends TestCase {
 	"d:/Documents/LogView/Picolario/2007_07_20.lov"
 	};
 	
-	String[] files_1_50 = {
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB.lov",
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA.lov",
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB.lov", 
-			"d:/Documents/LogView/Htronic Akkumaster C4/2007-09-06-Empfänger1300-K1.lov",
-			"d:/Documents/LogView/Htronic Akkumaster C4/akkumaster.lov", 
+	String[] files_1_50_ALPHA = {
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuA(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB(1.5 ALPHA).lov",
+			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB_1(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB(1.5 ALPHA).lov" 
 	};
 	
+	String[] files_1_50_PreBETA = {
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-09-06-Empfänger1300-K1(1.5 PreBeta).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/akkumaster(1.5 PreBeta).lov", 
+	};
+
+	
+	String[] files_2_0_BETA = {
+			"D:/Documents/LogView/Htronic Akkumaster C4/2007-06-01-EmpfängerAA4-K2(2 BETA).lov",
+			"D:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest(2 BETA).lov"
+	};
+
+	String[] files_2_0_BETA2 = {
+			"D:/Documents/LogView/UniLog/1_Empfaenger(2 BETA2).lov",
+			"D:/Documents/LogView/Picolario/Gunnar_pico_test(2 BETA2).lov"
+	};
+
 	String[] files_2_0 = {
 	// 2.0
+	"d:/Documents/LogView/UniLog/Auto-Geschwindigkeit.lov",
 	"d:/Documents/LogView/Picolario/2006_05_12(2).lov",
 	"d:/Documents/LogView/Picolario/2006_06_07(2).lov",
 	"d:/Documents/LogView/UniLog/2008_13_04_ASW27_LiPo_Westhang.lov",
 	"d:/Documents/LogViewOBJ/ASW-27/ASW-27 23.5.2008 19.32.lov",
 	"d:/Documents/LogViewOBJ/ASW-27/ASW-27 24.5.2008 15.44.lov",
-	"d:/Documents/LogView/UniLog/Auto-Geschwindigkeit.lov",
 	};
 
 	String[] files_mixed = {
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuA.lov", 
-			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB.lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-EmpfängerAA5.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-FlugakkuA.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-24-FlugakkuB.lov", 
@@ -65,11 +81,9 @@ public class LogViewReaderTester extends TestCase {
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02-AntriebAA8-K2.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02-AntriebTPLiPo2s2p-K2.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-06-02SenderSubC7-K4.lov", 
-			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA.lov",
-			//"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB.lov", 
 			"d:/Documents/LogView/Htronic Akkumaster C4/2007-09-06-Empfänger1300-K1.lov",
 			"d:/Documents/LogView/Htronic Akkumaster C4/akkumaster.lov", 
-			//"d:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest.lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest.lov",
 			
 			"d:/Documents/LogView/Picolario/2006_05_12(2).lov",
 			"d:/Documents/LogView/Picolario/2006_05_12.lov",
@@ -102,7 +116,21 @@ public class LogViewReaderTester extends TestCase {
 			"d:/Documents/LogView/UniLog/Starling electro 20071014 UniLog.lov",
 			
 			"d:/Documents/LogViewOBJ/ASW-27/ASW-27 23.5.2008 19.32.lov",
-			"d:/Documents/LogViewOBJ/ASW-27/ASW-27 24.5.2008 15.44.lov"
+			"d:/Documents/LogViewOBJ/ASW-27/ASW-27 24.5.2008 15.44.lov",
+			
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuA(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuB(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuA(1.5 ALPHA).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-07-21-FlugakkuB(1.5 ALPHA).lov",
+
+			"d:/Documents/LogView/Htronic Akkumaster C4/2007-09-06-Empfänger1300-K1(1.5 PreBeta).lov",
+			"d:/Documents/LogView/Htronic Akkumaster C4/akkumaster(1.5 PreBeta).lov", 
+
+			"D:/Documents/LogView/Htronic Akkumaster C4/2007-06-01-EmpfängerAA4-K2(2 BETA).lov",
+			"D:/Documents/LogView/Htronic Akkumaster C4/Beta2.0_9VoltBlockTest(2 BETA).lov",
+
+			"D:/Documents/LogView/UniLog/1_Empfaenger(2 BETA2).lov",
+			"D:/Documents/LogView/Picolario/Gunnar_pico_test(2 BETA2).lov"
 	};
 	
 	/* (non-Javadoc)
@@ -130,59 +158,147 @@ public class LogViewReaderTester extends TestCase {
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_13() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 		for (String filePath : this.files_1_13) {
 			try {
 				LogViewReader.getHeader(filePath);
 			}
 			catch (Exception e) {
-				fail(filePath + " - " + e.getMessage() + "\n");
+				failures.put(filePath, e);
 			}
 		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
 	}
 	
 	/**
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_15() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 		for (String filePath : this.files_1_15) {
 			try {
 				LogViewReader.getHeader(filePath);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
-				fail(filePath + " - " + e.getMessage());
+				failures.put(filePath, e);
 			}
 		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
 	}
 	
 	/**
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
 	 */
-//	public final void testGetHeader_1_50() {
-//		for (String filePath : this.files_1_50) {
-//			try {
-//				LogViewReader.getHeader(filePath);
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//				fail(filePath + " - " + e.getMessage());
-//			}
-//		}
-//	}
+	public final void testGetHeader_1_50_ALPHA() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+		for (String filePath : this.files_1_50_ALPHA) {
+			try {
+				LogViewReader.getHeader(filePath);
+			}
+			catch (Exception e) {
+				failures.put(filePath, e);
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+	
+	/**
+	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 */
+	public final void testGetHeader_1_50_PreBETA() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+		for (String filePath : this.files_1_50_PreBETA) {
+			try {
+				LogViewReader.getHeader(filePath);
+			}
+			catch (Exception e) {
+				failures.put(filePath, e);
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+	
+	/**
+	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 */
+	public final void testGetHeader_2_0_BETA() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+		for (String filePath : this.files_2_0_BETA) {
+			try {
+				LogViewReader.getHeader(filePath);
+			}
+			catch (Exception e) {
+				failures.put(filePath, e);
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+	
+	/**
+	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 */
+	public final void testGetHeader_2_0_BETA2() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+		for (String filePath : this.files_2_0_BETA2) {
+			try {
+				LogViewReader.getHeader(filePath);
+			}
+			catch (Exception e) {
+				failures.put(filePath, e);
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
 	
 	/**
 	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_2_0() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 		for (String filePath : this.files_2_0) {
 			try {
 				LogViewReader.getHeader(filePath);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
-				fail(filePath + " - " + e.getMessage());
+				failures.put(filePath, e);
 			}
 		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
 	}
 	
 	/**

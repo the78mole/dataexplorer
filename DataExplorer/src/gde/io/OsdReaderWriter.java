@@ -41,7 +41,7 @@ import osde.data.RecordSet;
 import osde.device.ChannelTypes;
 import osde.device.IDevice;
 import osde.exception.DeclinedException;
-import osde.exception.NotSupportedFileFormat;
+import osde.exception.NotSupportedFileFormatException;
 import osde.exception.OSDEInternalException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
@@ -63,10 +63,10 @@ public class OsdReaderWriter {
 	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws NotSupportedFileFormat
+	 * @throws NotSupportedFileFormatException
 	 */
 	
-	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
+	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
 		return readHeader(filePath, data_in);
@@ -78,9 +78,9 @@ public class OsdReaderWriter {
 	 * @param data_in
 	 * @return
 	 * @throws IOException
-	 * @throws NotSupportedFileFormat
+	 * @throws NotSupportedFileFormatException
 	 */
-	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormat {
+	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormatException {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
 		int headerCounter = OSDE.OSD_FORMAT_HEADER_KEYS.length+1;
@@ -89,7 +89,7 @@ public class OsdReaderWriter {
 		line = line.substring(0, line.length()-1);
 		log.fine(line);
 		if (!line.startsWith(OSDE.OPEN_SERIAL_DATA_VERSION))
-			throw new NotSupportedFileFormat(filePath);
+			throw new NotSupportedFileFormatException(filePath);
 		
 		int version = new Integer(line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length())).intValue();
 		switch (version) {
@@ -124,7 +124,7 @@ public class OsdReaderWriter {
 			break;
 
 		default:
-			throw new NotSupportedFileFormat(filePath);
+			throw new NotSupportedFileFormatException(filePath);
 		}
 
 		return header;
@@ -135,10 +135,10 @@ public class OsdReaderWriter {
 	 * @param filePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws NotSupportedFileFormat 
+	 * @throws NotSupportedFileFormatException 
 	 * @throws DeclinedException 
 	 */
-	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormat {
+	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
 		String channelConfig = "";

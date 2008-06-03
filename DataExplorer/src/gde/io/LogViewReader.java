@@ -17,7 +17,8 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.ChannelTypes;
 import osde.device.IDevice;
-import osde.exception.NotSupportedFileFormat;
+import osde.exception.NotSupportedException;
+import osde.exception.NotSupportedFileFormatException;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
 
@@ -25,11 +26,19 @@ import osde.utils.StringHelper;
  * @author brueg
  */
 public class LogViewReader {	
-	final static Logger									log					= Logger.getLogger(LogViewReader.class.getName());
+	final static Logger										log					= Logger.getLogger(LogViewReader.class.getName());
 
-	final static OpenSerialDataExplorer	application	= OpenSerialDataExplorer.getInstance();
-	final static Channels 							channels 		= Channels.getInstance();
-
+	final static OpenSerialDataExplorer		application	= OpenSerialDataExplorer.getInstance();
+	final static Channels 								channels 		= Channels.getInstance();
+	final static HashMap<String, String> 	deviceMap		=	new HashMap<String, String>();
+	
+	// fill device Map with 
+	static {
+		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4");
+		deviceMap.put("picolario", "Picolario");
+		deviceMap.put("unilog", "UniLog");
+		// add more supported devices here, key in lower case
+	}
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
@@ -189,7 +198,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 * @throws NotSupportedFileFormat 
 	 */
-	private static HashMap<String, String> getBaseHeaderData(HashMap<String, String> header, DataInputStream data_in) throws IOException, NotSupportedFileFormat {
+	private static HashMap<String, String> getBaseHeaderData(HashMap<String, String> header, DataInputStream data_in) throws IOException, NotSupportedFileFormatException {
 		long position = 0;
 		//read total header size
 		byte[] buffer = new byte[8];
@@ -214,7 +223,7 @@ public class LogViewReader {
 		String stringVersion = new String(buffer);
 		log.info(OSDE.LOV_STRING_VERSION + stringVersion);
 		if (streamVersion != new Integer(stringVersion.split(":V")[1])) {
-			NotSupportedFileFormat e = new NotSupportedFileFormat("missmatch streamVersion (" + streamVersion + ") vs stringVersion (" + stringVersion + ")");
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException("missmatch streamVersion (" + streamVersion + ") vs stringVersion (" + stringVersion + ")");
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -263,7 +272,7 @@ public class LogViewReader {
 	 * @throws Exception 
 	 */
 	
-	public static HashMap<String, String> getHeader(final String filePath) throws IOException, NotSupportedFileFormat, Exception {
+	public static HashMap<String, String> getHeader(final String filePath) throws IOException, NotSupportedFileFormatException, Exception {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
 		HashMap<String, String> header = null;
@@ -275,8 +284,8 @@ public class LogViewReader {
 			if (e instanceof IOException) {
 				throw (IOException)e;
 			}
-			else if (e instanceof NotSupportedFileFormat) {
-				throw (NotSupportedFileFormat)e;
+			else if (e instanceof NotSupportedFileFormatException) {
+				throw (NotSupportedFileFormatException)e;
 			}
 			else
 				throw e;
@@ -293,9 +302,10 @@ public class LogViewReader {
 	 * @param data_in
 	 * @return
 	 * @throws IOException
+	 * @throws NotSupportedException 
 	 * @throws NotSupportedFileFormat
 	 */
-	private static HashMap<String, String> readHeader(DataInputStream data_in) throws IOException, NotSupportedFileFormat {
+	private static HashMap<String, String> readHeader(DataInputStream data_in) throws IOException, NotSupportedFileFormatException, NotSupportedException {
 		HashMap<String, String> header = new HashMap<String, String>();
 		
 		getBaseHeaderData(header, data_in);
@@ -309,16 +319,26 @@ public class LogViewReader {
 			header = getHeaderInfo_1_13(data_in, header);
 			header = getRecordSetInfo_1_13(data_in, header);
 		}
-		else if (useVersion.equals("1.15")) {
+		else if (useVersion.startsWith("1.14") || useVersion.equals("1.15")) {
 			header = getHeaderInfo_1_15(data_in, header);
 			header = getRecordSetInfo_1_15(data_in, header);
+		}
+		else if (useVersion.equals("1.50 ALPHA")) {
+			header = getHeaderInfo_1_50_ALPHA(data_in, header); 
+			//header = getHeaderInfo_1_15(data_in, header);
+			header = getRecordSetInfo_1_50_ALPHA(data_in, header);
+		}
+		else if (useVersion.equals("1.50 PreBETA") || useVersion.startsWith("2.0 BETA")) {
+			header = getHeaderInfo_1_50_BETA(data_in, header);
+			//header = getHeaderInfo_2_0(data_in, header);
+			header = getRecordSetInfo_1_50_BETA(data_in, header);
 		}
 		else if (useVersion.equals("2.0")) {
 			header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_2_0(data_in, header);
 		}
 		else {
-			NotSupportedFileFormat e = new NotSupportedFileFormat("Alpha/Beta Versions are not supported (1.50 ALPHA, 1.50 PreBETA, 1.50 BETA, 2.0 BETA, 2.0 BETA2, ..) - file version = " + useVersion);
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException("Dateiformatversions ist nicht unterstützt, da kein Beispile dafür vorliegt - Version = " + useVersion);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -330,8 +350,9 @@ public class LogViewReader {
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
+	 * @throws NotSupportedException 
 	 */
-	private static HashMap<String, String> getHeaderInfo_1_13(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+	private static HashMap<String, String> getHeaderInfo_1_13(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
 		// read file comment
@@ -387,8 +408,8 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
-		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
-		log.info(OSDE.DEVICE_NAME + " = " + deviceName);
+		deviceName = mapLovDeviceNames(deviceName);
+		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
 		position += data_in.skip(headerSize-position);
@@ -477,8 +498,9 @@ public class LogViewReader {
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
+	 * @throws NotSupportedException 
 	 */
-	private static HashMap<String, String> getHeaderInfo_1_15(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+	private static HashMap<String, String> getHeaderInfo_1_15(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
 		// read file comment
@@ -534,8 +556,8 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
-		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
-		log.info(OSDE.DEVICE_NAME + " = " + deviceName);
+		deviceName = mapLovDeviceNames(deviceName);
+		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
 		position += data_in.skip(headerSize-position);
@@ -637,17 +659,188 @@ public class LogViewReader {
 		}
 		return header;
 	}
+	
+	/**
+	 * read extended header info which is part of base header of format version 1.50 ALPHA
+	 * @param data_in
+	 * @param header
+	 * @throws IOException
+	 * @throws NotSupportedException 
+	 */
+	private static HashMap<String, String> getHeaderInfo_1_50_ALPHA(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
+		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
+		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
+		// read file comment
+		StringBuilder fileComment = new StringBuilder();
+		byte[] buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberCommentLines = parse2Int(buffer);
+		for (int i = 0; i < numberCommentLines; i++) {
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int fileCommentSize = parse2Int(buffer);
+			buffer = new byte[fileCommentSize];
+			position += data_in.read(buffer);
+			fileComment.append(new String(buffer)).append(" ");
+		}
+		log.info(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		header.put(OSDE.FILE_COMMENT, fileComment.toString());
+		log.info(String.format("position = 0x%x", position));
+		
+		// read data set channel
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberChannels = parse2Int(buffer);
+		for (int i = 0; i < numberChannels; i++) {
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int fileCommentSize = parse2Int(buffer);
+			buffer = new byte[fileCommentSize];
+			position += data_in.read(buffer);
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			log.info(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
+		}
+		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		log.info(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+
+		
+		// read communication port
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int comStrSize = parse2Int(buffer);
+		if (comStrSize != 0) {
+			buffer = new byte[comStrSize];
+			position += data_in.read(buffer);
+			log.info("CommunicationPort = " + new String(buffer));
+		}
+		position += data_in.skipBytes(4);
+
+		// read device name
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int deviceNameSize = parse2Int(buffer);
+		buffer = new byte[deviceNameSize];
+		position += data_in.read(buffer);
+		String deviceName = new String(buffer);
+		deviceName = mapLovDeviceNames(deviceName);
+		log.info(OSDE.DEVICE_NAME + deviceName);
+		header.put(OSDE.DEVICE_NAME, deviceName);
+		
+		position += data_in.skip(headerSize-position);
+		log.info(String.format("position = 0x%x", position));
+
+		header.put(OSDE.DATA_POINTER_POS, ""+position);
+
+		return header;
+	}	
+
 
 	/**
-	 * read extended header info which is part of base header of format version 1.50
+	 * get the record set and dependent record parameters of format version 1.50 ALPHA
+	 * @param device
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
 	 */
-	private static HashMap<String, String> getHeaderInfo_1_50(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+	private static HashMap<String, String> getRecordSetInfo_1_50_ALPHA(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
+		
+		position += data_in.skip(88);
+		log.info(String.format("position = 0x%x", position));
+		
+		// read number record sets
+		byte[] buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberRecordSets = parse2Int(buffer);
+		log.info(OSDE.RECORD_SET_SIZE + numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+
+		position += data_in.skipBytes(8);
+		
+		for (int i = 0; i < numberRecordSets; i++) {
+			StringBuilder sb = new StringBuilder();
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int recordSetNameSize = parse2Int(buffer);
+			buffer = new byte[recordSetNameSize];
+			position += data_in.read(buffer);
+			String recordSetName = new String(buffer);
+			sb.append(OSDE.RECORD_SET_NAME).append(recordSetName).append(OSDE.DATA_DELIMITER);
+			log.info(OSDE.RECORD_SET_NAME + recordSetName);
+			
+			position += data_in.skipBytes(4);
+
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int recordSetCommentSize = parse2Int(buffer);
+			buffer = new byte[recordSetCommentSize];
+			position += data_in.read(buffer);
+			String recordSetComment = new String(buffer);
+			log.info(OSDE.RECORD_SET_COMMENT + recordSetComment);
+			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
+			
+			position += data_in.skipBytes(122);
+			log.info(String.format("position = 0x%x", position));
+
+			int tmpDataSize = 0;
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = parse2Int(buffer);
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = tmpDataSize > parse2Int(buffer) ? tmpDataSize : parse2Int(buffer);
+
+			int dataSize = tmpDataSize;
+			log.info(OSDE.RECORD_DATA_SIZE + dataSize);
+			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
+			log.info(String.format("position = 0x%x", position));
+			
+			position += data_in.skipBytes(216);
+			log.info(String.format("position = 0x%x", position));
+			
+			// config block n100W, ...
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int numberLines = parse2Int(buffer);
+			log.info("numberLines = " + numberLines);
+			for (int j = 0; j < numberLines; j++) {
+				buffer = new byte[4];
+				position += data_in.read(buffer);
+				int stringSize = parse2Int(buffer);
+				buffer = new byte[stringSize];
+				position += data_in.read(buffer);
+				log.info(new String(buffer));
+			}
+			log.info(String.format("position = 0x%x", position));
+			
+			//position += data_in.skipBytes(8);
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long recordSetDataBytes = parse2Long(buffer);
+			log.info(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
+
+			header.put(OSDE.DATA_POINTER_POS, ""+position);
+			log.info(String.format("position = 0x%x", position));
+
+			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
+			log.info(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+		}
+		return header;
+	}
+
+	/**
+	 * read extended header info which is part of base header of format version 1.50 BETA
+	 * @param data_in
+	 * @param header
+	 * @throws IOException
+	 * @throws NotSupportedException 
+	 */
+	private static HashMap<String, String> getHeaderInfo_1_50_BETA(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
-		log.info(String.format("position = 0x%x", position));
 		// read file comment
 		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[8];
@@ -656,7 +849,7 @@ public class LogViewReader {
 		buffer = new byte[(int)fileCommentSize];
 		position += data_in.read(buffer);
 		String tmpString = new String(buffer);
-		//log.info(tmpString);
+		log.info(tmpString);
 		
 		int index = 0;
 		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
@@ -665,7 +858,8 @@ public class LogViewReader {
 		}
 		log.info(OSDE.FILE_COMMENT + " = " + fileComment.toString());
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
-		
+		log.info(String.format("position = 0x%x", position));
+
 		// read data set channel
 		buffer = new byte[4];
 		position += data_in.read(buffer);
@@ -676,7 +870,9 @@ public class LogViewReader {
 			fileCommentSize = parse2Int(buffer);
 			buffer = new byte[(int)fileCommentSize];
 			position += data_in.read(buffer);
-			log.info(new String(buffer));
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			log.info(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
 		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
 		log.info(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
@@ -700,7 +896,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
-		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
+		deviceName = mapLovDeviceNames(deviceName);
 		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -719,12 +915,16 @@ public class LogViewReader {
 			int lineSize = parse2Int(buffer);
 			buffer = new byte[lineSize];
 			position += data_in.read(buffer);
-			log.info(new String(buffer));
+			String configLine = new String(buffer);
+			if (configLine.startsWith(OSDE.LOV_TIME_STEP)) 
+				header.put(RecordSet.TIME_STEP_MS, configLine.split("=")[1]);
+			else if (configLine.startsWith(OSDE.LOV_NUM_MEASUREMENTS))
+				header.put(OSDE.LOV_NUM_MEASUREMENTS, ""+ ((new Integer(configLine.split("=")[1].trim()).intValue()) - 1)); // -1 == time
+			log.info(configLine);
 		}
 
 		// end of header sometimes after headerSize
-		//position += data_in.skip(headerSize-position);
-		//log.info(String.format("position = 0x%x", position));
+		position += data_in.skip(headerSize-position);
 		//**** end main header			
 		header.put(OSDE.DATA_POINTER_POS, ""+position);
 		log.info(String.format("position = 0x%x", position));
@@ -733,14 +933,137 @@ public class LogViewReader {
 	}	
 
 	/**
-	 * read extended header info which is part of base header of format version 2.0
+	 * get the record set and dependent record parameters of format version 2.0
+	 * @param device
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
 	 */
-	private static HashMap<String, String> getHeaderInfo_2_0(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+	private static HashMap<String, String> getRecordSetInfo_1_50_BETA(DataInputStream data_in, HashMap<String, String> header) throws IOException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
-		//long headerSize = new Long(header.get(LOV_HEADER_SIZE)).longValue();
+		
+		position += data_in.skip(88);
+		log.info(String.format("position = 0x%x", position));
+		
+		// read number record sets
+		byte[] buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberRecordSets = parse2Int(buffer);
+		log.info(OSDE.RECORD_SET_SIZE + numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+	
+		position += data_in.skipBytes(8);
+		
+		for (int i = 0; i < numberRecordSets; i++) {
+			StringBuilder sb = new StringBuilder();
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int recordSetNameSize = parse2Int(buffer);
+			buffer = new byte[recordSetNameSize];
+			position += data_in.read(buffer);
+			String recordSetName = new String(buffer);
+			sb.append(OSDE.RECORD_SET_NAME).append(recordSetName).append(OSDE.DATA_DELIMITER);
+			log.info(OSDE.RECORD_SET_NAME + recordSetName);
+						
+			position += data_in.skipBytes(2);
+			log.info(String.format("position = 0x%x", position));
+			
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long recordSetConfigSize = parse2Long(buffer);
+			buffer = new byte[(int)recordSetConfigSize];
+			position += data_in.read(buffer);
+			//log.info("RecordSetConfig = " + new String(buffer));
+			
+			position += data_in.skipBytes(112);
+			log.info(String.format("position = 0x%x", position));
+
+			int tmpDataSize = 0;
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = parse2Int(buffer);
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = tmpDataSize > parse2Int(buffer) ? tmpDataSize : parse2Int(buffer);
+			
+			int dataSize = tmpDataSize;
+			log.info(OSDE.RECORD_DATA_SIZE + dataSize);
+			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
+			
+			position += data_in.skipBytes(16);
+			log.info(String.format("position = 0x%x", position));
+			
+			// config block n100W, ...
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int numberLines = parse2Int(buffer);
+			log.info("numberLines = " + numberLines);
+			for (int j = 0; j < numberLines; j++) {
+				buffer = new byte[4];
+				position += data_in.read(buffer);
+				int stringSize = parse2Int(buffer);
+				buffer = new byte[stringSize];
+				position += data_in.read(buffer);
+				log.info(new String(buffer));
+			}
+			
+			position += data_in.skipBytes(4);
+			log.info(String.format("position = 0x%x", position));
+			
+			// rtf block
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long rtfCommentSize = parse2Long(buffer);
+			buffer = new byte[(int)rtfCommentSize];
+			position += data_in.read(buffer);
+			String tmpString = new String(buffer);
+			//log.info(tmpString);
+			
+			int index = 0;
+			StringBuilder recordSetComment = new StringBuilder();
+			while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
+				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(" ");
+				index += OSDE.LOV_RTF_START_USER_TEXT.length();
+			}
+			log.info(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
+			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment.toString()).append(OSDE.DATA_DELIMITER);
+
+			// rtf block
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			buffer = new byte[parse2Int(buffer)];
+			position += data_in.read(buffer);
+			log.info(new String(buffer));
+			log.info(String.format("position = 0x%x", position));			
+			
+			position += data_in.skip(175);
+			log.info(String.format("position = 0x%x", position));
+			
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long recordSetDataBytes = parse2Long(buffer);
+			log.info(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
+
+			header.put(OSDE.DATA_POINTER_POS, ""+position);
+			log.info(String.format("position = 0x%x", position));
+			
+			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
+			log.info(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+		}
+		return header;
+	}
+
+	/**
+	 * read extended header info which is part of base header of format version 2.0
+	 * @param data_in
+	 * @param header
+	 * @throws IOException
+	 * @throws NotSupportedException 
+	 */
+	private static HashMap<String, String> getHeaderInfo_2_0(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
+		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
+		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
 		// read file comment
 		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[8];
@@ -796,7 +1119,7 @@ public class LogViewReader {
 		buffer = new byte[deviceNameSize];
 		position += data_in.read(buffer);
 		String deviceName = new String(buffer);
-		if (deviceName.indexOf(" ") != -1) deviceName = StringHelper.removeBlanks(deviceName);
+		deviceName = mapLovDeviceNames(deviceName);
 		log.info(OSDE.DEVICE_NAME + deviceName);
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
@@ -824,8 +1147,7 @@ public class LogViewReader {
 		}
 
 		// end of header sometimes after headerSize
-		//position += data_in.skip(headerSize-position);
-		//log.info(String.format("position = 0x%x", position));
+		position += data_in.skip(headerSize-position);
 		//**** end main header			
 		header.put(OSDE.DATA_POINTER_POS, ""+position);
 		log.info(String.format("position = 0x%x", position));
@@ -843,7 +1165,7 @@ public class LogViewReader {
 	private static HashMap<String, String> getRecordSetInfo_2_0(DataInputStream data_in, HashMap<String, String> header) throws IOException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		
-		position += data_in.skip(80);
+		position += data_in.skip(88);
 		log.info(String.format("position = 0x%x", position));
 		
 		// read number record sets
@@ -975,5 +1297,23 @@ public class LogViewReader {
 		long tmpLong2 = (((long)buffer[7] & 255) << 56) + ((long)(buffer[6] & 255) << 48) + ((long)(buffer[5] & 255) << 40) + ((long)(buffer[4] & 255) << 32);
     return  tmpLong2 + tmpLong1;
 		
+	}
+	
+	/**
+	 * map LogView device names with OSDE device names if possible
+	 * @param deviceName
+	 * @return
+	 * @throws NotSupportedException 
+	 */
+	private static String mapLovDeviceNames(String deviceName) throws NotSupportedException {
+		String deviceKey = deviceName.toLowerCase().trim();
+		if (!deviceMap.containsKey(deviceKey)) {
+			String msg = "Ein Gerät mit dem Namen = " + deviceName + " ist nicht unterstützt !";
+			NotSupportedException e = new NotSupportedException(msg);
+			log.log(Level.WARNING, e.getMessage(), e);
+			throw e;
+		}
+		
+		return deviceMap.get(deviceKey);
 	}
 }
