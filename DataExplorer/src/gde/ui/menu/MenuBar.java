@@ -48,7 +48,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
 import osde.exception.DeclinedException;
-import osde.exception.NotSupportedFileFormat;
+import osde.exception.NotSupportedFileFormatException;
 import osde.io.CSVReaderWriter;
 import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
@@ -838,7 +838,7 @@ public class MenuBar {
 	 * @param openFilePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws NotSupportedFileFormat
+	 * @throws NotSupportedFileFormatException
 	 * @throws DeclinedException
 	 */
 	void openOsdFile(final String openFilePath) {
@@ -952,7 +952,7 @@ public class MenuBar {
 	 * @param openFilePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws NotSupportedFileFormat
+	 * @throws NotSupportedFileFormatException
 	 * @throws DeclinedException
 	 */
 	void openLovFile(final String openFilePath) {
@@ -961,7 +961,7 @@ public class MenuBar {
 			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
 			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
-			if (fileDeviceName.toLowerCase().indexOf(activeDeviceName.toLowerCase()) == -1) { // new device in file
+			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				String msg = "Das Gerät der ausgewählten Datei entspricht nicht dem aktiven Gerät. Soll auf das Gerät " + fileDeviceName + " umgeschaltet werden ?";
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					return;			
