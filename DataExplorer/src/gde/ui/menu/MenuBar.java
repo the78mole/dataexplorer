@@ -682,17 +682,17 @@ public class MenuBar {
 
 	/**
 	 * update file history while add history file to history menu
-	 * @param addDeviceFileName (device/filename.xyz)
+	 * @param fullQualifiedFileName (/home/device/filename.osd)
 	 */
-	public void updateSubHistoryMenuItem(final String addDeviceFileName) {
-		List<String> refFileHistory = Settings.getInstance().getFileHistory();
-		if (addDeviceFileName != null && addDeviceFileName.length() > 4) {
-			final String newhistoryEntry = addDeviceFileName.replace("\\", "\\\\"); // windows/filesep
-
-			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
-				refFileHistory.remove(newhistoryEntry);
+	public void updateSubHistoryMenuItem(final String fullQualifiedFileName) {
+		HashMap<String, String> refFileHistory = Settings.getInstance().getFileHistory();
+		if (fullQualifiedFileName != null && fullQualifiedFileName.length() > 4) {
+			final String newhistoryEntry = fullQualifiedFileName.replace("\\", "/"); // windows/file separator
+			final String fileKey = fullQualifiedFileName.substring(fullQualifiedFileName.lastIndexOf('/')+1);
+			if (refFileHistory.containsKey(fileKey)) { // fileName already exist
+				refFileHistory.remove(fileKey);
 			}
-			refFileHistory.add(0, newhistoryEntry);
+			refFileHistory.put(fileKey, newhistoryEntry);
 		}
 		// clean up
 		MenuItem[] menuItems = this.fileHistoryMenu.getItems();
@@ -700,28 +700,29 @@ public class MenuBar {
 			menuItem.dispose();
 		}
 		
-		for (Iterator<String> iterator = refFileHistory.iterator(); iterator.hasNext();) {
-			String fileReference = iterator.next();
+		for (String key : refFileHistory.keySet()) {
+			String fileReference = refFileHistory.get(key);
+			fileReference = fileReference.substring(fileReference.lastIndexOf('/')+1);
 			final MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
 			historyImportMenuItem.setText(fileReference);
 			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
-					String deviceFileName = historyImportMenuItem.getText();
-					String fileType = deviceFileName.substring(deviceFileName.lastIndexOf('.')+1);
-					if (fileType != null && fileType.length() > 2) {
+					String fileKey = historyImportMenuItem.getText();
+					HashMap<String, String> refFileNameMap = Settings.getInstance().getFileHistory();
+					if (refFileNameMap.containsKey(fileKey)) {
+						String fileName = refFileNameMap.get(fileKey);
+						String fileType = fileName.substring(fileName.lastIndexOf('.')+1).toUpperCase();
+						MenuBar.log.info("opening file = " + fileName);
 						if (fileType.equalsIgnoreCase("OSD")) {
-							MenuBar.log.info("opening file = " + Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
-							openOsdFile(Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+							openOsdFile(fileName);
 						}
 						else if (fileType.equalsIgnoreCase("LOV")) {
-							MenuBar.log.info("opening file = " + Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
-							openLovFile(Settings.getInstance().getDataFilePath() + MenuBar.this.fileSep + deviceFileName);
+							openLovFile(fileName);
 						}
-
-					}
-					else {
-						MenuBar.this.application.openMessageDialog("Die Datei kann auf Grund der Dateiendung nicht verarbeitet werden!");
+						else {
+							MenuBar.this.application.openMessageDialog("Die Datei kann auf Grund der Dateiendung nicht verarbeitet werden!");
+						}
 					}
 				}
 			});
@@ -881,7 +882,7 @@ public class MenuBar {
 				}
 			};
 			this.readerWriterThread.start();
-			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + openFilePath.substring(openFilePath.lastIndexOf(this.fileSep)));
+			updateSubHistoryMenuItem(openFilePath);
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
@@ -941,7 +942,7 @@ public class MenuBar {
 				}
 			};
 			this.readerWriterThread.start();
-			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + filePath.substring(filePath.lastIndexOf(this.fileSep)));
+			updateSubHistoryMenuItem(filePath);
 			activeChannel.setFileName(filePath.substring(filePath.lastIndexOf(this.fileSep)+1));
 			activeChannel.setSaved(true);
 		}
@@ -1000,7 +1001,7 @@ public class MenuBar {
 				}
 			};
 			this.readerWriterThread.start();
-			updateSubHistoryMenuItem(this.application.getActiveDevice().getName() + openFilePath.substring(openFilePath.lastIndexOf(this.fileSep)));
+			updateSubHistoryMenuItem(openFilePath);
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
