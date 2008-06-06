@@ -83,43 +83,24 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
-	 */
-	public int getLovDataByteOffset() {
-		return 4;
-	}
-
-	/**
-	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
-		int offset = this.getLovDataByteOffset();
-		int size = this.getLovDataByteSize();
-		byte[] readBuffer = new byte[size];
+	public synchronized void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int lovDataSize = this.getLovDataByteSize();
+		
+		//byte[] configurationBuffer	= new byte[14];
+		//byte[] measurementsBuffer		= new byte[16];
+		byte[] convertDataBuffer = new byte[14 + 16];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
 		
 		for (int i = 0; i < recordDataSize; i++) { 
-			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
-			recordSet.addPoints(converDataBytes(points, readBuffer, offset, null), false);
-		}
-	}
-
-	/**
-	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
-	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
-	 * @param points pointer to integer array to be filled with converted data
-	 * @param offset if there is any offset of the data within the data byte array
-	 * @param dataBuffer byte arrax with the data to be converted
-	 * @param calcValues factor, offset, reduction, ....
-	 */
-	@SuppressWarnings("unused")
-	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {	
-
+			
 //		StringBuilder sb = new StringBuilder();
 //		for (byte b : dataBuffer) {
 //			sb.append(String.format("%02x", b)).append(" ");
@@ -134,14 +115,29 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 //33 00 00 00 51 81 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 cb 07 f0 0d 02 01 25 1f 03 17 38 01 00 3c 0d 0a 20 31 38 31 30 30 00 00 00 00 13 07 00 00 
 //offset      51 81 00 03 00 0C 08 98 02 58 02 58                      52 02 85 0A 4A 0C DE 01 04 1F 04 17 1B 01
 
+			System.arraycopy(dataBuffer,  4 + i*lovDataSize, convertDataBuffer,  0, 14); //configurationBuffer.length
+			System.arraycopy(dataBuffer, 23 + i*lovDataSize, convertDataBuffer, 14, 16); //measurementsBuffer.length
+			recordSet.addPoints(converDataBytes(points, convertDataBuffer), false);
+		}
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param dataBuffer byte arrax with the data to be converted
+	 */
+	@SuppressWarnings("unused")
+	public int[] converDataBytes(int[] points, byte[] dataBuffer) {	
+
 		// build the point array according curves from record set
 		//int[] points = new int[getRecordSet().size()];
 		
 		HashMap<String, Object> values = new HashMap<String, Object>(7);
 		byte[] configurationBuffer	= new byte[14];
-		System.arraycopy(dataBuffer, offset, configurationBuffer, 0, configurationBuffer.length);
+		System.arraycopy(dataBuffer, 0, configurationBuffer, 0, configurationBuffer.length);
 		byte[] measurementsBuffer		= new byte[16];
-		System.arraycopy(dataBuffer, 23, measurementsBuffer, 0, measurementsBuffer.length);
+		System.arraycopy(dataBuffer, 14, measurementsBuffer, 0, measurementsBuffer.length);
 		values = AkkuMasterC4SerialPort.getConvertedValues(values, AkkuMasterC4SerialPort.convertConfigurationAnswer(configurationBuffer), AkkuMasterC4SerialPort.convertMeasurementValues(measurementsBuffer));
 
 

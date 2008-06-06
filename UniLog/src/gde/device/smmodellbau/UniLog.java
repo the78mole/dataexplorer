@@ -3,7 +3,6 @@ package osde.device.smmodellbau;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,43 +73,20 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 32;  // 2 bytes hight, 1 byte voltage 
+		return 32; 
 	}
 	
 	/**
-	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
-	 */
-	public int getLovDataByteOffset() {
-		return 0;
-	}
-	
-	/**
-	 * get number of data buffers with device specific information like UniLog min/max are the first two receive buffers
-	 */
-	public int getSkipBufferCount() {
-		return 2;
-	}
-
-	/**
-	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
-		int timeStep_ms = 0;
-		String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
-		HashMap<String, Double> calcValues = new HashMap<String, Double>();
-		calcValues.put(A1_FACTOR, recordSet.get(measurements[11]).getFactor());
-		calcValues.put(A1_OFFSET, recordSet.get(measurements[11]).getOffset());
-		calcValues.put(A2_FACTOR, recordSet.get(measurements[12]).getFactor());
-		calcValues.put(A2_OFFSET, recordSet.get(measurements[12]).getOffset());
-		calcValues.put(A3_FACTOR, recordSet.get(measurements[13]).getFactor());
-		calcValues.put(A3_OFFSET, recordSet.get(measurements[13]).getOffset());
-		
-		int offset = this.getLovDataByteOffset();
+	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int timeStep_ms = 0;		
 		int size = this.getLovDataByteSize();
 		byte[] readBuffer = new byte[size];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
@@ -128,7 +104,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 
-			recordSet.addPoints(converDataBytes(points, readBuffer, offset, calcValues), false);
+			recordSet.addPoints(converDataBytes(points, readBuffer), false);
 		}
 	}
 
@@ -137,27 +113,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
-	 * @param offset if there is any offset of the data within the data byte array
-	 * @param calcValues factor, offset, reduction, ....
 	 */
-	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {
+	public int[] converDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
 		String lineSep = System.getProperty("line.separator");
 		int tmpValue = 0;
 		
 		// voltageReceiver *** power/drive *** group
-		tmpValue = (((dataBuffer[7+offset] & 0xFF) << 8) + (dataBuffer[6+offset] & 0xFF)) & 0x0FFF;
+		tmpValue = (((dataBuffer[7] & 0xFF) << 8) + (dataBuffer[6] & 0xFF)) & 0x0FFF;
 		points[0] = (tmpValue * 10); //0=voltageReceiver
 		if (log.isLoggable(Level.INFO)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
 
 		// voltage *** power/drive *** group
-		tmpValue = (((dataBuffer[9+offset] & 0xFF) << 8) + (dataBuffer[8+offset] & 0xFF));
+		tmpValue = (((dataBuffer[9] & 0xFF) << 8) + (dataBuffer[8] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[1] = (tmpValue * 10); //1=voltage
 		if (log.isLoggable(Level.INFO)) sb.append("voltage [V] = " + points[1]).append(lineSep);
 
 		// current *** power/drive *** group - asymmetric for 400 A sensor 
-		tmpValue = (((dataBuffer[11+offset] & 0xFF) << 8) + (dataBuffer[10+offset] & 0xFF));
+		tmpValue = (((dataBuffer[11] & 0xFF) << 8) + (dataBuffer[10] & 0xFF));
 		tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
 		points[2] = tmpValue * 10; //2=current [A]
 		if (log.isLoggable(Level.INFO)) sb.append("current [A] = " + points[2]).append(lineSep);
@@ -176,7 +150,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		points[6] = 0; //6=votagePerCellS
 
 		// revolution speed *** power/drive *** group
-		tmpValue = (((dataBuffer[13+offset] & 0xFF) << 8) + (dataBuffer[12+offset] & 0xFF));
+		tmpValue = (((dataBuffer[13] & 0xFF) << 8) + (dataBuffer[12] & 0xFF));
 		if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
 		points[7] = (tmpValue * 1000); //7=revolutionSpeed
 		if (log.isLoggable(Level.INFO)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
@@ -187,7 +161,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		points[8] = 0; //8=efficiency
 
 		// height *** power/drive *** group
-		tmpValue = (((dataBuffer[15+offset] & 0xFF) << 8) + (dataBuffer[14+offset] & 0xFF)) + 20000;
+		tmpValue = (((dataBuffer[15] & 0xFF) << 8) + (dataBuffer[14] & 0xFF)) + 20000;
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[9] = (tmpValue * 100); //9=height
 		if (log.isLoggable(Level.INFO)) sb.append("height [m] = " + points[9]).append(lineSep);
@@ -195,25 +169,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		points[10] = 0; //10=slope
 
 		// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
-		int a1Modus = (dataBuffer[7+offset] & 0xF0) >> 4; // 11110000
-		tmpValue = (((dataBuffer[17+offset] & 0xFF) << 8) + (dataBuffer[16+offset] & 0xFF));
+		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
+		tmpValue = (((dataBuffer[17] & 0xFF) << 8) + (dataBuffer[16] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-		points[11] = new Double(tmpValue * 100.0 * calcValues.get(A1_FACTOR) + (calcValues.get(A1_OFFSET) * 1000.0)).intValue(); //11=a1Value
+		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
 		if (log.isLoggable(Level.INFO)) {
 			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
 			sb.append("a1Value = " + points[11]).append(lineSep);
 		}
 
 		// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
-		int a2Modus = (dataBuffer[4+offset] & 0x30); // 00110000
+		int a2Modus = (dataBuffer[4] & 0x30); // 00110000
 		if (a2Modus == 0) {
-			tmpValue = (((dataBuffer[19+offset] & 0xEF) << 8) + (dataBuffer[18+offset] & 0xFF));
+			tmpValue = (((dataBuffer[19] & 0xEF) << 8) + (dataBuffer[18] & 0xFF));
 			tmpValue = tmpValue > 32768 ? (tmpValue - 65536) : tmpValue;
-			points[12] = new Double(tmpValue * 100.0 * calcValues.get(A2_FACTOR) + (calcValues.get(A2_OFFSET) * 1000.0)).intValue(); //12=a2Value						if (log.isLoggable(Level.FINER)) 
+			points[12] = new Integer(tmpValue * 100).intValue(); //12=a2Value
 		}
 		else {
-			tmpValue = (((dataBuffer[19+offset] & 0xFF) << 8) + (dataBuffer[18+offset] & 0xFF));
-			points[12] = new Double(tmpValue * 1000.0 * calcValues.get(A2_FACTOR) + (calcValues.get(A2_OFFSET) * 1000)).intValue(); //12=a2Value
+			tmpValue = (((dataBuffer[19] & 0xFF) << 8) + (dataBuffer[18] & 0xFF));
+			points[12] = new Integer(tmpValue * 1000).intValue(); //12=a2Value
 		}
 		if (log.isLoggable(Level.INFO)) {
 			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
@@ -224,10 +198,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		}
 
 		// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
-		int a3Modus = (dataBuffer[4+offset] & 0xC0); // 11000000
-		tmpValue = (((dataBuffer[21+offset] & 0xEF) << 8) + (dataBuffer[20+offset] & 0xFF));
+		int a3Modus = (dataBuffer[4] & 0xC0); // 11000000
+		tmpValue = (((dataBuffer[21] & 0xEF) << 8) + (dataBuffer[20] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-		points[13] = new Double(tmpValue * 100.0 * calcValues.get(A3_FACTOR) + (calcValues.get(A3_OFFSET) * 1000.0)).intValue(); //13=a3Value
+		points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
 		if (log.isLoggable(Level.INFO)) {
 			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
 			if (a3Modus == 0)

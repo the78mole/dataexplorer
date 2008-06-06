@@ -17,7 +17,6 @@
 package osde.device.renschler;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,31 +83,26 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public int getLovDataByteSize() {
 		return 16;  // 0x0C = 12 + 4 (counter)
 	}
-	
-	/**
-	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
-	 */
-	public int getLovDataByteOffset() {
-		return 4;
-	}
 
 	/**
-	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
-		int offset = this.getLovDataByteOffset();
+	public synchronized void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int offset = 4;
 		int size = this.getLovDataByteSize();
-		byte[] readBuffer = new byte[size];
+		int devicedataBufferSize = 3;
+		byte[] convertBuffer = new byte[devicedataBufferSize];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
 		
 		for (int i = 0; i < recordDataSize; i++) { 
-			System.arraycopy(dataBuffer, i*size, readBuffer, 0, size);
-			recordSet.addPoints(converDataBytes(points, readBuffer, offset, null), false);
+			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, devicedataBufferSize);
+			recordSet.addPoints(converDataBytes(points, convertBuffer), false);
 		}
 	}
 
@@ -116,20 +110,18 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
-	 * @param offset if there is any offset of the data within the data byte array
 	 * @param dataBuffer byte arrax with the data to be converted
-	 * @param calcValues factor, offset, reduction, ....
 	 */
 	@SuppressWarnings("unused")
-	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues) {		
-		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here
-		points[0] = new Integer(dataBuffer[2 + offset]) * 1000;
+	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
+		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
+		points[0] = new Integer(dataBuffer[2]) * 1000;
 
 		// calculate height values and add
-		if (((dataBuffer[1 + offset] & 0x80) >> 7) == 0) // we have signed [feet]
-			points[1] = ((dataBuffer[offset] & 0xFF) + ((dataBuffer[1 + offset] & 0x7F) << 8)) * 1000; // only positive part of height data
+		if (((dataBuffer[1] & 0x80) >> 7) == 0) // we have signed [feet]
+			points[1] = ((dataBuffer[0] & 0xFF) + ((dataBuffer[1] & 0x7F) << 8)) * 1000; // only positive part of height data
 		else
-			points[1] = (((dataBuffer[offset] & 0xFF) + ((dataBuffer[1 + offset] & 0x7F) << 8)) * -1) * 1000; // height is negative
+			points[1] = (((dataBuffer[0] & 0xFF) + ((dataBuffer[1] & 0x7F) << 8)) * -1) * 1000; // height is negative
 
 		return points;
 	}

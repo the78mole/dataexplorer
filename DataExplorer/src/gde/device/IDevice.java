@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.device;
 
-import java.util.HashMap;
 import java.util.List;
 
 import osde.data.Record;
@@ -331,28 +330,22 @@ public interface IDevice {
 	public int getLovDataByteSize();
 	
 	/**
-	 * get LogView data bytes offset, in most cases the real data has an offset within the data bytes array
-	 */
-	public int getLovDataByteOffset();
-	
-	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
-	 * @param offset if there is any offset of the data within the data byte array
-	 * @param calcValues factor, offset, reduction, ....
 	 */
-	public int[] converDataBytes(int[] points, byte[] dataBuffer, int offset, HashMap<String, Double> calcValues);
+	public int[] converDataBytes(int[] points, byte[] dataBuffer);
 
 	/**
-	 * add record data size points to each measurement, if measurement is calculation 0 will be added
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 */
-	public void addConvertedDataBufferAsDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
+	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
 	
 	/**
 	 * function to translate measured value from a device to values represented
