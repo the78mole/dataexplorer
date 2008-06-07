@@ -906,7 +906,7 @@ public class LogViewReader {
 		buffer = new byte[4];
 		position += data_in.read(buffer);
 		int deviceConfigLineSize = parse2Int(buffer);
-		//if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
+		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
 		
 		for (int i = 0; i < deviceConfigLineSize; i++) {
 			// read device ini line
@@ -973,7 +973,7 @@ public class LogViewReader {
 			long recordSetConfigSize = parse2Long(buffer);
 			buffer = new byte[(int)recordSetConfigSize];
 			position += data_in.read(buffer);
-			//if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
 			
 			position += data_in.skipBytes(112);
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
@@ -1017,7 +1017,7 @@ public class LogViewReader {
 			buffer = new byte[(int)rtfCommentSize];
 			position += data_in.read(buffer);
 			String tmpString = new String(buffer);
-			//if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+			if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
 			
 			int index = 0;
 			StringBuilder recordSetComment = new StringBuilder();
@@ -1072,7 +1072,7 @@ public class LogViewReader {
 		buffer = new byte[(int)fileCommentSize];
 		position += data_in.read(buffer);
 		String tmpString = new String(buffer);
-		//if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+		if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
 		
 		int index = 0;
 		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
@@ -1129,7 +1129,7 @@ public class LogViewReader {
 		buffer = new byte[4];
 		position += data_in.read(buffer);
 		int deviceConfigLineSize = parse2Int(buffer);
-		//if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
+		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
 		
 		for (int i = 0; i < deviceConfigLineSize; i++) {
 			// read device ini line
@@ -1195,7 +1195,7 @@ public class LogViewReader {
 			long recordSetConfigSize = parse2Long(buffer);
 			buffer = new byte[(int)recordSetConfigSize];
 			position += data_in.read(buffer);
-			//if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
 			
 			position += data_in.skipBytes(112);
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
@@ -1236,7 +1236,7 @@ public class LogViewReader {
 			buffer = new byte[(int)rtfCommentSize];
 			position += data_in.read(buffer);
 			String tmpString = new String(buffer);
-			//if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+			if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
 			
 			int index = 0;
 			StringBuilder recordSetComment = new StringBuilder();
@@ -1252,7 +1252,7 @@ public class LogViewReader {
 			position += data_in.read(buffer);
 			buffer = new byte[parse2Int(buffer)];
 			position += data_in.read(buffer);
-			//if (log.isLoggable(Level.FINEST)) log.finest(new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest(new String(buffer));
 			
 			
 			position += data_in.skip(175);
