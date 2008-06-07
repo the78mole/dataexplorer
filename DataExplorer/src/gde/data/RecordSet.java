@@ -46,7 +46,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
-	String												objectKey							= "---";
+	String												objectKey							= "";
 	String												header 								= null;
 	String[]											recordNames;										// Spannung, Strom, ..
 	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte

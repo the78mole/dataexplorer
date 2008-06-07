@@ -48,11 +48,23 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
+/**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
  */
 public class SettingsDialog extends Dialog {
-	final static Logger										log	= Logger.getLogger(SettingsDialog.class.getName());
+	final static Logger						log							= Logger.getLogger(SettingsDialog.class.getName());
 
 	CCombo												configLevelCombo;
 	CLabel												utilsLevelLabel;
@@ -76,8 +88,13 @@ public class SettingsDialog extends Dialog {
 	CLabel												Port;
 	CCombo												serialPort;
 	Button												useGlobalSerialPort;
-	Button 												deviceDialogButton;
-	Group 												deviceDialogGroup;
+	Button												suggestObjectKey;
+	Button												suggestDate;
+	Group													fileOpenSaveDialogGroup;
+	CLabel												fileIOLevelLabel;
+	CCombo												fileIOLevelCombo;
+	Button												deviceDialogButton;
+	Group													deviceDialogGroup;
 	Group													serialPortGroup;
 	Group													separatorGroup;
 	CCombo												listSeparator;
@@ -90,7 +107,7 @@ public class SettingsDialog extends Dialog {
 	Group													loggingGroup;
 
 	Thread												listPortsThread;
-	Vector<String>								availablePorts = new Vector<String>();
+	Vector<String>								availablePorts	= new Vector<String>();
 	final Settings								settings;
 	final OpenSerialDataExplorer	application;
 
@@ -108,18 +125,60 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(496, 575);
+			this.dialogShell.setSize(496, 641);
 			this.dialogShell.setText("OpenSerialDataExplorer - Settings");
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.gif"));
+			{
+				FormData fileOpenSaveDialogGroupLData = new FormData();
+				fileOpenSaveDialogGroupLData.width = 451;
+				fileOpenSaveDialogGroupLData.height = 44;
+				fileOpenSaveDialogGroupLData.left = new FormAttachment(0, 1000, 12);
+				fileOpenSaveDialogGroupLData.top = new FormAttachment(0, 1000, 79);
+				this.fileOpenSaveDialogGroup = new Group(this.dialogShell, SWT.NONE);
+				this.fileOpenSaveDialogGroup.setLayout(null);
+				this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
+				this.fileOpenSaveDialogGroup.setText("Dateinamen Sicherndialog");
+				this.fileOpenSaveDialogGroup.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						SettingsDialog.log.fine("fileOpenSaveDialogGroup.paintControl, event=" + evt);
+						SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
+						SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
+					}
+				});
+				{
+					this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
+					this.suggestDate.setText("Datum als Dateianfang");
+					this.suggestDate.setBounds(27, 28, 194, 16);
+					this.suggestDate.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							SettingsDialog.log.fine("suggestDate.widgetSelected, event=" + evt);
+							SettingsDialog.this.settings.setUsageDateAsFileNameLeader(SettingsDialog.this.suggestDate.getSelection());
+						}
+					});
+				}
+				{
+					this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
+					this.suggestObjectKey.setText("Objektschlüssel verwenden");
+					this.suggestObjectKey.setBounds(239, 28, 194, 16);
+					this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							SettingsDialog.log.fine("suggestObjectKey.widgetSelected, event=" + evt);
+							SettingsDialog.this.settings.setUsageObjectKeyInFileName(SettingsDialog.this.suggestObjectKey.getSelection());
+						}
+					});
+				}
+			}
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.fine("dialogShell.helpRequested, event="+evt);
+					SettingsDialog.log.fine("dialogShell.helpRequested, event=" + evt);
 					SettingsDialog.this.application.openHelpDialog("", "HelpInfo_1.html");
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.finest("dialogShell.widgetDisposed, event=" + evt);
+					SettingsDialog.log.finest("dialogShell.widgetDisposed, event=" + evt);
 					if (SettingsDialog.this.settings.getActiveDevice().startsWith("---")) SettingsDialog.this.settings.setActiveDevice("---;---;---");
 					SettingsDialog.this.settings.store();
 					if (SettingsDialog.this.settings.isGlobalSerialPort()) SettingsDialog.this.application.setGloabalSerialPort(SettingsDialog.this.serialPort.getText());
@@ -131,15 +190,15 @@ public class SettingsDialog extends Dialog {
 				FormData GerätedialogLData = new FormData();
 				GerätedialogLData.width = 451;
 				GerätedialogLData.height = 35;
-				GerätedialogLData.left =  new FormAttachment(0, 1000, 12);
-				GerätedialogLData.top =  new FormAttachment(0, 1000, 153);
+				GerätedialogLData.left = new FormAttachment(0, 1000, 12);
+				GerätedialogLData.top = new FormAttachment(0, 1000, 221);
 				this.deviceDialogGroup = new Group(this.dialogShell, SWT.NONE);
 				this.deviceDialogGroup.setLayout(null);
 				this.deviceDialogGroup.setLayoutData(GerätedialogLData);
 				this.deviceDialogGroup.setText("Gerätedialoge");
 				this.deviceDialogGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.finest("deviceDialogGroup.paintControl, event="+evt);
+						SettingsDialog.log.finest("deviceDialogGroup.paintControl, event=" + evt);
 						SettingsDialog.this.deviceDialogButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
 					}
 				});
@@ -149,8 +208,9 @@ public class SettingsDialog extends Dialog {
 					this.deviceDialogButton.setBounds(65, 24, 327, 16);
 					this.deviceDialogButton.setToolTipText("Hiermit stellt man ein ob die Gerätedialoge erst geschlosen werden müssen bevor man an die Hauptfenster herankommt");
 					this.deviceDialogButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("deviceDialogButton.widgetSelected, event="+evt);
+							SettingsDialog.log.finest("deviceDialogButton.widgetSelected, event=" + evt);
 							SettingsDialog.this.settings.enabelModalDeviceDialogs(SettingsDialog.this.deviceDialogButton.getSelection());
 						}
 					});
@@ -169,7 +229,7 @@ public class SettingsDialog extends Dialog {
 				this.defaultDataPathGroup.setText("Standarddatenpfad");
 				this.defaultDataPathGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.finest("defaultDataPathGroup.paintControl, event=" + evt);
+						SettingsDialog.log.finest("defaultDataPathGroup.paintControl, event=" + evt);
 						SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
 					}
 				});
@@ -187,10 +247,11 @@ public class SettingsDialog extends Dialog {
 					this.defaultDataPathAdjustButton.setText(". . . ");
 					this.defaultDataPathAdjustButton.setBounds(405, 24, 30, 20);
 					this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("defaultDataPathAdjustButton.widgetSelected, event=" + evt);
+							SettingsDialog.log.finest("defaultDataPathAdjustButton.widgetSelected, event=" + evt);
 							String defaultDataDirectory = SettingsDialog.this.application.openDirFileDialog("Einstellungen - Standard Daten Pfad", SettingsDialog.this.settings.getDataFilePath());
-							log.fine("default directory from directoy dialog = " + defaultDataDirectory);
+							SettingsDialog.log.fine("default directory from directoy dialog = " + defaultDataDirectory);
 							SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 							SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
 						}
@@ -203,14 +264,14 @@ public class SettingsDialog extends Dialog {
 				FormData separatorGroupLData = new FormData();
 				separatorGroupLData.width = 451;
 				separatorGroupLData.height = 44;
-				separatorGroupLData.left =  new FormAttachment(0, 1000, 12);
-				separatorGroupLData.top =  new FormAttachment(0, 1000, 80);
-				separatorGroupLData.right =  new FormAttachment(1000, 1000, -19);
+				separatorGroupLData.left = new FormAttachment(0, 1000, 12);
+				separatorGroupLData.top = new FormAttachment(0, 1000, 148);
+				separatorGroupLData.right = new FormAttachment(1000, 1000, -19);
 				this.separatorGroup.setLayoutData(separatorGroupLData);
 				this.separatorGroup.setText("Zahlen- CSV-Separator");
 				this.separatorGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.finest("separatorGroup.paintControl, event=" + evt);
+						SettingsDialog.log.finest("separatorGroup.paintControl, event=" + evt);
 						SettingsDialog.this.decimalSeparator.setText(SettingsDialog.this.settings.getDecimalSeparator() + "");
 						SettingsDialog.this.listSeparator.setText(SettingsDialog.this.settings.getListSeparator() + "");
 					}
@@ -226,8 +287,9 @@ public class SettingsDialog extends Dialog {
 					this.decimalSeparator.setItems(new String[] { " . ", " , " });
 					this.decimalSeparator.setBounds(153, 24, 43, 20);
 					this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("decimalSeparator.widgetSelected, event=" + evt);
+							SettingsDialog.log.finest("decimalSeparator.widgetSelected, event=" + evt);
 							SettingsDialog.this.settings.setDecimalSeparator(SettingsDialog.this.decimalSeparator.getText().trim());
 							SettingsDialog.this.decimalSeparator.setText(" " + SettingsDialog.this.decimalSeparator.getText().trim() + " ");
 						}
@@ -244,8 +306,9 @@ public class SettingsDialog extends Dialog {
 					this.listSeparator.setItems(new String[] { " , ", " ; " });
 					this.listSeparator.setBounds(369, 24, 47, 20);
 					this.listSeparator.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("listSeparator.widgetSelected, event=" + evt);
+							SettingsDialog.log.finest("listSeparator.widgetSelected, event=" + evt);
 							SettingsDialog.this.settings.setListSeparator(SettingsDialog.this.listSeparator.getText().trim());
 							SettingsDialog.this.listSeparator.setText(" " + SettingsDialog.this.listSeparator.getText().trim() + " ");
 						}
@@ -258,14 +321,14 @@ public class SettingsDialog extends Dialog {
 				FormData serialPortGroupLData = new FormData();
 				serialPortGroupLData.width = 451;
 				serialPortGroupLData.height = 34;
-				serialPortGroupLData.left =  new FormAttachment(0, 1000, 12);
-				serialPortGroupLData.right =  new FormAttachment(1000, 1000, -19);
-				serialPortGroupLData.top =  new FormAttachment(0, 1000, 216);
+				serialPortGroupLData.left = new FormAttachment(0, 1000, 12);
+				serialPortGroupLData.right = new FormAttachment(1000, 1000, -19);
+				serialPortGroupLData.top = new FormAttachment(0, 1000, 284);
 				this.serialPortGroup.setLayoutData(serialPortGroupLData);
 				this.serialPortGroup.setText("Serial Port Adjustment");
 				this.serialPortGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.finest("serialPortGroup.paintControl, event=" + evt);
+						SettingsDialog.log.finest("serialPortGroup.paintControl, event=" + evt);
 						SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
 						//serialPort.setText(settings.getSerialPort());
 						SettingsDialog.this.serialPort.setItems(SettingsDialog.this.availablePorts.toArray(new String[SettingsDialog.this.availablePorts.size()]));
@@ -279,10 +342,11 @@ public class SettingsDialog extends Dialog {
 					this.useGlobalSerialPort.setToolTipText("Steht dieser Schalter angewählt wird Anwendungsweit nur ein serieller Port verwendet, sonst wird pro Gerät eine eigene Portkonfiguration verwendet");
 					this.useGlobalSerialPort.setBounds(15, 19, 225, 20);
 					this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
+							SettingsDialog.log.finest("useGlobalSerialPort.widgetSelected, event=" + evt);
 							if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
-								SettingsDialog.this.settings.setIsGlobalSerialPort("true");	
+								SettingsDialog.this.settings.setIsGlobalSerialPort("true");
 								updateAvailablePorts();
 							}
 							else {
@@ -295,8 +359,9 @@ public class SettingsDialog extends Dialog {
 					this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 					this.serialPort.setBounds(240, 19, 130, 20);
 					this.serialPort.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("serialPort.widgetSelected, event=" + evt);
+							SettingsDialog.log.finest("serialPort.widgetSelected, event=" + evt);
 							SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText());
 						}
 					});
@@ -313,14 +378,14 @@ public class SettingsDialog extends Dialog {
 				FormData loggingGroupLData = new FormData();
 				loggingGroupLData.width = 451;
 				loggingGroupLData.height = 195;
-				loggingGroupLData.left =  new FormAttachment(0, 1000, 12);
-				loggingGroupLData.top =  new FormAttachment(0, 1000, 276);
-				loggingGroupLData.right =  new FormAttachment(1000, 1000, -19);
+				loggingGroupLData.left = new FormAttachment(0, 1000, 12);
+				loggingGroupLData.top = new FormAttachment(0, 1000, 344);
+				loggingGroupLData.right = new FormAttachment(1000, 1000, -19);
 				this.loggingGroup.setLayoutData(loggingGroupLData);
 				this.loggingGroup.setText("Debug Logging Level");
 				this.loggingGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.finest("loggingGroup.paintControl, event=" + evt);
+						SettingsDialog.log.finest("loggingGroup.paintControl, event=" + evt);
 						SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
 						if (SettingsDialog.this.settings.isGlobalLogLevel()) {
 							enableIndividualLogging(false);
@@ -345,8 +410,9 @@ public class SettingsDialog extends Dialog {
 						this.globalLogLevel.setText(" globaler Log Level");
 						this.globalLogLevel.setBounds(4, 3, 148, 21);
 						this.globalLogLevel.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("globalLogLevel.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("globalLogLevel.widgetSelected, event=" + evt);
 								if (SettingsDialog.this.globalLogLevel.getSelection()) {
 									enableIndividualLogging(false);
 									SettingsDialog.this.globalLoggingCombo.setEnabled(true);
@@ -366,8 +432,9 @@ public class SettingsDialog extends Dialog {
 						this.globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
 						this.globalLoggingCombo.setBounds(4, 28, 148, 21);
 						this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("globalLoggingCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("globalLoggingCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.this.globalLoggingCombo.getText());
 								SettingsDialog.this.globalLoggingCombo.setText(SettingsDialog.this.globalLoggingCombo.getText());
 							}
@@ -391,8 +458,9 @@ public class SettingsDialog extends Dialog {
 						this.uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						this.uiLevelCombo.setBounds(183, 3, 79, 21);
 						this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("uiLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("uiLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.this.uiLevelCombo.getText());
 							}
 						});
@@ -410,8 +478,9 @@ public class SettingsDialog extends Dialog {
 						this.deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						this.deviceLevelCombo.setBounds(183, 27, 79, 21);
 						this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("deviceLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("deviceLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.this.deviceLevelCombo.getText());
 							}
 						});
@@ -429,8 +498,9 @@ public class SettingsDialog extends Dialog {
 						this.commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						this.commonLevelCombo.setBounds(183, 51, 79, 21);
 						this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("commonLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("commonLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.this.commonLevelCombo.getText());
 							}
 						});
@@ -448,8 +518,9 @@ public class SettingsDialog extends Dialog {
 						this.configLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						this.configLevelCombo.setBounds(183, 75, 79, 21);
 						this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("configLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("configLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.this.configLevelCombo.getText());
 							}
 						});
@@ -467,9 +538,29 @@ public class SettingsDialog extends Dialog {
 						this.utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
 						this.utilsLevelCombo.setBounds(183, 99, 79, 21);
 						this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("utilsLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("utilsLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.this.utilsLevelCombo.getText());
+							}
+						});
+					}
+					{
+						this.fileIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+						RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						this.fileIOLevelLabel.setLayout(cLabel4Layout);
+						this.fileIOLevelLabel.setBounds(3, 124, 170, 20);
+						this.fileIOLevelLabel.setText("Datei I/O : ");
+					}
+					{
+						this.fileIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+						this.fileIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
+						this.fileIOLevelCombo.setBounds(183, 124, 79, 21);
+						this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								SettingsDialog.log.finest("fileIOLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.this.fileIOLevelCombo.getText());
 							}
 						});
 					}
@@ -479,15 +570,15 @@ public class SettingsDialog extends Dialog {
 
 						this.serialIOLevelLabel.setLayout(cLabel4Layout);
 						this.serialIOLevelLabel.setText("serial I/O : ");
-						this.serialIOLevelLabel.setBounds(3, 123, 170, 20);
+						this.serialIOLevelLabel.setBounds(3, 149, 170, 20);
 					}
 					{
 						this.serialIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 						this.serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
-						this.serialIOLevelCombo.setBounds(183, 123, 79, 21);
+						this.serialIOLevelCombo.setBounds(183, 149, 79, 21);
 						this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("serialIOLevelCombo.widgetSelected, event=" + evt);
+								SettingsDialog.log.finest("serialIOLevelCombo.widgetSelected, event=" + evt);
 								SettingsDialog.this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.this.serialIOLevelCombo.getText());
 							}
 						});
@@ -499,24 +590,24 @@ public class SettingsDialog extends Dialog {
 				FormData okButtonLData = new FormData();
 				okButtonLData.width = 250;
 				okButtonLData.height = 25;
-				okButtonLData.left =  new FormAttachment(0, 1000, 116);
-				okButtonLData.right =  new FormAttachment(1000, 1000, -122);
-				okButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
+				okButtonLData.left = new FormAttachment(0, 1000, 116);
+				okButtonLData.right = new FormAttachment(1000, 1000, -122);
+				okButtonLData.bottom = new FormAttachment(1000, 1000, -12);
 				this.okButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.okButton.setLayoutData(okButtonLData);
 				this.okButton.setText("OK");
 				this.okButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("okButton.widgetSelected, event=" + evt);
+						SettingsDialog.log.finest("okButton.widgetSelected, event=" + evt);
 						SettingsDialog.this.dialogShell.dispose();
 					}
 				});
 			} // end ok button
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
-			
+
 			updateAvailablePorts();
-			
+
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
@@ -561,6 +652,8 @@ public class SettingsDialog extends Dialog {
 		this.configLevelCombo.setEnabled(value);
 		this.utilsLevelLabel.setEnabled(value);
 		this.utilsLevelCombo.setEnabled(value);
+		this.fileIOLevelLabel.setEnabled(value);
+		this.fileIOLevelCombo.setEnabled(value);
 		this.serialIOLevelLabel.setEnabled(value);
 		this.serialIOLevelCombo.setEnabled(value);
 	}
@@ -598,6 +691,11 @@ public class SettingsDialog extends Dialog {
 			this.settings.setProperty(Settings.UTILS_LOG_LEVEL, "INFO");
 		}
 		this.utilsLevelCombo.setText(this.settings.getProperty(Settings.UTILS_LOG_LEVEL));
+
+		if (this.settings.getProperty(Settings.FILE_IO_LOG_LEVEL) == null) {
+			this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, "INFO");
+		}
+		this.fileIOLevelCombo.setText(this.settings.getProperty(Settings.FILE_IO_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.SERIAL_IO_LOG_LEVEL) == null) {
 			this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, "INFO");
