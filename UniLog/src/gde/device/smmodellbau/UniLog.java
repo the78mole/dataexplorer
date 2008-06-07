@@ -100,7 +100,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
 				if (timeStep_ms != 0) {
 					recordSet.setTimeStep_ms(timeStep_ms);
-					if (log.isLoggable(Level.INFO)) log.info("timeStep_ms = " + timeStep_ms);
+					if (log.isLoggable(Level.FINE)) log.info("timeStep_ms = " + timeStep_ms);
 				}
 			}
 
@@ -122,19 +122,19 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// voltageReceiver *** power/drive *** group
 		tmpValue = (((dataBuffer[7] & 0xFF) << 8) + (dataBuffer[6] & 0xFF)) & 0x0FFF;
 		points[0] = (tmpValue * 10); //0=voltageReceiver
-		if (log.isLoggable(Level.INFO)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
 
 		// voltage *** power/drive *** group
 		tmpValue = (((dataBuffer[9] & 0xFF) << 8) + (dataBuffer[8] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[1] = (tmpValue * 10); //1=voltage
-		if (log.isLoggable(Level.INFO)) sb.append("voltage [V] = " + points[1]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("voltage [V] = " + points[1]).append(lineSep);
 
 		// current *** power/drive *** group - asymmetric for 400 A sensor 
 		tmpValue = (((dataBuffer[11] & 0xFF) << 8) + (dataBuffer[10] & 0xFF));
 		tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
 		points[2] = tmpValue * 10; //2=current [A]
-		if (log.isLoggable(Level.INFO)) sb.append("current [A] = " + points[2]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("current [A] = " + points[2]).append(lineSep);
 
 		//capacity = cycleCount > 0 ? capacity + ((points[2] * timeStep_ms * 1.0) / 3600) : 0.0;
 		//points[3] = capacity.intValue(); //3=capacity [Ah]
@@ -153,7 +153,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[13] & 0xFF) << 8) + (dataBuffer[12] & 0xFF));
 		if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
 		points[7] = (tmpValue * 1000); //7=revolutionSpeed
-		if (log.isLoggable(Level.INFO)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
 
 		//double motorPower = (points[7]*100.0)/prop100WValue;
 		//double eta = points[4] > motorPower ? (motorPower*100.0)/points[4] : 0;
@@ -164,7 +164,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[15] & 0xFF) << 8) + (dataBuffer[14] & 0xFF)) + 20000;
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[9] = (tmpValue * 100); //9=height
-		if (log.isLoggable(Level.INFO)) sb.append("height [m] = " + points[9]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("height [m] = " + points[9]).append(lineSep);
 
 		points[10] = 0; //10=slope
 
@@ -173,7 +173,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[17] & 0xFF) << 8) + (dataBuffer[16] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
-		if (log.isLoggable(Level.INFO)) {
+		if (log.isLoggable(Level.FINE)) {
 			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
 			sb.append("a1Value = " + points[11]).append(lineSep);
 		}
@@ -189,7 +189,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			tmpValue = (((dataBuffer[19] & 0xFF) << 8) + (dataBuffer[18] & 0xFF));
 			points[12] = new Integer(tmpValue * 1000).intValue(); //12=a2Value
 		}
-		if (log.isLoggable(Level.INFO)) {
+		if (log.isLoggable(Level.FINE)) {
 			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
 			if (a2Modus == 0)
 				sb.append("a2Value = " + points[12]).append(lineSep);
@@ -202,7 +202,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[21] & 0xEF) << 8) + (dataBuffer[20] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
-		if (log.isLoggable(Level.INFO)) {
+		if (log.isLoggable(Level.FINE)) {
 			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
 			if (a3Modus == 0)
 				sb.append("a3Value = " + points[13]).append(lineSep);
@@ -210,7 +210,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				sb.append("tempIntern = " + points[13]).append(lineSep);
 		}
 		
-		if (log.isLoggable(Level.INFO)) log.info(sb.toString());
+		if (log.isLoggable(Level.FINE)) log.info(sb.toString());
 		return points;
 	}
 
