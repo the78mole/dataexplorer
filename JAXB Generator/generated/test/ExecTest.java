@@ -34,7 +34,7 @@ public class ExecTest {
 			
 			Marshaller marshaller = jc.createMarshaller();
 	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,  new Boolean(true));
-	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,  "DeviceProperties_V03.xsd");
+	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,  "DeviceProperties_V04.xsd");
 			
 			JAXBElement<DevicePropertiesType> elememt1 = (JAXBElement<DevicePropertiesType>)unmarshaller.unmarshal(new File (basePath + "Picolario.xml"));
 			DevicePropertiesType devProps = elememt1.getValue();
