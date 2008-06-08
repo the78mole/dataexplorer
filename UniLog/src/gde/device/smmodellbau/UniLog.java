@@ -38,6 +38,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET;
 	public final static String		NUMBER_CELLS							= "number_cells";
 	public final static String		PROP_N_100_WATT						= "prop_n100W";
+	public final static String		FIRMEWARE_VERSION					= "Firmware";
+	public final static String		SERIAL_NUMBER							= "S/N";
 
 	final OpenSerialDataExplorer	application;
 	final UniLogSerialPort				serialPort;
@@ -448,5 +450,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION, 
 				NUMBER_CELLS, PROP_N_100_WATT, 
 				CalculationThread.REGRESSION_INTERVAL_SEC, CalculationThread.REGRESSION_TYPE};
+	}
+
+	/**
+	 * enhance initial record set comment device specific
+	 * UniLog has serial number and a firmeware version
+	 * @param recordSet
+	 */
+	public void updateInitialRecordSetComment(RecordSet recordSet) {
+		recordSet.setRecordSetDescription(String.format("%s; %s : %s; %s : %s; ", 
+				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().unilogVersion));
 	}
 }
