@@ -1,0 +1,58 @@
+When you're done, please email it to <gnueval-input@gnu.org> (as plain text).
+
+* General Information
+** Do you agree to follow GNU policies?
+   If your program is accepted to be part of the GNU system, it means
+   that you become a GNU maintainer, which in turn means that you will
+   need to follow GNU policies in regards to that GNU program.  
+   (Summarized below, see maintainers document for full descriptions.)
+
+** Package name and version:
+
+** Author Full Name <Email>:
+
+** URL to home page (if any):
+
+** URL to sources (if any):
+
+** Brief description of the package:
+
+
+* Code
+** Dependencies:
+    Please list the package's dependencies (source language, libraries, etc.).
+
+** Configuration & compilation:
+    It might or might not use Autoconf/Automake, but it should meet GNU
+    Standards.  Even packages which are written in interpreted languages
+    and thus do not require compilation, such as Perl, Python, and PHP,
+    should follow these standards, so installers have a uniform way to
+    set installation directories, etc.  Please see:
+    http://www.gnu.org/prep/standards/html_node/Configuration.html
+    http://www.gnu.org/prep/standards/html_node/Makefile-Conventions.html
+
+** Documentation:
+    We recommend using Texinfo (http://www.gnu.org/software/texinfo/)
+    for documentation, and writing both reference and tutorial
+    information in the same manual.  Please see
+    http://www.gnu.org/prep/standards/html_node/GNU-Manuals.html
+
+
+* Licensing:
+   This is crucial.  Both the software itself *and all dependencies*
+   (third-party libraries, etc.) must be free software in order to be
+   included in GNU.  Documentation should be under the GFDL.
+   
+   Please see http://www.gnu.org/philosophy/license-list.html for a
+   practical guide to which licenses are free (for GNU's purposes) and
+   which are not.  Please give specific url's to any licenses involved
+   that are not listed on that page.
+
+
+* Similar projects:
+   Please explain what motivated you to write your package, and search
+   at least the Free Software Directory (http://www.gnu.org/directory/)
+   for projects similar to yours.  If any exist, please also explain
+   what the principal differences are.
+
+* Any other information, comments, or questions:
