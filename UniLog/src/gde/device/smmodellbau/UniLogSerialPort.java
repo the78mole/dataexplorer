@@ -92,9 +92,6 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				double progressFactor = 100.0 / memoryUsed;
 				log.finer("progressFactor = " + progressFactor);
 				
-				//update the config display of the dialog
-				dialog.updateConfigurationValues(readBuffer);
-
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
 
@@ -129,6 +126,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			}
 			else
 				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+			
+			log.fine("end");
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
