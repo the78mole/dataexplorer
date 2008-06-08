@@ -91,6 +91,9 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				log.finer("memoryUsed = " + memoryUsed);
 				double progressFactor = 100.0 / memoryUsed;
 				log.finer("progressFactor = " + progressFactor);
+				
+				//update the config display of the dialog
+				dialog.updateConfigurationValues(readBuffer);
 
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);

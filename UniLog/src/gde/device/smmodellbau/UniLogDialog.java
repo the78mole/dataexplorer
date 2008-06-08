@@ -1399,5 +1399,4 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		this.device.storeDeviceProperties();
 	}
-
 }
