@@ -31,6 +31,7 @@ public class LogViewReader {
 	final static OpenSerialDataExplorer		application	= OpenSerialDataExplorer.getInstance();
 	final static Channels 								channels 		= Channels.getInstance();
 	final static HashMap<String, String> 	deviceMap		=	new HashMap<String, String>();
+	final static HashMap<String, String> 	lov2osdMap	=	new HashMap<String, String>();
 	
 	// fill device Map with 
 	static {
@@ -38,7 +39,39 @@ public class LogViewReader {
 		deviceMap.put("picolario", "Picolario");
 		deviceMap.put("unilog", "UniLog");
 		// add more supported devices here, key in lower case
+		
+		// UniLog mappings
+		lov2osdMap.put(OSDE.LOV_N_100_W, 			"prop_n100W" 	 + "=_" + "INTEGER");
+		lov2osdMap.put(OSDE.LOV_NUMBER_CELLS, "number_cells" + "=_" + "INTEGER");
+		lov2osdMap.put(OSDE.LOV_RPM_ACTIVE, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A1_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A2_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A3_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_RPM_NAME, 		Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A1_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A2_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A3_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_RPM_UNIT, 		Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A1_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A2_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A3_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	"a1_"+IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A1_OFFSET, 		"a1_"+IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_OFFSET, 		"a2_"+IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_OFFSET, 		"a3_"+IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_RPM_FACTOR, 	"a1_"+IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A1_FACTOR, 		"a1_"+IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_FACTOR, 		"a2_"+IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_FACTOR, 		"a3_"+IDevice.FACTOR + "=_" + "DOUBLE");
+		//lov2osdMap.put(OSDE.LOV_CURRENT_OFFSET, value);
+		//lov2osdMap.put(OSDE.LOV_CURRENT_INVERT, value);
+		//lov2osdMap.put(OSDE.LOV_NUMBER_MOTOR, value); // handled UniLog internal
+		//lov2osdMap.put(OSDE.LOV_GEAR_FACTOR, value);	// handled UniLog internal
+
+		// add more device specific mappings
 	}
+
+	
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
@@ -61,6 +94,7 @@ public class LogViewReader {
 		HashMap<String, String> header = readHeader(data_in);
 		int channelNumber = new Integer(header.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
 		String channelType = ChannelTypes.values()[device.getChannelType(channelNumber)].name();
+		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(OSDE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelName(channelNumber);
 		if (log.isLoggable(Level.FINE)) log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")");
 		header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType);
@@ -84,7 +118,59 @@ public class LogViewReader {
 			// append record properties if any available
 			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER;
 			for (int j = 0; j < device.getNumberOfMeasurements(device.getChannelName(channelNumber)); j++) {
-				recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + Record.END_MARKER;
+				StringBuilder recordConfigData = new StringBuilder();
+				// convert record logview config data to OSDE config keys into records section
+				if (device.getName().equals("UniLog")) {
+					if (j == 6) {// 6=votagePerCell LOV_CONFIG_DATA_KEYS_UNILOG_6
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_6);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_6) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+					else if (j == 7) { // 7=revolutionSpeed LOV_CONFIG_DATA_KEYS_UNILOG_7	
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_7);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_7) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+					else if (j == 8) {// 8=efficiency LOV_CONFIG_DATA_KEYS_UNILOG_8
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_8);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_8) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+					else					if (j == 11) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_11);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_11) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+					else					if (j == 12) {//12=a2Value LOV_CONFIG_DATA_KEYS_UNILOG_12
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_12);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_12) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+					else					if (j == 13) {//13=a3Value LOV_CONFIG_DATA_KEYS_UNILOG_13
+						HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_13);
+						for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_13) {
+							if (configData.containsKey(lovKey)) {
+								recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+							}
+						}
+					}
+				}
+				recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
 			}
 			recordSetsInfo.add(getRecordSetProperties(recordSetInfo));
 		}
@@ -129,8 +215,8 @@ public class LogViewReader {
 				String [] recordKeys = recordSet.getRecordNames();
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
-					record.setSerializedProperties(recordsProperties[i]);
-					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
+					record.setSerializedProperties(recordsProperties[i]); //name, unit, symbol, active, ...
+					record.setSerializedDeviceSpecificProperties(recordsProperties[i]); // factor, offset, ...
 				}
 				
 				channel.put(recordSetName, recordSet);
@@ -169,7 +255,7 @@ public class LogViewReader {
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
-				channel.applyTemplate(recordSet.getName());
+				//channel.applyTemplate(recordSet.getName());
 				
 				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));
 			}
@@ -630,6 +716,7 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			// config block n100W, ...
+			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
@@ -640,8 +727,10 @@ public class LogViewReader {
 				int stringSize = parse2Int(buffer);
 				buffer = new byte[stringSize];
 				position += data_in.read(buffer);
+				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
+			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			position += data_in.skipBytes(8);
@@ -801,6 +890,7 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			// config block n100W, ...
+			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
@@ -811,8 +901,10 @@ public class LogViewReader {
 				int stringSize = parse2Int(buffer);
 				buffer = new byte[stringSize];
 				position += data_in.read(buffer);
+				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
+			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			//position += data_in.skipBytes(8);
@@ -994,6 +1086,7 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			// config block n100W, ...
+			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
@@ -1004,8 +1097,10 @@ public class LogViewReader {
 				int stringSize = parse2Int(buffer);
 				buffer = new byte[stringSize];
 				position += data_in.read(buffer);
+				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
+			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
 			
 			position += data_in.skipBytes(4);
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
@@ -1216,6 +1311,7 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
 			
 			// config block n100W, ...
+			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
@@ -1226,8 +1322,10 @@ public class LogViewReader {
 				int stringSize = parse2Int(buffer);
 				buffer = new byte[stringSize];
 				position += data_in.read(buffer);
+				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
+			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
 			
 			// rtf block
 			buffer = new byte[8];

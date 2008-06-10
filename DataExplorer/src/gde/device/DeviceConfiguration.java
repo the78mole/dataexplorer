@@ -504,13 +504,18 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(String channelConfigKey, String measurementKey) {
-		String tmpMeasurementKey = measurementKey.split("_")[0];
 		MeasurementType measurement = null;
-		for (MeasurementType meas : this.getChannel(channelConfigKey).getMeasurement()) {
-			if (meas.getName().equals(tmpMeasurementKey)) {
-				measurement = meas;
-				break;
+		try {
+			String tmpMeasurementKey = measurementKey.split("_")[0];
+			for (MeasurementType meas : this.getChannel(channelConfigKey).getMeasurement()) {
+				if (meas.getName().equals(tmpMeasurementKey)) {
+					measurement = meas;
+					break;
+				}
 			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, channelConfigKey + " - " + measurementKey, e);
 		}
 		return measurement;
 	}
@@ -609,12 +614,17 @@ public class DeviceConfiguration {
 	 */
 	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = null;
-		List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getProperty();
-		for (PropertyType propertyType : properties) {
-			if(propertyType.getName().equals(propertyKey)) {
-				property = propertyType;
-				break;
+		try {
+			List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey.split("_")[0]).getProperty();
+			for (PropertyType propertyType : properties) {
+				if(propertyType.getName().equals(propertyKey)) {
+					property = propertyType;
+					break;
+				}
 			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, channelConfigKey + " - " + measurementKey + " - " + propertyKey, e);
 		}
 		return property;
 	}
