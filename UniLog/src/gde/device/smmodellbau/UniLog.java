@@ -32,7 +32,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 	public final static String		A1_FACTOR									= "a1_"+IDevice.FACTOR;
 	public final static String		A1_OFFSET									= "a1_"+IDevice.OFFSET;
-	public final static String		A2_FACTOR									= "a21_"+IDevice.FACTOR;
+	public final static String		A2_FACTOR									= "a2_"+IDevice.FACTOR;
 	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET;
 	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR;
 	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET;
