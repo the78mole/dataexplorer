@@ -155,8 +155,8 @@ public class LogViewReader {
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
-				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));
 				
+				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));				
 				int dataBufferSize = device.getLovDataByteSize();
 				byte[] buffer = new byte[dataBufferSize * recordDataSize];
 				if (log.isLoggable(Level.FINE)) log.fine("data buffer size = " + buffer.length);
@@ -173,6 +173,7 @@ public class LogViewReader {
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
+				recordSet.setAllVisibleAndDisplayable();
 				channel.applyTemplate(recordSet.getName());
 				
 				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));

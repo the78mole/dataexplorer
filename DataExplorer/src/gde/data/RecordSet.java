@@ -797,11 +797,22 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * check if all records from this record set are displayable, starts calcualation if not
+	 * set all records from this record to displayable
 	 */
 	public void setAllDisplayable() {
 		for (String recordKey : this.recordNames) {
 			this.get(recordKey).setDisplayable(true);
+		}
+	}
+	
+	/**
+	 * force enable all records to be displayed, this is used for unknown data import or unknown configurations
+	 */
+	public void setAllVisibleAndDisplayable() {
+		for (String recordKey : this.recordNames) {
+			Record record = this.get(recordKey);
+			record.setVisible(record.isActive());
+			record.setDisplayable(true);
 		}
 	}
 
