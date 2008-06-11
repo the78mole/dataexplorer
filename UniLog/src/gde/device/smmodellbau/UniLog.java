@@ -3,6 +3,7 @@ package osde.device.smmodellbau;
 import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.OSDE;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
@@ -22,6 +24,7 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
 import osde.utils.QuasiLinearRegression;
+import osde.utils.StringHelper;
 
 /**
  * UniLog default device implementation, just copied from Sample project
@@ -79,6 +82,119 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 	}
 
+	/**
+	 * load the mapping exist between lov file configuration keys and OSDE keys
+	 * @param lov2osdMap reference to the map where the key mapping has to be put
+	 * @return lov2osdMap same reference as input parameter
+	 */
+	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
+				
+		lov2osdMap.put(OSDE.LOV_CURRENT_OFFSET, IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_CURRENT_INVERT, "is_invert_current");
+		
+		lov2osdMap.put(OSDE.LOV_NUMBER_CELLS, "number_cells" + "=_" + "INTEGER");
+
+		lov2osdMap.put(OSDE.LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		//lov2osdMap.put(OSDE.LOV_RPM_NAME, 		Record.NAME);
+		//lov2osdMap.put(OSDE.LOV_RPM_UNIT, 		Record.UNIT);
+		//lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE");
+		//lov2osdMap.put(OSDE.LOV_NUMBER_MOTOR, value); // handled UniLog internal
+		lov2osdMap.put(OSDE.LOV_GEAR_FACTOR, 	IDevice.FACTOR + "=_" + "INTEGER");
+		lov2osdMap.put(OSDE.LOV_N_100_W, 			"prop_n100W" 	 + "=_" + "INTEGER");
+	
+		lov2osdMap.put(OSDE.LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A3_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(OSDE.LOV_A1_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A2_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A3_NAME, 			Record.NAME);
+		lov2osdMap.put(OSDE.LOV_A1_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A2_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A3_UNIT, 			Record.UNIT);
+		lov2osdMap.put(OSDE.LOV_A1_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A1_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+
+		return lov2osdMap;
+	}
+	
+	/**
+	 * convert record logview config data to OSDE config keys into records section
+	 * @param header
+	 * @param lov2osdMap
+	 * @param channelNumber
+	 * @return
+	 */
+	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
+		String recordSetInfo = new String();
+		for (int j = 0; j < this.getNumberOfMeasurements(this.getChannelName(channelNumber)); j++) {
+			StringBuilder recordConfigData = new StringBuilder();
+			if (j == 2) {// 6=votage LOV_CONFIG_DATA_KEYS_UNILOG_2
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_2);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_2) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 6) {// 6=votagePerCell LOV_CONFIG_DATA_KEYS_UNILOG_6
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_6);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_6) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 7) { // 7=revolutionSpeed LOV_CONFIG_DATA_KEYS_UNILOG_7	
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_7);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_7) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 8) {// 8=efficiency LOV_CONFIG_DATA_KEYS_UNILOG_8
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_8);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_8) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 11) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_11);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_11) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 12) {//12=a2Value LOV_CONFIG_DATA_KEYS_UNILOG_12
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_12);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_12) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			else if (j == 13) {//13=a3Value LOV_CONFIG_DATA_KEYS_UNILOG_13
+				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_13);
+				for (String lovKey : OSDE.LOV_CONFIG_DATA_KEYS_UNILOG_13) {
+					if (configData.containsKey(lovKey)) {
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+					}
+				}
+			}
+			recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
+		}
+		
+		return recordSetInfo;
+	}
+	
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
@@ -442,7 +558,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 			for (int i = 0; i < recordRevolution.size(); i++) {
 				double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-				if (recordRevolution.get(i)> 100) log.info("recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
+				//if (recordRevolution.get(i)> 100) log.info("recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
 				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
 				record.add(new Double(eta * 1000).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));

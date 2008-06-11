@@ -17,6 +17,7 @@
 package osde.device.renschler;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,6 +76,28 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+	}
+
+	/**
+	 * load the mapping exist between lov file configuration keys and OSDE keys
+	 * @param lov2osdMap reference to the map where the key mapping has to be put
+	 * @return lov2osdMap same reference as input parameter
+	 */
+	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
+		//nothing to do here
+		return lov2osdMap;
+	}
+
+	/**
+	 * convert record logview config data to OSDE config keys into records section
+	 * @param header reference to header data, contain all key value pairs
+	 * @param lov2osdMap reference to the map where the key mapping
+	 * @param channelNumber 
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
+		return "";
 	}
 
 	/**
