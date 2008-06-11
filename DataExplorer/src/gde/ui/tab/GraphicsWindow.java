@@ -350,7 +350,7 @@ public class GraphicsWindow {
 					});
 				}
 				{
-					this.recordSetComment = new Text(this.graphicsComposite, SWT.SINGLE | SWT.LEFT);
+					this.recordSetComment = new Text(this.graphicsComposite, SWT.MULTI | SWT.LEFT);
 					this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 					this.recordSetComment.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
@@ -375,15 +375,15 @@ public class GraphicsWindow {
 
 					this.recordSetComment.addKeyListener(new KeyAdapter() {
 						public void keyPressed(KeyEvent evt) {
-							log.finest("recordSetCommentText.keyPressed, event=" + evt);
+							if(log.isLoggable(Level.FINER)) log.finer("recordSetCommentText.keyPressed, event=" + evt);
 							GraphicsWindow.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
-								if (evt.character == SWT.CR) {
+								//if (evt.character == SWT.CR || evt.character == '\0' || evt.character == '') {
 									RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 									if (recordSet != null) {
 										recordSet.setRecordSetDescription(GraphicsWindow.this.recordSetComment.getText());
 									}
-								}
+								//}
 							}
 						}
 					});
@@ -1350,7 +1350,7 @@ public class GraphicsWindow {
 	public void enableRecordSetComment(boolean enabled) {
 		if (enabled) {
 			this.commentGap = 10;
-			this.commentHeight = 20;
+			this.commentHeight = 40;
 		}
 		else {
 			this.commentGap = 0;
