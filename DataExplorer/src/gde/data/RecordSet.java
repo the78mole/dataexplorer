@@ -1342,7 +1342,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
 		this.setTableDataCalculated(false);
-		for (String recordKey : this.recordNames) {
+		for (String recordKey : this.device.getMeasurementNames(this.channelConfigName)) {
 			if (this.device.getMeasurement(this.channelConfigName, recordKey).isCalculation())
 				this.get(recordKey).resetMinMax();
 		}
