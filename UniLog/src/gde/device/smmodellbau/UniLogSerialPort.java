@@ -292,8 +292,13 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized boolean setConfiguration(byte[] updateBuffer) throws Exception {
 		boolean success = false;
+		boolean isPortOpenedByMe = false;
+		
 		try {
-			this.open();
+			if(!this.isConnected()) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
 			// check device connected
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
@@ -316,7 +321,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			throw e;
 		}
 		finally {
-			this.close();
+			if(isPortOpenedByMe)this.close();
 		}
 		return success;
 	}
