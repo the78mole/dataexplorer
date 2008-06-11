@@ -216,6 +216,8 @@ public class Channels extends HashMap<Integer, Channel> {
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
 		for (int i = 1; i <= super.size(); i++) { 
 			Channel channel = this.get(i);
+			channel.setFileName("");
+			channel.setSaved(false);
 			for (int j = 0; j < channel.size(); j++) {
 				channel.getRecordSets().clear(); // clear records
 			}
