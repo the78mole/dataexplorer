@@ -43,30 +43,31 @@ public class LogViewReader {
 		// UniLog mappings
 		lov2osdMap.put(OSDE.LOV_N_100_W, 			"prop_n100W" 	 + "=_" + "INTEGER");
 		lov2osdMap.put(OSDE.LOV_NUMBER_CELLS, "number_cells" + "=_" + "INTEGER");
+		
 		lov2osdMap.put(OSDE.LOV_RPM_ACTIVE, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
 		lov2osdMap.put(OSDE.LOV_A1_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
 		lov2osdMap.put(OSDE.LOV_A2_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
 		lov2osdMap.put(OSDE.LOV_A3_ACTIVE, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
-		lov2osdMap.put(OSDE.LOV_RPM_NAME, 		Record.NAME);
+		//lov2osdMap.put(OSDE.LOV_RPM_NAME, 		Record.NAME);
 		lov2osdMap.put(OSDE.LOV_A1_NAME, 			Record.NAME);
 		lov2osdMap.put(OSDE.LOV_A2_NAME, 			Record.NAME);
 		lov2osdMap.put(OSDE.LOV_A3_NAME, 			Record.NAME);
-		lov2osdMap.put(OSDE.LOV_RPM_UNIT, 		Record.UNIT);
+		//lov2osdMap.put(OSDE.LOV_RPM_UNIT, 		Record.UNIT);
 		lov2osdMap.put(OSDE.LOV_A1_UNIT, 			Record.UNIT);
 		lov2osdMap.put(OSDE.LOV_A2_UNIT, 			Record.UNIT);
 		lov2osdMap.put(OSDE.LOV_A3_UNIT, 			Record.UNIT);
-		lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	"a1_"+IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A1_OFFSET, 		"a1_"+IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A2_OFFSET, 		"a2_"+IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A3_OFFSET, 		"a3_"+IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_RPM_FACTOR, 	"a1_"+IDevice.FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A1_FACTOR, 		"a1_"+IDevice.FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A2_FACTOR, 		"a2_"+IDevice.FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_A3_FACTOR, 		"a3_"+IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A1_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A1_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A2_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_A3_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
 		//lov2osdMap.put(OSDE.LOV_CURRENT_OFFSET, value);
 		//lov2osdMap.put(OSDE.LOV_CURRENT_INVERT, value);
 		//lov2osdMap.put(OSDE.LOV_NUMBER_MOTOR, value); // handled UniLog internal
-		//lov2osdMap.put(OSDE.LOV_GEAR_FACTOR, value);	// handled UniLog internal
+		lov2osdMap.put(OSDE.LOV_PROPELLER_FACTOR, IDevice.FACTOR + "=_" + "INTEGER");
 
 		// add more device specific mappings
 	}

@@ -506,6 +506,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											}
 											recordSet.setRecalculationRequired();
 											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+											UniLogConfigTab.this.application.updateGraphicsWindow();
 											UniLogConfigTab.this.application.updateDataTable();
 										}
 									}

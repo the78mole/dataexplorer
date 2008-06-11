@@ -36,8 +36,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET;
 	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR;
 	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET;
+	
 	public final static String		NUMBER_CELLS							= "number_cells";
 	public final static String		PROP_N_100_WATT						= "prop_n100W";
+	
+	public final static String		IS_INVERT_CURRENT					= "is_invert_current";
+	public final static String		CURRENT_OFFSET						= IDevice.OFFSET;
+	
+	public final static String		NUMBER_MOTOR							= "number_motor";
+	public final static String		RPM_FACTOR								= IDevice.FACTOR;
+	
 	public final static String		FIRMEWARE_VERSION					= "Firmware";
 	public final static String		SERIAL_NUMBER							= "S/N";
 
@@ -222,8 +230,28 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double newValues = (record.getOffset() * 1000.0) + record.getFactor() * value;
-		// do some calculation
+		double newValues = value;
+		
+		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		PropertyType property = null;
+		if (record.getName().startsWith(measurements[2])) {//2=current [A]
+			property = record.getProperty(UniLog.CURRENT_OFFSET);
+			double currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			newValues = value + currentOffset;
+		}
+		else if (record.getName().startsWith(measurements[7])) {//7=revolutionSpeed [1/min]
+			property = record.getProperty(UniLog.RPM_FACTOR);
+			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			property = record.getProperty(UniLog.NUMBER_MOTOR);
+			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			newValues = value * rpmFactor / numberMotor;
+		}
+		else if (record.getName().startsWith(measurements[11]) 	//11=a1Value
+				|| record.getName().startsWith(measurements[12])		//12=a2Value
+				|| record.getName().startsWith(measurements[13])) {	//13=a3Value
+			newValues = (record.getOffset() * 1000.0) + record.getFactor() * value;
+		}
+		
 		return newValues;
 	}
 
@@ -233,8 +261,28 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double newValues = value / record.getFactor() - (record.getOffset() * 1000.0);
-		// do some calculation
+		double newValues = value;
+		
+		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		PropertyType property = null;
+		if (record.getName().startsWith(measurements[2])) {//2=current [A]
+			property = record.getProperty(UniLog.CURRENT_OFFSET);
+			double currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			newValues = value - currentOffset;
+		}
+		else if (record.getName().startsWith(measurements[7])) {//7=revolutionSpeed [1/min]
+			property = record.getProperty(UniLog.RPM_FACTOR);
+			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			property = record.getProperty(UniLog.NUMBER_MOTOR);
+			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			newValues = value * numberMotor / rpmFactor;
+		}
+		else if (record.getName().startsWith(measurements[11]) 	//11=a1Value
+				|| record.getName().startsWith(measurements[12])		//12=a2Value
+				|| record.getName().startsWith(measurements[13])) {	//13=a3Value
+			newValues = value / record.getFactor() - (record.getOffset() * 1000.0);
+		}
+
 		return newValues;
 	}
 
@@ -385,11 +433,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record = recordSet.get(recordKey);
 			record.clear();
 			Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
+			property = recordRevolution.getProperty(UniLog.RPM_FACTOR);
+			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			property = recordRevolution.getProperty(UniLog.NUMBER_MOTOR);
+			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
 			property = record.getProperty(UniLog.PROP_N_100_WATT);
 			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 			for (int i = 0; i < recordRevolution.size(); i++) {
-				double motorPower = Math.pow((recordRevolution.get(i) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+				double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+				if (recordRevolution.get(i)> 100) log.info("recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
 				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
 				record.add(new Double(eta * 1000).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
