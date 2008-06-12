@@ -47,6 +47,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		CURRENT_OFFSET						= IDevice.OFFSET;
 	
 	public final static String		NUMBER_MOTOR							= "number_motor";
+	public final static String		RPM2_FACTOR								= "revolution_factor";
 	public final static String		RPM_FACTOR								= IDevice.FACTOR;
 	
 	public final static String		FIRMEWARE_VERSION					= "Firmware";
@@ -89,19 +90,19 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 				
-		lov2osdMap.put(OSDE.LOV_CURRENT_OFFSET, IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(OSDE.LOV_CURRENT_INVERT, "is_invert_current");
+		lov2osdMap.put(OSDE.LOV_CURRENT_OFFSET, CURRENT_OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_CURRENT_INVERT, IS_INVERT_CURRENT	+ "=_" + "BOOLEAN");
 		
-		lov2osdMap.put(OSDE.LOV_NUMBER_CELLS, "number_cells" + "=_" + "INTEGER");
+		lov2osdMap.put(OSDE.LOV_NUMBER_CELLS, NUMBER_CELLS + "=_" + "INTEGER");
 
 		lov2osdMap.put(OSDE.LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
 		//lov2osdMap.put(OSDE.LOV_RPM_NAME, 		Record.NAME);
 		//lov2osdMap.put(OSDE.LOV_RPM_UNIT, 		Record.UNIT);
-		//lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE");
 		lov2osdMap.put(OSDE.LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE");
-		//lov2osdMap.put(OSDE.LOV_NUMBER_MOTOR, value); // handled UniLog internal
-		lov2osdMap.put(OSDE.LOV_GEAR_FACTOR, 	IDevice.FACTOR + "=_" + "INTEGER");
-		lov2osdMap.put(OSDE.LOV_N_100_W, 			"prop_n100W" 	 + "=_" + "INTEGER");
+		lov2osdMap.put(OSDE.LOV_NUMBER_MOTOR, NUMBER_MOTOR); 
+		lov2osdMap.put(OSDE.LOV_RPM2_FACTOR, 	RPM2_FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(OSDE.LOV_N_100_W, 			PROP_N_100_WATT 	 + "=_" + "INTEGER");
 	
 		lov2osdMap.put(OSDE.LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
 		lov2osdMap.put(OSDE.LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
