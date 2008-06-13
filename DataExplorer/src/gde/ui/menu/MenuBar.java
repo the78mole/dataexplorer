@@ -840,7 +840,7 @@ public class MenuBar {
 	 * @throws NotSupportedFileFormatException
 	 * @throws DeclinedException
 	 */
-	void openOsdFile(final String openFilePath) {
+	public void openOsdFile(final String openFilePath) {
 		try {
 			//check current device and switch if required
 			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OSDE.DEVICE_NAME);
