@@ -954,7 +954,7 @@ public class MenuBar {
 	 * @throws NotSupportedFileFormatException
 	 * @throws DeclinedException
 	 */
-	void openLovFile(final String openFilePath) {
+	public void openLovFile(final String openFilePath) {
 		try {
 			//check current device and switch if required
 			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
