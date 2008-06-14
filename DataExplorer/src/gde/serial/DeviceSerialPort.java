@@ -420,11 +420,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	public synchronized void close() {
-		log.info("entry");
-		this.closeThread = new Thread() { 
-			public void run() { 
-				log.info("entry");
-				if (isConnected() && DeviceSerialPort.this.serialPort != null) {
+		if (isConnected() && DeviceSerialPort.this.serialPort != null) {
+			this.closeThread = new Thread() {
+				public void run() {
+					log.info("entry");
 					try {
 						Thread.sleep(2);
 						byte[] buf = new byte[getInputStream().available()];
@@ -440,10 +439,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					if (DeviceSerialPort.this.application != null) DeviceSerialPort.this.application.setPortConnected(false);
 					log.info("exit");
 				}
-			}
-		};
-		this.closeThread.start();
-		log.info("exit, close thread started");
+			};
+			this.closeThread.start();
+		}
 	}
 
 	public InputStream getInputStream() {
