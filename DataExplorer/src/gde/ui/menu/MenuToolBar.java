@@ -539,6 +539,7 @@ public class MenuToolBar {
 											RecordSet recordSet = MenuToolBar.this.channels.getActiveChannel().get(oldRecordSetName);
 											recordSet.setName(newRecordSetName);
 											recordSet.setHeader(newRecordSetName);
+											recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 											activeChannel.put(newRecordSetName, recordSet);
 											activeChannel.remove(oldRecordSetName);
 											activeChannel.getRecordSetNames();
