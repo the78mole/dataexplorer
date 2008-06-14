@@ -1449,4 +1449,11 @@ public class RecordSet extends HashMap<String, Record> {
 		this.header = newHeader;
 		this.application.updateHeaderText(newHeader);
 	}
+
+	/**
+	 * @return the unsaveReasons
+	 */
+	public Vector<String> getUnsaveReasons() {
+		return this.unsaveReasons;
+	}
 }

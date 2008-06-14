@@ -245,8 +245,13 @@ public class Channels extends HashMap<Integer, Channel> {
 		for (int i = 1; i <= super.size(); i++) {
 			Channel channel = this.get(i);
 			for (String recordSetkey : channel.getRecordSetNames()) {
-				if (channel.get(recordSetkey)!= null && !channel.get(recordSetkey).isSaved())
-					sb.append(System.getProperty("line.separator")).append(channel.getName()).append(" -> ").append(channel.get(recordSetkey).getName());
+				if (channel.get(recordSetkey)!= null && !channel.get(recordSetkey).isSaved()) {
+					sb.append(System.getProperty("line.separator")).append(channel.getName()).append(" -> ").append(channel.get(recordSetkey).getName()).append(" (");
+					for (String reason : channel.get(recordSetkey).getUnsaveReasons()) {
+						sb.append(reason).append(", ");
+					}
+					sb.delete(sb.lastIndexOf(", "), sb.lastIndexOf(", ")+2).append(")");
+				}
 			}
 		}		
 		return sb.toString();
