@@ -23,10 +23,10 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -53,6 +53,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	Button		okBbutton;
 	CCombo		maxValueSelect;
 	CCombo		minValueSelect;
+	boolean 	isInit = false;
 	double[]	newValues	= new double[2];
 
 	/**
@@ -78,6 +79,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public double[] open(final double[] oldMinMax) {
 		try {
+			this.isInit = true;
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
@@ -95,11 +97,14 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().replace(',', '.'));
 				}
 			});
-			this.dialogShell.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent evt) {
-					log.finest("dialogShell.paintControl, event=" + evt);
-					generateAndSetSelectionValues(AxisEndValuesDialog.this.maxValueSelect, oldMinMax[1], 20);
-					generateAndSetSelectionValues(AxisEndValuesDialog.this.minValueSelect, oldMinMax[0], 20);
+			this.dialogShell.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					if (AxisEndValuesDialog.this.isInit) {
+						log.info("paintControl.paintControl, event=" + evt);
+						generateAndSetSelectionValues(AxisEndValuesDialog.this.maxValueSelect, oldMinMax[1], 20);
+						generateAndSetSelectionValues(AxisEndValuesDialog.this.minValueSelect, oldMinMax[0], 20);
+					}
+					AxisEndValuesDialog.this.isInit = false;
 				}
 			});
 			{
