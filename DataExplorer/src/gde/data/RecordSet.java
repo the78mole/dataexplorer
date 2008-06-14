@@ -733,6 +733,7 @@ public class RecordSet extends HashMap<String, Record> {
 		// add key to recordNames[] in case of TYPE_COMPARE_SET
 		if(this.isCompareSet)
 			this.addRecordName(key);
+		
 		return newRecord;
 	}
 
@@ -760,11 +761,13 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * set data unsaved with a given reason RecordSet.UNSAVED_REASON_*
-	 * @param reason
+	 * @param unsavedReason
 	 */
-	public void setUnsaved(String reason) {
+	public void setUnsaved(String unsavedReason) {
 		this.isSaved = false;
-		this.unsaveReasons.add(reason);
+		if(!this.unsaveReasons.contains(unsavedReason)) {
+			this.unsaveReasons.add(unsavedReason);
+		}
 	}
 
 	/**
