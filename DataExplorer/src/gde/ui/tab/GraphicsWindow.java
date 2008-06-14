@@ -382,6 +382,7 @@ public class GraphicsWindow {
 									RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
 									if (recordSet != null) {
 										recordSet.setRecordSetDescription(GraphicsWindow.this.recordSetComment.getText());
+										recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 									}
 								//}
 							}
