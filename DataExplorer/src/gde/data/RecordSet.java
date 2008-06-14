@@ -806,7 +806,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * force enable all records to be displayed, this is used for unknown data import or unknown configurations
+	 * force enable all records to be displayed and active if none calculation, this is used for unknown data import or unknown configurations
 	 */
 	public void setAllVisibleAndDisplayable() {
 		for (String recordKey : this.recordNames) {
@@ -814,8 +814,11 @@ public class RecordSet extends HashMap<String, Record> {
 			record.setVisible(record.isActive());
 			record.setDisplayable(true);
 		}
+		for (String recordKey : this.getNoneCalculationRecordNames()) {
+			this.get(recordKey).setActive(true);
+		}
 	}
-
+	
 	/**
 	 * @return the isFromFile, this flag indicates to call the make allInActiveDisplayable 
 	 * - the handling might be different if data captured directly from device
