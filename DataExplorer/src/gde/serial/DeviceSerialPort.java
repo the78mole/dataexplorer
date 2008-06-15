@@ -97,24 +97,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	public static Vector<String> listConfiguredSerialPorts() {
 		log.fine("entry");
+		
 		Vector<String> availablePorts = new Vector<String>(1, 1);
-		String osname = System.getProperty("os.name", "").toLowerCase();
-
-		if (osname.startsWith("windows")) {
-			// windows
-			availablePorts = getAvailablePorts(availablePorts); //COM1, COM2 -> COM20
-		}
-		else if (osname.startsWith("linux")) {
-			// linux
-			availablePorts = getAvailablePorts(availablePorts); // /dev/ttyS0, /dev/ttyS1 -> /dev/ttyS20
-			//availablePorts = getAvailablePorts(availablePorts); // /dev/ttyUSB0, /dev/ttyUSB1 -> /dev/ttyUSB10
-		}
-		else {
-			log.severe("Error, your operating system is not supported");
-			System.exit(-1);
-		}
-
+		
+		availablePorts = getAvailablePorts(availablePorts); //Windows COM1, COM2 -> COM20
+		// Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
 		availablePorts.trimToSize();
+		
 		log.fine("exit");
 		return availablePorts;
 	}
