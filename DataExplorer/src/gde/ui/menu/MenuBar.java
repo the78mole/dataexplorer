@@ -553,7 +553,8 @@ public class MenuBar {
 							MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName());
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
-								MenuBar.this.channels.getActiveChannel().applyTemplate(activeChannel.getActiveRecordSet().getName());
+								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName());
+								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							}
 						}
 					});
