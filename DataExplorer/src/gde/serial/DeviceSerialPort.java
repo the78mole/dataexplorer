@@ -17,7 +17,6 @@
 package osde.serial;
 
 import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
@@ -25,6 +24,7 @@ import gnu.io.SerialPortEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -96,17 +96,18 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	public static Vector<String> listConfiguredSerialPorts() {
+		log.fine("entry");
 		Vector<String> availablePorts = new Vector<String>(1, 1);
 		String osname = System.getProperty("os.name", "").toLowerCase();
 
 		if (osname.startsWith("windows")) {
 			// windows
-			availablePorts = getAvailablePorts(availablePorts, "COM", 1, 20); //COM1, COM2 -> COM20
+			availablePorts = getAvailablePorts(availablePorts); //COM1, COM2 -> COM20
 		}
 		else if (osname.startsWith("linux")) {
 			// linux
-			availablePorts = getAvailablePorts(availablePorts, "/dev/ttyS", 0, 20); // /dev/ttyS0, /dev/ttyS1 -> /dev/ttyS20
-			availablePorts = getAvailablePorts(availablePorts, "/dev/ttyUSB", 0, 10); // /dev/ttyUSB0, /dev/ttyUSB1 -> /dev/ttyUSB10
+			availablePorts = getAvailablePorts(availablePorts); // /dev/ttyS0, /dev/ttyS1 -> /dev/ttyS20
+			//availablePorts = getAvailablePorts(availablePorts); // /dev/ttyUSB0, /dev/ttyUSB1 -> /dev/ttyUSB10
 		}
 		else {
 			log.severe("Error, your operating system is not supported");
@@ -114,29 +115,24 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		}
 
 		availablePorts.trimToSize();
+		log.fine("exit");
 		return availablePorts;
 	}
 
 	/**
 	 * find the serial ports using the given string prefix
 	 * @param availablePorts
-	 * @param serialPortPrefix
-	 * @param startIndex
-	 * @param searchCounter
 	 */
-	private static Vector<String> getAvailablePorts(Vector<String> availablePorts, String serialPortPrefix, int startIndex, int searchCounter) {
+	private static Vector<String> getAvailablePorts(Vector<String> availablePorts) {
 		String serialPortStr;
-		int index = startIndex;
-		CommPortIdentifier.getPortIdentifiers(); // initializes serial port
+		Enumeration<CommPortIdentifier> enumIdentifiers = CommPortIdentifier.getPortIdentifiers(); // initializes serial port
 		// find all available serial ports
-		for (; index < searchCounter; index++) {
-			serialPortStr = serialPortPrefix + index;
-			CommPortIdentifier tmpPortId;
-			try {
-				tmpPortId = CommPortIdentifier.getPortIdentifier(serialPortStr);
-				if (tmpPortId.getPortType() == CommPortIdentifier.PORT_SERIAL && !tmpPortId.isCurrentlyOwned()) {
+		while (enumIdentifiers.hasMoreElements()) {
+			CommPortIdentifier commPortIdentifier = (CommPortIdentifier) enumIdentifiers.nextElement();
+				if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
+					serialPortStr = commPortIdentifier.getName();
 					try {
-						((SerialPort) tmpPortId.open("OpenSerialDataExplorer", 2000)).close();
+						((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close();
 						availablePorts.add(serialPortStr);
 						log.fine("Found port: " + serialPortStr);
 					}
@@ -144,10 +140,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						log.fine("Found port, but can't open: " + serialPortStr);
 					}
 				}
-			}
-			catch (NoSuchPortException e) {
-				// ignore
-			}
 		}
 		return availablePorts;
 	}
