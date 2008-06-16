@@ -95,6 +95,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		this.application = currentApplication;
 	}
 
+	/**
+	 * @return a vector with actual available ports at the system
+	 */
 	public static Vector<String> listConfiguredSerialPorts() {
 		log.fine("entry");
 		
@@ -121,14 +124,23 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 					serialPortStr = commPortIdentifier.getName();
 					try {
-						((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close();
+						if(Settings.getInstance().doPortAvailabilityCheck()) {
+							((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close();
+						}
 						availablePorts.add(serialPortStr);
-						log.fine("Found port: " + serialPortStr);
+						if (log.isLoggable(Level.FINER)) log.finer("Found available port: " + serialPortStr);
 					}
 					catch (Exception e) {
-						log.fine("Found port, but can't open: " + serialPortStr);
+						if (log.isLoggable(Level.FINER)) log.finer("Found port, but can't open: " + serialPortStr);
 					}
 				}
+		}
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder().append("Available serial Ports : ");
+			for (String comPort : availablePorts) {
+				sb.append(comPort).append(" ");
+			}
+			log.fine(sb.toString());
 		}
 		return availablePorts;
 	}
