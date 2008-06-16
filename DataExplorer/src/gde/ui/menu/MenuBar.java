@@ -810,7 +810,6 @@ public class MenuBar {
 	/**
 	 * handles the file dialog od OpenSerialData file
 	 * @param dialogName
-	 * @param isRaw
 	 */
 	public void openOsdFileDialog(final String dialogName) {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {

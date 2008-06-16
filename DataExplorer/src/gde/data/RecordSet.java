@@ -1354,7 +1354,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * @param newRecalculationValue the isRecalculation to set
+	 * set if a recalculation of depending calculated records are required
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;

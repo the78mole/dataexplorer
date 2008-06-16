@@ -122,8 +122,8 @@ public class StringHelper {
 
 	/**
 	 * remove blanks within a string
-	 * @param deviceName
-	 * @return
+	 * @param inputString
+	 * @return cleaned string
 	 */
 	public static String removeBlanks(String inputString) {
 		String[] tmpDev = inputString.split(" ");
