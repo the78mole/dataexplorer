@@ -137,4 +137,11 @@ public class GraphicsTemplate extends Properties {
 		return this.currentFileFilePath;
 	}
 
+	/**
+	 * @return the default filename for the current device and channel configuration number
+	 */
+	public String getDefaultFileName() {
+		return this.defaultFileName;
+	}
+
 }

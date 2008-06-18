@@ -448,6 +448,10 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	public String getFileName() {
+		return this.fileName!= null ? this.fileName.substring(this.fileName.lastIndexOf("/")+1) : null;
+	}
+
+	public String getFullQualifiedFileName() {
 		return this.fileName;
 	}
 
