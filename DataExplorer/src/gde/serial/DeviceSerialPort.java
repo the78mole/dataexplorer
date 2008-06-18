@@ -115,12 +115,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * find the serial ports using the given string prefix
 	 * @param availablePorts
 	 */
+	@SuppressWarnings("unchecked")
 	private static Vector<String> getAvailablePorts(Vector<String> availablePorts) {
 		String serialPortStr;
 		Enumeration<CommPortIdentifier> enumIdentifiers = CommPortIdentifier.getPortIdentifiers(); // initializes serial port
 		// find all available serial ports
 		while (enumIdentifiers.hasMoreElements()) {
-			CommPortIdentifier commPortIdentifier = (CommPortIdentifier) enumIdentifiers.nextElement();
+			CommPortIdentifier commPortIdentifier = enumIdentifiers.nextElement();
 				if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 					serialPortStr = commPortIdentifier.getName();
 					try {
@@ -497,5 +498,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public void setConnected(boolean enabled) {
 		this.isConnected = enabled;
+	}
+
+	public int getNumBytesAvailable() {
+		return this.numBytesAvailable;
 	}
 }
