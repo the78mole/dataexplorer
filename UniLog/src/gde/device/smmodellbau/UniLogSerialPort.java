@@ -8,10 +8,13 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 import osde.device.DeviceConfiguration;
 import osde.exception.CheckSumMissmatchException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.SWTResourceManager;
 import osde.utils.Checksum;
 
 /**
@@ -35,9 +38,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
 	final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
 
-	@SuppressWarnings("unused")
 	final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
-	@SuppressWarnings("unused")
 	final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
 	
 	final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
@@ -108,7 +109,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						telegrams.add(readBuffer);
 					}
 					else {
-						dataCollection.put(""+numberRecordSet, telegrams.clone());
+						//telegrams.size() > 4 min + max + 2 data points
+						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone());
 						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
 					}
@@ -122,7 +124,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						break;
 					}
 				}
-				dataCollection.put(""+numberRecordSet, telegrams.clone());
+				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone());
 			}
 			else
 				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
@@ -169,32 +171,60 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	}
 	
 	/**
+	 * wait while UniLog answers with data by a given retry count, the wait time between retries is 250 ms
+	 * @param retrys number time 250 ms is maximum time
+	 * @return true, if data can received after the adjusted time period
+	 * @throws Exception
+	 */
+	public synchronized boolean wait4LifeData(int retrys) throws Exception {
+		boolean isLifeDataAvailable = false;
+		if (this.isConnected()) {
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+			while (this.getNumBytesAvailable() < 10 && retrys-- > 0) {
+				this.write(COMMAND_LIVE_VALUES);
+				Thread.sleep(250);
+				log.fine("retryLimit = " + retrys);
+			}
+			// read data bytes to clear buffer
+			this.read(DATA_LENGTH_BYTES, 1);
+			isLifeDataAvailable = true;
+			
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		}
+		else
+			throw new Exception("Der serialle Port ist nicht geöffnet!");
+		
+		return isLifeDataAvailable;
+	}
+	
+	/**
 	 * enable live data view, timer loop must gather the data which also handles open/close operations
 	 * @return byte array with red data
 	 * @throws Exception
 	 */
 	public synchronized byte[] queryLiveData() throws Exception {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
-		try {
-			if (this.isConnected()) {
+		
+		if (this.isConnected()) {
+			try {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
-				
+				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
-					this.write(COMMAND_REPEAT);
-					readBuffer = this.read(DATA_LENGTH_BYTES, 2);
+					this.write(COMMAND_LIVE_VALUES);
+					readBuffer = this.read(DATA_LENGTH_BYTES, 1);
 					verifyChecksum(readBuffer); // throws exception if checksum miss match
 				}
 			}
-			else
-				throw new Exception("Der serialle Port ist nicht geöffnet!");
+			catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
+			}
 		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			this.close();
-			throw e;
-		}
+		else
+			throw new Exception("Der serialle Port ist nicht geöffnet!");
+
 		return readBuffer;
 	}
 	
@@ -303,7 +333,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
 				if (this.checkDataReady()) {
-					//this.write(COMMAND_PREPARE_SET_CONFIG);
+					this.write(COMMAND_PREPARE_SET_CONFIG);
 
 					this.write(updateBuffer);
 					byte[] readBuffer = this.read(1, 2);
@@ -413,15 +443,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized boolean waitDataReady() throws Exception {
 		boolean isReady = false;
-		int retryCount = 10;
 		
-		while (!isReady && retryCount-- > 0) {
-			this.write(COMMAND_QUERY_STATE); 
-			byte[] buffer = this.read(1, 2);
-			if (buffer[0] == DATA_STATE_READY) { 
-				isReady = true;
-			}
-		}
+		isReady = this.checkConnectionStatus();
+		isReady = this.checkDataReady();
+
 		return isReady;
 	}
 
@@ -459,14 +484,14 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	}
 
 	/**
-	 * @param isFinished the isTransmitFinished to set
+	 * @param isFinished the isTransmitFinished to set, used within getData only
 	 */
 	public void setTransmitFinished(boolean isFinished) {
 		this.isTransmitFinished = isFinished;
 	}
 
 	/**
-	 * @return the isTransmitFinished
+	 * @return the isTransmitFinished, used within getData only
 	 */
 	public boolean isTransmitFinished() {
 		return this.isTransmitFinished;
