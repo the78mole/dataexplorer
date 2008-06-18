@@ -55,6 +55,7 @@ import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsWindow;
 import osde.utils.FileUtils;
+import osde.utils.StringHelper;
 
 /**
  * menu bar implementation class for the OpenSerialDataExplorer
@@ -80,7 +81,7 @@ public class MenuBar {
 	Menu													viewMenu;
 	MenuItem											viewMenuItem;
 	Menu													graphicsMenu;
-	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
 	MenuItem											csvExportMenuItem1, csvExportMenuItem2;
 	MenuItem											nextDeviceMenuItem;
 	MenuItem											prevDeviceMenuItem;
@@ -522,19 +523,21 @@ public class MenuBar {
 					});
 				}
 				{
-					this.saveGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.saveGraphicsTemplateItem.setText("Graphikvorlage sichern unter..");
-					this.saveGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+					this.saveAsGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
+					this.saveAsGraphicsTemplateItem.setText("Graphikvorlage sichern unter..");
+					this.saveAsGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt);
 							MenuBar.log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath());
-							FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
-									.getGraphicsTemplatePath());
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
-							GraphicsTemplate template = activeChannel.getTemplate();
-							MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName());
-							template.setNewFileName(fileDialog.getFileName());
-							activeChannel.saveTemplate();
+							if (activeChannel != null) {
+								GraphicsTemplate template = activeChannel.getTemplate();
+								FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog("Sichere GraphicsTemplate", new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance()
+										.getGraphicsTemplatePath(), template.getDefaultFileName());
+								MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName());
+								template.setNewFileName(fileDialog.getFileName());
+								activeChannel.saveTemplate();
+							}
 						}
 					});
 				}
@@ -781,7 +784,7 @@ public class MenuBar {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
 		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
-		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path);
+		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.csv" }, path, getFileNameProposal());
 		String recordSetKey = activeRecordSet.getName();
 		final String csvFilePath = csvFileDialog.getFilterPath() + this.fileSep + csvFileDialog.getFileName();
 
@@ -805,6 +808,20 @@ public class MenuBar {
 			};
 			this.readerWriterThread.start();
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	String getFileNameProposal() {
+		String fileName = "";
+		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
+			fileName = StringHelper.getDate() + "_";
+		}
+		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
+			fileName = fileName + Channels.getInstance().getActiveChannel().getActiveRecordSet().getObjectKey() + "_";
+		}
+		return fileName;
 	}
 
 	/**
@@ -910,16 +927,16 @@ public class MenuBar {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
 		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
-		if (fileName == null || fileName.length() < 5) {
-			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path);
+		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
+			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path, getFileNameProposal());
 			filePath = fileDialog.getFilterPath() + this.fileSep + fileDialog.getFileName();
 		}
 		else {
 			filePath = path + fileName; // including ending ".osd"
 		}
 
-		if (filePath.length() > 4) { // file name has a reasonable length
-			while (filePath.endsWith(".osd") || filePath.endsWith(".OSD")){
+		if (filePath.length() > 4 && !filePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
+			while (filePath.toLowerCase().endsWith(".osd") || filePath.toLowerCase().endsWith(".lov")){
 				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
 			}
 			filePath = (filePath + ".osd").replace("\\", "/");
@@ -941,7 +958,7 @@ public class MenuBar {
 			};
 			this.readerWriterThread.start();
 			updateSubHistoryMenuItem(filePath);
-			activeChannel.setFileName(filePath.substring(filePath.lastIndexOf(this.fileSep)+1));
+			activeChannel.setFileName(filePath.replace('\\', '/'));
 			activeChannel.setSaved(true);
 		}
 	}
