@@ -779,7 +779,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setText("Start Daten auslesen");
 									this.readDataButton.setBounds(11, 40, 260, 30);
-									this.readDataButton.setEnabled(false);
+									this.readDataButton.setEnabled(true);
 									this.readDataButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("readDataButton.widgetSelected, event=" + evt);
@@ -861,21 +861,22 @@ public class UniLogDialog extends DeviceDialog {
 									this.startLiveGatherButton.setText("Start live Datenabfrage");
 									this.startLiveGatherButton.setBounds(16, 26, 246, 30);
 									this.startLiveGatherButton.setSize(260, 30);
-									this.startLiveGatherButton.setEnabled(false);
+									this.startLiveGatherButton.setEnabled(true);
 									this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
 											UniLogDialog.log.fine("liveViewButton.widgetSelected, event=" + evt);
 											try {
 												String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText();
-												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName);
-												UniLogDialog.this.liveRecordName = UniLogDialog.this.liveThread.startTimerThread();
 												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
+												UniLogDialog.this.readDataButton.setEnabled(false);
 												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
 												UniLogDialog.this.setClosePossible(false);
+												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
+												UniLogDialog.this.liveRecordName = UniLogDialog.this.liveThread.startTimerThread();
 											}
 											catch (Exception e) {
-												UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
 												UniLogDialog.this.application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+												UniLogDialog.this.resetButtons();
 											}
 										}
 									});
@@ -889,7 +890,7 @@ public class UniLogDialog extends DeviceDialog {
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setText("Start");
 										this.startLoggingButton.setBounds(12, 27, 100, 30);
-										this.startLoggingButton.setEnabled(false);
+										this.startLoggingButton.setEnabled(true);
 										this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
 											public void widgetSelected(SelectionEvent evt) {
 												UniLogDialog.log.fine("startLoggingButton.widgetSelected, event=" + evt);
@@ -920,6 +921,9 @@ public class UniLogDialog extends DeviceDialog {
 													UniLogDialog.this.startLoggingButton.setEnabled(true);
 													UniLogDialog.this.stopLoggingButton.setEnabled(false);
 													UniLogDialog.this.setClosePossible(true);
+													if(!UniLogDialog.this.stopLiveGatherButton.getEnabled()) {
+														UniLogDialog.this.readDataButton.setEnabled(true);
+													}
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
@@ -946,6 +950,9 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
 											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
 											UniLogDialog.this.setClosePossible(true);
+											if(!UniLogDialog.this.stopLoggingButton.getEnabled()) {
+												UniLogDialog.this.readDataButton.setEnabled(true);
+											}
 										}
 									});
 								}
@@ -1322,26 +1329,36 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.readDataButton.setEnabled(false);
 			this.editConfigButton.setEnabled(false);
-			this.stopDataButton.setEnabled(false);
-			this.startLoggingButton.setEnabled(false);
-			this.stopLoggingButton.setEnabled(false);
 			this.useConfigCombo.setEnabled(true);
-			this.startLiveGatherButton.setEnabled(false);
+			
+			this.readDataButton.setEnabled(true);
+			this.stopDataButton.setEnabled(false);
+			
+			this.startLoggingButton.setEnabled(true);
+			this.stopLoggingButton.setEnabled(false);
+			
+			this.startLiveGatherButton.setEnabled(true);
+			this.stopLiveGatherButton.setEnabled(false);
+			
 			this.clearMemoryButton.setEnabled(true);
-			this.isClosePossible = true;
+			this.setClosePossible(true);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					UniLogDialog.this.readDataButton.setEnabled(false);
 					UniLogDialog.this.editConfigButton.setEnabled(false);
-					UniLogDialog.this.stopDataButton.setEnabled(false);
-					UniLogDialog.this.startLoggingButton.setEnabled(false);
-					UniLogDialog.this.stopLoggingButton.setEnabled(false);
 					UniLogDialog.this.useConfigCombo.setEnabled(true);
-					UniLogDialog.this.startLiveGatherButton.setEnabled(false);
+					
+					UniLogDialog.this.readDataButton.setEnabled(true);
+					UniLogDialog.this.stopDataButton.setEnabled(false);
+					
+					UniLogDialog.this.startLoggingButton.setEnabled(true);
+					UniLogDialog.this.stopLoggingButton.setEnabled(false);
+					
+					UniLogDialog.this.startLiveGatherButton.setEnabled(true);
+					UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
+					
 					UniLogDialog.this.clearMemoryButton.setEnabled(true);
 					UniLogDialog.this.setClosePossible(true);
 				}
