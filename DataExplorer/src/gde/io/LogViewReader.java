@@ -131,7 +131,7 @@ public class LogViewReader {
 
 				//apply record sets records properties
 				String [] recordKeys = recordSet.getRecordNames();
-				for (int i = 0; i < recordKeys.length; ++i) {
+				for (int i = 0; i < recordsProperties.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
 					record.setSerializedProperties(recordsProperties[i]); //name, unit, symbol, active, ...
 					record.setSerializedDeviceSpecificProperties(recordsProperties[i]); // factor, offset, ...
