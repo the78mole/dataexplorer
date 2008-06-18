@@ -104,7 +104,7 @@ public class GraphicsWindow {
 	int														headerGap								= 0;
 	int														commentHeight						= 0;
 	int														commentGap							= 0;
-	RecordSet											oldRecordSetHeader, oldRecordSetComment;
+	String												oldRecordSetHeader, oldRecordSetComment;
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -142,7 +142,7 @@ public class GraphicsWindow {
 	boolean												isLeftCutMode						= false;
 	boolean												isRightCutMode					= false;
 	int														xPosCut									= 0;
-
+	
 	public GraphicsWindow(TabFolder currentDisplayTab, int currentType, String useName) {
 		this.displayTab = currentDisplayTab;
 		this.type = currentType;
@@ -299,10 +299,10 @@ public class GraphicsWindow {
 							GraphicsWindow.log.finest("recordSetHeader.paintControl, event=" + evt);
 							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
-								if (recordSet != null && (GraphicsWindow.this.oldRecordSetHeader == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetHeader.getName()))) {
+								if (recordSet != null && (GraphicsWindow.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsWindow.this.oldRecordSetHeader))) {
 									GraphicsWindow.this.recordSetHeader.setText(recordSet.getHeader());
+									GraphicsWindow.this.oldRecordSetHeader = recordSet.getHeader();
 								}
-								GraphicsWindow.this.oldRecordSetHeader = recordSet;
 							}
 						}
 					});
@@ -359,10 +359,10 @@ public class GraphicsWindow {
 
 							if (GraphicsWindow.this.channels.getActiveChannel() != null) {
 								RecordSet recordSet = GraphicsWindow.this.channels.getActiveChannel().getActiveRecordSet();
-								if (recordSet != null && (GraphicsWindow.this.oldRecordSetComment == null || !recordSet.getName().equals(GraphicsWindow.this.oldRecordSetComment.getName()))) {
+								if (recordSet != null && (GraphicsWindow.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsWindow.this.oldRecordSetComment))) {
 									GraphicsWindow.this.recordSetComment.setText(recordSet.getRecordSetDescription());
+									GraphicsWindow.this.oldRecordSetComment = recordSet.getRecordSetDescription();
 								}
-								GraphicsWindow.this.oldRecordSetComment = recordSet;
 							}
 						}
 					});
@@ -397,8 +397,8 @@ public class GraphicsWindow {
 	 * this method is called in case of an paint event (redraw) and draw the containing records 
 	 * @param evt
 	 */
-	void drawAreaPaintControl(PaintEvent evt) {
-		GraphicsWindow.log.finest("drawAreaPaintControl.paintControl, event=" + evt);
+	synchronized void drawAreaPaintControl(PaintEvent evt) {
+		GraphicsWindow.log.finer("drawAreaPaintControl.paintControl, event=" + evt);
 		// Get the canvas and its dimensions
 		Canvas canvas = (Canvas) evt.widget;
 		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + this.type);
@@ -406,7 +406,7 @@ public class GraphicsWindow {
 		Point canvasSize = canvas.getSize();
 		int maxX = canvasSize.x - 5; // enable a small gap if no axis is shown 
 		int maxY = canvasSize.y;
-		GraphicsWindow.log.fine("canvas size = " + maxX + " x " + maxY);
+		GraphicsWindow.log.finer("canvas size = " + maxX + " x " + maxY);
 
 		RecordSet recordSet = null;
 		switch (this.type) {
@@ -1147,7 +1147,7 @@ public class GraphicsWindow {
 							this.xLast = evt.x;
 							this.yLast = evt.y;
 						}
-						else if (this.isLeftCutMode) { //TODO
+						else if (this.isLeftCutMode) { 
 							// clear old cut area
 							if (evt.x < this.xPosCut) {
 								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
