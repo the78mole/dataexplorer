@@ -475,7 +475,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.info("switch " + record.getName() + " to " + measurement.isActive());
+				log.fine("switch " + record.getName() + " to " + measurement.isActive());
 			}	
 		}
 		
@@ -499,8 +499,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// updateHeightDependent
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		recordSet.get(recordSet.getRecordNames()[10]).setDisplayable(recordSet.get(recordSet.getRecordNames()[9]).isActive());
-					
-		this.application.updateGraphicsWindow();
 	}
 	
 	/**
@@ -677,7 +675,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 */
 	public void updateInitialRecordSetComment(RecordSet recordSet) {
-		recordSet.setRecordSetDescription(String.format("%s; %s : %s; %s : %s; ", 
+		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ", 
 				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().unilogVersion));
 	}
 }
