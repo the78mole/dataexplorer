@@ -402,36 +402,34 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("numCellInput.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
-									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
-									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
-									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
-									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (recordSet != null) {
-											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
-											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
-											if (property != null) {
-												property.setValue(UniLogConfigTab.this.prop100WValue);
-											}
-											else {
-												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
-											}
-											// update number cells too, if user has changed, but not hit enter 
-											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
-											property = record.getProperty(UniLog.NUMBER_CELLS);
-											if (property != null) {
-												property.setValue(UniLogConfigTab.this.numCellValue);
-											}
-											else {
-												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
-											}
-											recordSet.setRecalculationRequired();
-											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
-											UniLogConfigTab.this.application.updateDataTable();
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+								UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
+								UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+								UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
+								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
+									RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
+									if (recordSet != null) {
+										Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+										PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
+										if (property != null) {
+											property.setValue(UniLogConfigTab.this.prop100WValue);
 										}
+										else {
+											record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+										}
+										// update number cells too, if user has changed, but not hit enter 
+										record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+										property = record.getProperty(UniLog.NUMBER_CELLS);
+										if (property != null) {
+											property.setValue(UniLogConfigTab.this.numCellValue);
+										}
+										else {
+											record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
+										}
+										recordSet.setRecalculationRequired();
+										UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+										UniLogConfigTab.this.application.updateDataTable();
 									}
 								}
 							}
@@ -478,37 +476,35 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("prop100WInput.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									UniLogConfigTab.this.setConfigButton.setEnabled(true);
-									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
-									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
-									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
-									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
-									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-										if (recordSet != null) {
-											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
-											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
-											if (property != null) {
-												property.setValue(UniLogConfigTab.this.prop100WValue);
-											}
-											else {
-												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
-											}
-											// update number cells too, if user has changed, but not hit enter 
-											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
-											property = record.getProperty(UniLog.NUMBER_CELLS);
-											if (property != null) {
-												property.setValue(UniLogConfigTab.this.numCellValue);
-											}
-											else {
-												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
-											}
-											recordSet.setRecalculationRequired();
-											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
-											UniLogConfigTab.this.application.updateGraphicsWindow();
-											UniLogConfigTab.this.application.updateDataTable();
+								UniLogConfigTab.this.setConfigButton.setEnabled(true);
+								UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+								UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
+								UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+								UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
+								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
+									RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
+									if (recordSet != null) {
+										Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+										PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
+										if (property != null) {
+											property.setValue(UniLogConfigTab.this.prop100WValue);
 										}
+										else {
+											record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+										}
+										// update number cells too, if user has changed, but not hit enter 
+										record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+										property = record.getProperty(UniLog.NUMBER_CELLS);
+										if (property != null) {
+											property.setValue(UniLogConfigTab.this.numCellValue);
+										}
+										else {
+											record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
+										}
+										recordSet.setRecalculationRequired();
+										UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+										UniLogConfigTab.this.application.updateGraphicsWindow();
+										UniLogConfigTab.this.application.updateDataTable();
 									}
 								}
 							}
@@ -726,9 +722,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -739,9 +733,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -751,9 +743,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -763,9 +753,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -787,9 +775,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -800,9 +786,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -812,9 +796,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -824,9 +806,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -848,9 +828,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Text.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -861,9 +839,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -873,9 +849,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
@@ -885,9 +859,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt);
-								if (evt.character == SWT.CR) {
-									checkUpdateAnalog();
-								}
+								checkUpdateAnalog();
 							}
 						});
 					}
