@@ -436,7 +436,7 @@ public class MenuToolBar {
 						this.channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/eine Konfiguration aus der angezeigt werden soll");
 						RowData channelSelectComboLData = new RowData();
 						channelSelectComboLData.width = 140;
-						channelSelectComboLData.height = 18;
+						channelSelectComboLData.height = 17;
 						this.channelSelectCombo.setLayoutData(channelSelectComboLData);
 						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -493,6 +493,7 @@ public class MenuToolBar {
 						}
 					}
 					this.channelToolBar.pack();
+					MenuToolBar.log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize());
 					{
 						RowData composite2LData = new RowData();
 						composite2LData.width = 250;
@@ -506,11 +507,11 @@ public class MenuToolBar {
 							FormLayout aufnahmeComboLayout = new FormLayout();
 							this.recordSelectCombo.setLayout(aufnahmeComboLayout);
 							this.recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
-							this.recordSelectCombo.setToolTipText("Wählen Sie einen Datensatz aus, der angezeigt werden soll");
+							this.recordSelectCombo.setToolTipText("Datensatz auswählen, der angezeigt werden soll");
 							this.recordSelectCombo.setTextLimit(30);
 							RowData recordSelectComboLData = new RowData();
 							recordSelectComboLData.width = 240;
-							recordSelectComboLData.height = 18;
+							recordSelectComboLData.height = 17;
 							this.recordSelectCombo.setLayoutData(recordSelectComboLData);
 							this.recordSelectCombo.setEditable(false);
 							this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -550,6 +551,7 @@ public class MenuToolBar {
 							});
 						}
 						this.recordSelectComposite.pack();
+						MenuToolBar.log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize());
 					}
 					{
 						this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
@@ -595,6 +597,7 @@ public class MenuToolBar {
 							});
 						}
 						this.recordToolBar.pack();
+						MenuToolBar.log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize());
 					}
 					{
 						this.separator = new ToolItem(this.recordToolBar, SWT.SEPARATOR);
@@ -646,13 +649,14 @@ public class MenuToolBar {
 						});
 					}
 					this.channelSelectComposite.pack();
+					MenuToolBar.log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize());
 				}
 			}
 			this.dataBarComposite.pack();
-			int height = this.size.y + 2;
+			//int height = this.size.y + 2;
 			this.size = this.dataBarComposite.getSize();
 			MenuToolBar.log.fine("pre dataBarComposite.size = " + this.size);
-			this.dataBarComposite.setSize(this.size.x, height);
+			//this.dataBarComposite.setSize(this.size.x, height);
 			this.size = this.dataBarComposite.getSize();
 			MenuToolBar.log.fine("post dataBarComposite.size = " + this.size);
 			this.dataCoolItem.setSize(this.size);
