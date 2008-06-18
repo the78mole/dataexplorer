@@ -85,7 +85,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (this.waitDataReady()) {
 				// query configuration to have actual values -> get number of entries to calculate percentage and progress bar
 				this.write(COMMAND_QUERY_CONFIG);
-				readBuffer = this.read(DATA_LENGTH_BYTES, 1);
+				readBuffer = this.read(DATA_LENGTH_BYTES, 2);
 				verifyChecksum(readBuffer);
 				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 				log.finer("memoryUsed = " + memoryUsed);
@@ -108,8 +108,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						telegrams.add(readBuffer);
 					}
 					else {
-						dataCollection.put(""+numberRecordSet, telegrams);
-						++numberRecordSet;
+						dataCollection.put(""+numberRecordSet, telegrams.clone());
+						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
 					}
 
@@ -122,7 +122,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						break;
 					}
 				}
-				dataCollection.put(""+numberRecordSet, telegrams);
+				dataCollection.put(""+numberRecordSet, telegrams.clone());
 			}
 			else
 				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
