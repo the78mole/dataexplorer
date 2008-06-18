@@ -132,7 +132,6 @@ public class UniLogDialog extends DeviceDialog {
 	final UniLog									device;											// get device specific things, get serial port, ...
 	DataGathererThread						gatherThread;
 	LiveGathererThread						liveThread;
-	String												liveRecordName;
 	UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 
 	String												statusText								= "";
@@ -225,7 +224,9 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							// check threads before close
 							if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) UniLogDialog.this.gatherThread.interrupt();
-							if (UniLogDialog.this.liveThread != null && UniLogDialog.this.liveThread.isAlive()) UniLogDialog.this.liveThread.interrupt();
+							if (UniLogDialog.this.liveThread != null && UniLogDialog.this.liveThread.isTimerRunning) {
+								UniLogDialog.this.liveThread.stopTimerThread();
+							}
 						}
 					}
 				});
@@ -872,9 +873,14 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
 												UniLogDialog.this.setClosePossible(false);
 												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
-												UniLogDialog.this.liveRecordName = UniLogDialog.this.liveThread.startTimerThread();
+												UniLogDialog.this.liveThread.start();
 											}
 											catch (Exception e) {
+												if (UniLogDialog.this.liveThread != null && UniLogDialog.this.liveThread.isTimerRunning) {
+													UniLogDialog.this.liveThread.stopTimerThread();
+													UniLogDialog.this.liveThread.interrupt();
+												}
+												UniLogDialog.this.application.updateGraphicsWindow();
 												UniLogDialog.this.application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 												UniLogDialog.this.resetButtons();
 											}
@@ -945,7 +951,13 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.fine("stopLiveGatherButton.widgetSelected, event=" + evt);
 											if (UniLogDialog.this.liveThread != null) {
 												UniLogDialog.this.liveThread.stopTimerThread();
-												UniLogDialog.this.liveThread.finalizeRecordSet(UniLogDialog.this.liveRecordName);
+												UniLogDialog.this.liveThread.interrupt();
+												
+												if (Channels.getInstance().getActiveChannel() != null) {
+														RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+														// active record set name == life gatherer record name
+														UniLogDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
+												}
 											}
 											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
 											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
