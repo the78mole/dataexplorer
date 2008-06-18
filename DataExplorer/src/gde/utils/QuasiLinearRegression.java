@@ -19,6 +19,7 @@ package osde.utils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.ui.OpenSerialDataExplorer;
@@ -121,7 +122,9 @@ public class QuasiLinearRegression extends CalculationThread {
 			}
 			if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.fine("counter = " + counter + " modCounter = " + modCounter);
 			if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
-			if (record.isVisible()) this.application.updateGraphicsWindow();
+			if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
+				this.application.updateGraphicsWindow();
+			}
 			
 			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
 			QuasiLinearRegression.logQl.fine("finished data calculation for record = " + this.targetRecordKey);
