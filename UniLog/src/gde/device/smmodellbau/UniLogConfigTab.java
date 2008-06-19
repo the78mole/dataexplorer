@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -68,6 +69,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	Button												heightButton;
 	CLabel												capacityLabel;
 	Button												currentButton;
+	Button												currentInvertButton;
+	CLabel												currentOffsetLabel;
+	Text													currentOffset;
 	Button												voltageButton;
 	Text													a1Factor, a2Factor, a3Factor;
 	Text													a1Offset, a2Offset, a3Offset;
@@ -96,6 +100,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	boolean												isActiveUe					= false;
 	boolean												isActiveU						= false;
 	boolean												isActiveI						= false;
+	double												offsetCurrent				= 0.0;
 	boolean												isActiveRPM					= false;
 	boolean												isActiveHeight			= false;
 	int														prop100WValue				= 3400;
@@ -118,14 +123,14 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	double												factorA1						= 1.0;
 	double												factorA2						= 1.0;
 	double												factorA3						= 1.0;
-	String												configName;								// tabName
+	String												configName;					// tabName
 
 	CLabel												calculationTypeLabel;
 	CCombo												slopeCalculationTypeCombo;
 	CCombo												regressionTime;
 
 	final UniLogDialog						dialog;
-	final UniLog									device;										// get device specific things, get serial port, ...
+	final UniLog									device;							// get device specific things, get serial port, ...
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
 
@@ -183,6 +188,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.currentButton.setText(measurement.getName());
 							UniLogConfigTab.this.currentSymbol.setText(" " + measurement.getSymbol());
 							UniLogConfigTab.this.currentUnit.setText("[" + measurement.getUnit() + "]");
+							UniLogConfigTab.this.currentOffset.setText(String.format("%.4f", UniLogConfigTab.this.offsetCurrent));
 
 							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[3];
 							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
@@ -340,7 +346,51 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.currentUnit = new CLabel(this.powerGroup, SWT.NONE);
-						this.currentUnit.setBounds(198, 62, 62, 20);
+						this.currentUnit.setBounds(198, 61, 20, 20);
+					}
+					{
+						this.currentInvertButton = new Button(this.powerGroup, SWT.PUSH | SWT.CENTER);
+						this.currentInvertButton.setBounds(220, 64, 25, 18);
+						this.currentInvertButton.setText("inv");
+						this.currentInvertButton.setToolTipText("invertiert die Daten der Stromkurve");
+						this.currentInvertButton.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt);
+								Channel activeChannel = UniLogConfigTab.this.channels.getActiveChannel();
+								if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
+									String[] recordKeys = activeChannel.getActiveRecordSet().getRecordNames();
+									Record currentRecord = activeChannel.getActiveRecordSet().get(recordKeys[2]);
+									UniLogConfigTab.this.device.invertRecordData(currentRecord);
+									UniLogConfigTab.this.application.updateGraphicsWindow();
+									UniLogConfigTab.this.application.updateDataTable();
+									UniLogConfigTab.this.application.updateDigitalWindow();
+									UniLogConfigTab.this.application.updateAnalogWindow();
+								}
+							}
+						});
+					}
+					{
+						this.currentOffsetLabel = new CLabel(this.powerGroup, SWT.LEFT);
+						this.currentOffsetLabel.setBounds(247, 44, 46, 18);
+						this.currentOffsetLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						this.currentOffsetLabel.setText("Offset");
+					}
+					{
+						this.currentOffset = new Text(this.powerGroup, SWT.BORDER);
+						this.currentOffset.setBounds(245, 64, 50, 18);
+						this.currentOffset.setToolTipText("versieht die Stromkurve mit dem angegebenen Offset");
+						this.currentOffset.addKeyListener(new KeyAdapter() {
+							public void keyReleased(KeyEvent evt) {
+								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentOffset.keyReleased, event=" + evt);
+								try {
+									UniLogConfigTab.this.offsetCurrent = new Double(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
+							}
+						});
 					}
 					{
 						this.capacityLabel = new CLabel(this.powerGroup, SWT.CHECK | SWT.LEFT);
@@ -402,35 +452,40 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("numCellInput.keyReleased, event=" + evt);
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
-								UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
-								UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
-								UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
-								UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (recordSet != null) {
-										Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
-										PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
-										if (property != null) {
-											property.setValue(UniLogConfigTab.this.prop100WValue);
+								try {
+									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
+									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
+									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
+										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
+										if (recordSet != null) {
+											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
+											if (property != null) {
+												property.setValue(UniLogConfigTab.this.prop100WValue);
+											}
+											else {
+												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+											}
+											// update number cells too, if user has changed, but not hit enter 
+											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+											property = record.getProperty(UniLog.NUMBER_CELLS);
+											if (property != null) {
+												property.setValue(UniLogConfigTab.this.numCellValue);
+											}
+											else {
+												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
+											}
+											recordSet.setRecalculationRequired();
+											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+											UniLogConfigTab.this.application.updateDataTable();
 										}
-										else {
-											record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
-										}
-										// update number cells too, if user has changed, but not hit enter 
-										record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
-										property = record.getProperty(UniLog.NUMBER_CELLS);
-										if (property != null) {
-											property.setValue(UniLogConfigTab.this.numCellValue);
-										}
-										else {
-											record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
-										}
-										recordSet.setRecalculationRequired();
-										UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
-										UniLogConfigTab.this.application.updateDataTable();
 									}
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 								}
 							}
 						});
@@ -476,36 +531,41 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("prop100WInput.keyReleased, event=" + evt);
-								UniLogConfigTab.this.setConfigButton.setEnabled(true);
-								UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
-								UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
-								UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
-								UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
-								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
-									RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
-									if (recordSet != null) {
-										Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
-										PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
-										if (property != null) {
-											property.setValue(UniLogConfigTab.this.prop100WValue);
+								try {
+									UniLogConfigTab.this.setConfigButton.setEnabled(true);
+									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue);
+									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue);
+									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
+										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
+										if (recordSet != null) {
+											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
+											if (property != null) {
+												property.setValue(UniLogConfigTab.this.prop100WValue);
+											}
+											else {
+												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+											}
+											// update number cells too, if user has changed, but not hit enter 
+											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+											property = record.getProperty(UniLog.NUMBER_CELLS);
+											if (property != null) {
+												property.setValue(UniLogConfigTab.this.numCellValue);
+											}
+											else {
+												record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
+											}
+											recordSet.setRecalculationRequired();
+											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+											UniLogConfigTab.this.application.updateGraphicsWindow();
+											UniLogConfigTab.this.application.updateDataTable();
 										}
-										else {
-											record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
-										}
-										// update number cells too, if user has changed, but not hit enter 
-										record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
-										property = record.getProperty(UniLog.NUMBER_CELLS);
-										if (property != null) {
-											property.setValue(UniLogConfigTab.this.numCellValue);
-										}
-										else {
-											record.createProperty(CalculationThread.REGRESSION_TYPE, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
-										}
-										recordSet.setRecalculationRequired();
-										UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
-										UniLogConfigTab.this.application.updateGraphicsWindow();
-										UniLogConfigTab.this.application.updateDataTable();
 									}
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
 								}
 							}
 						});
@@ -644,20 +704,20 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.a1Button.setSelection(UniLogConfigTab.this.isActiveA1);
 							UniLogConfigTab.this.a1Text.setText(UniLogConfigTab.this.nameA1);
 							UniLogConfigTab.this.a1Unit.setText("[" + UniLogConfigTab.this.unitA1 + "]");
-							UniLogConfigTab.this.a1Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA1));
-							UniLogConfigTab.this.a1Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA1));
+							UniLogConfigTab.this.a1Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA1));
+							UniLogConfigTab.this.a1Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA1));
 
 							UniLogConfigTab.this.a2Button.setSelection(UniLogConfigTab.this.isActiveA2);
 							UniLogConfigTab.this.a2Text.setText(UniLogConfigTab.this.nameA2);
 							UniLogConfigTab.this.a2Unit.setText("[" + UniLogConfigTab.this.unitA2 + "]");
-							UniLogConfigTab.this.a2Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA2));
-							UniLogConfigTab.this.a2Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA2));
+							UniLogConfigTab.this.a2Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA2));
+							UniLogConfigTab.this.a2Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA2));
 
 							UniLogConfigTab.this.a3Button.setSelection(UniLogConfigTab.this.isActiveA3);
 							UniLogConfigTab.this.a3Text.setText(UniLogConfigTab.this.nameA3);
 							UniLogConfigTab.this.a3Unit.setText("[" + UniLogConfigTab.this.unitA3 + "]");
-							UniLogConfigTab.this.a3Offset.setText(String.format("%.2f", UniLogConfigTab.this.offsetA3));
-							UniLogConfigTab.this.a3Factor.setText(String.format("%.2f", UniLogConfigTab.this.factorA3));
+							UniLogConfigTab.this.a3Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA3));
+							UniLogConfigTab.this.a3Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA3));
 						}
 					});
 					{
@@ -682,31 +742,31 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.axName = new CLabel(this.axModusGroup, SWT.LEFT);
-						this.axName.setBounds(47, 50, 116, 18);
+						this.axName.setBounds(40, 50, 116, 18);
 						this.axName.setText("Bezeichnung");
-						this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axUnit = new CLabel(this.axModusGroup, SWT.LEFT);
-						this.axUnit.setBounds(160, 50, 45, 20);
+						this.axUnit.setBounds(156, 50, 51, 18);
 						this.axUnit.setText("Einheit");
-						this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axOffset = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axOffset.setBounds(209, 50, 46, 20);
 						this.axOffset.setText("Offset");
-						this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axFactor = new CLabel(this.axModusGroup, SWT.LEFT);
-						this.axFactor.setBounds(255, 50, 50, 20);
-						this.axFactor.setText("Factor");
-						this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 1, false, false));
+						this.axFactor.setBounds(257, 50, 48, 20);
+						this.axFactor.setText("Faktor");
+						this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a1Button.setBounds(4, 71, 41, 18);
+						this.a1Button.setBounds(4, 71, 36, 18);
 						this.a1Button.setText("A1");
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -717,49 +777,63 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Text.setBounds(49, 72, 116, 18);
+						this.a1Text.setBounds(42, 72, 116, 18);
 						this.a1Text.setToolTipText("Name vom A1 Ausgang");
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Text.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.nameA1 = UniLogConfigTab.this.a1Text.getText().trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a1Unit.setBounds(165, 72, 40, 18);
+						this.a1Unit.setBounds(160, 72, 45, 18);
 						this.a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.unitA1 = UniLogConfigTab.this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Offset.setBounds(205, 72, 50, 18);
+						this.a1Offset.setBounds(207, 72, 48, 18);
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.offsetA1 = new Double(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
 					{
 						this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Factor.setBounds(255, 72, 50, 18);
+						this.a1Factor.setBounds(257, 72, 48, 18);
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.factorA1 = new Double(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
 					{
 						this.a2Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a2Button.setBounds(4, 93, 41, 18);
+						this.a2Button.setBounds(4, 93, 36, 18);
 						this.a2Button.setText("A2");
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -770,49 +844,63 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Text.setBounds(49, 93, 116, 18);
+						this.a2Text.setBounds(42, 93, 116, 18);
 						this.a2Text.setToolTipText("Name vom A2 Ausgang");
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Text.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.nameA2 = UniLogConfigTab.this.a2Text.getText().trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a2Unit.setBounds(165, 93, 40, 18);
+						this.a2Unit.setBounds(160, 93, 45, 18);
 						this.a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.unitA2 = UniLogConfigTab.this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Offset.setBounds(205, 93, 50, 18);
+						this.a2Offset.setBounds(207, 93, 48, 18);
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.offsetA2 = new Double(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
 					{
 						this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Factor.setBounds(255, 93, 50, 18);
+						this.a2Factor.setBounds(257, 93, 48, 18);
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.factorA2 = new Double(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
 					{
 						this.a3Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a3Button.setBounds(4, 115, 41, 18);
+						this.a3Button.setBounds(4, 115, 36, 18);
 						this.a3Button.setText("A3");
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -823,43 +911,57 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Text.setBounds(49, 115, 116, 18);
+						this.a3Text.setBounds(42, 115, 116, 18);
 						this.a3Text.setToolTipText("Name vom A3 Ausgang");
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Text.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.nameA3 = UniLogConfigTab.this.a3Text.getText().trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a3Unit.setBounds(165, 115, 40, 18);
+						this.a3Unit.setBounds(160, 115, 45, 18);
 						this.a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								UniLogConfigTab.this.unitA3 = UniLogConfigTab.this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim();
+								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Offset.setBounds(205, 115, 50, 18);
+						this.a3Offset.setBounds(207, 115, 48, 18);
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.offsetA3 = new Double(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
 					{
 						this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Factor.setBounds(255, 115, 50, 18);
+						this.a3Factor.setBounds(257, 115, 48, 18);
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt);
-								checkUpdateAnalog();
+								try {
+									UniLogConfigTab.this.factorA3 = new Double(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.'));
+									if (evt.character == SWT.CR) checkUpdateAnalog();
+								}
+								catch (Exception e) {
+									UniLogConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+								}
 							}
 						});
 					}
@@ -1102,6 +1204,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurementKey = this.device.getMeasurementNames(this.configName)[2];
 		measurement = this.device.getMeasurement(this.configName, measurementKey);
 		measurement.setActive(this.currentButton.getSelection());
+		measurement.setOffset(new Double(this.currentOffset.getText().replace(',', '.').trim()));
 
 		measurementKey = this.device.getMeasurementNames(this.configName)[6]; // 6=votagePerCell
 		this.device.setMeasurementPropertyValue(this.configName, measurementKey, UniLog.NUMBER_CELLS, DataTypes.INTEGER, this.numCellValue);
@@ -1186,6 +1289,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.isActiveU = recordSet.get(recordKeys[1]).isActive();
 			this.isActiveI = recordSet.get(recordKeys[2]).isActive();
 			
+			this.offsetCurrent = recordSet.get(recordKeys[2]).getOffset();
+			
 			property = recordSet.get(recordKeys[6]).getProperty(UniLog.NUMBER_CELLS);
 			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
 			
@@ -1234,6 +1339,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			recordKey = this.device.getMeasurementNames(this.configName)[2];
 			measurement = this.device.getMeasurement(this.configName, recordKey);
 			this.isActiveI = measurement.isActive();
+			this.offsetCurrent = measurement.getOffset();
 
 			recordKey = this.device.getMeasurementNames(this.configName)[6];
 			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.NUMBER_CELLS);
@@ -1292,18 +1398,22 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				// 2=current
+				activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setOffset(new Double(this.currentOffset.getText().trim().replace(',', '.')));
+
+				// 11=a1Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText().trim());
-				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				// 12=a2Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText().trim());
-				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+				// 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.')));

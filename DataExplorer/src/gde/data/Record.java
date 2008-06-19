@@ -207,8 +207,8 @@ public class Record extends Vector<Integer> {
 		for (PropertyType property : record.properties) {
 			this.properties.add(property.clone());
 		}
-		this.maxValue = Integer.MIN_VALUE;
-		this.minValue = Integer.MAX_VALUE;
+		this.maxValue = 0;
+		this.minValue = 0;
 		this.clear();
 		this.trimToSize();
 		if (isFromBegin) {
@@ -918,8 +918,16 @@ public class Record extends Vector<Integer> {
 	 * reset the min-max-values to enable new settings after re-calculation
 	 */
 	public void resetMinMax() {
-		this.maxValue = Integer.MIN_VALUE;
-		this.minValue = Integer.MAX_VALUE;
+		this.maxValue = 0;
+		this.minValue = 0;
+	}
+
+	/**
+	 * set new the min-max-values after external re-calculation
+	 */
+	public void setMinMax(int newMin, int newMax) {
+		this.maxValue = newMax;
+		this.minValue = newMin;
 	}
 	
 	/**

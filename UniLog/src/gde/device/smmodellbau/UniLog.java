@@ -678,4 +678,23 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ", 
 				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().unilogVersion));
 	}
+	
+	/**
+	 * invert data of current curve
+	 */
+	public void invertRecordData(Record record) {
+		int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+		for (int i=0; i<record.realSize(); ++i) {
+			int value = record.get(i) * -1;
+			record.set(i, value);
+			if (i != 0) {
+				if (value > max) max = value;
+				if (value < min) min = value;
+			}
+			else {
+				min = max = value;
+			}
+		}
+		record.setMinMax(min, max);
+	}
 }
