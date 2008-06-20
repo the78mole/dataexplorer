@@ -1024,9 +1024,9 @@ public class CurveSelectorContextMenu {
 								if (newMaxValue > oldMaxValue) {
 									compareSet.setMaxValue(newMaxValue); // store new max value into record set
 								}
-								for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
-									compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
-								}
+							}
+							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
+								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
 							}
 
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
