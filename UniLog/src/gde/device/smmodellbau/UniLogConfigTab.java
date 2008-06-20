@@ -1406,7 +1406,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 				// 11=a1Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(this.a1Button.getSelection());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(this.a1Button.getSelection());
+				//activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
@@ -1414,7 +1414,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.')));
 				// 12=a2Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setActive(this.a2Button.getSelection());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setVisible(this.a2Button.getSelection());
+				//activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setVisible(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
@@ -1422,7 +1422,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.')));
 				// 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setActive(this.a3Button.getSelection());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setVisible(this.a3Button.getSelection());
+				//activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setVisible(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
