@@ -160,9 +160,7 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt);
-							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
-								openOsdFileDialog("Öffne Datei ...");
-							}
+							openOsdFileDialog("Öffne Datei ...");
 						}
 					});
 				}

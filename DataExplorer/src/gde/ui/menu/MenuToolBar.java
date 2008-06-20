@@ -131,9 +131,7 @@ public class MenuToolBar {
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt);
-							if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
-								MenuToolBar.this.application.getMenuBar().openOsdFileDialog("Öffne Datei ...");
-							}
+							MenuToolBar.this.application.getMenuBar().openOsdFileDialog("Öffne Datei ...");
 						}
 					});
 				}
