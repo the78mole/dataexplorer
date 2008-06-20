@@ -188,7 +188,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.currentButton.setText(measurement.getName());
 							UniLogConfigTab.this.currentSymbol.setText(" " + measurement.getSymbol());
 							UniLogConfigTab.this.currentUnit.setText("[" + measurement.getUnit() + "]");
-							UniLogConfigTab.this.currentOffset.setText(String.format("%.4f", UniLogConfigTab.this.offsetCurrent));
+							UniLogConfigTab.this.currentOffset.setText(String.format("%.3f", UniLogConfigTab.this.offsetCurrent));
 
 							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[3];
 							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
@@ -350,7 +350,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.currentInvertButton = new Button(this.powerGroup, SWT.PUSH | SWT.CENTER);
-						this.currentInvertButton.setBounds(220, 64, 25, 18);
+						this.currentInvertButton.setBounds(220, 63, 25, 20);
 						this.currentInvertButton.setText("inv");
 						this.currentInvertButton.setToolTipText("invertiert die Daten der Stromkurve");
 						this.currentInvertButton.addSelectionListener(new SelectionAdapter() {
@@ -704,20 +704,20 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.a1Button.setSelection(UniLogConfigTab.this.isActiveA1);
 							UniLogConfigTab.this.a1Text.setText(UniLogConfigTab.this.nameA1);
 							UniLogConfigTab.this.a1Unit.setText("[" + UniLogConfigTab.this.unitA1 + "]");
-							UniLogConfigTab.this.a1Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA1));
-							UniLogConfigTab.this.a1Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA1));
+							UniLogConfigTab.this.a1Offset.setText(String.format("%.3f", UniLogConfigTab.this.offsetA1));
+							UniLogConfigTab.this.a1Factor.setText(String.format("%.3f", UniLogConfigTab.this.factorA1));
 
 							UniLogConfigTab.this.a2Button.setSelection(UniLogConfigTab.this.isActiveA2);
 							UniLogConfigTab.this.a2Text.setText(UniLogConfigTab.this.nameA2);
 							UniLogConfigTab.this.a2Unit.setText("[" + UniLogConfigTab.this.unitA2 + "]");
-							UniLogConfigTab.this.a2Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA2));
-							UniLogConfigTab.this.a2Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA2));
+							UniLogConfigTab.this.a2Offset.setText(String.format("%.3f", UniLogConfigTab.this.offsetA2));
+							UniLogConfigTab.this.a2Factor.setText(String.format("%.3f", UniLogConfigTab.this.factorA2));
 
 							UniLogConfigTab.this.a3Button.setSelection(UniLogConfigTab.this.isActiveA3);
 							UniLogConfigTab.this.a3Text.setText(UniLogConfigTab.this.nameA3);
 							UniLogConfigTab.this.a3Unit.setText("[" + UniLogConfigTab.this.unitA3 + "]");
-							UniLogConfigTab.this.a3Offset.setText(String.format("%.4f", UniLogConfigTab.this.offsetA3));
-							UniLogConfigTab.this.a3Factor.setText(String.format("%.4f", UniLogConfigTab.this.factorA3));
+							UniLogConfigTab.this.a3Offset.setText(String.format("%.3f", UniLogConfigTab.this.offsetA3));
+							UniLogConfigTab.this.a3Factor.setText(String.format("%.3f", UniLogConfigTab.this.factorA3));
 						}
 					});
 					{
@@ -1402,26 +1402,36 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setOffset(new Double(this.currentOffset.getText().trim().replace(',', '.')));
 
 				// 11=a1Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(this.a1Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.')));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText().trim());
 				// 12=a2Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setActive(this.a2Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setVisible(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.')));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText().trim());
 				// 13=a3Value
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setActive(this.a3Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setVisible(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(new Double(this.a3Factor.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
+				
 				UniLogConfigTab.this.application.updateGraphicsWindow();
 			}
 		}
 		this.setConfigButton.setEnabled(true);
+		this.powerGroup.redraw();
+		this.axModusGroup.redraw();
 	}
 }

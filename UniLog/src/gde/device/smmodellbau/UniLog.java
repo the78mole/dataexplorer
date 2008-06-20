@@ -276,7 +276,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
 				if (timeStep_ms != 0) {
 					recordSet.setTimeStep_ms(timeStep_ms);
-					if (log.isLoggable(Level.FINE)) log.info("timeStep_ms = " + timeStep_ms);
+					if (log.isLoggable(Level.FINE)) log.fine("timeStep_ms = " + timeStep_ms);
 				}
 			}
 
@@ -386,7 +386,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				sb.append("tempIntern = " + points[13]).append(lineSep);
 		}
 		
-		if (log.isLoggable(Level.FINE)) log.info(sb.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
 		return points;
 	}
 
@@ -398,24 +398,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		double newValues = value;
 		
-		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+		String[] recordNames = record.getParent().getRecordNames(); 
 		PropertyType property = null;
-		if (record.getName().startsWith(measurements[2])) {//2=current [A]
+		if (record.getName().startsWith(recordNames[2])) {//2=current [A]
 			property = record.getProperty(UniLog.CURRENT_OFFSET);
 			double currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValues = value + currentOffset;
 		}
-		else if (record.getName().startsWith(measurements[7])) {//7=revolutionSpeed [1/min]
+		else if (record.getName().startsWith(recordNames[7])) {//7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.RPM_FACTOR);
 			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValues = value * rpmFactor / numberMotor;
 		}
-		else if (record.getName().startsWith(measurements[11]) 	//11=a1Value
-				|| record.getName().startsWith(measurements[12])		//12=a2Value
-				|| record.getName().startsWith(measurements[13])) {	//13=a3Value
-			newValues = (record.getOffset() * 1000.0) + record.getFactor() * value;
+		else if (record.getName().startsWith(recordNames[11]) 	//11=a1Value
+				|| record.getName().startsWith(recordNames[12])		//12=a2Value
+				|| record.getName().startsWith(recordNames[13])) {	//13=a3Value
+			newValues = record.getFactor() * value + record.getOffset();
 		}
 		
 		return newValues;
@@ -429,24 +430,26 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		double newValues = value;
 		
-		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+		String[] recordNames = record.getParent().getRecordNames(); 
+
 		PropertyType property = null;
-		if (record.getName().startsWith(measurements[2])) {//2=current [A]
+		if (record.getName().startsWith(recordNames[2])) {//2=current [A]
 			property = record.getProperty(UniLog.CURRENT_OFFSET);
 			double currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValues = value - currentOffset;
 		}
-		else if (record.getName().startsWith(measurements[7])) {//7=revolutionSpeed [1/min]
+		else if (record.getName().startsWith(recordNames[7])) {//7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.RPM_FACTOR);
 			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			newValues = value * numberMotor / rpmFactor;
 		}
-		else if (record.getName().startsWith(measurements[11]) 	//11=a1Value
-				|| record.getName().startsWith(measurements[12])		//12=a2Value
-				|| record.getName().startsWith(measurements[13])) {	//13=a3Value
-			newValues = value / record.getFactor() - (record.getOffset() * 1000.0);
+		else if (record.getName().startsWith(recordNames[11]) 	//11=a1Value
+				|| record.getName().startsWith(recordNames[12])		//12=a2Value
+				|| record.getName().startsWith(recordNames[13])) {	//13=a3Value
+			newValues = value / record.getFactor() - record.getOffset();
 		}
 
 		return newValues;
@@ -460,15 +463,18 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		String configKey = recordSet.getChannelConfigName();
+		String channelConfigKey = recordSet.getChannelConfigName();
 		Record record;
 		MeasurementType measurement;
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		String[] measurements = this.getMeasurementNames(configKey);
+		String[] measurementNames = this.getMeasurementNames(channelConfigKey);
+		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (String measurementKey : measurements) {
-			record = recordSet.get(measurementKey);
-			measurement = this.getMeasurement(configKey, measurementKey);
+		for (int i = 0; i < recordNames.length; ++i) {
+			// since actual record names can differ from device configuration measurement names, match by sequence
+			record = recordSet.get(recordNames[i]);		
+			measurement = this.getMeasurement(channelConfigKey, measurementNames[i]);
+			log.fine(recordNames[i] + " = " + measurementNames[i]);
 			
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {

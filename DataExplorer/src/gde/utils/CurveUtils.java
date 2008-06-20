@@ -107,13 +107,19 @@ public class CurveUtils {
 				if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine(String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue));
 			}
 			if (record.isStartpointZero()) {
-				yMinValue = yMinValueDisplay = 0;
-				if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("start 0 yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
+				yMinValueDisplay = 0;
+				if (isRaw) {
+					yMinValue = yMinValueDisplay - record.getOffset();
+				}
+				else {
+					yMinValue = yMinValueDisplay;
+				}
+				if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue);
 			}
 		}
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
-		if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
+		if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay);
 		String graphText = recordName.split("_")[0] + "   " + record.getSymbol() + "   [" + record.getUnit() + "]";
 
 		// adapt number space calculation to real displayed max number
@@ -153,6 +159,7 @@ public class CurveUtils {
 		// set the values corresponding to the display area of this curve
 		record.setMinDisplayValue(yMinValue);
 		record.setMaxDisplayValue(yMaxValue);
+		if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue);
 	}
 
 	/**
