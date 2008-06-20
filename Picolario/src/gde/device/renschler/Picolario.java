@@ -156,14 +156,16 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(record.getParent().getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigung
+		// 0=Spannung, 1=Höhe, 2=Steigung
+		String[] recordNames = record.getParent().getRecordNames(); 
+		
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		// height calculation need special procedure
-		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
+		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
 			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
@@ -188,8 +190,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 
 		// slope calculation needs height factor for calculation
-		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), measurements[1]);
+		else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
 		}
 
 		double newValue = offset + (value - reduction) * factor;
@@ -205,14 +207,16 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
-		String[] measurements = this.getMeasurementNames(record.getChannelConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigung
+		// 0=Spannung, 1=Höhe, 2=Steigung
+		String[] recordNames = record.getParent().getRecordNames(); 
+
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		// height calculation need special procedure
-		if (recordKey.startsWith(measurements[1])) { // 1=Höhe
+		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
 			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
@@ -237,8 +241,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 
 		// slope calculation needs height factor for calculation
-		else if (recordKey.startsWith(measurements[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), measurements[1]);
+		else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
 		}
 
 		double newValue = (value - offset) / factor + reduction;
