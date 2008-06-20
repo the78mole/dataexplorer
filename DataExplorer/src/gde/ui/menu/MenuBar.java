@@ -19,6 +19,8 @@ package osde.ui.menu;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -686,35 +688,34 @@ public class MenuBar {
 	 * update file history while add history file to history menu
 	 * @param fullQualifiedFileName (/home/device/filename.osd)
 	 */
-	public void updateSubHistoryMenuItem(final String fullQualifiedFileName) {
-		HashMap<String, String> refFileHistory = Settings.getInstance().getFileHistory();
+	public void updateSubHistoryMenuItem(String fullQualifiedFileName) {
+		List<String> refFileHistory = Settings.getInstance().getFileHistory();
 		if (fullQualifiedFileName != null && fullQualifiedFileName.length() > 4) {
-			final String newhistoryEntry = fullQualifiedFileName.replace("\\", "/"); // windows/file separator
-			final String fileKey = fullQualifiedFileName.substring(fullQualifiedFileName.lastIndexOf('/')+1);
-			if (refFileHistory.containsKey(fileKey)) { // fileName already exist
-				refFileHistory.remove(fileKey);
+			final String newhistoryEntry = fullQualifiedFileName.replace("\\", "/");
+
+			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
+				refFileHistory.remove(newhistoryEntry);
 			}
-			refFileHistory.put(fileKey, newhistoryEntry);
+			refFileHistory.add(0, newhistoryEntry);
 		}
-		// clean up
+		// clean up the menu entries
 		MenuItem[] menuItems = this.fileHistoryMenu.getItems();
 		for (MenuItem menuItem : menuItems) {
 			menuItem.dispose();
 		}
-		
-		for (String key : refFileHistory.keySet()) {
-			String fileReference = refFileHistory.get(key);
-			fileReference = fileReference.substring(fileReference.lastIndexOf('/')+1);
+		// fill with refreshed data
+		for (Iterator<String> iterator = refFileHistory.iterator(); iterator.hasNext();) {
+			String fullQualifiedFileReference = iterator.next();
+			String shortFileReference = fullQualifiedFileReference.substring(fullQualifiedFileReference.lastIndexOf('/') + 1);
 			final MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
-			historyImportMenuItem.setText(fileReference);
+			historyImportMenuItem.setText(shortFileReference);
+			historyImportMenuItem.setData(shortFileReference, fullQualifiedFileReference);
 			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);
-					String fileKey = historyImportMenuItem.getText();
-					HashMap<String, String> refFileNameMap = Settings.getInstance().getFileHistory();
-					if (refFileNameMap.containsKey(fileKey)) {
-						String fileName = refFileNameMap.get(fileKey);
-						String fileType = fileName.substring(fileName.lastIndexOf('.')+1).toUpperCase();
+					String fileName = (String) historyImportMenuItem.getData(historyImportMenuItem.getText());
+					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
+					if (fileType != null && fileType.length() > 2) {
 						MenuBar.log.info("opening file = " + fileName);
 						if (fileType.equalsIgnoreCase("OSD")) {
 							openOsdFile(fileName);
@@ -728,7 +729,6 @@ public class MenuBar {
 					}
 				}
 			});
-			
 		}
 	}
 
