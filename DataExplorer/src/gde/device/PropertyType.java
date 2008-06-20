@@ -104,7 +104,10 @@ public class PropertyType {
      *     
      */
     public String getValue() {
-        return this.value;
+    	if (this.type == DataTypes.DOUBLE)
+        return this.value.trim().replace(',', '.');
+    	 
+    	return this.value.trim();
     }
 
     /**

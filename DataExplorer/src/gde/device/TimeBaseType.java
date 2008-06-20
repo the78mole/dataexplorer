@@ -139,7 +139,7 @@ public class TimeBaseType {
      *     
      */
     public Double getTimeStep() {
-        return new Double(this.timeStep);
+        return new Double(this.timeStep.trim().replace(',', '.'));
     }
 
     /**

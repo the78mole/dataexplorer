@@ -93,8 +93,8 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.finest("dialogShell.widgetDisposed, event=" + evt);
-					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().replace(',', '.'));
-					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().replace(',', '.'));
+					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
+					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
 				}
 			});
 			this.dialogShell.addPaintListener(new PaintListener() {
