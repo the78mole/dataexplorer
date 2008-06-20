@@ -383,7 +383,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentOffset.keyReleased, event=" + evt);
 								try {
-									UniLogConfigTab.this.offsetCurrent = new Double(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.'));
+									UniLogConfigTab.this.offsetCurrent = new Double(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')).doubleValue();
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
@@ -1232,24 +1232,24 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setActive(this.a1Button.getSelection());
 		measurement.setName(this.a1Text.getText().trim());
 		measurement.setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a1Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a1Factor.getText().replace(',', '.').trim()));
+		measurement.setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.').trim()));
 
 		measurementKey = this.device.getMeasurementNames(this.configName)[12];
 		measurement = this.device.getMeasurement(this.configName, measurementKey);
 		measurement.setActive(this.a2Button.getSelection());
 		measurement.setName(this.a2Text.getText().trim());
 		measurement.setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a2Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a2Factor.getText().replace(',', '.').trim()));
+		measurement.setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.').trim()));
 
 		measurementKey = this.device.getMeasurementNames(this.configName)[13];
 		measurement = this.device.getMeasurement(this.configName, measurementKey);
 		measurement.setActive(this.a3Button.getSelection());
 		measurement.setName(this.a3Text.getText().trim());
 		measurement.setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a3Offset.getText().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a3Factor.getText().replace(',', '.').trim()));
+		measurement.setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(new Double(this.a3Factor.getText().trim().replace(',', '.').trim()));
 
 		this.device.setChangePropery(true);
 		this.device.storeDeviceProperties();

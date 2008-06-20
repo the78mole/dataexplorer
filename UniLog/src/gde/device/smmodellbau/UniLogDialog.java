@@ -1226,7 +1226,7 @@ public class UniLogDialog extends DeviceDialog {
 		updateBuffer[10] = 0x00; // ignore 
 		updateBuffer[11] = 0x00; // ignore
 
-		double tempGearRatio = new Double(this.gearFactorCombo.getText().split(":")[0].trim()).doubleValue() * 10;
+		double tempGearRatio = new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue() * 10;
 		updateBuffer[12] = (byte) tempGearRatio;
 		checkSum = checkSum + (0xFF & updateBuffer[12]);
 
@@ -1284,7 +1284,7 @@ public class UniLogDialog extends DeviceDialog {
 	 * @return
 	 */
 	double getGearRatio() {
-		return new Double(this.gearFactorCombo.getText().split(":")[0].trim()).doubleValue();
+		return new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue();
 	}
 
 	/**
