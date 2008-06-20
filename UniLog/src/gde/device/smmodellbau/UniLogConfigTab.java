@@ -350,7 +350,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.currentInvertButton = new Button(this.powerGroup, SWT.PUSH | SWT.CENTER);
-						this.currentInvertButton.setBounds(220, 63, 25, 20);
+						this.currentInvertButton.setBounds(220, 62, 25, 22);
 						this.currentInvertButton.setText("inv");
 						this.currentInvertButton.setToolTipText("invertiert die Daten der Stromkurve");
 						this.currentInvertButton.addSelectionListener(new SelectionAdapter() {
@@ -372,12 +372,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.currentOffsetLabel = new CLabel(this.powerGroup, SWT.LEFT);
 						this.currentOffsetLabel.setBounds(247, 44, 46, 18);
-						this.currentOffsetLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.currentOffsetLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 						this.currentOffsetLabel.setText("Offset");
 					}
 					{
 						this.currentOffset = new Text(this.powerGroup, SWT.BORDER);
-						this.currentOffset.setBounds(245, 64, 50, 18);
+						this.currentOffset.setBounds(245, 63, 50, 20);
 						this.currentOffset.setToolTipText("versieht die Stromkurve mit dem angegebenen Offset");
 						this.currentOffset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -744,40 +744,41 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.axName = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axName.setBounds(40, 50, 116, 18);
 						this.axName.setText("Bezeichnung");
-						this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axUnit = new CLabel(this.axModusGroup, SWT.LEFT);
-						this.axUnit.setBounds(156, 50, 51, 18);
+						this.axUnit.setBounds(158, 50, 50, 18);
 						this.axUnit.setText("Einheit");
-						this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axOffset = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axOffset.setBounds(209, 50, 46, 20);
 						this.axOffset.setText("Offset");
-						this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axFactor = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axFactor.setBounds(257, 50, 48, 20);
 						this.axFactor.setText("Faktor");
-						this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a1Button.setBounds(4, 71, 36, 18);
+						this.a1Button.setBounds(4, 72, 36, 20);
 						this.a1Button.setText("A1");
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.isActiveA1 = UniLogConfigTab.this.a1Button.getSelection();
 								checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Text.setBounds(42, 72, 116, 18);
+						this.a1Text.setBounds(42, 72, 116, 20);
 						this.a1Text.setToolTipText("Name vom A1 Ausgang");
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -789,8 +790,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a1Unit.setBounds(160, 72, 45, 18);
-						this.a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a1Unit.setBounds(160, 72, 45, 20);
+						//this.a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt);
@@ -801,7 +802,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Offset.setBounds(207, 72, 48, 18);
+						this.a1Offset.setBounds(207, 72, 48, 20);
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt);
@@ -817,7 +818,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a1Factor.setBounds(257, 72, 48, 18);
+						this.a1Factor.setBounds(257, 72, 48, 20);
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt);
@@ -833,18 +834,19 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a2Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a2Button.setBounds(4, 93, 36, 18);
+						this.a2Button.setBounds(4, 93, 36, 20);
 						this.a2Button.setText("A2");
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.isActiveA2 = UniLogConfigTab.this.a2Button.getSelection();
 								checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Text.setBounds(42, 93, 116, 18);
+						this.a2Text.setBounds(42, 93, 116, 20);
 						this.a2Text.setToolTipText("Name vom A2 Ausgang");
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -856,8 +858,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a2Unit.setBounds(160, 93, 45, 18);
-						this.a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a2Unit.setBounds(160, 93, 45, 20);
+						//this.a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt);
@@ -868,7 +870,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Offset.setBounds(207, 93, 48, 18);
+						this.a2Offset.setBounds(207, 93, 48, 20);
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt);
@@ -884,7 +886,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a2Factor.setBounds(257, 93, 48, 18);
+						this.a2Factor.setBounds(257, 93, 48, 20);
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt);
@@ -900,18 +902,19 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a3Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
-						this.a3Button.setBounds(4, 115, 36, 18);
+						this.a3Button.setBounds(4, 115, 36, 20);
 						this.a3Button.setText("A3");
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3ValueButton.widgetSelected, event=" + evt);
+								UniLogConfigTab.this.isActiveA3 = UniLogConfigTab.this.a3Button.getSelection();
 								checkUpdateAnalog();
 							}
 						});
 					}
 					{
 						this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Text.setBounds(42, 115, 116, 18);
+						this.a3Text.setBounds(42, 115, 116, 20);
 						this.a3Text.setToolTipText("Name vom A3 Ausgang");
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -923,8 +926,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
-						this.a3Unit.setBounds(160, 115, 45, 18);
-						this.a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						this.a3Unit.setBounds(160, 115, 45, 20);
+						//this.a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt);
@@ -935,7 +938,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Offset.setBounds(207, 115, 48, 18);
+						this.a3Offset.setBounds(207, 115, 48, 20);
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt);
@@ -951,7 +954,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
-						this.a3Factor.setBounds(257, 115, 48, 18);
+						this.a3Factor.setBounds(257, 115, 48, 20);
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt);
