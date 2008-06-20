@@ -126,7 +126,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double newValues = record.getOffset() * 1000.0 + record.getFactor() * value;
+		double newValues = record.getFactor() * value + record.getOffset();
 		Simulator.log.fine("newValue = " + newValues);
 		// do some calculation
 		return newValues;
@@ -138,7 +138,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double newValues = value / record.getFactor() - record.getOffset() * 1000.0;
+		double newValues = value / record.getFactor() - record.getOffset();
 		// do some calculation
 		return newValues;
 	}
