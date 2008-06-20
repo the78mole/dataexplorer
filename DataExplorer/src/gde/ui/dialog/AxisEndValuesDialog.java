@@ -100,7 +100,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					if (AxisEndValuesDialog.this.isInit) {
-						log.info("paintControl.paintControl, event=" + evt);
+						log.finest("paintControl.paintControl, event=" + evt);
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.maxValueSelect, oldMinMax[1], 20);
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.minValueSelect, oldMinMax[0], 20);
 					}
