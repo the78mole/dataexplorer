@@ -993,6 +993,7 @@ public class CurveSelectorContextMenu {
 							Record oldRecord = CurveSelectorContextMenu.this.recordSet.get(oldRecordKey);
 							compareSet.put(newRecordkey, oldRecord.clone()); // will delete channelConfigKey
 							Record newRecord = compareSet.get(newRecordkey);
+							newRecord.setSourceRecordSetNames(CurveSelectorContextMenu.this.recordSet.getRecordNames());
 							newRecord.setChannelConfigKey(oldRecord.getChannelConfigKey());
 							newRecord.setVisible(true); // if a non visible record added
 							newRecord.setName(newRecordkey);

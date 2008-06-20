@@ -89,6 +89,9 @@ public class Record extends Vector<Integer> {
 	boolean							isMeasurementMode				= false;
 	boolean							isDeltaMeasurementMode	= false;
 	
+	// compare
+	String[]						sourceRecordSetNames		= new String[0];
+	
 	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated
 	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated
 	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated
@@ -1041,6 +1044,20 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setUnsaved(String reason) {
 		this.parent.setUnsaved(reason);
+	}
+
+	/**
+	 * @return the sourceRecordSetNames, only filled if record of compare set
+	 */
+	public String[] getSourceRecordSetNames() {
+		return this.sourceRecordSetNames;
+	}
+
+	/**
+	 * @param newSourceRecordSetNames the sourceRecordSetNames to set during copy operation to compare set
+	 */
+	public void setSourceRecordSetNames(String[] newSourceRecordSetNames) {
+		this.sourceRecordSetNames = newSourceRecordSetNames;
 	}
 }
 
