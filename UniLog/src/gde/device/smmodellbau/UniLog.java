@@ -399,7 +399,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		double newValues = value;
 		
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		String[] recordNames = record.getParent().isCompareSet() ? record.getSourceRecordSetNames() : record.getParent().getRecordNames(); 
+		String[] recordNames = record.getRecordSetNames(); 
 
 		PropertyType property = null;
 		if (record.getName().startsWith(recordNames[2])) {//2=current [A]
@@ -432,7 +432,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		double newValues = value;
 		
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		String[] recordNames = record.getParent().isCompareSet() ? record.getSourceRecordSetNames() : record.getParent().getRecordNames(); 
+		String[] recordNames = record.getRecordSetNames(); 
 
 		PropertyType property = null;
 		if (record.getName().startsWith(recordNames[2])) {//2=current [A]

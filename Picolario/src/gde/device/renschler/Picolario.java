@@ -157,7 +157,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getParent().isCompareSet() ? record.getSourceRecordSetNames() : record.getParent().getRecordNames(); 
+		String[] recordNames = record.getRecordSetNames(); 
 		
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -208,7 +208,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getParent().isCompareSet() ? record.getSourceRecordSetNames() : record.getParent().getRecordNames(); 
+		String[] recordNames = record.getRecordSetNames(); 
 
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset

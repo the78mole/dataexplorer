@@ -1047,10 +1047,12 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * @return the sourceRecordSetNames, only filled if record of compare set
+	 * calls parent getRecordNames for all records of normal record sets, 
+	 * if record set isCompareSet it returns the recordSetNames of the source record set 
+	 * @return the getRecordSetNames
 	 */
-	public String[] getSourceRecordSetNames() {
-		return this.sourceRecordSetNames;
+	public String[] getRecordSetNames() {
+		return this.getParent().isCompareSet() ? this.sourceRecordSetNames : this.getParent().getRecordNames();
 	}
 
 	/**
