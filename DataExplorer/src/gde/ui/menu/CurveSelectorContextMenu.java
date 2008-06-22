@@ -676,15 +676,11 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("timeGridOff Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
-						else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_NONE);
-							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
 				}
@@ -695,12 +691,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("timeGridMain Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
-						else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MAIN);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -714,12 +708,10 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("timeGridMod60 Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
-						else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MOD60);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -735,12 +727,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
-							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-								CurveSelectorContextMenu.this.recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-								CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-								CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-							}
-							else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							CurveSelectorContextMenu.this.recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -807,16 +797,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("horizontalGridOff Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
-							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
-							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
 				}
@@ -827,14 +813,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("horizontalGridMain Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
-							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
-						else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -848,14 +832,12 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.finest("horizontalGridMod60 Action performed! " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
-							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						}
-						else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -871,13 +853,12 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
-							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) {
-								CurveSelectorContextMenu.this.recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-								if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-								CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-								CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							}
-							else if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE) {
+							CurveSelectorContextMenu.this.recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+							
+							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
