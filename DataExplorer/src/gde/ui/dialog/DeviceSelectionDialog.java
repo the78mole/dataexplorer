@@ -960,6 +960,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public IDevice getInstanceOfDevice() {
 		IDevice newInst = null;
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getName().replace(" ", "").replace("-", "");
+		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = "osde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(" ", "").replace("-", "") + "." + selectedDeviceName;
 		try {
 			//String className = "osde.device.DefaultDeviceDialog";

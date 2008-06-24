@@ -63,6 +63,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	private OutputStream					outputStream			= null;
 
 	protected String							name;
+	
+	protected int									xferErrors = 0;
 
 	// flag if device has an version string
 	protected boolean							hasVersion				= false;
@@ -164,6 +166,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 	
 	public synchronized SerialPort open() throws Exception  {
+		this.xferErrors = 0;
 		// Initialize serial port
 		try {
 			Settings settings = Settings.getInstance();
@@ -502,5 +505,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	public int getNumBytesAvailable() {
 		return this.numBytesAvailable;
+	}
+
+	int getXferErrors() {
+		return this.xferErrors;
+	}
+
+	void setXferErrors(int xferErrors) {
+		this.xferErrors = xferErrors;
 	}
 }

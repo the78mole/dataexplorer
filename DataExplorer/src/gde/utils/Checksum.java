@@ -172,4 +172,18 @@ public class Checksum {
 		return value;
 	}
 
+	/**
+	 * calculate ADD operation
+	 * @param b byte array to compute
+	 * @param len length of checksum if part of the byte array
+	 * @return 16-bit result
+	 */
+	public static int ADD(byte[] b, int start, int len) {
+		int value = b[start] & 0xFF;
+		for (int i = start+1; i <= len; i++) {
+			value = value  + (b[i] & 0xFF);
+		}
+		return value;
+	}
+
 }

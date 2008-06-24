@@ -38,6 +38,10 @@ public class LogViewReader {
 		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4");
 		deviceMap.put("picolario", "Picolario");
 		deviceMap.put("unilog", "UniLog");
+		deviceMap.put("e-station 902", "eStation902");
+		deviceMap.put("e-station bc6", "eStationBC6");
+		deviceMap.put("e-station bc610", "eStationBC610");
+		deviceMap.put("e-station bc8", "eStationBC8");
 		// add more supported devices here, key in lower case
 	}
 
