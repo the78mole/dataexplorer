@@ -26,9 +26,12 @@ import osde.ui.OpenSerialDataExplorer;
  * DeviceDialog is the abstract class as parent for device dialog implementations
  * @author Winfried Brügmann
  */
-public abstract class DeviceDialog extends Dialog{
+public abstract class DeviceDialog extends Dialog {
 
 	protected Shell	dialogShell;
+	protected	int		shellAlpha = 50; //TODO settings
+	protected boolean	isAlphaOn = true;
+	protected boolean	isInDialog = false;
 	
 	protected boolean isClosePossible = true; // use this variable to manage if dialog can be disposed 
 	protected String disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
@@ -106,5 +109,32 @@ public abstract class DeviceDialog extends Dialog{
 	 */
 	public void setClosePossible(boolean enabled) {
 		this.isClosePossible = enabled;
+	}
+
+	int getShellAlpha() {
+		return this.shellAlpha;
+	}
+
+	public synchronized void setShellAlpha(int newShellAlpha) {
+			if (newShellAlpha > this.shellAlpha) {
+				for (int i = this.dialogShell.getAlpha(); i <= 254; i+=3) {
+					this.dialogShell.setAlpha(i);
+				}
+				this.dialogShell.setAlpha(254);
+			}
+			else {
+				for (int i = this.dialogShell.getAlpha(); i >= this.shellAlpha; i-=3) {
+					this.dialogShell.setAlpha(i);
+				}
+				this.dialogShell.setAlpha(shellAlpha);
+			}
+	}
+
+	public boolean isAlphaOn() {
+		return this.isAlphaOn;
+	}
+
+	public void setAlphaOn(boolean enable) {
+		this.isAlphaOn = enable;
 	}
 }
