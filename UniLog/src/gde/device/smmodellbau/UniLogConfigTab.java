@@ -481,6 +481,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											recordSet.setRecalculationRequired();
 											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 											UniLogConfigTab.this.application.updateDataTable();
+											recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 										}
 									}
 								}
@@ -561,6 +562,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 											UniLogConfigTab.this.application.updateGraphicsWindow();
 											UniLogConfigTab.this.application.updateDataTable();
+											recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 										}
 									}
 								}
@@ -658,6 +660,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 									UniLogConfigTab.this.application.updateDataTable();
+									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
@@ -686,6 +689,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 									UniLogConfigTab.this.application.updateDataTable();
+									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);
 							}
@@ -1024,6 +1028,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[8]).setDisplayable(enabled);
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.prop100WLabel.setEnabled(enabled);
@@ -1060,6 +1065,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[10]).setDisplayable(enabled);
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.slopeLabel.setEnabled(enabled);
@@ -1122,6 +1128,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[3]).setDisplayable(enabled);
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.capacityLabel.setEnabled(enabled);
@@ -1151,6 +1158,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[4]).setDisplayable(enabled);
 				activeRecordSet.get(activeRecordSet.getRecordNames()[5]).setDisplayable(enabled);
 				activeRecordSet.get(activeRecordSet.getRecordNames()[6]).setDisplayable(enabled);
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.powerLabel.setEnabled(enabled);
@@ -1431,6 +1439,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
 				
 				UniLogConfigTab.this.application.updateGraphicsWindow();
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.setConfigButton.setEnabled(true);

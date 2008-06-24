@@ -250,6 +250,7 @@ public class PicolarioConfigTab extends Composite {
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 										PicolarioConfigTab.this.application.updateGraphicsWindow();
+										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 									}
 								}
 								PicolarioConfigTab.this.isConfigChanged = true;
@@ -272,6 +273,7 @@ public class PicolarioConfigTab extends Composite {
 												Record activeRecord = activeRecordSet.get(measurementKey);
 												activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 												PicolarioConfigTab.this.application.updateGraphicsWindow();
+												activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}
 										}
 									}
@@ -333,6 +335,7 @@ public class PicolarioConfigTab extends Composite {
 										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 										PicolarioConfigTab.this.application.updateDataTable();
+										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 									}
 								}
 								PicolarioConfigTab.this.isConfigChanged = true;
@@ -361,6 +364,7 @@ public class PicolarioConfigTab extends Composite {
 										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 										PicolarioConfigTab.this.application.updateDataTable();
+										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 									}
 								}
 								PicolarioConfigTab.this.isConfigChanged = true;
@@ -528,6 +532,7 @@ public class PicolarioConfigTab extends Composite {
 				activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT).setValue(""+PicolarioConfigTab.this.doOffsetHeight);
 				activeRecord.getProperty(IDevice.OFFSET).setValue(""+PicolarioConfigTab.this.heightOffsetValue);
 				PicolarioConfigTab.this.application.updateGraphicsWindow();
+				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
 		this.isConfigChanged = true;
