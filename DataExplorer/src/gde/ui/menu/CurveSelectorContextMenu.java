@@ -124,8 +124,13 @@ public class CurveSelectorContextMenu {
 							}
 							
 							// disable clear, if nothing to clear
-							if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0)
+							if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0) {
 								CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
+							}
+							// compare window has fixed defined scale end values
+							if (CurveSelectorContextMenu.this.recordSet.isCompareSet()) {
+								CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
+							}
 						}
 						else
 							setAllEnabled(false);
@@ -808,7 +813,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.horizontalGridEveryTick = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEveryTick.setText("jede Zeitmarke");
+			this.horizontalGridEveryTick.setText("jede Marke");
 			this.horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.finest("horizontalGridMain Action performed! " + e);
@@ -827,7 +832,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.horizontalGridEverySecond = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEverySecond.setText("jede zweite Zeitmarke");
+			this.horizontalGridEverySecond.setText("jede zweite Marke");
 			this.horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.finest("horizontalGridMod60 Action performed! " + e);
@@ -987,16 +992,20 @@ public class CurveSelectorContextMenu {
 								compareSet.setHorizontalGridRecordKey(newRecordkey);
 							}
 							int maxRecordSize = compareSet.getMaxSize();
-							double oldMinValue = compareSet.getMinValue();
-							double oldMaxValue = compareSet.getMaxValue();
-							log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
 							for (String recordKey : compareSet.keySet()) {
 								if (compareSet.get(recordKey).realSize() > maxRecordSize) {
 									compareSet.setMaxSize(compareSet.get(recordKey).realSize());
 								}
+							}
+							log.fine(" adapt compare set maxRecordSize = " + maxRecordSize);
+							
+							double oldMinValue = compareSet.getMinValue();
+							double oldMaxValue = compareSet.getMaxValue();
+							log.fine(String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue));
+							for (String recordKey : compareSet.keySet()) {
 								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
 								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
-								log.fine(String.format("scale values from record to be added min=%.3f max=%.3f", newMinValue, newMaxValue));
+								log.fine(String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue));
 
 								if (newMinValue < oldMinValue) {
 									compareSet.setMinValue(newMinValue); // store new min value into record set

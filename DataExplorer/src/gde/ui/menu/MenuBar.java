@@ -924,13 +924,16 @@ public class MenuBar {
 		FileDialog fileDialog;
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? this.fileSep + this.application.getActiveDevice().getName() : "";
-		String path = deviceSetting.getDataFilePath() + devicePath + this.fileSep;
+		String path = deviceSetting.getDataFilePath() + devicePath;
+		if (!FileUtils.checkDirectoryAndCreate(path)) {
+			this.application.openMessageDialog("Hinweis : Das Verzeichnis " + path + " wurde neu angelegt, um die Gerätedaten dort abzulegen!");
+		}
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
-			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path, getFileNameProposal());
+			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { "*.osd" }, path + this.fileSep, getFileNameProposal());
 			filePath = fileDialog.getFilterPath() + this.fileSep + fileDialog.getFileName();
 		}
 		else {
-			filePath = path + fileName; // including ending ".osd"
+			filePath = path + this.fileSep + fileName; // including ending ".osd"
 		}
 
 		if (filePath.length() > 4 && !filePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
