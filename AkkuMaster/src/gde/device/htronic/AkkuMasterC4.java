@@ -205,7 +205,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.info("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName());
 	}
 	
 	/**
@@ -217,15 +217,26 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				String[] recordNames = this.getMeasurementNames(recordSet.getChannelConfigName());
-				for (String recordKey : recordNames) {
-					MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), recordKey);
-					if (measurement.isCalculation()) {
-						AkkuMasterC4.log.fine(recordKey);
-						this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-						this.calculationThreads.get(recordKey).start();
-					}
+			// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+				String[] recordNames = recordSet.getRecordNames();
+				String[] measurementNames = this.getMeasurementNames(recordSet.getChannelConfigName());
+				
+				String recordKey = recordNames[3]; //3=Leistung
+				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[3]);
+				if (measurement.isCalculation()) {
+					AkkuMasterC4.log.fine(recordKey);
+					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 				}
+				this.calculationThreads.get(recordKey).start();
+				
+				recordKey = recordNames[4]; //4=Energie
+				measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[4]);
+				if (measurement.isCalculation()) {
+					AkkuMasterC4.log.fine(recordKey);
+					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+				}
+				this.calculationThreads.get(recordKey).start();
+				
 			}
 			catch (RuntimeException e) {
 				AkkuMasterC4.log.log(Level.SEVERE, e.getMessage(), e);
