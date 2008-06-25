@@ -29,12 +29,15 @@ import osde.ui.OpenSerialDataExplorer;
 public abstract class DeviceDialog extends Dialog {
 
 	protected Shell	dialogShell;
-	protected	int		shellAlpha = 50; //TODO settings
-	protected boolean	isAlphaOn = true;
-	protected boolean	isInDialog = false;
 	
-	protected boolean isClosePossible = true; // use this variable to manage if dialog can be disposed 
-	protected String disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
+	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port this flag eleminates warning loops in case of none modal dialog
+	
+	protected	int				shellAlpha = 50; //TODO settings
+	protected boolean		isAlphaOn = true;//TODO settings
+	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
+	
+	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
+	protected String 		disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
 	
 	protected final OpenSerialDataExplorer application;
 
@@ -111,22 +114,28 @@ public abstract class DeviceDialog extends Dialog {
 		this.isClosePossible = enabled;
 	}
 
-	int getShellAlpha() {
+	public int getShellAlpha() {
 		return this.shellAlpha;
 	}
 
 	public synchronized void setShellAlpha(int newShellAlpha) {
 			if (newShellAlpha > this.shellAlpha) {
-				for (int i = this.dialogShell.getAlpha(); i <= 254; i+=3) {
+				//System.out.println("fade-in");
+				for (int i = this.shellAlpha; i < 254; i+=5) {
 					this.dialogShell.setAlpha(i);
+					//System.out.print(i + " ");
 				}
 				this.dialogShell.setAlpha(254);
+				//System.out.println();
 			}
 			else {
-				for (int i = this.dialogShell.getAlpha(); i >= this.shellAlpha; i-=3) {
+				//System.out.println("fade-out");
+				for (int i = 254; i > this.shellAlpha; i-=5) {
 					this.dialogShell.setAlpha(i);
+					//System.out.print(i + " ");
 				}
-				this.dialogShell.setAlpha(shellAlpha);
+				//System.out.println();
+				this.dialogShell.setAlpha(this.shellAlpha);
 			}
 	}
 
@@ -136,5 +145,19 @@ public abstract class DeviceDialog extends Dialog {
 
 	public void setAlphaOn(boolean enable) {
 		this.isAlphaOn = enable;
+	}
+
+	/**
+	 * @return the isFailedConnectionWarned
+	 */
+	public boolean isFailedConnectionWarned() {
+		return this.isFailedConnectionWarned;
+	}
+
+	/**
+	 * @param isFailedConnectionWarned the isFailedConnectionWarned to set
+	 */
+	public void setFailedConnectionWarned(boolean enabled) {
+		this.isFailedConnectionWarned = enabled;
 	}
 }
