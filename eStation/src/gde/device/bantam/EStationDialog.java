@@ -402,7 +402,7 @@ public class EStationDialog extends DeviceDialog {
 							EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
 							boolean isEnterShellEvt = (evt.x < 8 || evt.x > EStationDialog.this.boundsSize.x - 8 || evt.y < 8 || evt.y > EStationDialog.this.boundsSize.y - 8) ? true : false;
 							EStationDialog.log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + EStationDialog.this.boundsSize);
-							if (isEnterShellEvt && isAlphaOn() && EStationDialog.this.settings.isDeviceDialogsModal()) {
+							if (isEnterShellEvt && isAlphaOn()) {
 								setShellAlpha(254);
 							}
 						}
@@ -418,7 +418,7 @@ public class EStationDialog extends DeviceDialog {
 							EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
 							boolean isExitShellEvt = (evt.x < 8 || evt.x > EStationDialog.this.boundsSize.x - 8 || evt.y < 8 || evt.y > EStationDialog.this.boundsSize.y - 8) ? true : false;
 							EStationDialog.log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + EStationDialog.this.boundsSize);
-							if (isExitShellEvt && isAlphaOn() && EStationDialog.this.settings.isDeviceDialogsModal()) {
+							if (isExitShellEvt && isAlphaOn()) {
 								setShellAlpha(getShellAlpha());
 							}
 						}

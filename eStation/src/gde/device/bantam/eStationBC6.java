@@ -18,8 +18,6 @@ import osde.device.IDevice;
 public class eStationBC6 extends eStation implements IDevice {
 	final static Logger						log	= Logger.getLogger(eStationBC6.class.getName());
 
-	final EStationBC6Dialog				dialog;
-
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -27,7 +25,7 @@ public class eStationBC6 extends eStation implements IDevice {
 	 */
 	public eStationBC6(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		this.dialog = new EStationBC6Dialog(this.application.getShell(), this);
+		this.dialog = new EStationDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -36,7 +34,7 @@ public class eStationBC6 extends eStation implements IDevice {
 	 */
 	public eStationBC6(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		this.dialog = new EStationBC6Dialog(this.application.getShell(), this);
+		this.dialog = new EStationDialog(this.application.getShell(), this);
 	}
 
 //	/**
@@ -204,7 +202,7 @@ public class eStationBC6 extends eStation implements IDevice {
 	/**
 	 * @return the dialog
 	 */
-	public EStationBC6Dialog getDialog() {
+	public EStationDialog getDialog() {
 		return this.dialog;
 	}
 

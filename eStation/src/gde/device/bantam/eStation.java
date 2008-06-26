@@ -23,7 +23,7 @@ import osde.ui.OpenSerialDataExplorer;
  * Sample device class, used as template for new device implementations
  * @author Winfried Brügmann
  */
-public class eStation extends DeviceConfiguration {
+public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log_base	= Logger.getLogger(eStation.class.getName());
 	
 	public static	final	String[]	USAGE_MODE = { "off", "discharge", "charge"}; 
@@ -33,7 +33,7 @@ public class eStation extends DeviceConfiguration {
 	public final static String		CONFIG_WAIT_TIME						= "wait_time";
 	public final static String		CONFIG_IN_VOLTAGE_CUT_OFF		= "in_voltage_cut_off";
 	public final static String		CONFIG_SAFETY_TIME					= "safety_time";
-	public final static String		CONFIG_SET_CAPATIVE					= "capacity_cut_off";
+	public final static String		CONFIG_SET_CAPASITY					= "capacity_cut_off";
 	public final static String		CONFIG_PROCESSING						= "processing";
 	public final static String		CONFIG_BATTERY_TYPE					= "battery_type";
 	public final static String		CONFIG_PROCESSING_TIME			= "processing_time";
@@ -41,6 +41,8 @@ public class eStation extends DeviceConfiguration {
 	protected final OpenSerialDataExplorer				application;
 	protected final EStationSerialPort						serialPort;
 	protected final Channels											channels;
+	protected       EStationDialog								dialog;
+
 	protected HashMap<String, CalculationThread>	calculationThreads	= new HashMap<String, CalculationThread>();
 
 	/**
@@ -183,7 +185,7 @@ public class eStation extends DeviceConfiguration {
 	 * @param dataBuffer [lenght 76 bytes]
 	 * @return 0 = no processing, 1 = discharge, 2 = charge
 	 */
-	private int getProcessingMode(byte[] dataBuffer) {
+	public int getProcessingMode(byte[] dataBuffer) {
 		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // 0=off, no processing; 1=discharge or charge
 		if(modeIndex != 0) {
 			modeIndex = (dataBuffer[8] & 0xFF)-0x80 == 0x01 || (dataBuffer[8] & 0xFF)-0x80 == 0x11 ? 2 : 1;
@@ -201,7 +203,7 @@ public class eStation extends DeviceConfiguration {
 		configData.put(eStation.CONFIG_WAIT_TIME,      ""+(dataBuffer[ 5] & 0xFF - 0x80));
 		configData.put(eStation.CONFIG_IN_VOLTAGE_CUT_OFF, ""+(dataBuffer[ 7] & 0xFF - 0x80)/10);
 		configData.put(eStation.CONFIG_SAFETY_TIME,  ""+((dataBuffer[29] & 0xFF - 0x80)*100 + (dataBuffer[30] & 0xFF - 0x80) * 10));
-		configData.put(eStation.CONFIG_SET_CAPATIVE, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80))));
+		configData.put(eStation.CONFIG_SET_CAPASITY, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80))));
 		if(getProcessingMode(dataBuffer) != 0) {
 			configData.put(eStation.CONFIG_BATTERY_TYPE, eStation.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80)]);
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80)));
@@ -323,4 +325,12 @@ public class eStation extends DeviceConfiguration {
 	public String[] getUsedPropertyKeys() {
 		return new String[] {IDevice.OFFSET, IDevice.FACTOR};
 	}
+	
+	/**
+	 * @return the dialog
+	 */
+	public EStationDialog getDialog() {
+		return this.dialog;
+	}
+
 }
