@@ -89,7 +89,8 @@ public class EStationSerialPort extends DeviceSerialPort {
 			throw e;
 		}
 		finally {
-			if (isPortOpenedByMe) this.close();
+			if (isPortOpenedByMe) 
+				this.close();
 		}
 		return data;
 	}

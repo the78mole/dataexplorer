@@ -161,14 +161,14 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.finer("boundsComposite.paintControl() " + evt);
-							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
-								EStationDialog.this.startCollectDataButton.setEnabled(true);
-								EStationDialog.this.stopColletDataButton.setEnabled(false);
-							}
-							else {
-								EStationDialog.this.startCollectDataButton.setEnabled(false);
-								EStationDialog.this.stopColletDataButton.setEnabled(true);
-							}
+//							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
+//								EStationDialog.this.startCollectDataButton.setEnabled(false);
+//								EStationDialog.this.stopColletDataButton.setEnabled(true);
+//							}
+//							else {
+//								EStationDialog.this.startCollectDataButton.setEnabled(true);
+//								EStationDialog.this.stopColletDataButton.setEnabled(false);
+//							}
 						}
 					});
 					{
@@ -235,8 +235,10 @@ public class EStationDialog extends DeviceDialog {
 									
 									if (Channels.getInstance().getActiveChannel() != null) {
 											RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-											// active record set name == life gatherer record name
-											EStationDialog.this.dataGatherThread.finalizeRecordSet(activeRecordSet.getName());
+											if (activeRecordSet != null) {
+												// active record set name == life gatherer record name
+												EStationDialog.this.dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
+											}
 									}
 								}
 								EStationDialog.this.startCollectDataButton.setEnabled(true);
@@ -398,13 +400,7 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
 						@Override
 						public void mouseEnter(MouseEvent evt) {
-							EStationDialog.log.fine("boundsComposite.mouseEnter, event=" + evt);
-							EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
-							boolean isEnterShellEvt = (evt.x < 8 || evt.x > EStationDialog.this.boundsSize.x - 8 || evt.y < 8 || evt.y > EStationDialog.this.boundsSize.y - 8) ? true : false;
-							EStationDialog.log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + EStationDialog.this.boundsSize);
-							if (isEnterShellEvt && isAlphaOn()) {
-								setShellAlpha(254);
-							}
+							fadeOutAplhaBlending(evt, EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize(), 10);
 						}
 
 						@Override
@@ -414,13 +410,7 @@ public class EStationDialog extends DeviceDialog {
 
 						@Override
 						public void mouseExit(MouseEvent evt) {
-							EStationDialog.log.fine("boundsComposite.mouseExit, event=" + evt);
-							EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
-							boolean isExitShellEvt = (evt.x < 8 || evt.x > EStationDialog.this.boundsSize.x - 8 || evt.y < 8 || evt.y > EStationDialog.this.boundsSize.y - 8) ? true : false;
-							EStationDialog.log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + EStationDialog.this.boundsSize);
-							if (isExitShellEvt && isAlphaOn()) {
-								setShellAlpha(getShellAlpha());
-							}
+							fadeInAlpaBlending(evt, EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize(), 10);
 						}
 					});
 				} // end boundsComposite
@@ -482,5 +472,36 @@ public class EStationDialog extends DeviceDialog {
 	public void resetButtons() {
 		this.startCollectDataButton.setEnabled(true);
 		this.stopColletDataButton.setEnabled(false);
+	}
+
+	/**
+	 * fade out alpha blending from 254 to the configured alpha value
+	 * @param evt
+	 * @param outherBoundSize
+	 * @param gapLimit
+	 */
+	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
+		log.fine("boundsComposite.mouseEnter, event=" + evt);
+		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize);
+		if (isEnterShellEvt && isAlphaOn()) {
+			setShellAlpha(254);
+		}
+	}
+
+	/**
+	 * fade in alpha blending the configured alpha value to 254
+	 * @param evt
+	 * @param outherBoundSize
+	 * @param gapLimit
+	 */
+	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
+		log.fine("boundsComposite.mouseExit, event=" + evt);
+		EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
+		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize);
+		if (isExitShellEvt && isAlphaOn()) {
+			setShellAlpha(getShellAlpha());
+		}
 	}
 }
