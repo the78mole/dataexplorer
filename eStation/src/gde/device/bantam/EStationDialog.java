@@ -18,7 +18,6 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -47,12 +46,11 @@ public class EStationDialog extends DeviceDialog {
 	final static Logger						log									= Logger.getLogger(EStationDialog.class.getName());
 
 	Text													infoText;
-	Button												okButton;
+	Button												closeButton;
 	Button												stopColletDataButton;
 	Button												startCollectDataButton;
 
 	Composite											boundsComposite;
-	Point													boundsSize;
 	Group													configGroup;
 	Composite											composite1;
 	Composite											composite2;
@@ -139,10 +137,10 @@ public class EStationDialog extends DeviceDialog {
 				if (this.settings.isDeviceDialogsModal()) 
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.TRANSPARENCY_ALPHA);
 				else
-					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
+					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if(this.isAlphaOn) this.dialogShell.setAlpha(50); // TODO settings
+				if(this.isAlphaEnabled) this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
 				this.dialogShell.setLayout(new FormLayout());
 				this.dialogShell.setText("e-Station BC6 ToolBox");
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
@@ -158,9 +156,9 @@ public class EStationDialog extends DeviceDialog {
 					boundsCompositeLData.bottom = new FormAttachment(1000, 1000, 0);
 					this.boundsComposite.setLayoutData(boundsCompositeLData);
 					this.boundsComposite.setLayout(new FormLayout());
-					this.boundsComposite.addPaintListener(new PaintListener() {
-						public void paintControl(PaintEvent evt) {
-							log.finer("boundsComposite.paintControl() " + evt);
+//					this.boundsComposite.addPaintListener(new PaintListener() {
+//						public void paintControl(PaintEvent evt) {
+//							log.finer("boundsComposite.paintControl() " + evt);
 //							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
 //								EStationDialog.this.startCollectDataButton.setEnabled(false);
 //								EStationDialog.this.stopColletDataButton.setEnabled(true);
@@ -169,8 +167,8 @@ public class EStationDialog extends DeviceDialog {
 //								EStationDialog.this.startCollectDataButton.setEnabled(true);
 //								EStationDialog.this.stopColletDataButton.setEnabled(false);
 //							}
-						}
-					});
+//						}
+//					});
 					{
 						FormData infoTextLData = new FormData();
 						infoTextLData.height = 70;
@@ -181,6 +179,7 @@ public class EStationDialog extends DeviceDialog {
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText("Diese Gerät kann nur Daten lesen.\nDie Schnittstelle schliesst sich automatisch, wenn das Gerät 3 Minuten lang weder laden oder entladen signalisiert.");
 						this.infoText.setEditable(false);
+						this.infoText.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData startCollectDataButtonLData = new FormData();
@@ -215,6 +214,7 @@ public class EStationDialog extends DeviceDialog {
 								}
 							}
 						});
+						this.startCollectDataButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData stopColletDataButtonLData = new FormData();
@@ -246,6 +246,7 @@ public class EStationDialog extends DeviceDialog {
 								EStationDialog.this.setClosePossible(true);
 							}
 						});
+						this.stopColletDataButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData configGroupLData = new FormData();
@@ -379,65 +380,66 @@ public class EStationDialog extends DeviceDialog {
 								this.cellTypeUnit.setText("");
 							}
 						}
+						this.configGroup.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					{
-						FormData okButtonLData = new FormData();
-						okButtonLData.height = 30;
-						okButtonLData.bottom = new FormAttachment(1000, 1000, -12);
-						okButtonLData.left = new FormAttachment(0, 1000, 12);
-						okButtonLData.right = new FormAttachment(1000, 1000, -12);
-						this.okButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.okButton.setLayoutData(okButtonLData);
-						this.okButton.setText("Schliessen");
-						this.okButton.addSelectionListener(new SelectionAdapter() {
-							@Override
+						FormData closeButtonLData = new FormData();
+						closeButtonLData.height = 30;
+						closeButtonLData.bottom = new FormAttachment(1000, 1000, -12);
+						closeButtonLData.left = new FormAttachment(0, 1000, 12);
+						closeButtonLData.right = new FormAttachment(1000, 1000, -12);
+						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
+						this.closeButton.setLayoutData(closeButtonLData);
+						this.closeButton.setText("Schliessen");
+						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("okButton.widgetSelected, event=" + evt);
 								close();
 							}
 						});
+						this.closeButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
-						@Override
 						public void mouseEnter(MouseEvent evt) {
-							fadeOutAplhaBlending(evt, EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize(), 10);
+							log.fine("boundsComposite.mouseEnter, event=" + evt);
+							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12);
 						}
-
-						@Override
 						public void mouseHover(MouseEvent evt) {
-							EStationDialog.log.finest("boundsComposite.mouseHover, event=" + evt);
+							log.finest("boundsComposite.mouseHover, event=" + evt);
 						}
-
-						@Override
 						public void mouseExit(MouseEvent evt) {
-							fadeInAlpaBlending(evt, EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize(), 10);
+							log.fine("boundsComposite.mouseExit, event=" + evt);
+							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12);
 						}
 					});
 				} // end boundsComposite
 
 				this.dialogShell.addFocusListener(new FocusAdapter() {
-					@Override
 					public void focusGained(FocusEvent evt) {
 						EStationDialog.log.finer("dialogShell.focusGained, event=" + evt);
-						// this is only placed in the focus listener as hint, do not forget place this query 
-						if (EStationDialog.this.serialPort != null && !isFailedConnectionWarned()) {
-							try {
-								EStationDialog.this.configData = EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());//serialPort.getData());
-								EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
-								EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
-								EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
-								EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
-								EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								if (EStationDialog.this.serialPort != null && !isFailedConnectionWarned()) {
+									try {
+										EStationDialog.this.configData = EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());//serialPort.getData());
+										EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
+										EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
+										EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
+										EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
+										EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
+									}
+									catch (Exception e) {
+										EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "?");
+										EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "?");
+										EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "?");
+										EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "?");
+										EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "?");
+										EStationDialog.this.application.openMessageDialogAsync("Serieller Port Fehler : " + e.getClass().getSimpleName() + " - " + e.getMessage()
+												+ "\nHinweis : Der Gerätevorgang könnte inzwischen beendet sein ?");
+									}
+								}
 							}
-							catch (Exception e) {
-								EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "?");
-								EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "?");
-								EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "?");
-								EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "?");
-								EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "?");
-								EStationDialog.this.application.openMessageDialogAsync("Serieller Port Fehler : " + e.getClass().getSimpleName() + " - " + e.getMessage());
-							}
-						}
+						});
 					}
 				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
@@ -472,36 +474,5 @@ public class EStationDialog extends DeviceDialog {
 	public void resetButtons() {
 		this.startCollectDataButton.setEnabled(true);
 		this.stopColletDataButton.setEnabled(false);
-	}
-
-	/**
-	 * fade out alpha blending from 254 to the configured alpha value
-	 * @param evt
-	 * @param outherBoundSize
-	 * @param gapLimit
-	 */
-	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
-		log.fine("boundsComposite.mouseEnter, event=" + evt);
-		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
-		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize);
-		if (isEnterShellEvt && isAlphaOn()) {
-			setShellAlpha(254);
-		}
-	}
-
-	/**
-	 * fade in alpha blending the configured alpha value to 254
-	 * @param evt
-	 * @param outherBoundSize
-	 * @param gapLimit
-	 */
-	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
-		log.fine("boundsComposite.mouseExit, event=" + evt);
-		EStationDialog.this.boundsSize = EStationDialog.this.boundsComposite.getSize();
-		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
-		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize);
-		if (isExitShellEvt && isAlphaOn()) {
-			setShellAlpha(getShellAlpha());
-		}
 	}
 }

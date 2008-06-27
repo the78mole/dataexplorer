@@ -78,7 +78,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			for (byte b : data) {
 				sb.append(String.format("0x%02x ,", b));
 			}
-			log.info(sb.toString());
+			if (log.isLoggable(Level.FINER)) log.finer(sb.toString());
 			
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
@@ -105,7 +105,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 		int check_sum = Checksum.ADD(buffer, 1, 72);
 		if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
 			isOK = true;
-		log.info("Check_sum = " + isOK);
+		if (log.isLoggable(Level.FINER)) log.finer("Check_sum = " + isOK);
 		return isOK;
 	}
 

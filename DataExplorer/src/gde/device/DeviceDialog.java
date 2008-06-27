@@ -16,7 +16,12 @@
 ****************************************************************************************/
 package osde.device;
 
+import java.util.logging.Logger;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
@@ -27,18 +32,32 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public abstract class DeviceDialog extends Dialog {
+	final static Logger log = Logger.getLogger(DeviceDialog.class.getName());
 
 	protected Shell	dialogShell;
 	
 	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port this flag eleminates warning loops in case of none modal dialog
 	
 	protected	int				shellAlpha = 50; //TODO settings
-	protected boolean		isAlphaOn = true;//TODO settings
+	protected boolean		isAlphaEnabled = true;//TODO settings
+	protected boolean 	isFadeOut = false; // false = aplha value is lower 254
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
 	protected String 		disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
 	
+	protected MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
+		public void mouseEnter(MouseEvent evt) {
+			log.fine("mouseEnter, event=" + evt);
+			fadeOutAplhaBlending();
+		}
+		public void mouseHover(MouseEvent evt) {
+			log.finest("mouseHover, event=" + evt);
+		}
+		public void mouseExit(MouseEvent evt) {
+			log.finest("mouseEnter, event=" + evt);
+		}
+	};	
 	protected final OpenSerialDataExplorer application;
 
 	/**
@@ -139,12 +158,8 @@ public abstract class DeviceDialog extends Dialog {
 			}
 	}
 
-	public boolean isAlphaOn() {
-		return this.isAlphaOn;
-	}
-
-	public void setAlphaOn(boolean enable) {
-		this.isAlphaOn = enable;
+	public boolean isAlphaEnabled() {
+		return this.isAlphaEnabled;
 	}
 
 	/**
@@ -159,5 +174,45 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void setFailedConnectionWarned(boolean enabled) {
 		this.isFailedConnectionWarned = enabled;
+	}
+		
+	/**
+	 * fade out alpha blending from 254 to the configured alpha value
+	 */
+	public void fadeOutAplhaBlending() {
+		if (!this.isFadeOut && this.isAlphaEnabled) {
+			setShellAlpha(254);
+			this.isFadeOut = true;
+		}
+	}
+
+	/**
+	 * fade out alpha blending from 254 to the configured alpha value
+	 * @param evt
+	 * @param outherBoundSize
+	 * @param gapLimit
+	 */
+	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
+		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize);
+		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
+			setShellAlpha(254);
+			this.isFadeOut = true;
+		}
+	}
+
+	/**
+	 * fade in alpha blending the configured alpha value to 254
+	 * @param evt
+	 * @param outherBoundSize
+	 * @param gapLimit
+	 */
+	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
+		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize);
+		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
+			setShellAlpha(getShellAlpha());
+			this.isFadeOut = false;
+		}
 	}
 }

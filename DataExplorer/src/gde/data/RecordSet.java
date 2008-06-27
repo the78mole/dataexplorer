@@ -388,12 +388,12 @@ public class RecordSet extends HashMap<String, Record> {
 				Record record = this.getRecord(this.recordNames[i]);
 				record.add((new Integer(points[i])).intValue());
 			}
-			if (log.isLoggable(Level.INFO)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(" ");
 				}
-				log.info(sb.toString());
+				log.fine(sb.toString());
 			}
 			if (doUpdate) {
 				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {

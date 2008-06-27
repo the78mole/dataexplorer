@@ -420,7 +420,15 @@ public class Record extends Vector<Integer> {
 			return this.minValue == this.maxValue ? this.minValue - 100 : this.minValue;
 	}
 
-	/**
+	public int getRealMaxValue() {
+		return this.maxValue;
+	}
+
+	public int getRealMinValue() {
+		return this.minValue;
+	}
+
+/**
 	 * overwrites size method for zoom mode and not zoomed compare window
 	 */
 	public int size() {

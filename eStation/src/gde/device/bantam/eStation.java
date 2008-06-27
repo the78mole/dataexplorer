@@ -26,7 +26,7 @@ import osde.ui.OpenSerialDataExplorer;
 public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log_base	= Logger.getLogger(eStation.class.getName());
 	
-	public static	final	String[]	USAGE_MODE = { "off", "discharge", "charge"}; 
+	public static	final	String[]	USAGE_MODE = { "off", "entladen", "laden"}; 
 	public static	final	String[]	ACCU_TYPES = { "Lithium", "NiMH", "NiCd", "Pb"}; 
 
 	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off";
@@ -205,11 +205,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		configData.put(eStation.CONFIG_SAFETY_TIME,  ""+((dataBuffer[29] & 0xFF - 0x80)*100 + (dataBuffer[30] & 0xFF - 0x80) * 10));
 		configData.put(eStation.CONFIG_SET_CAPASITY, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80))));
 		if(getProcessingMode(dataBuffer) != 0) {
-			configData.put(eStation.CONFIG_BATTERY_TYPE, eStation.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80)]);
+			configData.put(eStation.CONFIG_BATTERY_TYPE, eStation.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80) - 1]);
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80)));
 		}
 		for (String key : configData.keySet()) {
-			log_base.info(key + " = " + configData.get(key));
+			log_base.fine(key + " = " + configData.get(key));
 		}
 		return configData;
 	}
@@ -286,6 +286,18 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 				String[] recordNames = recordSet.getRecordNames();
 				String[] measurementNames = this.getMeasurementNames(recordSet.getChannelConfigName());
+				int displayableCounter = 0;
+				Record record;
+
+				
+				// check if measurements isActive == false and set to isDisplayable == false
+				for (String measurementKey : recordNames) {
+					record = recordSet.get(measurementKey);
+					
+					if (record.isActive()) {
+						++displayableCounter;
+					}
+				}
 				
 				String recordKey = recordNames[3]; //3=Leistung
 				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[3]);
@@ -294,6 +306,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 				}
 				this.calculationThreads.get(recordKey).start();
+				++displayableCounter;
 				
 				recordKey = recordNames[4]; //4=Energie
 				measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[4]);
@@ -302,7 +315,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 				}
 				this.calculationThreads.get(recordKey).start();
+				++displayableCounter;
 				
+				log_base.fine("displayableCounter = " + displayableCounter);
+				recordSet.setConfiguredDisplayable(displayableCounter);
 			}
 			catch (RuntimeException e) {
 				log_base.log(Level.SEVERE, e.getMessage(), e);

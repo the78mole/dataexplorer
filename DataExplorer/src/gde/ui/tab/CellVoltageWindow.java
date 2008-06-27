@@ -50,11 +50,12 @@ public class CellVoltageWindow {
 
 	final Channels									channels;
 	final TabFolder									displayTab;
-	RecordSet												oldRecordSet;
-	Channel													oldChannel;
+	RecordSet												oldRecordSet = null;
+	Channel													oldChannel = null;
 	
-	private int[]														values;
-	private int 														voltageDelta = 0;
+	int[]														voltageValues;
+	int 														voltageDelta = 0;
+	Point 													displayCompositeSize = new Point(0,0);
 
 	public CellVoltageWindow(TabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
@@ -118,13 +119,14 @@ public class CellVoltageWindow {
 	/**
 	 * method to update the window with its children
 	 */
-	public void updateChilds(int[] voltageValues) {
-		this.voltageDelta = calculateVoltageDelta(voltageValues);
+	public void updateChilds(int[] newVoltageValues) {
+		this.voltageValues = newVoltageValues;
+		this.voltageDelta = calculateVoltageDelta(newVoltageValues);
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null && voltageValues.length == this.displays.size()) { // channel does not have a record set yet
-			for (int i=0; i<this.displays.size() && i<voltageValues.length; ++i) {
-				this.displays.get(i).setVoltage(i+1, voltageValues[i]);
-				log.fine("setVoltage cell " + i);
+		if (recordSet != null && this.voltageValues.length == this.displays.size()) { // channel does not have a record set yet
+			for (int i=0; i<this.voltageValues.length; ++i) {
+				this.displays.get(i).setVoltage(i+1, this.voltageValues[i]);
+				log.fine("setVoltage cell " + i + " - " + this.voltageValues[i]);
 			}
 		}
 		else {
@@ -147,25 +149,27 @@ public class CellVoltageWindow {
 
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
-				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName());
+				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
+						|| this.displays.size() != this.voltageValues.length;
 						
 				log.fine("isUpdateRequired = " + isUpdateRequired);
 				if (isUpdateRequired) {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// cleanup
-					for (int i=0; i<this.displays.size(); ++i) {
-						CellVoltageDisplay display = this.displays.firstElement();
+					while (this.displays.size() > 0) {
+						CellVoltageDisplay display = this.displays.lastElement();
 						if (display != null) {
 							if (!display.isDisposed()) display.dispose();
 							this.displays.remove(display);
 						}
 					}
 					// add new
-					for (int i=0; this.values!=null && i<this.values.length; ++i) {
-						int value = this.values[i];
-						CellVoltageDisplay display = new CellVoltageDisplay(this, this.coverComposite, value, OpenSerialDataExplorer.getInstance().getActiveDevice());
+					for (int i=0; this.voltageValues!=null && i<this.voltageValues.length; ++i) {
+						int value = this.voltageValues[i];
+						CellVoltageDisplay display = new CellVoltageDisplay(this, this.coverComposite, value);
 						display.create();
+						display.redraw();
 						log.fine("created cellVoltage display for " + value);
 						this.displays.add(display);
 					}
@@ -177,8 +181,8 @@ public class CellVoltageWindow {
 				//updateChilds(new int[] { 2500, 4150, 4100, 3700 });
 			}
 			else { // clean up after device switched
-				for (int i=0; i<this.displays.size(); ++i) {
-					CellVoltageDisplay display = this.displays.firstElement();
+				while (this.displays.size() > 0) {
+					CellVoltageDisplay display = this.displays.lastElement();
 					if (display != null) {
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(display);
@@ -197,8 +201,8 @@ public class CellVoltageWindow {
 	 * @param newValues
 	 */
 	private int calculateVoltageDelta(int[] newValues) {
-		int min = Integer.MAX_VALUE;
-		int max = Integer.MIN_VALUE;
+		int min = newValues[0];
+		int max = newValues[0];
 		for (int value : newValues) {
 			if (value < min) min = value;
 			else if (value > max) max = value;
@@ -211,5 +215,12 @@ public class CellVoltageWindow {
 	 */
 	public int getVoltageDelta() {
 		return this.voltageDelta;
+	}
+
+	/**
+	 * @return the displayCompositeSize
+	 */
+	public Point getDisplayCompositeSize() {
+		return this.displayCompositeSize;
 	}
 }
