@@ -714,7 +714,7 @@ public class MenuBar {
 					String fileName = (String) historyImportMenuItem.getData(historyImportMenuItem.getText());
 					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
 					if (fileType != null && fileType.length() > 2) {
-						MenuBar.log.info("opening file = " + fileName);
+						MenuBar.log.fine("opening file = " + fileName);
 						if (fileType.equalsIgnoreCase("OSD")) {
 							openOsdFile(fileName);
 						}
@@ -989,7 +989,7 @@ public class MenuBar {
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = ChannelTypes.values()[activeDevice.getChannelType(channelNumber)].name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
-			log.info("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")");
+			log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")");
 			
 			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {

@@ -24,6 +24,7 @@ import gnu.io.SerialPortEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
@@ -282,6 +283,15 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		}
 	}
 
+	/**
+	 * read number of given bytes in a given time frame defined by time out value
+	 * @param bytes
+	 * @param timeoutInSeconds
+	 * @param waitTimes
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
 	public synchronized byte[] read(int bytes, int timeoutInSeconds) throws IOException, TimeOutException {
 
 		byte[] readBuffer = new byte[bytes];
@@ -292,6 +302,53 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (this.application != null) this.application.setSerialRxOn();
 
 			wait4Bytes(bytes, timeoutInSeconds);
+
+			while (bytes != readBytes && retryCounter-- > 0){
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+			}
+			
+			this.isReadBufferEmpty = true;
+			this.numBytesAvailable = 0;
+
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Read  data: ");
+				for (int i = 0; i < readBuffer.length; i++) {
+					sb.append(String.format("%02X ", readBuffer[i]));
+				}
+				log.fine(sb.toString());
+			}
+
+			if (this.application != null) this.application.setSerialRxOff();
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		return readBuffer;
+	}
+
+	/**
+	 * read number of given bytes in a given time frame defined by time out value
+	 * the reference to the wait time vector will add the actual wait time to have the read buffer ready to read the given number of bytes
+	 * @param bytes
+	 * @param timeoutInSeconds
+	 * @param waitTimes
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] read(int bytes, int timeoutInSeconds, Vector<Long> waitTimes) throws IOException, TimeOutException {
+
+		byte[] readBuffer = new byte[bytes];
+		int readBytes = 0;
+		int retryCounter = 5;
+
+		try {
+			if (this.application != null) this.application.setSerialRxOn();
+			long startTime_ms = new Date().getTime();
+			wait4Bytes(bytes, timeoutInSeconds);
+			waitTimes.add((new Date().getTime()) - startTime_ms);
 
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);

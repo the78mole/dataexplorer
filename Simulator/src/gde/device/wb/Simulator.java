@@ -152,7 +152,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.info("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName());
 	}
 
 	/**
