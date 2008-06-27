@@ -28,6 +28,7 @@ import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.exception.DataInconsitsentException;
+import osde.exception.TimeOutException;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -212,8 +213,8 @@ public class GathererThread extends Thread {
 					cleanup(GathererThread.this.recordSetKey, message, e);
 				}
 				catch (Throwable e) {
-					finalizeRecordSet(GathererThread.this.recordSetKey, false);
-					if (e instanceof java.io.IOException && GathererThread.this.isWaitTimeChargeDischarge) {
+					if (e instanceof TimeOutException && GathererThread.this.isWaitTimeChargeDischarge) {
+						finalizeRecordSet(GathererThread.this.recordSetKey, false);
 						try {
 							log.info("waiting...");
 							Thread.sleep(GathererThread.this.waitTime_ms+1500);

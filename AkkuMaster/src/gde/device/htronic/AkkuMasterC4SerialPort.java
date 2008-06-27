@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
+import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -133,8 +134,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	/**
 	 * OK start program
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	public synchronized void ok(byte[] channel) throws IOException {
+	public synchronized void ok(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
 		command[0] = new Integer(okStartProgram + channel[0]).byteValue();
 
@@ -148,8 +150,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	/**
 	 * start loaded program
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	public synchronized void start(byte[] channel) throws IOException {
+	public synchronized void start(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
 		command[0] = new Integer(startProgram + channel[0]).byteValue();
 
@@ -163,8 +166,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	/**
 	 * stop loaded program
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	public synchronized void stop(byte[] channel) throws IOException {
+	public synchronized void stop(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
 		command[0] = new Integer(stopProgram + channel[0]).byteValue();
 
@@ -179,9 +183,10 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * write new program to given memory number
 	 * Komando, Programm-Nummer, Wartezeit bis Formieren wiederholt wird, Akku Typ, Zellenzahl, Nominale Kapazität des Akkus, Entladestrom, Ladestrom
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
 	public synchronized void writeNewProgram(byte[] channel, int programNumber, int waitTime_days, int akkuTyp, int cellCount, int akkuCapacity, int dischargeCurrent_mA, int chargeCurrent_mA)
-			throws IOException {
+			throws IOException, TimeOutException {
 		byte[] command = new byte[11];
 		command[0] = new Integer(setNewProgramm + channel[0]).byteValue();
 		command[1] = new Integer(programNumber).byteValue();
@@ -212,8 +217,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * YYH byte Anzahl Wiederholungen (1 bit = 1 Wiederholung [2 . . 9])
 	 * YYYYH word Wartezeit (1 bit = 1 Minute [0 . . 43200])
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	public synchronized void setMemoryNumberCycleCoundSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException {
+	public synchronized void setMemoryNumberCycleCoundSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException, TimeOutException {
 		byte[] command = new byte[5];
 		command[0] = new Integer(setMomoryCycleSleep + channel[0]).byteValue();
 		command[1] = new Integer(memoryNumber).byteValue();
@@ -319,8 +325,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 *	[8] eingestellte Wartezeit bis Formieren wiederholt wird
 	 * @throws IOException 
 	 * @return String[] containing described values
+	 * @throws TimeOutException 
 	 */
-	public synchronized String[] getConfiguration(byte[] channel) throws IOException {
+	public synchronized String[] getConfiguration(byte[] channel) throws IOException, TimeOutException {
 		byte readConfigOfChannel[] = new byte[1];
 
 		int a = readConfiguration[0];
@@ -425,8 +432,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 *  [2] tatsächlicher Ladestrom
 	 * @throws IOException 
 	 * @return String[] containing described values
+	 * @throws TimeOutException 
 	 */
-	public synchronized String[] getAdjustedValues(byte[] channel) throws IOException {
+	public synchronized String[] getAdjustedValues(byte[] channel) throws IOException, TimeOutException {
 		String[] adjustments = new String[3];
 		byte readAdjustmentsOfChannel[] = new byte[1];
 
@@ -467,8 +475,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * [10] Verbleibende Wartezeit bis Formieren wiederholt wird
 	 * @return String[]
 	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	public synchronized String[] getMeasuredValues(byte[] channel) throws IOException {
+	public synchronized String[] getMeasuredValues(byte[] channel) throws IOException, TimeOutException {
 		byte readValuesOfChannel[] = new byte[1];
 
 		int a = readMeasuredValues[0];

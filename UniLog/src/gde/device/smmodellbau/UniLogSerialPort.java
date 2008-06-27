@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 
 import osde.device.DeviceConfiguration;
 import osde.exception.CheckSumMissmatchException;
+import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -401,8 +402,9 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * query if UniLog is connected and capable for communication
 	 * @return true/false
 	 * @throws IOException
+	 * @throws TimeOutException 
 	 */
-	public synchronized boolean checkConnectionStatus() throws IOException {
+	public synchronized boolean checkConnectionStatus() throws IOException, TimeOutException {
 		boolean isConnect = false;
 		int counter = 20;
 

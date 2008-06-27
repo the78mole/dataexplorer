@@ -282,7 +282,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		}
 	}
 
-	public synchronized byte[] read(int bytes, int timeoutInSeconds) throws IOException {
+	public synchronized byte[] read(int bytes, int timeoutInSeconds) throws IOException, TimeOutException {
 
 		byte[] readBuffer = new byte[bytes];
 		int readBytes = 0;
@@ -324,9 +324,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @param timeoutInSeconds
 	 * @param isTerminatedByChecksum
 	 * @return number of bytes in receive buffer
-	 * @throws IOException
+	 * @throws TimeOutException 
 	 */
-	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws IOException {
+	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws TimeOutException {
 		int counter = timeoutInSeconds * 1000;
 		int resBytes = 0;
 		try {
@@ -336,8 +336,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				counter--;
 				//if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
 				if (counter <= 0) {
-					this.close();
-					IOException e = new IOException("Error: can not read result during given timeout !");
+					TimeOutException e = new TimeOutException("Error: can not read result during given timeout !");
 					log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
@@ -511,7 +510,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		return this.xferErrors;
 	}
 
-	void setXferErrors(int xferErrors) {
-		this.xferErrors = xferErrors;
+	void setXferErrors(int newXferErrors) {
+		this.xferErrors = newXferErrors;
 	}
 }

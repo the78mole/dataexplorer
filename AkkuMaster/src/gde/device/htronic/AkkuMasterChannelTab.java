@@ -631,7 +631,7 @@ public class AkkuMasterChannelTab {
 							if (!isCaptureOnly()) try {
 								AkkuMasterChannelTab.this.serialPort.stop(AkkuMasterChannelTab.this.channelSig);
 							}
-							catch (IOException e) {
+							catch (Exception e) {
 								e.printStackTrace();
 							}
 							stopTimer();
