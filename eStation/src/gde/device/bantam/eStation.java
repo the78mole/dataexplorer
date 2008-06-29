@@ -16,7 +16,9 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
+import osde.exception.SerialPortException;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -24,7 +26,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class eStation extends DeviceConfiguration implements IDevice {
-	final static Logger						log_base	= Logger.getLogger(eStation.class.getName());
+	final static Logger						log	= Logger.getLogger(eStation.class.getName());
 	
 	public static	final	String[]	USAGE_MODE = { "off", "entladen", "laden"}; 
 	public static	final	String[]	ACCU_TYPES = { "Lithium", "NiMH", "NiCd", "Pb"}; 
@@ -208,7 +210,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80)));
 		}
 		for (String key : configData.keySet()) {
-			log_base.fine(key + " = " + configData.get(key));
+			log.fine(key + " = " + configData.get(key));
 		}
 		return configData;
 	}
@@ -232,7 +234,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value * factor + offset;
-		log_base.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
 	}
 
@@ -255,7 +257,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value / factor - offset;
-		log_base.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
 	}
 
@@ -268,7 +270,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log_base.fine("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName());
 	}
 
 	/**
@@ -301,7 +303,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				String recordKey = recordNames[3]; //3=Leistung
 				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[3]);
 				if (measurement.isCalculation()) {
-					log_base.fine(recordKey);
+					log.fine(recordKey);
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 				}
 				this.calculationThreads.get(recordKey).start();
@@ -310,17 +312,17 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				recordKey = recordNames[4]; //4=Energie
 				measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[4]);
 				if (measurement.isCalculation()) {
-					log_base.fine(recordKey);
+					log.fine(recordKey);
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 				}
 				this.calculationThreads.get(recordKey).start();
 				++displayableCounter;
 				
-				log_base.fine("displayableCounter = " + displayableCounter);
+				log.fine("displayableCounter = " + displayableCounter);
 				recordSet.setConfiguredDisplayable(displayableCounter);
 			}
 			catch (RuntimeException e) {
-				log_base.log(Level.SEVERE, e.getMessage(), e);
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -347,5 +349,47 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}
-
+	
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 */
+	public void openCloseSerialPort() {
+		if (this.serialPort != null) {
+			if (!this.serialPort.isConnected()) {
+				try {
+					if (Channels.getInstance().getActiveChannel() != null) {
+						String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
+						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, channelConfigKey, this.getDialog());
+						this.getDialog().dataGatherThread.start();
+						if (this.getDialog().boundsComposite != null) this.getDialog().boundsComposite.redraw();
+					}
+				}
+				catch (SerialPortException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+				}
+				catch (ApplicationConfigurationException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
+					this.application.getDeviceSelectionDialog().open();
+				}
+			}
+			else {
+				if (this.getDialog().dataGatherThread != null) {
+					this.getDialog().dataGatherThread.stopTimerThread();
+					this.getDialog().dataGatherThread.interrupt();
+					
+					if (Channels.getInstance().getActiveChannel() != null) {
+							RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+							if (activeRecordSet != null) {
+								// active record set name == life gatherer record name
+								this.getDialog().dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
+							}
+					}
+				}
+				if (this.getDialog().boundsComposite != null) this.getDialog().boundsComposite.redraw();
+				this.serialPort.close();
+			}
+		}
+	}
 }

@@ -125,9 +125,12 @@ public class EStationDialog extends DeviceDialog {
 						this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if(this.isAlphaEnabled) this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
+				if(this.isAlphaEnabled) {
+					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
+					this.isFadeOut = false;
+				}
 				this.dialogShell.setLayout(new FormLayout());
-				this.dialogShell.setText("e-Station BC6 ToolBox");
+				this.dialogShell.setText(this.device.getName() + " ToolBox");
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -178,23 +181,25 @@ public class EStationDialog extends DeviceDialog {
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("startCollectDataButton.widgetSelected, event=" + evt);
-								try {
-									if (Channels.getInstance().getActiveChannel() != null) {
-										String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
-										EStationDialog.this.startCollectDataButton.setEnabled(false);
-										EStationDialog.this.stopColletDataButton.setEnabled(true);
-										EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey, EStationDialog.this);
-										EStationDialog.this.dataGatherThread.start();
+								if (!EStationDialog.this.serialPort.isConnected()) {
+									try {
+										if (Channels.getInstance().getActiveChannel() != null) {
+											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
+											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey,
+													EStationDialog.this);
+											EStationDialog.this.dataGatherThread.start();
+											EStationDialog.this.boundsComposite.redraw();
+										}
 									}
-								}
-								catch (Exception e) {
-									if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
-										EStationDialog.this.dataGatherThread.stopTimerThread();
-										EStationDialog.this.dataGatherThread.interrupt();
+									catch (Exception e) {
+										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
+											EStationDialog.this.dataGatherThread.stopTimerThread();
+											EStationDialog.this.dataGatherThread.interrupt();
+										}
+										EStationDialog.this.boundsComposite.redraw();
+										EStationDialog.this.application.updateGraphicsWindow();
+										EStationDialog.this.application.openMessageDialog("Bei der Datenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
 									}
-									EStationDialog.this.application.updateGraphicsWindow();
-									EStationDialog.this.application.openMessageDialog("Bei der Datenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
-									EStationDialog.this.resetButtons();
 								}
 							}
 						});
@@ -213,7 +218,7 @@ public class EStationDialog extends DeviceDialog {
 						this.stopColletDataButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("stopColletDataButton.widgetSelected, event=" + evt);
-								if (EStationDialog.this.dataGatherThread != null) {
+								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
 									EStationDialog.this.dataGatherThread.stopTimerThread();
 									EStationDialog.this.dataGatherThread.interrupt();
 									
@@ -225,8 +230,7 @@ public class EStationDialog extends DeviceDialog {
 											}
 									}
 								}
-								EStationDialog.this.startCollectDataButton.setEnabled(true);
-								EStationDialog.this.stopColletDataButton.setEnabled(false);
+								EStationDialog.this.boundsComposite.redraw();
 							}
 						});
 						this.stopColletDataButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
@@ -435,23 +439,25 @@ public class EStationDialog extends DeviceDialog {
 	 */
 	public void updateGlobalConfigData(HashMap<String, String> newConfigData) {
 		EStationDialog.this.configData = newConfigData;
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
-			EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
-			EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
-			EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
-			EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
-		}
-		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
-					EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
-					EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
-					EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
-					EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
-				}
-			});
+		if (this.dialogShell != null) {
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
+				EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
+				EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
+				EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
+				EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
+				EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
+			}
+			else {
+				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
+						EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
+						EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
+						EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
+						EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
+					}
+				});
+			}
 		}
 	}
 }

@@ -28,7 +28,9 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
+import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -73,10 +75,12 @@ public class GathererThread extends Thread {
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
 
 	/**
+	 * data gathere thread definition 
+	 * @throws SerialPortException 
+	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
-	 * 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, String channelName, EStationDialog useDialog) throws Exception {
+	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, String channelName, EStationDialog useDialog) throws ApplicationConfigurationException, SerialPortException {
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
@@ -111,7 +115,6 @@ public class GathererThread extends Thread {
 		this.timer = new Timer();
 		this.timerTask = new TimerTask() {
 
-			@Override
 			public void run() {
 				if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("====> entry");
 				try {
@@ -174,9 +177,10 @@ public class GathererThread extends Thread {
 							GathererThread.this.application.updateDigitalWindowChilds();
 							GathererThread.this.application.updateAnalogWindowChilds();
 
-							GathererThread.this.numberBatteryCells = 0;
+							int posCells = GathererThread.this.device.getName().endsWith("BC6") ? 6 : 8;
+							GathererThread.this.numberBatteryCells = 0; //GathererThread.this.device.getNumberOfLithiumXCells(dataBuffer);
 							String[] recordKeys = GathererThread.this.recordSet.getRecordNames();
-							for (int i = 8; i < GathererThread.this.recordSet.size(); i++) {
+							for (int i = posCells; i < GathererThread.this.recordSet.size(); i++) {
 								Record record = GathererThread.this.recordSet.get(recordKeys[i]);
 								if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
 									GathererThread.this.numberBatteryCells++;
@@ -188,14 +192,14 @@ public class GathererThread extends Thread {
 							if (GathererThread.this.numberBatteryCells > 0) {
 								int[] voltages = new int[GathererThread.this.numberBatteryCells];
 								for (int i = 0; i < GathererThread.this.numberBatteryCells; i++) {
-									voltages[i] = points[i + 8];
-									GathererThread.log.finer("points[" + i + "+ 8] = " + points[i + 8]);
+									voltages[i] = points[i + posCells];
+									GathererThread.log.finer("points[" + i + "+ " + posCells + "] = " + points[i + posCells]);
 								}
 								GathererThread.this.application.updateCellVoltageChilds(voltages);
 							}
 
 							//switch off single cell voltage lines if not battery type of lithium where cell voltages are available
-							for (int i = 8+GathererThread.this.numberBatteryCells; !GathererThread.this.isConfigUpdated && i < points.length; i++) {
+							for (int i = posCells+GathererThread.this.numberBatteryCells; !GathererThread.this.isConfigUpdated && i < points.length; i++) {
 								GathererThread.this.recordSet.get(recordKeys[i]).setActive(false);
 								GathererThread.this.recordSet.get(recordKeys[i]).setDisplayable(false);
 								GathererThread.this.recordSet.get(recordKeys[i]).setVisible(false);
@@ -238,6 +242,7 @@ public class GathererThread extends Thread {
 						GathererThread.this.stopTimerThread();
 						if (GathererThread.this.isPortOpenedByLiveGatherer) 
 							GathererThread.this.serialPort.close();
+						GathererThread.this.application.openMessageDialog("Programmablauf beendet!");
 					}
 					else {
 						cleanup(GathererThread.this.recordSetKey, message);
@@ -276,6 +281,8 @@ public class GathererThread extends Thread {
 	public synchronized void stopTimerThread() {
 		if (this.timerTask != null) this.timerTask.cancel();
 		if (this.timer != null) this.timer.cancel();
+		this.timerTask = null;
+		this.timer = null;
 		this.isTimerRunning = false;
 		this.isCollectDataStopped = true;
 		
@@ -283,12 +290,13 @@ public class GathererThread extends Thread {
 			this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
 		}
 		if (this.receiveWaitTime.size() > 0) {
-			long waitAvg = 0;
-			long waitSum = 0;
-			for (Long waitTime : this.receiveWaitTime) {
-				waitSum += waitTime;
+			long waitAvg = this.receiveWaitTime.firstElement();
+			StringBuilder sb = new StringBuilder();
+			for (int i=1; i<this.receiveWaitTime.size(); ++i) {
+				sb.append(this.receiveWaitTime.get(i)).append(" ");
+				waitAvg = (waitAvg * (i-1) + this.receiveWaitTime.get(i)) / i ;
 			}
-			waitAvg = waitSum / this.receiveWaitTime.size();
+			log.info(sb.toString());
 			this.application.openMessageDialogAsync("Wartezeit beim Datenempang = " + waitAvg);
 		}
 	}
@@ -324,6 +332,8 @@ public class GathererThread extends Thread {
 				});
 			}
 		}
+		else
+			GathererThread.this.application.openMessageDialog(message);
 	}
 
 	/**

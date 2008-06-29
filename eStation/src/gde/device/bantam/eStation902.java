@@ -4,7 +4,6 @@
 package osde.device.bantam;
 
 import java.io.FileNotFoundException;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
@@ -16,7 +15,6 @@ import osde.device.IDevice;
  * @author Winfried Brügmann
  */
 public class eStation902 extends eStation implements IDevice {
-	final static Logger						log	= Logger.getLogger(eStation902.class.getName());
 
 	/**
 	 * constructor using properties file
