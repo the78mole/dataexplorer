@@ -53,7 +53,7 @@ public class CellVoltageWindow {
 	RecordSet												oldRecordSet = null;
 	Channel													oldChannel = null;
 	
-	int[]														voltageValues;
+	int[]														voltageValues = new int[0];
 	int 														voltageDelta = 0;
 	Point 													displayCompositeSize = new Point(0,0);
 
