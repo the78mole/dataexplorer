@@ -1,6 +1,5 @@
 package osde.device.bantam;
 
-
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
@@ -45,8 +44,8 @@ public class eStationBC6 extends eStation implements IDevice {
 	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
-	 * @@param points pointer to integer array to be filled with converted data
-	 * @@param dataBuffer byte arrax with the data to be converted
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
 		
