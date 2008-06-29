@@ -8,8 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -137,7 +135,10 @@ public class EStationDialog extends DeviceDialog {
 				if (this.settings.isDeviceDialogsModal()) 
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.TRANSPARENCY_ALPHA);
 				else
-					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA | SWT.ON_TOP);
+					if (SWT.ON_TOP == SWT.ON_TOP) // TODO -> settings
+						this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA | SWT.ON_TOP);
+					else
+						this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if(this.isAlphaEnabled) this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
@@ -198,7 +199,7 @@ public class EStationDialog extends DeviceDialog {
 										String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
 										EStationDialog.this.startCollectDataButton.setEnabled(false);
 										EStationDialog.this.stopColletDataButton.setEnabled(true);
-										EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey);
+										EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey, EStationDialog.this);
 										EStationDialog.this.dataGatherThread.start();
 									}
 								}
@@ -411,27 +412,6 @@ public class EStationDialog extends DeviceDialog {
 						}
 					});
 				} // end boundsComposite
-
-				this.dialogShell.addFocusListener(new FocusAdapter() {
-					public void focusGained(FocusEvent evt) {
-						EStationDialog.log.finer("dialogShell.focusGained, event=" + evt);
-						Thread  updateGlobalConfig4Display = new Thread() {
-							public void run() {
-								if (EStationDialog.this.serialPort != null && !isFailedConnectionWarned()) {
-									try {
-										EStationDialog.this.configData = EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData(null));
-										updateGlobalConfigData();
-									}
-									catch (Exception e) {
-										EStationDialog.this.application.openMessageDialogAsync("Serieller Port Fehler : " + e.getClass().getSimpleName() + " - " + e.getMessage()
-												+ "\nHinweis : Der Gerätevorgang könnte inzwischen beendet sein ?");
-									}
-								}
-							}
-						};
-						updateGlobalConfig4Display.start();
-					}
-				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						EStationDialog.log.finer("dialogShell.widgetDisposed, event=" + evt);
@@ -444,7 +424,7 @@ public class EStationDialog extends DeviceDialog {
 						EStationDialog.this.application.openHelpDialog("Sample", "HelpInfo.html");
 					}
 				});
-				this.dialogShell.setLocation(getParent().toDisplay(200, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-250, 150));
 				this.dialogShell.open();
 			}
 			else {
@@ -469,7 +449,8 @@ public class EStationDialog extends DeviceDialog {
 	/**
 	 * update the global conguration data in dialog
 	 */
-	void updateGlobalConfigData() {
+	public void updateGlobalConfigData(HashMap<String, String> newConfigData) {
+		EStationDialog.this.configData = newConfigData;
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
 			EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
