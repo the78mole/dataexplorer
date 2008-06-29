@@ -266,4 +266,24 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public String[] getUsedPropertyKeys() {
 		return new String[0];
 	}
+	
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 */
+	public void openCloseSerialPort() {
+		if (this.serialPort != null) {
+			if (!this.serialPort.isConnected()) {
+				try {
+					this.serialPort.open();
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+				}
+			}
+			else {
+				this.serialPort.close();
+			}
+		}
+	}
 }

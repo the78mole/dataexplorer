@@ -309,4 +309,24 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public PicolarioSerialPort getSerialPort() {
 		return this.serialPort;
 	}
+	
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 */
+	public void openCloseSerialPort() {
+		if (this.serialPort != null) {
+			if (!this.serialPort.isConnected()) {
+				try {
+					this.serialPort.open();
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+				}
+			}
+			else {
+				this.serialPort.close();
+			}
+		}
+	}
 }

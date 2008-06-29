@@ -410,7 +410,8 @@ public class MenuBar {
 					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt);
-							MenuBar.this.application.openCloseSerialPort();
+							IDevice activeDevice = MenuBar.this.application.getActiveDevice();
+							if(activeDevice != null) activeDevice.openCloseSerialPort();
 						}
 					});
 				}

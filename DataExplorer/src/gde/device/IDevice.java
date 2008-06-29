@@ -408,4 +408,9 @@ public interface IDevice {
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
 	public String[] getUsedPropertyKeys();
+	
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 */
+	public void openCloseSerialPort(); 
 }

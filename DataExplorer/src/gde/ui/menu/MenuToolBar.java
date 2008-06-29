@@ -41,6 +41,7 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
+import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
@@ -400,7 +401,16 @@ public class MenuToolBar {
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("portOpenCloseItem.widgetSelected, event=" + evt);
-							MenuToolBar.this.application.openCloseSerialPort();
+							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
+							if(activeDevice != null) {
+								activeDevice.openCloseSerialPort();
+								if (activeDevice.getSerialPort().isConnected()) {
+									MenuToolBar.this.portOpenCloseItem.setToolTipText("Seriellen Port schliessen, um eine Datenaufnahme abzubrechen");
+								}
+								else {
+									MenuToolBar.this.portOpenCloseItem.setToolTipText("Seriellen Port öffnen, um eine Datenaufnahme zu ermöglichen");
+								}
+							}
 						}
 					});
 				}

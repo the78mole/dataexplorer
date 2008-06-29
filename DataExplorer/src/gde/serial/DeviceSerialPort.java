@@ -17,9 +17,12 @@
 package osde.serial;
 
 import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.TooManyListenersException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +39,7 @@ import osde.config.Settings;
 import osde.device.DeviceConfiguration;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.ReadWriteOutOfSyncException;
+import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -166,7 +171,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		return match;
 	}
 	
-	public synchronized SerialPort open() throws Exception  {
+	public synchronized SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		this.xferErrors = 0;
 		// Initialize serial port
 		try {
@@ -216,10 +221,40 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (this.application != null) this.application.setPortConnected(true);
 			return this.serialPort;
 		}
-		catch (Exception e) {
+		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (this.serialPort != null) this.serialPort.close();
 			throw e;
+		}
+		catch (IOException e) {
+			SerialPortException en = new SerialPortException(e.getMessage());
+			log.log(Level.SEVERE, en.getMessage(), en);
+			if (this.serialPort != null) this.serialPort.close();
+			throw en;
+		}
+		catch (NoSuchPortException e) {
+			SerialPortException en = new SerialPortException(e.getMessage());
+			log.log(Level.SEVERE, en.getMessage(), en);
+			if (this.serialPort != null) this.serialPort.close();
+			throw en;
+		}
+		catch (UnsupportedCommOperationException e) {
+			SerialPortException en = new SerialPortException(e.getMessage());
+			log.log(Level.SEVERE, en.getMessage(), en);
+			if (this.serialPort != null) this.serialPort.close();
+			throw en;
+		}
+		catch (TooManyListenersException e) {
+			SerialPortException en = new SerialPortException(e.getMessage());
+			log.log(Level.SEVERE, en.getMessage(), en);
+			if (this.serialPort != null) this.serialPort.close();
+			throw en;
+		}
+		catch (PortInUseException e) {
+			SerialPortException en = new SerialPortException(e.getMessage());
+			log.log(Level.SEVERE, en.getMessage(), en);
+			if (this.serialPort != null) this.serialPort.close();
+			throw en;
 		}
 	}
 
@@ -296,15 +331,21 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 		byte[] readBuffer = new byte[bytes];
 		int readBytes = 0;
-		int retryCounter = 5;
+		int retryCounter = timeoutInSeconds * 1000 / 50;
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
 
-			wait4Bytes(bytes, timeoutInSeconds);
+			//wait4Bytes(bytes, timeoutInSeconds);
 
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+				if (bytes != readBytes) Thread.sleep(50);
+			}
+			if (retryCounter <= 0) {
+				TimeOutException e = new TimeOutException("\nFehler : Die angeforderten Daten konnten nicht in der vorgegebenen Zeit gelesen werden. " + bytes + " bytes; " + timeoutInSeconds + " Sec.");
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
 			}
 			
 			this.isReadBufferEmpty = true;
@@ -324,6 +365,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		return readBuffer;
 	}
@@ -342,17 +386,24 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 		byte[] readBuffer = new byte[bytes];
 		int readBytes = 0;
-		int retryCounter = 5;
+		int retryCounter = timeoutInSeconds * 1000 / 50;
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
 			long startTime_ms = new Date().getTime();
-			wait4Bytes(bytes, timeoutInSeconds);
-			waitTimes.add((new Date().getTime()) - startTime_ms);
+			//wait4Bytes(bytes, timeoutInSeconds);
 
 			while (bytes != readBytes && retryCounter-- > 0){
-				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
+				if (bytes != readBytes) Thread.sleep(50);
 			}
+			if (retryCounter <= 0) {
+				TimeOutException e = new TimeOutException("\nFehler : Die angeforderten Daten konnten nicht in der vorgegebenen Zeit gelesen werden. " + bytes + " bytes; " + timeoutInSeconds + " Sec.");
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
+			}
+			
+			waitTimes.add((new Date().getTime()) - startTime_ms);
 			
 			this.isReadBufferEmpty = true;
 			this.numBytesAvailable = 0;
@@ -371,6 +422,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		return readBuffer;
 	}
