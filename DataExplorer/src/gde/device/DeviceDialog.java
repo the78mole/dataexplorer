@@ -139,22 +139,24 @@ public abstract class DeviceDialog extends Dialog {
 
 	public synchronized void setShellAlpha(int newShellAlpha) {
 			if (newShellAlpha > this.shellAlpha) {
-				//System.out.println("fade-in");
-				for (int i = this.shellAlpha; i < 254; i+=5) {
+				//System.out.println("fade-out");
+				for (int i = 50; i < 254; i+=5) {
 					this.dialogShell.setAlpha(i);
 					//System.out.print(i + " ");
 				}
 				this.dialogShell.setAlpha(254);
 				//System.out.println();
+				this.isFadeOut = true;
 			}
 			else {
-				//System.out.println("fade-out");
-				for (int i = 254; i > this.shellAlpha; i-=5) {
+				//System.out.println("fade-in");
+				for (int i = 254; i > 50; i-=5) {
 					this.dialogShell.setAlpha(i);
 					//System.out.print(i + " ");
 				}
 				//System.out.println();
-				this.dialogShell.setAlpha(this.shellAlpha);
+				this.dialogShell.setAlpha(50);
+				this.isFadeOut = false;
 			}
 	}
 
@@ -180,9 +182,9 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade out alpha blending from 254 to the configured alpha value
 	 */
 	public void fadeOutAplhaBlending() {
+		log.fine("this.isFadeOut = " + this.isFadeOut);
 		if (!this.isFadeOut && this.isAlphaEnabled) {
 			setShellAlpha(254);
-			this.isFadeOut = true;
 		}
 	}
 
@@ -197,7 +199,6 @@ public abstract class DeviceDialog extends Dialog {
 		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize);
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
-			this.isFadeOut = true;
 		}
 	}
 
@@ -212,7 +213,6 @@ public abstract class DeviceDialog extends Dialog {
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize);
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
-			this.isFadeOut = false;
 		}
 	}
 }
