@@ -42,6 +42,7 @@ public class GathererThread extends Thread {
 	OpenSerialDataExplorer				application;
 	final EStationSerialPort			serialPort;
 	final eStation								device;
+	final EStationDialog					dialog;
 	final Channels								channels;
 	final Channel									channel;
 	final Integer									channelNumber;
@@ -75,9 +76,10 @@ public class GathererThread extends Thread {
 	 * @throws Exception 
 	 * 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, String channelName) throws Exception {
+	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, String channelName, EStationDialog useDialog) throws Exception {
 		this.application = currentApplication;
 		this.device = useDevice;
+		this.dialog = useDialog;
 		this.serialPort = useSerialPort;
 		this.channels = Channels.getInstance();
 		this.channelNumber = new Integer(channelName.trim().split(":")[0].trim());
@@ -136,6 +138,7 @@ public class GathererThread extends Thread {
 								GathererThread.this.isWaitTimeChargeDischarge = true;
 								GathererThread.this.isConfigUpdated	= false;
 								GathererThread.this.isProgrammExecuting	= true;
+								GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
 								// record set does not exist or is outdated, build a new name and create
 								GathererThread.this.waitTime_ms = new Integer(usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer).get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 								log.fine("waitTime_ms = " + GathererThread.this.waitTime_ms);

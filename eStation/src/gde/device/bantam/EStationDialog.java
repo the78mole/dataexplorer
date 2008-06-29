@@ -96,22 +96,6 @@ public class EStationDialog extends DeviceDialog {
 	final Settings								settings;																																	// application configuration settings
 
 	/**
-	* main method to test this dialog inside a shell 
-	*/
-	public static void main(String[] args) {
-		try {
-			Display display = Display.getDefault();
-			Shell shell = new Shell(display);
-			eStation device = new eStationBC6("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Geraete\\Htronic Akkumaster C4.ini");
-			EStationDialog inst = new EStationDialog(shell, device);
-			inst.open();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * default constructor initialize all variables required
 	 * @param parent Shell
 	 * @param useDevice device specific class implementation

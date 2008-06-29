@@ -51,6 +51,11 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			else {
 				answer = this.read(13, 2, waitTime);
+//				StringBuilder sb = new StringBuilder();
+//				for (Long time : waitTime) {
+//					sb.append(time).append(" ");
+//				}
+//				log.info("wait times = " + sb.toString());
 			}
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
@@ -60,6 +65,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 						answer = this.read(i, 1);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
+						log.info("----> receive sync finished");
 						break; //sync
 					}
 				}
@@ -89,6 +95,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
+				log.warning("=====> checksum error occured, number of errors = " + this.xferErrors);
 				data = getData(waitTime);
 			}
 		}

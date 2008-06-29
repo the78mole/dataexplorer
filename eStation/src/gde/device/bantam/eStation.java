@@ -132,7 +132,6 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused")
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
 		
 //		StringBuilder sb = new StringBuilder();
@@ -141,11 +140,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 //		}
 //		log.info(sb.toString());
 
-		int modeIndex = getProcessingMode(dataBuffer);
-		String mode = USAGE_MODE[modeIndex];
-		int accuIndex = getAccuCellType(dataBuffer);
-		String accuType = ACCU_TYPES[accuIndex - 1]; 
-		getNumberOfLithiumXCells(dataBuffer);
+//		int modeIndex = getProcessingMode(dataBuffer);
+//		String mode = USAGE_MODE[modeIndex];
+//		int accuIndex = getAccuCellType(dataBuffer);
+//		String accuType = ACCU_TYPES[accuIndex - 1]; 
+//		getNumberOfLithiumXCells(dataBuffer);
 		
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 		points[0] = new Integer((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
@@ -169,7 +168,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return cell count (0=auto, 1=1cell, 12=12cells)
 	 */
-	private int getNumberOfLithiumXCells(byte[] dataBuffer) {
+	public int getNumberOfLithiumXCells(byte[] dataBuffer) {
 		return (dataBuffer[18] & 0xFF)- 0x80;// cell count (0=auto, 1=1cell, 12=12cells)
 	}
 
@@ -177,7 +176,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @return for Lithium=1, NiMH=2, NiCd=3, Pb=4
 	 */
-	private int getAccuCellType(byte[] dataBuffer) {
+	public int getAccuCellType(byte[] dataBuffer) {
 		return (dataBuffer[23] & 0xFF)- 0x80; //Lithium=1, NiMH=2, NiCd=3, Pb=4
 	}
 
