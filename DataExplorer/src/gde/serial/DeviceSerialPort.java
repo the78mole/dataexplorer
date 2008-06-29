@@ -563,11 +563,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		return this.numBytesAvailable;
 	}
 
-	int getXferErrors() {
+	public int getXferErrors() {
 		return this.xferErrors;
-	}
-
-	void setXferErrors(int newXferErrors) {
-		this.xferErrors = newXferErrors;
 	}
 }

@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,16 +55,18 @@ public class GathererThread extends Thread {
 	boolean												isSwitchedRecordSet					= false;
 
 	RecordSet											recordSet;
-	int														retryCounter								= 180;																							// 3*60 sec, 1 sec for each retry
+	int														retryCounter								= 40;				// 60 sec/1.5 sec per retry
 	long													timeStamp;
 	boolean												isCollectDataStopped				= false;
 	String												recordSetKey								= ") nicht definiert";
-	int														numberBatteryCells					= 0;																								// only if battery type is Lithium* single cell voltages will be available
+	int														numberBatteryCells					= 0;				// only if battery type is Lithium* single cell voltages will be available
 	boolean												isUpdatedRecordSetCellState	= false;
 	int														waitTime_ms									= 0;
 	boolean												isWaitTimeChargeDischarge 	= false;
+	boolean												isProgrammExecuting					= false;
 	boolean												isConfigUpdated							= false;
 	HashMap<String, String>				configData									= new HashMap<String, String>();
+	Vector<Long>									receiveWaitTime							= new Vector<Long>();
 
 	// offsets and factors are constant over thread live time
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
@@ -90,7 +93,6 @@ public class GathererThread extends Thread {
 		this.timeStep_ms = new Double(this.device.getTimeStep_ms()).intValue();
 	}
 
-	@Override
 	public void run() {
 		this.isTimerRunning = true;
 
@@ -116,7 +118,7 @@ public class GathererThread extends Thread {
 						//if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 
 						// build the point array according curves from record set
-						byte[] dataBuffer = GathererThread.this.serialPort.getData();
+						byte[] dataBuffer = GathererThread.this.serialPort.getData(GathererThread.this.receiveWaitTime);
 
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
@@ -133,6 +135,7 @@ public class GathererThread extends Thread {
 								GathererThread.this.isCollectDataStopped = false;
 								GathererThread.this.isWaitTimeChargeDischarge = true;
 								GathererThread.this.isConfigUpdated	= false;
+								GathererThread.this.isProgrammExecuting	= true;
 								// record set does not exist or is outdated, build a new name and create
 								GathererThread.this.waitTime_ms = new Integer(usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer).get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 								log.fine("waitTime_ms = " + GathererThread.this.waitTime_ms);
@@ -200,22 +203,22 @@ public class GathererThread extends Thread {
 							if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 								stopTimerThread();
 								GathererThread.log.fine("Timer stopped eStation inactiv");
-								setRetryCounter(180);
+								setRetryCounter(40);
 							}
 						}
 					}
 				}
 				catch (DataInconsitsentException e) {
 					String message = "Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage();
-					cleanup(GathererThread.this.recordSetKey, message, e);
+					cleanup(GathererThread.this.recordSetKey, message);
 				}
 				catch (Throwable e) {
 					if (e instanceof TimeOutException && GathererThread.this.isWaitTimeChargeDischarge) {
-						finalizeRecordSet(GathererThread.this.recordSetKey, false);
 						String batteryType = GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE);
 						if (!batteryType.equals(eStation.ACCU_TYPES[0])) { // Lithium programm has no charge/discharge
 							try {
-								log.fine("waiting...");
+								finalizeRecordSet(GathererThread.this.recordSetKey, false);
+								log.info("waiting...");
 								Thread.sleep(GathererThread.this.waitTime_ms + 1500);
 								GathererThread.this.isWaitTimeChargeDischarge = false;
 								return;
@@ -225,8 +228,17 @@ public class GathererThread extends Thread {
 							}
 						}
 					}
-					String message = "Die serielle Kommunikation zu Gerät zeigt den Fehler : " + e.getClass().getSimpleName() + " - " + e.getMessage();
-					cleanup(GathererThread.this.recordSetKey, message, e);
+					String message = "Die serielle Kommunikation zu Gerät zeigt den Fehler : " + e.getClass().getSimpleName() + " - " + e.getMessage()
+					+ "\nHinweis : Der Gerätevorgang könnte inzwischen beendet sein";
+					if (GathererThread.this.isProgrammExecuting) {
+						finalizeRecordSet(GathererThread.this.recordSetKey, false);
+						GathererThread.this.stopTimerThread();
+						if (GathererThread.this.isPortOpenedByLiveGatherer) 
+							GathererThread.this.serialPort.close();
+					}
+					else {
+						cleanup(GathererThread.this.recordSetKey, message);
+					}
 				}
 				if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("======> exit");
 			}
@@ -263,6 +275,19 @@ public class GathererThread extends Thread {
 		if (this.timer != null) this.timer.cancel();
 		this.isTimerRunning = false;
 		this.isCollectDataStopped = true;
+		
+		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
+			this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
+		}
+		if (this.receiveWaitTime.size() > 0) {
+			long waitAvg = 0;
+			long waitSum = 0;
+			for (Long waitTime : this.receiveWaitTime) {
+				waitSum += waitTime;
+			}
+			waitAvg = waitSum / this.receiveWaitTime.size();
+			this.application.openMessageDialogAsync("Wartezeit beim Datenempang = " + waitAvg);
+		}
 	}
 
 	/**
@@ -271,9 +296,11 @@ public class GathererThread extends Thread {
 	 * @param message
 	 * @param e
 	 */
-	void cleanup(final String useRecordSetKey, final String message, Throwable e) {
+	void cleanup(final String useRecordSetKey, final String message) {
 		this.stopTimerThread();
-		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
+		if (this.isPortOpenedByLiveGatherer) 
+			this.serialPort.close();
+		
 		if (this.channel.get(useRecordSetKey) != null) {
 			this.channel.get(useRecordSetKey).clear();
 			this.channel.remove(useRecordSetKey);
@@ -294,7 +321,6 @@ public class GathererThread extends Thread {
 				});
 			}
 		}
-		GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 	}
 
 	/**
@@ -337,5 +363,12 @@ public class GathererThread extends Thread {
 	 */
 	int setRetryCounter(int newRetryCounter) {
 		return this.retryCounter = newRetryCounter;
+	}
+
+	/**
+	 * @return the isTimerRunning
+	 */
+	public boolean isTimerRunning() {
+		return this.isTimerRunning;
 	}
 }

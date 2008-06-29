@@ -1,10 +1,12 @@
 package osde.device.bantam;
 
 import java.io.IOException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
+import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.Checksum;
@@ -33,7 +35,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public byte[] getData() throws Exception {
+	public byte[] getData(Vector<Long> waitTime) throws Exception {
 		byte[] data = new byte[76];
 		byte[] answer = new byte[] {0x00};
 
@@ -44,7 +46,12 @@ public class EStationSerialPort extends DeviceSerialPort {
 				isPortOpenedByMe = true;
 			}
 			
-			answer = this.read(13, 1);
+			if (waitTime == null) {
+				answer = this.read(13, 2);
+			}
+			else {
+				answer = this.read(13, 2, waitTime);
+			}
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
@@ -82,10 +89,13 @@ public class EStationSerialPort extends DeviceSerialPort {
 			
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
+				data = getData(waitTime);
 			}
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			if (!(e instanceof TimeOutException)) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
 			throw e;
 		}
 		finally {
