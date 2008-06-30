@@ -71,7 +71,8 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			Thread.sleep(30);
 			this.write(this.readNumberRecordSets);
 
-			byte[] answer = this.read(4, 2);
+			byte[] answer = new byte[4];
+			answer = this.read(answer, 2);
 
 			if (answer[0] != this.readNumberRecordSets[0] && answer[2] != this.readNumberRecordSets[0])
 				throw new IOException("command to answer missmatch");
@@ -111,10 +112,13 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 
 			while (!this.isTransmitFinished) {
 
-				int numberAvailableBytes = waitForStabelReceiveBuffer(31, 1);
+				//int numberAvailableBytes = waitForStabelReceiveBuffer(31, 1);
 
-				if (numberAvailableBytes > 0) {
-					readBuffer = read(numberAvailableBytes, 1); // throws timeout exception
+				//if (numberAvailableBytes > 0) {
+					readBuffer = new byte[31];
+					readBuffer = read(readBuffer, 1, 50); // throws timeout exception
+					
+				if (readBuffer.length < 31) {
 
 					checkForLeftBytes(); // on receive buffer -> wait for stable bytes failed
 

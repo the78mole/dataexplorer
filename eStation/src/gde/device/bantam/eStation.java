@@ -361,7 +361,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 						String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
 						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, channelConfigKey, this.getDialog());
 						this.getDialog().dataGatherThread.start();
-						if (this.getDialog().boundsComposite != null) this.getDialog().boundsComposite.redraw();
+						if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 					}
 				}
 				catch (SerialPortException e) {
@@ -387,7 +387,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 							}
 					}
 				}
-				if (this.getDialog().boundsComposite != null) this.getDialog().boundsComposite.redraw();
+				if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 				this.serialPort.close();
 			}
 		}

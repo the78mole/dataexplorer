@@ -46,23 +46,20 @@ public class EStationSerialPort extends DeviceSerialPort {
 				isPortOpenedByMe = true;
 			}
 			
+			answer = new byte[13];
 			if (waitTime == null) {
-				answer = this.read(13, 2);
+				answer = this.read(answer, 2);
 			}
-			else {
-				answer = this.read(13, 2, waitTime);
-//				StringBuilder sb = new StringBuilder();
-//				for (Long time : waitTime) {
-//					sb.append(time).append(" ");
-//				}
-//				log.info("wait times = " + sb.toString());
+			else { // collect wait time to receive the required bytes
+				answer = this.read(answer, 2, waitTime);
 			}
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
 					if(answer[i] == 0x7b){
 						System.arraycopy(answer, i, data, 0, 13-i);
-						answer = this.read(i, 1);
+						answer = new byte[i];
+						answer = this.read(answer, 1);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
 						log.info("----> receive sync finished");
@@ -71,20 +68,23 @@ public class EStationSerialPort extends DeviceSerialPort {
 				}
 				if(this.isInSync)
 					break;
-				answer = this.read(13, 1);
+				answer = new byte[13];
+				answer = this.read(answer, 1);
 			}
 			if (answer[0] == 0x7b) {
 				System.arraycopy(answer, 0, data, 0, 13);
 			}
-			answer = this.read(12, 1);
+			answer = new byte[12];
+			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 13, 12);
-			answer = this.read(12, 1);
+			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 25, 12);
-			answer = this.read(12, 1);
+			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 37, 12);
-			answer = this.read(12, 1);
+			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 49, 12);
-			answer = this.read(15, 1);
+			answer = new byte[15];
+			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 61, 15);
 
 			StringBuilder sb = new StringBuilder();
@@ -96,7 +96,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
 				log.warning("=====> checksum error occured, number of errors = " + this.xferErrors);
-				data = getData(waitTime);
+				data = getData(null);
 			}
 		}
 		catch (Exception e) {

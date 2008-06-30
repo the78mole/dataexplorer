@@ -319,7 +319,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * read number of given bytes in a given time frame defined by time out value
+	 *  read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
 	 * @param bytes
 	 * @param timeoutInSeconds
 	 * @param waitTimes
@@ -327,11 +327,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized byte[] read(int bytes, int timeoutInSeconds) throws IOException, TimeOutException {
-
-		byte[] readBuffer = new byte[bytes];
+	public synchronized byte[] read(byte[] readBuffer, int timeoutInSeconds) throws IOException, TimeOutException {
+		int sleepTime = 10; // ms
+		int bytes = readBuffer.length;
 		int readBytes = 0;
-		int retryCounter = timeoutInSeconds * 1000 / 50;
+		int retryCounter = timeoutInSeconds * 1000 / sleepTime;
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
@@ -340,7 +340,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
-				if (bytes != readBytes) Thread.sleep(50);
+				if (bytes != readBytes) Thread.sleep(sleepTime);
 			}
 			if (retryCounter <= 0) {
 				TimeOutException e = new TimeOutException("\nFehler : Die angeforderten Daten konnten nicht in der vorgegebenen Zeit gelesen werden. " + bytes + " bytes; " + timeoutInSeconds + " Sec.");
@@ -373,7 +373,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * read number of given bytes in a given time frame defined by time out value
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
 	 * the reference to the wait time vector will add the actual wait time to have the read buffer ready to read the given number of bytes
 	 * @param bytes
 	 * @param timeoutInSeconds
@@ -382,11 +382,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized byte[] read(int bytes, int timeoutInSeconds, Vector<Long> waitTimes) throws IOException, TimeOutException {
-
-		byte[] readBuffer = new byte[bytes];
+	public synchronized byte[] read(byte[] readBuffer, int timeoutInSeconds, Vector<Long> waitTimes) throws IOException, TimeOutException {
+		int sleepTime = 10; // ms
+		int bytes = readBuffer.length;
 		int readBytes = 0;
-		int retryCounter = timeoutInSeconds * 1000 / 50;
+		int retryCounter = timeoutInSeconds * 1000 / sleepTime;
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
@@ -395,7 +395,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
-				if (bytes != readBytes) Thread.sleep(50);
+				if (bytes != readBytes) Thread.sleep(sleepTime);
 			}
 			if (retryCounter <= 0) {
 				TimeOutException e = new TimeOutException("\nFehler : Die angeforderten Daten konnten nicht in der vorgegebenen Zeit gelesen werden. " + bytes + " bytes; " + timeoutInSeconds + " Sec.");
@@ -437,7 +437,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @return number of bytes in receive buffer
 	 * @throws TimeOutException 
 	 */
-	private int wait4Bytes(int numBytes, int timeoutInSeconds) throws TimeOutException {
+	public int wait4Bytes(int numBytes, int timeoutInSeconds) throws TimeOutException {
 		int counter = timeoutInSeconds * 1000;
 		int resBytes = 0;
 		try {
@@ -458,6 +458,77 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return resBytes;
+	}
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * if the readBuffer kan not be filled a stable counter will be active where a number of retries can be specified
+	 * @param bytes
+	 * @param timeoutInSeconds
+	 * @param waitTimes
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] read(byte[] readBuffer, int timeoutInSeconds, int stableIndex) throws IOException, TimeOutException {
+		int sleepTime = 5; // ms
+		int bytes = readBuffer.length;
+		int readBytes = 0;
+		int lastRead = 0;
+		int retryCounter = timeoutInSeconds * 1000 / sleepTime;
+		int stableCounter = stableIndex;
+		if (stableIndex >= retryCounter) {
+			log.severe("Interner Benutzungsfehler \"stableIndex >= retryCounter\""); 
+		}
+
+
+		try {
+			if (this.application != null) this.application.setSerialRxOn();
+
+			while (bytes != readBytes && retryCounter-- > 0 && stableCounter > 0){
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+				if (bytes != readBytes) Thread.sleep(sleepTime);
+				if (lastRead == readBytes) {
+					stableCounter--;
+				}
+				else {
+					lastRead = readBytes;
+					stableCounter = stableIndex;
+				}
+			}
+			if (retryCounter <= 0) {
+				TimeOutException e = new TimeOutException("\nFehler : Die angeforderten Daten konnten nicht in der vorgegebenen Zeit gelesen werden. " + bytes + " bytes; " + timeoutInSeconds + " Sec.");
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
+			}
+			
+			//this.isReadBufferEmpty = true;
+			//this.numBytesAvailable = 0;
+			
+			if (readBytes < readBuffer.length) { // resize the data buffer to real red data 
+				byte[] tmpBuffer = new byte[readBytes];
+				System.arraycopy(readBuffer, 0, tmpBuffer, 0, readBytes);
+				readBuffer = tmpBuffer;
+			}
+
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Read  data: ");
+				for (int i = 0; i < readBuffer.length; i++) {
+					sb.append(String.format("%02X ", readBuffer[i]));
+				}
+				log.fine(sb.toString());
+			}
+
+			if (this.application != null) this.application.setSerialRxOff();
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		return readBuffer;
 	}
 
 	/**
