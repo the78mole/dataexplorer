@@ -17,6 +17,7 @@
 package osde.ui.tab;
 
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -148,13 +149,15 @@ public class CellVoltageWindow {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// cleanup
-					while (this.displays.size() > 0) {
-						CellVoltageDisplay display = this.displays.lastElement();
+					for (CellVoltageDisplay display : this.displays) {
 						if (display != null) {
-							if (!display.isDisposed()) display.dispose();
-							this.displays.remove(display);
+							if (!display.isDisposed()) {
+								display.dispose();
+								display = null;
+							}
 						}
 					}
+					this.displays.removeAllElements();
 					// add new
 					for (int i=0; this.voltageValues!=null && i<this.voltageValues.length; ++i) {
 						int value = this.voltageValues[i];
@@ -169,13 +172,15 @@ public class CellVoltageWindow {
 				}
 			}
 			else { // clean up after device switched
-				while (this.displays.size() > 0) {
-					CellVoltageDisplay display = this.displays.lastElement();
+				for (CellVoltageDisplay display : this.displays) {
 					if (display != null) {
-						if (!display.isDisposed()) display.dispose();
-						this.displays.remove(display);
+						if (!display.isDisposed()) {
+							display.dispose();
+							display = null;
+						}
 					}
 				}
+				this.displays.removeAllElements();
 				if (recordSet != null && !recordSet.getDevice().isVoltagePerCellTabRequested()) {
 					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
 					else this.infoText.setText(this.info);
@@ -203,11 +208,18 @@ public class CellVoltageWindow {
 					//log.info("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1, index))) { // better use a propperty to flag as single cell voltage
 						if(record.getLast() > 0)this.voltageVector.add(record.getLast());
-						log.info("record.getLast() " + record.getLast());
+						//log.info("record.getLast() " + record.getLast());
 					}
 				}
 				this.voltageValues = this.voltageVector.toArray(new Integer[0]);
 			}
+		}
+		if (log.isLoggable(Level.INFO)) {
+			StringBuilder sb = new StringBuilder();
+			for (Integer value : this.voltageValues) {
+				sb.append(value).append(" ");
+			}
+			log.info("updateCellVoltageVector -> " + sb.toString());
 		}
 	}
 
