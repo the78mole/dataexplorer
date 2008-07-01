@@ -47,6 +47,7 @@ public class CellVoltageWindow {
 	Composite												cellVoltageMainComposite, coverComposite;
 	TabItem													cellVoltageTab;
 	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
+	Vector<Integer> 								voltageVector = new Vector<Integer>();
 	CLabel													infoText;
 	String 													info = "Die Anzeige ist ausgeschaltet!";
 
@@ -74,30 +75,14 @@ public class CellVoltageWindow {
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("cellVoltageMainComposite.paintControl, event=" + evt);
-					Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
-					//log.info("mainSize = " + mainSize.toString());
-					int cellWidth = mainSize.x / 6;
-					int x = (6 - CellVoltageWindow.this.voltageValues.length) * cellWidth / 2;
-					int width = mainSize.x - (2 * x);
-					Rectangle bounds = new Rectangle(x, mainSize.y * 10/100, width, mainSize.y * 80/100);
-					//log.info("cover bounds = " + bounds.toString());
-					CellVoltageWindow.this.coverComposite.setBounds(bounds);
-					update();
+					updateAndResize();
 				}
 			});
 			setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.fine("infoText.paintControl, event=" + evt);
-					Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
-					//log.info("mainSize = " + mainSize.toString());
-					int cellWidth = mainSize.x / 6;
-					int x = (6 - CellVoltageWindow.this.voltageValues.length) * cellWidth / 2;
-					int width = mainSize.x - (2 * x);
-					Rectangle bounds = new Rectangle(x, mainSize.y * 10/100, width, mainSize.y * 80/100);
-					//log.info("cover bounds = " + bounds.toString());
-					CellVoltageWindow.this.coverComposite.setBounds(bounds);
-					update();
+					updateAndResize();
 				}
 			});
 			
@@ -126,32 +111,18 @@ public class CellVoltageWindow {
 	/**
 	 * method to update the window with its children
 	 */
-	public void updateChilds(int[] newVoltageValues) {
-		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) { // channel does not have a record set yet
-			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-			Vector<Integer> voltageVector = new Vector<Integer>();
-			for (String recordKey : activeRecordKeys) {
-				Record record = recordSet.get(recordKey);
-				int index = record.getName().length();
-				log.info("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
-				if(record.getSymbol().endsWith(record.getName().substring(index-1, index))) { // better use a propperty to flag as single cell voltage
-					voltageVector.add(record.getLast());
-					log.info("record.getLast() " + record.getLast());
-				}
-			}
-			this.voltageValues = voltageVector.toArray(new Integer[1]);
+	public void updateChilds() {
+		log.info("voltageValues.length = " + this.voltageValues.length + " displays.size() = " + this.displays.size());
+		if (this.voltageValues.length > 0 && this.voltageValues.length == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageValues);
-
-			if (this.voltageValues.length == this.displays.size()) { // channel does not have a record set yet
-				for (int i=0; i<this.voltageValues.length; ++i) {
-					this.displays.get(i).setVoltage(i+1, this.voltageValues[i]);
-					log.fine("setVoltage cell " + i + " - " + this.voltageValues[i]);
-				}
+			for (int i = 0; i < this.voltageValues.length; ++i) {
+				this.displays.get(i).setVoltage(i + 1, this.voltageValues[i]);
+				this.displays.get(i).redraw();
+				log.info("setVoltage cell " + i + " - " + this.voltageValues[i]);
 			}
-			else {
-				update();
-			}
+		}
+		else {
+			update();
 		}
 	}
 
@@ -164,13 +135,16 @@ public class CellVoltageWindow {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
+				
+				updateCellVoltageVector();
+				
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| this.displays.size() != this.voltageValues.length;
 						
 				log.info("isUpdateRequired = " + isUpdateRequired);
-				if (true) {
+				if (isUpdateRequired) {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// cleanup
@@ -186,12 +160,12 @@ public class CellVoltageWindow {
 						int value = this.voltageValues[i];
 						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, value);
 						display.create();
-						display.redraw();
 						log.info("created cellVoltage display for " + value);
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
 					this.oldChannel = activeChannel;
+					this.updateChilds();
 				}
 			}
 			else { // clean up after device switched
@@ -209,7 +183,31 @@ public class CellVoltageWindow {
 			}
 			this.cellVoltageMainComposite.layout();
 			this.coverComposite.layout();
-			this.updateChilds(null);
+		}
+	}
+
+	/**
+	 * check cell voltage availability and build cell voltage array
+	 */
+	void updateCellVoltageVector() {
+		this.voltageVector = new Vector<Integer>();
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = activeChannel.getActiveRecordSet();
+			// check if just created  or device switched or disabled
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
+				String[] activeRecordKeys = recordSet.getRecordNames();
+				for (String recordKey : activeRecordKeys) {
+					Record record = recordSet.get(recordKey);
+					int index = record.getName().length();
+					//log.info("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
+					if (record.getSymbol().endsWith(record.getName().substring(index - 1, index))) { // better use a propperty to flag as single cell voltage
+						if(record.getLast() > 0)this.voltageVector.add(record.getLast());
+						log.info("record.getLast() " + record.getLast());
+					}
+				}
+				this.voltageValues = this.voltageVector.toArray(new Integer[0]);
+			}
 		}
 	}
 
@@ -241,5 +239,33 @@ public class CellVoltageWindow {
 	 */
 	public Point getDisplayCompositeSize() {
 		return this.displayCompositeSize;
+	}
+
+	/**
+	 * 
+	 */
+	void updateAndResize() {
+		updateCellVoltageVector();
+		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
+		if (this.voltageVector.size() > 0) {
+			//log.info("mainSize = " + mainSize.toString());
+			int cellWidth = mainSize.x / 6;
+			int x = (6 - CellVoltageWindow.this.voltageValues.length) * cellWidth / 2;
+			int width = mainSize.x - (2 * x);
+			Rectangle bounds = new Rectangle(x, mainSize.y * 10 / 100, width, mainSize.y * 80 / 100);
+			//log.info("cover bounds = " + bounds.toString());
+			CellVoltageWindow.this.coverComposite.setBounds(bounds);
+		}
+		else {
+			CellVoltageWindow.this.coverComposite.setSize(0,0);
+		}
+		update();
+	}
+
+	/**
+	 * @return the cellVoltageMainComposite
+	 */
+	public Composite getCellVoltageMainComposite() {
+		return this.cellVoltageMainComposite;
 	}
 }

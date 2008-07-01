@@ -106,34 +106,32 @@ public class CellVoltageDisplay extends Composite {
 			this.cellComposite.setLayout(canvas1Layout);
 			{
 				this.fillLeft = new Composite(this.cellComposite, SWT.NONE);
-				//				fillLeft.setVisible(false);
-				//				fillLeft.setDragDetect(false);
-				//				fillLeft.setEnabled(false);
+				this.fillLeft.setDragDetect(false);
+				this.fillLeft.setEnabled(false);
 				this.fillLeft.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			}
 			{
-				this.cellCanvas = new Canvas(this.cellComposite, SWT.BORDER);
-				this.cellCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				//				this.cellCanvas.setDragDetect(false);
+				this.cellCanvas = new Canvas(this.cellComposite, SWT.NONE);
+				//this.cellCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.cellCanvas.setDragDetect(false);
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						CellVoltageDisplay.log.fine("cellCanvas.paintControl, evt = " + evt);
-						voltagePaintControl();
+						voltagePaintControl(evt);
 					}
 				});
 			}
 			{
 				this.fillRight = new Composite(this.cellComposite, SWT.NONE);
-				//				fillRight.setEnabled(false);
-				//				fillRight.setDragDetect(false);
-				//				fillRight.setVisible(false);
+				this.fillRight.setEnabled(false);
+				this.fillRight.setDragDetect(false);
 				this.fillRight.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			}
 		}
 		this.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				CellVoltageDisplay.log.fine("mainComposite.paintControl, evt = " + evt);
-				voltagePaintControl();
+				CellVoltageDisplay.this.cellCanvas.redraw();
 			}
 		});
 		this.layout();
@@ -143,51 +141,34 @@ public class CellVoltageDisplay extends Composite {
 	 * @param newVoltage the voltage to set
 	 */
 	public void setVoltage(int cellNumber, int newVoltage) {
-		this.displayText = this.displayText1 + cellNumber + this.displayText2;
-		this.voltage = newVoltage;
+		boolean isUpdateRequired = false;
+		if (!this.displayText.equals(this.displayText1 + cellNumber + this.displayText2)) {
+			this.displayText = this.displayText1 + cellNumber + this.displayText2;
+			isUpdateRequired = true;
+		}
+		if (this.voltage != newVoltage) {
+			this.voltage = newVoltage;
+			isUpdateRequired = true;
+		}
 
-		log.info("this = " + this.getSize());
-		log.info("this.cellComposite = " + this.cellComposite.getSize());
-		log.info("this.textLabel = " + this.textLabel.getSize());
-		log.info("this.actualDigitalLabel = " + this.actualDigitalLabel.getSize());
-		log.info("this.cellCanvas = " + this.cellCanvas.getSize());
-		//this.update();
+		if (isUpdateRequired) {
+			this.cellComposite.layout();
+		}
 	}
-
-	//	/**
-	//	 * 
-	//	 */
-	//	public void update() {
-	//		log.fine("CellVoltageDisplay.paintControl, voltage = " + this.voltage);
-	//		Point mainSize = this.mainComposite.getSize();
-	//		log.fine("mainSize = " + mainSize.toString());
-	//		int width = mainSize.x;
-	//		int height = mainSize.y;
-	//		
-	//		this.textLabel.setText(this.displayText);
-	//		this.textLabel.setSize(width, 60);
-	//				
-	//		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); 
-	//		this.actualDigitalLabel.setText(valueText);
-	//		this.actualDigitalLabel.setSize(width, 60);
-	//		
-	//		Rectangle rect = new Rectangle(0, 120, width, height-120);
-	//		log.fine("cellCanvas = " + rect);
-	//		this.cellCanvas.setBounds(rect);
-	//		this.cellCanvas.redraw();
-	//	}
 
 	/**
 	 * 
 	 */
-	void voltagePaintControl() {
+	void voltagePaintControl(PaintEvent evt) {
 		this.textLabel.setText(this.displayText);
 
 		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0));
 		this.actualDigitalLabel.setText(valueText);
 
-		Rectangle rect = CellVoltageDisplay.this.cellCanvas.getBounds();
-		GC gc = SWTResourceManager.getGC(CellVoltageDisplay.this.cellCanvas, CellVoltageDisplay.this.displayText);
+		Canvas canvas = (Canvas) evt.widget;
+		GC gc = SWTResourceManager.getGC(canvas, CellVoltageDisplay.this.displayText);
+		Rectangle rect = canvas.getClientArea();
+		CellVoltageDisplay.log.info("cellCanvas.getBounds = " + rect);
 
 		int baseVoltage = 2500;
 		//		int cellVoltageDelta = CellVoltageDisplay.this.parent.getVoltageDelta();
@@ -199,7 +180,7 @@ public class CellVoltageDisplay extends Composite {
 		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * (height - 20) / baseVoltage;
 		int top = delta.intValue();
 
-		rect = new Rectangle(0, top, rect.width, height);
+		rect = new Rectangle(0, top, rect.width-1, height-1-top);
 
 		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4200)
 			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
@@ -209,6 +190,11 @@ public class CellVoltageDisplay extends Composite {
 			// == 4200
 			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_GREEN));
 
+		CellVoltageDisplay.log.info("fillRectangle = " + rect);
 		gc.fillRectangle(rect);
+		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		//gc.drawLine(0, 0, rect.width, rect.height+top);
+		gc.drawLine(0, top, rect.width, top);
+		gc.drawRectangle(0, 0, rect.width, rect.height+top);
 	}
 }
