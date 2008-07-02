@@ -190,12 +190,12 @@ public class GathererThread extends Thread {
 							GathererThread.log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells);
 
 							if (GathererThread.this.numberBatteryCells > 0) {
-								int[] voltages = new int[GathererThread.this.numberBatteryCells];
-								for (int i = 0; i < GathererThread.this.numberBatteryCells; i++) {
-									voltages[i] = points[i + posCells];
-									GathererThread.log.finer("points[" + i + "+ " + posCells + "] = " + points[i + posCells]);
-								}
-								GathererThread.this.application.updateCellVoltageChilds(voltages);
+//								int[] voltages = new int[GathererThread.this.numberBatteryCells];
+//								for (int i = 0; i < GathererThread.this.numberBatteryCells; i++) {
+//									voltages[i] = points[i + posCells];
+//									GathererThread.log.finer("points[" + i + "+ " + posCells + "] = " + points[i + posCells]);
+//								}
+								GathererThread.this.application.updateCellVoltageChilds();
 							}
 
 							//switch off single cell voltage lines if not battery type of lithium where cell voltages are available

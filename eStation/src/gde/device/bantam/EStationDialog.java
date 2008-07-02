@@ -117,12 +117,9 @@ public class EStationDialog extends DeviceDialog {
 			EStationDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed()));
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal()) 
-					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.TRANSPARENCY_ALPHA);
+					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 				else
-					if (SWT.ON_TOP == SWT.ON_TOP) // TODO -> settings
-						this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA | SWT.ON_TOP);
-					else
-						this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.TRANSPARENCY_ALPHA);
+					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if(this.isAlphaEnabled) {
@@ -167,6 +164,7 @@ public class EStationDialog extends DeviceDialog {
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText("Diese Gerät kann nur Daten lesen.\nDie Schnittstelle schliesst sich automatisch, wenn das Gerät ca. 1 Minute lang weder laden oder entladen signalisiert.");
 						this.infoText.setEditable(false);
+						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 						this.infoText.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
 					}
 					{
