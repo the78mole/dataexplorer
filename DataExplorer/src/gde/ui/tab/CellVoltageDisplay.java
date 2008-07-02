@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -60,6 +61,7 @@ public class CellVoltageDisplay extends Composite {
 	String							displayText2	= " Spannung [ V ]";
 	String							displayText		= this.displayText1 + "?" + this.displayText2;
 	int 								lastTop = 0;
+	int 								lastVoltageLevel = 0;
 
 	public CellVoltageDisplay(Composite cellVoltageMainComposite, int value) {
 		super(cellVoltageMainComposite, SWT.BORDER);
@@ -162,10 +164,12 @@ public class CellVoltageDisplay extends Composite {
 		if (isUpdateRequired) {
 			Rectangle rect = this.cellCanvas.getClientArea();
 			Point topHeight = calculateBarGraph(rect);
-			if (this.lastTop < topHeight.y)
-				this.cellComposite.redraw(0, this.lastTop-1, rect.width-1, topHeight.x+1, true); // TODO partial redraw needs pre calculation of area to be invalid
+			if (this.lastVoltageLevel != checkVoltageLevel()) 
+				this.cellComposite.redraw();
+			else if (this.lastTop < topHeight.y)
+				this.cellComposite.redraw(0, this.lastTop-1, rect.width-1, topHeight.x+1, true); 
 			else
-				this.cellComposite.redraw(0, topHeight.x-1, rect.width-1, this.lastTop+1, true); // TODO partial redraw needs pre calculation of area to be invalid
+				this.cellComposite.redraw(0, topHeight.x-1, rect.width-1, this.lastTop+1, true); 
 		}
 	}
 
@@ -177,25 +181,30 @@ public class CellVoltageDisplay extends Composite {
 		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0));
 		this.cellVoltageDigitalLabel.setText(valueText);
 
-		GC gc = SWTResourceManager.getGC(this.cellCanvas, CellVoltageDisplay.this.displayText + this.cellVoltageDigitalLabel.getText());
 		Rectangle rect = this.cellCanvas.getClientArea();
-		CellVoltageDisplay.log.info("cellCanvas.getBounds = " + rect);
-
+		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("cellCanvas.getBounds = " + rect);
+		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
+		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height);
+		if (log.isLoggable(Level.FINE)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height);
 		Point topHeight = calculateBarGraph(rect);
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		this.lastTop = topHeight.x;
 
-		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4200) {
+		this.lastVoltageLevel = checkVoltageLevel();
+		switch (this.lastVoltageLevel) {
+		case 1: // < 2600 || > 4200
 			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-		}
-		else if (CellVoltageDisplay.this.voltage >= 2600 && CellVoltageDisplay.this.voltage < 4200) {
+			break;
+		default:
+		case 2: //2600 - 4200
 			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
-		}
-		else { // == 4200
+			break;
+		case 3: //== 4200
 			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_GREEN));
+			break;
 		}
 
-		CellVoltageDisplay.log.info("fillRectangle = " + rect);
+		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("fillRectangle = " + rect);
 		gc.fillRectangle(1, topHeight.x+2, rect.width-1, topHeight.y-1);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
@@ -203,22 +212,36 @@ public class CellVoltageDisplay extends Composite {
 	}
 
 	/**
-	 * @param rect
-	 * @return
+	 * @return 1 if voltage <2600 | >4200, 2 if voltage between 2600 and 4200, 3 for voltage == 4200
 	 */
-	Point calculateBarGraph(Rectangle rect) {
+	int checkVoltageLevel() {
+		int voltageLevel;
+		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4200) {
+			voltageLevel = 1;
+		}
+		else if (CellVoltageDisplay.this.voltage >= 2600 && CellVoltageDisplay.this.voltage < 4200) {
+			voltageLevel = 2;
+		}
+		else { // == 4200
+			voltageLevel = 3;
+		}
+		return voltageLevel;
+	}
+
+	/**
+	 * @param cellCanvasBounds
+	 * @return top limit and botom line position within the cellCanvas bounds
+	 */
+	Point calculateBarGraph(Rectangle cellCanvasBounds) {
 		Point topHeight = new Point(0,0);
 		int baseVoltage = 2500;
-		//		int cellVoltageDelta = CellVoltageDisplay.this.parent.getVoltageDelta();
-		//		if (cellVoltageDelta < 200 && cellVoltageDelta != 0) 
-		//			baseVoltage = 1000;
 
-		topHeight.y = rect.height; // 4,2 - 2  = 2,2 (max voltage - min voltage)
-		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * (topHeight.y - 20) / baseVoltage;
+		topHeight.y = cellCanvasBounds.height; // 4,2 - 2  = 2,2 (max voltage - min voltage)
+		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * topHeight.y / baseVoltage;
 		
 		topHeight.x = delta.intValue();
 		topHeight.y = topHeight.y-1-topHeight.x;
-		log.info(topHeight.toString());
+		if (log.isLoggable(Level.FINER)) log.finer(topHeight.toString());
 		return topHeight;
 	}
 }
