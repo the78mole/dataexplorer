@@ -152,7 +152,7 @@ public class MenuBar {
 				});
 				{
 					this.newFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.newFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0008)); //$NON-NLS-1$
+					this.newFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0002)); //$NON-NLS-1$
 					this.newFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -165,18 +165,18 @@ public class MenuBar {
 				}
 				{
 					this.openFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.openFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0011)); 
+					this.openFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0003)); 
 					this.openFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							openOsdFileDialog(Messages.getString(MessageIds.OSDE_MSGT0014));
+							openOsdFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
 				}
 				{
 					this.saveFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.saveFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0015));
+					this.saveFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0005));
 					this.saveFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -184,27 +184,27 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0018), OSDE.EMPTY_STRING);  //$NON-NLS-2$
+									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.EMPTY_STRING);  //$NON-NLS-2$
 								else
-									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0020), activeChannel.getFileName()); 
+									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName()); 
 							}
 						}
 					});
 				}
 				{
 					this.saveAsFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0021));
+					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0008));
 					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0018), OSDE.EMPTY_STRING); //$NON-NLS-1$
+							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.EMPTY_STRING); //$NON-NLS-1$
 						}
 					});
 				}
 				{
 					this.historyFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
-					this.historyFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0026));
+					this.historyFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0009));
 					{
 						this.fileHistoryMenu = new Menu(this.historyFileMenuItem);
 						this.historyFileMenuItem.setMenu(this.fileHistoryMenu);
@@ -215,27 +215,27 @@ public class MenuBar {
 				}
 				{
 					this.importFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
-					this.importFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027)); 
+					this.importFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0010)); 
 					{
 						this.importMenu = new Menu(this.importFileMenuItem);
 						this.importFileMenuItem.setMenu(this.importMenu);
 						{
 							this.csvImportMenuItem1 = new MenuItem(this.importMenu, SWT.PUSH);
-							this.csvImportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0028));
+							this.csvImportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0011));
 							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0030), false);
+									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0012), false);
 								}
 							});
 						}
 						{
 							this.csvImportMenuItem2 = new MenuItem(this.importMenu, SWT.PUSH);
-							this.csvImportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0031));
+							this.csvImportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0013));
 							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0033), true);
+									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0014), true);
 								}
 							});
 						}
@@ -243,28 +243,28 @@ public class MenuBar {
 				}
 				{
 					this.exportFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
-					this.exportFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0034));
+					this.exportFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0015));
 					{
 						this.exportMenu = new Menu(this.exportFileMenuItem);
 						this.exportFileMenuItem.setMenu(this.exportMenu);
 						{
 							this.csvExportMenuItem1 = new MenuItem(this.exportMenu, SWT.CASCADE);
-							this.csvExportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0035));
+							this.csvExportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0016));
 							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0037), false);
+									exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0017), false);
 								}
 							});
 						}
 					}
 					{
 						this.csvExportMenuItem2 = new MenuItem(this.exportMenu, SWT.CASCADE);
-						this.csvExportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0038));
+						this.csvExportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0018));
 						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-								exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0040), true); 
+								exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0019), true); 
 							}
 						});
 					}
@@ -274,7 +274,7 @@ public class MenuBar {
 				}
 				{
 					this.preferencesFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0041));
+					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0020));
 					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -286,7 +286,7 @@ public class MenuBar {
 								MenuBar.this.application.setStatusMessage(OSDE.EMPTY_STRING); //$NON-NLS-1$
 							}
 							else
-								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0045), SWT.COLOR_RED); 
+								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
 						}
 					});
 				}
@@ -295,7 +295,7 @@ public class MenuBar {
 				}
 				{
 					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.exitMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0046));
+					this.exitMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0021));
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -311,7 +311,7 @@ public class MenuBar {
 		}
 		{
 			this.editMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.editMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048));
+			this.editMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0022));
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -323,7 +323,7 @@ public class MenuBar {
 				this.editMenuItem.setMenu(this.editMenu);
 				{
 					this.activateZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0052));
+					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0023));
 					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif")); //$NON-NLS-1$
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -334,7 +334,7 @@ public class MenuBar {
 				}
 				{
 					this.resetZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0055));
+					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0024));
 					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif")); //$NON-NLS-1$
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -345,7 +345,7 @@ public class MenuBar {
 				}
 				{
 					this.panGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.panGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0058));
+					this.panGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0025));
 					this.panGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PanHot.gif")); //$NON-NLS-1$
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -359,7 +359,7 @@ public class MenuBar {
 				}
 				{
 					this.copyGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0061));
+					this.copyGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0026));
 					this.copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -373,7 +373,7 @@ public class MenuBar {
 				}
 				{
 					this.copyTableMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyTableMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0063));
+					this.copyTableMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
 					this.copyTableMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -389,7 +389,7 @@ public class MenuBar {
 		}
 		{
 			this.deviceMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.deviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0065));
+			this.deviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0028));
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -401,7 +401,7 @@ public class MenuBar {
 				this.deviceMenuItem.setMenu(this.deviceMenu);
 				{
 					this.toolBoxDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0069));
+					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0029));
 					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -415,7 +415,7 @@ public class MenuBar {
 				}
 				{
 					this.portMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0186));
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049));
 					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
 					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -430,7 +430,7 @@ public class MenuBar {
 				}
 				{
 					this.selectDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.selectDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0075));
+					this.selectDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0030));
 					this.selectDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -445,7 +445,7 @@ public class MenuBar {
 				{
 					this.prevDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.prevDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
-					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0079)); 
+					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0031)); 
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -471,7 +471,7 @@ public class MenuBar {
 								}
 							}
 							else {
-								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0081)); 
+								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0002)); 
 							}
 						}
 					});
@@ -479,7 +479,7 @@ public class MenuBar {
 				{
 					this.nextDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.nextDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
-					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0083)); 
+					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0032)); 
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -504,7 +504,7 @@ public class MenuBar {
 								}
 							}
 							else {
-								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0081)); 
+								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0002)); 
 							}
 						}
 					});
@@ -513,7 +513,7 @@ public class MenuBar {
 		}
 		{
 			this.graphicsMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.graphicsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0086));
+			this.graphicsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0033));
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -525,7 +525,7 @@ public class MenuBar {
 				this.graphicsMenuItem.setMenu(this.graphicsMenu);
 				{
 					this.saveDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0090));
+					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0034));
 					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -535,7 +535,7 @@ public class MenuBar {
 				}
 				{
 					this.saveAsGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.saveAsGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0092)); 
+					this.saveAsGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0035)); 
 					this.saveAsGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -543,7 +543,7 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								GraphicsTemplate template = activeChannel.getTemplate();
-								FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog(Messages.getString(MessageIds.OSDE_MSGT0095), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
+								FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog(Messages.getString(MessageIds.OSDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 										.getGraphicsTemplatePath(), template.getDefaultFileName());
 								MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 								template.setNewFileName(fileDialog.getFileName());
@@ -554,11 +554,11 @@ public class MenuBar {
 				}
 				{
 					this.restoreGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.restoreGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0097));
+					this.restoreGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0037));
 					this.restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0100), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
+							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 									.getGraphicsTemplatePath());
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
@@ -576,7 +576,7 @@ public class MenuBar {
 		}
 		{
 			this.viewMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.viewMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0102)); 
+			this.viewMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0039)); 
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -588,7 +588,7 @@ public class MenuBar {
 				this.viewMenuItem.setMenu(this.viewMenu);
 				{
 					this.curveSelectionMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
-					this.curveSelectionMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0106)); 
+					this.curveSelectionMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0040)); 
 					this.curveSelectionMenuItem.setSelection(true);
 					this.curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -607,7 +607,7 @@ public class MenuBar {
 				}
 				{
 					this.graphicsHeaderMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
-					this.graphicsHeaderMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0108));
+					this.graphicsHeaderMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0041));
 					this.graphicsHeaderMenuItem.setSelection(false);
 					this.graphicsHeaderMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -628,7 +628,7 @@ public class MenuBar {
 				}
 				{
 					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
-					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0110)); 
+					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0042)); 
 					this.recordCommentMenuItem.setSelection(false);
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -648,7 +648,7 @@ public class MenuBar {
 		}
 		{
 			this.helpMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.helpMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0112)); 
+			this.helpMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0043)); 
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -659,7 +659,7 @@ public class MenuBar {
 				this.helpMenu = new Menu(this.helpMenuItem);
 				{
 					this.contentsMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
-					this.contentsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0116)); 
+					this.contentsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0044)); 
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -669,17 +669,17 @@ public class MenuBar {
 				}
 				{
 					this.webCheckMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
-					this.webCheckMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0120)); 
+					this.webCheckMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0045)); 
 					this.webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openWebBrowser(Messages.getString(MessageIds.OSDE_MSGT0122));
+							MenuBar.this.application.openWebBrowser(Messages.getString(MessageIds.OSDE_MSGT0046));
 						}
 					});
 				}
 				{
 					this.aboutMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
-					this.aboutMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0123)); 
+					this.aboutMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0047)); 
 					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -732,7 +732,7 @@ public class MenuBar {
 							openLovFile(fileName);
 						}
 						else {
-							MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0131)); 
+							MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0003)); 
 						}
 					}
 				}
@@ -780,12 +780,12 @@ public class MenuBar {
 	public void exportFileCVS(final String dialogName, final boolean isRaw) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0136)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0005)); 
 			return;
 		}
 		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 		if (activeRecordSet == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0136)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0005)); 
 			return;
 		}
 
@@ -797,7 +797,7 @@ public class MenuBar {
 		final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.UNIX_FILE_SEPARATOR + csvFileDialog.getFileName();
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
-			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0140, new Object[]{csvFilePath}))) { 
+			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0007, new Object[]{csvFilePath}))) { 
 				return;
 			}
 
@@ -850,7 +850,7 @@ public class MenuBar {
 				else if (openFilePath.toUpperCase().endsWith(FILE_ENDING_LOV))
 					openLovFile(openFilePath);
 				else
-					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0151) + openFilePath); 
+					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0008) + openFilePath); 
 			}
 		}
 	}
@@ -869,7 +869,7 @@ public class MenuBar {
 			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				String msg = Messages.getString(MessageIds.OSDE_MSGI0152, new Object[]{fileDeviceName}); 
+				String msg = Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}); 
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					return;			
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
@@ -879,7 +879,7 @@ public class MenuBar {
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
 			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0155, new Object[]{channelConfigName})); 
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelConfigName})); 
 					if (answer != SWT.OK) 
 						return;				
 				}
@@ -919,12 +919,12 @@ public class MenuBar {
 	public void saveOsdFile(final String dialogName, final String fileName) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0159)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0011)); 
 			return;
 		}
 		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 		if (activeRecordSet == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0159));
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0011));
 			return;
 		}
 
@@ -934,7 +934,7 @@ public class MenuBar {
 		String devicePath = this.application.getActiveDevice() != null ? OSDE.UNIX_FILE_SEPARATOR + this.application.getActiveDevice().getName() : OSDE.EMPTY_STRING; 
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0162, new Object[] { path })); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 
 		}
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
 			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { FILE_ENDING_STAR_OSD }, path + OSDE.UNIX_FILE_SEPARATOR, getFileNameProposal()); 
@@ -949,7 +949,7 @@ public class MenuBar {
 				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
 			}
 			filePath = (filePath + FILE_ENDING_DOT_OSD).replace(OSDE.WINDOWS_FILE_SEPARATOR, OSDE.UNIX_FILE_SEPARATOR); //$NON-NLS-1$
-			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0170, new Object[]{filePath}))) { 
+			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0013, new Object[]{filePath}))) { 
 				return;
 			}
 
@@ -987,7 +987,7 @@ public class MenuBar {
 			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				String msg = Messages.getString(MessageIds.OSDE_MSGI0173, new Object[]{fileDeviceName});
+				String msg = Messages.getString(MessageIds.OSDE_MSGI0014, new Object[]{fileDeviceName});
 				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 					return;			
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
@@ -1001,7 +1001,7 @@ public class MenuBar {
 			
 			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0179, new Object[] {channelConfigName}));
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0006, new Object[] {channelConfigName}));
 					if (answer != SWT.OK) 
 						return;				
 				}
@@ -1040,12 +1040,12 @@ public class MenuBar {
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (isOpenStatus) {
 			this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
-			this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0184)); //$NON-NLS-1$
+			this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048)); //$NON-NLS-1$
 		}
 		else {
 			if (!this.application.isDisposed()) {
 				this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
-				this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0186)); //$NON-NLS-1$
+				this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049)); //$NON-NLS-1$
 			}
 		}
 	}
