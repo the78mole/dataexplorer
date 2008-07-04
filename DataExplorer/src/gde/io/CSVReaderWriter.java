@@ -208,7 +208,7 @@ public class CSVReaderWriter {
 							String[] inMeasurement = header[i].trim().replace(OSDE.STRING_LEFT_BRACKET, OSDE.STRING_SEMICOLON).replace(OSDE.STRING_RIGHT_BRACKET, OSDE.STRING_SEMICOLON).split(OSDE.STRING_SEMICOLON);
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
 							unitCompare.append(recordKey + Messages.getString(MessageIds.OSDE_MSGT0136) + inUnit + Messages.getString(MessageIds.OSDE_MSGT0137) + expectUnit).append(lineSep);
-							if (inUnit.equals(expectUnit) || inUnit.equals("---")) ++match; //$NON-NLS-1$
+							if (inUnit.equals(expectUnit) || inUnit.equals(Settings.EMPTY)) ++match; //$NON-NLS-1$
 						}
 						log.fine(unitCompare.toString());
 						if (match != header.length - 1) {

@@ -55,7 +55,7 @@ public class StatusBar {
 		this.statusComposite = currentStatusComposite;
 		this.statusComposite.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
-				StatusBar.this.log.finer("statusComposite.paintControl evt=" + evt);
+				StatusBar.this.log.finer("statusComposite.paintControl evt=" + evt); //$NON-NLS-1$
 				Point statusCompositeSize = StatusBar.this.statusComposite.getSize();
 				Point comCompositeSize = StatusBar.this.comComposite.getSize();
 				int offsetX = comCompositeSize.x+280;
@@ -89,12 +89,12 @@ public class StatusBar {
 					this.portButton = new CLabel(this.comComposite, SWT.NONE);
 					this.portButton.setBounds(2,2, 50, 20);
 					this.portButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
-					this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+					this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.conText = new Text(this.comComposite, SWT.LEFT);
-					this.conText.setText("CON");
-					this.conText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+					this.conText.setText("CON"); //$NON-NLS-1$
+					this.conText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false)); //$NON-NLS-1$
 					this.conText.setEditable(false);
 					this.conText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
@@ -102,27 +102,27 @@ public class StatusBar {
 					this.rxButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.rxButton.setBounds(2,2, 50, 20);
 					this.rxButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
-					this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+					this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.rxText = new Text(this.comComposite, SWT.LEFT);
 					this.rxText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.rxText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+					this.rxText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false)); //$NON-NLS-1$
 					this.rxText.setEditable(false);
-					this.rxText.setText("RX");
+					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
 					this.txButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.txButton.setBounds(2,2, 50, 20);
 					this.txButton.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+					this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.txText = new Text(this.comComposite, SWT.LEFT);
 					this.txText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.txText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+					this.txText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false)); //$NON-NLS-1$
 					this.txText.setEditable(false);
-					this.txText.setText("TX");
+					this.txText.setText("TX"); //$NON-NLS-1$
 				}
 				this.comComposite.pack();
 			}
@@ -170,41 +170,41 @@ public class StatusBar {
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif"));
+		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif"));
+		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 }

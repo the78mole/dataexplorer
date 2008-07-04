@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
+import osde.OSDE;
+
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
  * There are no restrictions on the use of this code.
@@ -55,9 +57,9 @@ import org.eclipse.swt.widgets.Widget;
 public class SWTResourceManager {
 	private static Logger log = Logger.getLogger(SWTResourceManager.class.getName());
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private static HashMap resources = new HashMap();
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	static Vector users = new Vector();
 	private static SWTResourceManager instance = new SWTResourceManager();
 
@@ -79,7 +81,7 @@ public class SWTResourceManager {
 	 * at all, and the "dispose" method should be explicitly called after all
 	 * resources are no longer being used.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static void registerResourceUser(Widget widget) {
 		if (users.contains(widget))
 			return;
@@ -87,7 +89,7 @@ public class SWTResourceManager {
 		widget.addDisposeListener(disposeListener);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static void dispose() {
 		Iterator it = resources.keySet().iterator();
 		while (it.hasNext()) {
@@ -112,28 +114,28 @@ public class SWTResourceManager {
 		return getFont(name, size, style, false, false);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
-		String fontName = name + "|" + size + "|" + style + "|" + strikeout + "|" + underline;
+		String fontName = name + OSDE.STRING_OR + size + OSDE.STRING_OR + style + OSDE.STRING_OR + strikeout + OSDE.STRING_OR + underline;
 		if (resources.containsKey(fontName))
 			return (Font) resources.get(fontName);
 		FontData fd = new FontData(name, size, style);
 		if (strikeout || underline) {
 			try {
-				Class lfCls = Class.forName("org.eclipse.swt.internal.win32.LOGFONT");
-				Object lf = FontData.class.getField("data").get(fd);
+				Class lfCls = Class.forName("org.eclipse.swt.internal.win32.LOGFONT"); //$NON-NLS-1$
+				Object lf = FontData.class.getField("data").get(fd); //$NON-NLS-1$
 				if (lf != null && lfCls != null) {
 					if (strikeout)
-						lfCls.getField("lfStrikeOut").set(lf, new Byte((byte) 1));
+						lfCls.getField("lfStrikeOut").set(lf, new Byte((byte) 1)); //$NON-NLS-1$
 					if (underline)
-						lfCls.getField("lfUnderline").set(lf, new Byte((byte) 1));
+						lfCls.getField("lfUnderline").set(lf, new Byte((byte) 1)); //$NON-NLS-1$
 				}
 			} catch (Throwable e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 		Font font = new Font(Display.getDefault(), fd);
-		if (log.isLoggable(Level.FINE)) log.fine("new font created = " + fontName);
+		if (log.isLoggable(Level.FINE)) log.fine("new font created = " + fontName); //$NON-NLS-1$
 		resources.put(fontName, font);
 		return font;
 	}
@@ -145,14 +147,14 @@ public class SWTResourceManager {
 		return img;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(int x, int y) {
-		String key = "IMAGE:" + x + "_" + y;
+		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -161,14 +163,14 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(int x, int y, String imgKey) {
-		String key = "IMAGE:" + x + "_" + y + "_" + imgKey;
+		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y + OSDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -177,14 +179,14 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getRotatedImage(Image image, int style, String imgKey) {	
 		Image resultImg = null;
 		
 		// Use the image's data to create a rotated image's data
 		ImageData sd = image.getImageData();
 		boolean up = (style & SWT.UP) == SWT.UP;
-		String key = "IMAGE:" + sd.width + "_" + sd.height + "_" + style + "_" + imgKey;
+		String key = "IMAGE:" + sd.width + OSDE.STRING_UNDER_BAR + sd.height + OSDE.STRING_UNDER_BAR + style + OSDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 
 		try {
 			if (resources.containsKey(key)) {
@@ -208,7 +210,7 @@ public class SWTResourceManager {
 				}
 				// Create the vertical image
 				Image vertical = new Image(Display.getDefault(), dd);
-				if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
+				if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 				resources.put(key, vertical);
 				resultImg = vertical;
 			}
@@ -218,15 +220,15 @@ public class SWTResourceManager {
 		return resultImg;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(ImageData imageData) {
 		//sd.height, sd.width, sd.depth, sd.palette
-		String key = "IMAGE_DATA:" + imageData.height + "_" + imageData.width + "_" + imageData.depth;
+		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imageData.depth; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), imageData);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key);
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -235,16 +237,16 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(String url) {
 		try {
 			String tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith("/"))
+			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
 			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl);
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
@@ -253,70 +255,70 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Color getColor(int swtColor) {
-		String name = "COLOR:" + swtColor;
+		String name = "COLOR:" + swtColor; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = Display.getDefault().getSystemColor(swtColor);
-		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name); //$NON-NLS-1$
 		resources.put(name, color);
 		return color;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Color getColor(int red, int green, int blue) {
-		String name = "COLOR:" + red + "," + green + "," + blue;
+		String name = "COLOR:" + red + OSDE.STRING_COMMA + green + OSDE.STRING_COMMA + blue; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = new Color(Display.getDefault(), red, green, blue);
-		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name); //$NON-NLS-1$
 		resources.put(name, color);
 		return color;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
-		String name = "PATTERN:" + x1 + "," + y1 + "," + x2 + "," + y2 + swtColor1 + "," + alpha1 + "," + swtColor2 + "," + alpha2;
+		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + alpha1 + OSDE.STRING_COMMA + swtColor2 + OSDE.STRING_COMMA + alpha2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), alpha1, SWTResourceManager.getColor(swtColor2), alpha2);
-		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name); //$NON-NLS-1$
 		resources.put(name, pattern);
 		return pattern;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int swtColor2) {
-		String name = "PATTERN:" + x1 + "," + y1 + "," + x2 + "," + y2 + swtColor1 + "," + swtColor2;
+		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + swtColor2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), SWTResourceManager.getColor(swtColor2));
-		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name); //$NON-NLS-1$
 		resources.put(name, pattern);
 		return pattern;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Cursor getCursor(int type) {
-		String name = "CURSOR:" + type;
+		String name = "CURSOR:" + type; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Cursor) resources.get(name);
 		Cursor cursor = new Cursor(Display.getDefault(), type);
-		if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + name); //$NON-NLS-1$
 		resources.put(name, cursor);
 		return cursor;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Cursor getCursor(String url) {
 		try {
 			String tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith("/")) tmpUrl = tmpUrl.substring(1);
+			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl)) return (Cursor) resources.get(tmpUrl);
 			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);
-			if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + tmpUrl);
+			if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(url, cursor);
 			return cursor;
 		}
@@ -326,35 +328,35 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Image img) {
-		String name = "GC_IMAGE:" + img.hashCode();
+		String name = "GC_IMAGE:" + img.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(img);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Display display) {
-		String name = "GC_IMAGE:" + display.hashCode();
+		String name = "GC_IMAGE:" + display.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(display);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Canvas canvas, String descriptorKey) {
-		String name = "GC_CANVAS:" + descriptorKey;
+		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(canvas);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name);
+		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
