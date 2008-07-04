@@ -66,14 +66,6 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class MenuBar {
-
-	public static final String		FILE_ENDING_STAR_LOV		= "*.lov";																		//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_OSD		= "*.osd";																		//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_CVS		= "*.cvs";																		//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_LOV			= ".lov";																			//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_OSD			= ".osd";																			//$NON-NLS-1$
-	public static final String		FILE_ENDING_LOV					= "LOV";																			//$NON-NLS-1$
-	public static final String		FILE_ENDING_OSD					= "OSD";																			//$NON-NLS-1$
 	
 	final static Logger						log			= Logger.getLogger(MenuBar.class.getName());
 
@@ -136,7 +128,7 @@ public class MenuBar {
 			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_3.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -144,7 +136,7 @@ public class MenuBar {
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
 						MenuBar.log.finest("fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
-						MenuBar.this.updateSubHistoryMenuItem(OSDE.EMPTY_STRING); //$NON-NLS-1$
+						MenuBar.this.updateSubHistoryMenuItem(OSDE.SRING_EMPTY); //$NON-NLS-1$
 					}
 					public void menuHidden(MenuEvent evt) {
 						log.finest("fileMenu.menuHidden " + evt); //$NON-NLS-1$
@@ -184,7 +176,7 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.EMPTY_STRING);  //$NON-NLS-2$
+									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.SRING_EMPTY);  //$NON-NLS-2$
 								else
 									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName()); 
 							}
@@ -198,7 +190,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.EMPTY_STRING); //$NON-NLS-1$
+							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.SRING_EMPTY); //$NON-NLS-1$
 						}
 					});
 				}
@@ -283,7 +275,7 @@ public class MenuBar {
 							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuBar.this.application.openSettingsDialog();
-								MenuBar.this.application.setStatusMessage(OSDE.EMPTY_STRING); //$NON-NLS-1$
+								MenuBar.this.application.setStatusMessage(OSDE.SRING_EMPTY); //$NON-NLS-1$
 							}
 							else
 								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
@@ -315,7 +307,7 @@ public class MenuBar {
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -393,7 +385,7 @@ public class MenuBar {
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -517,7 +509,7 @@ public class MenuBar {
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -580,7 +572,7 @@ public class MenuBar {
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -652,7 +644,7 @@ public class MenuBar {
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -663,7 +655,7 @@ public class MenuBar {
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openHelpDialog(OSDE.EMPTY_STRING, "HelpInfo.html");  //$NON-NLS-1$
+							MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
 						}
 					});
 				}
@@ -699,7 +691,7 @@ public class MenuBar {
 	public void updateSubHistoryMenuItem(String fullQualifiedFileName) {
 		List<String> refFileHistory = Settings.getInstance().getFileHistory();
 		if (fullQualifiedFileName != null && fullQualifiedFileName.length() > 4) {
-			final String newhistoryEntry = fullQualifiedFileName.replace(OSDE.WINDOWS_FILE_SEPARATOR, OSDE.UNIX_FILE_SEPARATOR);
+			final String newhistoryEntry = fullQualifiedFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 
 			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
 				refFileHistory.remove(newhistoryEntry);
@@ -725,10 +717,10 @@ public class MenuBar {
 					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
 					if (fileType != null && fileType.length() > 2) {
 						MenuBar.log.fine("opening file = " + fileName);//$NON-NLS-1$
-						if (fileType.equalsIgnoreCase(FILE_ENDING_OSD)) { 
+						if (fileType.equalsIgnoreCase(OSDE.FILE_ENDING_OSD)) { 
 							openOsdFile(fileName);
 						}
-						else if (fileType.equalsIgnoreCase(FILE_ENDING_LOV)) { 
+						else if (fileType.equalsIgnoreCase(OSDE.FILE_ENDING_LOV)) { 
 							openLovFile(fileName);
 						}
 						else {
@@ -748,15 +740,15 @@ public class MenuBar {
 	public void importFileCVS(String dialogName, final boolean isRaw) {
 		IDevice activeDevice = this.application.getActiveDevice();
 		if (activeDevice == null) {
-			this.application.openMessageDialog(Messages.getString(FILE_ENDING_STAR_CVS));
+			this.application.openMessageDialog(Messages.getString(OSDE.FILE_ENDING_STAR_CVS));
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.UNIX_FILE_SEPARATOR + this.application.getActiveDevice().getName() : OSDE.EMPTY_STRING;
-		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.UNIX_FILE_SEPARATOR;
-		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { FILE_ENDING_STAR_CVS }, path);
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
+		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path);
 		if (csvFileDialog.getFileName().length() > 4) {
-			final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.UNIX_FILE_SEPARATOR + csvFileDialog.getFileName();
+			final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 			String fileName = csvFileDialog.getFileName();
 			fileName = fileName.substring(0, fileName.indexOf('.'));
 
@@ -767,7 +759,7 @@ public class MenuBar {
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
-				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 			}
 		}
 	}
@@ -790,11 +782,11 @@ public class MenuBar {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.UNIX_FILE_SEPARATOR + this.application.getActiveDevice().getName() : OSDE.EMPTY_STRING;
-		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.UNIX_FILE_SEPARATOR;
-		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { FILE_ENDING_STAR_CVS }, path, getFileNameProposal()); 
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
+		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path, getFileNameProposal()); 
 		String recordSetKey = activeRecordSet.getName();
-		final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.UNIX_FILE_SEPARATOR + csvFileDialog.getFileName();
+		final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0007, new Object[]{csvFilePath}))) { 
@@ -810,7 +802,7 @@ public class MenuBar {
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			};
@@ -822,12 +814,12 @@ public class MenuBar {
 	 * @return
 	 */
 	String getFileNameProposal() {
-		String fileName = OSDE.EMPTY_STRING;
+		String fileName = OSDE.SRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
-			fileName = StringHelper.getDate() + OSDE.UNDER_BAR;
+			fileName = StringHelper.getDate() + OSDE.STRING_UNDER_BAR;
 		}
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
-			fileName = fileName + Channels.getInstance().getActiveChannel().getActiveRecordSet().getObjectKey() + OSDE.UNDER_BAR;
+			fileName = fileName + Channels.getInstance().getActiveChannel().getActiveRecordSet().getObjectKey() + OSDE.STRING_UNDER_BAR;
 		}
 		return fileName;
 	}
@@ -839,15 +831,15 @@ public class MenuBar {
 	public void openOsdFileDialog(final String dialogName) {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? OSDE.UNIX_FILE_SEPARATOR + this.application.getActiveDevice().getName() : OSDE.EMPTY_STRING;
-			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.UNIX_FILE_SEPARATOR : deviceSetting.getDataFilePath();
-			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { FILE_ENDING_STAR_OSD, FILE_ENDING_STAR_LOV }, path); 
+			String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_OSD, OSDE.FILE_ENDING_STAR_LOV }, path); 
 			if (openFileDialog.getFileName().length() > 4) {
-				String openFilePath = (openFileDialog.getFilterPath() + OSDE.UNIX_FILE_SEPARATOR + openFileDialog.getFileName()).replace(OSDE.WINDOWS_FILE_SEPARATOR, OSDE.UNIX_FILE_SEPARATOR);
+				String openFilePath = (openFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 
-				if (openFilePath.toUpperCase().endsWith(FILE_ENDING_OSD)) 
+				if (openFilePath.toUpperCase().endsWith(OSDE.FILE_ENDING_OSD)) 
 					openOsdFile(openFilePath);
-				else if (openFilePath.toUpperCase().endsWith(FILE_ENDING_LOV))
+				else if (openFilePath.toUpperCase().endsWith(OSDE.FILE_ENDING_LOV))
 					openLovFile(openFilePath);
 				else
 					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0008) + openFilePath); 
@@ -898,7 +890,7 @@ public class MenuBar {
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			};
@@ -907,7 +899,7 @@ public class MenuBar {
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 
@@ -931,24 +923,24 @@ public class MenuBar {
 		String filePath;
 		FileDialog fileDialog;
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.UNIX_FILE_SEPARATOR + this.application.getActiveDevice().getName() : OSDE.EMPTY_STRING; 
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY; 
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 
 		}
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
-			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { FILE_ENDING_STAR_OSD }, path + OSDE.UNIX_FILE_SEPARATOR, getFileNameProposal()); 
-			filePath = fileDialog.getFilterPath() + OSDE.UNIX_FILE_SEPARATOR + fileDialog.getFileName();
+			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_OSD }, path + OSDE.FILE_SEPARATOR_UNIX, getFileNameProposal()); 
+			filePath = fileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + fileDialog.getFileName();
 		}
 		else {
-			filePath = path + OSDE.UNIX_FILE_SEPARATOR + fileName; // including ending ".osd"
+			filePath = path + OSDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
 		}
 
 		if (filePath.length() > 4 && !filePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
-			while (filePath.toLowerCase().endsWith(FILE_ENDING_DOT_OSD) || filePath.toLowerCase().endsWith(FILE_ENDING_DOT_LOV)){ 
+			while (filePath.toLowerCase().endsWith(OSDE.FILE_ENDING_DOT_OSD) || filePath.toLowerCase().endsWith(OSDE.FILE_ENDING_DOT_LOV)){ 
 				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
 			}
-			filePath = (filePath + FILE_ENDING_DOT_OSD).replace(OSDE.WINDOWS_FILE_SEPARATOR, OSDE.UNIX_FILE_SEPARATOR); //$NON-NLS-1$
+			filePath = (filePath + OSDE.FILE_ENDING_DOT_OSD).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0013, new Object[]{filePath}))) { 
 				return;
 			}
@@ -961,13 +953,13 @@ public class MenuBar {
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			};
 			this.readerWriterThread.start();
 			updateSubHistoryMenuItem(filePath);
-			activeChannel.setFileName(filePath.replace(OSDE.WINDOWS_FILE_SEPARATOR, OSDE.UNIX_FILE_SEPARATOR));
+			activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
 			activeChannel.setSaved(true);
 		}
 	}
@@ -1020,7 +1012,7 @@ public class MenuBar {
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			};
@@ -1029,7 +1021,7 @@ public class MenuBar {
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.MESSAGE_CONCATOR + e.getMessage());
+			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 

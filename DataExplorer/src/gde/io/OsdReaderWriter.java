@@ -279,41 +279,41 @@ public class OsdReaderWriter {
 			int filePointer = 0;
 			try {
 				// first line : header with version
-				String versionString = OSDE.OPEN_SERIAL_DATA_VERSION + useVersion + OSDE.lineSep;
+				String versionString = OSDE.OPEN_SERIAL_DATA_VERSION + useVersion + OSDE.STRING_NEW_LINE;
 				data_out.writeUTF(versionString);
-				filePointer += OSDE.utfSigSize + versionString.getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer);
 				//creation time stamp
 				StringBuilder sb = new StringBuilder();
 				sb.append(OSDE.CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' ');
-				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(OSDE.lineSep);
+				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
-				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// second line : size file comment , file comment
 				sb = new StringBuilder();
-				sb.append(OSDE.FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(OSDE.lineSep);
+				sb.append(OSDE.FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
-				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// third line : size device name , device name
 				sb = new StringBuilder();
-				sb.append(OSDE.DEVICE_NAME).append(activeDevice.getName()).append(OSDE.lineSep);
+				sb.append(OSDE.DEVICE_NAME).append(activeDevice.getName()).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
-				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
-				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(OSDE.lineSep);
+				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
-				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// number of record sets
 				sb = new StringBuilder();
-				sb.append(OSDE.RECORD_SET_SIZE).append(activeChannel.size()).append(OSDE.lineSep);
+				sb.append(OSDE.RECORD_SET_SIZE).append(activeChannel.size()).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
-				filePointer += OSDE.utfSigSize + sb.toString().getBytes("UTF8").length;
-				log.fine("line lenght = " + (OSDE.utfSigSize + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length;
+				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer);
 				// record sets with it properties
 				StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
 				String[] recordSetNames = activeChannel.getRecordSetNames();
@@ -331,10 +331,10 @@ public class OsdReaderWriter {
 						sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 					}
 					sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(OSDE.DATA_DELIMITER);
-					filePointer += OSDE.utfSigSize + sbs[i].toString().getBytes("UTF8").length;
-					filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.lineSep.toString().getBytes("UTF8").length; // pre calculated size
+					filePointer += OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length;
+					filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size
 					log.fine("line lenght = "
-							+ (OSDE.utfSigSize + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.lineSep.toString().getBytes("UTF8").length)
+							+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length)
 							+ " filePointer = " + filePointer);
 				}
 				int dataSize = 0;
@@ -343,10 +343,10 @@ public class OsdReaderWriter {
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
-					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(OSDE.lineSep);
+					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(OSDE.STRING_NEW_LINE);
 					//data_out.writeInt(sbs[i].length());
 					data_out.writeUTF(sbs[i].toString());
-					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.intSize * recordSet.getRecordDataSize());
+					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize());
 					log.fine("filePointer = " + (filePointer + dataSize));
 				}
 				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....

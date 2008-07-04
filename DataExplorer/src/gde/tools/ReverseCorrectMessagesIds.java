@@ -74,13 +74,14 @@ public class ReverseCorrectMessagesIds {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		String srcFilePath = "src/osde/messages/messages.properties";
 		String inFilePathIds = "src/osde/messages/MessageIds.java";
-		String outFilePath = "src/osde/messages/messages_en.properties";
+		String outFilePath = "src/osde/messages/messages_.properties";
 		BufferedReader readerIds; // to read the ID data
 		BufferedWriter writer; // to write the data
 		Properties msgProps = new Properties();
 		String line;
-		msgProps.load(new InputStreamReader(new FileInputStream(outFilePath), "ISO-8859-1"));
+		msgProps.load(new InputStreamReader(new FileInputStream(srcFilePath), "ISO-8859-1"));
 		readerIds = new BufferedReader(new InputStreamReader(new FileInputStream(inFilePathIds), "UTF-8"));
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFilePath), "ISO-8859-1"));
 		writer.write(fileHeader);
@@ -96,9 +97,9 @@ public class ReverseCorrectMessagesIds {
 			String[] sections = line.trim().split(" |\t");
 			if (!sections[4].startsWith("OSDE_MSGE")) continue;
 			//System.out.println(line);
-			System.out.println(sections[4] + " -> " + sections[6].substring(1, 14));
-			writeRangeMark(writer, new Integer(sections[6].substring(10, 14)));
-			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, 14)) + "\n");
+			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
+			writeRangeMark(writer, calcMsgValue(sections));
+			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_OSDE_MSGE);
 		readerIds.reset();
@@ -113,9 +114,9 @@ public class ReverseCorrectMessagesIds {
 			String[] sections = line.trim().split(" |\t");
 			if (!sections[4].startsWith("OSDE_MSGW")) continue;
 			//System.out.println(line);
-			System.out.println(sections[4] + " -> " + sections[6].substring(1, 14));
-			writeRangeMark(writer, new Integer(sections[6].substring(10, 14)));
-			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, 14)) + "\n");
+			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
+			writeRangeMark(writer, calcMsgValue(sections));
+			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_OSDE_MSGW);
 		readerIds.reset();
@@ -130,9 +131,9 @@ public class ReverseCorrectMessagesIds {
 			String[] sections = line.trim().split(" |\t");
 			if (!sections[4].startsWith("OSDE_MSGI")) continue;
 			//System.out.println(line);
-			System.out.println(sections[4] + " -> " + sections[6].substring(1, 14));
-			writeRangeMark(writer, new Integer(sections[6].substring(10, 14)));
-			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, 14)) + "\n");
+			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
+			writeRangeMark(writer, calcMsgValue(sections));
+			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 
 		}
 		writer.write(end_OSDE_MSGI);
@@ -148,9 +149,9 @@ public class ReverseCorrectMessagesIds {
 			String[] sections = line.trim().split(" |\t");
 			if (!sections[4].startsWith("OSDE_MSGT")) continue;
 			//System.out.println(line);
-			System.out.println(sections[4] + " -> " + sections[6].substring(1, 14));
-			writeRangeMark(writer, new Integer(sections[6].substring(10, 14)));
-			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, 14)) + "\n");
+			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
+			writeRangeMark(writer, calcMsgValue(sections));
+			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_OSDE_MSGT);
 
@@ -158,6 +159,14 @@ public class ReverseCorrectMessagesIds {
 
 		writer.close();
 		readerIds.close();
+	}
+
+	/**
+	 * @param sections
+	 * @return
+	 */
+	static Integer calcMsgValue(String[] sections) {
+		return new Integer(sections[6].substring(10, sections[6].length()-2));
 	}
 
 	/**

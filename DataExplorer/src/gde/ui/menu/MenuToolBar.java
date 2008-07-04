@@ -36,16 +36,19 @@ import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
+import osde.messages.MessageIds;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsWindow;
+import osde.utils.Messages;
 
 /**
  * Graphical menu tool bar class
@@ -112,12 +115,12 @@ public class MenuToolBar {
 				//fileToolBar.setSize(116, 29);
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.PUSH);
-					this.newToolItem.setToolTipText("Löscht die aktuellen Aufzeichnungen und legt einen leeren Datensatz an");
-					this.newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif"));
-					this.newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif"));
+					this.newToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
+					this.newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif")); //$NON-NLS-1$
+					this.newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("newToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("newToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
 								MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
 							}
@@ -126,62 +129,62 @@ public class MenuToolBar {
 				}
 				{
 					this.openToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.openToolItem.setToolTipText("Verwirft den aktuellen Datensatz und  öffnet eine neue Datei mit neuem Inhalt");
-					this.openToolItem.setImage(SWTResourceManager.getImage("osde/resource/Open.gif"));
-					this.openToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif"));
+					this.openToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0051)); //$NON-NLS-1$
+					this.openToolItem.setImage(SWTResourceManager.getImage("osde/resource/Open.gif")); //$NON-NLS-1$
+					this.openToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt);
-							MenuToolBar.this.application.getMenuBar().openOsdFileDialog("Öffne Datei ...");
+							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuToolBar.this.application.getMenuBar().openOsdFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
 				}
 				{
 					this.saveToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.saveToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen in eine Datei");
-					this.saveToolItem.setImage(SWTResourceManager.getImage("osde/resource/Save.gif"));
-					this.saveToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif"));
+					this.saveToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0053));
+					this.saveToolItem.setImage(SWTResourceManager.getImage("osde/resource/Save.gif")); //$NON-NLS-1$
+					this.saveToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("saveToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("saveToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern unter ...", "");
+									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.SRING_EMPTY);
 								else
-									MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern", activeChannel.getFileName());
+									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0007, activeChannel.getFileName());
 							}
 						}
 					});
 				}
 				{
 					this.saveAsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.saveAsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
-					this.saveAsToolItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAs.gif"));
-					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif"));
+					this.saveAsToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0054));
+					this.saveAsToolItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAs.gif")); //$NON-NLS-1$
+					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt);
-							MenuToolBar.this.application.getMenuBar().saveOsdFile("OSD Datei - Speichern unter ...", "");
+							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.SRING_EMPTY);
 						}
 					});
 				}
 				{
 					this.settingsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.settingsToolItem.setToolTipText("Sichert die aktuellen Aufzeichnungen unter einem anzugebenden Namen");
-					this.settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif"));
-					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif"));
+					this.settingsToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0055));
+					this.settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif")); //$NON-NLS-1$
+					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.settingsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("settingsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if other none modal dialog is open
 							DeviceDialog deviceDialog = MenuToolBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuToolBar.this.application.openSettingsDialog();
-								MenuToolBar.this.application.setStatusMessage("");
+								MenuToolBar.this.application.setStatusMessage(OSDE.SRING_EMPTY);
 							}
 							else
-								MenuToolBar.this.application.setStatusMessage("Ein Gerätedialog geöffnet, ein Öffnen des Einstellungsdialoges ist zur Zeit nicht möglich !", SWT.COLOR_RED);
+								MenuToolBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGW0002), SWT.COLOR_RED);
 						}
 					});
 				}
@@ -191,7 +194,7 @@ public class MenuToolBar {
 			this.menuCoolItem.setSize(this.size);
 			this.menuCoolItem.setPreferredSize(this.size);
 			this.menuCoolItem.setMinimumSize(this.size);
-			MenuToolBar.log.fine("fileToolBar.size = " + this.size);
+			MenuToolBar.log.fine("fileToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end file cool item
 
 		{ // begin device cool item
@@ -202,12 +205,12 @@ public class MenuToolBar {
 				//deviceToolBar.setSize(120, 29);
 				{
 					this.deviceSelectToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
-					this.deviceSelectToolItem.setToolTipText("Geräteauswahl mit Einstellungen");
-					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif"));
-					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif"));
+					this.deviceSelectToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0057));
+					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif")); //$NON-NLS-1$
+					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("deviceToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("deviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelection = MenuToolBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelection.checkDataSaved()) {
 								deviceSelection.open();
@@ -217,12 +220,12 @@ public class MenuToolBar {
 				}
 				{
 					this.prevDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
-					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-					this.prevDeviceToolItem.setToolTipText("Schalte zum verhergehenden Gerät");
-					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+					this.prevDeviceToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0058));
+					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("prevDeviceToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("prevDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
 							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
 									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
@@ -254,12 +257,12 @@ public class MenuToolBar {
 				}
 				{
 					this.nextDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
-					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-					this.nextDeviceToolItem.setToolTipText("Schalte zum nachfolgenden Gerät");
-					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+					this.nextDeviceToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0059));
+					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("nextDeviceToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("nextDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
 							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
 									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
@@ -290,12 +293,12 @@ public class MenuToolBar {
 				}
 				{
 					this.toolBoxToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
-					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif"));
-					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
-					this.toolBoxToolItem.setToolTipText("Gerätedialog öffnen");
+					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif")); //$NON-NLS-1$
+					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+					this.toolBoxToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0060));
 					this.toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("toolBoxToolItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("toolBoxToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.application.getDeviceDialog() != null) {
 								MenuToolBar.this.application.getDeviceDialog().open();
 							}
@@ -320,60 +323,60 @@ public class MenuToolBar {
 				//zoomToolBar.setSize(90, 29);
 				{
 					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif"));
-					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif"));
-					this.zoomWindowItem.setToolTipText("Ausschnitt vergrößern");
+					this.zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif")); //$NON-NLS-1$
+					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif")); //$NON-NLS-1$
+					this.zoomWindowItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0061));
 					this.zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("zoomWindowItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
 						}
 					});
 				}
 				{
 					this.panItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif"));
-					this.panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif"));
-					this.panItem.setToolTipText("Verschieben");
+					this.panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif")); //$NON-NLS-1$
+					this.panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif")); //$NON-NLS-1$
+					this.panItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0062));
 					this.panItem.setEnabled(false);
 					this.panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("resizeItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("resizeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
 						}
 					});
 				}
 				{
 					this.cutLeftItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.cutLeftItem.setImage(SWTResourceManager.getImage("osde/resource/CutLeft.gif"));
-					this.cutLeftItem.setToolTipText("Linke Seite beschneiden (nur im Zoommodus)");
+					this.cutLeftItem.setImage(SWTResourceManager.getImage("osde/resource/CutLeft.gif")); //$NON-NLS-1$
+					this.cutLeftItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0063));
 					this.cutLeftItem.setEnabled(false);
 					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutLeftItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutLeftItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setCutModeActive(true, false);
 						}
 					});
 				}
 				{
 					this.cutRightItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.cutRightItem.setImage(SWTResourceManager.getImage("osde/resource/CutRight.gif"));
-					this.cutRightItem.setToolTipText("Rechte Seite beschneiden (nur im Zoommodus)");
+					this.cutRightItem.setImage(SWTResourceManager.getImage("osde/resource/CutRight.gif")); //$NON-NLS-1$
+					this.cutRightItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0064));
 					this.cutRightItem.setEnabled(false);
 					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutRightItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("cutRightItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setCutModeActive(false, true);						}
 					});
 				}
 				{
 					this.fitIntoItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif"));
-					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif"));
-					this.fitIntoItem.setToolTipText("Auf Ursprungsgröße einpassen");
+					this.fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif")); //$NON-NLS-1$
+					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif")); //$NON-NLS-1$
+					this.fitIntoItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0065));
 					this.fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("fitIntoItem.widgetSelected, event=" + evt);
+							if (MenuToolBar.log.isLoggable(Level.FINEST)) MenuToolBar.log.finest("fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
 						}
 					});
@@ -394,21 +397,21 @@ public class MenuToolBar {
 				//portToolBar.setSize(129, 29);
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
-					this.portOpenCloseItem.setToolTipText("Seriellen Port Öffnen, um eine Datenaufnahme zu ermöglichen");
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif")); //$NON-NLS-1$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuToolBar.log.finest("portOpenCloseItem.widgetSelected, event=" + evt);
+							MenuToolBar.log.finest("portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
 							if(activeDevice != null) {
 								activeDevice.openCloseSerialPort();
 								if (activeDevice.getSerialPort().isConnected()) {
-									MenuToolBar.this.portOpenCloseItem.setToolTipText("Seriellen Port schliessen, um eine Datenaufnahme abzubrechen");
+									MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
 								}
 								else {
-									MenuToolBar.this.portOpenCloseItem.setToolTipText("Seriellen Port öffnen, um eine Datenaufnahme zu ermöglichen");
+									MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
 								}
 							}
 						}
@@ -439,9 +442,9 @@ public class MenuToolBar {
 					this.channelSelectComposite.setLayoutData(composite1LData);
 					{
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
-						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" });
+						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
-						this.channelSelectCombo.setToolTipText("Wählen Sie einen Ausgang/eine Konfiguration aus der angezeigt werden soll");
+						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
 						RowData channelSelectComboLData = new RowData();
 						channelSelectComboLData.width = 140;
 						channelSelectComboLData.height = 17;
@@ -450,7 +453,7 @@ public class MenuToolBar {
 						this.channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								MenuToolBar.log.finest("kanalCombo.widgetSelected, event=" + evt);
+								MenuToolBar.log.finest("kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 							}
 						});
@@ -459,13 +462,13 @@ public class MenuToolBar {
 						this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
 						{
 							this.prevChannel = new ToolItem(this.channelToolBar, SWT.NONE);
-							this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-							this.prevChannel.setToolTipText("Ausgang/Konfiguration zurück");
+							this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+							this.prevChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0076));
 							this.prevChannel.setEnabled(false);
-							this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 							this.prevChannel.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("prevChannel.widgetSelected, event=" + evt);
+									MenuToolBar.log.finest("prevChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
 									if (selectionIndex > 0) MenuToolBar.this.channelSelectCombo.select(selectionIndex - 1);
 									if (selectionIndex == 1) MenuToolBar.this.prevChannel.setEnabled(false);
@@ -477,13 +480,13 @@ public class MenuToolBar {
 						}
 						{
 							this.nextChannel = new ToolItem(this.channelToolBar, SWT.NONE);
-							this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-							this.nextChannel.setToolTipText("Ausgang/Konfiguration vor");
+							this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+							this.nextChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0077));
 							this.nextChannel.setEnabled(false);
-							this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 							this.nextChannel.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("nextChannel.widgetSelected, event=" + evt);
+									MenuToolBar.log.finest("nextChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
 									int maxIndex = MenuToolBar.this.channelSelectCombo.getItemCount() - 1;
 									if (maxIndex <= 0) {
@@ -501,7 +504,7 @@ public class MenuToolBar {
 						}
 					}
 					this.channelToolBar.pack();
-					MenuToolBar.log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize());
+					MenuToolBar.log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
 					{
 						RowData composite2LData = new RowData();
 						composite2LData.width = 250;
@@ -514,8 +517,8 @@ public class MenuToolBar {
 							this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER);
 							FormLayout aufnahmeComboLayout = new FormLayout();
 							this.recordSelectCombo.setLayout(aufnahmeComboLayout);
-							this.recordSelectCombo.setItems(new String[] { " " }); // "2) Flugaufzeichnung", "3) laden" });
-							this.recordSelectCombo.setToolTipText("Datensatz auswählen, der angezeigt werden soll");
+							this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });
+							this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
 							this.recordSelectCombo.setTextLimit(30);
 							RowData recordSelectComboLData = new RowData();
 							recordSelectComboLData.width = 240;
@@ -525,20 +528,20 @@ public class MenuToolBar {
 							this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 							this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("recordSelectCombo.widgetSelected, event=" + evt);
+									MenuToolBar.log.finest("recordSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 									if (activeChannel != null) activeChannel.switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
 								}
 							});
 							this.recordSelectCombo.addKeyListener(new KeyAdapter() {
 								public void keyPressed(KeyEvent evt) {
-									MenuToolBar.log.finest("recordSelectCombo.keyPressed, event=" + evt);
+									MenuToolBar.log.finest("recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 									if (evt.character == SWT.CR) {
 										Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 										if (activeChannel != null) {
 											String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
 											String newRecordSetName = MenuToolBar.this.recordSelectCombo.getText();
-											MenuToolBar.log.fine("newRecordSetName = " + newRecordSetName);
+											MenuToolBar.log.fine("newRecordSetName = " + newRecordSetName); //$NON-NLS-1$
 											String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
 											for (int i = 0; i < recordSetNames.length; i++) {
 												if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
@@ -559,19 +562,19 @@ public class MenuToolBar {
 							});
 						}
 						this.recordSelectComposite.pack();
-						MenuToolBar.log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize());
+						MenuToolBar.log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
 					}
 					{
 						this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
 						{
 							this.prevRecord = new ToolItem(this.recordToolBar, SWT.NONE);
-							this.prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif"));
-							this.prevRecord.setToolTipText("vorhergehender Datensatz");
+							this.prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+							this.prevRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0079));
 							this.prevRecord.setEnabled(false);
-							this.prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif"));
+							this.prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 							this.prevRecord.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("prevRecord.widgetSelected, event=" + evt);
+									MenuToolBar.log.finest("prevRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
 									if (selectionIndex > 0) MenuToolBar.this.recordSelectCombo.select(selectionIndex - 1);
 									if (selectionIndex == 1) MenuToolBar.this.prevRecord.setEnabled(false);
@@ -582,13 +585,13 @@ public class MenuToolBar {
 						}
 						{
 							this.nextRecord = new ToolItem(this.recordToolBar, SWT.NONE);
-							this.nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif"));
-							this.nextRecord.setToolTipText("nächster Datensatz");
+							this.nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+							this.nextRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0080));
 							this.nextRecord.setEnabled(false);
-							this.nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif"));
+							this.nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 							this.nextRecord.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("nextRecord.widgetSelected, event=" + evt);
+									MenuToolBar.log.finest("nextRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
 									int maxIndex = MenuToolBar.this.recordSelectCombo.getItemCount() - 1;
 									if (maxIndex <= 0) {
@@ -605,19 +608,19 @@ public class MenuToolBar {
 							});
 						}
 						this.recordToolBar.pack();
-						MenuToolBar.log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize());
+						MenuToolBar.log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
 					}
 					{
 						this.separator = new ToolItem(this.recordToolBar, SWT.SEPARATOR);
 					}
 					{
 						this.deleteRecord = new ToolItem(this.recordToolBar, SWT.NONE);
-						this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
-						this.deleteRecord.setToolTipText("löscht den aktiven Datensatz");
-						this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif"));
+						this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
+						this.deleteRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0081));
+						this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
 						this.deleteRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								MenuToolBar.log.finest("deleteAufnahme.widgetSelected, event=" + evt);
+								MenuToolBar.log.finest("deleteAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
 								Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									RecordSet recordSet = activeChannel.getActiveRecordSet();
@@ -634,7 +637,7 @@ public class MenuToolBar {
 										// ready for deletion
 										activeChannel.get(deleteRecordSetName).clear();
 										activeChannel.remove(deleteRecordSetName);
-										MenuToolBar.log.fine("deleted " + deleteRecordSetName);
+										MenuToolBar.log.fine("deleted " + deleteRecordSetName); //$NON-NLS-1$
 										updateRecordSetSelectCombo();
 										MenuToolBar.this.application.updateDataTable();
 									}
@@ -644,12 +647,12 @@ public class MenuToolBar {
 					}
 					{
 						this.editRecord = new ToolItem(this.recordToolBar, SWT.NONE);
-						this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
-						this.editRecord.setToolTipText("umbenennen des aktiven Datensatznamen");
-						this.editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
+						this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
+						this.editRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0082));
+						this.editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
 						this.editRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								MenuToolBar.log.finest("editAufnahme.widgetSelected, event=" + evt);
+								MenuToolBar.log.finest("editAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuToolBar.this.recordSelectCombo.setEditable(true);
 								MenuToolBar.this.recordSelectCombo.setFocus();
 								// begin here text can be edited
@@ -657,16 +660,16 @@ public class MenuToolBar {
 						});
 					}
 					this.channelSelectComposite.pack();
-					MenuToolBar.log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize());
+					MenuToolBar.log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
 				}
 			}
 			this.dataBarComposite.pack();
 			//int height = this.size.y + 2;
 			this.size = this.dataBarComposite.getSize();
-			MenuToolBar.log.fine("pre dataBarComposite.size = " + this.size);
+			MenuToolBar.log.fine("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			//this.dataBarComposite.setSize(this.size.x, height);
 			this.size = this.dataBarComposite.getSize();
-			MenuToolBar.log.fine("post dataBarComposite.size = " + this.size);
+			MenuToolBar.log.fine("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			this.dataCoolItem.setSize(this.size);
 			this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.size);
@@ -728,7 +731,7 @@ public class MenuToolBar {
 			this.channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
 		else { // no channel
-			this.channelSelectCombo.setItems(new String[] { "" });
+			this.channelSelectCombo.setItems(new String[] { OSDE.SRING_EMPTY });
 		}
 		this.channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
@@ -766,7 +769,7 @@ public class MenuToolBar {
 		}
 		else {
 			this.recordSelectCombo.setItems(new String[0]);
-			this.recordSelectCombo.setText("");
+			this.recordSelectCombo.setText(OSDE.SRING_EMPTY);
 		}
 		updateRecordToolItems();
 		this.application.updateGraphicsWindow();
@@ -864,16 +867,16 @@ public class MenuToolBar {
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (isOpenStatus) {
-			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif"));
-			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif"));
-			this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif"));
+			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif")); //$NON-NLS-1$
+			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif")); //$NON-NLS-1$
+			this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif")); //$NON-NLS-1$
 			//portOpenCloseLabel.setText("Port schliessen");
 		}
 		else {
 			if (!this.application.isDisposed()) {
-				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif"));
-				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif"));
-				this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif"));
+				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif")); //$NON-NLS-1$
+				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif")); //$NON-NLS-1$
+				this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif")); //$NON-NLS-1$
 				//portOpenCloseLabel.setText("Port öffnen         ");
 			}
 		}
@@ -893,18 +896,6 @@ public class MenuToolBar {
 		updateChannelSelector();
 	}
 
-	@SuppressWarnings("unused")
-	private void initGUI() {
-		try {
-			{
-				this.application.setSize(800, 200);
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 	/**
 	 * enable pan button in zoomed mode
 	 * @param enable 
