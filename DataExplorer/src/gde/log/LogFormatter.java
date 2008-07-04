@@ -30,10 +30,10 @@ import java.util.logging.LogRecord;
 public class LogFormatter extends Formatter {
 
 	//private static final DateFormat	format	= new SimpleDateFormat("HH:mm:ss:SSS");
-	private static final String lineSep = System.getProperty("line.separator");
+	private static final String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
 	//private static final DateFormat tf = new SimpleDateFormat("HH:mm:ss:SSS");
 	Date dat = new Date();
-  private final static String format = "{0,date,yyyy-MM-dd HH:mm:ss.SSS} {1,number,000000} {2}.{3}() - {4}" + lineSep;
+  private final static String format = "{0,date,yyyy-MM-dd HH:mm:ss.SSS} {1,number,000000} {2}.{3}() - {4}" + lineSep; //$NON-NLS-1$
   private Object args[] = new Object[5];
   private MessageFormat formatter;
 	/*
