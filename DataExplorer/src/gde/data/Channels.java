@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 
 import osde.OSDE;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
-import osde.utils.Messages;
 import osde.utils.StringHelper;
 
 /**

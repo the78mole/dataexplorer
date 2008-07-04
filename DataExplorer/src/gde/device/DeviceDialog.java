@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
-import osde.utils.Messages;
 
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations

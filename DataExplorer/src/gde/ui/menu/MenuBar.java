@@ -53,12 +53,12 @@ import osde.io.CSVReaderWriter;
 import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsWindow;
 import osde.utils.FileUtils;
-import osde.utils.Messages;
 import osde.utils.StringHelper;
 
 /**

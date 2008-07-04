@@ -37,11 +37,11 @@ import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.AxisEndValuesDialog;
 import osde.ui.tab.GraphicsWindow;
-import osde.utils.Messages;
 
 /**
  * Context menu class of the curve selection window acts as popup menu

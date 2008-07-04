@@ -19,6 +19,8 @@ import osde.device.ChannelTypes;
 import osde.device.IDevice;
 import osde.exception.NotSupportedException;
 import osde.exception.NotSupportedFileFormatException;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
 
@@ -35,13 +37,13 @@ public class LogViewReader {
 	
 	// fill device Map with 
 	static {
-		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4");
-		deviceMap.put("picolario", "Picolario");
-		deviceMap.put("unilog", "UniLog");
-		deviceMap.put("e-station 902", "eStation902");
-		deviceMap.put("e-station bc6", "eStationBC6");
-		deviceMap.put("e-station bc610", "eStationBC610");
-		deviceMap.put("e-station bc8", "eStationBC8");
+		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("picolario", "Picolario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("e-station 902", "eStation902"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("e-station bc6", "eStationBC6"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("e-station bc610", "eStationBC610"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
@@ -54,10 +56,10 @@ public class LogViewReader {
 	public static RecordSet read(String filePath) throws Exception {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
-		String channelConfig = "";
-		String recordSetName = "";
-		String recordSetComment = "";
-		String recordSetProperties = "";
+		String channelConfig = OSDE.STRING_EMPTY;
+		String recordSetName = OSDE.STRING_EMPTY;
+		String recordSetComment = OSDE.STRING_EMPTY;
+		String recordSetProperties = OSDE.STRING_EMPTY;
 		String[] recordsProperties;
 		int recordDataSize = 0;
 		Channel channel = null;
@@ -72,10 +74,10 @@ public class LogViewReader {
 		String channelType = ChannelTypes.values()[device.getChannelType(channelNumber)].name();
 		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(OSDE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelName(channelNumber);
-		if (log.isLoggable(Level.FINE)) log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")");
+		if (log.isLoggable(Level.FINE)) log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType);
 		header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
-		//header.put(OSDE.RECORD_SET_DATA_POINTER, ""+position);
+		//header.put(OSDE.RECORD_SET_DATA_POINTER, OSDE.STRING_EMPTY+position);
 		//header.containsKey(LOV_NUM_MEASUREMENTS)
 		
 		// record sets with it properties
@@ -83,13 +85,13 @@ public class LogViewReader {
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>(numberRecordSets);
 		for (int i=1; i<=numberRecordSets; ++i) {
 			// RecordSetName : 1) Flugaufzeichnung||::||RecordSetComment : empfangen: 12.05.2006, 20:42:52||::||RecordDataSize : 22961||::||RecordSetDataBytes : 367376
-			String recordSetInfo = header.get((i)+" " + OSDE.RECORD_SET_NAME);
+			String recordSetInfo = header.get((i)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME);
 			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + OSDE.CHANNEL_CONFIG_NAME + header.get(OSDE.CHANNEL_CONFIG_NAME);
 			if (header.containsKey(RecordSet.TIME_STEP_MS)) {
-				recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + "=" + header.get(RecordSet.TIME_STEP_MS);
+				recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + OSDE.STRING_EQUAL + header.get(RecordSet.TIME_STEP_MS);
 			}
 			else { // format version 1.1x dos not have this info in  file (no devices with variable time step supported)
-				recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + OSDE.RECORD_SET_PROPERTIES + RecordSet.TIME_STEP_MS + "=" + device.getTimeStep_ms();
+				recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + OSDE.RECORD_SET_PROPERTIES + RecordSet.TIME_STEP_MS + OSDE.STRING_EQUAL + device.getTimeStep_ms();
 			}
 			// append record properties if any available
 			recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER;
@@ -111,9 +113,9 @@ public class LogViewReader {
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
-					String msg = "Die Kanalkonfiguration des Datensatzes " + recordSetName + " entspricht keiner aktuell vorhandenen.\n"
-						+ "Eine Änderung von Einstellungen ist nur nach Übertrag in eine vorhandene Kanalkonfiguration möglich.\n" 
-						+ "Hinweis: Ein umstellen der KanalKonfiguration is über den Gerätedialog möglich.";
+					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) 
+						+ Messages.getString(MessageIds.OSDE_MSGI0019)
+						+ Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size()+ 1;
 					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
@@ -160,10 +162,10 @@ public class LogViewReader {
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
 				
-				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));				
+				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));				 //$NON-NLS-1$
 				int dataBufferSize = device.getLovDataByteSize();
 				byte[] buffer = new byte[dataBufferSize * recordDataSize];
-				if (log.isLoggable(Level.FINE)) log.fine("data buffer size = " + buffer.length);
+				if (log.isLoggable(Level.FINE)) log.fine("data buffer size = " + buffer.length); //$NON-NLS-1$
 
 				data_in.readFully(buffer);
 				position += buffer.length;
@@ -172,7 +174,7 @@ public class LogViewReader {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
-					channels.setFileName(filePath.substring(filePath.lastIndexOf("/")+1));
+					channels.setFileName(filePath.substring(filePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1));
 					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
@@ -180,7 +182,7 @@ public class LogViewReader {
 				recordSet.setAllVisibleAndDisplayable();
 				channel.applyTemplate(recordSet.getName());
 				
-				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position));
+				if (log.isLoggable(Level.FINER)) log.finer(String.format("data pointer position = 0x%x", position)); //$NON-NLS-1$
 			}
 			return recordSet;
 		}
@@ -214,14 +216,14 @@ public class LogViewReader {
 		position += data_in.read(buffer);
 		long headerSize = parse2Long(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.LOV_HEADER_SIZE + headerSize);
-		header.put(OSDE.LOV_HEADER_SIZE, ""+headerSize);
+		header.put(OSDE.LOV_HEADER_SIZE, OSDE.STRING_EMPTY+headerSize);
 		
 		// read LOV stream version
 		buffer = new byte[4];
 		position += data_in.read(buffer);
 		int streamVersion = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.LOV_STREAM_VERSION + streamVersion);
-		header.put(OSDE.LOV_STREAM_VERSION, ""+streamVersion);
+		header.put(OSDE.LOV_STREAM_VERSION, OSDE.STRING_EMPTY+streamVersion);
 		
 		// read LOV tmp string size
 		buffer = new byte[4];
@@ -231,8 +233,8 @@ public class LogViewReader {
 		position += data_in.read(buffer);
 		String stringVersion = new String(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.LOV_STRING_VERSION + stringVersion);
-		if (streamVersion != new Integer(stringVersion.split(":V")[1])) {
-			NotSupportedFileFormatException e = new NotSupportedFileFormatException("missmatch streamVersion (" + streamVersion + ") vs stringVersion (" + stringVersion + ")");
+		if (streamVersion != new Integer(stringVersion.split(":V")[1])) { //$NON-NLS-1$
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.OSDE_MSGE0008, new Object[] { streamVersion, stringVersion })); 
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -266,8 +268,8 @@ public class LogViewReader {
 		if (log.isLoggable(Level.FINER)) log.finer(OSDE.LAST_UPDATE_TIME_STAMP + new String(buffer));
 		header.put(OSDE.LAST_UPDATE_TIME_STAMP, new String(buffer));
 		
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		
 		return header;
 	}
@@ -319,35 +321,35 @@ public class LogViewReader {
 		
 		getBaseHeaderData(header, data_in);
 		
-		String[] aVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(" ");
-		String useVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(" ")[1];
-		if (aVersion.length >= 3) useVersion = useVersion + " " + aVersion[2];
-		if (log.isLoggable(Level.FINE)) log.fine("using format version " + useVersion);
+		String[] aVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK);
+		String useVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK)[1];
+		if (aVersion.length >= 3) useVersion = useVersion + OSDE.STRING_BLANK + aVersion[2];
+		if (log.isLoggable(Level.FINE)) log.fine("using format version " + useVersion); //$NON-NLS-1$
 		
-		if (useVersion.equals("1.13")) {
+		if (useVersion.equals("1.13")) { //$NON-NLS-1$
 			header = getHeaderInfo_1_13(data_in, header);
 			header = getRecordSetInfo_1_13(data_in, header);
 		}
-		else if (useVersion.startsWith("1.14") || useVersion.equals("1.15")) {
+		else if (useVersion.startsWith("1.14") || useVersion.equals("1.15")) { //$NON-NLS-1$ //$NON-NLS-2$
 			header = getHeaderInfo_1_15(data_in, header);
 			header = getRecordSetInfo_1_15(data_in, header);
 		}
-		else if (useVersion.equals("1.50 ALPHA")) {
+		else if (useVersion.equals("1.50 ALPHA")) { //$NON-NLS-1$
 			header = getHeaderInfo_1_50_ALPHA(data_in, header); 
 			//header = getHeaderInfo_1_15(data_in, header);
 			header = getRecordSetInfo_1_50_ALPHA(data_in, header);
 		}
-		else if (useVersion.equals("1.50 PreBETA") || useVersion.startsWith("2.0 BETA")) {
+		else if (useVersion.equals("1.50 PreBETA") || useVersion.startsWith("2.0 BETA")) { //$NON-NLS-1$ //$NON-NLS-2$
 			header = getHeaderInfo_1_50_BETA(data_in, header);
 			//header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_1_50_BETA(data_in, header);
 		}
-		else if (useVersion.equals("2.0")) {
+		else if (useVersion.equals("2.0")) { //$NON-NLS-1$
 			header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_2_0(data_in, header);
 		}
 		else {
-			NotSupportedFileFormatException e = new NotSupportedFileFormatException("Dateiformatversions ist nicht unterstützt, da kein Beispile dafür vorliegt - Version = " + useVersion);
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.OSDE_MSGI0021, new Object[] { useVersion } ));
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -375,9 +377,9 @@ public class LogViewReader {
 			int fileCommentSize = parse2Int(buffer);
 			buffer = new byte[fileCommentSize];
 			position += data_in.read(buffer);
-			fileComment.append(new String(buffer)).append(" ");
+			fileComment.append(new String(buffer)).append(OSDE.STRING_BLANK);
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
 		
 		// read data set channel
@@ -394,9 +396,9 @@ public class LogViewReader {
 			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
-		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
 
 		
 		// read communication port
@@ -406,7 +408,7 @@ public class LogViewReader {
 		if (comStrSize != 0) {
 			buffer = new byte[comStrSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
 		}
 		position += data_in.skipBytes(4);
 
@@ -422,8 +424,8 @@ public class LogViewReader {
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
 		position += data_in.skip(headerSize-position);
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		return header;
 	}
@@ -445,7 +447,7 @@ public class LogViewReader {
 		position += data_in.read(buffer);
 		int numberRecordSets = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
-		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
 
 		position += data_in.skipBytes(8);
 		
@@ -472,7 +474,7 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(4);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			int tmpDataSize = 0;
 			buffer = new byte[4];
@@ -493,11 +495,11 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
-			header.put(OSDE.DATA_POINTER_POS, ""+position);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
-			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
-			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
@@ -523,9 +525,9 @@ public class LogViewReader {
 			int fileCommentSize = parse2Int(buffer);
 			buffer = new byte[fileCommentSize];
 			position += data_in.read(buffer);
-			fileComment.append(new String(buffer)).append(" ");
+			fileComment.append(new String(buffer)).append(OSDE.STRING_BLANK);
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
 		
 		// read data set channel
@@ -542,9 +544,9 @@ public class LogViewReader {
 			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
-		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
 
 		
 		// read communication port
@@ -554,7 +556,7 @@ public class LogViewReader {
 		if (comStrSize != 0) {
 			buffer = new byte[comStrSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
 		}
 		position += data_in.skipBytes(4);
 
@@ -570,9 +572,9 @@ public class LogViewReader {
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
 		position += data_in.skip(headerSize-position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
 
 		return header;
 	}	
@@ -594,7 +596,7 @@ public class LogViewReader {
 		position += data_in.read(buffer);
 		int numberRecordSets = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
-		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
 
 		position += data_in.skipBytes(8);
 		
@@ -621,7 +623,7 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(4);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			int tmpDataSize = 0;
 			buffer = new byte[4];
@@ -636,14 +638,14 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(16);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			// config block n100W, ...
 			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
-			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines);
+			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines); //$NON-NLS-1$
 			for (int j = 0; j < numberLines; j++) {
 				buffer = new byte[4];
 				position += data_in.read(buffer);
@@ -654,7 +656,7 @@ public class LogViewReader {
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
 			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			position += data_in.skipBytes(8);
 			buffer = new byte[8];
@@ -663,11 +665,11 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
-			header.put(OSDE.DATA_POINTER_POS, ""+position);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
-			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
-			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
@@ -693,11 +695,11 @@ public class LogViewReader {
 			int fileCommentSize = parse2Int(buffer);
 			buffer = new byte[fileCommentSize];
 			position += data_in.read(buffer);
-			fileComment.append(new String(buffer)).append(" ");
+			fileComment.append(new String(buffer)).append(OSDE.STRING_BLANK);
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		
 		// read data set channel
 		buffer = new byte[4];
@@ -713,9 +715,9 @@ public class LogViewReader {
 			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
-		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
 
 		
 		// read communication port
@@ -725,7 +727,7 @@ public class LogViewReader {
 		if (comStrSize != 0) {
 			buffer = new byte[comStrSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
 		}
 		position += data_in.skipBytes(4);
 
@@ -741,9 +743,9 @@ public class LogViewReader {
 		header.put(OSDE.DEVICE_NAME, deviceName);
 		
 		position += data_in.skip(headerSize-position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
 
 		return header;
 	}	
@@ -760,14 +762,14 @@ public class LogViewReader {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		
 		position += data_in.skip(88);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		
 		// read number record sets
 		byte[] buffer = new byte[4];
 		position += data_in.read(buffer);
 		int numberRecordSets = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
-		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
 
 		position += data_in.skipBytes(8);
 		
@@ -794,7 +796,7 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(122);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			int tmpDataSize = 0;
 			buffer = new byte[4];
@@ -807,17 +809,17 @@ public class LogViewReader {
 			int dataSize = tmpDataSize;
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_DATA_SIZE + dataSize);
 			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			position += data_in.skipBytes(216);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			// config block n100W, ...
 			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
-			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines);
+			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines); //$NON-NLS-1$
 			for (int j = 0; j < numberLines; j++) {
 				buffer = new byte[4];
 				position += data_in.read(buffer);
@@ -828,7 +830,7 @@ public class LogViewReader {
 				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
 			}
 			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			//position += data_in.skipBytes(8);
 			buffer = new byte[8];
@@ -837,11 +839,11 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
-			header.put(OSDE.DATA_POINTER_POS, ""+position);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
-			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
-			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
@@ -868,12 +870,12 @@ public class LogViewReader {
 		
 		int index = 0;
 		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(" ");
+			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
 			index += OSDE.LOV_RTF_START_USER_TEXT.length();
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		// read data set channel
 		buffer = new byte[4];
@@ -889,9 +891,9 @@ public class LogViewReader {
 			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
-		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
 				
 		// read communication port
 		buffer = new byte[4];
@@ -900,7 +902,7 @@ public class LogViewReader {
 		if (comStrSize != 0) {
 			buffer = new byte[comStrSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
 		}
 		position += data_in.skipBytes(4);
 
@@ -921,7 +923,7 @@ public class LogViewReader {
 		buffer = new byte[4];
 		position += data_in.read(buffer);
 		int deviceConfigLineSize = parse2Int(buffer);
-		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
+		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize); //$NON-NLS-1$
 		
 		for (int i = 0; i < deviceConfigLineSize; i++) {
 			// read device ini line
@@ -932,17 +934,17 @@ public class LogViewReader {
 			position += data_in.read(buffer);
 			String configLine = new String(buffer);
 			if (configLine.startsWith(OSDE.LOV_TIME_STEP)) 
-				header.put(RecordSet.TIME_STEP_MS, configLine.split("=")[1]);
+				header.put(RecordSet.TIME_STEP_MS, configLine.split(OSDE.STRING_EQUAL)[1]);
 			else if (configLine.startsWith(OSDE.LOV_NUM_MEASUREMENTS))
-				header.put(OSDE.LOV_NUM_MEASUREMENTS, ""+ ((new Integer(configLine.split("=")[1].trim()).intValue()) - 1)); // -1 == time
+				header.put(OSDE.LOV_NUM_MEASUREMENTS, OSDE.STRING_EMPTY+ ((new Integer(configLine.split(OSDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
 			if (log.isLoggable(Level.FINEST)) log.finest(configLine);
 		}
 
 		// end of header sometimes after headerSize
 		position += data_in.skip(headerSize-position);
 		//**** end main header			
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		return header;
 	}	
@@ -958,14 +960,14 @@ public class LogViewReader {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		
 		position += data_in.skip(88);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		
 		// read number record sets
 		byte[] buffer = new byte[4];
 		position += data_in.read(buffer);
 		int numberRecordSets = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
-		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
 	
 		position += data_in.skipBytes(8);
 		
@@ -981,17 +983,17 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_NAME + recordSetName);
 						
 			position += data_in.skipBytes(2);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			buffer = new byte[8];
 			position += data_in.read(buffer);
 			long recordSetConfigSize = parse2Long(buffer);
 			buffer = new byte[(int)recordSetConfigSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer)); //$NON-NLS-1$
 			
 			position += data_in.skipBytes(112);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			int tmpDataSize = 0;
 			buffer = new byte[4];
@@ -1006,14 +1008,14 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(16);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			// config block n100W, ...
 			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
-			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines);
+			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines); //$NON-NLS-1$
 			for (int j = 0; j < numberLines; j++) {
 				buffer = new byte[4];
 				position += data_in.read(buffer);
@@ -1026,7 +1028,7 @@ public class LogViewReader {
 			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
 			
 			position += data_in.skipBytes(4);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			// rtf block
 			buffer = new byte[8];
@@ -1040,7 +1042,7 @@ public class LogViewReader {
 			int index = 0;
 			StringBuilder recordSetComment = new StringBuilder();
 			while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(" ");
+				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
 				index += OSDE.LOV_RTF_START_USER_TEXT.length();
 			}
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
@@ -1052,10 +1054,10 @@ public class LogViewReader {
 			buffer = new byte[parse2Int(buffer)];
 			position += data_in.read(buffer);
 			if (log.isLoggable(Level.FINEST)) log.finest(new String(buffer));
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));			
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));			 //$NON-NLS-1$
 			
 			position += data_in.skip(175);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			buffer = new byte[8];
 			position += data_in.read(buffer);
@@ -1063,11 +1065,11 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
-			header.put(OSDE.DATA_POINTER_POS, ""+position);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
-			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
-			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
@@ -1094,13 +1096,13 @@ public class LogViewReader {
 		
 		int index = 0;
 		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(" ");
+			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
 			index += OSDE.LOV_RTF_START_USER_TEXT.length();
 		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString());
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
 		header.put(OSDE.FILE_COMMENT, fileComment.toString());
 		
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		// read data set channel
 		buffer = new byte[4];
 		position += data_in.read(buffer);
@@ -1115,9 +1117,9 @@ public class LogViewReader {
 			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split("=")[1].trim()).intValue();
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
-		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channelNumber);
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
 				
 		// read communication port
 		buffer = new byte[4];
@@ -1126,7 +1128,7 @@ public class LogViewReader {
 		if (comStrSize != 0) {
 			buffer = new byte[comStrSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
 		}
 		position += data_in.skipBytes(4);
 
@@ -1147,7 +1149,7 @@ public class LogViewReader {
 		buffer = new byte[4];
 		position += data_in.read(buffer);
 		int deviceConfigLineSize = parse2Int(buffer);
-		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize);
+		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize); //$NON-NLS-1$
 		
 		for (int i = 0; i < deviceConfigLineSize; i++) {
 			// read device ini line
@@ -1158,17 +1160,17 @@ public class LogViewReader {
 			position += data_in.read(buffer);
 			String configLine = new String(buffer);
 			if (configLine.startsWith(OSDE.LOV_TIME_STEP)) 
-				header.put(RecordSet.TIME_STEP_MS, configLine.split("=")[1]);
+				header.put(RecordSet.TIME_STEP_MS, configLine.split(OSDE.STRING_EQUAL)[1]);
 			else if (configLine.startsWith(OSDE.LOV_NUM_MEASUREMENTS))
-				header.put(OSDE.LOV_NUM_MEASUREMENTS, ""+ ((new Integer(configLine.split("=")[1].trim()).intValue()) - 1)); // -1 == time
+				header.put(OSDE.LOV_NUM_MEASUREMENTS, OSDE.STRING_EMPTY+ ((new Integer(configLine.split(OSDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
 			if (log.isLoggable(Level.FINEST)) log.finest(configLine);
 		}
 
 		// end of header sometimes after headerSize
 		position += data_in.skip(headerSize-position);
 		//**** end main header			
-		header.put(OSDE.DATA_POINTER_POS, ""+position);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		return header;
 	}	
@@ -1184,14 +1186,14 @@ public class LogViewReader {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		
 		position += data_in.skip(88);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		
 		// read number record sets
 		byte[] buffer = new byte[4];
 		position += data_in.read(buffer);
 		int numberRecordSets = parse2Int(buffer);
 		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
-		header.put(OSDE.RECORD_SET_SIZE, ""+numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
 	
 		position += data_in.skipBytes(8);
 		
@@ -1213,10 +1215,10 @@ public class LogViewReader {
 			long recordSetConfigSize = parse2Long(buffer);
 			buffer = new byte[(int)recordSetConfigSize];
 			position += data_in.read(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer));
+			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer)); //$NON-NLS-1$
 			
 			position += data_in.skipBytes(112);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			int tmpDataSize = 0;
 			buffer = new byte[4];
@@ -1231,14 +1233,14 @@ public class LogViewReader {
 			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
 			
 			position += data_in.skipBytes(16);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			// config block n100W, ...
 			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
-			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines);
+			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines); //$NON-NLS-1$
 			for (int j = 0; j < numberLines; j++) {
 				buffer = new byte[4];
 				position += data_in.read(buffer);
@@ -1262,7 +1264,7 @@ public class LogViewReader {
 			int index = 0;
 			StringBuilder recordSetComment = new StringBuilder();
 			while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(" ");
+				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
 				index += OSDE.LOV_RTF_START_USER_TEXT.length();
 			}
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
@@ -1284,11 +1286,11 @@ public class LogViewReader {
 			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
-			header.put(OSDE.DATA_POINTER_POS, ""+position);
-			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position));
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
-			header.put((i+1)+" " + OSDE.RECORD_SET_NAME, sb.toString());
-			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+" " + OSDE.RECORD_SET_NAME));
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
@@ -1329,7 +1331,7 @@ public class LogViewReader {
 	private static String mapLovDeviceNames(String deviceName) throws NotSupportedException {
 		String deviceKey = deviceName.toLowerCase().trim();
 		if (!deviceMap.containsKey(deviceKey)) {
-			String msg = "Ein Gerät mit dem Namen = " + deviceName + " ist nicht unterstützt !";
+			String msg = Messages.getString(MessageIds.OSDE_MSGW0016, new Object[] { deviceName }); 
 			NotSupportedException e = new NotSupportedException(msg);
 			log.log(Level.WARNING, e.getMessage(), e);
 			throw e;

@@ -40,8 +40,8 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
-import osde.utils.Messages;
 
 /**
  * Class to read and write comma separated value files

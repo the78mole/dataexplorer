@@ -32,9 +32,9 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.utils.Messages;
 import osde.utils.StringHelper;
 import osde.utils.TimeLine;
 

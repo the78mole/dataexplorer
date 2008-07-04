@@ -40,7 +40,7 @@ import osde.OSDE;
 import osde.config.Settings;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
-import osde.utils.Messages;
+import osde.messages.Messages;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application

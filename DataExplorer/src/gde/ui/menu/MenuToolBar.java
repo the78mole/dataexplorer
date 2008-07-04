@@ -44,11 +44,11 @@ import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
 import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsWindow;
-import osde.utils.Messages;
 
 /**
  * Graphical menu tool bar class
