@@ -926,7 +926,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.SRING_EMPTY);
+						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.STRING_EMPTY);
 					}
 				}
 			});
@@ -946,7 +946,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.SRING_EMPTY);
+						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.STRING_EMPTY);
 					}
 				}
 			});
@@ -1067,7 +1067,7 @@ public class CurveSelectorContextMenu {
 		if (!this.recordNameMeasurement.equals(tmpRecordNameMeasurement) && this.recordNameMeasurement.length() > 1) {
 			this.application.setMeasurementActive(this.recordNameMeasurement, false);
 			this.application.setDeltaMeasurementActive(this.recordNameMeasurement, false);
-			this.application.setStatusMessage(OSDE.SRING_EMPTY);
+			this.application.setStatusMessage(OSDE.STRING_EMPTY);
 			isChanged = true;
 		}
 		this.recordNameMeasurement = tmpRecordNameMeasurement;

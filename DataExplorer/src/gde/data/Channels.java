@@ -21,7 +21,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import osde.OSDE;
+import osde.messages.MessageIds;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.Messages;
 import osde.utils.StringHelper;
 
 /**
@@ -29,8 +32,8 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
-	final static long											serialVersionUID		= 26031957;
-	final static Logger										log									= Logger.getLogger(Channels.class.getName());
+	final static long							serialVersionUID		= 26031957;
+	final static Logger						log									= Logger.getLogger(Channels.class.getName());
 
 	static Channels								channles								= null;
 	String												fileDescription					= StringHelper.getDate();
@@ -86,7 +89,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		int searchedNumber = 1;
 		boolean isFound = false;
 		for (String name : this.getChannelNames()) {
-			if (name != null && name.length() > 5 && name.split(":")[1].trim().equals(channelName)) {
+			if (name != null && name.length() > 5 && name.split(OSDE.STRING_COLON)[1].trim().equals(channelName)) {
 				isFound = true;
 				break;
 			}
@@ -116,7 +119,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
 		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {
-			sb.append(channelName.split(":")[1]).append(", ");
+			sb.append(channelName.split(OSDE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -129,7 +132,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 		
-		this.switchChannel(new Integer(channelName.split(":")[0].trim()).intValue(), "");
+		this.switchChannel(new Integer(channelName.split(OSDE.STRING_COLON)[0].trim()).intValue(), OSDE.STRING_EMPTY);
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param recordSetKey or empty string if switched to first record set
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
-		log.fine("switching to channel " + channelNumber);		
+		log.fine("switching to channel " + channelNumber);		 //$NON-NLS-1$
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
 				this.setActiveChannelNumber(channelNumber);
@@ -149,7 +152,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 			}
 			else {
-				log.fine("nothing to do selected channel == active channel");
+				log.fine("nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			Channel activeChannel = this.getActiveChannel();
@@ -174,7 +177,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}
 		else
-			this.application.openMessageDialogAsync("Gewählte Kanal/Konfiguration ungültig für das aktive Gerät !");
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW0006)); 
 	}
 
 	/**
@@ -202,7 +205,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * method to cleanup all child and dependent
 	 */
 	public void cleanup() {
-		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date()); //$NON-NLS-1$
 		this.activeChannelNumber	= 1;		// default at least one channel must exist
 		this.channelNames = new String[1];
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -216,7 +219,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
 		for (int i = 1; i <= super.size(); i++) { 
 			Channel channel = this.get(i);
-			channel.setFileName("");
+			channel.setFileName(OSDE.STRING_EMPTY);
 			channel.setSaved(false);
 			for (int j = 0; j < channel.size(); j++) {
 				channel.getRecordSets().clear(); // clear records
@@ -224,7 +227,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			channel.clear(); // clear record set
 		}
 		this.clear(); // clear channel
-		log.fine("visited");
+		log.fine("visited"); //$NON-NLS-1$
 	}
 
 	public String getFileDescription() {
@@ -246,13 +249,13 @@ public class Channels extends HashMap<Integer, Channel> {
 			Channel channel = this.get(i);
 			for (String recordSetkey : channel.getRecordSetNames()) {
 				if (channel.get(recordSetkey) != null && !channel.get(recordSetkey).isSaved()) {
-					sb.append(System.getProperty("line.separator")).append(channel.getName()).append(" -> ").append(channel.get(recordSetkey).getName());
+					sb.append(System.getProperty("line.separator")).append(channel.getName()).append(" -> ").append(channel.get(recordSetkey).getName()); //$NON-NLS-1$ //$NON-NLS-2$
 					if (channel.get(recordSetkey).getUnsaveReasons().size() > 0) {
-						sb.append(" (");
+						sb.append(" ("); //$NON-NLS-1$
 						for (String reason : channel.get(recordSetkey).getUnsaveReasons()) {
-							sb.append(reason).append(", ");
+							sb.append(reason).append(", "); //$NON-NLS-1$
 						}
-						sb.delete(sb.lastIndexOf(", "), sb.lastIndexOf(", ") + 2).append(")");
+						sb.delete(sb.lastIndexOf(", "), sb.lastIndexOf(", ") + 2).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}

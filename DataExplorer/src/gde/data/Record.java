@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import osde.OSDE;
 import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.ObjectFactory;
@@ -46,8 +47,8 @@ public class Record extends Vector<Integer> {
 	static final long						serialVersionUID			= 26031957;
 	static final Logger					log										= Logger.getLogger(Record.class.getName());
 	
-	public static final String DELIMITER = "|-|";
-	public static final String END_MARKER = "|:-:|";
+	public static final String DELIMITER = "|-|"; //$NON-NLS-1$
+	public static final String END_MARKER = "|:-:|"; //$NON-NLS-1$
 
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 		// used as channelConfigKey
@@ -92,24 +93,24 @@ public class Record extends Vector<Integer> {
 	// compare
 	String[]						sourceRecordSetNames		= new String[0];
 	
-	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated
-	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated
-	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated
-	public final static String	IS_ACTIVE							= "_isActive";					// active means this measurement can be red from device, other wise its calculated
-	public final static String	IS_DIPLAYABLE					= "_isDisplayable";			// true for all active records, true for passive records when data calculated
-	public final static String	IS_VISIBLE						= "_isVisible";					// defines if data are displayed 
-	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";		// defines the side where the axis id displayed 
-	public final static String	COLOR									= "_color";							// defines which color is used to draw the curve
-	public final static String	LINE_WITH							= "_lineWidth";
-	public final static String	LINE_STYLE						= "_lineStyle";
-	public final static String	IS_ROUND_OUT					= "_isRoundOut";				// defines if axis values are rounded
-	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";	// defines if axis value starts at zero
-	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";	// defines that explicit end values are defined for axis
-	public final static String	NUMBER_FORMAT					= "_numberFormat";
-	public final static String	MAX_VALUE							= "_maxValue";
-	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";				// overwritten max value
-	public final static String	MIN_VALUE							= "_minValue";
-	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value
+	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
+	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
+	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
+	public final static String	IS_ACTIVE							= "_isActive";					// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
+	public final static String	IS_DIPLAYABLE					= "_isDisplayable";			// true for all active records, true for passive records when data calculated //$NON-NLS-1$
+	public final static String	IS_VISIBLE						= "_isVisible";					// defines if data are displayed  //$NON-NLS-1$
+	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";		// defines the side where the axis id displayed  //$NON-NLS-1$
+	public final static String	COLOR									= "_color";							// defines which color is used to draw the curve //$NON-NLS-1$
+	public final static String	LINE_WITH							= "_lineWidth"; //$NON-NLS-1$
+	public final static String	LINE_STYLE						= "_lineStyle"; //$NON-NLS-1$
+	public final static String	IS_ROUND_OUT					= "_isRoundOut";				// defines if axis values are rounded //$NON-NLS-1$
+	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";	// defines if axis value starts at zero //$NON-NLS-1$
+	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";	// defines that explicit end values are defined for axis //$NON-NLS-1$
+	public final static String	NUMBER_FORMAT					= "_numberFormat"; //$NON-NLS-1$
+	public final static String	MAX_VALUE							= "_maxValue"; //$NON-NLS-1$
+	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";				// overwritten max value //$NON-NLS-1$
+	public final static String	MIN_VALUE							= "_minValue"; //$NON-NLS-1$
+	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value //$NON-NLS-1$
 	
 	private final String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
 			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
@@ -134,7 +135,7 @@ public class Record extends Vector<Integer> {
 		for (PropertyType property : newProperties) {
 			this.properties.add(property.clone());
 		}
-		this.df = new DecimalFormat("0.0");
+		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 		this.numberFormat = 1;
 		
 		// special keys for compare set record are handled with put method
@@ -267,7 +268,7 @@ public class Record extends Vector<Integer> {
 			if (point > this.maxValue) this.maxValue = point;
 			if (point < this.minValue) this.minValue = point;
 		}
-		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point);
+		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point); //$NON-NLS-1$
 		return this.add(new Integer(point));
 	}
 
@@ -344,7 +345,7 @@ public class Record extends Vector<Integer> {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue("" + value);
+		newProperty.setValue(OSDE.STRING_EMPTY + value);
 		return newProperty;
 	}
 
@@ -361,9 +362,9 @@ public class Record extends Vector<Integer> {
 	public void setFactor(double newValue) {
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
-			property.setValue(String.format("%.4f", newValue));
+			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format("%.4f", newValue)));
+			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public double getOffset() {
@@ -379,9 +380,9 @@ public class Record extends Vector<Integer> {
 	public void setOffset(double newValue) {
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
-			property.setValue(String.format("%.4f", newValue));
+			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format("%.4f", newValue)));
+			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public double getReduction() {
@@ -399,9 +400,9 @@ public class Record extends Vector<Integer> {
 	public void setReduction(double newValue) {
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null)
-			property.setValue(String.format("%.4f", newValue));
+			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format("%.4f", newValue)));
+			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public boolean isVisible() {
@@ -585,16 +586,16 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
 		case 0:
-			this.df.applyPattern("0");
+			this.df.applyPattern("0"); //$NON-NLS-1$
 			break;
 		case 1:
-			this.df.applyPattern("0.0");
+			this.df.applyPattern("0.0"); //$NON-NLS-1$
 			break;
 		default:
-			this.df.applyPattern("0.00");
+			this.df.applyPattern("0.00"); //$NON-NLS-1$
 			break;
 		case 3:
-			this.df.applyPattern("0.000");
+			this.df.applyPattern("0.000"); //$NON-NLS-1$
 			break;
 		}
 	}
@@ -736,11 +737,11 @@ public class Record extends Vector<Integer> {
 	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		scaledIndex = this.parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - this.parent.getRecordZoomOffset() -1 : scaledIndex;
-		if (log.isLoggable(Level.FINER))log.finer("scaledIndex = " + scaledIndex);
+		if (log.isLoggable(Level.FINER))log.finer("scaledIndex = " + scaledIndex); //$NON-NLS-1$
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
 		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height-1 : pointY;
-		if (log.isLoggable(Level.FINER))log.finer("pointY = " + pointY);
+		if (log.isLoggable(Level.FINER))log.finer("pointY = " + pointY); //$NON-NLS-1$
 		return pointY;
 	}
 	
@@ -799,14 +800,14 @@ public class Record extends Vector<Integer> {
 	 * @return string of value
 	 */
 	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
-		if(log.isLoggable(Level.FINE)) log.fine("" + points.toString());
+		if(log.isLoggable(Level.FINE)) log.fine(OSDE.STRING_EMPTY + points.toString());
 		double measureDelta;
 		if(this.parent.isZoomMode())
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
-		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta);
+		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return this.df.format(measureDelta / timeDelta);
 	}
 	
@@ -822,7 +823,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorTime(double newDisplayScaleFactorTime) {
 		this.displayScaleFactorTime = newDisplayScaleFactorTime;
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
 	}
 
 	/**
@@ -837,7 +838,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
 
@@ -877,7 +878,7 @@ public class Record extends Vector<Integer> {
 	public void setMinMaxZoomScaleValues(double newMinZoomScaleValue, double newMaxZoomScaleValue) {
 		this.minZoomScaleValue				= newMinZoomScaleValue;
 		this.maxZoomScaleValue				= newMaxZoomScaleValue;
-		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue);
+		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**
@@ -947,27 +948,27 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(NAME).append("=").append(this.name).append(DELIMITER);
-		sb.append(UNIT).append("=").append(this.unit).append(DELIMITER);
-		sb.append(SYMBOL).append("=").append(this.symbol).append(DELIMITER);
-		sb.append(IS_ACTIVE).append("=").append(this.isActive).append(DELIMITER);
-		sb.append(IS_DIPLAYABLE).append("=").append(this.isDisplayable).append(DELIMITER);
-		sb.append(IS_VISIBLE).append("=").append(this.isVisible).append(DELIMITER);
-		sb.append(MAX_VALUE).append("=").append(this.maxValue).append(DELIMITER);
-		sb.append(MIN_VALUE).append("=").append(this.minValue).append(DELIMITER);
+		sb.append(NAME).append(OSDE.STRING_EQUAL).append(this.name).append(DELIMITER);
+		sb.append(UNIT).append(OSDE.STRING_EQUAL).append(this.unit).append(DELIMITER);
+		sb.append(SYMBOL).append(OSDE.STRING_EQUAL).append(this.symbol).append(DELIMITER);
+		sb.append(IS_ACTIVE).append(OSDE.STRING_EQUAL).append(this.isActive).append(DELIMITER);
+		sb.append(IS_DIPLAYABLE).append(OSDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
+		sb.append(IS_VISIBLE).append(OSDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
+		sb.append(MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
+		sb.append(MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
 		for (PropertyType property : this.properties) {
-			sb.append(property.getName()).append("_").append(property.getType()).append("=").append(property.getValue()).append(DELIMITER);
+			sb.append(property.getName()).append(OSDE.STRING_UNDER_BAR).append(property.getType()).append(OSDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
-		sb.append(DEFINED_MAX_VALUE).append("=").append(this.maxScaleValue).append(DELIMITER);
-		sb.append(DEFINED_MIN_VALUE).append("=").append(this.minScaleValue).append(DELIMITER);
-		sb.append(IS_POSITION_LEFT).append("=").append(this.isPositionLeft).append(DELIMITER);
-		sb.append(COLOR).append("=").append(this.color.getRed()).append(",").append(this.color.getGreen()).append(",").append(this.color.getBlue()).append(DELIMITER);
-		sb.append(LINE_WITH).append("=").append(this.lineWidth).append(DELIMITER);
-		sb.append(LINE_STYLE).append("=").append(this.lineStyle).append(DELIMITER);
-		sb.append(IS_ROUND_OUT).append("=").append(this.isRoundOut).append(DELIMITER);
-		sb.append(IS_START_POINT_ZERO).append("=").append(this.isStartpointZero).append(DELIMITER);
-		sb.append(IS_START_END_DEFINED).append("=").append(this.isStartEndDefined).append(DELIMITER);
-		sb.append(NUMBER_FORMAT).append("=").append(this.numberFormat).append(DELIMITER);
+		sb.append(DEFINED_MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
+		sb.append(DEFINED_MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
+		sb.append(IS_POSITION_LEFT).append(OSDE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
+		sb.append(COLOR).append(OSDE.STRING_EQUAL).append(this.color.getRed()).append(OSDE.STRING_COMMA).append(this.color.getGreen()).append(OSDE.STRING_COMMA).append(this.color.getBlue()).append(DELIMITER);
+		sb.append(LINE_WITH).append(OSDE.STRING_EQUAL).append(this.lineWidth).append(DELIMITER);
+		sb.append(LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.lineStyle).append(DELIMITER);
+		sb.append(IS_ROUND_OUT).append(OSDE.STRING_EQUAL).append(this.isRoundOut).append(DELIMITER);
+		sb.append(IS_START_POINT_ZERO).append(OSDE.STRING_EQUAL).append(this.isStartpointZero).append(DELIMITER);
+		sb.append(IS_START_END_DEFINED).append(OSDE.STRING_EQUAL).append(this.isStartEndDefined).append(DELIMITER);
+		sb.append(NUMBER_FORMAT).append(OSDE.STRING_EQUAL).append(this.numberFormat).append(DELIMITER);
 		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
 	}
 	
@@ -994,7 +995,7 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  new Boolean(tmpValue.trim()).booleanValue();
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(",")[0]), new Integer(tmpValue.split(",")[1]), new Integer(tmpValue.split(",")[2]));
+		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
 		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  new Integer(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);
@@ -1037,9 +1038,9 @@ public class Record extends Vector<Integer> {
 				String prop = recordDeviceProps.get(propName);
 				PropertyType tmpProperty = new ObjectFactory().createPropertyType();
 				tmpProperty.setName(propName);
-				String type = prop.split("=")[0].substring(1);
+				String type = prop.split(OSDE.STRING_EQUAL)[0].substring(1);
 				if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
-				String value = prop.split("=")[1];
+				String value = prop.split(OSDE.STRING_EQUAL)[1];
 				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
 				this.properties.add(tmpProperty.clone());
 			}

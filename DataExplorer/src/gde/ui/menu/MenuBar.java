@@ -128,7 +128,7 @@ public class MenuBar {
 			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -136,7 +136,7 @@ public class MenuBar {
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
 						MenuBar.log.finest("fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
-						MenuBar.this.updateSubHistoryMenuItem(OSDE.SRING_EMPTY); //$NON-NLS-1$
+						MenuBar.this.updateSubHistoryMenuItem(OSDE.STRING_EMPTY); //$NON-NLS-1$
 					}
 					public void menuHidden(MenuEvent evt) {
 						log.finest("fileMenu.menuHidden " + evt); //$NON-NLS-1$
@@ -176,7 +176,7 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.SRING_EMPTY);  //$NON-NLS-2$
+									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);  //$NON-NLS-2$
 								else
 									MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName()); 
 							}
@@ -190,7 +190,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.SRING_EMPTY); //$NON-NLS-1$
+							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY); //$NON-NLS-1$
 						}
 					});
 				}
@@ -275,7 +275,7 @@ public class MenuBar {
 							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuBar.this.application.openSettingsDialog();
-								MenuBar.this.application.setStatusMessage(OSDE.SRING_EMPTY); //$NON-NLS-1$
+								MenuBar.this.application.setStatusMessage(OSDE.STRING_EMPTY); //$NON-NLS-1$
 							}
 							else
 								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
@@ -307,7 +307,7 @@ public class MenuBar {
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -385,7 +385,7 @@ public class MenuBar {
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -509,7 +509,7 @@ public class MenuBar {
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -572,7 +572,7 @@ public class MenuBar {
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -644,7 +644,7 @@ public class MenuBar {
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -655,7 +655,7 @@ public class MenuBar {
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openHelpDialog(OSDE.SRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
+							MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
 						}
 					});
 				}
@@ -744,7 +744,7 @@ public class MenuBar {
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path);
 		if (csvFileDialog.getFileName().length() > 4) {
@@ -782,7 +782,7 @@ public class MenuBar {
 		}
 
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path, getFileNameProposal()); 
 		String recordSetKey = activeRecordSet.getName();
@@ -814,7 +814,7 @@ public class MenuBar {
 	 * @return
 	 */
 	String getFileNameProposal() {
-		String fileName = OSDE.SRING_EMPTY;
+		String fileName = OSDE.STRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
 			fileName = StringHelper.getDate() + OSDE.STRING_UNDER_BAR;
 		}
@@ -831,7 +831,7 @@ public class MenuBar {
 	public void openOsdFileDialog(final String dialogName) {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY;
+			String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_OSD, OSDE.FILE_ENDING_STAR_LOV }, path); 
 			if (openFileDialog.getFileName().length() > 4) {
@@ -923,7 +923,7 @@ public class MenuBar {
 		String filePath;
 		FileDialog fileDialog;
 		Settings deviceSetting = Settings.getInstance();
-		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.SRING_EMPTY; 
+		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY; 
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 

@@ -150,7 +150,7 @@ public class MenuToolBar {
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.SRING_EMPTY);
+									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.STRING_EMPTY);
 								else
 									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0007, activeChannel.getFileName());
 							}
@@ -165,7 +165,7 @@ public class MenuToolBar {
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.SRING_EMPTY);
+							MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.STRING_EMPTY);
 						}
 					});
 				}
@@ -181,7 +181,7 @@ public class MenuToolBar {
 							DeviceDialog deviceDialog = MenuToolBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuToolBar.this.application.openSettingsDialog();
-								MenuToolBar.this.application.setStatusMessage(OSDE.SRING_EMPTY);
+								MenuToolBar.this.application.setStatusMessage(OSDE.STRING_EMPTY);
 							}
 							else
 								MenuToolBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGW0002), SWT.COLOR_RED);
@@ -731,7 +731,7 @@ public class MenuToolBar {
 			this.channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
 		else { // no channel
-			this.channelSelectCombo.setItems(new String[] { OSDE.SRING_EMPTY });
+			this.channelSelectCombo.setItems(new String[] { OSDE.STRING_EMPTY });
 		}
 		this.channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
@@ -769,7 +769,7 @@ public class MenuToolBar {
 		}
 		else {
 			this.recordSelectCombo.setItems(new String[0]);
-			this.recordSelectCombo.setText(OSDE.SRING_EMPTY);
+			this.recordSelectCombo.setText(OSDE.STRING_EMPTY);
 		}
 		updateRecordToolItems();
 		this.application.updateGraphicsWindow();
