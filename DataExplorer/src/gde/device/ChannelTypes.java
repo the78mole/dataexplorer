@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  * 
  */
-@XmlType(name = "channel_types")
+@XmlType(name = "channel_types") //$NON-NLS-1$
 @XmlEnum
 public enum ChannelTypes {
 

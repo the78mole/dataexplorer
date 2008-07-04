@@ -38,21 +38,21 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TimeOutType", propOrder = {
-    "rtoCharDelayTime",
-    "rtoExtraDelayTime",
-    "wtoCharDelayTime",
-    "wtoExtraDelayTime"
+@XmlType(name = "TimeOutType", propOrder = { //$NON-NLS-1$
+    "rtoCharDelayTime", //$NON-NLS-1$
+    "rtoExtraDelayTime", //$NON-NLS-1$
+    "wtoCharDelayTime", //$NON-NLS-1$
+    "wtoExtraDelayTime" //$NON-NLS-1$
 })
 public class TimeOutType {
 
-    @XmlElement(name = "RTOCharDelayTime", required = true)
+    @XmlElement(name = "RTOCharDelayTime", required = true) //$NON-NLS-1$
     protected BigInteger rtoCharDelayTime;
-    @XmlElement(name = "RTOExtraDelayTime", required = true)
+    @XmlElement(name = "RTOExtraDelayTime", required = true) //$NON-NLS-1$
     protected BigInteger rtoExtraDelayTime;
-    @XmlElement(name = "WTOCharDelayTime", required = true)
+    @XmlElement(name = "WTOCharDelayTime", required = true) //$NON-NLS-1$
     protected BigInteger wtoCharDelayTime;
-    @XmlElement(name = "WTOExtraDelayTime", required = true)
+    @XmlElement(name = "WTOExtraDelayTime", required = true) //$NON-NLS-1$
     protected BigInteger wtoExtraDelayTime;
 
     /**

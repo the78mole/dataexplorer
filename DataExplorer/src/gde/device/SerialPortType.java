@@ -48,17 +48,17 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SerialPortType", propOrder = {
-    "port",
-    "baudeRate",
-    "dataBits",
-    "stopBits",
-    "parity",
-    "flowControlMode",
-    "isRTS",
-    "isDTR",
-    "timeOut",
-    "dataBlock"
+@XmlType(name = "SerialPortType", propOrder = { //$NON-NLS-1$
+    "port", //$NON-NLS-1$
+    "baudeRate", //$NON-NLS-1$
+    "dataBits", //$NON-NLS-1$
+    "stopBits", //$NON-NLS-1$
+    "parity", //$NON-NLS-1$
+    "flowControlMode", //$NON-NLS-1$
+    "isRTS", //$NON-NLS-1$
+    "isDTR", //$NON-NLS-1$
+    "timeOut", //$NON-NLS-1$
+    "dataBlock" //$NON-NLS-1$
 })
 public class SerialPortType {
 
@@ -76,9 +76,9 @@ public class SerialPortType {
     protected FlowControlType flowControlMode;
     protected boolean isRTS;
     protected boolean isDTR;
-    @XmlElement(name = "TimeOut")
+    @XmlElement(name = "TimeOut") //$NON-NLS-1$
     protected TimeOutType timeOut;
-    @XmlElement(name = "DataBlock")
+    @XmlElement(name = "DataBlock") //$NON-NLS-1$
     protected DataBlockType dataBlock;
 
     /**

@@ -30,18 +30,18 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  * 
  */
-@XmlType(name = "data_types")
+@XmlType(name = "data_types") //$NON-NLS-1$
 @XmlEnum
 public enum DataTypes {
 
-    @XmlEnumValue("Integer")
-    INTEGER("Integer"),
-    @XmlEnumValue("Double")
-    DOUBLE("Double"),
-    @XmlEnumValue("Boolean")
-    BOOLEAN("Boolean"),
-    @XmlEnumValue("String")
-    STRING("String");
+    @XmlEnumValue("Integer") //$NON-NLS-1$
+    INTEGER("Integer"), //$NON-NLS-1$
+    @XmlEnumValue("Double") //$NON-NLS-1$
+    DOUBLE("Double"), //$NON-NLS-1$
+    @XmlEnumValue("Boolean") //$NON-NLS-1$
+    BOOLEAN("Boolean"), //$NON-NLS-1$
+    @XmlEnumValue("String") //$NON-NLS-1$
+    STRING("String"); //$NON-NLS-1$
     private final String value;
 
     DataTypes(String v) {

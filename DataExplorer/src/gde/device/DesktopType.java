@@ -36,17 +36,17 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DesktopType", propOrder = {
-    "property"
+@XmlType(name = "DesktopType", propOrder = { //$NON-NLS-1$
+    "property" //$NON-NLS-1$
 })
 public class DesktopType {
 
-	public static final String		TYPE_TABLE_TAB						= "table_tab";
-	public static final String		TYPE_DIGITAL_TAB					= "digital_tab";
-	public static final String		TYPE_ANALOG_TAB						= "analog_tab";
-	public static final String		TYPE_VOLTAGE_PER_CELL_TAB	= "voltage_per_cell_tab";
+	public static final String		TYPE_TABLE_TAB						= "table_tab"; //$NON-NLS-1$
+	public static final String		TYPE_DIGITAL_TAB					= "digital_tab"; //$NON-NLS-1$
+	public static final String		TYPE_ANALOG_TAB						= "analog_tab"; //$NON-NLS-1$
+	public static final String		TYPE_VOLTAGE_PER_CELL_TAB	= "voltage_per_cell_tab"; //$NON-NLS-1$
 		
-    @XmlElement(name = "Property")
+    @XmlElement(name = "Property") //$NON-NLS-1$
     protected List<PropertyType> property;
 
     /**

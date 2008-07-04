@@ -40,11 +40,11 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TimeBaseType", propOrder = {
-    "name",
-    "symbol",
-    "unit",
-    "timeStep"
+@XmlType(name = "TimeBaseType", propOrder = { //$NON-NLS-1$
+    "name", //$NON-NLS-1$
+    "symbol", //$NON-NLS-1$
+    "unit", //$NON-NLS-1$
+    "timeStep" //$NON-NLS-1$
 })
 public class TimeBaseType {
 
@@ -55,7 +55,7 @@ public class TimeBaseType {
     @XmlElement(required = true)
     protected String unit;
     @XmlElement(required = true)
-    @XmlSchemaType(name = "positiveInteger")
+    @XmlSchemaType(name = "positiveInteger") //$NON-NLS-1$
     protected String timeStep;
 
     /**
@@ -151,8 +151,8 @@ public class TimeBaseType {
      *     
      */
     public void setTimeStep(double value) {
-    		if (value % 1 == 0) this.timeStep = String.format("%.0f", value);
-    		else								this.timeStep = String.format("%.2f", value);
+    		if (value % 1 == 0) this.timeStep = String.format("%.0f", value); //$NON-NLS-1$
+    		else								this.timeStep = String.format("%.2f", value); //$NON-NLS-1$
         
     }
 

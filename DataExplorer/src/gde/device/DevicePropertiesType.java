@@ -40,24 +40,24 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DevicePropertiesType", propOrder = {
-    "device",
-    "serialPort",
-    "timeBase",
-    "channel",
-    "desktop"
+@XmlType(name = "DevicePropertiesType", propOrder = { //$NON-NLS-1$
+    "device", //$NON-NLS-1$
+    "serialPort", //$NON-NLS-1$
+    "timeBase", //$NON-NLS-1$
+    "channel", //$NON-NLS-1$
+    "desktop" //$NON-NLS-1$
 })
 public class DevicePropertiesType {
 
-    @XmlElement(name = "Device", required = true)
+    @XmlElement(name = "Device", required = true) //$NON-NLS-1$
     protected DeviceType device;
-    @XmlElement(name = "SerialPort", required = true)
+    @XmlElement(name = "SerialPort", required = true) //$NON-NLS-1$
     protected SerialPortType serialPort;
-    @XmlElement(name = "TimeBase", required = true)
+    @XmlElement(name = "TimeBase", required = true) //$NON-NLS-1$
     protected TimeBaseType timeBase;
-    @XmlElement(name = "Channel", required = true)
+    @XmlElement(name = "Channel", required = true) //$NON-NLS-1$
     protected List<ChannelType> channel;
-    @XmlElement(name = "Desktop", required = true)
+    @XmlElement(name = "Desktop", required = true) //$NON-NLS-1$
     protected DesktopType desktop;
 
     /**

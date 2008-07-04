@@ -36,10 +36,10 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DataBlockType", propOrder = {
-    "size",
-    "checkSum",
-    "endingByte"
+@XmlType(name = "DataBlockType", propOrder = { //$NON-NLS-1$
+    "size", //$NON-NLS-1$
+    "checkSum", //$NON-NLS-1$
+    "endingByte" //$NON-NLS-1$
 })
 public class DataBlockType {
 

@@ -40,13 +40,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DeviceType", propOrder = {
-    "name",
-    "manufacturer",
-    "manufacturerURL",
-    "group",
-    "image",
-    "usage"
+@XmlType(name = "DeviceType", propOrder = { //$NON-NLS-1$
+    "name", //$NON-NLS-1$
+    "manufacturer", //$NON-NLS-1$
+    "manufacturerURL", //$NON-NLS-1$
+    "group", //$NON-NLS-1$
+    "image", //$NON-NLS-1$
+    "usage" //$NON-NLS-1$
 })
 public class DeviceType {
 
@@ -55,12 +55,12 @@ public class DeviceType {
     @XmlElement(required = true)
     protected String manufacturer;
     @XmlElement(required = true)
-    @XmlSchemaType(name = "anyURI")
+    @XmlSchemaType(name = "anyURI") //$NON-NLS-1$
     protected String manufacturerURL;
     @XmlElement(required = true)
     protected String group;
     @XmlElement(required = true)
-    @XmlSchemaType(name = "anyURI")
+    @XmlSchemaType(name = "anyURI") //$NON-NLS-1$
     protected String image;
     protected boolean usage;
 

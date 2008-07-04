@@ -25,7 +25,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.messages.MessageIds;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.Messages;
 
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations
@@ -44,18 +46,18 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
-	protected String 		disposeDisabledMessage = "Der Dialog ist aktiv und kann nicht geschlossen werden !";
+	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.OSDE_MSGW0007);
 	
 	protected MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
 		public void mouseEnter(MouseEvent evt) {
-			log.fine("mouseEnter, event=" + evt);
+			log.fine("mouseEnter, event=" + evt); //$NON-NLS-1$
 			fadeOutAplhaBlending();
 		}
 		public void mouseHover(MouseEvent evt) {
-			log.finest("mouseHover, event=" + evt);
+			log.finest("mouseHover, event=" + evt); //$NON-NLS-1$
 		}
 		public void mouseExit(MouseEvent evt) {
-			log.finest("mouseEnter, event=" + evt);
+			log.finest("mouseEnter, event=" + evt); //$NON-NLS-1$
 		}
 	};	
 	protected final OpenSerialDataExplorer application;
@@ -81,7 +83,7 @@ public abstract class DeviceDialog extends Dialog {
 	public void dispose() {
 		if (this.isClosePossible) {
 			this.dialogShell.dispose();
-			this.application.setStatusMessage("");
+			this.application.setStatusMessage(""); //$NON-NLS-1$
 		}
 		else this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
 	}
@@ -182,7 +184,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade out alpha blending from 254 to the configured alpha value
 	 */
 	public void fadeOutAplhaBlending() {
-		log.fine("this.isFadeOut = " + this.isFadeOut);
+		log.fine("this.isFadeOut = " + this.isFadeOut); //$NON-NLS-1$
 		if (!this.isFadeOut && this.isAlphaEnabled) {
 			setShellAlpha(254);
 		}
@@ -196,7 +198,7 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
 		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
-		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize);
+		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
 		}
@@ -210,7 +212,7 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
 		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
-		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize);
+		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
 		}

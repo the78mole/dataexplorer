@@ -41,12 +41,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MeasurementType", propOrder = {
-    "name",
-    "symbol",
-    "unit",
-    "active",
-    "property"
+@XmlType(name = "MeasurementType", propOrder = { //$NON-NLS-1$
+    "name", //$NON-NLS-1$
+    "symbol", //$NON-NLS-1$
+    "unit", //$NON-NLS-1$
+    "active", //$NON-NLS-1$
+    "property" //$NON-NLS-1$
 })
 public class MeasurementType {
 
@@ -57,7 +57,7 @@ public class MeasurementType {
     @XmlElement(required = true)
     protected String unit;
     protected Boolean active;
-    @XmlElement(name = "Property")
+    @XmlElement(name = "Property") //$NON-NLS-1$
     protected List<PropertyType> property;
         
     /**
@@ -239,7 +239,7 @@ public class MeasurementType {
   		PropertyType newProperty = factory.createPropertyType();
   		newProperty.setName(propertyKey);
   		newProperty.setType(type);
-  		newProperty.setValue("" + value);
+  		newProperty.setValue("" + value); //$NON-NLS-1$
   		this.getProperty().add(newProperty);
   	}
   	
@@ -283,7 +283,7 @@ public class MeasurementType {
   			createProperty(IDevice.OFFSET, DataTypes.DOUBLE, offset);
   		}
   		else {
-  			tmpProperty.setValue("" + offset);
+  			tmpProperty.setValue("" + offset); //$NON-NLS-1$
   		}
   	}
 
@@ -310,7 +310,7 @@ public class MeasurementType {
   			createProperty(IDevice.FACTOR, DataTypes.DOUBLE, factor);
   		}
   		else {
-  			tmpProperty.setValue("" + factor);
+  			tmpProperty.setValue("" + factor); //$NON-NLS-1$
   		}
   	}
 }

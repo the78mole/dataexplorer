@@ -36,13 +36,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PropertyType")
+@XmlType(name = "PropertyType") //$NON-NLS-1$
 public class PropertyType {
 
     @XmlAttribute(required = true)
     protected String name;
     @XmlAttribute(required = true)
-    @XmlSchemaType(name = "anySimpleType")
+    @XmlSchemaType(name = "anySimpleType") //$NON-NLS-1$
     protected String value;
     @XmlAttribute(required = true)
     protected DataTypes type;
@@ -119,7 +119,7 @@ public class PropertyType {
      *     
      */
     public void setValue(Object newValue) {
-        this.value = "" + newValue;
+        this.value = "" + newValue; //$NON-NLS-1$
     }
 
     /**

@@ -39,12 +39,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ChannelType", propOrder = {
-    "measurement"
+@XmlType(name = "ChannelType", propOrder = { //$NON-NLS-1$
+    "measurement" //$NON-NLS-1$
 })
 public class ChannelType {
 
-    @XmlElement(name = "Measurement", required = true)
+    @XmlElement(name = "Measurement", required = true) //$NON-NLS-1$
     protected List<MeasurementType> measurement;
     @XmlAttribute(required = true)
     protected String name;

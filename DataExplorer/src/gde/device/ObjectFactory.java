@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _DeviceProperties_QNAME = new QName("", "DeviceProperties");
+    private final static QName _DeviceProperties_QNAME = new QName("", "DeviceProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: osde.device
@@ -124,7 +124,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DevicePropertiesType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "DeviceProperties")
+    @XmlElementDecl(namespace = "", name = "DeviceProperties") //$NON-NLS-1$ //$NON-NLS-2$
     public JAXBElement<DevicePropertiesType> createDeviceProperties(DevicePropertiesType value) {
         return new JAXBElement<DevicePropertiesType>(_DeviceProperties_QNAME, DevicePropertiesType.class, null, value);
     }
