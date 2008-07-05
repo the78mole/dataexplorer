@@ -23,6 +23,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import osde.OSDE;
+
 /**
  * @author Winfried Brügmann
  * class with collection of string helper finctions
@@ -45,7 +47,7 @@ public class StringHelper {
 				for (String key : hashKeys) {
 					if (tmpStr.startsWith(key)) {
 						String value = tmpStr.substring(key.length(), endindex).trim();
-						if (value.startsWith("=")) value = value.substring(1).trim();
+						if (value.startsWith(OSDE.STRING_EQUAL)) value = value.substring(1).trim();
 						resultMap.put(key, value);
 						break;
 					}
@@ -55,14 +57,14 @@ public class StringHelper {
 			for (String key : hashKeys) {
 				if (tmpStr.startsWith(key)) {
 					String value = tmpStr.substring(key.length()).trim();
-					if (value.startsWith("=")) value = value.substring(1).trim();
+					if (value.startsWith(OSDE.STRING_EQUAL)) value = value.substring(1).trim();
 					resultMap.put(key, value);
 					break;
 				}
 			}
 			if (log.isLoggable(Level.FINER)) {
 				for (String key : hashKeys) {
-					log.finer(key + " = " + resultMap.get(key));
+					log.finer(key + " = " + resultMap.get(key)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -99,7 +101,7 @@ public class StringHelper {
 			}
 			if (log.isLoggable(Level.FINER)) {
 				for (String string : result) {
-					log.finer(stripString + " = " + string);
+					log.finer(stripString + " = " + string); //$NON-NLS-1$
 				}
 			}
 		}
@@ -110,14 +112,14 @@ public class StringHelper {
 	 * method to receive formated data and time
 	 */
 	public static String getDateAndTime() {
-		return  new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime());
+		return  new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime()); //$NON-NLS-1$
 	}
 	
 	/**
 	 * method to get current date
 	 */
 	public static String getDate() {
-		return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		return new SimpleDateFormat("yyyy-MM-dd").format(new Date()); //$NON-NLS-1$
 	}
 
 	/**
@@ -126,7 +128,7 @@ public class StringHelper {
 	 * @return cleaned string
 	 */
 	public static String removeBlanks(String inputString) {
-		String[] tmpDev = inputString.split(" ");
+		String[] tmpDev = inputString.split(OSDE.STRING_BLANK);
 		StringBuilder sb = new StringBuilder();
 		for (String tmp : tmpDev) {
 			sb.append(tmp);

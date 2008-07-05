@@ -37,13 +37,13 @@ public class Checksum {
 				(byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C,
 				(byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x07 };
 
-		System.out.println("CRC16    = " + Integer.toHexString(Checksum.crc16(b)));
-		System.out.println("CRC32 = " + Integer.toHexString(Checksum.CRC32(b)));
-		System.out.println("Adler32  = " + Long.toHexString(Checksum.adler32(b)));
-		System.out.println("ADD      = " + Integer.toHexString(Checksum.AND(b)));
+		System.out.println("CRC16    = " + Integer.toHexString(Checksum.crc16(b))); //$NON-NLS-1$
+		System.out.println("CRC32 = " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
+		System.out.println("Adler32  = " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
+		System.out.println("ADD      = " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
 		// Picolario seams to use XOR checksum
-		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b)));
-		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b1)));
+		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
+		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
 
 	}
 

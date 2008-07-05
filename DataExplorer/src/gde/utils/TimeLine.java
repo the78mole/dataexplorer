@@ -28,6 +28,8 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 import osde.data.RecordSet;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -44,7 +46,7 @@ public class TimeLine {
 	public final static int	TIME_LINE_MIN_HRS		= 4;
 	public final static int	TIME_LINE_HRS				= 5;
 
-	static String						timeLineText				= "Zeit   t   [min]";
+	static String						timeLineText				= Messages.getString(MessageIds.OSDE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
 
 	/**
@@ -56,58 +58,58 @@ public class TimeLine {
 		int format = TimeLine.TIME_LINE_MSEC; // the time format type 
 
 		int numberOfPoints = recordSet.getRecordDataSize();
-		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms());
+		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		long totalTime_msec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1)).longValue();
 		long totalTime_sec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000.0).longValue();
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		if (TimeLine.log.isLoggable(Level.FINE))
-			TimeLine.log.fine("totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec);
+			TimeLine.log.fine("totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int maxTimeNumber; // the biggest number in the scale to be displayed
 
 		if (totalTime_std > 5) {
 			maxTimeNumber = (int) totalTime_std;
-			TimeLine.timeLineText = "Zeit   t   [Std]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0265);
 			format = TimeLine.TIME_LINE_HRS;
 		}
 		else if (totalTime_min > 60) {
 			maxTimeNumber = (int) totalTime_min;
-			TimeLine.timeLineText = "Zeit   t   [min, Std]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0266);
 			format = TimeLine.TIME_LINE_MIN_HRS;
 		}
 		else if (totalTime_min > 10) {
 			maxTimeNumber = (int) totalTime_min;
-			TimeLine.timeLineText = "Zeit   t   [min]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0267);
 			format = TimeLine.TIME_LINE_MIN;
 		}
 		else if (totalTime_sec > 60) {
 			maxTimeNumber = (int) totalTime_sec;
-			TimeLine.timeLineText = "Zeit   t   [sek, min]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0268);
 			format = TimeLine.TIME_LINE_SEC_MIN;
 		}
 		else if (totalTime_sec > 10) {
 			maxTimeNumber = (int) totalTime_sec;
-			TimeLine.timeLineText = "Zeit   t   [sec]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else if (totalTime_sec > 1) {
 			maxTimeNumber = (int) totalTime_msec;
-			TimeLine.timeLineText = "Zeit   t   [sec]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
 			factor = 100; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else {
 			maxTimeNumber = (int) totalTime_msec;
-			TimeLine.timeLineText = "Zeit   t   [msec]";
+			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0271);
 			factor = 1;
 			format = TimeLine.TIME_LINE_MSEC;
 		}
-		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine(TimeLine.timeLineText + "  " + maxTimeNumber);
+		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine(TimeLine.timeLineText + "  " + maxTimeNumber); //$NON-NLS-1$
 
 		this.isTimeLinePrepared = true;
 
-		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("timeLineText = " + TimeLine.timeLineText + " maxTimeNumber = " + maxTimeNumber + " factor = " + factor);
+		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("timeLineText = " + TimeLine.timeLineText + " maxTimeNumber = " + maxTimeNumber + " factor = " + factor); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return new int[] { maxTimeNumber, factor, format };
 	}
 
@@ -126,7 +128,7 @@ public class TimeLine {
 	 */
 	public synchronized void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, Color color) {
 		if (this.isTimeLinePrepared == false) {
-			TimeLine.log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first");
+			TimeLine.log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first"); //$NON-NLS-1$
 			return;
 		}
 
@@ -135,7 +137,7 @@ public class TimeLine {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
 		gc.drawLine(x0, y0, x0 + width, y0);
-		if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer(String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, timeFormat));
+		if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer(String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, timeFormat)); //$NON-NLS-1$
 
 		Point pt = gc.textExtent(TimeLine.timeLineText);
 		int ticklength = pt.y / 2;
@@ -170,7 +172,7 @@ public class TimeLine {
 		double numberTicks;
 		//int offset = (startTimeValue != 0) ? 10 - startTimeValue % 10 : 0;
 		int timeDelta = endTimeValue - startTimeValue;
-		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("timeDelta = " + timeDelta + " startTime = " + startTimeValue + " endTime = " + endTimeValue);
+		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("timeDelta = " + timeDelta + " startTime = " + startTimeValue + " endTime = " + endTimeValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// calculate a scale factor, a big time difference would have to much ticks
 		if (timeDelta > 0) {
@@ -229,13 +231,13 @@ public class TimeLine {
 				break;
 			}
 			if (TimeLine.log.isLoggable(Level.FINE))
-				TimeLine.log.fine("timeFormat = " + timeFormat + " numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue);
+				TimeLine.log.fine("timeFormat = " + timeFormat + " numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 			double deltaTick = 1.0 * width / numberTicks;
 			miniticks++;
 
 			// calculate the space required to draw the time values
-			Point pt = gc.textExtent("00");
+			Point pt = gc.textExtent("00"); //$NON-NLS-1$
 
 			// prepare grid vector
 			Vector<Integer> timeGrid = new Vector<Integer>();
@@ -253,22 +255,22 @@ public class TimeLine {
 				for (int j = 1; j < miniticks && i < numberTicks; j++) {
 					double xMiniTickPos = (xTickPosition + j * deltaPosMini);
 					int intMiniTickPos = new Double(xMiniTickPos).intValue();
-					if (TimeLine.log.isLoggable(Level.FINEST)) TimeLine.log.finest("intXTickPosition=" + intXTickPosition + ", width=" + width);
+					if (TimeLine.log.isLoggable(Level.FINEST)) TimeLine.log.finest("intXTickPosition=" + intXTickPosition + ", width=" + width); //$NON-NLS-1$ //$NON-NLS-2$
 					if (intMiniTickPos < (x0 + width)) {
 						gc.drawLine(intMiniTickPos, y0, intMiniTickPos, y0 + ticklength / 2);
 					}
 				}
 				//draw values to the scale	
 				double timeValue = i * 100.0 / scaleFactor;
-				if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer("timeValue = " + timeValue);
+				if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer("timeValue = " + timeValue); //$NON-NLS-1$
 				// prepare to make every minute or hour to bold
 				boolean isMod60 = (timeValue % 60) == 0;
 				String numberStr;
 				FontData[] fd;
 				if (timeFormat != TimeLine.TIME_LINE_MSEC) { // msec
 					double timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
-					if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer("timeValue = " + timeValue + ", timeValue60 = " + timeValue60);
-					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60);
+					if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer("timeValue = " + timeValue + ", timeValue60 = " + timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
+					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
 					fd = gc.getFont().getFontData();
 					if (isMod60 && timeValue != 0) {
 						fd[0].setStyle(SWT.BOLD);
@@ -282,7 +284,7 @@ public class TimeLine {
 					}
 				}
 				else
-					GraphicsUtils.drawText(("" + timeValue), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+					GraphicsUtils.drawText(("" + timeValue), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$
 			}
 			recordSet.setTimeGrid(timeGrid);
 		}
@@ -296,7 +298,7 @@ public class TimeLine {
 		long time_sec = new Double(time_ms / 1000.0).longValue();
 		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
 		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
-		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms);
+		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int result;
 
 		switch (timeFormat) {
@@ -324,7 +326,7 @@ public class TimeLine {
 	 * @return string of time value in simple date format HH:mm:ss:SSS
 	 */
 	public static String getFomatedTime(double milliSeconds) {
-		String time = "0";
+		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
 			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
 			milliSeconds %= 1000;
@@ -334,11 +336,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d [ss:SSS]", lSeconds, new Double(milliSeconds).intValue());
+				time = String.format("%02d:%03d [ss:SSS]", lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, new Double(milliSeconds).intValue());
+				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
 			else
-				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue());
+				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
 		}
 		return time;
 	}

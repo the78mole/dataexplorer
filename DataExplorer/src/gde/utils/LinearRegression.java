@@ -51,11 +51,11 @@ public class LinearRegression extends CalculationThread {
 	@Override
 	public void run() {
 		if (this.recordSet == null || this.sourceRecordKey == null || this.targetRecordKey == null) {
-			LinearRegression.logLin.warning("Die Steigung kann icht berechnet werden -> recordSet == null || sourceRecordKey == null || targetRecordKey == null");
+			LinearRegression.logLin.warning("Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
 			return;
 		}
 		synchronized (REGRESSION_INTERVAL_SEC) {
-			LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey);
+			LinearRegression.logLin.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 			Record record = this.recordSet.get(this.targetRecordKey);
 			record.clear(); // make sure to clean the target record before calculate new data points
 			Record recordHeight = this.recordSet.get(this.sourceRecordKey);
@@ -76,7 +76,7 @@ public class LinearRegression extends CalculationThread {
 				ssXX = ssXX + (((0.05 * i) - avgX) * ((0.05 * i) - avgX));
 			}
 			ssXX = ssXX / pointsPerInterval;
-			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("avgX = " + avgX + " ssXX = " + ssXX);
+			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
 			--modCounter;
 			while (modCounter > 0 && !this.threadStop) {
 				// calculate avg y
@@ -108,21 +108,21 @@ public class LinearRegression extends CalculationThread {
 				}
 				counter = counter + pointInterval;
 
-				if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter);
+				if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				--modCounter;
 			}
 			// fill the rest of the curve to make equal lenght
 			for (int i = counter - pointInterval; i < recordHeight.size(); i++) {
 				record.add(0);
 			}
-			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter);
+			if (LinearRegression.logLin.isLoggable(Level.FINEST)) LinearRegression.logLin.fine("counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 			if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
 				this.application.updateGraphicsWindow();
 			}
 
 			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-			LinearRegression.logLin.fine("finished data calculation for record = " + this.targetRecordKey);
+			LinearRegression.logLin.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}
 

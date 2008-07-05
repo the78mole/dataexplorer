@@ -111,7 +111,7 @@ public class GraphicsUtils {
 			int deltaPosMini = (int) (deltaTick / miniticks);
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
 				int yPosMini = yPosition - j * deltaPosMini;
-				if(log.isLoggable(Level.FINEST)) log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini);
+				if(log.isLoggable(Level.FINEST)) log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	

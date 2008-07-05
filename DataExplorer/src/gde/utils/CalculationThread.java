@@ -19,6 +19,8 @@ package osde.utils;
 import java.util.logging.Logger;
 
 import osde.data.RecordSet;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -28,10 +30,10 @@ import osde.ui.OpenSerialDataExplorer;
 public abstract class CalculationThread extends Thread {
 	final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
 
-	public static final String REGRESSION_TYPE 					= "regression_type";
-	public static final String REGRESSION_TYPE_LINEAR 	= "Linear";
-	public static final String REGRESSION_TYPE_CURVE 		= "Kurve";
-	public static final String REGRESSION_INTERVAL_SEC 	= "regression_interval_sec";
+	public static final String REGRESSION_TYPE 					= "regression_type"; //$NON-NLS-1$
+	public static final String REGRESSION_TYPE_LINEAR 	= Messages.getString(MessageIds.OSDE_MSGT0262);
+	public static final String REGRESSION_TYPE_CURVE 		= Messages.getString(MessageIds.OSDE_MSGT0263);
+	public static final String REGRESSION_INTERVAL_SEC 	= "regression_interval_sec"; //$NON-NLS-1$
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;

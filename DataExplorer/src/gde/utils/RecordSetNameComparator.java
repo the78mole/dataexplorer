@@ -27,15 +27,15 @@ public class RecordSetNameComparator implements Comparator<String> {
 
 	public static void main(String[] args) {
 		RecordSetNameComparator rc = new RecordSetNameComparator();
-		rc.compare("1) asdfer", "12) 12121");
+		rc.compare("1) asdfer", "12) 12121"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	// Comparator interface requires defining compare method.
 	public int compare(String nameA, String nameB) {
 		try {
-			Pattern p = Pattern.compile("^[ ]*[0-9]+[^0-9]");
+			Pattern p = Pattern.compile("^[ ]*[0-9]+[^0-9]"); //$NON-NLS-1$
 			if (p.matcher(nameA).find() && p.matcher(nameB).find() ) {
-				Integer intA = new Integer(nameA.trim().split("\\D")[0]);
-				Integer intB = new Integer(nameB.trim().split("\\D")[0]);
+				Integer intA = new Integer(nameA.trim().split("\\D")[0]); //$NON-NLS-1$
+				Integer intB = new Integer(nameB.trim().split("\\D")[0]); //$NON-NLS-1$
 				if (intA > intB)
 					return 1;
 				else if (intA < intB)
