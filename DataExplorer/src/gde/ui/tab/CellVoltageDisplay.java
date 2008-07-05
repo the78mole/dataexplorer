@@ -32,6 +32,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -57,9 +59,9 @@ public class CellVoltageDisplay extends Composite {
 	Composite						cellComposite;
 
 	int									voltage;
-	String							displayText1	= "Zelle ";
-	String							displayText2	= " Spannung [ V ]";
-	String							displayText		= this.displayText1 + "?" + this.displayText2;
+	String							displayText1	= Messages.getString(MessageIds.OSDE_MSGT0230);
+	String							displayText2	= Messages.getString(MessageIds.OSDE_MSGT0231);
+	String							displayText		= this.displayText1 + "?" + this.displayText2; //$NON-NLS-1$
 	int 								lastTop = 0;
 	int 								lastVoltageLevel = 0;
 
@@ -77,7 +79,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+			this.cellTextLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellTextLabel.setText(this.displayText);
 			GridData text1LData = new GridData();
@@ -88,8 +90,8 @@ public class CellVoltageDisplay extends Composite {
 		{
 			this.cellVoltageDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellVoltageDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			this.cellVoltageDigitalLabel.setText("0,00");
-			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 32, 0, false, false));
+			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
+			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 32, 0, false, false)); //$NON-NLS-1$
 			GridData actualDigitalLabelLData = new GridData();
 			actualDigitalLabelLData.horizontalAlignment = GridData.FILL;
 			actualDigitalLabelLData.grabExcessHorizontalSpace = true;
@@ -120,7 +122,7 @@ public class CellVoltageDisplay extends Composite {
 				this.cellCanvas.setDragDetect(false);
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						CellVoltageDisplay.log.fine("cellCanvas.paintControl, evt = " + evt);
+						CellVoltageDisplay.log.fine("cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
 						voltagePaintControl();
 					}
 				});
@@ -156,7 +158,7 @@ public class CellVoltageDisplay extends Composite {
 		}
 		if (this.voltage != newVoltage) {
 			this.voltage = newVoltage;
-			String valueText = String.format("%.2f", new Double(this.voltage / 1000.0));
+			String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 			this.cellVoltageDigitalLabel.setText(valueText);
 			isUpdateRequired = true;
 		}
@@ -178,14 +180,14 @@ public class CellVoltageDisplay extends Composite {
 	 */
 	void voltagePaintControl() {
 		this.cellTextLabel.setText(this.displayText);
-		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0));
+		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 		this.cellVoltageDigitalLabel.setText(valueText);
 
 		Rectangle rect = this.cellCanvas.getClientArea();
-		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("cellCanvas.getBounds = " + rect);
+		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("cellCanvas.getBounds = " + rect); //$NON-NLS-1$
 		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
-		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height);
-		if (log.isLoggable(Level.FINE)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height);
+		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		this.lastTop = topHeight.x;
@@ -204,7 +206,7 @@ public class CellVoltageDisplay extends Composite {
 			break;
 		}
 
-		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("fillRectangle = " + rect);
+		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("fillRectangle = " + rect); //$NON-NLS-1$
 		gc.fillRectangle(1, topHeight.x+2, rect.width-1, topHeight.y-1);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);

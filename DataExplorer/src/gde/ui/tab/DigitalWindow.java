@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.TabItem;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -46,7 +48,7 @@ public class DigitalWindow {
 	HashMap<String, DigitalDisplay>	displays;
 	CLabel													infoText;
 	FillLayout 											digitalMainCompositeLayout;
-	String 													info = "Die Anzeige ist ausgeschaltet!";
+	String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
 
 	final Channels									channels;
 	final TabFolder									displayTab;
@@ -61,7 +63,7 @@ public class DigitalWindow {
 
 	public void create() {
 		this.digitalTab = new TabItem(this.displayTab, SWT.NONE);
-		this.digitalTab.setText("Digital");
+		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		SWTResourceManager.registerResourceUser(this.digitalTab);
 		
 		this.displays = new HashMap<String, DigitalDisplay>(3);
@@ -72,14 +74,14 @@ public class DigitalWindow {
 			this.digitalMainComposite.setLayout(null);
 			this.digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("digitalMainComposite.paintControl, event=" + evt);
+					log.fine("digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					update();
 				}
 			});
 			setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("infoText.paintControl, event=" + evt);
+					log.fine("infoText.paintControl, event=" + evt); //$NON-NLS-1$
 					update();
 				}
 			});
@@ -132,7 +134,7 @@ public class DigitalWindow {
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
-				log.fine("isUpdateRequired = " + isUpdateRequired);
+				log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove the info text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
@@ -150,7 +152,7 @@ public class DigitalWindow {
 					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
 						DigitalDisplay display = new DigitalDisplay(this.digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 						display.create();
-						log.fine("created digital display for " + recordKey);
+						log.fine("created digital display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);
 					}
 					this.oldRecordSet = recordSet;
@@ -161,7 +163,7 @@ public class DigitalWindow {
 				for (String recordKey : this.displays.keySet().toArray(new String[0])) {
 					DigitalDisplay display = this.displays.get(recordKey);
 					if (display != null) {
-						log.fine("clean child " + recordKey);
+						log.fine("clean child " + recordKey); //$NON-NLS-1$
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}

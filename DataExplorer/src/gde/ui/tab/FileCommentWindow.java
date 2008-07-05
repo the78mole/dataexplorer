@@ -40,6 +40,8 @@ import org.eclipse.swt.widgets.Text;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -76,7 +78,7 @@ public class FileCommentWindow {
 	 */
 	public void create() {
 		this.commentTab = new TabItem(this.displayTab, SWT.NONE);
-		this.commentTab.setText("Dateikommentar");
+		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 		SWTResourceManager.registerResourceUser(this.commentTab);
 
 		{
@@ -85,30 +87,30 @@ public class FileCommentWindow {
 			this.commentMainComposite.setLayout(null);
 			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("commentMainComposite.paintControl, event=" + evt);
+					log.fine("commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					updateRecordSetTable();
 				}
 			});
 			{
 				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
-				this.infoLabel.setText("Dateikommentar");
-				this.infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+				this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
+				this.infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 				this.infoLabel.setBounds(50, 10, 500, 26);
 			}
 			{
 				this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER  | SWT.V_SCROLL);
-				this.fileCommentText.setText("Dateikommentar : ");
+				this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
 				this.fileCommentText.setBounds(50, 40, 500, 100);
 				this.fileCommentText.setText(this.channels.getFileDescription());
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.finer("fileCommentText.helpRequested " + evt);
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html");
+						log.finer("fileCommentText.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.fileCommentText.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("recordSelectCombo.keyPressed, event=" + evt);
+						log.finest("recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
 						}
@@ -124,11 +126,11 @@ public class FileCommentWindow {
 
 			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader.setWidth(250);
-			this.recordCommentTableHeader.setText("Datensatzname");
+			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0242));
 
 			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader2.setWidth(500);
-			this.recordCommentTableHeader2.setText("Kommentar");
+			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.OSDE_MSGT0243));
 }
 		}
 	}

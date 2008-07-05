@@ -26,11 +26,14 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -57,7 +60,7 @@ public class DataTableWindow {
 
 	public void create() {
 		this.table = new TabItem(this.tabFolder, SWT.NONE);
-		this.table.setText("Tabelle");
+		this.table.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
 		{
 			this.dataTable = new Table(this.tabFolder, SWT.BORDER);
 			this.table.setControl(this.dataTable);
@@ -78,7 +81,7 @@ public class DataTableWindow {
 		}
 
 		int extentFactor = 9;
-		String time = "Zeit [sec]";
+		String time = Messages.getString(MessageIds.OSDE_MSGT0234); //$NON-NLS-1$
 		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
 		this.timeColumn.setWidth(time.length() * extentFactor);
 		this.timeColumn.setText(time);
@@ -92,12 +95,12 @@ public class DataTableWindow {
 			for (int i = 0; i < measurements.length; i++) {
 				MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
 				StringBuilder sb = new StringBuilder();
-				sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append("]");
+				sb.append(measurement.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
 				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 				column.setWidth(sb.length() * extentFactor);
 				column.setText(sb.toString());
 			}
-			if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding
+			if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 				column.setWidth(100);
 			}
@@ -110,8 +113,8 @@ public class DataTableWindow {
 	public void updateDataTable(final RecordSet recordSet) {
 
 		if (recordSet.isTableDisplayable() && recordSet.isTableDataCalculated()) {
-			if (log.isLoggable(Level.FINE)) log.fine("entry data table update");
-			this.application.setStatusMessage(" -> erneuere Datentabelle");				
+			if (log.isLoggable(Level.FINE)) log.fine("entry data table update"); //$NON-NLS-1$
+			this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0235));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
 			// cleanup old data table
@@ -137,8 +140,8 @@ public class DataTableWindow {
 
 			this.application.setProgress(100);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-			this.application.setStatusMessage(" ");
-			if (log.isLoggable(Level.FINE)) log.fine("exit data table update");
+			this.application.setStatusMessage(OSDE.STRING_BLANK);
+			if (log.isLoggable(Level.FINE)) log.fine("exit data table update"); //$NON-NLS-1$
 		}
 	}
 	
@@ -146,7 +149,7 @@ public class DataTableWindow {
 		this.dataTable.removeAll();
 		if (isDisabled) {
 			TableItem item = new TableItem(this.dataTable, SWT.RIGHT);
-			item.setText(new String[] {"Die", "Anzeige",  "ist",  "ausgeschaltet!"});
+			item.setText(Messages.getString(MessageIds.OSDE_MSGT0228).split(OSDE.STRING_BLANK));
 		}
 	}
 }

@@ -35,6 +35,8 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -49,7 +51,7 @@ public class CellVoltageWindow {
 	TabItem													cellVoltageTab;
 	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
 	CLabel													infoText;
-	String 													info = "Die Anzeige ist ausgeschaltet!";
+	String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
 
 	final Channels									channels;
 	final TabFolder									displayTab;
@@ -67,21 +69,21 @@ public class CellVoltageWindow {
 
 	public void create() {
 		this.cellVoltageTab = new TabItem(this.displayTab, SWT.NONE);
-		this.cellVoltageTab.setText("Zellenspannung");
+		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		SWTResourceManager.registerResourceUser(this.displayTab);
 		{
 			this.cellVoltageMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.cellVoltageTab.setControl(this.cellVoltageMainComposite);
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("cellVoltageMainComposite.paintControl, event=" + evt);
+					log.fine("cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
 			setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("infoText.paintControl, event=" + evt);
+					log.fine("infoText.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
@@ -112,13 +114,13 @@ public class CellVoltageWindow {
 	 * method to update the window with its children
 	 */
 	public void updateChilds() {
-		if (log.isLoggable(Level.FINER)) log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size());
+		if (log.isLoggable(Level.FINER)) log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				this.displays.get(i).setVoltage(i + 1, this.voltageVector.get(i));
 				this.displays.get(i).redraw();
-				if (log.isLoggable(Level.FINE)) log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i));
+				if (log.isLoggable(Level.FINE)) log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else {
@@ -143,7 +145,7 @@ public class CellVoltageWindow {
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| this.displays.size() != this.voltageVector.size();
 						
-				if (log.isLoggable(Level.FINE)) log.fine("isUpdateRequired = " + isUpdateRequired);
+				if (log.isLoggable(Level.FINE)) log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
@@ -162,7 +164,7 @@ public class CellVoltageWindow {
 						int value = this.voltageVector.get(i);
 						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, value);
 						display.create();
-						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + value);
+						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + value); //$NON-NLS-1$
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
@@ -215,9 +217,9 @@ public class CellVoltageWindow {
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (Integer value : this.voltageVector) {
-				sb.append(value).append(" ");
+				sb.append(value).append(" "); //$NON-NLS-1$
 			}
-			if (log.isLoggable(Level.FINE)) log.fine("updateCellVoltageVector -> " + sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine("updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
 	}
 

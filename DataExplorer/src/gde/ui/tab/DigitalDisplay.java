@@ -31,6 +31,8 @@ import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -61,16 +63,16 @@ public class DigitalDisplay extends Composite {
 	public void create() {
 		{
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false));
+			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false)); //$NON-NLS-1$
 			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.finest("textDigitalLabel.paintControl, event=" + evt);
+					log.finest("textDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							log.fine("update label for " + DigitalDisplay.this.recordKey);
+							log.fine("update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 							DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
 						}
 					}
@@ -80,11 +82,11 @@ public class DigitalDisplay extends Composite {
 		{
 			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.actualDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			this.actualDigitalLabel.setText("00,00");
-			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 72, 0, false, false));
+			this.actualDigitalLabel.setText("00,00"); //$NON-NLS-1$
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 72, 0, false, false)); //$NON-NLS-1$
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
-					log.finest("digitalLabel.paintControl, event=" + evt);
+					log.finest("digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -95,8 +97,8 @@ public class DigitalDisplay extends Composite {
 									label.setForeground(record.getColor());
 									DecimalFormat df = record.getDecimalFormat();
 									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.get(record.size() - 1) / 1000.0))));
-									DigitalDisplay.this.maxDigitalLabel.setText("MAX : " + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMaxValue()) / 1000.0)));
-									DigitalDisplay.this.minDigitalLabel.setText("MIN : " + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMinValue()) / 1000.0)));
+									DigitalDisplay.this.maxDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMaxValue()) / 1000.0)));
+									DigitalDisplay.this.minDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMinValue()) / 1000.0)));
 								}
 						}
 					}
@@ -109,13 +111,13 @@ public class DigitalDisplay extends Composite {
 			this.minMaxComposite.setLayout(digitalComposite1Layout);
 
 			this.minDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
-			this.minDigitalLabel.setText("MIN : 00,00");
-			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+			this.minDigitalLabel.setText("MIN : 00,00"); //$NON-NLS-1$
+			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.minDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
 			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
-			this.maxDigitalLabel.setText("MAX : 00,00");
-			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+			this.maxDigitalLabel.setText("MAX : 00,00"); //$NON-NLS-1$
+			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.maxDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		}
 	}
