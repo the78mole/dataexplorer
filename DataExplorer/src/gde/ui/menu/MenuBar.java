@@ -837,9 +837,9 @@ public class MenuBar {
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 
-				if (openFilePath.toUpperCase().endsWith(OSDE.FILE_ENDING_OSD)) 
+				if (openFilePath.toLowerCase().endsWith(OSDE.FILE_ENDING_OSD)) 
 					openOsdFile(openFilePath);
-				else if (openFilePath.toUpperCase().endsWith(OSDE.FILE_ENDING_LOV))
+				else if (openFilePath.toLowerCase().endsWith(OSDE.FILE_ENDING_LOV))
 					openLovFile(openFilePath);
 				else
 					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0008) + openFilePath); 

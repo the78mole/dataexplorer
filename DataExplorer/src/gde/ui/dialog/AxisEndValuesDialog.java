@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -55,6 +57,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	CCombo		minValueSelect;
 	boolean 	isInit = false;
 	double[]	newValues	= new double[2];
+	String[]	initialValues = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "10", "25", "50", "100" };//$NON-NLS-$
 
 	/**
 	* Auto-generated main method to display this 
@@ -66,7 +69,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			Shell shell = new Shell(display);
 			AxisEndValuesDialog inst = new AxisEndValuesDialog(shell, SWT.NULL);
 			double[] oldMinMax = {7.0, 1.0};
-			System.out.println("newMinMax = " + inst.open( oldMinMax ).toString());
+			System.out.println("newMinMax = " + inst.open( oldMinMax ).toString()); //$NON-NLS-1$
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -87,12 +90,12 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(345, 272);
-			this.dialogShell.setText("Achsenendwerte  min / max ");
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Measure.gif"));
+			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0151));
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Measure.gif")); //$NON-NLS-1$
 			this.dialogShell.setLocation(100, 100);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.finest("dialogShell.widgetDisposed, event=" + evt);
+					log.finest("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
 					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
 				}
@@ -100,7 +103,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					if (AxisEndValuesDialog.this.isInit) {
-						log.finest("paintControl.paintControl, event=" + evt);
+						log.finest("paintControl.paintControl, event=" + evt); //$NON-NLS-1$
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.maxValueSelect, oldMinMax[1], 20);
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.minValueSelect, oldMinMax[0], 20);
 					}
@@ -115,10 +118,10 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				okBbuttonLData.top = new FormAttachment(0, 1000, 99);
 				this.okBbutton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.okBbutton.setLayoutData(okBbuttonLData);
-				this.okBbutton.setText("OK");
+				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("okBbutton.widgetSelected, event=" + evt);
+						log.finest("okBbutton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						AxisEndValuesDialog.this.dialogShell.dispose();
 					}
 				});
@@ -133,7 +136,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				canvasLData.left = new FormAttachment(0, 1000, 113);
 				this.canvas = new Canvas(this.dialogShell, SWT.BORDER);
 				this.canvas.setLayoutData(canvasLData);
-				this.canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/SmallGraph.gif"));
+				this.canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/SmallGraph.gif")); //$NON-NLS-1$
 			}
 			{
 				this.maxValueLabel = new CLabel(this.dialogShell, SWT.NONE);
@@ -143,7 +146,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				maxValueLabelLData.left = new FormAttachment(0, 1000, 12);
 				maxValueLabelLData.top = new FormAttachment(0, 1000, 12);
 				this.maxValueLabel.setLayoutData(maxValueLabelLData);
-				this.maxValueLabel.setText("Maximalwert");
+				this.maxValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0152));
 			}
 			{
 				FormData maxValueSelectLData = new FormData();
@@ -153,11 +156,11 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
 				this.maxValueSelect.setLayoutData(maxValueSelectLData);
-				this.maxValueSelect.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "10", "25", "50", "100" });
+				this.maxValueSelect.setItems(this.initialValues);
 				this.maxValueSelect.select(7);
 				this.maxValueSelect.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("maxValueSelect.keyPressed, event=" + evt);
+						log.finest("maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 							AxisEndValuesDialog.this.dialogShell.dispose();
 						}
@@ -172,7 +175,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				cLabel1LData.left = new FormAttachment(0, 1000, 12);
 				cLabel1LData.top = new FormAttachment(0, 1000, 169);
 				this.minValueLabel.setLayoutData(cLabel1LData);
-				this.minValueLabel.setText("Minimalwert");
+				this.minValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0153));
 			}
 			{
 				FormData minValueSelectLData = new FormData();
@@ -182,11 +185,11 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
 				this.minValueSelect.setLayoutData(minValueSelectLData);
-				this.minValueSelect.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "10", "25", "50", "100" });
+				this.minValueSelect.setItems(this.initialValues);
 				this.minValueSelect.select(5);
 				this.minValueSelect.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("maxValueSelect.keyPressed, event=" + evt);
+						log.finest("maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 							AxisEndValuesDialog.this.dialogShell.dispose();
 						}
@@ -215,7 +218,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	void generateAndSetSelectionValues(final CCombo combo, final double value, int size) {
 		int tmpSize = size + (size % 2) + 1;
-		String strDoubleValue = String.format("%.3f", value);
+		String strDoubleValue = String.format("%.3f", value); //$NON-NLS-1$
 		int intValue = new Double(value).intValue();
 		String[] tmpValues = new String[tmpSize];
 		for (int i = intValue-tmpSize/2, j = tmpSize-1; i <= intValue+tmpSize/2; i++, j--) {

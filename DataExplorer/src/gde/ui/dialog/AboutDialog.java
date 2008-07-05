@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -70,13 +72,13 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 		try {
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg"));
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg")); //$NON-NLS-1$
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
 			this.dialogShell.pack();			
 			this.dialogShell.setSize(650, 430);
-			this.dialogShell.setText("About Dialog");
+			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0146));
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
@@ -86,10 +88,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.infoText = new Text(this.dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
 				this.infoText.setLayoutData(infoTextLData);
-				this.infoText.setText("Der OpenSerialDataExplorer ist ein Werkzeug zu aufnehmen, betrachten und auswerten von Daten aus Geräten, die über eine serielle Schnittstelle erreichbar sind. Geräte könne Datenlogger, Messgeräte, Ladegeräte oder ähnliches sein."
-						+ System.getProperty("line.separator") + "Open Serial Data Explorer benutzt für die serielle Kommunikation die freie Implementierung des unter GPL stehenden RXTXComm Paketes und die grafische Benutzeroberfläche (GUI) basiert auf dem aus der Eclipse Welt kommenden Software Widged Toolkit (SWT)." 
-						+ System.getProperty("line.separator") + "Die Software wurde sorgfältig getestet. Trotzdem könnte es durch Fehlbedienung der angeschlossenen Geräte zu beschädigungen kommen. Die Benutung erfolgt auf eigenes Risiko, ein Schadensersatz wir in keinem Fall geleistet." 
-						+ System.getProperty("line.separator") + "Bei der Benutzung können dem Anwender Fehler auffallen oder Verbesserungsvorschläge einfallen. Über einen Mitteilung solcher Umstände bin ich dankbar (winfried@bruegmaenner.de). Eine umgehende Beseitigung von Fehlern oder das Einbauen von Vergesserungen kann aber nicht garantiert werden, da es sich hier um ein reines Freizeitprojekt handelt.");
+				this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT0147)
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0148)  //$NON-NLS-1$ 
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0149)  //$NON-NLS-1$
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
@@ -113,10 +115,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				okLData.right =  new FormAttachment(1000, 1000, -154);
 				this.ok = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.ok.setLayoutData(okLData);
-				this.ok.setText("OK");
+				this.ok.setText("OK"); //$NON-NLS-1$
 				this.ok.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("ok.widgetSelected, event="+evt);
+						log.finest("ok.widgetSelected, event="+evt); //$NON-NLS-1$
 						AboutDialog.this.dialogShell.dispose();
 					}
 				});
@@ -130,8 +132,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.aboutText = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				this.aboutText.setLayoutData(aboutTextLData);
-				this.aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false));
-				this.aboutText.setText("Open Serial Data Explorer");
+				this.aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false)); //$NON-NLS-1$
+				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
 			}
