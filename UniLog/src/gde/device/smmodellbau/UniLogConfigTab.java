@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -1107,15 +1108,15 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			a3Values = new String[] { "TempIntern", "A3", "°C", "0.0", "1.0" };
 			break;
 		}
-		this.a2Text.setText(a2Values[0]);
-		this.a2Unit.setText(a2Values[2]);
-		this.a2Offset.setText(a2Values[3]);
-		this.a2Factor.setText(a2Values[4]);
+		this.a2Text.setText(this.nameA2 = a2Values[0]);
+		this.a2Unit.setText(this.unitA2 = a2Values[2]);
+		this.a2Offset.setText(""+(this.offsetA2 = new Double(a2Values[3])));
+		this.a2Factor.setText(""+(this.factorA2 = new Double(a2Values[4])));
 
-		this.a3Text.setText(a3Values[0]);
-		this.a3Unit.setText(a3Values[2]);
-		this.a3Offset.setText(a3Values[3]);
-		this.a3Factor.setText(a3Values[4]);
+		this.a3Text.setText(this.nameA3 = a3Values[0]);
+		this.a3Unit.setText(this.unitA3 = a3Values[2]);
+		this.a3Offset.setText(""+(this.offsetA3 = new Double(a3Values[3])));
+		this.a3Factor.setText(""+(this.factorA3 = new Double(a3Values[4])));
 	}
 
 	/**
@@ -1374,29 +1375,33 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_INTERVAL_SEC);
 			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
 
-			recordKey = this.device.getMeasurementNames(this.configName)[11];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveA1 = measurement.isActive();
-			this.nameA1 = measurement.getName();
-			this.unitA1 = measurement.getUnit();
-			this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
-			this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
-
-			recordKey = this.device.getMeasurementNames(this.configName)[12];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveA2 = measurement.isActive();
-			this.nameA2 = measurement.getName();
-			this.unitA2 = measurement.getUnit();
-			this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
-			this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
-
-			recordKey = this.device.getMeasurementNames(this.configName)[13];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
-			this.isActiveA3 = measurement.isActive();
-			this.nameA3 = measurement.getName();
-			this.unitA3 = measurement.getUnit();
-			this.offsetA3 = this.device.getMeasurementOffset(this.configName, recordKey);
-			this.factorA3 = this.device.getMeasurementFactor(this.configName, recordKey);
+			if (this.nameA1.equals(OSDE.STRING_DASH)) {
+				recordKey = this.device.getMeasurementNames(this.configName)[11];
+				measurement = this.device.getMeasurement(this.configName, recordKey);
+				this.isActiveA1 = measurement.isActive();
+				this.nameA1 = measurement.getName();
+				this.unitA1 = measurement.getUnit();
+				this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
+				this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
+			}
+			if (this.nameA2.equals(OSDE.STRING_DASH)) {
+				recordKey = this.device.getMeasurementNames(this.configName)[12];
+				measurement = this.device.getMeasurement(this.configName, recordKey);
+				this.isActiveA2 = measurement.isActive();
+				this.nameA2 = measurement.getName();
+				this.unitA2 = measurement.getUnit();
+				this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
+				this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
+			}
+			if (this.nameA3.equals(OSDE.STRING_DASH)) {
+				recordKey = this.device.getMeasurementNames(this.configName)[13];
+				measurement = this.device.getMeasurement(this.configName, recordKey);
+				this.isActiveA3 = measurement.isActive();
+				this.nameA3 = measurement.getName();
+				this.unitA3 = measurement.getUnit();
+				this.offsetA3 = this.device.getMeasurementOffset(this.configName, recordKey);
+				this.factorA3 = this.device.getMeasurementFactor(this.configName, recordKey);
+			}
 		}
 	}
 
