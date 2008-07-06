@@ -278,7 +278,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0")); //$NON-NLS-1$
 			}
 			log.fine("applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (recordSet.equals(this.getActiveRecordSet())) 
+			if (this.getActiveRecordSet() != null && recordSet.equals(this.getActiveRecordSet())) 
 				this.application.updateGraphicsWindow();
 		}
 	}	
@@ -329,7 +329,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 			log.fine("applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			//if (recordSet.equals(this.getActiveRecordSet())) 
-			if (recordSet.getName().equals(this.getActiveRecordSet().getName())) 
+			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName())) 
 				this.application.updateGraphicsWindow();
 		}
 	}
