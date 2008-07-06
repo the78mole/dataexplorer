@@ -77,10 +77,13 @@ public class EStationSerialPort extends DeviceSerialPort {
 			answer = new byte[12];
 			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 13, 12);
+			answer = new byte[12];
 			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 25, 12);
+			answer = new byte[12];
 			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 37, 12);
+			answer = new byte[12];
 			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 49, 12);
 			answer = new byte[15];

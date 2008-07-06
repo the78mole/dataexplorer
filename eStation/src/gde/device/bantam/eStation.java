@@ -193,7 +193,23 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		return modeIndex;
 	}
-	
+
+	/**
+	 * @param dataBuffer [lenght 76 bytes]
+	 * @return processing time in seconds
+	 */
+	public int getProcessingTime(byte[] dataBuffer) {
+		return  ((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80));
+	}
+
+	/**
+	 * @param dataBuffer [lenght 76 bytes]
+	 * @return processing current
+	 */
+	public int getFeedBackCurrent(byte[] dataBuffer) {
+		return  (((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10;
+	}
+
 	/**
 	 * get global device configuration values
 	 * @param configData

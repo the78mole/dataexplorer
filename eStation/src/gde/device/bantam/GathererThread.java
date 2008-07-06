@@ -128,7 +128,10 @@ public class GathererThread extends Thread {
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
 						String processName = eStation.USAGE_MODE[usedDevice.getProcessingMode(dataBuffer)];
-						GathererThread.log.fine("usage mode = " + processName);
+						if (log.isLoggable(Level.FINE)) {
+							GathererThread.log.fine("processing mode = " + processName);
+							GathererThread.log.fine("feed.back current = " + usedDevice.getFeedBackCurrent(dataBuffer));
+						}
 						if ((processName.equals(eStation.USAGE_MODE[1]) || processName.equals(eStation.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
 							&& !GathererThread.this.isCollectDataStopped) { 
 							// check state change waiting to discharge to charge
@@ -212,6 +215,7 @@ public class GathererThread extends Thread {
 								GathererThread.log.fine("Timer stopped eStation inactiv");
 								setRetryCounter(40);
 							}
+							log.fine("retryCounter = " + getRetryCounter());
 						}
 					}
 				}
@@ -287,7 +291,8 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = true;
 		
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
+			//this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
+			log.warning("During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!");
 		}
 		if (this.receiveWaitTime.size() > 0) {
 			long waitAvg = this.receiveWaitTime.firstElement();
@@ -297,7 +302,7 @@ public class GathererThread extends Thread {
 				waitAvg = (waitAvg * (i-1) + this.receiveWaitTime.get(i)) / i ;
 			}
 			log.info(sb.toString());
-			this.application.openMessageDialogAsync("Wartezeit beim Datenempang = " + waitAvg);
+			log.info("waitAvg = " + waitAvg);
 		}
 	}
 
