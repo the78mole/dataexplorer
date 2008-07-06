@@ -22,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
@@ -213,6 +214,34 @@ public abstract class DeviceDialog extends Dialog {
 	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
 		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
+		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
+			setShellAlpha(getShellAlpha());
+		}
+	}
+
+	/**
+	 * fade out alpha blending from 254 to the configured alpha value
+	 * @param evt
+	 * @param outherBound
+	 * @param gapLimit
+	 */
+	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int gapLimit) {
+		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBound.width - gapLimit || evt.y < gapLimit || evt.y > outherBound.height - gapLimit) ? true : false;
+		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
+			setShellAlpha(254);
+		}
+	}
+
+	/**
+	 * fade in alpha blending the configured alpha value to 254
+	 * @param evt
+	 * @param outherBound
+	 * @param gapLimit
+	 */
+	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int gapLimit) {
+		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBound.width - gapLimit || evt.y < gapLimit || evt.y > outherBound.height - gapLimit) ? true : false;
+		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
 		}
