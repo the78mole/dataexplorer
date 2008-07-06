@@ -32,8 +32,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import osde.messages.MessageIds;
-import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -57,17 +55,19 @@ public class CellVoltageDisplay extends Composite {
 	Composite						fillRight;
 	Composite						fillLeft;
 	Composite						cellComposite;
+	
+	final CellVoltageWindow		parent;
+	final String							displayHeaderText;
 
 	int									voltage;
-	String							displayText1	= Messages.getString(MessageIds.OSDE_MSGT0230);
-	String							displayText2	= Messages.getString(MessageIds.OSDE_MSGT0231);
-	String							displayText		= this.displayText1 + "?" + this.displayText2; //$NON-NLS-1$
 	int 								lastTop = 0;
 	int 								lastVoltageLevel = 0;
 
-	public CellVoltageDisplay(Composite cellVoltageMainComposite, int value) {
+	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
 		super(cellVoltageMainComposite, SWT.BORDER);
-		this.voltage = value;
+		this.voltage = measurementValue;
+		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit);
+		this.parent = useParent;
 		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		GridLayout mainCompositeLayout = new GridLayout();
 		mainCompositeLayout.makeColumnsEqualWidth = true;
@@ -81,7 +81,7 @@ public class CellVoltageDisplay extends Composite {
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellTextLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			this.cellTextLabel.setText(this.displayText);
+			this.cellTextLabel.setText(this.displayHeaderText);
 			GridData text1LData = new GridData();
 			text1LData.horizontalAlignment = GridData.FILL;
 			text1LData.grabExcessHorizontalSpace = true;
@@ -134,44 +134,35 @@ public class CellVoltageDisplay extends Composite {
 				this.fillRight.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			}
 		}
-//		this.addPaintListener(new PaintListener() {
-//			public void paintControl(PaintEvent evt) {
-//				CellVoltageDisplay.log.fine("mainComposite.paintControl, evt = " + evt);
-//				CellVoltageDisplay.this.cellTextLabel.redraw();
-//				CellVoltageDisplay.this.cellVoltageDigitalLabel.redraw();
-//				CellVoltageDisplay.this.cellCanvas.redraw();
-//			}
-//		});
 		this.layout();
 	}
 
 	/**
 	 * @param newVoltage the voltage to set
 	 */
-	public void setVoltage(int cellNumber, int newVoltage) {
+	public void setVoltage(int newVoltage) {
 		this.layout(true);
-		boolean isUpdateRequired = false;
-		if (!this.displayText.equals(this.displayText1 + cellNumber + this.displayText2)) {
-			this.displayText = this.displayText1 + cellNumber + this.displayText2;
-			this.cellTextLabel.setText(this.displayText);
-			isUpdateRequired = true;
-		}
 		if (this.voltage != newVoltage) {
 			this.voltage = newVoltage;
 			String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 			this.cellVoltageDigitalLabel.setText(valueText);
-			isUpdateRequired = true;
-		}
 
-		if (isUpdateRequired) {
 			Rectangle rect = this.cellCanvas.getClientArea();
 			Point topHeight = calculateBarGraph(rect);
 			if (this.lastVoltageLevel != checkVoltageLevel()) 
-				this.cellComposite.redraw();
-			else if (this.lastTop < topHeight.y)
-				this.cellComposite.redraw(0, this.lastTop-1, rect.width-1, topHeight.x+1, true); 
-			else
-				this.cellComposite.redraw(0, topHeight.x-1, rect.width-1, this.lastTop+1, true); 
+				this.cellCanvas.redraw();
+			else if (this.lastTop < topHeight.x) {
+				int top = this.lastTop-1 < 0 ? 0 : this.lastTop-1;
+				int height = topHeight.x+1 > rect.height-1 ? rect.height-1 : topHeight.x+1;
+				this.cellCanvas.redraw(0, top, rect.width-1, height, true);
+				log.fine(newVoltage + " redraw "+ ", " + top + " -> " + height);
+			}
+			else {
+				int top = topHeight.x-1 < 0 ? 0 : topHeight.x-1;
+				int height = this.lastTop+1 > rect.height-1 ? rect.height-1 : this.lastTop+1;
+				this.cellCanvas.redraw(0, top, rect.width-1, height, true); 
+				log.fine(newVoltage + " redraw "+ ", " + top + " -> " + height);
+			}
 		}
 	}
 
@@ -179,7 +170,7 @@ public class CellVoltageDisplay extends Composite {
 	 * 
 	 */
 	void voltagePaintControl() {
-		this.cellTextLabel.setText(this.displayText);
+		//this.cellTextLabel.setText(this.displayHeaderText);
 		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 		this.cellVoltageDigitalLabel.setText(valueText);
 
@@ -238,8 +229,14 @@ public class CellVoltageDisplay extends Composite {
 		Point topHeight = new Point(0,0);
 		int baseVoltage = 2500;
 
-		topHeight.y = cellCanvasBounds.height; // 4,2 - 2  = 2,2 (max voltage - min voltage)
-		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * topHeight.y / baseVoltage;
+		// spread display if voltage average is greater than 4.0 V and delta between cell voltages lower than 0.1 V
+		if (CellVoltageDisplay.this.parent.getVoltageDelta() < 100 && CellVoltageDisplay.this.parent.getVoltageAvg() > 4000) {
+			baseVoltage = 4000;
+		}
+
+		topHeight.y = cellCanvasBounds.height; 
+		// 4,2 - 2,5  = 1,7 (max voltage - min voltage)
+		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * topHeight.y / (4200 - baseVoltage);
 		
 		topHeight.x = delta.intValue();
 		topHeight.y = topHeight.y-1-topHeight.x;

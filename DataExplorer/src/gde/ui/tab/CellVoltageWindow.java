@@ -50,6 +50,7 @@ public class CellVoltageWindow {
 	Composite												cellVoltageMainComposite, coverComposite;
 	TabItem													cellVoltageTab;
 	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
+	int															voltageAvg = 0;
 	CLabel													infoText;
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
 
@@ -58,7 +59,35 @@ public class CellVoltageWindow {
 	RecordSet												oldRecordSet = null;
 	Channel													oldChannel = null;
 	
-	Vector<Integer> 								voltageVector = new Vector<Integer>();
+	class CellInfo { // class to hold voltage and unit information
+		final int voltage;
+		final String name;
+		final String unit;
+		CellInfo(int newVoltage, String newName, String newUnit) {
+			this.voltage = newVoltage;
+			this.name = newName;
+			this.unit = newUnit;
+		}
+		/**
+		 * @return the voltage
+		 */
+		public int getVoltage() {
+			return this.voltage;
+		}
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return this.name;
+		}
+		/**
+		 * @return the unit
+		 */
+		public String getUnit() {
+			return this.unit;
+		}
+	}
+	Vector<CellInfo> 								voltageVector = new Vector<CellInfo>();
 	int 														voltageDelta = 0;
 	Point 													displayCompositeSize = new Point(0,0);
 
@@ -114,11 +143,12 @@ public class CellVoltageWindow {
 	 * method to update the window with its children
 	 */
 	public void updateChilds() {
+		updateCellVoltageVector();
 		if (log.isLoggable(Level.FINER)) log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
-				this.displays.get(i).setVoltage(i + 1, this.voltageVector.get(i));
+				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
 				this.displays.get(i).redraw();
 				if (log.isLoggable(Level.FINE)) log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -161,10 +191,9 @@ public class CellVoltageWindow {
 					this.displays.removeAllElements();
 					// add new
 					for (int i=0; this.voltageVector!=null && i<this.voltageVector.size(); ++i) {
-						int value = this.voltageVector.get(i);
-						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, value);
+						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);
 						display.create();
-						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + value); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
@@ -196,30 +225,37 @@ public class CellVoltageWindow {
 	 * check cell voltage availability and build cell voltage array
 	 */
 	void updateCellVoltageVector() {
-		this.voltageVector = new Vector<Integer>();
+		this.voltageVector = new Vector<CellInfo>();
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
+				int cellCount = this.voltageAvg = 0;
 				String[] activeRecordKeys = recordSet.getRecordNames();
 				for (String recordKey : activeRecordKeys) {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
 					//if (log.isLoggable(Level.FINER)) log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1, index))) { // better use a propperty to flag as single cell voltage
-						if(record.getLast() > 0)this.voltageVector.add(record.getLast());
-						//if (log.isLoggable(Level.FINER)) log.finer("record.getLast() " + record.getLast());
+						if(record.getLast() > 0) {
+							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
+							this.voltageAvg += record.getLast();
+							cellCount++;
+						}
+						//if (log.isLoggable(Level.INFO)) log.info("record.getLast() " + record.getLast());
 					}
 				}
+				this.voltageAvg = this.voltageAvg/cellCount;
+				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
-			for (Integer value : this.voltageVector) {
-				sb.append(value).append(" "); //$NON-NLS-1$
+			for (CellInfo cellInfo : this.voltageVector) {
+				sb.append(cellInfo.getVoltage()).append(" "); //$NON-NLS-1$
 			}
-			if (log.isLoggable(Level.FINE)) log.fine("updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
+			log.fine("updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
 	}
 
@@ -227,12 +263,12 @@ public class CellVoltageWindow {
 	 * calculates the voltage delta over all given cell voltages
 	 * @param newValues
 	 */
-	private int calculateVoltageDelta(Vector<Integer> newValues) {
-		int min = newValues.firstElement();
-		int max = newValues.firstElement();
-		for (int value : newValues) {
-			if (value < min) min = value;
-			else if (value > max) max = value;
+	private int calculateVoltageDelta(Vector<CellInfo> newValues) {
+		int min = newValues.firstElement().getVoltage();
+		int max = newValues.firstElement().getVoltage();
+		for (CellInfo cellInfo : newValues) {
+			if (cellInfo.voltage < min) 			min = cellInfo.voltage;
+			else if (cellInfo.voltage > max) 	max = cellInfo.voltage;
 		}
 		return max - min;
 	}
@@ -277,5 +313,12 @@ public class CellVoltageWindow {
 	 */
 	public Composite getCellVoltageMainComposite() {
 		return this.cellVoltageMainComposite;
+	}
+
+	/**
+	 * @return the voltageAvg
+	 */
+	public int getVoltageAvg() {
+		return this.voltageAvg;
 	}
 }
