@@ -504,8 +504,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				throw e;
 			}
 			
-			//this.isReadBufferEmpty = true;
-			//this.numBytesAvailable = 0;
+			this.isReadBufferEmpty = true;
+			this.numBytesAvailable = 0;
 			
 			if (readBytes < readBuffer.length) { // resize the data buffer to real red data 
 				byte[] tmpBuffer = new byte[readBytes];
