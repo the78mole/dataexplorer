@@ -62,7 +62,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 						answer = this.read(answer, 1);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
-						log.info("----> receive sync finished");
+						if (log.isLoggable(Level.FINE)) log.fine("----> receive sync finished");
 						break; //sync
 					}
 				}

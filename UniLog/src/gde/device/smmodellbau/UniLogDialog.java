@@ -14,6 +14,8 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -207,6 +209,10 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.setText("UniLog ToolBox");
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 				SWTResourceManager.registerResourceUser(this.dialogShell);
+				if(this.isAlphaEnabled) {
+					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
+					this.isFadeOut = false;
+				}
 				this.dialogShell.setLayout(null);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -243,6 +249,19 @@ public class UniLogDialog extends DeviceDialog {
 							UniLogDialog.this.application.openHelpDialog("UniLog", "HelpInfo.html#config_tab");
 					}
 				});
+				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+					public void mouseEnter(MouseEvent evt) {
+						log.info("dialogShell.mouseEnter, event=" + evt);
+						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+					}
+					public void mouseHover(MouseEvent evt) {
+						log.info("dialogShell.mouseHover, event=" + evt);
+					}
+					public void mouseExit(MouseEvent evt) {
+						log.info("dialogShell.mouseExit, event=" + evt);
+						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+					}
+				});
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.helpButton.setText("Hilfe");
@@ -276,6 +295,7 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
 							this.configMainComosite.setLayout(null);
+							//this.configMainComosite.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 							this.configMainComosite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									UniLogDialog.log.finer("configMainComosite.paintControl " + evt);
@@ -317,6 +337,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.statusGroup.setLayout(null);
 								this.statusGroup.setText("Status");
 								this.statusGroup.setBounds(12, 17, 602, 45);
+								this.statusGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareText.setText("Firmware :  ");
@@ -360,6 +381,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.outletA1Group.setLayout(null);
 								this.outletA1Group.setText("A1 Modus");
 								this.outletA1Group.setBounds(337, 189, 277, 59);
+								this.outletA1Group.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.a1ModusCombo = new CCombo(this.outletA1Group, SWT.BORDER);
 									this.a1ModusCombo.setItems(UniLogDialog.A1_MODUS);
@@ -380,6 +402,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.currentSensotGroup.setLayout(null);
 								this.currentSensotGroup.setText("Stromsensor");
 								this.currentSensotGroup.setBounds(337, 122, 277, 59);
+								this.currentSensotGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.sensorCurrentCombo = new CCombo(this.currentSensotGroup, SWT.BORDER);
 									this.sensorCurrentCombo.setBounds(88, 23, 119, 20);
@@ -400,6 +423,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.autoStartGroup.setLayout(null);
 								this.autoStartGroup.setText("Logging Autostart");
 								this.autoStartGroup.setBounds(12, 226, 300, 99);
+								this.autoStartGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.currentTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
 									this.currentTriggerButton.setText("bei Stromschwelle");
@@ -482,6 +506,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.motorPropGroup.setLayout(null);
 								this.motorPropGroup.setText("Drehzahlsensor");
 								this.motorPropGroup.setBounds(12, 117, 300, 96);
+								this.motorPropGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.numberPolsButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
 									this.numberPolsButton.setText("Motorpole");
@@ -590,6 +615,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataRateGroup.setLayout(null);
 								this.dataRateGroup.setText("Speicherrate");
 								this.dataRateGroup.setBounds(337, 71, 277, 46);
+								this.dataRateGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setItems(UniLogDialog.TIME_INTERVAL);
@@ -683,11 +709,13 @@ public class UniLogDialog extends DeviceDialog {
 							this.dataMainComposite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.dataMainComposite.setLayout(null);
 							this.dataTabItem.setControl(this.dataMainComposite);
+							this.dataMainComposite.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 							{
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setLayout(null);
 								this.channleConfigGroup.setBounds(14, 12, 290, 58);
 								this.channleConfigGroup.setText("Zuerst Kanalkonfiguration der Daten wählen");
+								this.channleConfigGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
 									this.useConfigCombo.setBounds(24, 24, 140, 20);
@@ -776,6 +804,7 @@ public class UniLogDialog extends DeviceDialog {
 										UniLogDialog.this.useConfigCombo.select(index);
 									}
 								});
+								this.dataReadGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setText("Start Daten auslesen");
@@ -857,6 +886,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.liveDataCaptureGroup.setLayout(null);
 								this.liveDataCaptureGroup.setBounds(324, 12, 284, 198);
 								this.liveDataCaptureGroup.setText("Datenaufzeichnung");
+								this.liveDataCaptureGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.startLiveGatherButton.setText("Start live Datenabfrage");
@@ -871,6 +901,8 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
 												UniLogDialog.this.readDataButton.setEnabled(false);
 												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
+												UniLogDialog.this.useConfigCombo.setEnabled(false);
+												UniLogDialog.this.editConfigButton.setEnabled(false);
 												UniLogDialog.this.setClosePossible(false);
 												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
 												UniLogDialog.this.liveThread.start();
@@ -961,6 +993,8 @@ public class UniLogDialog extends DeviceDialog {
 											}
 											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
 											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
+											UniLogDialog.this.useConfigCombo.setEnabled(true);
+											UniLogDialog.this.editConfigButton.setEnabled(true);
 											UniLogDialog.this.setClosePossible(true);
 											if(!UniLogDialog.this.stopLoggingButton.getEnabled()) {
 												UniLogDialog.this.readDataButton.setEnabled(true);
@@ -975,6 +1009,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.clearDataBufferGroup.setLayout(null);
 								this.clearDataBufferGroup.setBounds(324, 216, 284, 104);
 								this.clearDataBufferGroup.setText("Datenspeicher");
+								this.clearDataBufferGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.clearMemoryButton = new Button(this.clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 									this.clearMemoryButton.setText("löschen");
@@ -1042,7 +1077,22 @@ public class UniLogDialog extends DeviceDialog {
 				} // end tabs
 
 				this.deviceConfigTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber());
-				this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+				//this.deviceConfigTabFolder.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
+				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
+					public void mouseEnter(MouseEvent evt) {
+						log.info("deviceConfigTabFolder.mouseEnter, event=" + evt);
+						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
+					}
+					public void mouseHover(MouseEvent evt) {
+						log.info("deviceConfigTabFolder.mouseHover, event=" + evt);
+					}
+					public void mouseExit(MouseEvent evt) {
+						log.info("deviceConfigTabFolder.mouseExit, event=" + evt);
+						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
+					}
+				});
+				
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-250, 150));
 				this.dialogShell.open();
 			}
 			else {

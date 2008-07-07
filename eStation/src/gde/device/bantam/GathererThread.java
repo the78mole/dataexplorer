@@ -229,8 +229,8 @@ public class GathererThread extends Thread {
 						if (!batteryType.equals(eStation.ACCU_TYPES[0])) { // Lithium programm has no charge/discharge
 							try {
 								finalizeRecordSet(GathererThread.this.recordSetKey, false);
-								log.info("waiting...");
-								Thread.sleep(GathererThread.this.waitTime_ms + 1500);
+								log.fine("waiting...");
+								Thread.sleep(GathererThread.this.waitTime_ms + GathererThread.this.timeStep_ms);
 								GathererThread.this.isWaitTimeChargeDischarge = false;
 								return;
 							}

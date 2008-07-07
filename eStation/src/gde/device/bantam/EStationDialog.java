@@ -387,14 +387,14 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
 						public void mouseEnter(MouseEvent evt) {
 							log.fine("boundsComposite.mouseEnter, event=" + evt);
-							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12);
+							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12, 12, 15, 15);
 						}
 						public void mouseHover(MouseEvent evt) {
 							log.finest("boundsComposite.mouseHover, event=" + evt);
 						}
 						public void mouseExit(MouseEvent evt) {
 							log.fine("boundsComposite.mouseExit, event=" + evt);
-							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12);
+							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12, 12, 0, 15);
 						}
 					});
 				} // end boundsComposite

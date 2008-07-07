@@ -165,6 +165,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.setLayout(null);
 					this.powerGroup.setText("Versorgung/Antrieb/Höhe");
 					this.powerGroup.setToolTipText("Hier bitte alle Datenkanäle auswählen, die angezeigt werden sollen");
+					this.powerGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt);
@@ -703,6 +704,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.axModusGroup.setText("A* Konfiguration");
 					this.axModusGroup.setBounds(313, 2, 310, 193);
 					this.axModusGroup.setToolTipText("Hier bitte die Konfiguration für die A* Ausgange festlegen");
+					this.axModusGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					this.axModusGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("axModusGroup.paintControl, event=" + evt);
