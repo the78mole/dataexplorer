@@ -149,19 +149,21 @@ public class CellVoltageDisplay extends Composite {
 
 			Rectangle rect = this.cellCanvas.getClientArea();
 			Point topHeight = calculateBarGraph(rect);
-			if (this.lastVoltageLevel != checkVoltageLevel()) 
+			if (this.lastVoltageLevel != checkVoltageLevel()) {
 				this.cellCanvas.redraw();
+				log.finer(newVoltage + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y);
+			}
 			else if (this.lastTop < topHeight.x) {
 				int top = this.lastTop-1 < 0 ? 0 : this.lastTop-1;
 				int height = topHeight.x+1 > rect.height-1 ? rect.height-1 : topHeight.x+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true);
-				log.fine(newVoltage + " redraw "+ ", " + top + " -> " + height);
+				log.finer(newVoltage + " redraw "+ ", " + top + " -> " + height);
 			}
 			else {
 				int top = topHeight.x-1 < 0 ? 0 : topHeight.x-1;
 				int height = this.lastTop+1 > rect.height-1 ? rect.height-1 : this.lastTop+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true); 
-				log.fine(newVoltage + " redraw "+ ", " + top + " -> " + height);
+				log.finer(newVoltage + " redraw "+ ", " + top + " -> " + height);
 			}
 		}
 	}
@@ -178,8 +180,9 @@ public class CellVoltageDisplay extends Composite {
 		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("cellCanvas.getBounds = " + rect); //$NON-NLS-1$
 		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
 		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINE)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.INFO)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
+		log.fine(valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y);
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		this.lastTop = topHeight.x;
 
@@ -198,7 +201,7 @@ public class CellVoltageDisplay extends Composite {
 		}
 
 		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("fillRectangle = " + rect); //$NON-NLS-1$
-		gc.fillRectangle(1, topHeight.x+2, rect.width-1, topHeight.y-1);
+		gc.fillRectangle(1, topHeight.x, rect.width-1, topHeight.y);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
 		gc.drawRectangle(0, 0, rect.width, rect.height+topHeight.x);
@@ -227,20 +230,19 @@ public class CellVoltageDisplay extends Composite {
 	 */
 	Point calculateBarGraph(Rectangle cellCanvasBounds) {
 		Point topHeight = new Point(0,0);
-		int baseVoltage = 2500;
+		int baseVoltage = 2300;
 
 		// spread display if voltage average is greater than 4.0 V and delta between cell voltages lower than 0.1 V
 		if (CellVoltageDisplay.this.parent.getVoltageDelta() < 100 && CellVoltageDisplay.this.parent.getVoltageAvg() > 3800) {
-			baseVoltage = 4000;
+			baseVoltage = 3500;
 		}
 
-		topHeight.y = cellCanvasBounds.height; 
 		// 4,2 - 2,5  = 1,7 (max voltage - min voltage)
-		Double delta = (4200.0 - CellVoltageDisplay.this.voltage) * topHeight.y / (4200 - baseVoltage);
+		Double delta = cellCanvasBounds.height / (4200.0 - baseVoltage) * (4200.0 - CellVoltageDisplay.this.voltage);
 		
-		topHeight.x = delta.intValue();
-		topHeight.y = topHeight.y-1-topHeight.x;
-		if (log.isLoggable(Level.FINER)) log.finer(topHeight.toString());
+		topHeight.x = (int)(delta+0.5);
+		topHeight.y = cellCanvasBounds.height-topHeight.x;
+		if (log.isLoggable(Level.INFO)) log.fine(topHeight.toString());
 		return topHeight;
 	}
 }

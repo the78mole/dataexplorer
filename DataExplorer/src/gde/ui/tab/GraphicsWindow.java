@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,6 +109,18 @@ public class GraphicsWindow {
 	int														commentHeight						= 0;
 	int														commentGap							= 0;
 	String												oldRecordSetHeader, oldRecordSetComment;
+	
+	// update graphics only area required
+	int 													oldNumberActiveVisible	= 0;
+	class MinMaxValues {
+		double min = 0;
+		double max = 0;
+		MinMaxValues(double newMin, double newMax) {
+			this.min = newMin;
+			this.max = newMax;
+		}
+	}
+	HashMap<String, MinMaxValues>	minMaxValues = new HashMap<String, MinMaxValues>();
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -251,7 +264,7 @@ public class GraphicsWindow {
 										GraphicsWindow.this.popupmenu.getItem(0).setSelection(true);
 										item.setData(OpenSerialDataExplorer.OLD_STATE, true);
 										item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
-										GraphicsWindow.this.graphicCanvas.redraw();
+										GraphicsWindow.this.redrawGraphics();
 										GraphicsWindow.this.application.updateDigitalWindow();
 										GraphicsWindow.this.application.updateAnalogWindow();
 										GraphicsWindow.this.application.updateCellVoltageWindow();
@@ -262,7 +275,7 @@ public class GraphicsWindow {
 										GraphicsWindow.this.popupmenu.getItem(0).setSelection(false);
 										item.setData(OpenSerialDataExplorer.OLD_STATE, false);
 										item.setData(GraphicsWindow.WINDOW_TYPE, GraphicsWindow.this.type);
-										GraphicsWindow.this.graphicCanvas.redraw();
+										GraphicsWindow.this.redrawGraphics();
 										GraphicsWindow.this.application.updateDigitalWindow();
 										GraphicsWindow.this.application.updateAnalogWindow();
 										GraphicsWindow.this.application.updateCellVoltageWindow();
@@ -610,16 +623,57 @@ public class GraphicsWindow {
 	 */
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			doUpdateCurveSelectorTable();
-			this.graphicCanvas.redraw();
+			doRedrawGraphics();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					doUpdateCurveSelectorTable();
-					GraphicsWindow.this.graphicCanvas.redraw();
+					doRedrawGraphics();
 				}
 			});
+		}
+	}
+
+	/**
+	 * updates the gravics canvas, while repeatabel redraw calls it optimized to the required area
+	 */
+	void doRedrawGraphics() {
+		if (Channels.getInstance().getActiveChannel() != null) {
+			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+			if (activeRecordSet != null) {
+				boolean isFullUpdateRequired = false;
+				int numberActiveVisible = activeRecordSet.getActiveAndVisibleRecordNames().length;
+				if (this.oldNumberActiveVisible != numberActiveVisible) {
+					isFullUpdateRequired = true;
+				}
+				for (String recordKey : activeRecordSet.getActiveAndVisibleRecordNames()) {
+					Record record = activeRecordSet.get(recordKey);
+					if (this.minMaxValues.get(recordKey) == null || record.getMinDisplayValue() != this.minMaxValues.get(recordKey).min || record.getMaxDisplayValue() != this.minMaxValues.get(recordKey).max) {
+						this.minMaxValues.put(recordKey, new MinMaxValues(record.getMinDisplayValue(), record.getMaxDisplayValue()));
+						isFullUpdateRequired = true;
+					}
+				}
+				if (isFullUpdateRequired) {
+					doUpdateCurveSelectorTable();
+					this.graphicCanvas.redraw();
+				}
+				else {
+					doUpdateCurveSelectorTable();
+					if (this.curveAreaBounds != null) {
+						//int height = this.graphicCanvas.getClientArea().height;
+						Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
+						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+40, true);
+						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+40).toString());
+					}
+					else
+						this.graphicCanvas.redraw();
+				}
+				this.oldNumberActiveVisible = numberActiveVisible;
+			}
+		}
+		else { // enable clear
+			doUpdateCurveSelectorTable();
+			GraphicsWindow.this.graphicCanvas.redraw();
 		}
 	}
 
@@ -1143,7 +1197,7 @@ public class GraphicsWindow {
 							if (GraphicsWindow.log.isLoggable(Level.FINER)) GraphicsWindow.log.finer(" xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
 							if ((this.xDeltaPan != 0 && this.xDeltaPan % 5 == 0) || (this.yDeltaPan != 0 && this.yDeltaPan % 5 == 0)) {
 								recordSet.shift(this.xDeltaPan, this.yDeltaPan); // 10% each direction
-								this.graphicCanvas.redraw();
+								this.redrawGraphics(); //this.graphicCanvas.redraw();?
 								this.xDeltaPan = this.yDeltaPan = 0;
 							}
 							this.xLast = evt.x;
@@ -1269,7 +1323,7 @@ public class GraphicsWindow {
 					if (GraphicsWindow.log.isLoggable(Level.FINER)) GraphicsWindow.log.finer("zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					if (xEnd - xStart > 5 && yMax - yMin > 5) {
 						recordSet.setZoomOffsetAndWidth(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-						this.graphicCanvas.redraw();
+						this.redrawGraphics(); //this.graphicCanvas.redraw();
 					}
 				}
 				else if (this.isLeftMouseMeasure) {

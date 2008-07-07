@@ -246,7 +246,7 @@ public class CellVoltageWindow {
 						//if (log.isLoggable(Level.INFO)) log.info("record.getLast() " + record.getLast());
 					}
 				}
-				this.voltageAvg = this.voltageAvg/cellCount;
+				if (cellCount < 0 ) this.voltageAvg = this.voltageAvg/cellCount;
 				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
