@@ -49,7 +49,7 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
 	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.OSDE_MSGW0007);
 	
-	protected MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
+	public MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
 		public void mouseEnter(MouseEvent evt) {
 			log.fine("mouseEnter, event=" + evt); //$NON-NLS-1$
 			fadeOutAplhaBlending();
@@ -195,10 +195,13 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade out alpha blending from 254 to the configured alpha value
 	 * @param evt
 	 * @param outherBoundSize
-	 * @param gapLimit
+	 * @param left gap
+	 * @param right gap
+	 * @param top gap
+	 * @param bottom gap
 	 */
-	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
-		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bot) {
+		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bot) ? true : false;
 		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
@@ -209,10 +212,13 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade in alpha blending the configured alpha value to 254
 	 * @param evt
 	 * @param outherBoundSize
-	 * @param gapLimit
+	 * @param left gap
+	 * @param right gap
+	 * @param top gap
+	 * @param bottom gap
 	 */
-	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int gapLimit) {
-		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBoundSize.x - gapLimit || evt.y < gapLimit || evt.y > outherBoundSize.y - gapLimit) ? true : false;
+	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bot) {
+		boolean isExitShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bot) ? true : false;
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
@@ -223,10 +229,13 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade out alpha blending from 254 to the configured alpha value
 	 * @param evt
 	 * @param outherBound
-	 * @param gapLimit
+	 * @param left gap
+	 * @param right gap
+	 * @param top gap
+	 * @param bottom gap
 	 */
-	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int gapLimit) {
-		boolean isEnterShellEvt = (evt.x < gapLimit || evt.x > outherBound.width - gapLimit || evt.y < gapLimit || evt.y > outherBound.height - gapLimit) ? true : false;
+	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bot) {
+		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bot) ? true : false;
 		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
@@ -237,10 +246,13 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade in alpha blending the configured alpha value to 254
 	 * @param evt
 	 * @param outherBound
-	 * @param gapLimit
+	 * @param left gap
+	 * @param right gap
+	 * @param top gap
+	 * @param bottom gap
 	 */
-	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int gapLimit) {
-		boolean isExitShellEvt = (evt.x < gapLimit || evt.x > outherBound.width - gapLimit || evt.y < gapLimit || evt.y > outherBound.height - gapLimit) ? true : false;
+	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bot) {
+		boolean isExitShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bot) ? true : false;
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
