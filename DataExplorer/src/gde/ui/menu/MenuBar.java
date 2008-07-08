@@ -869,13 +869,15 @@ public class MenuBar {
 			
 			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
-			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+			if(channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelConfigName})); 
 					if (answer != SWT.OK) 
 						return;				
 				}
-				Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+				// clean existing channel for new data, if channel does not exist ignore, 
+				// this will be covered by the reader by creating a new channel
 				for (String recordSetKey : channel.getRecordSetNames()) {
 					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
 				}
@@ -944,7 +946,9 @@ public class MenuBar {
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0013, new Object[]{filePath}))) { 
 				return;
 			}
-
+			// rename existing file to *.bak
+			FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK);
+			
 			final String useFilePath = filePath;
 			this.readerWriterThread = new Thread() {
 				public void run() {
@@ -990,16 +994,19 @@ public class MenuBar {
 			String channelType = ChannelTypes.values()[activeDevice.getChannelType(channelNumber)].name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
 			log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
 			
-			if(this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			if(channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0006, new Object[] {channelConfigName}));
 					if (answer != SWT.OK) 
 						return;				
-				}
-				Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
-				for (String recordSetKey : channel.getRecordSetNames()) {
-					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
+					
+					// clean existing channel for new data, if channel does not exist ignore, 
+					// this will be covered by the reader by creating a new channel
+					for (String recordSetKey : channel.getRecordSetNames()) {
+						if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
+					}
 				}
 			}
 			else
