@@ -112,6 +112,8 @@ public class GraphicsWindow {
 	
 	// update graphics only area required
 	int 													oldNumberActiveVisible	= 0;
+	String												oldActiveRecordSetName	= OSDE.STRING_EMPTY;
+	int 													numScaleLeft = 0;
 	class MinMaxValues {
 		double min = 0;
 		double max = 0;
@@ -642,11 +644,18 @@ public class GraphicsWindow {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
-				int numberActiveVisible = activeRecordSet.getActiveAndVisibleRecordNames().length;
+				if (this.oldActiveRecordSetName.equals(activeRecordSet.getName())) {
+					this.minMaxValues = new HashMap<String, MinMaxValues>();
+					isFullUpdateRequired = true;
+				}
+				if (this.numScaleLeft != activeRecordSet.getNumberVisibleWithAxisPosLeft()) {
+					isFullUpdateRequired = true;
+				}
+				int numberActiveVisible = activeRecordSet.getVisibleRecordNames().length;
 				if (this.oldNumberActiveVisible != numberActiveVisible) {
 					isFullUpdateRequired = true;
 				}
-				for (String recordKey : activeRecordSet.getActiveAndVisibleRecordNames()) {
+				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
 					Record record = activeRecordSet.get(recordKey);
 					if (this.minMaxValues.get(recordKey) == null || record.getMinDisplayValue() != this.minMaxValues.get(recordKey).min || record.getMaxDisplayValue() != this.minMaxValues.get(recordKey).max) {
 						this.minMaxValues.put(recordKey, new MinMaxValues(record.getMinDisplayValue(), record.getMaxDisplayValue()));
@@ -659,16 +668,23 @@ public class GraphicsWindow {
 				}
 				else {
 					doUpdateCurveSelectorTable();
-					if (this.curveAreaBounds != null) {
+					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
+					int timeScaleHeight = 40;
+					if (curveBounds != null) {
 						//int height = this.graphicCanvas.getClientArea().height;
-						Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
-						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+40, true);
-						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+40).toString());
+						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeScaleHeight, true);
+						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeScaleHeight).toString());
 					}
 					else
 						this.graphicCanvas.redraw();
 				}
 				this.oldNumberActiveVisible = numberActiveVisible;
+				this.oldActiveRecordSetName = activeRecordSet.getName();
+				this.numScaleLeft = activeRecordSet.getNumberVisibleWithAxisPosLeft();
+			}
+			else { // enable clear
+				doUpdateCurveSelectorTable();
+				GraphicsWindow.this.graphicCanvas.redraw();
 			}
 		}
 		else { // enable clear
