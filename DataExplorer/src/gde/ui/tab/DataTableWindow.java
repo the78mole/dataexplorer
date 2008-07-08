@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.TableItem;
 import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
+import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
@@ -87,22 +88,40 @@ public class DataTableWindow {
 		this.timeColumn.setText(time);
 
 		// set the new header line
-		IDevice device = this.application.getActiveDevice();
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
-			String channelConfigKey = activeChannel.getConfigKey();
-			String[] measurements = device.getMeasurementNames(channelConfigKey);
-			for (int i = 0; i < measurements.length; i++) {
-				MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
-				StringBuilder sb = new StringBuilder();
-				sb.append(measurement.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
-				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-				column.setWidth(sb.length() * extentFactor);
-				column.setText(sb.toString());
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				String[] recordNames = activeRecordSet.getRecordNames();
+				for (int i = 0; i < recordNames.length; i++) {
+					Record record = activeRecordSet.get(recordNames[i]);
+					StringBuilder sb = new StringBuilder();
+					sb.append(record.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(record.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(sb.length() * extentFactor);
+					column.setText(sb.toString());
+				}
+				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(100);
+				}
 			}
-			if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-				column.setWidth(100);
+			else {
+				IDevice device = this.application.getActiveDevice();
+				String channelConfigKey = activeChannel.getConfigKey();
+				String[] measurements = device.getMeasurementNames(channelConfigKey);
+				for (int i = 0; i < measurements.length; i++) {
+					MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
+					StringBuilder sb = new StringBuilder();
+					sb.append(measurement.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(sb.length() * extentFactor);
+					column.setText(sb.toString());
+				}
+				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+					column.setWidth(100);
+				}
 			}
 		}
 	}

@@ -534,6 +534,18 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * method to get the sorted record active names which are visible as string array
+	 * @return String[] containing record names 
+	 */
+	public String[] getVisibleRecordNames() {
+		Vector<String> visibleRecords = new Vector<String>();
+		for (String recordKey : this.recordNames) {
+			if (this.get(recordKey).isVisible()) visibleRecords.add(recordKey);
+		}
+		return visibleRecords.toArray(new String[0]);
+	}
+
+	/**
 	 * method to get the sorted record active names as string array
 	 * @return String[] containing record names 
 	 */
@@ -715,6 +727,18 @@ public class RecordSet extends HashMap<String, Record> {
 				if (!tmpRecord.isPositionLeft() && tmpRecord.isVisible() && tmpRecord.isDisplayable()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
+		}
+		return value;
+	}
+	
+	/**
+	 * calculate number of records with axis position is left
+	 */
+	public int getNumberVisibleWithAxisPosLeft() {
+		int value = 0;
+		for (String recordKey : this.getRecordNames()) {
+			Record record = this.get(recordKey);
+			if (record.isVisible && record.isDisplayable && record.isPositionLeft) ++value;
 		}
 		return value;
 	}

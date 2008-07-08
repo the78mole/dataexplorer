@@ -174,7 +174,7 @@ public class LogViewReader {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
-					channels.setFileName(filePath.substring(filePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1));
+					channels.setFileName(filePath);
 					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
 					channels.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);

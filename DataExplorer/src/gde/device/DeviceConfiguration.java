@@ -618,11 +618,14 @@ public class DeviceConfiguration {
 	public PropertyType getMeasruementProperty(String channelConfigKey, String measurementKey, String propertyKey) {
 		PropertyType property = null;
 		try {
-			List<PropertyType> properties = this.getMeasurement(channelConfigKey, measurementKey.split(OSDE.STRING_UNDER_BAR)[0]).getProperty();
-			for (PropertyType propertyType : properties) {
-				if(propertyType.getName().equals(propertyKey)) {
-					property = propertyType;
-					break;
+			MeasurementType measurementType = this.getMeasurement(channelConfigKey, measurementKey.split(OSDE.STRING_UNDER_BAR)[0]);
+			if (measurementType != null) {
+				List<PropertyType> properties = measurementType.getProperty();
+				for (PropertyType propertyType : properties) {
+					if (propertyType.getName().equals(propertyKey)) {
+						property = propertyType;
+						break;
+					}
 				}
 			}
 		}
