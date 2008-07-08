@@ -210,6 +210,7 @@ public class GathererThread extends Thread {
 							GathererThread.this.isConfigUpdated = true;
 						}
 						else { // else wait for 180 seconds max. for actions
+							log.fine("retry counter = " + getRetryCounter());
 							if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 								stopTimerThread();
 								GathererThread.log.fine("Timer stopped eStation inactiv");
