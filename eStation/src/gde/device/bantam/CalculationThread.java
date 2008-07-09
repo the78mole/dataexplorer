@@ -63,7 +63,7 @@ public class CalculationThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		CalculationThread.log.fine("start data calculation for record = " + this.recordKey);
+		CalculationThread.log.fine("start data calculation for record = " + this.recordKey); //$NON-NLS-1$
 		Record record = this.recordSet.get(this.recordKey);
 		// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 		String[] recordNames = this.recordSet.getRecordNames();
@@ -73,7 +73,7 @@ public class CalculationThread extends Thread {
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
-				if (CalculationThread.log.isLoggable(Level.FINEST)) CalculationThread.log.finest("adding value = " + record.get(i));
+				if (CalculationThread.log.isLoggable(Level.FINEST)) CalculationThread.log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
 		}
@@ -83,15 +83,15 @@ public class CalculationThread extends Thread {
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
-				if (CalculationThread.log.isLoggable(Level.FINEST)) CalculationThread.log.finest("adding value = " + record.get(i));
+				if (CalculationThread.log.isLoggable(Level.FINEST)) CalculationThread.log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
 		}
 		else
-			CalculationThread.log.warning("only supported records are " + recordNames[3] + ", " + recordNames[4]);
+			CalculationThread.log.warning("only supported records are " + recordNames[3] + ", " + recordNames[4]); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//recordSet.updateDataTable();
 		this.application.updateGraphicsWindow();
-		CalculationThread.log.fine("finished data calculation for record = " + this.recordKey);
+		CalculationThread.log.fine("finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
 	}
 }

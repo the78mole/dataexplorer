@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.OSDE;
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -19,6 +21,7 @@ import osde.device.MeasurementType;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -28,17 +31,17 @@ import osde.ui.OpenSerialDataExplorer;
 public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(eStation.class.getName());
 	
-	public static	final	String[]	USAGE_MODE = { "off", "entladen", "laden"}; 
-	public static	final	String[]	ACCU_TYPES = { "Lithium", "NiMH", "NiCd", "Pb"}; 
+	public static	final	String[]	USAGE_MODE = { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
+	public static	final	String[]	ACCU_TYPES = { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
 
-	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off";
-	public final static String		CONFIG_WAIT_TIME						= "wait_time";
-	public final static String		CONFIG_IN_VOLTAGE_CUT_OFF		= "in_voltage_cut_off";
-	public final static String		CONFIG_SAFETY_TIME					= "safety_time";
-	public final static String		CONFIG_SET_CAPASITY					= "capacity_cut_off";
-	public final static String		CONFIG_PROCESSING						= "processing";
-	public final static String		CONFIG_BATTERY_TYPE					= "battery_type";
-	public final static String		CONFIG_PROCESSING_TIME			= "processing_time";
+	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off"; //$NON-NLS-1$
+	public final static String		CONFIG_WAIT_TIME						= "wait_time"; //$NON-NLS-1$
+	public final static String		CONFIG_IN_VOLTAGE_CUT_OFF		= "in_voltage_cut_off"; //$NON-NLS-1$
+	public final static String		CONFIG_SAFETY_TIME					= "safety_time"; //$NON-NLS-1$
+	public final static String		CONFIG_SET_CAPASITY					= "capacity_cut_off"; //$NON-NLS-1$
+	public final static String		CONFIG_PROCESSING						= "processing"; //$NON-NLS-1$
+	public final static String		CONFIG_BATTERY_TYPE					= "battery_type"; //$NON-NLS-1$
+	public final static String		CONFIG_PROCESSING_TIME			= "processing_time"; //$NON-NLS-1$
 
 	protected final OpenSerialDataExplorer				application;
 	protected final EStationSerialPort						serialPort;
@@ -57,6 +60,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
+		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**
@@ -68,6 +72,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
+		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**
@@ -87,10 +92,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -216,17 +221,17 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 */
 	public HashMap<String, String> getConfigurationValues(HashMap<String, String> configData, byte[] dataBuffer) {
-		configData.put(eStation.CONFIG_EXT_TEMP_CUT_OFF,   ""+(dataBuffer[ 4] & 0xFF - 0x80));
-		configData.put(eStation.CONFIG_WAIT_TIME,      ""+(dataBuffer[ 5] & 0xFF - 0x80));
-		configData.put(eStation.CONFIG_IN_VOLTAGE_CUT_OFF, ""+(dataBuffer[ 7] & 0xFF - 0x80)/10);
-		configData.put(eStation.CONFIG_SAFETY_TIME,  ""+((dataBuffer[29] & 0xFF - 0x80)*100 + (dataBuffer[30] & 0xFF - 0x80) * 10));
-		configData.put(eStation.CONFIG_SET_CAPASITY, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80))));
+		configData.put(eStation.CONFIG_EXT_TEMP_CUT_OFF,   ""+(dataBuffer[ 4] & 0xFF - 0x80)); //$NON-NLS-1$
+		configData.put(eStation.CONFIG_WAIT_TIME,      ""+(dataBuffer[ 5] & 0xFF - 0x80)); //$NON-NLS-1$
+		configData.put(eStation.CONFIG_IN_VOLTAGE_CUT_OFF, ""+(dataBuffer[ 7] & 0xFF - 0x80)/10); //$NON-NLS-1$
+		configData.put(eStation.CONFIG_SAFETY_TIME,  ""+((dataBuffer[29] & 0xFF - 0x80)*100 + (dataBuffer[30] & 0xFF - 0x80) * 10)); //$NON-NLS-1$
+		configData.put(eStation.CONFIG_SET_CAPASITY, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80)))); //$NON-NLS-1$
 		if(getProcessingMode(dataBuffer) != 0) {
 			configData.put(eStation.CONFIG_BATTERY_TYPE, eStation.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80) - 1]);
-			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80)));
+			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80))); //$NON-NLS-1$
 		}
 		for (String key : configData.keySet()) {
-			log.fine(key + " = " + configData.get(key));
+			log.fine(key + " = " + configData.get(key)); //$NON-NLS-1$
 		}
 		return configData;
 	}
@@ -250,7 +255,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value * factor + offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -273,7 +278,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value / factor - offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -286,7 +291,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -334,7 +339,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				this.calculationThreads.get(recordKey).start();
 				++displayableCounter;
 				
-				log.fine("displayableCounter = " + displayableCounter);
+				log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
 				recordSet.setConfiguredDisplayable(displayableCounter);
 			}
 			catch (RuntimeException e) {
@@ -382,11 +387,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Es ist kein serieller Port für das ausgewählte Gerät konfiguriert !");
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 			}

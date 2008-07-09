@@ -136,8 +136,8 @@ public class Messages {
 	 * set the device specific resource bundle
 	 * @param newBundleName the deviceResourceBundle to be used
 	 */
-	public static void setDeviceResourceBundle(String newBundleName) {
-		Messages.deviceResourceBundle = ResourceBundle.getBundle(newBundleName);
+	public static void setDeviceResourceBundle(String newBundleName, Locale newLocale, ClassLoader loader) {
+		Messages.deviceResourceBundle = ResourceBundle.getBundle(newBundleName, newLocale, loader);
 	}
 
 }

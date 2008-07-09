@@ -62,7 +62,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 						answer = this.read(answer, 1);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
-						if (log.isLoggable(Level.FINE)) log.fine("----> receive sync finished");
+						if (log.isLoggable(Level.FINE)) log.fine("----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
@@ -92,13 +92,13 @@ public class EStationSerialPort extends DeviceSerialPort {
 
 			StringBuilder sb = new StringBuilder();
 			for (byte b : data) {
-				sb.append(String.format("0x%02x ,", b));
+				sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
 			}
 			if (log.isLoggable(Level.FINER)) log.finer(sb.toString());
 			
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
-				log.warning("=====> checksum error occured, number of errors = " + this.xferErrors);
+				log.warning("=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
 				data = getData(null);
 			}
 		}
@@ -125,7 +125,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 		int check_sum = Checksum.ADD(buffer, 1, 72);
 		if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
 			isOK = true;
-		if (log.isLoggable(Level.FINER)) log.finer("Check_sum = " + isOK);
+		if (log.isLoggable(Level.FINER)) log.finer("Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
 	}
 

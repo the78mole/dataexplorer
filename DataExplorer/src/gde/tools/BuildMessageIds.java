@@ -45,9 +45,7 @@ public class BuildMessageIds {
 		+ "\n"
 		+ "    You should have received a copy of the GNU General Public License\n"
 		+ "    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.\n"
-		+ "****************************************************************************************/\n"
-		+ "package osde.messages; \n"
-		+ "\n";
+		+ "****************************************************************************************/\n";
 		
 	final static String classHeader = "/** \n"
 		+ " * @author Winfried Brügmann \n"
@@ -65,8 +63,9 @@ public class BuildMessageIds {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String inFilePath = "src/osde/messages/messages.properties";
-		String outFilePath = "src/osde/messages/MessageIds.java";
+		String packageName = "package " + args[0] + ";\n\n"; // osde.messages
+		String inFilePath = args[1]; //"src/osde/messages/messages.properties";
+		String outFilePath = args[2]; //"src/osde/messages/MessageIds.java";
 		BufferedReader reader; // to read the data
 		BufferedWriter writer; // to write the data
 		String line;
@@ -74,9 +73,10 @@ public class BuildMessageIds {
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFilePath), "UTF-8"));
 		
 		writer.write(fileHeader);
+		writer.write(packageName);
 		writer.write(classHeader);
 		while ((line = reader.readLine()) != null){
-			System.out.println(line);
+			//System.out.println(line);
 			if (line.trim().startsWith("#") || line.trim().length() <=1) 
 				continue;
 			

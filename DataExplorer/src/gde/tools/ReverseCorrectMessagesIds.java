@@ -74,9 +74,9 @@ public class ReverseCorrectMessagesIds {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String srcFilePath = "src/osde/messages/messages.properties";
-		String inFilePathIds = "src/osde/messages/MessageIds.java";
-		String outFilePath = "src/osde/messages/messages_.properties";
+		String srcFilePath = args[0]; //"src/osde/messages/messages.properties";
+		String inFilePathIds = args[1]; //"src/osde/messages/MessageIds.java";
+		String outFilePath = args[2]; //"src/osde/messages/messages_.properties";
 		BufferedReader readerIds; // to read the ID data
 		BufferedWriter writer; // to write the data
 		Properties msgProps = new Properties();
