@@ -132,24 +132,23 @@ public class GathererThread extends Thread {
 						String processName = eStation.USAGE_MODE[usedDevice.getProcessingMode(dataBuffer)];
 						if (log.isLoggable(Level.FINE)) {
 							GathererThread.log.fine("processing mode = " + processName); //$NON-NLS-1$
-							GathererThread.log.fine("feed.back current = " + usedDevice.getFeedBackCurrent(dataBuffer)); //$NON-NLS-1$
 						}
 						if ((processName.equals(eStation.USAGE_MODE[1]) || processName.equals(eStation.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
 							&& !GathererThread.this.isCollectDataStopped) { 
 							// check state change waiting to discharge to charge
 							// check if a record set matching for re-use is available and prepare a new if required
 							if (GathererThread.this.channel.size() == 0 
-									|| !GathererThread.this.isWaitTimeChargeDischarge
 									|| !GathererThread.this.channel.getRecordSetNames()[GathererThread.this.channel.getRecordSetNames().length - 1].endsWith(processName)
-									|| (new Date().getTime() - getTimeStamp()) > 30000 || GathererThread.this.isCollectDataStopped) {
+									|| !GathererThread.this.isWaitTimeChargeDischarge
+									|| (new Date().getTime() - getTimeStamp()) > 3*60000) {
 								GathererThread.this.isCollectDataStopped = false;
 								GathererThread.this.isWaitTimeChargeDischarge = true;
 								GathererThread.this.isConfigUpdated	= false;
 								GathererThread.this.isProgrammExecuting	= true;
 								GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
-								// record set does not exist or is outdated, build a new name and create
 								GathererThread.this.waitTime_ms = new Integer(usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer).get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 								log.fine("waitTime_ms = " + GathererThread.this.waitTime_ms); //$NON-NLS-1$
+								// record set does not exist or is outdated, build a new name and create
 								GathererThread.this.recordSetKey = GathererThread.this.channel.size() + 1 + ") [" + GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
 								GathererThread.this.channel.put(GathererThread.this.recordSetKey, RecordSet.createRecordSet(getName().trim(), GathererThread.this.recordSetKey, GathererThread.this.application
 										.getActiveDevice(), true, false));
@@ -213,10 +212,10 @@ public class GathererThread extends Thread {
 						}
 						else { // else wait for 180 seconds max. for actions
 							log.fine("retry counter = " + getRetryCounter()); //$NON-NLS-1$
-							if (0 == (setRetryCounter(getRetryCounter() - 1))) {
+							if (0 == (setRetryCounter(getRetryCounter() - 1)) || GathererThread.this.isCollectDataStopped) {
 								stopTimerThread();
 								GathererThread.log.fine("Timer stopped eStation inactiv"); //$NON-NLS-1$
-								setRetryCounter(40);
+								setRetryCounter(90); // 90 * 2 sec timeout = 180 sec
 							}
 							log.fine("retryCounter = " + getRetryCounter()); //$NON-NLS-1$
 						}
