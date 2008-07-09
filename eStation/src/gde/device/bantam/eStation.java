@@ -4,6 +4,9 @@
 package osde.device.bantam;
 
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,8 +34,8 @@ import osde.ui.OpenSerialDataExplorer;
 public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(eStation.class.getName());
 	
-	public static	final	String[]	USAGE_MODE = { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
-	public static	final	String[]	ACCU_TYPES = { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
+	public final	String[]	USAGE_MODE;
+	public final	String[]	ACCU_TYPES;
 
 	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off"; //$NON-NLS-1$
 	public final static String		CONFIG_WAIT_TIME						= "wait_time"; //$NON-NLS-1$
@@ -60,7 +63,16 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
-		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		URL url = null;
+		try {
+			url = new URL(".");
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), new URLClassLoader(new URL[] {url}, this.getClass().getClassLoader())); //$NON-NLS-1$
+		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
 	}
 
 	/**
@@ -73,6 +85,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
 	}
 
 	/**
@@ -227,7 +241,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		configData.put(eStation.CONFIG_SAFETY_TIME,  ""+((dataBuffer[29] & 0xFF - 0x80)*100 + (dataBuffer[30] & 0xFF - 0x80) * 10)); //$NON-NLS-1$
 		configData.put(eStation.CONFIG_SET_CAPASITY, ""+(((dataBuffer[31] & 0xFF - 0x80)*100 + (dataBuffer[32] & 0xFF - 0x80)))); //$NON-NLS-1$
 		if(getProcessingMode(dataBuffer) != 0) {
-			configData.put(eStation.CONFIG_BATTERY_TYPE, eStation.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80) - 1]);
+			configData.put(eStation.CONFIG_BATTERY_TYPE, this.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80) - 1]);
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80))); //$NON-NLS-1$
 		}
 		for (String key : configData.keySet()) {

@@ -24,6 +24,7 @@
 			<metainf dir="src/META-INF" excludes="MANIFEST.MF"/>
 			<metainf dir="META-INF" excludes="MANIFEST.MF"/>
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
+	    	<fileset dir="src" includes="**/*.properties" />
 	    </jar>
 	</target>
 

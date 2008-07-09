@@ -31,21 +31,27 @@ import java.util.Properties;
  */
 public class ReverseCorrectMessagesIds {
 
-	final static String	fileHeader				= "#/************************************************************************************** \n" + "#  	This file is part of OpenSerialDataExplorer. \n"
-																						+ "# \n" + "#    OpenSerialdataExplorer is free software: you can redistribute it and/or modify \n"
-																						+ "#    it under the terms of the GNU General Public License as published by \n"
-																						+ "#    the Free Software Foundation, either version 3 of the License, or \n" + "#    (at your option) any later version. \n" + "# \n"
-																						+ "#    OpenSerialdataExplorer is distributed in the hope that it will be useful, \n"
-																						+ "#    but WITHOUT ANY WARRANTY; without even the implied warranty of \n" + "#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
-																						+ "#    GNU General Public License for more details. \n" + "# \n" + "#    You should have received a copy of the GNU General Public License \n"
-																						+ "#    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
-																						+ "#****************************************************************************************/ \n"
-																						+ "# OpenSerialDataExplorer message file Locale.GERMANY Winfried Brügann  - 22 Jan 2008 \n" + " \n" + "# OSDE_MSGE0000 -> error messages \n"
-																						+ "# OSDE_MSGW0000 -> warning messages \n" + "# OSDE_MSGI0000 -> info messages \n" + "# OSDE_MSGT0000 -> normal text \n"
-																						+ "# range 0000 to 1000 reserved for base OSDE code \n" + "# range 1000 to 1100 AkkuMaster device \n" + "# range 1000 to 1200 Picolario device \n"
-																						+ "# range 1000 to 1300 UniLog device \n" + "# range 1000 to 1400 eStation device \n"
-																						// add new supported device here
-																						+ " \n";
+	final static String	fileHeader				= 
+		"#/************************************************************************************** \n" + "#  	This file is part of OpenSerialDataExplorer. \n"
+	+ "# \n" + "#    OpenSerialdataExplorer is free software: you can redistribute it and/or modify \n"
+	+ "#    it under the terms of the GNU General Public License as published by \n"
+	+ "#    the Free Software Foundation, either version 3 of the License, or \n" + "#    (at your option) any later version. \n" + "# \n"
+	+ "#    OpenSerialdataExplorer is distributed in the hope that it will be useful, \n"
+	+ "#    but WITHOUT ANY WARRANTY; without even the implied warranty of \n" + "#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
+	+ "#    GNU General Public License for more details. \n" + "# \n" + "#    You should have received a copy of the GNU General Public License \n"
+	+ "#    along with OpenSerialdataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
+	+ "#****************************************************************************************/ \n"
+	+ "# OpenSerialDataExplorer message file Locale.GERMANY Winfried Brügann  - 22 Jan 2008 \n" + " \n" + "# OSDE_MSGE0000 -> error messages \n"
+	+ "# OSDE_MSGW0000 -> warning messages \n" 
+	+ "# OSDE_MSGI0000 -> info messages \n" 
+	+ "# OSDE_MSGT0000 -> normal text \n"
+	+ "# range 0000 to 1099 reserved for base OSDE code \n" 
+	+ "# range 1100 to 1199 AkkuMaster device \n" 
+	+ "# range 1200 to 1299 Picolario device \n"
+	+ "# range 1300 to 1399 UniLog device \n" 
+	+ "# range 1400 to 1499 eStation device \n"
+	// add new supported device here
+	+ " \n";
 
 	final static String	begin_OSDE_MSGE		= "# begin OSDE_MSGE0000 -> error messages \n";
 	final static String	end_OSDE_MSGE			= "# end OSDE_MSGE0000 -> error messages \n\n";
@@ -58,13 +64,13 @@ public class ReverseCorrectMessagesIds {
 	final static String	skipLine					= " \n";
 	final static String	range_OSDE				= "# range 0000 to 1000 reserved for base OSDE code \n";
 	static boolean isRanageOSDE = false;
-	final static String	range_AkkuMaster	= "# range 1000 to 1100 AkkuMaster device \n";
+	final static String	range_AkkuMaster	= "# range 1100 to 1199 AkkuMaster device \n";
 	static boolean isRanageAkkuMaster = false;
-	final static String	range_Picolario		= "# range 1000 to 1200 Picolario device \n";
+	final static String	range_Picolario		= "# range 1200 to 1299 Picolario device \n";
 	static boolean isRanagePicolario = false;
-	final static String	range_UniLog			= "# range 1000 to 1300 UniLog device \n";
+	final static String	range_UniLog			= "# range 1300 to 1399 UniLog device \n";
 	static boolean isRanageUniLog = false;
-	final static String	range_eStation		= "# range 1000 to 1400 eStation device \n";
+	final static String	range_eStation		= "# range 1400 to 1499 eStation device \n";
 	static boolean isRanageeStation = false;
 
 	// add new supported device here
@@ -179,19 +185,19 @@ public class ReverseCorrectMessagesIds {
 			if (!isRanageOSDE) writer.write(range_OSDE);
 			isRanageOSDE = true;
 		}
-		else if (range < 1100) {
+		else if (range > 1100 && range < 1199) {
 			if (!isRanageAkkuMaster) writer.write(range_AkkuMaster);
 			isRanageAkkuMaster = true;
 		}
-		else if (range < 1200) {
+		else if (range > 1200 && range < 1299) {
 			if (!isRanagePicolario) writer.write(range_Picolario);
 			isRanagePicolario = true;
 		}
-		else if (range < 1300) {
+		else if (range > 1300 && range < 1399) {
 			if (!isRanageUniLog) writer.write(range_UniLog);
 			isRanageUniLog = true;
 		}
-		else if (range < 1400) {
+		else if (range > 1400 && range < 1499) {
 			if (!isRanageeStation) writer.write(range_eStation);
 			isRanageeStation = true;
 		}

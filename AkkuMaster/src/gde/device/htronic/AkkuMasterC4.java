@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.OSDE;
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -32,6 +34,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.exception.DataInconsitsentException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -60,6 +63,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**
@@ -73,6 +77,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**
@@ -92,9 +97,9 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber
 	 * @return
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -149,7 +154,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {	
 
 		// build the point array according curves from record set
@@ -169,7 +174,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		points[2] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
 		points[3] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; //Leistung		[mW]
 		points[4] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
-		if (log.isLoggable(Level.FINE)) log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh");
+		if (log.isLoggable(Level.FINE)) log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 		return points;
 	}
@@ -178,10 +183,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(@SuppressWarnings("unused")Record record, double value) {
+	public double translateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value));
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -189,10 +194,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(@SuppressWarnings("unused")Record record, double value) {
+	public double reverseTranslateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value));
-		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue));
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		if (AkkuMasterC4.log.isLoggable(Level.FINEST)) AkkuMasterC4.log.finest(String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -205,7 +210,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 	
 	/**
@@ -278,7 +283,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] {e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
 				}
 			}
 			else {

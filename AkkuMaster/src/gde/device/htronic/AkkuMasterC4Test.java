@@ -39,7 +39,7 @@ public class AkkuMasterC4Test {
 	public static void main(String[] args) {
 		DeviceConfiguration deviceConfig;
 		try {
-			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/AkkumasterC4.xml");
+			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/AkkumasterC4.xml"); //$NON-NLS-1$
 			akkuMaster = new AkkuMasterC4SerialPort(deviceConfig, null);
 			DeviceSerialPort.listConfiguredSerialPorts();
 			SerialPort serialPort = akkuMaster.open();
@@ -97,6 +97,6 @@ public class AkkuMasterC4Test {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("fertig !");
+		System.out.println("fertig !"); //$NON-NLS-1$
 	}
 }

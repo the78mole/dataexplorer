@@ -24,7 +24,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -129,11 +128,11 @@ public class GathererThread extends Thread {
 
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
-						String processName = eStation.USAGE_MODE[usedDevice.getProcessingMode(dataBuffer)];
+						String processName = GathererThread.this.device.USAGE_MODE[usedDevice.getProcessingMode(dataBuffer)];
 						if (log.isLoggable(Level.FINE)) {
 							GathererThread.log.fine("processing mode = " + processName); //$NON-NLS-1$
 						}
-						if ((processName.equals(eStation.USAGE_MODE[1]) || processName.equals(eStation.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
+						if ((processName.equals(GathererThread.this.device.USAGE_MODE[1]) || processName.equals(GathererThread.this.device.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
 							&& !GathererThread.this.isCollectDataStopped) { 
 							// check state change waiting to discharge to charge
 							// check if a record set matching for re-use is available and prepare a new if required
@@ -228,7 +227,7 @@ public class GathererThread extends Thread {
 				catch (Throwable e) {
 					if (e instanceof TimeOutException && GathererThread.this.isWaitTimeChargeDischarge) {
 						String batteryType = GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE);
-						if (!batteryType.equals(eStation.ACCU_TYPES[0])) { // Lithium programm has no charge/discharge
+						if (!batteryType.equals(GathererThread.this.device.ACCU_TYPES[0])) { // Lithium programm has no charge/discharge
 							try {
 								finalizeRecordSet(GathererThread.this.recordSetKey, false);
 								log.fine("waiting..."); //$NON-NLS-1$
@@ -241,7 +240,7 @@ public class GathererThread extends Thread {
 							}
 						}
 					}
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage() } )
+					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 					+ Messages.getDeviceString(MessageIds.OSDE_MSGT1408);
 					if (GathererThread.this.isProgrammExecuting) {
 						finalizeRecordSet(GathererThread.this.recordSetKey, false);

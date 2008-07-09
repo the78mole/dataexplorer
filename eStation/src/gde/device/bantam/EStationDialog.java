@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -198,7 +197,7 @@ public class EStationDialog extends DeviceDialog {
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
-										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
+										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 									}
 								}
 							}
