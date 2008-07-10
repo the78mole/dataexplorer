@@ -59,11 +59,13 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**
@@ -73,11 +75,13 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public AkkuMasterC4(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 	}
 
 	/**

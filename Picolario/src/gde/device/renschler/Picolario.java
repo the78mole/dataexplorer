@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -30,6 +31,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
@@ -60,6 +62,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public Picolario(String iniFile) throws FileNotFoundException, JAXBException {
 		super(iniFile);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
@@ -72,6 +77,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public Picolario(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);

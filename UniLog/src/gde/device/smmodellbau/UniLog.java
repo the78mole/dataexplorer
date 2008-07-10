@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.OSDE;
+import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
@@ -20,6 +21,7 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
@@ -115,6 +117,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.smmodellbau.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
@@ -127,6 +132,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public UniLog(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.smmodellbau.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
