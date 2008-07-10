@@ -42,6 +42,7 @@ import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
@@ -73,7 +74,7 @@ public class PicolarioConfigTab extends Composite {
 	Button 												makePersitentButton;
 
 	boolean												isConfigChanged 			= false;
-	String												heightDataUnit				= "m";																									// Meter is default
+	String												heightDataUnit				= "m";																									// Meter is default //$NON-NLS-1$
 	boolean												doNoAdation						= false;
 	boolean												doHeightAdaption			= false;																								// indicates to adapt height values
 	boolean												doSubtractFirst				= true;																								// indicates to subtract first values from all other
@@ -81,7 +82,7 @@ public class PicolarioConfigTab extends Composite {
 	boolean												doOffsetHeight				= false;																								// indicates that the height has to be corrected by an offset
 	int														heightOffsetSelection	= 7;																										// represents the offset the measurment should be modified
 	double												heightOffsetValue			= 100;																									// represents the offset value
-	String												slopeDataUnit					= "m/s";																								// Meter is default
+	String												slopeDataUnit					= "m/s";																								// Meter is default //$NON-NLS-1$
 	String												slopeTypeSelection		= CalculationThread.REGRESSION_TYPE_CURVE;
 	int														slopeTimeSelection;
 
@@ -116,18 +117,18 @@ public class PicolarioConfigTab extends Composite {
 				{ // group 2
 					this.heightAdaptionGroup = new Group(this, SWT.NONE);
 					this.heightAdaptionGroup.setLayout(null);
-					this.heightAdaptionGroup.setText("Berechnungseinstellung für Höhe und Steigung");
+					this.heightAdaptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1209));
 					this.heightAdaptionGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							PicolarioConfigTab.log.finest("heightAdaptionGroup2.paintControl, event=" + evt);
-							PicolarioConfigTab.this.heightUnit.setText("[" + PicolarioConfigTab.this.heightDataUnit + "]");
+							PicolarioConfigTab.log.finest("heightAdaptionGroup2.paintControl, event=" + evt); //$NON-NLS-1$
+							PicolarioConfigTab.this.heightUnit.setText("[" + PicolarioConfigTab.this.heightDataUnit + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 							PicolarioConfigTab.this.noAdaptionButton.setSelection(PicolarioConfigTab.this.doNoAdation);
 							PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(PicolarioConfigTab.this.doSubtractFirst);
 							PicolarioConfigTab.this.reduceByLastValueButton.setSelection(PicolarioConfigTab.this.doSubtractLast);
 							PicolarioConfigTab.this.reduceByDefinedValueButton.setSelection(PicolarioConfigTab.this.doOffsetHeight);
 							PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
 
-							PicolarioConfigTab.this.slopeUnit.setText("[" + PicolarioConfigTab.this.slopeDataUnit + "]");
+							PicolarioConfigTab.this.slopeUnit.setText("[" + PicolarioConfigTab.this.slopeDataUnit + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 							PicolarioConfigTab.this.regressionTime.select(PicolarioConfigTab.this.slopeTimeSelection - 1);
 							PicolarioConfigTab.this.slopeCalculationTypeCombo.select(PicolarioConfigTab.this.slopeTypeSelection.equals(CalculationThread.REGRESSION_TYPE_CURVE) ? 1 : 0);
 							
@@ -136,12 +137,12 @@ public class PicolarioConfigTab extends Composite {
 					});
 					{
 						this.noAdaptionButton = new Button(this.heightAdaptionGroup, SWT.RADIO | SWT.LEFT);
-						this.noAdaptionButton.setText("Höhenwerte nicht anpassen");
+						this.noAdaptionButton.setText(Messages.getString(MessageIds.OSDE_MSGT1210));
 						this.noAdaptionButton.setBounds(12, 40, 186, 16);
 						this.noAdaptionButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								PicolarioConfigTab.log.finest("noAdaptioButton.widgetSelected, event=" + evt);
+								PicolarioConfigTab.log.finest("noAdaptioButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.noAdaptionButton.setSelection(true);
 								PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByLastValueButton.setSelection(false);
@@ -159,13 +160,13 @@ public class PicolarioConfigTab extends Composite {
 					}
 					{
 						this.reduceByFirstValueButton = new Button(this.heightAdaptionGroup, SWT.RADIO | SWT.LEFT);
-						this.reduceByFirstValueButton.setText("ersten Höhenwert von den folgenden abziehen");
+						this.reduceByFirstValueButton.setText(Messages.getString(MessageIds.OSDE_MSGT1211));
 						this.reduceByFirstValueButton.setSelection(this.doSubtractFirst);
 						this.reduceByFirstValueButton.setBounds(12, 61, 297, 16);
 						this.reduceByFirstValueButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								PicolarioConfigTab.log.finest("reduceByFirstValueButton.widgetSelected, event=" + evt);
+								PicolarioConfigTab.log.finest("reduceByFirstValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.noAdaptionButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(true);
 								PicolarioConfigTab.this.reduceByLastValueButton.setSelection(false);
@@ -184,11 +185,11 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.reduceByLastValueButton = new Button(this.heightAdaptionGroup, SWT.RADIO | SWT.LEFT);
 						this.reduceByLastValueButton.setBounds(12, 80, 293, 18);
-						this.reduceByLastValueButton.setText("letzten Höhenwert von allen anderen abziehen");
+						this.reduceByLastValueButton.setText(Messages.getString(MessageIds.OSDE_MSGT1212));
 						this.reduceByLastValueButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								PicolarioConfigTab.log.finest("reduceByLastValueButton.widgetSelected, event=" + evt);
+								PicolarioConfigTab.log.finest("reduceByLastValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.noAdaptionButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByLastValueButton.setSelection(true);
@@ -206,13 +207,13 @@ public class PicolarioConfigTab extends Composite {
 					}
 					{
 						this.reduceByDefinedValueButton = new Button(this.heightAdaptionGroup, SWT.RADIO | SWT.LEFT);
-						this.reduceByDefinedValueButton.setText("Offset Höhe");
+						this.reduceByDefinedValueButton.setText(Messages.getString(MessageIds.OSDE_MSGT1213));
 						this.reduceByDefinedValueButton.setSelection(this.doOffsetHeight);
 						this.reduceByDefinedValueButton.setBounds(12, 103, 143, 16);
 						this.reduceByDefinedValueButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								PicolarioConfigTab.log.finest("reduceByDefinedValueButton.widgetSelected, event=" + evt);
+								PicolarioConfigTab.log.finest("reduceByDefinedValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.noAdaptionButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(false);
 								PicolarioConfigTab.this.reduceByLastValueButton.setSelection(false);
@@ -229,17 +230,17 @@ public class PicolarioConfigTab extends Composite {
 					}
 					{
 						this.heightOffset = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
-						final String[] heightOffsetValues = new String[] { "200", "100", "50", "0", "-50", "-100", "-150", "-200", "-250", "-300", "-400", "-500", "-750", "-1000", "-1500" };
+						final String[] heightOffsetValues = new String[] { "200", "100", "50", "0", "-50", "-100", "-150", "-200", "-250", "-300", "-400", "-500", "-750", "-1000", "-1500" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$
 						this.heightOffset.setItems(heightOffsetValues);
 						this.heightOffset.setText(new Double(this.heightOffsetValue).toString());
-						for (@SuppressWarnings("unused")String element : heightOffsetValues) { // loop only
+						for (@SuppressWarnings("unused")String element : heightOffsetValues) { // loop only //$NON-NLS-1$
 							if (heightOffsetValues.equals(this.heightOffsetValue)) this.heightOffset.select(this.heightOffsetSelection);
 						}
 						this.heightOffset.setBounds(184, 101, 116, 21);
 						this.heightOffset.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								PicolarioConfigTab.log.finest("heightOffset.widgetSelected, event=" + evt);
+								PicolarioConfigTab.log.finest("heightOffset.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.heightOffsetValue = new Double(heightOffsetValues[PicolarioConfigTab.this.heightOffset.getSelectionIndex()]).doubleValue();
 
 								Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -259,7 +260,7 @@ public class PicolarioConfigTab extends Composite {
 						this.heightOffset.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyPressed(KeyEvent evt) {
-								PicolarioConfigTab.log.finest("heightOffset.keyPressed, event=" + evt);
+								PicolarioConfigTab.log.finest("heightOffset.keyPressed, event=" + evt); //$NON-NLS-1$
 								if (evt.character == SWT.CR) {
 									//heightOffsetSelection 
 									try {
@@ -279,7 +280,7 @@ public class PicolarioConfigTab extends Composite {
 									}
 									catch (NumberFormatException e) {
 										PicolarioConfigTab.log.log(Level.WARNING, e.getMessage(), e);
-										PicolarioConfigTab.this.application.openMessageDialog("Eingabefehler : " + e.getMessage());
+										PicolarioConfigTab.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE1200, new Object[] { e.getMessage() } ));
 									}
 									PicolarioConfigTab.this.isConfigChanged = true;
 								}
@@ -289,37 +290,37 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.heightLabel = new Label(this.heightAdaptionGroup, SWT.NONE);
 						this.heightLabel.setBounds(12, 21, 76, 20);
-						this.heightLabel.setText("Höhe");
+						this.heightLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1214));
 					}
 					{
 						this.heightUnit = new CLabel(this.heightAdaptionGroup, SWT.NONE);
 						this.heightUnit.setBounds(90, 16, 60, 20);
-						this.heightUnit.setText("[m]");
+						this.heightUnit.setText("[m]"); //$NON-NLS-1$
 					}
 					{
 						this.calculationTypeLabel = new CLabel(this.heightAdaptionGroup, SWT.NONE);
 						this.calculationTypeLabel.setBounds(33, 151, 87, 20);
-						this.calculationTypeLabel.setText("Berechnung");
+						this.calculationTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1215));
 					}
 					{
 						this.slopeName = new CLabel(this.heightAdaptionGroup, SWT.NONE);
 						this.slopeName.setBounds(12, 127, 76, 20);
-						this.slopeName.setText("Steigung");
+						this.slopeName.setText(Messages.getString(MessageIds.OSDE_MSGT1216));
 					}
 					{
 						this.slopeUnit = new CLabel(this.heightAdaptionGroup, SWT.NONE);
 						this.slopeUnit.setBounds(90, 127, 60, 20);
-						this.slopeUnit.setText("[m/s]");
+						this.slopeUnit.setText("[m/s]"); //$NON-NLS-1$
 					}
 					{
 						this.slopeCalculationTypeCombo = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.slopeCalculationTypeCombo.setBounds(140, 151, 97, 20);
-						this.slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE });
-						this.slopeCalculationTypeCombo.setToolTipText("Hier den Berechnungstyp einstellen");
+						this.slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE }); //$NON-NLS-1$ //$NON-NLS-2$
+						this.slopeCalculationTypeCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1217));
 						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								if (PicolarioConfigTab.log.isLoggable(Level.FINEST)) PicolarioConfigTab.log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt);
+								if (PicolarioConfigTab.log.isLoggable(Level.FINEST)) PicolarioConfigTab.log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (PicolarioConfigTab.this.slopeCalculationTypeCombo.getSelectionIndex() == 1)
 									PicolarioConfigTab.this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 								else
@@ -345,13 +346,13 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.regressionTime = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.regressionTime.setBounds(239, 151, 61, 20);
-						this.regressionTime.setItems(new String[] { " 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s",
-								"19 s", "20 s" });
-						this.regressionTime.setToolTipText("Hier die Regressionszeit in Sekunden einstellen");
+						this.regressionTime.setItems(new String[] { " 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
+								"19 s", "20 s" }); //$NON-NLS-1$ //$NON-NLS-2$
+						this.regressionTime.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1218));
 						this.regressionTime.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								if (PicolarioConfigTab.log.isLoggable(Level.FINEST)) PicolarioConfigTab.log.finest("regressionTime.widgetSelected, event=" + evt);
+								if (PicolarioConfigTab.log.isLoggable(Level.FINEST)) PicolarioConfigTab.log.finest("regressionTime.widgetSelected, event=" + evt); //$NON-NLS-1$
 								PicolarioConfigTab.this.slopeTimeSelection = PicolarioConfigTab.this.regressionTime.getSelectionIndex() + 1;
 
 								Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -360,7 +361,7 @@ public class PicolarioConfigTab extends Composite {
 									if (activeRecordSet != null) {
 										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
 										Record activeRecord = activeRecordSet.get(measurementKey);
-										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection);
+										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection); //$NON-NLS-1$
 										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 										PicolarioConfigTab.this.application.updateDataTable();
@@ -374,11 +375,11 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.makePersitentButton = new Button(this.heightAdaptionGroup, SWT.PUSH | SWT.CENTER);
 						this.makePersitentButton.setBounds(10, 177, 295, 25);
-						this.makePersitentButton.setText("Einstellungen als Vorgabe übernehmen");
+						this.makePersitentButton.setText(Messages.getString(MessageIds.OSDE_MSGT1219));
 						this.makePersitentButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.finest("makePersitentButton.widgetSelected, event=" + evt);
+								log.finest("makePersitentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
 								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doNoAdation);
 								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, measurementKey, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractFirst);
@@ -416,46 +417,46 @@ public class PicolarioConfigTab extends Composite {
 		MeasurementType measurement = this.device.getMeasurement(this.configName, recordKey);
 
 		this.heightDataUnit = measurement.getUnit();
-		PicolarioConfigTab.log.finer("heightDataUnit = " + this.heightDataUnit);
+		PicolarioConfigTab.log.finer("heightDataUnit = " + this.heightDataUnit); //$NON-NLS-1$
 
 		PropertyType property = measurement.getProperty(Picolario.DO_NO_ADAPTION);
-		this.doNoAdation = new Boolean(property != null ? property.getValue() : "false").booleanValue();
-		PicolarioConfigTab.log.finer("doHeightAdaption = " + this.doHeightAdaption);
+		this.doNoAdation = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+		PicolarioConfigTab.log.finer("doHeightAdaption = " + this.doHeightAdaption); //$NON-NLS-1$
 
 		property = measurement.getProperty(Picolario.DO_SUBTRACT_FIRST);
-		this.doSubtractFirst = new Boolean(property != null ? property.getValue() : "false").booleanValue();
-		PicolarioConfigTab.log.finer("doSubtractFirst = " + this.doSubtractFirst);
+		this.doSubtractFirst = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+		PicolarioConfigTab.log.finer("doSubtractFirst = " + this.doSubtractFirst); //$NON-NLS-1$
 
 		property = measurement.getProperty(Picolario.DO_SUBTRACT_LAST);
-		this.doSubtractLast = new Boolean(property != null ? property.getValue() : "false").booleanValue();
-		PicolarioConfigTab.log.finer("doSubtractLast = " + this.doSubtractLast);
+		this.doSubtractLast = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+		PicolarioConfigTab.log.finer("doSubtractLast = " + this.doSubtractLast); //$NON-NLS-1$
 
 		property = measurement.getProperty(Picolario.DO_OFFSET_HEIGHT);
 		this.doOffsetHeight = this.heightOffsetValue != 0 && this.doHeightAdaption;
-		PicolarioConfigTab.log.finer("doOffsetHeight = " + this.doOffsetHeight);
+		PicolarioConfigTab.log.finer("doOffsetHeight = " + this.doOffsetHeight); //$NON-NLS-1$
 
 		property = measurement.getProperty(IDevice.OFFSET);
-		this.heightOffsetValue = new Double(property != null ? property.getValue() : "0.0").doubleValue();
-		PicolarioConfigTab.log.finer("heightOffsetValue = " + this.heightOffsetValue);
+		this.heightOffsetValue = new Double(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
+		PicolarioConfigTab.log.finer("heightOffsetValue = " + this.heightOffsetValue); //$NON-NLS-1$
 
 		recordKey = this.device.getMeasurementNames(this.configName)[2]; // slope
 		measurement = this.device.getMeasurement(this.configName, recordKey);
 		this.slopeDataUnit = measurement.getUnit();
-		PicolarioConfigTab.log.finer("slopeDataUnit = " + this.slopeDataUnit);
+		PicolarioConfigTab.log.finer("slopeDataUnit = " + this.slopeDataUnit); //$NON-NLS-1$
 
 		PropertyType typeSelection = this.device.getMeasruementProperty(this.configName, this.device.getMeasurementNames(this.configName)[2], CalculationThread.REGRESSION_TYPE);
 		if (typeSelection == null)
 			this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 		else
 			this.slopeTypeSelection = typeSelection.getValue(); // CalculationThread.REGRESSION_TYPE_*
-		PicolarioConfigTab.log.finer("slopeTypeSelection = " + this.slopeTypeSelection);
+		PicolarioConfigTab.log.finer("slopeTypeSelection = " + this.slopeTypeSelection); //$NON-NLS-1$
 
 		PropertyType timeSelection = this.device.getMeasruementProperty(this.configName, this.device.getMeasurementNames(this.configName)[2], CalculationThread.REGRESSION_INTERVAL_SEC);
 		if (timeSelection == null)
 			this.slopeTimeSelection = 4;
 		else
 			this.slopeTimeSelection = new Integer(timeSelection.getValue());
-		PicolarioConfigTab.log.finer("slopeTimeSelection = " + this.slopeTimeSelection);
+		PicolarioConfigTab.log.finer("slopeTimeSelection = " + this.slopeTimeSelection); //$NON-NLS-1$
 	}
 
 	/**
@@ -526,11 +527,11 @@ public class PicolarioConfigTab extends Composite {
 			if (activeRecordSet != null) {
 				String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
 				Record activeRecord = activeRecordSet.get(measurementKey);
-				activeRecord.getProperty(Picolario.DO_NO_ADAPTION).setValue(""+PicolarioConfigTab.this.doNoAdation);
-				activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST).setValue(""+PicolarioConfigTab.this.doSubtractFirst);
-				activeRecord.getProperty(Picolario.DO_SUBTRACT_LAST).setValue(""+PicolarioConfigTab.this.doSubtractLast);
-				activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT).setValue(""+PicolarioConfigTab.this.doOffsetHeight);
-				activeRecord.getProperty(IDevice.OFFSET).setValue(""+PicolarioConfigTab.this.heightOffsetValue);
+				activeRecord.getProperty(Picolario.DO_NO_ADAPTION).setValue(""+PicolarioConfigTab.this.doNoAdation); //$NON-NLS-1$
+				activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST).setValue(""+PicolarioConfigTab.this.doSubtractFirst); //$NON-NLS-1$
+				activeRecord.getProperty(Picolario.DO_SUBTRACT_LAST).setValue(""+PicolarioConfigTab.this.doSubtractLast); //$NON-NLS-1$
+				activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT).setValue(""+PicolarioConfigTab.this.doOffsetHeight); //$NON-NLS-1$
+				activeRecord.getProperty(IDevice.OFFSET).setValue(""+PicolarioConfigTab.this.heightOffsetValue); //$NON-NLS-1$
 				PicolarioConfigTab.this.application.updateGraphicsWindow();
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}

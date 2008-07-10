@@ -23,6 +23,7 @@ package osde.device.renschler;
 public class MessageIds { 
 
 	public final static String	OSDE_MSGE1200 = "OSDE_MSGE1200";
+	public final static String	OSDE_MSGE1201 = "OSDE_MSGE1201";
 	public final static String	OSDE_MSGT1200 = "OSDE_MSGT1200";
 	public final static String	OSDE_MSGT1201 = "OSDE_MSGT1201";
 	public final static String	OSDE_MSGT1202 = "OSDE_MSGT1202";

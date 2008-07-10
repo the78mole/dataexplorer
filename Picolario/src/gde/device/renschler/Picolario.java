@@ -44,10 +44,10 @@ import osde.utils.QuasiLinearRegression;
 public class Picolario extends DeviceConfiguration implements IDevice {
 	final static Logger						log								= Logger.getLogger(Picolario.class.getName());
 
-	public final static String		DO_NO_ADAPTION		= "do_no_adaption";
-	public final static String		DO_OFFSET_HEIGHT	= "do_offset_height";
-	public final static String		DO_SUBTRACT_FIRST	= "do_subtract_first";
-	public final static String		DO_SUBTRACT_LAST	= "subtract_last";
+	public final static String		DO_NO_ADAPTION		= "do_no_adaption"; //$NON-NLS-1$
+	public final static String		DO_OFFSET_HEIGHT	= "do_offset_height"; //$NON-NLS-1$
+	public final static String		DO_SUBTRACT_FIRST	= "do_subtract_first"; //$NON-NLS-1$
+	public final static String		DO_SUBTRACT_LAST	= "subtract_last"; //$NON-NLS-1$
 
 	final OpenSerialDataExplorer	application;
 	final PicolarioDialog					dialog;
@@ -103,9 +103,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
 		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
 		points[0] = new Integer(dataBuffer[2]) * 1000;
@@ -162,7 +162,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double translateValue(Record record, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
 		String[] recordNames = record.getRecordSetNames(); 
@@ -182,14 +182,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			if (subtractFirst) {
 				// get the record set to be used
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
 				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
 			}
 			else if (subtractLast) {
 				// get the record set to be used
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
 				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
 			}
@@ -204,7 +204,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		double newValue = offset + (value - reduction) * factor;
 
-		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -213,7 +213,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value));
+		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
 		String[] recordNames = record.getRecordSetNames(); 
@@ -233,14 +233,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			if (subtractFirst) {
 				// get the record set to be used
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
 				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
 			}
 			else if (subtractLast) {
 				// get the record set to be used
 				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet();
+				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
 				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
 			}
@@ -255,7 +255,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - offset) / factor + reduction;
 
-		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue));
+		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -268,7 +268,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {
