@@ -33,6 +33,8 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -131,6 +133,10 @@ public class SimulatorDialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
+				if(this.isAlphaEnabled) {
+					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
+					this.isFadeOut = false;
+				}
 				this.dialogShell.setLayout(new FormLayout());
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -289,6 +295,19 @@ public class SimulatorDialog extends DeviceDialog {
 						SimulatorDialog.this.application.openHelpDialog("Simulator", "HelpInfo.html");
 					}
 				});
+				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+					public void mouseEnter(MouseEvent evt) {
+						log.finer("dialogShell.mouseEnter, event=" + evt);
+						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
+					}
+					public void mouseHover(MouseEvent evt) {
+						log.finest("dialogShell.mouseHover, event=" + evt);
+					}
+					public void mouseExit(MouseEvent evt) {
+						log.finer("dialogShell.mouseExit, event=" + evt);
+						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
+					}
+				});
 				{
 					FormData descriptionLData = new FormData();
 					descriptionLData.width = 277;
@@ -299,6 +318,8 @@ public class SimulatorDialog extends DeviceDialog {
 					this.description.setLayoutData(descriptionLData);
 					this.description.setText("Mit START wird eine neue Serie an Daten generiert, bis STOP gedrückt wird ");
 					this.description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+					// enable fade in for big areas inside the dialog while fast mouse move
+					this.description.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
 				}
 				{
 					FormData descriptionLabelLData = new FormData();
@@ -311,6 +332,8 @@ public class SimulatorDialog extends DeviceDialog {
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
 					this.descriptionLabel.setText("Datengenerator");
 					this.descriptionLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 0, false, false));
+					// enable fade in for big areas inside the dialog while fast mouse move
+					this.descriptionLabel.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
 				}
 				{
 					FormData startButtonLData = new FormData();

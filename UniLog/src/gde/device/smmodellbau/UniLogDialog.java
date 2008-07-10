@@ -251,14 +251,14 @@ public class UniLogDialog extends DeviceDialog {
 				});
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.info("dialogShell.mouseEnter, event=" + evt);
+						log.finer("dialogShell.mouseEnter, event=" + evt);
 						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.info("dialogShell.mouseHover, event=" + evt);
+						log.finest("dialogShell.mouseHover, event=" + evt);
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.info("dialogShell.mouseExit, event=" + evt);
+						log.finer("dialogShell.mouseExit, event=" + evt);
 						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
 					}
 				});

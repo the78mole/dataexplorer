@@ -27,6 +27,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -105,6 +107,10 @@ public class PicolarioDialog extends DeviceDialog {
 				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 			SWTResourceManager.registerResourceUser(this.dialogShell);
+			if(this.isAlphaEnabled) {
+				this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
+				this.isFadeOut = false;
+			}
 			this.dialogShell.setLayout(null);
 			this.dialogShell.layout();
 			this.dialogShell.pack();
@@ -129,12 +135,26 @@ public class PicolarioDialog extends DeviceDialog {
 					PicolarioDialog.this.application.openHelpDialog("Picolario", "HelpInfo.html");
 				}
 			});
+			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+				public void mouseEnter(MouseEvent evt) {
+					log.finer("dialogShell.mouseEnter, event=" + evt);
+					fadeOutAplhaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+				}
+				public void mouseHover(MouseEvent evt) {
+					log.finest("dialogShell.mouseHover, event=" + evt);
+				}
+				public void mouseExit(MouseEvent evt) {
+					log.finer("dialogShell.mouseExit, event=" + evt);
+					fadeInAlpaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+				}
+			});
 
 			{ // group 1
 				this.numberAvailableRecorsSetsGroup1 = new Group(this.dialogShell, SWT.NONE);
 				this.numberAvailableRecorsSetsGroup1.setLayout(null);
 				this.numberAvailableRecorsSetsGroup1.setText("Anzahl Aufzeichnungen");
 				this.numberAvailableRecorsSetsGroup1.setBounds(10, 5, 320, 60);
+				this.numberAvailableRecorsSetsGroup1.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.queryAvailableRecordSetButton = new Button(this.numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
 					this.queryAvailableRecordSetButton.setText("Anzahl der Aufzeichnungen auslesen");
@@ -190,8 +210,8 @@ public class PicolarioDialog extends DeviceDialog {
 
 				this.configTabFolder.setSelection(0);
 				this.configTabFolder.setBounds(10, 70, 320, 235);
+				this.configTabFolder.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				this.configTabFolder.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.finest("configTabFolder.widgetSelected, event=" + evt);
 						int channelNumber = PicolarioDialog.this.configTabFolder.getSelectionIndex() + 1;
@@ -225,6 +245,7 @@ public class PicolarioDialog extends DeviceDialog {
 				this.readDataGroup3.setLayout(null);
 				this.readDataGroup3.setText("Aufzeichnungen auslesen");
 				this.readDataGroup3.setBounds(10, 310, 320, 195);
+				this.readDataGroup3.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.switchRecordSetButton = new Button(this.readDataGroup3, SWT.CHECK | SWT.CENTER);
 					this.switchRecordSetButton.setBounds(15, 20, 290, 17);

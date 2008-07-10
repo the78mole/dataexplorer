@@ -4,9 +4,6 @@
 package osde.device.bantam;
 
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,20 +56,15 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException 
 	 */
 	public eStation(String deviceProperties) throws FileNotFoundException, JAXBException {
-		super(deviceProperties);
+		super(deviceProperties);		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
+
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
-		URL url = null;
-		try {
-			url = new URL(".");
-		}
-		catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), new URLClassLoader(new URL[] {url}, this.getClass().getClassLoader())); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
 	}
 
 	/**
@@ -81,12 +73,14 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 */
 	public eStation(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		this.application = OpenSerialDataExplorer.getInstance();
-		this.serialPort = new EStationSerialPort(this, this.application);
-		this.channels = Channels.getInstance();
+		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
 		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
+
+		this.application = OpenSerialDataExplorer.getInstance();
+		this.serialPort = new EStationSerialPort(this, this.application);
+		this.channels = Channels.getInstance();
 	}
 
 	/**
