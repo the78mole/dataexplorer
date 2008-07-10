@@ -45,7 +45,8 @@ public class ReverseCorrectMessagesIds {
 	+ "# OSDE_MSGW0000 -> warning messages \n" 
 	+ "# OSDE_MSGI0000 -> info messages \n" 
 	+ "# OSDE_MSGT0000 -> normal text \n"
-	+ "# range 0000 to 1099 reserved for base OSDE code \n" 
+	+ "# range 0000 to 1000 reserved for base OSDE code \n" 
+	+ "# range 1001 to 1099 Sample + Simulator \n" 
 	+ "# range 1100 to 1199 AkkuMaster device \n" 
 	+ "# range 1200 to 1299 Picolario device \n"
 	+ "# range 1300 to 1399 UniLog device \n" 
@@ -64,6 +65,8 @@ public class ReverseCorrectMessagesIds {
 	final static String	skipLine					= " \n";
 	final static String	range_OSDE				= "# range 0000 to 1000 reserved for base OSDE code \n";
 	static boolean isRanageOSDE = false;
+	final static String range_Sample			= "# range 1001 to 1099 Sample + Simulator \n"; 
+	static boolean isRanageSample = false;
 	final static String	range_AkkuMaster	= "# range 1100 to 1199 AkkuMaster device \n";
 	static boolean isRanageAkkuMaster = false;
 	final static String	range_Picolario		= "# range 1200 to 1299 Picolario device \n";
@@ -185,19 +188,23 @@ public class ReverseCorrectMessagesIds {
 			if (!isRanageOSDE) writer.write(range_OSDE);
 			isRanageOSDE = true;
 		}
-		else if (range > 1100 && range < 1199) {
+		else if (range >= 1001 && range < 1099) {
+			if (!isRanageSample) writer.write(range_Sample);
+			isRanageSample = true;
+		}
+		else if (range >= 1100 && range < 1199) {
 			if (!isRanageAkkuMaster) writer.write(range_AkkuMaster);
 			isRanageAkkuMaster = true;
 		}
-		else if (range > 1200 && range < 1299) {
+		else if (range >= 1200 && range < 1299) {
 			if (!isRanagePicolario) writer.write(range_Picolario);
 			isRanagePicolario = true;
 		}
-		else if (range > 1300 && range < 1399) {
+		else if (range >= 1300 && range < 1399) {
 			if (!isRanageUniLog) writer.write(range_UniLog);
 			isRanageUniLog = true;
 		}
-		else if (range > 1400 && range < 1499) {
+		else if (range >= 1400 && range < 1499) {
 			if (!isRanageeStation) writer.write(range_eStation);
 			isRanageeStation = true;
 		}

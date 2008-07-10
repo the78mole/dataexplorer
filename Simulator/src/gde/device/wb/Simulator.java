@@ -90,10 +90,10 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
 		// unknown device for LogView
 	}
@@ -124,7 +124,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
 		return points;
 	}
@@ -136,7 +136,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(Record record, double value) {
 		double newValues = record.getFactor() * value + record.getOffset();
-		Simulator.log.fine("newValue = " + newValues);
+		Simulator.log.fine("newValue = " + newValues); //$NON-NLS-1$
 		// do some calculation
 		return newValues;
 	}
@@ -161,7 +161,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName());
+		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -173,7 +173,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
-		log.fine("working with " + recordSet.getName());
+		log.fine("working with " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {

@@ -51,6 +51,7 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.exception.DataInconsitsentException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -59,7 +60,8 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class SimulatorDialog extends DeviceDialog {
-	final static Logger						log										= Logger.getLogger(SimulatorDialog.class.getName());
+	final static Logger						log		= Logger.getLogger(SimulatorDialog.class.getName());
+	private static final String		DEVICE_NAME	= "Simulator";
 
 	CLabel												currentLabel;
 	CCombo												currentCombo;
@@ -96,7 +98,7 @@ public class SimulatorDialog extends DeviceDialog {
 		try {
 			Display display = Display.getDefault();
 			Shell shell = new Shell(display);
-			Simulator device = new Simulator("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Devices\\Htronic Akkumaster C4.ini");
+			Simulator device = new Simulator("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Devices\\Htronic Akkumaster C4.ini"); //$NON-NLS-1$
 			SimulatorDialog inst = new SimulatorDialog(shell, device);
 			inst.open();
 		}
@@ -125,7 +127,7 @@ public class SimulatorDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
-			log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed()));
+			log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -141,8 +143,8 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(336, 393);
-				this.dialogShell.setText("Simulator");
-				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+				this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				{
 					FormData timeResultLabelLData = new FormData();
 					timeResultLabelLData.width = 94;
@@ -151,7 +153,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeResultLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeResultLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeResultLabel.setLayoutData(timeResultLabelLData);
-					this.timeResultLabel.setText("=  Zeit pro Takt");
+					this.timeResultLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1050));
 				}
 				{
 					FormData timesLabelLData = new FormData();
@@ -161,7 +163,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timesLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timesLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timesLabel.setLayoutData(timesLabelLData);
-					this.timesLabel.setText("*");
+					this.timesLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1051));
 				}
 				{
 					FormData clusterComboLData = new FormData();
@@ -171,14 +173,14 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterComboLData.top = new FormAttachment(0, 1000, 138);
 					this.clusterCombo = new CCombo(this.dialogShell, SWT.NONE);
 					this.clusterCombo.setLayoutData(clusterComboLData);
-					this.clusterCombo.setItems(new String[] { "10", "20", "50", "100" });
+					this.clusterCombo.setItems(new String[] { "10", "20", "50", "100" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					this.clusterCombo.setText(new Integer(this.device.getDataBlockSize()).toString());
 					this.clusterCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("clusterCombo.widgetSelected, event=" + evt);
+							log.fine("clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setDataBlockSize(new Integer(SimulatorDialog.this.clusterCombo.getText()).intValue());
-							log.fine(" new clusterSize = " + SimulatorDialog.this.device.getDataBlockSize());
+							log.fine(" new clusterSize = " + SimulatorDialog.this.device.getDataBlockSize()); //$NON-NLS-1$
 						}
 					});
 				}
@@ -190,7 +192,7 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.clusterLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.clusterLabel.setLayoutData(clusterLabelLData);
-					this.clusterLabel.setText("Datenpunkte");
+					this.clusterLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1052));
 				}
 				{
 					FormData currentLabelLData = new FormData();
@@ -200,7 +202,7 @@ public class SimulatorDialog extends DeviceDialog {
 					currentLabelLData.top = new FormAttachment(0, 1000, 221);
 					this.currentLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.EMBEDDED);
 					this.currentLabel.setLayoutData(currentLabelLData);
-					this.currentLabel.setText("Strom");
+					this.currentLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1053));
 				}
 				{
 					FormData currentComboLData = new FormData();
@@ -210,11 +212,11 @@ public class SimulatorDialog extends DeviceDialog {
 					currentComboLData.top = new FormAttachment(0, 1000, 244);
 					this.currentCombo = new CCombo(this.dialogShell, SWT.NONE);
 					this.currentCombo.setLayoutData(currentComboLData);
-					this.currentCombo.setText("cCombo1");
+					this.currentCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.currentCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("currentCombo.widgetSelected, event=" + evt);
+							log.fine("currentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for currentCombo.widgetSelected
 						}
 					});
@@ -227,7 +229,7 @@ public class SimulatorDialog extends DeviceDialog {
 					voltageLabelLData.top = new FormAttachment(0, 1000, 167);
 					this.voltageLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.voltageLabel.setLayoutData(voltageLabelLData);
-					this.voltageLabel.setText("Spannung");
+					this.voltageLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1054));
 				}
 				{
 					FormData voltageComboLData = new FormData();
@@ -237,11 +239,11 @@ public class SimulatorDialog extends DeviceDialog {
 					voltageComboLData.top = new FormAttachment(0, 1000, 198);
 					this.voltageCombo = new CCombo(this.dialogShell, SWT.NONE);
 					this.voltageCombo.setLayoutData(voltageComboLData);
-					this.voltageCombo.setText("cCombo1");
+					this.voltageCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("voltageCombo.widgetSelected, event=" + evt);
+							log.fine("voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for voltageCombo.widgetSelected
 						}
 					});
@@ -254,7 +256,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeLabel.setLayoutData(timeLabelLData);
-					this.timeLabel.setText("Zeit [msec]");
+					this.timeLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1055));
 				}
 				{
 					FormData timeComboLData = new FormData();
@@ -264,47 +266,47 @@ public class SimulatorDialog extends DeviceDialog {
 					timeComboLData.top = new FormAttachment(0, 1000, 138);
 					this.timeCombo = new CCombo(this.dialogShell, SWT.NONE);
 					this.timeCombo.setLayoutData(timeComboLData);
-					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" });
-					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms()));
+					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
+					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms())); //$NON-NLS-1$
 					this.timeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("timeCombo.widgetSelected, event=" + evt);
+							log.fine("timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setTimeStep_ms(new Integer(SimulatorDialog.this.timeCombo.getText()).intValue());
-							log.fine(" new timeStep_ms = " + SimulatorDialog.this.device.getTimeStep_ms());
+							log.fine(" new timeStep_ms = " + SimulatorDialog.this.device.getTimeStep_ms()); //$NON-NLS-1$
 						}
 					});
 				}
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						log.fine("dialogShell.widgetDisposed, event=" + evt);
+						log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						//TODO check if some thing to do before exiting
 					}
 				});
 				this.dialogShell.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						log.fine("dialogShell.keyReleased, event=" + evt);
+						log.fine("dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
 						//TODO add your code for dialogShell.keyReleased
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.fine("dialogShell.helpRequested, event=" + evt);
-						SimulatorDialog.this.application.openHelpDialog("Simulator", "HelpInfo.html");
+						log.fine("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						SimulatorDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-2$
 					}
 				});
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.finer("dialogShell.mouseEnter, event=" + evt);
+						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.finest("dialogShell.mouseHover, event=" + evt);
+						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.finer("dialogShell.mouseExit, event=" + evt);
+						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
 					}
 				});
@@ -316,7 +318,7 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLData.top = new FormAttachment(0, 1000, 49);
 					this.description = new Text(this.dialogShell, SWT.CENTER | SWT.WRAP);
 					this.description.setLayoutData(descriptionLData);
-					this.description.setText("Mit START wird eine neue Serie an Daten generiert, bis STOP gedrückt wird ");
+					this.description.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1056));
 					this.description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.description.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
@@ -330,8 +332,8 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLabelLData.right = new FormAttachment(1000, 1000, -12);
 					this.descriptionLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.WRAP | SWT.EMBEDDED);
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
-					this.descriptionLabel.setText("Datengenerator");
-					this.descriptionLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 0, false, false));
+					this.descriptionLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1057));
+					this.descriptionLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 0, false, false)); //$NON-NLS-1$
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.descriptionLabel.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
 				}
@@ -343,10 +345,10 @@ public class SimulatorDialog extends DeviceDialog {
 					startButtonLData.top = new FormAttachment(0, 1000, 296);
 					this.startButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.startButton.setLayoutData(startButtonLData);
-					this.startButton.setText("START");
+					this.startButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("startButton.widgetSelected, event=" + evt);
+							log.fine("startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.startButton.setEnabled(false);
 							SimulatorDialog.this.stopButton.setEnabled(true);
 							SimulatorDialog.this.channel = SimulatorDialog.this.channels.getActiveChannel();
@@ -355,15 +357,15 @@ public class SimulatorDialog extends DeviceDialog {
 							// prepare timed data gatherer thread
 							int delay = 0;
 							int period = new Double(SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize()).intValue();
-							log.fine("timer period = " + period + " ms");
+							log.fine("timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
-								String									recordSetKeyStem	= ") Datensatz";
+								String									recordSetKeyStem	= Messages.getDeviceString(MessageIds.OSDE_MSGT1058); 
 								HashMap<String, Object>	data;															// Spannung, Strom
 								String									recordSetKey;
 
 								@Override
-								@SuppressWarnings("unchecked")
+								@SuppressWarnings("unchecked") //$NON-NLS-1$
 								//(Vector<Integer>)
 								public void run() {
 									RecordSet recordSet;
@@ -376,7 +378,7 @@ public class SimulatorDialog extends DeviceDialog {
 											this.recordSetKey = (SimulatorDialog.this.channel.size() + 1) + this.recordSetKeyStem;
 											SimulatorDialog.this.channel.put(this.recordSetKey, RecordSet.createRecordSet(SimulatorDialog.this.device.getChannelName(1), this.recordSetKey, SimulatorDialog.this.application
 													.getActiveDevice(), true, false));
-											log.fine(this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName());
+											log.fine(this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
 											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
@@ -389,11 +391,11 @@ public class SimulatorDialog extends DeviceDialog {
 												SimulatorDialog.this.application.getMenuToolBar().addRecordSetName(this.recordSetKey);
 												SimulatorDialog.this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 											}
-											log.fine("recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
+											log.fine("recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else {
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
-											log.fine("re-using " + this.recordSetKey);
+											log.fine("re-using " + this.recordSetKey); //$NON-NLS-1$
 										}
 										// prepare the data for adding to record set
 										
@@ -410,7 +412,7 @@ public class SimulatorDialog extends DeviceDialog {
 										while (iterV.hasNext()) {
 											points[0] = iterV.next().intValue();//Spannung 
 											points[1] = iterA.next().intValue();//Strom 
-											log.fine(String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1]));
+											log.fine(String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1])); //$NON-NLS-1$
 											recordSet.addPoints(points, false);
 										}
 
@@ -422,7 +424,7 @@ public class SimulatorDialog extends DeviceDialog {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
 										if (SimulatorDialog.this.timer != null) SimulatorDialog.this.timer.cancel();
 										SimulatorDialog.log.log(Level.SEVERE, e.getMessage(), e);
-										SimulatorDialog.this.application.openMessageDialog("Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+										SimulatorDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -441,12 +443,12 @@ public class SimulatorDialog extends DeviceDialog {
 					okButtonLData.top = new FormAttachment(0, 1000, 296);
 					this.stopButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.stopButton.setLayoutData(okButtonLData);
-					this.stopButton.setText("STOP");
+					this.stopButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 					this.stopButton.setEnabled(false);
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("stopButton.widgetSelected, event=" + evt);
+							log.fine("stopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							stopTimer();
 							SimulatorDialog.this.isCollectDataStopped = true;
 							SimulatorDialog.this.startButton.setEnabled(true);
