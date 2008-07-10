@@ -52,7 +52,13 @@ public class Messages {
 	 */
 	public static String getString(String key, Object[] params) {
 		try {
-			String result = mainResourceBundle.getString(key);
+			String result;
+			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+				result = mainResourceBundle.getString(key);
+			}
+			else {
+				result = deviceResourceBundle.getString(key);
+			}
 			String[] array = result.split("[{}]");
 			StringBuilder sb = new StringBuilder();
 			if (array.length > 1) {
@@ -79,48 +85,9 @@ public class Messages {
 	 */
 	public static String getString(String key) {
 		try {
-			return mainResourceBundle.getString(key);
-		}
-		catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
-
-	/**
-	 * example usage: application.openMessageDialog(Messages.getDeviceString(MessageIds.OSDE_MSG001, new Object{"hallo", "world"));
-	 * @param key
-	 * @param params as object array
-	 * @return the message as string with unlined parameters
-	 */
-	public static String getDeviceString(String key, Object[] params) {
-		try {
-			String result = deviceResourceBundle.getString(key);
-			String[] array = result.split("[{}]");
-			StringBuilder sb = new StringBuilder();
-			if (array.length > 1) {
-				for (int i = 0, j = 0; i < array.length; i++) {
-					if (i != 0 && i % 2 != 0)
-						sb.append(params.length >= (j + 1) ? params[j++] : "?");
-					else
-						sb.append(array[i]);
-				}
-				result = sb.toString();
+			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+				return mainResourceBundle.getString(key);
 			}
-			
-			return result;
-		}
-		catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
-	
-	/**
-	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSG001));
-	 * @param key
-	 * @return the string matching the given key
-	 */
-	public static String getDeviceString(String key) {
-		try {
 			return deviceResourceBundle.getString(key);
 		}
 		catch (MissingResourceException e) {
@@ -144,5 +111,4 @@ public class Messages {
 		log.info("loader = " + loader.toString());
 		Messages.deviceResourceBundle = ResourceBundle.getBundle(newBundleName, newLocale, loader);
 	}
-
 }

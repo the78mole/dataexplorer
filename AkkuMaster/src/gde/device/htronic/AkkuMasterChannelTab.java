@@ -176,13 +176,13 @@ public class AkkuMasterChannelTab {
 					});
 					{
 						this.captureOnlyText = new Text(this.captureOnlyGroup, SWT.MULTI | SWT.WRAP);
-						this.captureOnlyText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1173));
+						this.captureOnlyText.setText(Messages.getString(MessageIds.OSDE_MSGT1173));
 						this.captureOnlyText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 						this.captureOnlyText.setBounds(51, 40, 315, 37);
 					}
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
-						this.captureOnlyButton.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1174)); 
+						this.captureOnlyButton.setText(Messages.getString(MessageIds.OSDE_MSGT1174)); 
 						this.captureOnlyButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
 						this.captureOnlyButton.setBounds(12, 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
@@ -221,7 +221,7 @@ public class AkkuMasterChannelTab {
 					});
 					{
 						this.programmButton = new Button(this.programGroup, SWT.RADIO | SWT.LEFT);
-						this.programmButton.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1175));
+						this.programmButton.setText(Messages.getString(MessageIds.OSDE_MSGT1175));
 						this.programmButton.setBounds(12, 15, 295, 21);
 						this.programmButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
 						this.programmButton.addSelectionListener(new SelectionAdapter() {
@@ -248,7 +248,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.akkuGroup = new Group(this.programGroup, SWT.NONE);
 						this.akkuGroup.setLayout(null);
-						this.akkuGroup.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1176));
+						this.akkuGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1176));
 						this.akkuGroup.setBounds(15, 40, 369, 67);
 						this.akkuGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
@@ -261,7 +261,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.capacityText = new Text(this.akkuGroup, SWT.NONE);
 							this.capacityText.setBounds(12, 20, 105, 18);
-							this.capacityText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1177));
+							this.capacityText.setText(Messages.getString(MessageIds.OSDE_MSGT1177));
 							this.capacityText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.capacityText.setEditable(false);
 						}
@@ -282,7 +282,7 @@ public class AkkuMasterChannelTab {
 							this.countCellsText = new Text(this.akkuGroup, SWT.NONE);
 							this.countCellsText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.countCellsText.setBounds(130, 20, 105, 18);
-							this.countCellsText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1178));
+							this.countCellsText.setText(Messages.getString(MessageIds.OSDE_MSGT1178));
 							this.countCellsText.setEditable(false);
 						}
 						{
@@ -304,7 +304,7 @@ public class AkkuMasterChannelTab {
 							this.akkuTypeText = new Text(this.akkuGroup, SWT.NONE);
 							this.akkuTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.akkuTypeText.setBounds(255, 20, 105, 18);
-							this.akkuTypeText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1179));
+							this.akkuTypeText.setText(Messages.getString(MessageIds.OSDE_MSGT1179));
 							this.akkuTypeText.setDoubleClickEnabled(false);
 							this.akkuTypeText.setDragDetect(false);
 							this.akkuTypeText.setEditable(false);
@@ -328,7 +328,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.programTypeGroup = new Group(this.programGroup, SWT.NONE);
 						this.programTypeGroup.setBounds(15, 110, 369, 123);
-						this.programTypeGroup.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1180));
+						this.programTypeGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1180));
 						this.programTypeGroup.setLayout(null);
 						this.programTypeGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
@@ -343,7 +343,7 @@ public class AkkuMasterChannelTab {
 							this.programText = new Text(this.programTypeGroup, SWT.NONE);
 							this.programText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.programText.setBounds(130, 20, 105, 18);
-							this.programText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1181)); 
+							this.programText.setText(Messages.getString(MessageIds.OSDE_MSGT1181)); 
 						}
 						{
 							this.program = new CCombo(this.programTypeGroup, SWT.NONE);
@@ -363,7 +363,7 @@ public class AkkuMasterChannelTab {
 							this.chargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
 							this.chargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.chargeCurrentText.setBounds(12, 70, 105, 18);
-							this.chargeCurrentText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1182));
+							this.chargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1182));
 							this.chargeCurrentText.setEditable(false);
 						}
 						{
@@ -384,7 +384,7 @@ public class AkkuMasterChannelTab {
 							this.dischargeCurrentText.setBounds(130, 70, 105, 18);
 							this.dischargeCurrentText.setDragDetect(false);
 							this.dischargeCurrentText.setDoubleClickEnabled(false);
-							this.dischargeCurrentText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1183));
+							this.dischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1183));
 							this.dischargeCurrentText.setEditable(false);
 						}
 						{
@@ -403,7 +403,7 @@ public class AkkuMasterChannelTab {
 							this.memoryNumberText = new Text(this.programTypeGroup, SWT.NONE);
 							this.memoryNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.memoryNumberText.setBounds(255, 70, 105, 18);
-							this.memoryNumberText.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1184)); 
+							this.memoryNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1184)); 
 							this.memoryNumberText.setEditable(false);
 						}
 						{
@@ -464,7 +464,7 @@ public class AkkuMasterChannelTab {
 										}
 
 										if (AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + dischargeCurrent_mA || AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + chargeCurrent_mA) {
-											AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getDeviceString(MessageIds.OSDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
+											AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
 											setCollectData(false);
 											setStartDataGatheringSelection(true);
 											return;
@@ -527,18 +527,18 @@ public class AkkuMasterChannelTab {
 															}
 															// update discharge / charge current display
 															int actualCurrent = ((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue();
-															if (processName.trim().equalsIgnoreCase(Messages.getDeviceString(MessageIds.OSDE_MSGT1126).trim())) {
+															if (processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.OSDE_MSGT1126).trim())) {
 																AkkuMasterChannelTab.this.parent.addTotalChargeCurrent(actualCurrent);
 																setChargeCurrentAdded(true);
 															}
-															else if (processName.trim().equalsIgnoreCase(Messages.getDeviceString(MessageIds.OSDE_MSGT1127).trim())) {
+															else if (processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.OSDE_MSGT1127).trim())) {
 																AkkuMasterChannelTab.this.parent.addTotalDischargeCurrent(actualCurrent);
 																setDischargeCurrentAdded(true);
 															}
-															if (processName.trim().equalsIgnoreCase(Messages.getDeviceString(MessageIds.OSDE_MSGT1126).trim()) && isDischargeCurrentAdded()) { 
+															if (processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.OSDE_MSGT1126).trim()) && isDischargeCurrentAdded()) { 
 																AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(actualCurrent);
 															}
-															else if (processName.trim().equalsIgnoreCase(Messages.getDeviceString(MessageIds.OSDE_MSGT1127).trim()) && isChargeCurrentAdded()) {
+															else if (processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.OSDE_MSGT1127).trim()) && isChargeCurrentAdded()) {
 																AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(actualCurrent);
 															}
 														}

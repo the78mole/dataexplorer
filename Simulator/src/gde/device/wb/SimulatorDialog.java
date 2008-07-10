@@ -153,7 +153,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeResultLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeResultLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeResultLabel.setLayoutData(timeResultLabelLData);
-					this.timeResultLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1050));
+					this.timeResultLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1050));
 				}
 				{
 					FormData timesLabelLData = new FormData();
@@ -163,7 +163,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timesLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timesLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timesLabel.setLayoutData(timesLabelLData);
-					this.timesLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1051));
+					this.timesLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1051));
 				}
 				{
 					FormData clusterComboLData = new FormData();
@@ -192,7 +192,7 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.clusterLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.clusterLabel.setLayoutData(clusterLabelLData);
-					this.clusterLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1052));
+					this.clusterLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1052));
 				}
 				{
 					FormData currentLabelLData = new FormData();
@@ -202,7 +202,7 @@ public class SimulatorDialog extends DeviceDialog {
 					currentLabelLData.top = new FormAttachment(0, 1000, 221);
 					this.currentLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.EMBEDDED);
 					this.currentLabel.setLayoutData(currentLabelLData);
-					this.currentLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1053));
+					this.currentLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1053));
 				}
 				{
 					FormData currentComboLData = new FormData();
@@ -229,7 +229,7 @@ public class SimulatorDialog extends DeviceDialog {
 					voltageLabelLData.top = new FormAttachment(0, 1000, 167);
 					this.voltageLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.voltageLabel.setLayoutData(voltageLabelLData);
-					this.voltageLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1054));
+					this.voltageLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1054));
 				}
 				{
 					FormData voltageComboLData = new FormData();
@@ -256,7 +256,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeLabel.setLayoutData(timeLabelLData);
-					this.timeLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1055));
+					this.timeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1055));
 				}
 				{
 					FormData timeComboLData = new FormData();
@@ -318,7 +318,7 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLData.top = new FormAttachment(0, 1000, 49);
 					this.description = new Text(this.dialogShell, SWT.CENTER | SWT.WRAP);
 					this.description.setLayoutData(descriptionLData);
-					this.description.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1056));
+					this.description.setText(Messages.getString(MessageIds.OSDE_MSGT1056));
 					this.description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.description.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
@@ -332,7 +332,7 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLabelLData.right = new FormAttachment(1000, 1000, -12);
 					this.descriptionLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.WRAP | SWT.EMBEDDED);
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
-					this.descriptionLabel.setText(Messages.getDeviceString(MessageIds.OSDE_MSGT1057));
+					this.descriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1057));
 					this.descriptionLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 0, false, false)); //$NON-NLS-1$
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.descriptionLabel.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
@@ -360,7 +360,7 @@ public class SimulatorDialog extends DeviceDialog {
 							log.fine("timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
-								String									recordSetKeyStem	= Messages.getDeviceString(MessageIds.OSDE_MSGT1058); 
+								String									recordSetKeyStem	= Messages.getString(MessageIds.OSDE_MSGT1058); 
 								HashMap<String, Object>	data;															// Spannung, Strom
 								String									recordSetKey;
 

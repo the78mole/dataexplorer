@@ -59,8 +59,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		super(deviceProperties);		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
 
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
@@ -75,8 +75,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1400), Messages.getDeviceString(MessageIds.OSDE_MSGT1401), Messages.getDeviceString(MessageIds.OSDE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getDeviceString(MessageIds.OSDE_MSGT1403), Messages.getDeviceString(MessageIds.OSDE_MSGT1404), Messages.getDeviceString(MessageIds.OSDE_MSGT1405), Messages.getDeviceString(MessageIds.OSDE_MSGT1406)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
 
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);

@@ -241,13 +241,13 @@ public class GathererThread extends Thread {
 						}
 					}
 					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ Messages.getDeviceString(MessageIds.OSDE_MSGT1408);
+					+ Messages.getString(MessageIds.OSDE_MSGT1408);
 					if (GathererThread.this.isProgrammExecuting) {
 						finalizeRecordSet(GathererThread.this.recordSetKey, false);
 						GathererThread.this.stopTimerThread();
 						if (GathererThread.this.isPortOpenedByLiveGatherer) 
 							GathererThread.this.serialPort.close();
-						GathererThread.this.application.openMessageDialog(Messages.getDeviceString(MessageIds.OSDE_MSGT1409));
+						GathererThread.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT1409));
 					}
 					else {
 						cleanup(GathererThread.this.recordSetKey, message);
