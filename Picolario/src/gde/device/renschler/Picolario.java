@@ -164,45 +164,52 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
-		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-		
-		String recordKey = record.getName();
-		double offset = record.getOffset(); // != 0 if curve has an defined offset
-		double reduction = record.getReduction();
-		double factor = record.getFactor(); // != 1 if a unit translation is required
+		String recordKey = "?"; //$NON-NLS-1$
+		double newValue = 0.0;
+		try {
+			// 0=Spannung, 1=Höhe, 2=Steigung
+			String[] recordNames = record.getRecordSetNames(); 
+			
+			recordKey = record.getName();
+			double offset = record.getOffset(); // != 0 if curve has an defined offset
+			double reduction = record.getReduction();
+			double factor = record.getFactor(); // != 1 if a unit translation is required
 
-		// height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			// height calculation need special procedure
+			if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
+				PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
+				boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
+				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
-			if (subtractFirst) {
-				// get the record set to be used
-				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+				if (subtractFirst) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
+					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
+				}
+				else if (subtractLast) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+
+					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+				}
+				else
+					reduction = 0;
 			}
-			else if (subtractLast) {
-				// get the record set to be used
-				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+			// slope calculation needs height factor for calculation
+			else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
+				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
 			}
-			else
-				reduction = 0;
-		}
 
-		// slope calculation needs height factor for calculation
-		else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
+			newValue = offset + (value - reduction) * factor;
 		}
-
-		double newValue = offset + (value - reduction) * factor;
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 
 		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
 		return newValue;

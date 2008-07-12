@@ -25,6 +25,7 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
@@ -38,7 +39,7 @@ public class DataGathererThread extends Thread {
 
 	OpenSerialDataExplorer		application;
 	String[]									datagramNumbers;
-	final String							RECORD_SET_NAME	= ") Flugaufzeichnung";
+	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1220);
 	final String							configKey;
 	final PicolarioSerialPort	serialPort;
 	final PicolarioDialog			dialog;
@@ -63,11 +64,11 @@ public class DataGathererThread extends Thread {
 	 * if more than one available record set is created the status bar shows the status how many record sets are done
 	 * this gives not a real feeling since the record sets may have big differences in number of available telegrams
 	 */
-	@SuppressWarnings("unchecked") // cast from Object to Vector<Integer>
+	@SuppressWarnings("unchecked") // cast from Object to Vector<Integer> //$NON-NLS-1$
 	public void run() {
 		boolean isPortOpenedByMe = false;
 		try {
-			DataGathererThread.log.fine("entry data gatherer");
+			DataGathererThread.log.fine("entry data gatherer"); //$NON-NLS-1$
 			Channel channel = Channels.getInstance().getActiveChannel();
 			String[] measurements = this.device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
@@ -82,9 +83,9 @@ public class DataGathererThread extends Thread {
 				this.dialog.resetTelegramLabel();
 				this.dialog.setAlreadyRedDataSets(this.datagramNumbers[j]);
 				Vector<byte[]> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device);
-				recordSetKey = (channel.size() + 1) + this.RECORD_SET_NAME;
+				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 				channel.put(recordSetKey, RecordSet.createRecordSet(this.configKey, recordSetKey, this.application.getActiveDevice(), true, false));
-				DataGathererThread.log.fine(recordSetKey + " created");
+				DataGathererThread.log.fine(recordSetKey + " created"); //$NON-NLS-1$
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
 
@@ -112,19 +113,20 @@ public class DataGathererThread extends Thread {
 				channel.applyTemplate(recordSetKey);
 			}// end for
 			this.dialog.enableReadButtons();
-			DataGathererThread.log.fine("exit data gatherer");
+			DataGathererThread.log.fine("exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog("Das Datenmodell der Anwendung wird fehlerhaft bedient.\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+			this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		catch (Exception e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog("Bei der seriellen Kommunikation mit dem angeschlossene Gerät gibt es Fehler !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+			this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		finally {
 			if (isPortOpenedByMe) this.serialPort.close();
+			this.dialog.resetButtons();
 		}
 	} // end of run()
 

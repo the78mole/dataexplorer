@@ -13,6 +13,7 @@ import org.eclipse.swt.SWT;
 import osde.device.DeviceConfiguration;
 import osde.exception.CheckSumMissmatchException;
 import osde.exception.TimeOutException;
+import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -25,9 +26,9 @@ import osde.utils.Checksum;
 public class UniLogSerialPort extends DeviceSerialPort {
 	final static Logger					log											= Logger.getLogger(UniLogSerialPort.class.getName());
 
-	public final static String 		NUMBER_RECORD						= "number_record";
-	public final static String 		TIME_MILLI_SEC					= "time_ms";
-	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3";
+	public final static String 		NUMBER_RECORD						= "number_record"; 	//$NON-NLS-1$
+	public final static String 		TIME_MILLI_SEC					= "time_ms"; 				//$NON-NLS-1$
+	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3"; 	//$NON-NLS-1$
 	
 	final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
 	final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
@@ -76,7 +77,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
 		try {
-			log.fine("start");
+			log.fine("start"); //$NON-NLS-1$
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
@@ -90,9 +91,9 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				readBuffer = this.read(readBuffer, 2);
 				verifyChecksum(readBuffer);
 				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-				log.finer("memoryUsed = " + memoryUsed);
+				log.finer("memoryUsed = " + memoryUsed); //$NON-NLS-1$
 				double progressFactor = 100.0 / memoryUsed;
-				log.finer("progressFactor = " + progressFactor);
+				log.finer("progressFactor = " + progressFactor); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
@@ -111,7 +112,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					}
 					else {
 						//telegrams.size() > 4 min + max + 2 data points
-						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone());
+						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
 						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
 					}
@@ -121,16 +122,16 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, new Double(counter * progressFactor).intValue());
 
 					if (this.isTransmitFinished) {
-						log.log(Level.WARNING, "transmission stopped by user");
+						log.log(Level.WARNING, "transmission stopped by user"); //$NON-NLS-1$
 						break;
 					}
 				}
-				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone());
+				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
 			}
 			else
-				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
 			
-			log.fine("end");
+			log.fine("end"); //$NON-NLS-1$
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -138,7 +139,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		}
 		finally {
 			if(isPortOpenedByMe) this.close();
-			log.fine("stop");
+			log.fine("stop"); //$NON-NLS-1$
 		}
 		return dataCollection;
 	}
@@ -181,10 +182,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		boolean isLifeDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-			while (this.getNumBytesAvailable() < 10 && retrys-- > 0) {
+			while (this.getInputStream().available() < 10 && retrys-- > 0) {
 				this.write(COMMAND_LIVE_VALUES);
 				Thread.sleep(250);
-				log.fine("retryLimit = " + retrys);
+				log.fine("retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			// read data bytes to clear buffer
 			this.read(new byte[DATA_LENGTH_BYTES], 1);
@@ -193,7 +194,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
-			throw new Exception("Der serialle Port ist nicht geöffnet!");
+			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
 		
 		return isLifeDataAvailable;
 	}
@@ -224,7 +225,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			}
 		}
 		else
-			throw new Exception("Der serialle Port ist nicht geöffnet!");
+			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
 
 		return readBuffer;
 	}
@@ -304,7 +305,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 				}
 				else
-					throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
 			}
 		}
 		catch (Exception e) {
@@ -344,10 +345,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
 			}
 			else
-				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0033));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -385,10 +386,10 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException("Daten im Gerät sind nicht bereit zum Abholen.");
+					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0033));
 			}
 			else
-				throw new IOException("Gerät ist nicht angeschlossen oder nicht bereit.");
+				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -465,12 +466,12 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		int checkSum = 0;
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
-		log.finer("checkSum = " + checkSum);
+		log.finer("checkSum = " + checkSum); //$NON-NLS-1$
 		checkSumLast2Bytes = ((readBuffer[DATA_LENGTH_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATA_LENGTH_BYTES - 1] & 0xFF);
-		log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes);
+		log.finer("checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$
 		
 		if (checkSum != checkSumLast2Bytes)
-			throw new CheckSumMissmatchException("Die Checksumme ist fehlerhaft - " + checkSum + " / " + checkSumLast2Bytes);
+			throw new CheckSumMissmatchException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0034, new Object[] { checkSum, checkSumLast2Bytes } ));
 	}
 	
 	/**
@@ -484,7 +485,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
 		checkSumLast2Bytes = ((readBuffer[DATA_LENGTH_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATA_LENGTH_BYTES - 1] & 0xFF);
-		if(log.isLoggable(Level.FINER)) log.finer("checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes);
+		if(log.isLoggable(Level.FINER)) log.finer("checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return (checkSum == checkSumLast2Bytes);
 	}

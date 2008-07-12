@@ -109,10 +109,7 @@ public class PicolarioDialog extends DeviceDialog {
 				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 			SWTResourceManager.registerResourceUser(this.dialogShell);
-			if(this.isAlphaEnabled) {
-				this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
-				this.isFadeOut = false;
-			}
+			this.dialogShell.setAlpha(254);
 			this.dialogShell.setLayout(null);
 			this.dialogShell.layout();
 			this.dialogShell.pack();
@@ -140,14 +137,14 @@ public class PicolarioDialog extends DeviceDialog {
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 				public void mouseEnter(MouseEvent evt) {
 					log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-					fadeOutAplhaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+					fadeOutAplhaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 				}
 				public void mouseHover(MouseEvent evt) {
 					log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 				}
 				public void mouseExit(MouseEvent evt) {
 					log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-					fadeInAlpaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+					fadeInAlpaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
 				}
 			});
 
@@ -482,4 +479,27 @@ public class PicolarioDialog extends DeviceDialog {
 		return this.doSwtichRecordSet;
 	}
 
+	/**
+	 * reset the button states to default
+	 */
+	public void resetButtons() {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			PicolarioDialog.this.setClosePossible(true);
+			PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
+			PicolarioDialog.this.readSingle.setEnabled(true);
+			PicolarioDialog.this.readAllRecords.setEnabled(true);
+			PicolarioDialog.this.stopButton.setEnabled(false);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					PicolarioDialog.this.setClosePossible(true);
+					PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
+					PicolarioDialog.this.readSingle.setEnabled(true);
+					PicolarioDialog.this.readAllRecords.setEnabled(true);
+					PicolarioDialog.this.stopButton.setEnabled(false);
+				}
+			});
+		}
+	}
 }

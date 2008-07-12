@@ -1,7 +1,6 @@
 package osde.device.bantam;
 
 import java.io.IOException;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +34,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public byte[] getData(Vector<Long> waitTime) throws Exception {
+	public synchronized byte[] getData() throws Exception {
 		byte[] data = new byte[76];
 		byte[] answer = new byte[] {0x00};
 
@@ -47,12 +46,8 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			
 			answer = new byte[13];
-			if (waitTime == null) {
-				answer = this.read(answer, 2);
-			}
-			else { // collect wait time to receive the required bytes
-				answer = this.read(answer, 2, waitTime);
-			}
+			answer = this.read(answer, 2);
+			// synchronize received data to begin of sent data 
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
@@ -74,6 +69,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			if (answer[0] == 0x7b) {
 				System.arraycopy(answer, 0, data, 0, 13);
 			}
+			
 			answer = new byte[12];
 			answer = this.read(answer, 1);
 			System.arraycopy(answer, 0, data, 13, 12);
@@ -99,7 +95,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
 				log.warning("=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
-				data = getData(null);
+				data = getData();
 			}
 		}
 		catch (Exception e) {

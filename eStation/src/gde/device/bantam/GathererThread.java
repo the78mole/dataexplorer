@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,7 +69,6 @@ public class GathererThread extends Thread {
 	boolean												isProgrammExecuting					= false;
 	boolean												isConfigUpdated							= false;
 	HashMap<String, String>				configData									= new HashMap<String, String>();
-	Vector<Long>									receiveWaitTime							= new Vector<Long>();
 
 	// offsets and factors are constant over thread live time
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
@@ -124,7 +122,7 @@ public class GathererThread extends Thread {
 						//if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 
 						// build the point array according curves from record set
-						byte[] dataBuffer = GathererThread.this.serialPort.getData(GathererThread.this.receiveWaitTime);
+						byte[] dataBuffer = GathererThread.this.serialPort.getData();
 
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
@@ -132,6 +130,7 @@ public class GathererThread extends Thread {
 						if (log.isLoggable(Level.FINE)) {
 							GathererThread.log.fine("processing mode = " + processName); //$NON-NLS-1$
 						}
+						usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer);
 						if ((processName.equals(GathererThread.this.device.USAGE_MODE[1]) || processName.equals(GathererThread.this.device.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
 							&& !GathererThread.this.isCollectDataStopped) { 
 							// check state change waiting to discharge to charge
@@ -144,11 +143,10 @@ public class GathererThread extends Thread {
 								GathererThread.this.isWaitTimeChargeDischarge = true;
 								GathererThread.this.isConfigUpdated	= false;
 								GathererThread.this.isProgrammExecuting	= true;
-								GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
-								GathererThread.this.waitTime_ms = new Integer(usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer).get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
+								GathererThread.this.waitTime_ms = new Integer(GathererThread.this.configData.get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 								log.fine("waitTime_ms = " + GathererThread.this.waitTime_ms); //$NON-NLS-1$
 								// record set does not exist or is outdated, build a new name and create
-								GathererThread.this.recordSetKey = GathererThread.this.channel.size() + 1 + ") [" + GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
+								GathererThread.this.recordSetKey = GathererThread.this.channel.getNextRecordSetNumber() + ") [" + GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
 								GathererThread.this.channel.put(GathererThread.this.recordSetKey, RecordSet.createRecordSet(getName().trim(), GathererThread.this.recordSetKey, GathererThread.this.application
 										.getActiveDevice(), true, false));
 								GathererThread.this.channel.applyTemplateBasics(GathererThread.this.recordSetKey);
@@ -169,9 +167,7 @@ public class GathererThread extends Thread {
 								GathererThread.log.fine("re-using " + GathererThread.this.recordSetKey); //$NON-NLS-1$
 							}
 							setTimeStamp();
-
-							//recordSet = GathererThread.this.channel.get(GathererThread.this.recordSetKey);
-							//TODO check this.device.updateInitialRecordSetComment(recordSet);
+							GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
 
 							// prepare the data for adding to record set
 							GathererThread.this.recordSet.addPoints(usedDevice.converDataBytes(points, dataBuffer), false);
@@ -294,16 +290,6 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			//this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
 			log.warning("During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (this.receiveWaitTime.size() > 0) {
-			long waitAvg = this.receiveWaitTime.firstElement();
-			StringBuilder sb = new StringBuilder();
-			for (int i=1; i<this.receiveWaitTime.size(); ++i) {
-				sb.append(this.receiveWaitTime.get(i)).append(" "); //$NON-NLS-1$
-				waitAvg = (waitAvg * (i-1) + this.receiveWaitTime.get(i)) / i ;
-			}
-			log.info(sb.toString());
-			log.info("waitAvg = " + waitAvg); //$NON-NLS-1$
 		}
 	}
 

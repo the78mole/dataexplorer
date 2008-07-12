@@ -35,6 +35,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -55,14 +56,19 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class UniLogDialog extends DeviceDialog {
+	/**
+	 * 
+	 */
+	private static final String	DEVICE_NAME	= "UniLog";
+
 	final static Logger						log												= Logger.getLogger(UniLogDialog.class.getName());
 
 	public final static int				WERTESAETZE_MAX						= 25920;
-	public final static String[]	TIME_INTERVAL							= { " 1/16 s (-> 27 min)", " 1/8 s   (-> 54 min)", " 1/4 s   (-> 1:48 h)", " 1/2 s   (-> 3:36 h)", "   1 s    (-> 7:12 h)",
-			"   2 s    (-> 14:24 h)", "   5 s    (-> 36 h)", " 10 s   (-> 72 h)" };
-	public final static String[]	RX_AUTO_START_MS					= { " 1,1 ms", " 1,2 ms", " 1,3 ms", " 1,4 ms", " 1,5 ms", " 1,6 ms", " 1,7 ms", " 1,8 ms", " 1,9 ms", " Rx an" };
-	public final static String[]	CURRENT_SENSOR						= { " 40/80A ", "  150A ", "  400A ", "    20A " };
-	public final static String[]	A1_MODUS									= { " Temperatur ", " Millivolt ", " Speed 250 ", " Speed 400 " };
+	public final static String[]	TIME_INTERVAL							= { " 1/16 s (-> 27 min)", " 1/8 s   (-> 54 min)", " 1/4 s   (-> 1:48 h)", " 1/2 s   (-> 3:36 h)", "   1 s    (-> 7:12 h)", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			"   2 s    (-> 14:24 h)", "   5 s    (-> 36 h)", " 10 s   (-> 72 h)" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public final static String[]	RX_AUTO_START_MS					= { " 1,1 ms", " 1,2 ms", " 1,3 ms", " 1,4 ms", " 1,5 ms", " 1,6 ms", " 1,7 ms", " 1,8 ms", " 1,9 ms", " Rx on" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+	public final static String[]	CURRENT_SENSOR						= { " 40/80A ", "  150A ", "  400A ", "    20A " }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	public final static String[]	A1_MODUS									= { " Temperatur ", " Millivolt ", " Speed 250 ", " Speed 400 " }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 	CTabItem											configTabItem1, configTabItem2, configTabItem3, configTabItem4;
 	CCombo												a1ModusCombo;
@@ -136,12 +142,12 @@ public class UniLogDialog extends DeviceDialog {
 	LiveGathererThread						liveThread;
 	UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 
-	String												statusText								= "";
+	String												statusText								= ""; //$NON-NLS-1$
 
-	String												serialNumber							= "";
-	String												unilogVersion							= "";
+	String												serialNumber							= ""; //$NON-NLS-1$
+	String												unilogVersion							= ""; //$NON-NLS-1$
 	int														memoryUsed								= 0;
-	String												memoryUsedPercent					= "0";
+	String												memoryUsedPercent					= "0"; //$NON-NLS-1$
 	int														timeIntervalPosition			= -1;
 	boolean												isMotorPole								= false;
 	boolean												isPropBlade								= false;
@@ -159,10 +165,10 @@ public class UniLogDialog extends DeviceDialog {
 	double												gearRatio									= 1.0;
 
 	int														sliderPosition						= 50;
-	String[]											configurationNames				= new String[] { " Konfig 1" };
-	String												numberRedDataSetsText			= "0";
-	String												numberActualDataSetsText	= "0";
-	String												numberReadErrorText				= "0";
+	String[]											configurationNames				= new String[] { " Konfig 1" }; //$NON-NLS-1$
+	String												numberRedDataSetsText			= "0"; //$NON-NLS-1$
+	String												numberActualDataSetsText	= "0"; //$NON-NLS-1$
+	String												numberReadErrorText				= "0"; //$NON-NLS-1$
 	int														channelSelectionIndex			= 0;
 
 	/**
@@ -172,7 +178,7 @@ public class UniLogDialog extends DeviceDialog {
 		try {
 			Display display = Display.getDefault();
 			Shell shell = new Shell(display);
-			UniLog device = new UniLog("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Geraete\\Htronic Akkumaster C4.ini");
+			UniLog device = new UniLog("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Geraete\\Htronic Akkumaster C4.ini"); //$NON-NLS-1$
 			UniLogDialog inst = new UniLogDialog(shell, device);
 			inst.open();
 		}
@@ -192,6 +198,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.settings = Settings.getInstance();
+		RX_AUTO_START_MS[RX_AUTO_START_MS.length-1] = Messages.getString(MessageIds.OSDE_MSGT1400);
 	}
 
 	/**
@@ -199,15 +206,15 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void open() {
 		try {
-			UniLogDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed()));
+			UniLogDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
-				this.dialogShell.setText("UniLog ToolBox");
-				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+				this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if(this.isAlphaEnabled) {
 					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
@@ -219,12 +226,12 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.setSize(642, 446);
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
-						UniLogDialog.log.fine("dialogShell.widgetDisposed, event=" + evt);
+						UniLogDialog.log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UniLogDialog.this.configTab1.getConfigButtonStatus() && UniLogDialog.this.configTab2.getConfigButtonStatus() && UniLogDialog.this.configTab3.getConfigButtonStatus()
 								&& UniLogDialog.this.configTab4.getConfigButtonStatus()) {
-							String msg = "Eine Konfiguration wurde verändert, soll die geänderte Konfiguration abgespeichert werden ?";
+							String msg = Messages.getString(MessageIds.OSDE_MSGI1400);
 							if (UniLogDialog.this.application.openYesNoMessageDialog(msg) == SWT.YES) {
-								UniLogDialog.log.fine("SWT.YES");
+								UniLogDialog.log.fine("SWT.YES"); //$NON-NLS-1$
 								UniLogDialog.this.device.storeDeviceProperties();
 								UniLogDialog.this.setClosePossible(true);
 							}
@@ -238,48 +245,48 @@ public class UniLogDialog extends DeviceDialog {
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						UniLogDialog.log.fine("dialogShell.helpRequested, event=" + evt);
-						//application.openHelpDialog("UniLog", "HelpInfo.html");
+						UniLogDialog.log.fine("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						//application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$
 						int selection = UniLogDialog.this.deviceConfigTabFolder.getSelectionIndex();
 						if (selection == 0)
-							UniLogDialog.this.application.openHelpDialog("UniLog", "HelpInfo.html#adjustment");
+							UniLogDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html#adjustment"); //$NON-NLS-1$
 						else if (selection == UniLogDialog.this.deviceConfigTabFolder.getItemCount() - 1)
-							UniLogDialog.this.application.openHelpDialog("UniLog", "HelpInfo.html#data_io");
+							UniLogDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html#data_io"); //$NON-NLS-1$
 						else
-							UniLogDialog.this.application.openHelpDialog("UniLog", "HelpInfo.html#config_tab");
+							UniLogDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html#config_tab"); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.finer("dialogShell.mouseEnter, event=" + evt);
+						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.finest("dialogShell.mouseHover, event=" + evt);
+						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.finer("dialogShell.mouseExit, event=" + evt);
+						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
 					}
 				});
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.helpButton.setText("Hilfe");
+					this.helpButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0280));
 					this.helpButton.setBounds(31, 374, 259, 30);
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("helpButton.widgetSelected, event=" + evt);
-							UniLogDialog.this.application.openHelpDialog("UniLog", "HelpInfo.html");
+							if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLogDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$
 						}
 					});
 				}
 				{
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.closeButton.setText("Schliessen");
+					this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 					this.closeButton.setBounds(342, 374, 260, 30);
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("closeButton.widgetSelected, event=" + evt);
+							if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							dispose();
 						}
 					});
@@ -290,7 +297,7 @@ public class UniLogDialog extends DeviceDialog {
 
 					{// begin device configuration tab
 						this.baseConfigTabItem = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-						this.baseConfigTabItem.setText("Einstellung");
+						this.baseConfigTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1401));
 						{
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
@@ -298,7 +305,7 @@ public class UniLogDialog extends DeviceDialog {
 							//this.configMainComosite.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 							this.configMainComosite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									UniLogDialog.log.finer("configMainComosite.paintControl " + evt);
+									UniLogDialog.log.finer("configMainComosite.paintControl " + evt); //$NON-NLS-1$
 									if (UniLogDialog.this.timeIntervalPosition == -1) {
 										int selection = new Double(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue();
 										switch (selection) {
@@ -335,12 +342,12 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.statusGroup.setLayout(null);
-								this.statusGroup.setText("Status");
+								this.statusGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1402));
 								this.statusGroup.setBounds(12, 17, 602, 45);
 								this.statusGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
-									this.firmwareText.setText("Firmware :  ");
+									this.firmwareText.setText(Messages.getString(MessageIds.OSDE_MSGT1403));
 									this.firmwareText.setBounds(146, 15, 79, 22);
 								}
 								{
@@ -350,7 +357,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.serialNumberText = new CLabel(this.statusGroup, SWT.NONE);
-									this.serialNumberText.setText("S/N :");
+									this.serialNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1404));
 									this.serialNumberText.setBounds(12, 15, 42, 22);
 								}
 								{
@@ -360,7 +367,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.memoryUsageText = new CLabel(this.statusGroup, SWT.NONE);
-									this.memoryUsageText.setText("Speicherbelegung");
+									this.memoryUsageText.setText(Messages.getString(MessageIds.OSDE_MSGT1405));
 									this.memoryUsageText.setBounds(338, 15, 134, 22);
 								}
 								{
@@ -372,14 +379,14 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.memUsageUnit = new CLabel(this.statusGroup, SWT.NONE);
-									this.memUsageUnit.setText("[%]");
+									this.memUsageUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1406));
 									this.memUsageUnit.setBounds(543, 15, 26, 22);
 								}
 							}
 							{
 								this.outletA1Group = new Group(this.configMainComosite, SWT.NONE);
 								this.outletA1Group.setLayout(null);
-								this.outletA1Group.setText("A1 Modus");
+								this.outletA1Group.setText(Messages.getString(MessageIds.OSDE_MSGT1407));
 								this.outletA1Group.setBounds(337, 189, 277, 59);
 								this.outletA1Group.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
@@ -391,7 +398,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.a1ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("outletModusCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("outletModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -400,7 +407,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.currentSensotGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.currentSensotGroup.setLayout(null);
-								this.currentSensotGroup.setText("Stromsensor");
+								this.currentSensotGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1408));
 								this.currentSensotGroup.setBounds(337, 122, 277, 59);
 								this.currentSensotGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
@@ -412,7 +419,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.sensorCurrentCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.sensorCurrentCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("sensorCurrentCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("sensorCurrentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -421,38 +428,38 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.autoStartGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.autoStartGroup.setLayout(null);
-								this.autoStartGroup.setText("Logging Autostart");
+								this.autoStartGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1409));
 								this.autoStartGroup.setBounds(12, 226, 300, 99);
 								this.autoStartGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.currentTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
-									this.currentTriggerButton.setText("bei Stromschwelle");
+									this.currentTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1410));
 									this.currentTriggerButton.setBounds(34, 22, 150, 18);
 									this.currentTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("currentTriggerButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("currentTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
 								}
 								{
 									this.timeTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
-									this.timeTriggerButton.setText("Zeitschwelle");
+									this.timeTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1411));
 									this.timeTriggerButton.setBounds(34, 46, 150, 18);
 									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeTriggerButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
 								}
 								{
 									this.impulseTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
-									this.impulseTriggerButton.setText("RC-Signallänge");
+									this.impulseTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1412));
 									this.impulseTriggerButton.setBounds(34, 70, 150, 18);
 									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("impulseTriggerButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("impulseTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -460,13 +467,13 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.currentTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.currentTriggerCombo.setBounds(200, 22, 80, 20);
-									this.currentTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50" });
+									this.currentTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
 									this.currentTriggerCombo.select(2);
 									this.currentTriggerCombo.setEditable(false);
 									this.currentTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.currentTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("currentTriggerCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("currentTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -474,14 +481,14 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.timeTriggerCombo.setBounds(200, 46, 80, 20);
-									this.timeTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19",
-											" 20", " 30", " 60", " 120" });
+									this.timeTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$
+											" 20", " 30", " 60", " 120" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.timeTriggerCombo.select(16);
 									this.timeTriggerCombo.setEditable(true);
 									this.timeTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeTriggerCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -495,7 +502,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.impulseTriggerCombo.select(4);
 									this.impulseTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("rcTriggerCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("rcTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -504,16 +511,16 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.motorPropGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.motorPropGroup.setLayout(null);
-								this.motorPropGroup.setText("Drehzahlsensor");
+								this.motorPropGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1413));
 								this.motorPropGroup.setBounds(12, 117, 300, 96);
 								this.motorPropGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.numberPolsButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
-									this.numberPolsButton.setText("Motorpole");
+									this.numberPolsButton.setText(Messages.getString(MessageIds.OSDE_MSGT1414));
 									this.numberPolsButton.setBounds(31, 20, 150, 20);
 									this.numberPolsButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numberPolsButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numberPolsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.numberPolsButton.getSelection()) {
 												UniLogDialog.this.numbeProbCombo.setEnabled(false);
@@ -530,13 +537,13 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.motorPoleCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.motorPoleCombo.setBounds(198, 20, 63, 20);
-									this.motorPoleCombo.setItems(new String[] { "  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16" });
+									this.motorPoleCombo.setItems(new String[] { "  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 									this.motorPoleCombo.select(6);
 									this.motorPoleCombo.setEditable(false);
 									this.motorPoleCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.motorPoleCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("motorPoleCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("motorPoleCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -544,12 +551,12 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.gearLabel = new CLabel(this.motorPropGroup, SWT.LEFT);
 									this.gearLabel.setBounds(31, 42, 150, 20);
-									this.gearLabel.setText("Getriebeuntersetzung");
+									this.gearLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1415));
 								}
 								{
 									this.gearFactorCombo = new Text(this.motorPropGroup, SWT.LEFT | SWT.BORDER);
 									this.gearFactorCombo.setBounds(198, 44, 63, 20);
-									this.gearFactorCombo.setText(" 1.0  :  1");
+									this.gearFactorCombo.setText(" 1.0  :  1"); //$NON-NLS-1$
 									this.gearFactorCombo.setEditable(false);
 									this.gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 								}
@@ -561,15 +568,15 @@ public class UniLogDialog extends DeviceDialog {
 									this.gearRatioSlider.setSelection(this.sliderPosition);
 									this.gearRatioSlider.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("gearRatioSlider.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("gearRatioSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.gearRatioSlider.getSelection() > UniLogDialog.this.sliderPosition) {
 												//" 1.0  :  1"
-												UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", getGearRatio() - 0.1));
+												UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", getGearRatio() - 0.1)); //$NON-NLS-1$
 												++UniLogDialog.this.sliderPosition;
 											}
 											else {
-												UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", getGearRatio() + 0.1));
+												UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", getGearRatio() + 0.1)); //$NON-NLS-1$
 												--UniLogDialog.this.sliderPosition;
 											}
 										}
@@ -577,11 +584,11 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.numberPropButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
-									this.numberPropButton.setText("Propellerblätter");
+									this.numberPropButton.setText(Messages.getString(MessageIds.OSDE_MSGT1416));
 									this.numberPropButton.setBounds(31, 68, 150, 18);
 									this.numberPropButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numberPropButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numberPropButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.numberPropButton.getSelection()) {
 												UniLogDialog.this.numbeProbCombo.setEnabled(true);
@@ -598,13 +605,13 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.numbeProbCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.numbeProbCombo.setBounds(198, 68, 63, 18);
-									this.numbeProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" });
+									this.numbeProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.numbeProbCombo.select(1);
 									this.numbeProbCombo.setEditable(false);
 									this.numbeProbCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.numbeProbCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numbeProbCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("numbeProbCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 										}
 									});
@@ -613,7 +620,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.dataRateGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.dataRateGroup.setLayout(null);
-								this.dataRateGroup.setText("Speicherrate");
+								this.dataRateGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1417));
 								this.dataRateGroup.setBounds(337, 71, 277, 46);
 								this.dataRateGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
@@ -625,7 +632,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.timeIntervalCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeRateCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("timeRateCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											UniLogDialog.this.timeIntervalPosition = UniLogDialog.this.timeIntervalCombo.getSelectionIndex();
 										}
@@ -634,16 +641,16 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							{
 								this.readAdjustmentButton = new Button(this.configMainComosite, SWT.PUSH | SWT.FLAT | SWT.CENTER);
-								this.readAdjustmentButton.setText("UniLog Einstellungen auslesen");
+								this.readAdjustmentButton.setText(Messages.getString(MessageIds.OSDE_MSGT1418));
 								this.readAdjustmentButton.setBounds(12, 74, 300, 30);
 								this.readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
-										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("readAdjustmentButton.widgetSelected, event=" + evt);
+										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("readAdjustmentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										try {
 											updateConfigurationValues(UniLogDialog.this.serialPort.readConfiguration());
 										}
 										catch (Exception e) {
-											UniLogDialog.this.application.openMessageDialog(e.getClass().getSimpleName() + " - " + e.getMessage());
+											UniLogDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 										}
 
 									}
@@ -651,12 +658,12 @@ public class UniLogDialog extends DeviceDialog {
 							}
 							{
 								this.storeAdjustmentsButton = new Button(this.configMainComosite, SWT.PUSH | SWT.CENTER);
-								this.storeAdjustmentsButton.setText("Einstellungen im UniLog speichern");
+								this.storeAdjustmentsButton.setText(Messages.getString(MessageIds.OSDE_MSGT1419));
 								this.storeAdjustmentsButton.setBounds(335, 275, 281, 30);
 								this.storeAdjustmentsButton.setEnabled(false);
 								this.storeAdjustmentsButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
-										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("storeAdjustmentsButton.widgetSelected, event=" + evt);
+										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("storeAdjustmentsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										try {
 											if (UniLogDialog.this.serialPort.setConfiguration(buildUpdateBuffer())) {
 												updateTimeStep_ms(UniLogDialog.this.timeIntervalPosition);
@@ -704,7 +711,7 @@ public class UniLogDialog extends DeviceDialog {
 
 					{ // begin data tab
 						this.dataTabItem = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
-						this.dataTabItem.setText("Daten I/O");
+						this.dataTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1420));
 						{
 							this.dataMainComposite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.dataMainComposite.setLayout(null);
@@ -714,7 +721,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setLayout(null);
 								this.channleConfigGroup.setBounds(14, 12, 290, 58);
-								this.channleConfigGroup.setText("Zuerst Kanalkonfiguration der Daten wählen");
+								this.channleConfigGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1421));
 								this.channleConfigGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
@@ -724,17 +731,17 @@ public class UniLogDialog extends DeviceDialog {
 									this.useConfigCombo.setEditable(false);
 									this.useConfigCombo.setTextLimit(18);
 									this.useConfigCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-									this.useConfigCombo.setToolTipText("Hier wird die Konfiguration gewählt, die den Datensäten zugeordnet wird");
+									this.useConfigCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1422));
 									this.useConfigCombo.addKeyListener(new KeyAdapter() {
 										public void keyReleased(KeyEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("useConfigCombo.keyReleased, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("useConfigCombo.keyReleased, event=" + evt); //$NON-NLS-1$
 											if (evt.character == SWT.CR) {
 												String configName = UniLogDialog.this.useConfigCombo.getText().trim();
 												UniLogDialog.this.device.setChannelName(configName, UniLogDialog.this.channelSelectionIndex + 1);
 												UniLogDialog.this.configurationNames[UniLogDialog.this.channelSelectionIndex] = configName;
 												UniLogDialog.this.useConfigCombo.select(UniLogDialog.this.channelSelectionIndex);
 												UniLogDialog.this.dataReadGroup.redraw();
-												Channels.getInstance().get(UniLogDialog.this.channelSelectionIndex + 1).setName(" " + (UniLogDialog.this.channelSelectionIndex + 1) + " : " + configName);
+												Channels.getInstance().get(UniLogDialog.this.channelSelectionIndex + 1).setName(" " + (UniLogDialog.this.channelSelectionIndex + 1) + " : " + configName); //$NON-NLS-1$ //$NON-NLS-2$
 												UniLogDialog.this.application.getMenuToolBar().updateChannelSelector();
 												switch (UniLogDialog.this.channelSelectionIndex) {
 												case 0: //configTab1
@@ -762,7 +769,7 @@ public class UniLogDialog extends DeviceDialog {
 									});
 									this.useConfigCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("useConfigCombo.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("useConfigCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.readDataButton.setEnabled(true);
 											UniLogDialog.this.startLoggingButton.setEnabled(true);
 											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
@@ -776,11 +783,11 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.editConfigButton = new Button(this.channleConfigGroup, SWT.PUSH | SWT.CENTER);
 									this.editConfigButton.setBounds(172, 23, 106, 23);
-									this.editConfigButton.setText("Name ändern");
+									this.editConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1423));
 									this.editConfigButton.setEnabled(false);
 									this.editConfigButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("editConfigButton.widgetSelected, event=" + evt);
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("editConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.useConfigCombo.setEditable(true);
 											UniLogDialog.this.editConfigButton.setEnabled(false);
 										}
@@ -791,14 +798,14 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.dataReadGroup.setLayout(null);
 								this.dataReadGroup.setBounds(14, 78, 290, 242);
-								this.dataReadGroup.setText("Daten auslesen");
+								this.dataReadGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1424));
 								this.dataReadGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
-										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("dataReadGroup.paintControl, event=" + evt);
+										if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("dataReadGroup.paintControl, event=" + evt); //$NON-NLS-1$
 										int index = UniLogDialog.this.useConfigCombo.getSelectionIndex();
 										UniLogDialog.this.configurationNames = new String[UniLogDialog.this.device.getChannelCount()];
 										for (int i = 0; i < UniLogDialog.this.configurationNames.length; i++) {
-											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelName(i + 1);
+											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelName(i + 1); //$NON-NLS-1$
 										}
 										UniLogDialog.this.useConfigCombo.setItems(UniLogDialog.this.configurationNames);
 										UniLogDialog.this.useConfigCombo.select(index);
@@ -807,13 +814,13 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
-									this.readDataButton.setText("Start Daten auslesen");
+									this.readDataButton.setText(Messages.getString(MessageIds.OSDE_MSGT1425));
 									this.readDataButton.setBounds(11, 40, 260, 30);
 									this.readDataButton.setEnabled(true);
 									this.readDataButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("readDataButton.widgetSelected, event=" + evt);
-											String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText();
+											if (UniLogDialog.log.isLoggable(Level.FINEST)) UniLogDialog.log.finest("readDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
 											UniLogDialog.this.gatherThread = new DataGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName);
 											UniLogDialog.this.gatherThread.start();
 											UniLogDialog.this.setClosePossible(false);
@@ -830,34 +837,34 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.NONE);
+									this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.dataSetLabel.setBounds(22, 78, 180, 20);
-									this.dataSetLabel.setText("gelesene Telegramme         :");
+									this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1426));
 								}
 								{
 									this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.redDataSetLabel.setBounds(205, 78, 55, 20);
-									this.redDataSetLabel.setText("0");
+									this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
-									this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.NONE);
+									this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumberLabel.setBounds(22, 101, 180, 20);
-									this.actualDataSetNumberLabel.setText("aktuelle Datensatznummer   :");
+									this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1427));
 								}
 								{
 									this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumber.setBounds(205, 101, 55, 20);
-									this.actualDataSetNumber.setText("0");
+									this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 								}
 								{
-									this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.NONE);
+									this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataErrorLabel.setBounds(22, 123, 180, 20);
-									this.readDataErrorLabel.setText("Datenübertragungsfehler      :");
+									this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1428));
 								}
 								{
 									this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.numberReadErrorLabel.setBounds(205, 123, 55, 20);
-									this.numberReadErrorLabel.setText("0");
+									this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.readDataProgressBar = new ProgressBar(this.dataReadGroup, SWT.NONE);
@@ -868,11 +875,11 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.stopDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.stopDataButton.setBounds(15, 194, 260, 30);
-									this.stopDataButton.setText("S T O P");
+									this.stopDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
 									this.stopDataButton.setEnabled(false);
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											UniLogDialog.log.fine("stopDataButton.widgetSelected, event=" + evt);
+											UniLogDialog.log.fine("stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) {
 												UniLogDialog.this.gatherThread.setThreadStop(); // end serial communication
 											}
@@ -885,19 +892,19 @@ public class UniLogDialog extends DeviceDialog {
 								this.liveDataCaptureGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.liveDataCaptureGroup.setLayout(null);
 								this.liveDataCaptureGroup.setBounds(324, 12, 284, 198);
-								this.liveDataCaptureGroup.setText("Datenaufzeichnung");
+								this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1429));
 								this.liveDataCaptureGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
-									this.startLiveGatherButton.setText("Start live Datenabfrage");
+									this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1430));
 									this.startLiveGatherButton.setBounds(16, 26, 246, 30);
 									this.startLiveGatherButton.setSize(260, 30);
 									this.startLiveGatherButton.setEnabled(true);
 									this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											UniLogDialog.log.fine("liveViewButton.widgetSelected, event=" + evt);
+											UniLogDialog.log.fine("liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
-												String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText();
+												String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
 												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
 												UniLogDialog.this.readDataButton.setEnabled(false);
 												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
@@ -913,7 +920,7 @@ public class UniLogDialog extends DeviceDialog {
 													UniLogDialog.this.liveThread.interrupt();
 												}
 												UniLogDialog.this.application.updateGraphicsWindow();
-												UniLogDialog.this.application.openMessageDialog("Bei der Livedatenabfrage ist eine Fehler aufgetreten !\n" + e.getClass().getSimpleName() + " - " + e.getMessage());
+												UniLogDialog.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE1401, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 												UniLogDialog.this.resetButtons();
 											}
 										}
@@ -923,15 +930,15 @@ public class UniLogDialog extends DeviceDialog {
 									this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
 									this.loggingGroup.setLayout(null);
 									this.loggingGroup.setBounds(25, 70, 228, 70);
-									this.loggingGroup.setText("UniLog Datenaufnahme");
+									this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1432));
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
-										this.startLoggingButton.setText("Start");
+										this.startLoggingButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 										this.startLoggingButton.setBounds(12, 27, 100, 30);
 										this.startLoggingButton.setEnabled(true);
 										this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
 											public void widgetSelected(SelectionEvent evt) {
-												UniLogDialog.log.fine("startLoggingButton.widgetSelected, event=" + evt);
+												UniLogDialog.log.fine("startLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
 													UniLogDialog.this.setClosePossible(false);
 													UniLogDialog.this.serialPort.startLogging();
@@ -940,20 +947,19 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getSimpleName() + " - "
-															+ e.getMessage());
+													UniLogDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 												}
 											}
 										});
 									}
 									{
 										this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
-										this.stopLoggingButton.setText("Stop");
+										this.stopLoggingButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 										this.stopLoggingButton.setBounds(116, 27, 100, 30);
 										this.stopLoggingButton.setEnabled(false);
 										this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
 											public void widgetSelected(SelectionEvent evt) {
-												UniLogDialog.log.fine("stopLoggingButton.widgetSelected, event=" + evt);
+												UniLogDialog.log.fine("stopLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
 													UniLogDialog.this.serialPort.stopLogging();
 													UniLogDialog.this.startLoggingButton.setEnabled(true);
@@ -965,8 +971,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog("Es ist ein Fehler in der seriellen Kommunikation zum Gerät aufgetreten : " + e.getClass().getSimpleName() + " - "
-															+ e.getMessage());
+													UniLogDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 												}
 											}
 										});
@@ -975,12 +980,12 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.stopLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.stopLiveGatherButton.setBounds(17, 156, 246, 30);
-									this.stopLiveGatherButton.setText("Stop live Datenabfrage");
+									this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1433));
 									this.stopLiveGatherButton.setEnabled(false);
 									this.stopLiveGatherButton.setSize(260, 30);
 									this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											UniLogDialog.log.fine("stopLiveGatherButton.widgetSelected, event=" + evt);
+											UniLogDialog.log.fine("stopLiveGatherButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											if (UniLogDialog.this.liveThread != null) {
 												UniLogDialog.this.liveThread.stopTimerThread();
 												UniLogDialog.this.liveThread.interrupt();
@@ -1008,22 +1013,22 @@ public class UniLogDialog extends DeviceDialog {
 								this.clearDataBufferGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.clearDataBufferGroup.setLayout(null);
 								this.clearDataBufferGroup.setBounds(324, 216, 284, 104);
-								this.clearDataBufferGroup.setText("Datenspeicher");
+								this.clearDataBufferGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1434));
 								this.clearDataBufferGroup.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 								{
 									this.clearMemoryButton = new Button(this.clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
-									this.clearMemoryButton.setText("löschen");
+									this.clearMemoryButton.setText(Messages.getString(MessageIds.OSDE_MSGT1435));
 									this.clearMemoryButton.setBounds(15, 60, 260, 30);
 									this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
-											UniLogDialog.log.fine("clearMemoryButton.widgetSelected, event=" + evt);
+											UniLogDialog.log.fine("clearMemoryButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												UniLogDialog.this.clearMemoryButton.setEnabled(false);
 												UniLogDialog.this.serialPort.clearMemory();
 											}
 											catch (Exception e) {
 												UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-												UniLogDialog.this.application.openMessageDialog("Bei der Löschoperation ist ein Fehler aufgetreten : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+												UniLogDialog.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE1400, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 												e.printStackTrace();
 											}
 											UniLogDialog.this.clearMemoryButton.setEnabled(true);
@@ -1033,7 +1038,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.memoryDeleteInfo = new Text(this.clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
 									this.memoryDeleteInfo.setBounds(12, 22, 256, 34);
-									this.memoryDeleteInfo.setText("Löschen wird erst bei der nächsten Datenaufnahme wirksam");
+									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.OSDE_MSGI1401));
 									this.memoryDeleteInfo.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.memoryDeleteInfo.setEditable(false);
 								}
@@ -1044,21 +1049,21 @@ public class UniLogDialog extends DeviceDialog {
 					this.deviceConfigTabFolder.setBounds(0, 0, 634, 362);
 					this.deviceConfigTabFolder.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							UniLogDialog.log.finest("configTabFolder.widgetSelected, event=" + evt);
+							UniLogDialog.log.finest("configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int channelNumber = UniLogDialog.this.deviceConfigTabFolder.getSelectionIndex();
 							if (channelNumber >= 1 && channelNumber <= 4) {
-								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText();
+								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
 								Channels channels = Channels.getInstance();
 								Channel activeChannel = channels.getActiveChannel();
 								if (activeChannel != null) {
-									UniLogDialog.log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey);
+									UniLogDialog.log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
-										int answer = UniLogDialog.this.application.openYesNoMessageDialog("Soll der aktuelle Datensatz in die selektierte Konfiguration verschoben werden ?");
+										int answer = UniLogDialog.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI1402));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
-											UniLogDialog.log.fine("move record set " + recordSetKey + " to configuration " + configKey);
-											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim()));
+											UniLogDialog.log.fine("move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
 											activeChannel.remove(recordSetKey);
 
 											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
@@ -1080,14 +1085,14 @@ public class UniLogDialog extends DeviceDialog {
 				//this.deviceConfigTabFolder.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseEnter, event=" + evt);
+						log.info("deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseHover, event=" + evt);
+						log.info("deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseExit, event=" + evt);
+						log.info("deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
 					}
 				});
@@ -1116,10 +1121,10 @@ public class UniLogDialog extends DeviceDialog {
 	public void updateConfigurationValues(byte[] readBuffer) {
 		//status field
 		this.memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-		UniLogDialog.log.finer("memoryUsed = " + this.memoryUsed);
+		UniLogDialog.log.finer("memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
 
-		this.unilogVersion = String.format("v%.2f", new Double(readBuffer[8] & 0xFF) / 100);
-		UniLogDialog.log.finer("unilogVersion = " + this.unilogVersion);
+		this.unilogVersion = String.format("v%.2f", new Double(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
+		UniLogDialog.log.finer("unilogVersion = " + this.unilogVersion); //$NON-NLS-1$
 		this.firmwareVersionLabel.setText(this.unilogVersion);
 
 		int memoryDeleted = readBuffer[9] & 0xFF;
@@ -1128,13 +1133,13 @@ public class UniLogDialog extends DeviceDialog {
 			tmpMemoryUsed = 0;
 		else
 			tmpMemoryUsed = this.memoryUsed;
-		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / UniLogDialog.WERTESAETZE_MAX);
-		UniLogDialog.log.finer("memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + UniLogDialog.WERTESAETZE_MAX + ")");
+		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / UniLogDialog.WERTESAETZE_MAX); //$NON-NLS-1$
+		UniLogDialog.log.finer("memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + UniLogDialog.WERTESAETZE_MAX + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		this.memUsagePercent.setText(this.memoryUsedPercent);
 
 		// timer interval
 		this.timeIntervalPosition = readBuffer[10] & 0xFF;
-		UniLogDialog.log.finer("timeIntervalPosition = " + this.timeIntervalPosition + " timeInterval = ");
+		UniLogDialog.log.finer("timeIntervalPosition = " + this.timeIntervalPosition + " timeInterval = "); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.timeIntervalPosition != this.timeIntervalCombo.getSelectionIndex()) {
 			this.timeIntervalCombo.select(this.timeIntervalPosition);
 			updateTimeStep_ms(this.timeIntervalPosition);
@@ -1153,8 +1158,8 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		this.countPropBlade = readBuffer[11] & 0x7F;
 		this.countMotorPole = (readBuffer[11] & 0x7F) * 2;
-		UniLogDialog.log.finer("isPropBlade = " + this.isPropBlade + " countPropBlade = " + this.countPropBlade);
-		UniLogDialog.log.finer("isMotorPole = " + this.isMotorPole + " countMotorPole = " + this.countMotorPole);
+		UniLogDialog.log.finer("isPropBlade = " + this.isPropBlade + " countPropBlade = " + this.countPropBlade); //$NON-NLS-1$ //$NON-NLS-2$
+		UniLogDialog.log.finer("isMotorPole = " + this.isMotorPole + " countMotorPole = " + this.countMotorPole); //$NON-NLS-1$ //$NON-NLS-2$
 		this.numberPolsButton.setSelection(this.isMotorPole);
 		this.numberPropButton.setSelection(this.isPropBlade);
 		//motorPoleCombo.setItems(new String[] {"2", "4", "6", "8", "10", "12", "14", "16"});
@@ -1176,7 +1181,7 @@ public class UniLogDialog extends DeviceDialog {
 			this.isAutoStartCurrent = true;
 		}
 		this.currentAutoStart = readBuffer[12] & 0x7F;
-		UniLogDialog.log.finer("isAutoStartCurrent = " + this.isAutoStartCurrent + " currentAutoStart = " + this.currentAutoStart);
+		UniLogDialog.log.finer("isAutoStartCurrent = " + this.isAutoStartCurrent + " currentAutoStart = " + this.currentAutoStart); //$NON-NLS-1$ //$NON-NLS-2$
 		this.currentTriggerButton.setSelection(this.isAutoStartCurrent);
 		this.currentTriggerCombo.select(this.currentAutoStart - 1);
 
@@ -1189,7 +1194,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.rxAutoStartValue = (readBuffer[13] & 0x7F); // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
 		this.impulseTriggerCombo.select(this.rxAutoStartValue - 11);
 		this.impulseTriggerButton.setSelection(this.isAutStartRx);
-		UniLogDialog.log.finer("isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue);
+		UniLogDialog.log.finer("isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		this.isImpulseAutoStartTime = false;
 		this.impulseAutoStartTime_sec = 0;
@@ -1197,28 +1202,28 @@ public class UniLogDialog extends DeviceDialog {
 			this.isImpulseAutoStartTime = true;
 		}
 		this.impulseAutoStartTime_sec = readBuffer[14] & 0x7F;
-		UniLogDialog.log.finer("isAutoStartTime = " + this.isImpulseAutoStartTime + " timeAutoStart_sec = " + this.impulseAutoStartTime_sec);
+		UniLogDialog.log.finer("isAutoStartTime = " + this.isImpulseAutoStartTime + " timeAutoStart_sec = " + this.impulseAutoStartTime_sec); //$NON-NLS-1$ //$NON-NLS-2$
 		this.timeTriggerButton.setSelection(this.isImpulseAutoStartTime);
 		this.timeTriggerCombo.select(this.impulseAutoStartTime_sec + 1);
-		this.timeTriggerCombo.setText(String.format("%4s", this.impulseAutoStartTime_sec));
+		this.timeTriggerCombo.setText(String.format("%4s", this.impulseAutoStartTime_sec)); //$NON-NLS-1$
 
 		this.currentSensorPosition = readBuffer[15] & 0xFF;
-		UniLogDialog.log.finer("currentSensor = " + this.currentSensorPosition);
+		UniLogDialog.log.finer("currentSensor = " + this.currentSensorPosition); //$NON-NLS-1$
 		this.sensorCurrentCombo.select(this.currentSensorPosition);
 
-		this.serialNumber = "" + (((readBuffer[16] & 0xFF) << 8) + (readBuffer[17] & 0xFF));
-		UniLogDialog.log.finer("serialNumber = " + this.serialNumber);
+		this.serialNumber = "" + (((readBuffer[16] & 0xFF) << 8) + (readBuffer[17] & 0xFF)); //$NON-NLS-1$
+		UniLogDialog.log.finer("serialNumber = " + this.serialNumber); //$NON-NLS-1$
 		this.snLabel.setText(this.serialNumber);
 
 		this.modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
-		UniLogDialog.log.finer("modusA1 = " + this.modusA1Position);
+		UniLogDialog.log.finer("modusA1 = " + this.modusA1Position); //$NON-NLS-1$
 		this.a1ModusCombo.select(this.modusA1Position);
 
 		// skip 19, 20 not used
 
 		this.gearRatio = (readBuffer[21] & 0xFF) / 10.0;
-		UniLogDialog.log.finer(String.format("gearRatio = %.1f", this.gearRatio));
-		this.gearFactorCombo.setText(String.format(" %.1f  :  1", this.gearRatio));
+		UniLogDialog.log.finer(String.format("gearRatio = %.1f", this.gearRatio)); //$NON-NLS-1$
+		this.gearFactorCombo.setText(String.format(" %.1f  :  1", this.gearRatio)); //$NON-NLS-1$
 
 		if (this.configTab1 != null) this.configTab1.setA1ModusAvailable(true);
 		if (this.configTab2 != null) this.configTab2.setA1ModusAvailable(true);
@@ -1276,7 +1281,7 @@ public class UniLogDialog extends DeviceDialog {
 		updateBuffer[10] = 0x00; // ignore 
 		updateBuffer[11] = 0x00; // ignore
 
-		double tempGearRatio = new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue() * 10;
+		double tempGearRatio = new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue() * 10; //$NON-NLS-1$
 		updateBuffer[12] = (byte) tempGearRatio;
 		checkSum = checkSum + (0xFF & updateBuffer[12]);
 
@@ -1286,14 +1291,14 @@ public class UniLogDialog extends DeviceDialog {
 
 		if (UniLogDialog.log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("updateBuffer = [");
+			sb.append("updateBuffer = ["); //$NON-NLS-1$
 			for (int i = 0; i < updateBuffer.length; i++) {
 				if (i == updateBuffer.length - 1)
-					sb.append(String.format("%02X", updateBuffer[i]));
+					sb.append(String.format("%02X", updateBuffer[i])); //$NON-NLS-1$
 				else
-					sb.append(String.format("%02X ", updateBuffer[i]));
+					sb.append(String.format("%02X ", updateBuffer[i])); //$NON-NLS-1$
 			}
-			sb.append("]");
+			sb.append("]"); //$NON-NLS-1$
 			UniLogDialog.log.fine(sb.toString());
 		}
 
@@ -1334,7 +1339,7 @@ public class UniLogDialog extends DeviceDialog {
 	 * @return
 	 */
 	double getGearRatio() {
-		return new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue();
+		return new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue(); //$NON-NLS-1$
 	}
 
 	/**
@@ -1343,9 +1348,9 @@ public class UniLogDialog extends DeviceDialog {
 	 * @param numReadErrors
 	 */
 	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int progress) {
-		this.numberRedDataSetsText = "" + redTelegrams;
-		this.numberActualDataSetsText = "" + numberRecordSet;
-		this.numberReadErrorText = "" + numReadErrors;
+		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
+		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
+		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				int tmpValue = progress < 0 ? 0 : progress;
@@ -1363,9 +1368,9 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void resetDataSetsLabel() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.numberRedDataSetsText = "0";
-			this.numberActualDataSetsText = "0";
-			this.numberReadErrorText = "0";
+			this.numberRedDataSetsText = "0"; //$NON-NLS-1$
+			this.numberActualDataSetsText = "0"; //$NON-NLS-1$
+			this.numberReadErrorText = "0"; //$NON-NLS-1$
 			this.redDataSetLabel.setText(this.numberRedDataSetsText);
 			this.actualDataSetNumber.setText(this.numberActualDataSetsText);
 			this.numberReadErrorLabel.setText(this.numberReadErrorText);
@@ -1374,9 +1379,9 @@ public class UniLogDialog extends DeviceDialog {
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					UniLogDialog.this.numberRedDataSetsText = "0";
-					UniLogDialog.this.numberActualDataSetsText = "0";
-					UniLogDialog.this.numberReadErrorText = "0";
+					UniLogDialog.this.numberRedDataSetsText = "0"; //$NON-NLS-1$
+					UniLogDialog.this.numberActualDataSetsText = "0"; //$NON-NLS-1$
+					UniLogDialog.this.numberReadErrorText = "0"; //$NON-NLS-1$
 					UniLogDialog.this.redDataSetLabel.setText(UniLogDialog.this.numberRedDataSetsText);
 					UniLogDialog.this.actualDataSetNumber.setText(UniLogDialog.this.numberActualDataSetsText);
 					UniLogDialog.this.numberReadErrorLabel.setText(UniLogDialog.this.numberReadErrorText);

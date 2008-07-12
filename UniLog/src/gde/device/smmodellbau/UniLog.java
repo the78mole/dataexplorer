@@ -35,32 +35,32 @@ import osde.utils.StringHelper;
 public class UniLog extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(UniLog.class.getName());
 
-	public static final String	LOV_N_100_W = "n100W=";
-	public static final String	LOV_CURRENT_OFFSET = "Stromoffset=";
-	public static final String	LOV_NUMBER_MOTOR = "AnzahlMotoren=";
-	public static final String	LOV_NUMBER_CELLS = "AnzahlZellen=";
-	public static final String	LOV_RPM2_FACTOR = "DrehzahlFaktor=";
-	public static final String	LOV_CURRENT_INVERT = "StromInvertieren=";
-	public static final String	LOV_RPM_CHECKED = "RpmChecked=";
-	public static final String	LOV_A1_CHECKED = "A1Checked=";
-	public static final String	LOV_A2_CHECKED = "A2Checked=";
-	public static final String	LOV_A3_CHECKED = "A3Checked=";
-	public static final String	LOV_RPM_NAME = "RpmName=";
-	public static final String	LOV_A1_NAME = "A1Name=";
-	public static final String	LOV_A2_NAME = "A2Name=";
-	public static final String	LOV_A3_NAME = "A3Name=";
-	public static final String	LOV_RPM_OFFSET = "RpmOffset=";
-	public static final String	LOV_A1_OFFSET = "A1Offset=";
-	public static final String	LOV_A2_OFFSET = "A2Offset=";
-	public static final String	LOV_A3_OFFSET = "A3Offset=";
-	public static final String	LOV_RPM_FACTOR = "RpmFaktor=";
-	public static final String	LOV_A1_FACTOR = "A1Faktor=";
-	public static final String	LOV_A2_FACTOR = "A2Faktor=";
-	public static final String	LOV_A3_FACTOR = "A3Faktor=";
-	public static final String	LOV_RPM_UNIT = "RpmEinheit=";
-	public static final String	LOV_A1_UNIT = "A1Einheit=";
-	public static final String	LOV_A2_UNIT = " A2Einheit=";
-	public static final String	LOV_A3_UNIT = " A3Einheit=";
+	public static final String	LOV_N_100_W = "n100W="; //$NON-NLS-1$
+	public static final String	LOV_CURRENT_OFFSET = "Stromoffset="; //$NON-NLS-1$
+	public static final String	LOV_NUMBER_MOTOR = "AnzahlMotoren="; //$NON-NLS-1$
+	public static final String	LOV_NUMBER_CELLS = "AnzahlZellen="; //$NON-NLS-1$
+	public static final String	LOV_RPM2_FACTOR = "DrehzahlFaktor="; //$NON-NLS-1$
+	public static final String	LOV_CURRENT_INVERT = "StromInvertieren="; //$NON-NLS-1$
+	public static final String	LOV_RPM_CHECKED = "RpmChecked="; //$NON-NLS-1$
+	public static final String	LOV_A1_CHECKED = "A1Checked="; //$NON-NLS-1$
+	public static final String	LOV_A2_CHECKED = "A2Checked="; //$NON-NLS-1$
+	public static final String	LOV_A3_CHECKED = "A3Checked="; //$NON-NLS-1$
+	public static final String	LOV_RPM_NAME = "RpmName="; //$NON-NLS-1$
+	public static final String	LOV_A1_NAME = "A1Name="; //$NON-NLS-1$
+	public static final String	LOV_A2_NAME = "A2Name="; //$NON-NLS-1$
+	public static final String	LOV_A3_NAME = "A3Name="; //$NON-NLS-1$
+	public static final String	LOV_RPM_OFFSET = "RpmOffset="; //$NON-NLS-1$
+	public static final String	LOV_A1_OFFSET = "A1Offset="; //$NON-NLS-1$
+	public static final String	LOV_A2_OFFSET = "A2Offset="; //$NON-NLS-1$
+	public static final String	LOV_A3_OFFSET = "A3Offset="; //$NON-NLS-1$
+	public static final String	LOV_RPM_FACTOR = "RpmFaktor="; //$NON-NLS-1$
+	public static final String	LOV_A1_FACTOR = "A1Faktor="; //$NON-NLS-1$
+	public static final String	LOV_A2_FACTOR = "A2Faktor="; //$NON-NLS-1$
+	public static final String	LOV_A3_FACTOR = "A3Faktor="; //$NON-NLS-1$
+	public static final String	LOV_RPM_UNIT = "RpmEinheit="; //$NON-NLS-1$
+	public static final String	LOV_A1_UNIT = "A1Einheit="; //$NON-NLS-1$
+	public static final String	LOV_A2_UNIT = " A2Einheit="; //$NON-NLS-1$
+	public static final String	LOV_A3_UNIT = " A3Einheit="; //$NON-NLS-1$
 
 //	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG	= new String[] { LOV_N_100_W, LOV_NUMBER_CELLS, LOV_RPM_CHECKED, 
 //		LOV_A1_CHECKED, LOV_A2_CHECKED, LOV_A3_CHECKED, LOV_RPM_NAME, LOV_A1_NAME, LOV_A2_NAME, LOV_A3_NAME, LOV_RPM_OFFSET, 
@@ -84,25 +84,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public static final String[]	LOV_CONFIG_DATA_KEYS_UNILOG_13	= new String[] { 	//13=a3Value
 		LOV_A3_CHECKED, LOV_A3_NAME, LOV_A3_UNIT, LOV_A3_OFFSET, LOV_A3_FACTOR };									
 
-	public final static String		A1_FACTOR									= "a1_"+IDevice.FACTOR;
-	public final static String		A1_OFFSET									= "a1_"+IDevice.OFFSET;
-	public final static String		A2_FACTOR									= "a2_"+IDevice.FACTOR;
-	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET;
-	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR;
-	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET;
+	public final static String		A1_FACTOR									= "a1_"+IDevice.FACTOR; //$NON-NLS-1$
+	public final static String		A1_OFFSET									= "a1_"+IDevice.OFFSET; //$NON-NLS-1$
+	public final static String		A2_FACTOR									= "a2_"+IDevice.FACTOR; //$NON-NLS-1$
+	public final static String		A2_OFFSET									= "a2_"+IDevice.OFFSET; //$NON-NLS-1$
+	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR; //$NON-NLS-1$
+	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET; //$NON-NLS-1$
 	
-	public final static String		NUMBER_CELLS							= "number_cells";
-	public final static String		PROP_N_100_WATT						= "prop_n100W";
+	public final static String		NUMBER_CELLS							= "number_cells"; //$NON-NLS-1$
+	public final static String		PROP_N_100_WATT						= "prop_n100W"; //$NON-NLS-1$
 	
-	public final static String		IS_INVERT_CURRENT					= "is_invert_current";
+	public final static String		IS_INVERT_CURRENT					= "is_invert_current"; //$NON-NLS-1$
 	public final static String		CURRENT_OFFSET						= IDevice.OFFSET;
 	
-	public final static String		NUMBER_MOTOR							= "number_motor";
-	public final static String		RPM2_FACTOR								= "revolution_factor";
+	public final static String		NUMBER_MOTOR							= "number_motor"; //$NON-NLS-1$
+	public final static String		RPM2_FACTOR								= "revolution_factor"; //$NON-NLS-1$
 	public final static String		RPM_FACTOR								= IDevice.FACTOR;
 	
-	public final static String		FIRMEWARE_VERSION					= "Firmware";
-	public final static String		SERIAL_NUMBER							= "S/N";
+	public final static String		FIRMEWARE_VERSION					= "Firmware"; //$NON-NLS-1$
+	public final static String		SERIAL_NUMBER							= "S/N"; //$NON-NLS-1$
 
 	final OpenSerialDataExplorer	application;
 	final UniLogSerialPort				serialPort;
@@ -147,35 +147,35 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 				
-		lov2osdMap.put(LOV_CURRENT_OFFSET, CURRENT_OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_CURRENT_INVERT, IS_INVERT_CURRENT	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(LOV_CURRENT_OFFSET, CURRENT_OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_CURRENT_INVERT, IS_INVERT_CURRENT	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		lov2osdMap.put(LOV_NUMBER_CELLS, NUMBER_CELLS + "=_" + "INTEGER");
+		lov2osdMap.put(LOV_NUMBER_CELLS, NUMBER_CELLS + "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		lov2osdMap.put(LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		//lov2osdMap.put(LOV_RPM_NAME, 		Record.NAME);
 		//lov2osdMap.put(LOV_RPM_UNIT, 		Record.UNIT);
-		lov2osdMap.put(LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_NUMBER_MOTOR, NUMBER_MOTOR); 
-		lov2osdMap.put(LOV_RPM2_FACTOR, 	RPM2_FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_N_100_W, 			PROP_N_100_WATT 	 + "=_" + "INTEGER");
+		lov2osdMap.put(LOV_RPM2_FACTOR, 	RPM2_FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_N_100_W, 			PROP_N_100_WATT 	 + "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-		lov2osdMap.put(LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
-		lov2osdMap.put(LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
-		lov2osdMap.put(LOV_A3_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN");
+		lov2osdMap.put(LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A3_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_A1_NAME, 			Record.NAME);
 		lov2osdMap.put(LOV_A2_NAME, 			Record.NAME);
 		lov2osdMap.put(LOV_A3_NAME, 			Record.NAME);
 		lov2osdMap.put(LOV_A1_UNIT, 			Record.UNIT);
 		lov2osdMap.put(LOV_A2_UNIT, 			Record.UNIT);
 		lov2osdMap.put(LOV_A3_UNIT, 			Record.UNIT);
-		lov2osdMap.put(LOV_A1_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_A2_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_A3_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_A1_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_A2_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
-		lov2osdMap.put(LOV_A3_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE");
+		lov2osdMap.put(LOV_A1_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A2_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A3_OFFSET, 		IDevice.OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A1_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A2_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_A3_FACTOR, 		IDevice.FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return lov2osdMap;
 	}
@@ -195,7 +195,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_2);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_2) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -203,7 +203,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_6);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_6) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -211,7 +211,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_7);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_7) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -219,7 +219,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_8);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_8) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -227,7 +227,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_11);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_11) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -235,7 +235,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_12);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_12) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -243,7 +243,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_13);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_13) {
 					if (configData.containsKey(lovKey)) {
-						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER);
+						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
@@ -284,7 +284,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
 				if (timeStep_ms != 0) {
 					recordSet.setTimeStep_ms(timeStep_ms);
-					if (log.isLoggable(Level.FINE)) log.fine("timeStep_ms = " + timeStep_ms);
+					if (log.isLoggable(Level.FINE)) log.fine("timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				}
 			}
 
@@ -300,25 +300,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] converDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
-		String lineSep = System.getProperty("line.separator");
+		String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
 		int tmpValue = 0;
 		
 		// voltageReceiver *** power/drive *** group
 		tmpValue = (((dataBuffer[7] & 0xFF) << 8) + (dataBuffer[6] & 0xFF)) & 0x0FFF;
 		points[0] = (tmpValue * 10); //0=voltageReceiver
-		if (log.isLoggable(Level.FINE)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("voltageReceiver [V] = " + points[0]).append(lineSep); //$NON-NLS-1$
 
 		// voltage *** power/drive *** group
 		tmpValue = (((dataBuffer[9] & 0xFF) << 8) + (dataBuffer[8] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[1] = (tmpValue * 10); //1=voltage
-		if (log.isLoggable(Level.FINE)) sb.append("voltage [V] = " + points[1]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("voltage [V] = " + points[1]).append(lineSep); //$NON-NLS-1$
 
 		// current *** power/drive *** group - asymmetric for 400 A sensor 
 		tmpValue = (((dataBuffer[11] & 0xFF) << 8) + (dataBuffer[10] & 0xFF));
 		tmpValue = tmpValue <= 55536 ? tmpValue : (tmpValue - 65536);
 		points[2] = tmpValue * 10; //2=current [A]
-		if (log.isLoggable(Level.FINE)) sb.append("current [A] = " + points[2]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("current [A] = " + points[2]).append(lineSep); //$NON-NLS-1$
 
 		//capacity = cycleCount > 0 ? capacity + ((points[2] * timeStep_ms * 1.0) / 3600) : 0.0;
 		//points[3] = capacity.intValue(); //3=capacity [Ah]
@@ -337,7 +337,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[13] & 0xFF) << 8) + (dataBuffer[12] & 0xFF));
 		if (tmpValue > 50000) tmpValue = (tmpValue - 50000) * 10 + 50000;
 		points[7] = (tmpValue * 1000); //7=revolutionSpeed
-		if (log.isLoggable(Level.FINE)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("revolution speed [1/min] = " + points[7]).append(lineSep); //$NON-NLS-1$
 
 		//double motorPower = (points[7]*100.0)/prop100WValue;
 		//double eta = points[4] > motorPower ? (motorPower*100.0)/points[4] : 0;
@@ -348,7 +348,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[15] & 0xFF) << 8) + (dataBuffer[14] & 0xFF)) + 20000;
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[9] = (tmpValue * 100); //9=height
-		if (log.isLoggable(Level.FINE)) sb.append("height [m] = " + points[9]).append(lineSep);
+		if (log.isLoggable(Level.FINE)) sb.append("height [m] = " + points[9]).append(lineSep); //$NON-NLS-1$
 
 		points[10] = 0; //10=slope
 
@@ -358,8 +358,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep);
-			sb.append("a1Value = " + points[11]).append(lineSep);
+			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a1Value = " + points[11]).append(lineSep); //$NON-NLS-1$
 		}
 
 		// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
@@ -374,11 +374,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			points[12] = new Integer(tmpValue * 1000).intValue(); //12=a2Value
 		}
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep);
+			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
 			if (a2Modus == 0)
-				sb.append("a2Value = " + points[12]).append(lineSep);
+				sb.append("a2Value = " + points[12]).append(lineSep); //$NON-NLS-1$
 			else
-				sb.append("impulseTime [us]= " + points[12]).append(lineSep);
+				sb.append("impulseTime [us]= " + points[12]).append(lineSep); //$NON-NLS-1$
 		}
 
 		// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
@@ -387,11 +387,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep);
+			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
 			if (a3Modus == 0)
-				sb.append("a3Value = " + points[13]).append(lineSep);
+				sb.append("a3Value = " + points[13]).append(lineSep); //$NON-NLS-1$
 			else
-				sb.append("tempIntern = " + points[13]).append(lineSep);
+				sb.append("tempIntern = " + points[13]).append(lineSep); //$NON-NLS-1$
 		}
 		
 		if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
@@ -483,14 +483,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			// since actual record names can differ from device configuration measurement names, match by sequence
 			record = recordSet.get(recordNames[i]);		
 			measurement = this.getMeasurement(channelConfigKey, measurementNames[i]);
-			log.fine(recordNames[i] + " = " + measurementNames[i]);
+			log.fine(recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.fine("switch " + record.getName() + " to " + measurement.isActive());
+				log.fine("switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
 		}
 		
@@ -542,7 +542,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[3]; // 3=capacity [Ah]
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			Record recordCurrent = recordSet.get(measurements[2]); // 2=current
@@ -551,7 +551,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			for (int i = 0; i < recordCurrent.size(); i++) {
 				capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
 				record.add(capacity.intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -559,14 +559,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[4]; // 4=power [W]
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			recordCurrent = recordSet.get(measurements[2]); // 2=current
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -574,7 +574,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[5]; // 5=energy [Wh]
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			recordVoltage = recordSet.get(measurements[1]); // 1=voltage
@@ -584,7 +584,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				power = i > 0 ? power + ((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
 				record.add(power.intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -592,7 +592,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[6]; // 6=votagePerCell
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			recordVoltage = recordSet.get(measurements[1]); // 1=voltage
@@ -600,7 +600,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int numberCells = property != null ? new Integer(property.getValue()) : 4;
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable()) {
 				record.setDisplayable(true);
@@ -608,7 +608,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[8]; // 8=efficiency
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
@@ -624,7 +624,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				//if (recordRevolution.get(i)> 100) log.info("recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
 				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
 				record.add(new Double(eta * 1000).intValue());
-				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i));
+				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
 				record.setDisplayable(true);
@@ -633,7 +633,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 			boolean isNoSlopeCalculationStarted = true;
 			recordKey = measurements[10]; // 10=slope
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey);
+			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.clear();
 			property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
@@ -651,11 +651,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				++displayableCounter;
 			}
 			
-			log.fine("displayableCounter = " + displayableCounter);
+			log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
 			recordSet.setConfiguredDisplayable(displayableCounter);
 
 			if (isNoSlopeCalculationStarted) this.application.updateGraphicsWindow();
-			log.fine("finished data calculation for record = " + recordKey);
+			log.fine("finished data calculation for record = " + recordKey); //$NON-NLS-1$
 		}
 	}
 
@@ -690,7 +690,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 */
 	public void updateInitialRecordSetComment(RecordSet recordSet) {
-		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ", 
+		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ",  //$NON-NLS-1$
 				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().unilogVersion));
 	}
 	
@@ -724,7 +724,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog("Der serielle Port kann nicht geöffnet werden -> " + e.getClass().getSimpleName() + " : " + e.getMessage());
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {

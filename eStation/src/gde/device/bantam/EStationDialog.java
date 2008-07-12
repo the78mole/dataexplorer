@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -79,22 +79,23 @@ public class EStationDialog extends DeviceDialog {
 	CLabel												cellTypeUnit;
 	CLabel												processingTimeUnit;
 
-	String												inputLowPowerCutOff	= "11"; //$NON-NLS-1$
-	String												capacityCutOff			= "5000"; //$NON-NLS-1$
-	String												safetyTimer					= "120"; //$NON-NLS-1$
-	String												tempCutOff					= "80"; //$NON-NLS-1$
-	String												waitTime						= "5"; //$NON-NLS-1$
-	String												cellType						= ""; //$NON-NLS-1$
-	String												processingTime			= "0"; //$NON-NLS-1$
+	boolean												isConnectionWarned 	= false;
+	String												inputLowPowerCutOff	= "?";				//$NON-NLS-1$
+	String												capacityCutOff			= "?";				//$NON-NLS-1$
+	String												safetyTimer					= "?";				//$NON-NLS-1$
+	String												tempCutOff					= "?";				//$NON-NLS-1$
+	String												waitTime						= "?";				//$NON-NLS-1$
+	String												cellType						= "?";				//$NON-NLS-1$
+	String												processingTime			= "?";				//$NON-NLS-1$
 
 	HashMap<String, String>				configData					= new HashMap<String, String>();
 	GathererThread								dataGatherThread;
 
-	final eStation								device;																																		// get device specific things, get serial port, ...
-	final EStationSerialPort			serialPort;																																// open/close port execute getData()....
-	final OpenSerialDataExplorer	application;																																// interaction with application instance
-	final Channels								channels;																																	// interaction with channels, source of all records
-	final Settings								settings;																																	// application configuration settings
+	final eStation								device;						// get device specific things, get serial port, ...
+	final EStationSerialPort			serialPort;				// open/close port execute getData()....
+	final OpenSerialDataExplorer	application;			// interaction with application instance
+	final Channels								channels;					// interaction with channels, source of all records
+	final Settings								settings;					// application configuration settings
 
 	/**
 	 * default constructor initialize all variables required
@@ -113,26 +114,44 @@ public class EStationDialog extends DeviceDialog {
 	/**
 	 * default method where the default controls are defined, this needs to be overwritten by specific device dialog
 	 */
+	@Override
 	public void open() {
 		try {
 			EStationDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
-				if (this.settings.isDeviceDialogsModal()) 
+				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if(this.isAlphaEnabled) {
-					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
-					this.isFadeOut = false;
-				}
 				this.dialogShell.setLayout(new FormLayout());
 				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(350, 465);
+				this.dialogShell.addFocusListener(new FocusAdapter() {
+					public void focusGained(FocusEvent evt) {
+						EStationDialog.log.info("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
+						try {
+							if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
+								EStationDialog.this.configData = new HashMap<String, String>();
+								EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());
+								updateGlobalConfigData(EStationDialog.this.configData);
+							}
+						}
+						catch (Exception e) {
+							EStationDialog.this.isConnectionWarned = true;
+						}
+					}
+				});
+				this.dialogShell.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						EStationDialog.log.finer("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						EStationDialog.this.application.openHelpDialog("Sample", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				{
 					this.boundsComposite = new Composite(this.dialogShell, SWT.NONE);
 					FormData boundsCompositeLData = new FormData();
@@ -144,7 +163,7 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.setLayout(new FormLayout());
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							log.finer("boundsComposite.paintControl() " + evt); //$NON-NLS-1$
+							EStationDialog.log.finer("boundsComposite.paintControl() " + evt); //$NON-NLS-1$
 							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
 								EStationDialog.this.startCollectDataButton.setEnabled(false);
 								EStationDialog.this.stopColletDataButton.setEnabled(true);
@@ -166,7 +185,7 @@ public class EStationDialog extends DeviceDialog {
 						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1410));
 						this.infoText.setEditable(false);
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-						this.infoText.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
+						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData startCollectDataButtonLData = new FormData();
@@ -178,6 +197,7 @@ public class EStationDialog extends DeviceDialog {
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
 						this.startCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (!EStationDialog.this.serialPort.isConnected()) {
@@ -193,16 +213,16 @@ public class EStationDialog extends DeviceDialog {
 									catch (Exception e) {
 										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
 											EStationDialog.this.dataGatherThread.stopTimerThread();
-											EStationDialog.this.dataGatherThread.interrupt();
+											//EStationDialog.this.dataGatherThread.interrupt();
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
-										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
 						});
-						this.startCollectDataButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
+						this.startCollectDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData stopColletDataButtonLData = new FormData();
@@ -215,24 +235,25 @@ public class EStationDialog extends DeviceDialog {
 						this.stopColletDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 						this.stopColletDataButton.setEnabled(false);
 						this.stopColletDataButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
 									EStationDialog.this.dataGatherThread.stopTimerThread();
-									EStationDialog.this.dataGatherThread.interrupt();
-									
+									//EStationDialog.this.dataGatherThread.interrupt();
+
 									if (Channels.getInstance().getActiveChannel() != null) {
-											RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-											if (activeRecordSet != null) {
-												// active record set name == life gatherer record name
-												EStationDialog.this.dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
-											}
+										RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+										if (activeRecordSet != null) {
+											// active record set name == life gatherer record name
+											EStationDialog.this.dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
+										}
 									}
 								}
 								EStationDialog.this.boundsComposite.redraw();
 							}
 						});
-						this.stopColletDataButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
+						this.stopColletDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData configGroupLData = new FormData();
@@ -245,13 +266,16 @@ public class EStationDialog extends DeviceDialog {
 						this.configGroup.setLayout(configGroupLayout);
 						this.configGroup.setLayoutData(configGroupLData);
 						this.configGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1407));
-						this.configGroup.addPaintListener(new PaintListener() {public void paintControl(PaintEvent evt) {
+						this.configGroup.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent evt) {
 								EStationDialog.log.finest("configGroup.paintControl, event=" + evt); //$NON-NLS-1$
 								EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff);
 								EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff);
 								EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer);
 								EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff);
 								EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime);
+								EStationDialog.this.processingTimeText.setText(EStationDialog.this.processingTime);
+								EStationDialog.this.cellTypeText.setText(EStationDialog.this.cellType);
 							}
 						});
 						{
@@ -365,7 +389,7 @@ public class EStationDialog extends DeviceDialog {
 								this.cellTypeUnit.setText(""); //$NON-NLS-1$
 							}
 						}
-						this.configGroup.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
+						this.configGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData closeButtonLData = new FormData();
@@ -377,40 +401,34 @@ public class EStationDialog extends DeviceDialog {
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.finest("okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								close();
 							}
 						});
-						this.closeButton.addMouseTrackListener(EStationDialog.this.mouseTrackerEnterFadeOut);
+						this.closeButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
+						@Override
 						public void mouseEnter(MouseEvent evt) {
-							log.fine("boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
-							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12, 12, 15, 15);
+							EStationDialog.log.fine("boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
+							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 10, 10, 10, 15);
 						}
+
+						@Override
 						public void mouseHover(MouseEvent evt) {
-							log.finest("boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
+							EStationDialog.log.finest("boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
 						}
+
+						@Override
 						public void mouseExit(MouseEvent evt) {
-							log.fine("boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
-							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 12, 12, 0, 15);
+							EStationDialog.log.fine("boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
+							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 10, 10, -10, 15);
 						}
 					});
 				} // end boundsComposite
-				this.dialogShell.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent evt) {
-						EStationDialog.log.finer("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						//TODO check if some thing to do before exiting
-					}
-				});
-				this.dialogShell.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						EStationDialog.log.finer("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						EStationDialog.this.application.openHelpDialog("Sample", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-250, 150));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 250, 150));
 				this.dialogShell.open();
 			}
 			else {
@@ -426,7 +444,7 @@ public class EStationDialog extends DeviceDialog {
 			EStationDialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	public void resetButtons() {
 		this.startCollectDataButton.setEnabled(true);
 		this.stopColletDataButton.setEnabled(false);
@@ -436,23 +454,33 @@ public class EStationDialog extends DeviceDialog {
 	 * update the global conguration data in dialog
 	 */
 	public void updateGlobalConfigData(HashMap<String, String> newConfigData) {
-		EStationDialog.this.configData = newConfigData;
-		if (this.dialogShell != null) {
+		this.configData = newConfigData;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
 			if (Thread.currentThread().getId() == this.application.getThreadId()) {
-				EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF)); //$NON-NLS-1$
-				EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY)); //$NON-NLS-1$
-				EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME)); //$NON-NLS-1$
-				EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF)); //$NON-NLS-1$
-				EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME)); //$NON-NLS-1$
+				this.inputLowPowerCutOffText.setText(this.inputLowPowerCutOff = this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF)); //$NON-NLS-1$
+				this.capacityCutOffText.setText(this.capacityCutOff = this.configData.get(eStation.CONFIG_SET_CAPASITY)); //$NON-NLS-1$
+				this.safetyTimerText.setText(this.safetyTimer = this.configData.get(eStation.CONFIG_SAFETY_TIME)); //$NON-NLS-1$
+				this.tempCutOffText.setText(this.tempCutOff = this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF)); //$NON-NLS-1$
+				this.waitTimeText.setText(this.waitTime = this.configData.get(eStation.CONFIG_WAIT_TIME)); //$NON-NLS-1$
+				if (this.configData.get(eStation.CONFIG_PROCESSING_TIME) != null)
+					this.processingTimeText.setText(this.processingTime = this.configData.get(eStation.CONFIG_PROCESSING_TIME)); //$NON-NLS-1$
+				if (this.configData.get(eStation.CONFIG_BATTERY_TYPE) != null)
+					this.cellTypeText.setText(this.cellType = this.configData.get(eStation.CONFIG_BATTERY_TYPE));
+				this.configGroup.redraw();
 			}
 			else {
 				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
-						EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF)); //$NON-NLS-1$
-						EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY)); //$NON-NLS-1$
-						EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = "" + EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME)); //$NON-NLS-1$
-						EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = "" + EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF)); //$NON-NLS-1$
-						EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = "" + EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME)); //$NON-NLS-1$
+						EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
+						EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
+						EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
+						EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
+						EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
+						if (EStationDialog.this.configData.get(eStation.CONFIG_PROCESSING_TIME) != null)
+							EStationDialog.this.processingTimeText.setText(EStationDialog.this.processingTime = EStationDialog.this.configData.get(eStation.CONFIG_PROCESSING_TIME)); //$NON-NLS-1$
+						if (EStationDialog.this.configData.get(eStation.CONFIG_BATTERY_TYPE) != null)
+							EStationDialog.this.cellTypeText.setText(EStationDialog.this.cellType = EStationDialog.this.configData.get(eStation.CONFIG_BATTERY_TYPE));
+						EStationDialog.this.configGroup.redraw();
 					}
 				});
 			}

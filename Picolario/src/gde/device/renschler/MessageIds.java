@@ -44,5 +44,6 @@ public class MessageIds {
 	public final static String	OSDE_MSGT1217 = "OSDE_MSGT1217";
 	public final static String	OSDE_MSGT1218 = "OSDE_MSGT1218";
 	public final static String	OSDE_MSGT1219 = "OSDE_MSGT1219";
+	public final static String	OSDE_MSGT1220 = "OSDE_MSGT1220";
 
  }

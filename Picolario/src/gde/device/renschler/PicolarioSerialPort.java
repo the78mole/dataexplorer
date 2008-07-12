@@ -100,40 +100,32 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 */
 	public Vector<byte[]> getData(int datagramNumber, Picolario device) throws Exception {
 		Vector<byte[]> dataBuffer = new Vector<byte[]>(100);
-		boolean isGoodPackage = true;
 		byte[] readBuffer;
 		int numberRed = 0;
 		byte[] readRecordSetsWithNumber = new byte[] { this.readRecordSets[0], (byte) datagramNumber, this.readRecordSets[0], (byte) datagramNumber };
-
+		
 		try {
 			write(readRecordSetsWithNumber);
 			this.isTransmitFinished = false;
 
-			Thread.sleep(20); // wait for 20 ms since it makes no sense to check receive buffer earlier
+			Thread.sleep(100); // give picolario time to prepare data
 
 			while (!this.isTransmitFinished) {
 
-				//int numberAvailableBytes = waitForStabelReceiveBuffer(31, 1);
-
-				//if (numberAvailableBytes > 0) {
-					readBuffer = new byte[31];
-					readBuffer = read(readBuffer, 1, 50); // throws timeout exception
+				device.getDialog().setAlreadyRedText(numberRed++);
+				readBuffer = new byte[31];
+				readBuffer = read(readBuffer, 2, 50); // throws timeout exception
+			
+				if (readBuffer.length != 0) {
 					
-				if (readBuffer.length < 31) {
-
-					checkForLeftBytes(); // on receive buffer -> wait for stable bytes failed
-
-					resetReceiveBuffer();
-					isGoodPackage = checkGoodPackage(readBuffer, 31, 3);
-
-					if (isGoodPackage) {
+					if (checkGoodPackage(readBuffer, 31, 3)) {
 						// append data to data container
 						dataBuffer.add(readBuffer);
 
 						//acknowledge request next
 						this.write(new byte[] { readBuffer[readBuffer.length - 1], readBuffer[readBuffer.length - 1] });
 						// update the dialog
-						device.getDialog().setAlreadyRedText(numberRed++);
+						
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
@@ -141,10 +133,13 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 						byte wrongChecksum = readBuffer[readBuffer.length - 1];
 						byte[] requestAgain = new byte[] { wrongChecksum, wrongChecksum };
 						this.write(requestAgain);
+						numberRed--;
 					}
+					this.isTransmitFinished = checkTransmissionFinished(2);
 				}
+				//}
 				else {
-					this.isTransmitFinished = checkTransmissionFinished(31, 1);
+					this.isTransmitFinished = checkTransmissionFinished(2);
 				}
 			} // end while receive loop
 		}
@@ -156,17 +151,26 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	}
 
 	/**
-	 * function check transmission finished, set isTransmitFinished 
-	 * @throws TimeOutException 
+	 * function check transmission finished
+	 * @return false if there are available bytes
 	 * @throws InterruptedException 
+	 * @throws IOException 
+	 * @throws TimeOutException 
 	 */
-	private boolean checkTransmissionFinished(int size, int timeout_sec) throws InterruptedException, TimeOutException {
-		boolean isTransMitFinished = false;
-		if (0 == waitForStabelReceiveBuffer(size, timeout_sec)) isTransMitFinished = true;
-		//error in transmittion
-		//transmission canceled
-		resetReceiveBuffer();
-		return isTransMitFinished;
+	private boolean checkTransmissionFinished(int timeout_sec) throws InterruptedException, IOException, TimeOutException {
+		int sleepTime = 3;
+		int timeCounter = timeout_sec * 1000 / sleepTime;
+		int availableBytes = 0;
+
+		while (0 == (availableBytes = this.getInputStream().available()) && timeCounter-- > 0) {
+			Thread.sleep(sleepTime);	
+			if (timeCounter-- <= 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { 0, timeout_sec })); 
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
+			}
+		}
+		return availableBytes == 0 || this.isTransmitFinished;
 	}
 
 	/**
