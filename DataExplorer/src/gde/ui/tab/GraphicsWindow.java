@@ -115,9 +115,9 @@ public class GraphicsWindow {
 	String												oldActiveRecordSetName	= OSDE.STRING_EMPTY;
 	int 													numScaleLeft = 0;
 	class MinMaxValues {
-		double min = 0;
-		double max = 0;
-		MinMaxValues(double newMin, double newMax) {
+		String min;
+		String max;
+		MinMaxValues(String newMin, String newMax) {
 			this.min = newMin;
 			this.max = newMax;
 		}
@@ -463,7 +463,7 @@ public class GraphicsWindow {
 	 */
 	private void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
-		int maxTimeNumber = timeScale[0];
+		int maxTime = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
 
@@ -494,7 +494,6 @@ public class GraphicsWindow {
 		// draw x coordinate	- time scale
 		int startTime, endTime;
 		// Calculate the horizontal area to used for plotting graphs
-		int maxTime = maxTimeNumber; // alle 10 min/sec eine Markierung
 		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
 		dataScaleWidth = pt.x + pt.y * 2 + 5;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
@@ -644,7 +643,7 @@ public class GraphicsWindow {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
-				if (this.oldActiveRecordSetName.equals(activeRecordSet.getName())) {
+				if (!this.oldActiveRecordSetName.equals(activeRecordSet.getName())) {
 					this.minMaxValues = new HashMap<String, MinMaxValues>();
 					isFullUpdateRequired = true;
 				}
@@ -657,8 +656,11 @@ public class GraphicsWindow {
 				}
 				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
 					Record record = activeRecordSet.get(recordKey);
-					if (this.minMaxValues.get(recordKey) == null || record.getMinDisplayValue() != this.minMaxValues.get(recordKey).min || record.getMaxDisplayValue() != this.minMaxValues.get(recordKey).max) {
-						this.minMaxValues.put(recordKey, new MinMaxValues(record.getMinDisplayValue(), record.getMaxDisplayValue()));
+					String minFormated = record.getFormatedMinDisplayValue(), maxFormatted = record.getFormatedMaxDisplayValue();
+					MinMaxValues minMax = this.minMaxValues.get(recordKey);
+					if (minMax == null || !minFormated.equals(minMax.min) || !maxFormatted.equals(minMax.max)) {
+						this.minMaxValues.remove(recordKey);
+						this.minMaxValues.put(recordKey, new MinMaxValues(minFormated, maxFormatted));
 						isFullUpdateRequired = true;
 					}
 				}
@@ -672,7 +674,7 @@ public class GraphicsWindow {
 					int timeScaleHeight = 40;
 					if (curveBounds != null) {
 						//int height = this.graphicCanvas.getClientArea().height;
-						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeScaleHeight, true);
+						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width+10, curveBounds.height+timeScaleHeight+10, true);
 						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeScaleHeight).toString());
 					}
 					else

@@ -511,7 +511,7 @@ public class AkkuMasterChannelTab {
 																|| (new Date().getTime() - getTimeStamp()) > 30000 || isCollectDataStopped()) {
 															setCollectDataStopped(false);
 															// record set does not exist or is outdated, build a new name and create
-															setRecordSetKey((getChannel().size() + 1) + ") " + processName); //$NON-NLS-1$
+															setRecordSetKey(getChannel().getNextRecordSetNumber() + ") " + processName); //$NON-NLS-1$
 															getChannel().put(getRecordSetKey(), RecordSet.createRecordSet(getName().trim(), getRecordSetKey(), AkkuMasterChannelTab.this.application.getActiveDevice(), true, false));
 															getChannel().applyTemplateBasics(getRecordSetKey());
 															AkkuMasterChannelTab.log.fine(getRecordSetKey() + " created for channel " + getChannel().getName()); //$NON-NLS-1$

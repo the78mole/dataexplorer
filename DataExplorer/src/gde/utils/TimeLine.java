@@ -225,8 +225,13 @@ public class TimeLine {
 					numberTicks = timeDelta / 5.0; // every 5 th units one tick
 					scaleFactor = scaleFactor * 2;
 				}
+				else if (timeDelta >= 100 && timeDelta <= 500) {
+					numberTicks = timeDelta / 10.0; // every 10 th units one tick
+					scaleFactor = scaleFactor * 1;
+				}
 				else {
-					numberTicks = timeDelta / 10.0; // every 10th units one tick
+					numberTicks = timeDelta / 20.0; // every 20 th units one tick
+					scaleFactor = scaleFactor / 2;
 				}
 				break;
 			}

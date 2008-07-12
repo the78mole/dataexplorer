@@ -954,6 +954,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			channels.switchChannel(1, OSDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
 		}
+		this.application.updateGraphicsWindow();
 	}
 
 	/**

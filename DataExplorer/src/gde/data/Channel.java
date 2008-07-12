@@ -107,6 +107,30 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 	
 	/**
+	 * method to calculate next record set number, usally a record starts with a number followed by ")"
+	 * this method is used to build a new record set name while gathering data "3") flight record
+	 * @return
+	 */
+	public int getNextRecordSetNumber() {
+		int recordNumber = 1;
+		if (this.size() != 0) {
+			String[] sortedRecordSetNames = this.getRecordSetNames();
+			for (int i = sortedRecordSetNames.length - 1; i >= 0; --i) {
+				try {
+					recordNumber = new Integer(sortedRecordSetNames[i].split("[)]")[0]) + 1;
+					break;
+				}
+				catch (NumberFormatException e) {
+					// is alpha no numeric or no ")"
+				}
+			}
+		}
+		else 
+			recordNumber = 1;
+		
+		return recordNumber;
+	}
+	/**
 	 * @return the graphics template
 	 */
 	public GraphicsTemplate getTemplate() {
@@ -394,9 +418,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				Channels.getInstance().switchChannel(channelNumber, recordSetKey);
 				recordSet = activeChannel.get(recordSetKey);
 				if (recordSet != null && recordSet.isRecalculation)
-					recordSet.checkAllDisplayable(); // updates graphics window
-				else
-					this.application.updateGraphicsWindow();
+					recordSet.checkAllDisplayable();
 			}
 		}
 		else { // record  set exist
@@ -405,9 +427,8 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.application.resetGraphicsWindowZoomAndMeasurement();
 			if (recordSet.isRecalculation)
 				recordSet.checkAllDisplayable(); // updates graphics window
-			else
-				this.application.updateGraphicsWindow();
 			
+			this.application.updateGraphicsWindow();
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();

@@ -620,7 +620,7 @@ public class MenuToolBar {
 						this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
 						this.deleteRecord.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								MenuToolBar.log.finest("deleteAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
+								MenuToolBar.log.finest("deleteRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 								Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									RecordSet recordSet = activeChannel.getActiveRecordSet();
@@ -639,6 +639,13 @@ public class MenuToolBar {
 										activeChannel.remove(deleteRecordSetName);
 										MenuToolBar.log.fine("deleted " + deleteRecordSetName); //$NON-NLS-1$
 										updateRecordSetSelectCombo();
+										// update viewable
+										MenuToolBar.this.application.updateGraphicsWindow();
+										MenuToolBar.this.application.updateDataTable();
+										MenuToolBar.this.application.updateDigitalWindow();
+										MenuToolBar.this.application.updateAnalogWindow();
+										MenuToolBar.this.application.updateCellVoltageWindow();
+										MenuToolBar.this.application.updateFileCommentWindow();
 										MenuToolBar.this.application.updateDataTable();
 									}
 								}
@@ -772,7 +779,6 @@ public class MenuToolBar {
 			this.recordSelectCombo.setText(OSDE.STRING_EMPTY);
 		}
 		updateRecordToolItems();
-		this.application.updateGraphicsWindow();
 	}
 
 	/**

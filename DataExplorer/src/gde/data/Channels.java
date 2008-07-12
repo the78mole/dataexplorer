@@ -162,13 +162,12 @@ public class Channels extends HashMap<Integer, Channel> {
 					recordSet.resetZoomAndMeasurement();
 					if (recordSet.isRecalculation)
 						recordSet.checkAllDisplayable(); // updates graphics window
-					else
-						this.application.updateGraphicsWindow();
 				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
+				this.application.updateGraphicsWindow();
 				this.application.updateDigitalWindow();
 				this.application.updateAnalogWindow();
 				this.application.updateCellVoltageWindow();

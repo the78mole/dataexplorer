@@ -123,6 +123,13 @@ public class StringHelper {
 	}
 
 	/**
+	 * method to get formated time by given format string and time in millis seconds
+	 */
+	public static String getFormatedTime(String format, long millisec) {
+		return new SimpleDateFormat(format).format(millisec);
+	}
+
+	/**
 	 * remove blanks within a string
 	 * @param inputString
 	 * @return cleaned string

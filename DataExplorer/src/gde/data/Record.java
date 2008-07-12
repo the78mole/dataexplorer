@@ -44,23 +44,23 @@ import osde.utils.StringHelper;
  * class record holds data points of one measurement or line or curve
  */
 public class Record extends Vector<Integer> {
-	static final long						serialVersionUID			= 26031957;
-	static final Logger					log										= Logger.getLogger(Record.class.getName());
+	static final long					serialVersionUID			= 26031957;
+	static final Logger				log										= Logger.getLogger(Record.class.getName());
 	
-	public static final String DELIMITER = "|-|"; //$NON-NLS-1$
-	public static final String END_MARKER = "|:-:|"; //$NON-NLS-1$
+	public static final String DELIMITER 			= "|-|"; 		//$NON-NLS-1$
+	public static final String END_MARKER 		= "|:-:|"; 	//$NON-NLS-1$
 
 	// this variables are used to make a record selfcontained within compare set
-	String							channelConfigKey; 		// used as channelConfigKey
+	String							channelConfigKey; 								// used as channelConfigKey
 	String							keyName;
-	double							timeStep_ms						= 0;			// time base of measurement points
+	double							timeStep_ms						= 0;				// time base of measurement points
 	IDevice							device;
 
 	RecordSet						parent;
 	
-	String							name;																																// MessgrößeX Höhe
-	String							unit;																																// Einheit m
-	String							symbol;																															// Symbol h
+	String							name;																										// MessgrößeX Höhe
+	String							unit;																										// Einheit m
+	String							symbol;																									// Symbol h
 	boolean							isActive;
 	boolean							isDisplayable;
 	boolean							isVisible							= true;
@@ -73,10 +73,10 @@ public class Record extends Vector<Integer> {
 	boolean							isStartpointZero			= false;
 	boolean							isStartEndDefined			= false;
 	DecimalFormat				df;
-	int									numberFormat					= 1;																					// 0 = 0000, 1 = 000.0, 2 = 00.00
-	int									maxValue							= Integer.MIN_VALUE;		 										  // max value of the curve
-	int									minValue							= Integer.MAX_VALUE;													// min value of the curve
-	double							maxScaleValue					= this.maxValue;																		// overwrite calculated boundaries
+	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
+	int									maxValue							= 0;		 										  // max value of the curve
+	int									minValue							= 0;													// min value of the curve
+	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue		= this.maxScaleValue;
 	double							minZoomScaleValue		= this.minScaleValue;
@@ -101,15 +101,15 @@ public class Record extends Vector<Integer> {
 	public final static String	IS_VISIBLE						= "_isVisible";					// defines if data are displayed  //$NON-NLS-1$
 	public final static String	IS_POSITION_LEFT			= "_isPositionLeft";		// defines the side where the axis id displayed  //$NON-NLS-1$
 	public final static String	COLOR									= "_color";							// defines which color is used to draw the curve //$NON-NLS-1$
-	public final static String	LINE_WITH							= "_lineWidth"; //$NON-NLS-1$
-	public final static String	LINE_STYLE						= "_lineStyle"; //$NON-NLS-1$
+	public final static String	LINE_WITH							= "_lineWidth"; 				//$NON-NLS-1$
+	public final static String	LINE_STYLE						= "_lineStyle"; 				//$NON-NLS-1$
 	public final static String	IS_ROUND_OUT					= "_isRoundOut";				// defines if axis values are rounded //$NON-NLS-1$
 	public final static String	IS_START_POINT_ZERO		= "_isStartpointZero";	// defines if axis value starts at zero //$NON-NLS-1$
 	public final static String	IS_START_END_DEFINED	= "_isStartEndDefined";	// defines that explicit end values are defined for axis //$NON-NLS-1$
-	public final static String	NUMBER_FORMAT					= "_numberFormat"; //$NON-NLS-1$
-	public final static String	MAX_VALUE							= "_maxValue"; //$NON-NLS-1$
+	public final static String	NUMBER_FORMAT					= "_numberFormat"; 			//$NON-NLS-1$
+	public final static String	MAX_VALUE							= "_maxValue"; 					//$NON-NLS-1$
 	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";				// overwritten max value //$NON-NLS-1$
-	public final static String	MIN_VALUE							= "_minValue"; //$NON-NLS-1$
+	public final static String	MIN_VALUE							= "_minValue"; 					//$NON-NLS-1$
 	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value //$NON-NLS-1$
 	
 	private final String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
@@ -869,6 +869,20 @@ public class Record extends Vector<Integer> {
 	 */
 	public double getMaxDisplayValue() {
 		return this.maxDisplayValue;
+	}
+
+	/**
+	 * @return the formated minDisplayValue as it is displayed in graphics window
+	 */
+	public String getFormatedMinDisplayValue() {
+		return this.df.format(this.minDisplayValue);
+	}
+
+	/**
+	 * @return the formated maxDisplayValue as it is displayed in graphics window
+	 */
+	public String getFormatedMaxDisplayValue() {
+		return this.df.format(this.maxDisplayValue);
 	}
 
 	/**
