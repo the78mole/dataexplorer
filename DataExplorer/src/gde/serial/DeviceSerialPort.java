@@ -56,9 +56,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	protected final DeviceConfiguration			deviceConfig;
 	protected final OpenSerialDataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
-	private boolean													isConnected				= false;
-	private String													serialPortStr			= OSDE.STRING_EMPTY;
-	private Thread													closeThread;
+	boolean																	isConnected				= false;
+	String																	serialPortStr			= OSDE.STRING_EMPTY;
+	Thread																	closeThread;
 	
 	static CommPortIdentifier			portId;
 	static CommPortIdentifier			saveportId;
@@ -67,8 +67,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 //	public final String							PORT_CLOSED						= "geschlossen";
 
 	private InputStream						inputStream				= null;
-	private boolean								isReadBufferEmpty	= true;
-	private int										numBytesAvailable	= 0;
+	private boolean								dataAvailable			= false;
 	private OutputStream					outputStream			= null;
 
 	protected String							name;
@@ -220,7 +219,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			this.inputStream = this.serialPort.getInputStream();
 			this.outputStream = this.serialPort.getOutputStream();
 
-			this.setConnected(true);
+			this.isConnected = true;
 			if (this.application != null) this.application.setPortConnected(true);
 			return this.serialPort;
 		}
@@ -262,12 +261,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	public synchronized void write(byte[] buf) throws IOException {
-		if (!this.isReadBufferEmpty) {
-			int num = this.inputStream.available();
-			String msg = " -> " + num + " left bytes -> " + this.inputStream.read(new byte[num]); //$NON-NLS-1$ //$NON-NLS-2$
-			this.isReadBufferEmpty = true;
-			log.warning(msg);
-			//throw new IOException("ERROR: read buffer is not empty, please get previous data before send new command !" + msg);
+		int num = 0;
+		if ((num = this.inputStream.available()) != 0) {
+			log.warning("clean inputStreaam left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
 		}
 
 		try {
@@ -293,7 +289,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		}
 	}
 
-	public void serialEvent(SerialPortEvent event) {
+	public synchronized void serialEvent(SerialPortEvent event) {
 
 		switch (event.getEventType()) {
 		case SerialPortEvent.BI:
@@ -305,18 +301,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		case SerialPortEvent.DSR:
 		case SerialPortEvent.RI:
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
+			this.dataAvailable = false;
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
-			// we get here if data has been received
-			try {
-				this.numBytesAvailable = this.inputStream.available();
-				if (this.numBytesAvailable > 0) this.isReadBufferEmpty = false;
-				if (log.isLoggable(Level.FINER)) {
-					log.finer("inputStream numBytesAvailable = " + this.numBytesAvailable); //$NON-NLS-1$
-				}
-			}
-			catch (IOException e) {
-			}
+			this.dataAvailable = true;
 			break;
 		}
 	}
@@ -339,8 +327,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
 
-			//wait4Bytes(bytes, timeoutInSeconds);
+			wait4Bytes(timeoutInSeconds);
 
+			Thread.sleep(18);
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
@@ -351,9 +340,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				throw e;
 			}
 			
-			this.isReadBufferEmpty = true;
-			this.numBytesAvailable = 0;
-
 			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: "); //$NON-NLS-1$
@@ -392,10 +378,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int retryCounter = timeoutInSeconds * 1000 / sleepTime;
 
 		try {
-			if (this.application != null) this.application.setSerialRxOn();
 			long startTime_ms = new Date().getTime();
-			//wait4Bytes(bytes, timeoutInSeconds);
+			wait4Bytes(timeoutInSeconds);
 
+			if (this.application != null) this.application.setSerialRxOn();
+
+			Thread.sleep(18);
 			while (bytes != readBytes && retryCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
@@ -406,11 +394,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				throw e;
 			}
 			
-			waitTimes.add((new Date().getTime()) - startTime_ms);
+			long ms = (new Date().getTime()) - startTime_ms;
+			log.info("waitTime = " + ms);
+			waitTimes.add(ms);
 			
-			this.isReadBufferEmpty = true;
-			this.numBytesAvailable = 0;
-
 			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: "); //$NON-NLS-1$
@@ -433,33 +420,51 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
+	 * function check transmission finished
+	 * @return false if there are available bytes
+	 * @throws InterruptedException 
+	 * @throws TimeOutException 
+	 */
+	public void wait4Bytes(int timeout_sec) throws InterruptedException, TimeOutException {
+		int sleepTime = 5;
+		int timeCounter = timeout_sec * 1000 / sleepTime;
+
+		while (!this.dataAvailable && timeCounter-- > 0) {
+			Thread.sleep(sleepTime);	
+			if (timeCounter-- <= 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { 0, timeout_sec })); 
+				log.log(Level.WARNING, e.getMessage(), e);
+				throw e;
+			}
+		}
+	}
+
+	/**
 	 * waits until receive buffer is filled with the number of expected bytes
 	 * @param numBytes
 	 * @param timeoutInSeconds
 	 * @param isTerminatedByChecksum
 	 * @return number of bytes in receive buffer
 	 * @throws TimeOutException 
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
-	public int wait4Bytes(int numBytes, int timeoutInSeconds) throws TimeOutException {
+	public int wait4Bytes(int numBytes, int timeoutInSeconds) throws TimeOutException, IOException, InterruptedException {
 		int counter = timeoutInSeconds * 1000;
 		int resBytes = 0;
-		try {
+
 			// wait until readbuffer has been filled by eventListener
-			while (this.numBytesAvailable < numBytes) {
-				Thread.sleep(0, 1);
-				counter--;
-				//if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
-				if (counter <= 0) {
-					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { numBytes, timeoutInSeconds }));
-					log.log(Level.SEVERE, e.getMessage(), e);
-					throw e;
-				}
+		while (this.inputStream.available() < numBytes) {
+			Thread.sleep(3, 1);
+			counter--;
+			//if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
+			if (counter <= 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { numBytes, timeoutInSeconds }));
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
 			}
-			//if(log.isLoggable(Level.FINER)) log.finer("inputStream numBytesAvailable = " + (resBytes = this.numBytesAvailable));
 		}
-		catch (InterruptedException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
+		
 		return resBytes;
 	}
 	/**
@@ -473,39 +478,47 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeoutInSeconds, int stableIndex) throws IOException, TimeOutException {
-		int sleepTime = 5; // ms
-		int bytes = readBuffer.length;
+		int sleepTime = 2; // ms
+		int expectedBytes = readBuffer.length;
 		int readBytes = 0;
 		int lastRead = 0;
-		int retryCounter = timeoutInSeconds * 1000 / sleepTime;
+		boolean isStable = false;
+		int timeCounter = timeoutInSeconds * 1000 / (sleepTime*10);
 		int stableCounter = stableIndex;
-		if (stableIndex >= retryCounter) {
+		if (stableIndex >= timeCounter) {
 			log.severe(Messages.getString(MessageIds.OSDE_MSGE0013));
 		}
 
 
 		try {
+			wait4Bytes(timeoutInSeconds);
+
 			if (this.application != null) this.application.setSerialRxOn();
 
-			while (bytes != readBytes && retryCounter-- > 0 && stableCounter > 0){
-				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
-				if (bytes != readBytes) Thread.sleep(sleepTime);
+			Thread.sleep(18);
+			while (readBytes < expectedBytes && !isStable) {
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
+				//log.info("readBytes " + readBytes + " available " + this.inputStream.available());
+				if (expectedBytes != readBytes) {
+					Thread.sleep(sleepTime);
+				}
 				if (lastRead == readBytes) {
-					stableCounter--;
+					//log.info("stableCounter " + stableCounter + " timecounter " + timeCounter);
+					if (stableCounter-- == 0) {
+						isStable = true;
+					}
 				}
 				else {
 					lastRead = readBytes;
 					stableCounter = stableIndex;
 				}
+				if (timeCounter-- <= 0) {
+					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeoutInSeconds }));
+					log.log(Level.SEVERE, e.getMessage(), e);
+					throw e;
+				}
+				//log.info("timeCounter " + timeCounter);
 			}
-			if (retryCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { bytes, timeoutInSeconds }));
-				log.log(Level.SEVERE, e.getMessage(), e);
-				throw e;
-			}
-			
-			this.isReadBufferEmpty = true;
-			this.numBytesAvailable = 0;
 			
 			if (readBytes < readBuffer.length) { // resize the data buffer to real red data 
 				byte[] tmpBuffer = new byte[readBytes];
@@ -535,42 +548,42 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * waits until receive buffer is filled with number of expected bytes or does not change anymore in 10 cycles
+	 * waits until receive buffer is filled with number of expected bytes or does not change anymore in 100 msec (50 cycles * 2 msec)
 	 * @param expectedBytes
 	 * @param timeout_sec in seconds, this is the maximum time this process will wait for stable byte count or maxBytes
 	 * @return number of bytes in receive buffer
 	 * @throws InterruptedException 
 	 * @throws TimeOutException 
+	 * @throws IOException 
 	 */
-	public int waitForStabelReceiveBuffer(int expectedBytes, int timeout_sec) throws InterruptedException, TimeOutException {
-
-		int timeCounter = timeout_sec * 1000;
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_sec) throws InterruptedException, TimeOutException, IOException {
+		int sleepTime = 3; // ms
+		int timeCounter = timeout_sec * 1000 / sleepTime;
 		int stableCounter = 50;
 		boolean isStable = false;
 		boolean isTimedOut = false;
 
 		// availableBytes are updated by event handler
-		int byteCounter = this.numBytesAvailable;
+		int byteCounter = 0, numBytesAvailable = 0;
 		Thread.sleep(15);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			Thread.sleep(2); // 2 ms
+			Thread.sleep(sleepTime);
 
-			if (byteCounter == this.numBytesAvailable)
+			if (byteCounter == (numBytesAvailable = this.inputStream.available()))
 				--stableCounter;
 			else
 				stableCounter = 50;
 
 			if (stableCounter == 0) isStable = true;
 
-			byteCounter = this.numBytesAvailable;
+			byteCounter = numBytesAvailable;
 			--timeCounter;
 
-//			if (log.isLoggable(Level.FINER)) {
-//				log.finer("stableCounter = " + stableCounter);
-//				log.finer(" timeCounter = " + timeCounter);
-//			}
+			if (log.isLoggable(Level.INFO)) {
+				log.info("stableCounter = " + stableCounter + " timeCounter = " + timeCounter);
+			}
 			if (timeCounter == 0) {
-				this.close();
+				//this.close();
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_sec })); 
 				log.log(Level.SEVERE, e.getMessage(), e);
 				throw e;
@@ -592,16 +605,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException(Messages.getString(MessageIds.OSDE_MSGE0014));
 	}
 
-	/**
-	* function clear/reset receive buffer
-	*/
-	public void resetReceiveBuffer() {
-		this.isReadBufferEmpty = true;
-		this.setNumBytesAvailable(0);
-	}
-
 	public synchronized void close() {
-		if (isConnected() && DeviceSerialPort.this.serialPort != null) {
+		if (this.isConnected && DeviceSerialPort.this.serialPort != null) {
 			this.closeThread = new Thread() {
 				public void run() {
 					log.info("entry"); //$NON-NLS-1$
@@ -616,7 +621,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					log.info("before close"); //$NON-NLS-1$
 					DeviceSerialPort.this.serialPort.close();
 					log.info("after close"); //$NON-NLS-1$
-					setConnected(false);
+					DeviceSerialPort.this.isConnected = false;
 					if (DeviceSerialPort.this.application != null) DeviceSerialPort.this.application.setPortConnected(false);
 					log.info("exit"); //$NON-NLS-1$
 				}
@@ -631,10 +636,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	public OutputStream getOutputStream() {
 		return this.outputStream;
-	}
-
-	public synchronized void setNumBytesAvailable(int newNumBytesAvailable) {
-		this.numBytesAvailable = newNumBytesAvailable;
 	}
 
 	public boolean isConnected() {
@@ -653,20 +654,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * sample method to gather data from device, implementation is individual for device
-	 * @return map containing gathered data - this can individual specified per device
-	 * @throws Exception
-	 */
-	//public HashMap<String, Object> getData(byte[] channelSignature) throws Exception;
-	//public HashMap<String, Object> getData(int datagramNumber, Picolario device, String configurationKey) throws Exception {
-	//public HashMap<String, Object> getData(byte[] channel, int recordNumber, String channelConfigKey) throws Exception {
-//	public HashMap<String, Object> getData(IDevice device) {
-//		HashMap<String, Object> dataMap = new HashMap<String, Object>();
-//		dataMap.put(device.getChannelName(1), new Object());
-//		return dataMap;
-//	}
-
-	/**
 	 * @return the serialPortStr
 	 */
 	public String getSerialPortStr() {
@@ -681,16 +668,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * @param enabled the isConnected to set
+	 * @return number of transfer errors occur (checksum)
 	 */
-	public void setConnected(boolean enabled) {
-		this.isConnected = enabled;
-	}
-
-	public int getNumBytesAvailable() {
-		return this.numBytesAvailable;
-	}
-
 	public int getXferErrors() {
 		return this.xferErrors;
 	}
