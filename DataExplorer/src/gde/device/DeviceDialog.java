@@ -84,15 +84,19 @@ public abstract class DeviceDialog extends Dialog {
 	public void dispose() {
 		if (this.isClosePossible) {
 			this.dialogShell.dispose();
-			this.application.setStatusMessage(""); //$NON-NLS-1$
+			if (!this.application.isDisposed()) this.application.setStatusMessage(""); //$NON-NLS-1$
 		}
-		else this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
+		else if (!this.application.isDisposed()) this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
 	}
 
 	public void close() {
 		this.dispose();
 	}
 
+	public void forceDispose() {
+		this.dialogShell.dispose();
+	}
+	
 	/**
 	 * default method to dispose (close) a dialog shell
 	 * implement all cleanup operation in a disposeListener method
@@ -142,23 +146,24 @@ public abstract class DeviceDialog extends Dialog {
 
 	public synchronized void setShellAlpha(int newShellAlpha) {
 			if (newShellAlpha > this.shellAlpha) {
-				//System.out.println("fade-out");
-				for (int i = 50; i < 254; i+=5) {
+				//System.out.println("fade-out " + this.shellAlpha);
+				for (int i = this.shellAlpha; i < 254; i+=5) {
 					this.dialogShell.setAlpha(i);
 					//System.out.print(i + " ");
 				}
-				this.dialogShell.setAlpha(254);
-				//System.out.println();
+				this.dialogShell.setAlpha(253);
+				//System.out.println("fade-out " + this.dialogShell.getAlpha());
 				this.isFadeOut = true;
 			}
 			else {
-				//System.out.println("fade-in");
-				for (int i = 254; i > 50; i-=5) {
+				//System.out.println("fade-in " + this.dialogShell.getAlpha());
+				for (int i = 254; i > this.shellAlpha; i-=5) {
 					this.dialogShell.setAlpha(i);
 					//System.out.print(i + " ");
 				}
 				//System.out.println();
-				this.dialogShell.setAlpha(50);
+				this.dialogShell.setAlpha(this.shellAlpha);
+				//System.out.println("fade-in " + this.dialogShell.getAlpha());
 				this.isFadeOut = false;
 			}
 	}
