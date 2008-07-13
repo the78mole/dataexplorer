@@ -320,7 +320,7 @@ public class LogViewReader {
 		HashMap<String, String> header = new HashMap<String, String>();
 		
 		getBaseHeaderData(header, data_in);
-		
+		String streamVersion = header.get(OSDE.LOV_STREAM_VERSION);
 		String[] aVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK);
 		String useVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK)[1];
 		if (aVersion.length >= 3) useVersion = useVersion + OSDE.STRING_BLANK + aVersion[2];
@@ -344,7 +344,7 @@ public class LogViewReader {
 			//header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_1_50_BETA(data_in, header);
 		}
-		else if (useVersion.equals("2.0")) { //$NON-NLS-1$
+		else if (streamVersion.equals("4")) { //$NON-NLS-1$
 			header = getHeaderInfo_2_0(data_in, header);
 			header = getRecordSetInfo_2_0(data_in, header);
 		}
