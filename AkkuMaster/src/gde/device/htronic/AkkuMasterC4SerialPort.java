@@ -143,7 +143,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		
 		byte[] answer = new byte[2];
-		answer = this.read(answer, 2);
+		answer = this.read(answer, 2000);
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1101));
 	}
@@ -159,7 +159,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		
 		byte[] answer = new byte[2];
-		answer = this.read(answer, 2);
+		answer = this.read(answer, 2000);
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1102));
 	}
@@ -175,7 +175,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		
 		byte[] answer = new byte[2];
-		answer = this.read(answer, 2);
+		answer = this.read(answer, 2000);
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1103));
 	}
@@ -206,8 +206,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		
 		byte[] answer = new byte[2];
-		answer = this.read(answer, 2);
-		answer = this.read(answer, 2);
+		answer = this.read(answer, 2000);
+		answer = this.read(answer, 2000);
 
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1104));
@@ -232,7 +232,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(command);
 		
 		byte[] answer = new byte[2];
-		answer = this.read(answer, 2);
+		answer = this.read(answer, 2000);
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1105));
 	}
@@ -339,7 +339,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(readConfigOfChannel);
 		
 		byte[] configuration	= new byte[14];
-		configuration = this.read(configuration, 2);
+		configuration = this.read(configuration, 2000);
 		if (configuration[0] != readConfigOfChannel[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 
 		return convertConfigurationAnswer(configuration);
@@ -446,7 +446,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		readAdjustmentsOfChannel[0] = new Integer(a + b).byteValue();
 		this.write(readAdjustmentsOfChannel);
 		
-		this.adjustedValues = this.read(this.adjustedValues, 2);
+		this.adjustedValues = this.read(this.adjustedValues, 2000);
 		if (this.adjustedValues[0] != readAdjustmentsOfChannel[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 
 		// ausgewählte Speichernummer
@@ -489,7 +489,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		this.write(readValuesOfChannel);
 		
 		byte[]	measuredValues	= new byte[16];
-		measuredValues = this.read(measuredValues, 2);
+		measuredValues = this.read(measuredValues, 2000);
 		if (measuredValues[0] != readValuesOfChannel[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 
 		return convertMeasurementValues(measuredValues);
@@ -556,7 +556,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 			}
 
 			this.write(readVersion);
-			this.version = this.read(this.version, 2);
+			this.version = this.read(this.version, 2000);
 
 			// Versionsnummer der Software
 			String versionsNummer = new Integer(this.version[1]).toString();

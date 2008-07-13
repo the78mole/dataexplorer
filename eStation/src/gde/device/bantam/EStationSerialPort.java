@@ -46,7 +46,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			
 			answer = new byte[13];
-			answer = this.read(answer, 2);
+			answer = this.read(answer, 2000);
 			// synchronize received data to begin of sent data 
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
@@ -54,7 +54,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 					if(answer[i] == 0x7b){
 						System.arraycopy(answer, i, data, 0, 13-i);
 						answer = new byte[i];
-						answer = this.read(answer, 1);
+						answer = this.read(answer, 1000);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
 						if (log.isLoggable(Level.FINE)) log.fine("----> receive sync finished"); //$NON-NLS-1$
@@ -64,26 +64,26 @@ public class EStationSerialPort extends DeviceSerialPort {
 				if(this.isInSync)
 					break;
 				answer = new byte[13];
-				answer = this.read(answer, 1);
+				answer = this.read(answer, 1000);
 			}
 			if (answer[0] == 0x7b) {
 				System.arraycopy(answer, 0, data, 0, 13);
 			}
 			
 			answer = new byte[12];
-			answer = this.read(answer, 1);
+			answer = this.read(answer, 1000);
 			System.arraycopy(answer, 0, data, 13, 12);
 			answer = new byte[12];
-			answer = this.read(answer, 1);
+			answer = this.read(answer, 1000);
 			System.arraycopy(answer, 0, data, 25, 12);
 			answer = new byte[12];
-			answer = this.read(answer, 1);
+			answer = this.read(answer, 1000);
 			System.arraycopy(answer, 0, data, 37, 12);
 			answer = new byte[12];
-			answer = this.read(answer, 1);
+			answer = this.read(answer, 1000);
 			System.arraycopy(answer, 0, data, 49, 12);
 			answer = new byte[15];
-			answer = this.read(answer, 1);
+			answer = this.read(answer, 1000);
 			System.arraycopy(answer, 0, data, 61, 15);
 
 			StringBuilder sb = new StringBuilder();

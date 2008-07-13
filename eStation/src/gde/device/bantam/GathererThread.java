@@ -39,6 +39,11 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
+	/**
+	 * 
+	 */
+	private static final int	WAIT_TIME_RETRYS	= 90;
+
 	final static Logger						log													= Logger.getLogger(GathererThread.class.getName());
 
 	OpenSerialDataExplorer				application;
@@ -58,7 +63,7 @@ public class GathererThread extends Thread {
 	boolean												isSwitchedRecordSet					= false;
 
 	RecordSet											recordSet;
-	int														retryCounter								= 40;				// 60 sec/1.5 sec per retry
+	int														retryCounter								= WAIT_TIME_RETRYS;				// 90 * 2 sec timeout = 180 sec
 	long													timeStamp;
 	boolean												isCollectDataStopped				= false;
 	String												recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
@@ -122,6 +127,7 @@ public class GathererThread extends Thread {
 						//if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 
 						// build the point array according curves from record set
+						GathererThread.this.serialPort.wait4Bytes(2000);
 						byte[] dataBuffer = GathererThread.this.serialPort.getData();
 
 						// check if device is ready for data capturing, discharge or charge allowed only
@@ -189,11 +195,6 @@ public class GathererThread extends Thread {
 							GathererThread.log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
 
 							if (GathererThread.this.numberBatteryCells > 0) {
-//								int[] voltages = new int[GathererThread.this.numberBatteryCells];
-//								for (int i = 0; i < GathererThread.this.numberBatteryCells; i++) {
-//									voltages[i] = points[i + posCells];
-//									GathererThread.log.finer("points[" + i + "+ " + posCells + "] = " + points[i + posCells]);
-//								}
 								GathererThread.this.application.updateCellVoltageChilds();
 							}
 
@@ -206,11 +207,10 @@ public class GathererThread extends Thread {
 							GathererThread.this.isConfigUpdated = true;
 						}
 						else { // else wait for 180 seconds max. for actions
-							log.fine("retry counter = " + getRetryCounter()); //$NON-NLS-1$
 							if (0 == (setRetryCounter(getRetryCounter() - 1)) || GathererThread.this.isCollectDataStopped) {
 								stopTimerThread();
 								GathererThread.log.fine("Timer stopped eStation inactiv"); //$NON-NLS-1$
-								setRetryCounter(90); // 90 * 2 sec timeout = 180 sec
+								setRetryCounter(WAIT_TIME_RETRYS); // 90 * receive timeout sec timeout = 180 sec
 							}
 							log.fine("retryCounter = " + getRetryCounter()); //$NON-NLS-1$
 						}
@@ -256,6 +256,7 @@ public class GathererThread extends Thread {
 		// start the prepared timer thread within the life data gatherer thread
 		this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
 		this.isTimerRunning = true;
+		
 		GathererThread.log.fine("exit"); //$NON-NLS-1$
 	}
 
@@ -288,8 +289,10 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = true;
 		
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			//this.application.openMessageDialogAsync("Während der gesammten Datenübertragung sind " + this.serialPort.getXferErrors() + " Übertragungsfehler aufgetreten!");
 			log.warning("During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true) {
+			this.serialPort.close();
 		}
 	}
 
