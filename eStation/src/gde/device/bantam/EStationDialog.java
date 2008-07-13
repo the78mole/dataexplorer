@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import osde.config.Settings;
 import osde.data.Channels;
@@ -37,6 +36,19 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * e-Station dialog implementation (902, BC6, BC610, BC8)
  * @author Winfried Brügmann
@@ -44,7 +56,7 @@ import osde.ui.SWTResourceManager;
 public class EStationDialog extends DeviceDialog {
 	final static Logger						log									= Logger.getLogger(EStationDialog.class.getName());
 
-	Text													infoText;
+	CLabel												infoText;
 	Button												closeButton;
 	Button												stopColletDataButton;
 	Button												startCollectDataButton;
@@ -61,7 +73,6 @@ public class EStationDialog extends DeviceDialog {
 	CLabel												tempCutOffLabel;
 	CLabel												waitTimeLabel;
 	CLabel												cellTypeLabel;
-	CLabel												processingTimeLabel;
 
 	CLabel												inputLowPowerCutOffText;
 	CLabel												capacityCutOffText;
@@ -69,7 +80,6 @@ public class EStationDialog extends DeviceDialog {
 	CLabel												tempCutOffText;
 	CLabel												waitTimeText;
 	CLabel												cellTypeText;
-	CLabel												processingTimeText;
 
 	CLabel												inputLowPowerCutOffUnit;
 	CLabel												capacityCutOffUnit;
@@ -77,7 +87,6 @@ public class EStationDialog extends DeviceDialog {
 	CLabel												tempCutOffUnit;
 	CLabel												waitTimeUnit;
 	CLabel												cellTypeUnit;
-	CLabel												processingTimeUnit;
 
 	boolean												isConnectionWarned 	= false;
 	String												inputLowPowerCutOff	= "?";				//$NON-NLS-1$
@@ -86,7 +95,6 @@ public class EStationDialog extends DeviceDialog {
 	String												tempCutOff					= "?";				//$NON-NLS-1$
 	String												waitTime						= "?";				//$NON-NLS-1$
 	String												cellType						= "?";				//$NON-NLS-1$
-	String												processingTime			= "?";				//$NON-NLS-1$
 
 	HashMap<String, String>				configData					= new HashMap<String, String>();
 	GathererThread								dataGatherThread;
@@ -132,11 +140,13 @@ public class EStationDialog extends DeviceDialog {
 				this.dialogShell.pack();
 				this.dialogShell.setSize(350, 465);
 				this.dialogShell.addFocusListener(new FocusAdapter() {
+					@Override
 					public void focusGained(FocusEvent evt) {
 						EStationDialog.log.info("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
 						try {
 							if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
 								EStationDialog.this.configData = new HashMap<String, String>();
+								EStationDialog.this.serialPort.wait4Bytes(2000);
 								EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());
 								updateGlobalConfigData(EStationDialog.this.configData);
 							}
@@ -180,10 +190,9 @@ public class EStationDialog extends DeviceDialog {
 						infoTextLData.left = new FormAttachment(0, 1000, 12);
 						infoTextLData.top = new FormAttachment(0, 1000, 20);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
-						this.infoText = new Text(this.boundsComposite, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1410));
-						this.infoText.setEditable(false);
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
@@ -204,8 +213,7 @@ public class EStationDialog extends DeviceDialog {
 									try {
 										if (Channels.getInstance().getActiveChannel() != null) {
 											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
-											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey,
-													EStationDialog.this);
+											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey, EStationDialog.this);
 											EStationDialog.this.dataGatherThread.start();
 											EStationDialog.this.boundsComposite.redraw();
 										}
@@ -213,7 +221,7 @@ public class EStationDialog extends DeviceDialog {
 									catch (Exception e) {
 										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
 											EStationDialog.this.dataGatherThread.stopTimerThread();
-											//EStationDialog.this.dataGatherThread.interrupt();
+											//dataGatherThread.interrupt();
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
@@ -240,7 +248,7 @@ public class EStationDialog extends DeviceDialog {
 								EStationDialog.log.finest("stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
 									EStationDialog.this.dataGatherThread.stopTimerThread();
-									//EStationDialog.this.dataGatherThread.interrupt();
+									//dataGatherThread.interrupt();
 
 									if (Channels.getInstance().getActiveChannel() != null) {
 										RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
@@ -274,7 +282,6 @@ public class EStationDialog extends DeviceDialog {
 								EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer);
 								EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff);
 								EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime);
-								EStationDialog.this.processingTimeText.setText(EStationDialog.this.processingTime);
 								EStationDialog.this.cellTypeText.setText(EStationDialog.this.cellType);
 							}
 						});
@@ -305,10 +312,6 @@ public class EStationDialog extends DeviceDialog {
 							{
 								this.waitTimeLabel = new CLabel(this.composite1, SWT.NONE);
 								this.waitTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1418));
-							}
-							{
-								this.processingTimeLabel = new CLabel(this.composite1, SWT.NONE);
-								this.processingTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1419));
 							}
 							{
 								this.cellTypeLabel = new CLabel(this.composite1, SWT.NONE);
@@ -344,10 +347,6 @@ public class EStationDialog extends DeviceDialog {
 								this.waitTimeText.setText(this.waitTime);
 							}
 							{
-								this.processingTimeText = new CLabel(this.composite2, SWT.NONE);
-								this.processingTimeText.setText(this.processingTime);
-							}
-							{
 								this.cellTypeText = new CLabel(this.composite2, SWT.NONE);
 								this.cellTypeText.setText(this.cellType);
 							}
@@ -379,10 +378,6 @@ public class EStationDialog extends DeviceDialog {
 							{
 								this.waitTimeUnit = new CLabel(this.composite3, SWT.NONE);
 								this.waitTimeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1425));
-							}
-							{
-								this.processingTimeUnit = new CLabel(this.composite3, SWT.NONE);
-								this.processingTimeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1426));
 							}
 							{
 								this.cellTypeUnit = new CLabel(this.composite3, SWT.NONE);
@@ -462,8 +457,6 @@ public class EStationDialog extends DeviceDialog {
 				this.safetyTimerText.setText(this.safetyTimer = this.configData.get(eStation.CONFIG_SAFETY_TIME)); //$NON-NLS-1$
 				this.tempCutOffText.setText(this.tempCutOff = this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF)); //$NON-NLS-1$
 				this.waitTimeText.setText(this.waitTime = this.configData.get(eStation.CONFIG_WAIT_TIME)); //$NON-NLS-1$
-				if (this.configData.get(eStation.CONFIG_PROCESSING_TIME) != null)
-					this.processingTimeText.setText(this.processingTime = this.configData.get(eStation.CONFIG_PROCESSING_TIME)); //$NON-NLS-1$
 				if (this.configData.get(eStation.CONFIG_BATTERY_TYPE) != null)
 					this.cellTypeText.setText(this.cellType = this.configData.get(eStation.CONFIG_BATTERY_TYPE));
 				this.configGroup.redraw();
@@ -476,8 +469,6 @@ public class EStationDialog extends DeviceDialog {
 						EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer = EStationDialog.this.configData.get(eStation.CONFIG_SAFETY_TIME));
 						EStationDialog.this.tempCutOffText.setText(EStationDialog.this.tempCutOff = EStationDialog.this.configData.get(eStation.CONFIG_EXT_TEMP_CUT_OFF));
 						EStationDialog.this.waitTimeText.setText(EStationDialog.this.waitTime = EStationDialog.this.configData.get(eStation.CONFIG_WAIT_TIME));
-						if (EStationDialog.this.configData.get(eStation.CONFIG_PROCESSING_TIME) != null)
-							EStationDialog.this.processingTimeText.setText(EStationDialog.this.processingTime = EStationDialog.this.configData.get(eStation.CONFIG_PROCESSING_TIME)); //$NON-NLS-1$
 						if (EStationDialog.this.configData.get(eStation.CONFIG_BATTERY_TYPE) != null)
 							EStationDialog.this.cellTypeText.setText(EStationDialog.this.cellType = EStationDialog.this.configData.get(eStation.CONFIG_BATTERY_TYPE));
 						EStationDialog.this.configGroup.redraw();

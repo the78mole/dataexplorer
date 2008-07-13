@@ -51,6 +51,7 @@ import osde.ui.SWTResourceManager;
  */
 public class AkkuMasterC4Dialog extends DeviceDialog {
 	final static Logger						log										= Logger.getLogger(AkkuMasterC4Dialog.class.getName());
+	static final String						DEVICE_NAME						= "Akkumaster C4";
 
 	CLabel												totalDischargeCurrentLabel;
 	CLabel												totalChargeCurrentLabel;
@@ -110,7 +111,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(440, 590);
-			this.dialogShell.setText(Messages.getString("Akkumaster C4" + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273))); //$NON-NLS-1$
+			this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 			{
 				this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
