@@ -112,7 +112,7 @@ public class GraphicsWindow {
 	
 	// update graphics only area required
 	int 													oldNumberActiveVisible	= 0;
-	String												oldActiveRecordSetName	= OSDE.STRING_EMPTY;
+	RecordSet											oldActiveRecordSet	= null;
 	int 													numScaleLeft = 0;
 	class MinMaxValues {
 		String min;
@@ -643,7 +643,7 @@ public class GraphicsWindow {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
-				if (!this.oldActiveRecordSetName.equals(activeRecordSet.getName())) {
+				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.equals(activeRecordSet)) {
 					this.minMaxValues = new HashMap<String, MinMaxValues>();
 					isFullUpdateRequired = true;
 				}
@@ -654,16 +654,16 @@ public class GraphicsWindow {
 				if (this.oldNumberActiveVisible != numberActiveVisible) {
 					isFullUpdateRequired = true;
 				}
-				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-					Record record = activeRecordSet.get(recordKey);
-					String minFormated = record.getFormatedMinDisplayValue(), maxFormatted = record.getFormatedMaxDisplayValue();
-					MinMaxValues minMax = this.minMaxValues.get(recordKey);
-					if (minMax == null || !minFormated.equals(minMax.min) || !maxFormatted.equals(minMax.max)) {
-						this.minMaxValues.remove(recordKey);
-						this.minMaxValues.put(recordKey, new MinMaxValues(minFormated, maxFormatted));
-						isFullUpdateRequired = true;
-					}
-				}
+//				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
+//					Record record = activeRecordSet.get(recordKey);
+//					String minFormated = record.getFormatedMinDisplayValue(), maxFormatted = record.getFormatedMaxDisplayValue();
+//					MinMaxValues minMax = this.minMaxValues.get(recordKey);
+//					if (minMax == null || !minFormated.equals(minMax.min) || !maxFormatted.equals(minMax.max)) {
+//						this.minMaxValues.remove(recordKey);
+//						this.minMaxValues.put(recordKey, new MinMaxValues(minFormated, maxFormatted));
+//						isFullUpdateRequired = true;
+//					}
+//				}
 				if (isFullUpdateRequired) {
 					doUpdateCurveSelectorTable();
 					this.graphicCanvas.redraw();
@@ -681,7 +681,7 @@ public class GraphicsWindow {
 						this.graphicCanvas.redraw();
 				}
 				this.oldNumberActiveVisible = numberActiveVisible;
-				this.oldActiveRecordSetName = activeRecordSet.getName();
+				this.oldActiveRecordSet = activeRecordSet;
 				this.numScaleLeft = activeRecordSet.getNumberVisibleWithAxisPosLeft();
 			}
 			else { // enable clear
