@@ -213,13 +213,10 @@ public class UniLogDialog extends DeviceDialog {
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
+				SWTResourceManager.registerResourceUser(this.dialogShell);
 				this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if(this.isAlphaEnabled) {
-					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
-					this.isFadeOut = false;
-				}
+				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(null);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -259,14 +256,14 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
 						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 					}
 					public void mouseHover(MouseEvent evt) {
 						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
 						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 15);
+						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
 					}
 				});
 				{
@@ -716,7 +713,7 @@ public class UniLogDialog extends DeviceDialog {
 							this.dataMainComposite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.dataMainComposite.setLayout(null);
 							this.dataTabItem.setControl(this.dataMainComposite);
-							this.dataMainComposite.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
+							//this.dataMainComposite.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 							{
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setLayout(null);
@@ -1085,19 +1082,19 @@ public class UniLogDialog extends DeviceDialog {
 				//this.deviceConfigTabFolder.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
+						log.finer("deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
+						fadeOutAplhaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
+						log.finest("deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.info("deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 20, 20, 0, 0);
+						log.finer("deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
+						fadeInAlpaBlending(evt, UniLogDialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
 					}
 				});
 				
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-250, 150));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-320, 100));
 				this.dialogShell.open();
 			}
 			else {

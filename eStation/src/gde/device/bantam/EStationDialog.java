@@ -133,6 +133,7 @@ public class EStationDialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
+				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
 				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -423,7 +424,7 @@ public class EStationDialog extends DeviceDialog {
 						}
 					});
 				} // end boundsComposite
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 250, 150));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.open();
 			}
 			else {

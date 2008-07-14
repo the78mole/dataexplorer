@@ -135,10 +135,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if(this.isAlphaEnabled) {
-					this.dialogShell.setAlpha(this.shellAlpha); // TODO settings
-					this.isFadeOut = false;
-				}
+				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -300,14 +297,14 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
 						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
+						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 10);
 					}
 					public void mouseHover(MouseEvent evt) {
 						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
 						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 0, 10);
+						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 10);
 					}
 				});
 				{
@@ -458,7 +455,7 @@ public class SimulatorDialog extends DeviceDialog {
 						}
 					});
 				}
-				this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-175, 100));
 				this.dialogShell.open();
 			}
 			else {

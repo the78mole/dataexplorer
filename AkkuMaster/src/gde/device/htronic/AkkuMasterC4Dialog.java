@@ -28,6 +28,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -83,6 +85,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	Thread												versionThread;
 	final int											numberChannels;
 	final int											maxCurrent						= 2000;			// [mA]
+	
+	boolean 											isWarnedConnectError = false;
 
 	/**
 	 * constructor initialize all variables required
@@ -108,15 +112,42 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.dialogShell = new Shell(getApplication().getDisplay(), SWT.DIALOG_TRIM);
 
 			SWTResourceManager.registerResourceUser(this.dialogShell);
+			if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 			this.dialogShell.setLayout(null);
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(440, 590);
 			this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+				public void mouseEnter(MouseEvent evt) {
+					log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+					fadeOutAplhaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
+				}
+				public void mouseHover(MouseEvent evt) {
+					log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+				}
+				public void mouseExit(MouseEvent evt) {
+					log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+					fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
+				}
+			});
 			{
 				this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 				this.tabFolder.setBounds(0, 0, 430, 425);
+//				this.tabFolder.addMouseTrackListener(new MouseTrackAdapter() {
+//					public void mouseEnter(MouseEvent evt) {
+//						log.finer("tabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
+//						fadeOutAplhaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
+//					}
+//					public void mouseHover(MouseEvent evt) {
+//						log.finest("tabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
+//					}
+//					public void mouseExit(MouseEvent evt) {
+//						log.finer("tabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
+//						fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
+//					}
+//				});
 
 				@SuppressWarnings("nls")
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
@@ -291,7 +322,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 			}
-			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-220, 100));
 			this.dialogShell.open();
 			startUpdateVersionThread();
 		}
@@ -369,7 +400,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	void startUpdateVersionThread() {
 		try {
-			if (this.getSerialPort() != null) {
+			if (this.getSerialPort() != null && !this.isWarnedConnectError) {
 				if (!this.getSerialPort().isConnected()) {
 					this.getSerialPort().open();
 				}
@@ -396,6 +427,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		catch (Exception e) {
 			AkkuMasterC4Dialog.log.log(Level.WARNING, e.getMessage(), e);
 			this.getApplication().openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+			this.isWarnedConnectError = true;
 		}
 	}
 
@@ -500,5 +532,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		this.versionDate.setText(versionDateText);
 		this.versionCurrentType.setText(versionTypeText);
 		this.versionFrontplateType.setText(versionPanelText);
+	}
+
+	/**
+	 * @return the device
+	 */
+	public AkkuMasterC4 getDevice() {
+		return this.device;
 	}
 }

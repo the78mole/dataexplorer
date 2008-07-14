@@ -156,6 +156,7 @@ public class AkkuMasterChannelTab {
 				this.channelComposite = new Composite(tabFolder, SWT.NONE);
 				this.channelTab.setControl(this.channelComposite);
 				this.channelComposite.setLayout(null);
+				this.channelComposite.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 				this.channelComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						AkkuMasterChannelTab.log.finest("channelComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -168,6 +169,7 @@ public class AkkuMasterChannelTab {
 					this.captureOnlyGroup = new Group(this.channelComposite, SWT.NONE);
 					this.captureOnlyGroup.setLayout(null);
 					this.captureOnlyGroup.setBounds(12, 8, 400, 80);
+					this.captureOnlyGroup.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 					this.captureOnlyGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							AkkuMasterChannelTab.log.finest("captureOnlyGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -213,6 +215,7 @@ public class AkkuMasterChannelTab {
 					this.programGroup = new Group(this.channelComposite, SWT.NONE);
 					this.programGroup.setLayout(null);
 					this.programGroup.setBounds(12, 95, 400, 250);
+					this.programGroup.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 					this.programGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							AkkuMasterChannelTab.log.finest("programGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
