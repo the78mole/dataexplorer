@@ -17,7 +17,6 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.MeasurementType;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
@@ -315,40 +314,19 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			try {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 				String[] recordNames = recordSet.getRecordNames();
-				String[] measurementNames = this.getMeasurementNames(recordSet.getChannelConfigName());
-				int displayableCounter = 0;
-				Record record;
 
-				
-				// check if measurements isActive == false and set to isDisplayable == false
-				for (String measurementKey : recordNames) {
-					record = recordSet.get(measurementKey);
-					
-					if (record.isActive()) {
-						++displayableCounter;
-					}
-				}
-				
 				String recordKey = recordNames[3]; //3=Leistung
-				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[3]);
-				if (measurement.isCalculation()) {
-					log.fine(recordKey);
+				Record record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.get(recordKey).start();
 				}
-				this.calculationThreads.get(recordKey).start();
-				++displayableCounter;
-				
 				recordKey = recordNames[4]; //4=Energie
-				measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[4]);
-				if (measurement.isCalculation()) {
-					log.fine(recordKey);
+				record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-				}
-				this.calculationThreads.get(recordKey).start();
-				++displayableCounter;
-				
-				log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);
+					this.calculationThreads.get(recordKey).start();
+				}				
 			}
 			catch (RuntimeException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

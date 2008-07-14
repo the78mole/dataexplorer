@@ -217,7 +217,7 @@ public class MenuBar {
 							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0012), false);
+									importFileCSV(Messages.getString(MessageIds.OSDE_MSGT0012), false);
 								}
 							});
 						}
@@ -227,7 +227,7 @@ public class MenuBar {
 							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									importFileCVS(Messages.getString(MessageIds.OSDE_MSGT0014), true);
+									importFileCSV(Messages.getString(MessageIds.OSDE_MSGT0014), true);
 								}
 							});
 						}
@@ -245,7 +245,7 @@ public class MenuBar {
 							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-									exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0017), false);
+									exportFileCSV(Messages.getString(MessageIds.OSDE_MSGT0017), false);
 								}
 							});
 						}
@@ -256,7 +256,7 @@ public class MenuBar {
 						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-								exportFileCVS(Messages.getString(MessageIds.OSDE_MSGT0019), true); 
+								exportFileCSV(Messages.getString(MessageIds.OSDE_MSGT0019), true); 
 							}
 						});
 					}
@@ -737,16 +737,16 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void importFileCVS(String dialogName, final boolean isRaw) {
+	public void importFileCSV(String dialogName, final boolean isRaw) {
 		IDevice activeDevice = this.application.getActiveDevice();
 		if (activeDevice == null) {
-			this.application.openMessageDialog(Messages.getString(OSDE.FILE_ENDING_STAR_CVS));
+			this.application.openMessageDialog(Messages.getString(OSDE.FILE_ENDING_STAR_CSV));
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path);
+		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CSV }, path);
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 			String fileName = csvFileDialog.getFileName();
@@ -769,7 +769,7 @@ public class MenuBar {
 	 * @param dialogName
 	 * @param isRaw
 	 */
-	public void exportFileCVS(final String dialogName, final boolean isRaw) {
+	public void exportFileCSV(final String dialogName, final boolean isRaw) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0005)); 
@@ -784,7 +784,7 @@ public class MenuBar {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CVS }, path, getFileNameProposal()); 
+		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal()); 
 		String recordSetKey = activeRecordSet.getName();
 		final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 

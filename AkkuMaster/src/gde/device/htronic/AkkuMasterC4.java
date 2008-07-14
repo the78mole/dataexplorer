@@ -32,7 +32,6 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.MeasurementType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -226,26 +225,21 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-			// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+				// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 				String[] recordNames = recordSet.getRecordNames();
-				String[] measurementNames = this.getMeasurementNames(recordSet.getChannelConfigName());
 				
-				String recordKey = recordNames[3]; //3=Leistung
-				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[3]);
-				if (measurement.isCalculation()) {
-					AkkuMasterC4.log.fine(recordKey);
+				String recordKey = recordNames[3]; //3=Leistung/Power
+				Record record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.get(recordKey).start();
 				}
-				this.calculationThreads.get(recordKey).start();
-				
-				recordKey = recordNames[4]; //4=Energie
-				measurement = this.getMeasurement(recordSet.getChannelConfigName(), measurementNames[4]);
-				if (measurement.isCalculation()) {
-					AkkuMasterC4.log.fine(recordKey);
+				recordKey = recordNames[4]; //4=Energie/Energy
+				record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.get(recordKey).start();
 				}
-				this.calculationThreads.get(recordKey).start();
-				
 			}
 			catch (RuntimeException e) {
 				AkkuMasterC4.log.log(Level.SEVERE, e.getMessage(), e);
