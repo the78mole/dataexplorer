@@ -170,7 +170,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
-							initEditable();
 							String recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[0];
 							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
 							UniLogConfigTab.this.reveiverVoltageButton.setSelection(UniLogConfigTab.this.isActiveUe);
@@ -269,11 +268,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.reveiverVoltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("reveiverVoltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UniLogConfigTab.this.isActiveUe = UniLogConfigTab.this.reveiverVoltageButton.getSelection();
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 									if (activeRecordSet != null) {
 										// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-										activeRecordSet.get(activeRecordSet.getRecordNames()[0]).setActive(UniLogConfigTab.this.reveiverVoltageButton.getSelection());
+										activeRecordSet.get(activeRecordSet.getRecordNames()[0]).setActive(UniLogConfigTab.this.isActiveUe);
 										activeRecordSet.get(activeRecordSet.getRecordNames()[0]).setDisplayable(UniLogConfigTab.this.reveiverVoltageButton.getSelection());
 										UniLogConfigTab.this.application.updateGraphicsWindow();
 									}
@@ -296,7 +296,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.voltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("voltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
+								UniLogConfigTab.this.isActiveU = UniLogConfigTab.this.voltageButton.getSelection();
+								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.isActiveU && UniLogConfigTab.this.isActiveI);
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
 										&& UniLogConfigTab.this.revolutionButton.getSelection());
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
@@ -326,7 +327,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.currentButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								updateStateCurrentDependent(UniLogConfigTab.this.currentButton.getSelection());
+								updateStateCurrentDependent(UniLogConfigTab.this.isActiveI = UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
 										&& UniLogConfigTab.this.revolutionButton.getSelection());
@@ -500,8 +501,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.revolutionButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("revolutionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
-										&& UniLogConfigTab.this.revolutionButton.getSelection());
+								UniLogConfigTab.this.isActiveRPM = UniLogConfigTab.this.revolutionButton.getSelection();
+								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.isActiveU && UniLogConfigTab.this.isActiveI	&& UniLogConfigTab.this.isActiveRPM);
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 									if (activeRecordSet != null) {
@@ -598,7 +599,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.heightButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("heightButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								updateHeightDependent(UniLogConfigTab.this.heightButton.getSelection());
+								updateHeightDependent(UniLogConfigTab.this.isActiveHeight = UniLogConfigTab.this.heightButton.getSelection());
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 									if (activeRecordSet != null) {
