@@ -52,6 +52,7 @@ import osde.ui.SWTResourceManager;
 public class AkkuMasterC4Dialog extends DeviceDialog {
 	final static Logger						log										= Logger.getLogger(AkkuMasterC4Dialog.class.getName());
 	static final String						DEVICE_NAME						= "Akkumaster C4";
+	static final String						AKKU_MASTER_HELP_DIR	= "AkkuMaster";
 
 	CLabel												totalDischargeCurrentLabel;
 	CLabel												totalChargeCurrentLabel;
@@ -271,7 +272,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					AkkuMasterC4Dialog.log.finest("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-					getApplication().openHelpDialog("AkkuMaster", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					getApplication().openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -281,7 +282,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						AkkuMasterC4Dialog.log.finest("closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() && getChannelTab(4).isDataColletionActive())
+						if (getChannelTab(1).isDataColletionActive() && getChannelTab(2).isDataColletionActive() && getChannelTab(3).isDataColletionActive() && getChannelTab(4).isDataColletionActive())
 							setClosePossible(false);
 						else
 							setClosePossible(true);
