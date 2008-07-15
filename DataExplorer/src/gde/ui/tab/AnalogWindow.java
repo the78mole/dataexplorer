@@ -48,7 +48,7 @@ public class AnalogWindow {
 	private HashMap<String, AnalogDisplay>	displays;
 	private CLabel													infoText;
 	private GridLayout 											analogMainCompositeLayout;
-	private String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
+	private String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	private final Channels									channels;
 	private final TabFolder									displayTab;
@@ -63,7 +63,7 @@ public class AnalogWindow {
 
 	public void create() {
 		this.analogTab = new TabItem(this.displayTab, SWT.NONE);
-		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0229));
+		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		SWTResourceManager.registerResourceUser(this.analogTab);
 		
 		this.displays = new HashMap<String, AnalogDisplay>(3);

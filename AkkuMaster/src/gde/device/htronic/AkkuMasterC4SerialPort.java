@@ -207,7 +207,6 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		
 		byte[] answer = new byte[2];
 		answer = this.read(answer, 2000);
-		answer = this.read(answer, 2000);
 
 		if (answer[0] != command[0]) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1100));
 		if (answer[1] != this.ok) throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1104));

@@ -52,7 +52,7 @@ public class CellVoltageWindow {
 	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
 	int															voltageAvg = 0;
 	CLabel													infoText;
-	String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
+	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	final Channels									channels;
 	final TabFolder									displayTab;

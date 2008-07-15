@@ -168,7 +168,7 @@ public class DataTableWindow {
 		this.dataTable.removeAll();
 		if (isDisabled) {
 			TableItem item = new TableItem(this.dataTable, SWT.RIGHT);
-			item.setText(Messages.getString(MessageIds.OSDE_MSGT0228).split(OSDE.STRING_BLANK));
+			item.setText(Messages.getString(MessageIds.OSDE_MSGT0230).split(OSDE.STRING_BLANK));
 		}
 	}
 }

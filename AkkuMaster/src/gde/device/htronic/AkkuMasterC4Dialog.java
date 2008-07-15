@@ -107,7 +107,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		AkkuMasterC4Dialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
-				this.dialogShell = new Shell(this.getApplication().getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				this.dialogShell = new Shell(this.getApplication().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			else
 				this.dialogShell = new Shell(getApplication().getDisplay(), SWT.DIALOG_TRIM);
 
@@ -313,7 +313,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						AkkuMasterC4Dialog.log.finest("closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (getChannelTab(1).isDataColletionActive() && getChannelTab(2).isDataColletionActive() && getChannelTab(3).isDataColletionActive() && getChannelTab(4).isDataColletionActive())
+						if (getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() || getChannelTab(4).isDataColletionActive())
 							setClosePossible(false);
 						else
 							setClosePossible(true);

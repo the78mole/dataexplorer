@@ -109,7 +109,7 @@ public class AkkuMasterChannelTab {
 	long													timeStamp;
 	boolean												isChargeCurrentAdded			= false;
 	boolean												isDischargeCurrentAdded		= false;
-	boolean												isCollectDataStopped			= false;
+	boolean												isCollectDataStopped			= true;
 	boolean												isMemorySelectionChanged	= false;
 	String												recordSetKey							= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
 
@@ -614,6 +614,8 @@ public class AkkuMasterChannelTab {
 
 								}
 								catch (Exception e1) {
+									setStopButtonEnabled(false);
+									setStartDataGatheringSelection(true);
 									AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
 								}
 							}
@@ -725,7 +727,7 @@ public class AkkuMasterChannelTab {
 	}
 
 	public boolean isDataColletionActive() {
-		return isCollectData() && isCollectDataStopped();
+		return isCollectData() || !isCollectDataStopped();
 	}
 
 	/**

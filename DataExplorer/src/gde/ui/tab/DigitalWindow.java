@@ -48,7 +48,7 @@ public class DigitalWindow {
 	HashMap<String, DigitalDisplay>	displays;
 	CLabel													infoText;
 	FillLayout 											digitalMainCompositeLayout;
-	String 													info = Messages.getString(MessageIds.OSDE_MSGT0228);
+	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	final Channels									channels;
 	final TabFolder									displayTab;
