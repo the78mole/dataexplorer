@@ -151,8 +151,9 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				@SuppressWarnings("nls")
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
-				String[] aCellCount = new String[] { "1 Zelle", "2 Zellen", "3 Zellen", "4 Zellen", "5 Zellen", "6 Zellen", "7 Zellen", "8 Zellen", "9 Zellen", "10 Zellen", "11 Zellen", "12 Zellen",
-						"13 Zellen", "14 Zellen" };
+				String[] aCellCount = new String[] { "1"+Messages.getString(MessageIds.OSDE_MSGT1185), "2"+Messages.getString(MessageIds.OSDE_MSGT1148), "3"+Messages.getString(MessageIds.OSDE_MSGT1148), "4"+Messages.getString(MessageIds.OSDE_MSGT1148), "5"+Messages.getString(MessageIds.OSDE_MSGT1148), 
+						"6"+Messages.getString(MessageIds.OSDE_MSGT1148), "7"+Messages.getString(MessageIds.OSDE_MSGT1148), "8"+Messages.getString(MessageIds.OSDE_MSGT1148), "9"+Messages.getString(MessageIds.OSDE_MSGT1148), "10"+Messages.getString(MessageIds.OSDE_MSGT1148), 
+						"11"+Messages.getString(MessageIds.OSDE_MSGT1148), "12"+Messages.getString(MessageIds.OSDE_MSGT1148),	"13"+Messages.getString(MessageIds.OSDE_MSGT1148), "14"+Messages.getString(MessageIds.OSDE_MSGT1148) };
 				String[] aAkkuType = new String[] { "0 NiCa", "1 NiMh", "2 Pb" };
 				String[] aProgramm = new String[] { Messages.getString(MessageIds.OSDE_MSGT1100), Messages.getString(MessageIds.OSDE_MSGT1101), Messages.getString(MessageIds.OSDE_MSGT1102), Messages.getString(MessageIds.OSDE_MSGT1103), Messages.getString(MessageIds.OSDE_MSGT1104), Messages.getString(MessageIds.OSDE_MSGT1105), Messages.getString(MessageIds.OSDE_MSGT1106), Messages.getString(MessageIds.OSDE_MSGT1107),
 						Messages.getString(MessageIds.OSDE_MSGT1108) }; 
