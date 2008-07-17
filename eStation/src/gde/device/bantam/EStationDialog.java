@@ -55,6 +55,7 @@ import osde.ui.SWTResourceManager;
  */
 public class EStationDialog extends DeviceDialog {
 	final static Logger						log									= Logger.getLogger(EStationDialog.class.getName());
+	static final String						DEVICE_NAME					= "eStation";
 
 	CLabel												infoText;
 	Button												closeButton;
@@ -98,6 +99,7 @@ public class EStationDialog extends DeviceDialog {
 
 	HashMap<String, String>				configData					= new HashMap<String, String>();
 	GathererThread								dataGatherThread;
+	Thread												updateConfigTread;
 
 	final eStation								device;						// get device specific things, get serial port, ...
 	final EStationSerialPort			serialPort;				// open/close port execute getData()....
@@ -128,7 +130,7 @@ public class EStationDialog extends DeviceDialog {
 			EStationDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
-					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
@@ -143,24 +145,37 @@ public class EStationDialog extends DeviceDialog {
 				this.dialogShell.addFocusListener(new FocusAdapter() {
 					@Override
 					public void focusGained(FocusEvent evt) {
-						EStationDialog.log.info("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
-						try {
-							if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
-								EStationDialog.this.configData = new HashMap<String, String>();
-								EStationDialog.this.serialPort.wait4Bytes(2000);
-								EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());
-								updateGlobalConfigData(EStationDialog.this.configData);
-							}
-						}
-						catch (Exception e) {
-							EStationDialog.this.isConnectionWarned = true;
+						EStationDialog.log.finer("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
+						// if port is already connected, do not read the data update will be done by gathere thread
+						if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
+							EStationDialog.this.updateConfigTread = new Thread() {
+								public void run() {
+									try {
+										EStationDialog.this.configData = new HashMap<String, String>();
+										EStationDialog.this.serialPort.open();
+										EStationDialog.this.serialPort.wait4Bytes(2000);
+										EStationDialog.this.device.getConfigurationValues(EStationDialog.this.configData, EStationDialog.this.serialPort.getData());
+										getDialogShell().getDisplay().asyncExec(new Runnable() {
+											public void run() {
+												updateGlobalConfigData(EStationDialog.this.configData);
+											}
+										});
+									}
+									catch (Exception e) {
+										EStationDialog.this.isConnectionWarned = true;
+										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+									}
+									EStationDialog.this.serialPort.close();
+								}
+							};
+							EStationDialog.this.updateConfigTread.start();
 						}
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						EStationDialog.log.finer("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						EStationDialog.this.application.openHelpDialog("Sample", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						EStationDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				{
