@@ -71,7 +71,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	public void open() {
 		try {
 			Shell parent = getParent();
-			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg")); //$NON-NLS-1$
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());

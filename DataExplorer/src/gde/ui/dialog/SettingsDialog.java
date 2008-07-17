@@ -113,10 +113,11 @@ public class SettingsDialog extends Dialog {
 	Group													loggingGroup;
 
 	Thread												listPortsThread;
-	Vector<String>								availablePorts				= new Vector<String>();
+	Vector<String>								availablePorts					= new Vector<String>();
 	final Settings								settings;
 	final OpenSerialDataExplorer	application;
-	final String[] 								supportedLocals				= {"en", "de"}; //$NON-NLS-1$ //$NON-NLS-2$
+	final String[] 								supportedLocals					= {"en", "de"}; //$NON-NLS-1$ //$NON-NLS-2$
+	boolean 											isLocaleLanguageChanged = false;
 
 	public SettingsDialog(Shell parent, int style) {
 		super(parent, style);
@@ -129,7 +130,7 @@ public class SettingsDialog extends Dialog {
 			{
 			}
 			Shell parent = getParent();
-			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
@@ -176,6 +177,15 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
+								this.localCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.finest("localCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										String newLanguage = SettingsDialog.this.supportedLocals[SettingsDialog.this.localCombo.getSelectionIndex()];
+										SettingsDialog.this.isLocaleLanguageChanged = !SettingsDialog.this.settings.getLocale().getLanguage().equals(newLanguage);
+										SettingsDialog.this.settings.setLocaleLanguage(newLanguage);
+									}
+								});
 							}
 							{
 								this.localLabel = new CLabel(this.groupLocale, SWT.LEFT);
@@ -709,6 +719,10 @@ public class SettingsDialog extends Dialog {
 					if (SettingsDialog.this.settings.isGlobalSerialPort()) SettingsDialog.this.application.setGloabalSerialPort(SettingsDialog.this.serialPort.getText());
 					// set logging levels
 					SettingsDialog.this.settings.updateLogLevel();
+					// check for changed local
+					if (SettingsDialog.this.isLocaleLanguageChanged) {
+						SettingsDialog.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0304));
+					}
 				}
 			});
 			{ // begin ok button

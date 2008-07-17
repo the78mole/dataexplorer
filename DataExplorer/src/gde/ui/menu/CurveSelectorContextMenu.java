@@ -75,7 +75,7 @@ public class CurveSelectorContextMenu {
 	public CurveSelectorContextMenu() {
 		super();
 		this.application = OpenSerialDataExplorer.getInstance();
-		this.axisEndValuesDialog = new AxisEndValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		this.axisEndValuesDialog = new AxisEndValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 	}
 
 	public void createMenu(final Menu popupmenu) {

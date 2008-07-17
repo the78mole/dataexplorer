@@ -200,7 +200,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			updateAvailablePorts();
 
 			Shell parent = getParent();
-			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 
 			//Register as a resource user - SWTResourceManager will handle the obtaining and disposing of resources
 			SWTResourceManager.registerResourceUser(this.dialogShell);

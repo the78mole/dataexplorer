@@ -84,7 +84,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 		try {
 			this.isInit = true;
 			Shell parent = getParent();
-			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
