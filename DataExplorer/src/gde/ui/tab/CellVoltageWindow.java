@@ -22,14 +22,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 import osde.data.Channel;
 import osde.data.Channels;
@@ -48,14 +48,14 @@ public class CellVoltageWindow {
 	final static Logger											log	= Logger.getLogger(CellVoltageWindow.class.getName());
 
 	Composite												cellVoltageMainComposite, coverComposite;
-	TabItem													cellVoltageTab;
+	CTabItem												cellVoltageTab;
 	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
 	int															voltageAvg = 0;
 	CLabel													infoText;
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	final Channels									channels;
-	final TabFolder									displayTab;
+	final CTabFolder								displayTab;
 	RecordSet												oldRecordSet = null;
 	Channel													oldChannel = null;
 	
@@ -91,13 +91,13 @@ public class CellVoltageWindow {
 	int 														voltageDelta = 0;
 	Point 													displayCompositeSize = new Point(0,0);
 
-	public CellVoltageWindow(TabFolder currentDisplayTab) {
+	public CellVoltageWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		this.cellVoltageTab = new TabItem(this.displayTab, SWT.NONE);
+		this.cellVoltageTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		SWTResourceManager.registerResourceUser(this.displayTab);
 		{

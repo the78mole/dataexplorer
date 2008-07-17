@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -47,8 +49,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -88,14 +88,14 @@ public class GraphicsWindow {
 	public final static int				MODE_CUT_LEFT						= 6;
 	public final static int				MODE_CUT_RIGHT					= 7;
 
-	final TabFolder								displayTab;
+	final CTabFolder							displayTab;
 	SashForm											graphicSashForm;
 	// Curve Selector Table with popup menu
 	Composite											curveSelector;
 	CLabel												curveSelectorHeader;
 	Table													curveSelectorTable;
 	TableColumn										tableSelectorColumn;
-	TabItem												graphic;
+	CTabItem											graphic;
 	Menu													popupmenu;
 	CurveSelectorContextMenu			contextMenu;
 
@@ -161,7 +161,7 @@ public class GraphicsWindow {
 	boolean												isRightCutMode					= false;
 	int														xPosCut									= 0;
 	
-	public GraphicsWindow(TabFolder currentDisplayTab, int currentType, String useName) {
+	public GraphicsWindow(CTabFolder currentDisplayTab, int currentType, String useName) {
 		this.displayTab = currentDisplayTab;
 		this.type = currentType;
 		this.name = useName;
@@ -170,7 +170,7 @@ public class GraphicsWindow {
 	}
 
 	public void create() {
-		this.graphic = new TabItem(this.displayTab, SWT.NONE);
+		this.graphic = new CTabItem(this.displayTab, SWT.NONE);
 		this.graphic.setText(this.name);
 		SWTResourceManager.registerResourceUser(this.graphic);
 

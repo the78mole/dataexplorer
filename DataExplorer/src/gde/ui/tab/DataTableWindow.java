@@ -20,8 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -45,22 +45,22 @@ import osde.ui.SWTResourceManager;
 public class DataTableWindow {
 	final static Logger					  log	= Logger.getLogger(DataTableWindow.class.getName());
 
-	TabItem												table;
+	CTabItem											table;
 	Table													dataTable;
 	TableColumn										timeColumn;
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
-	final TabFolder								tabFolder;
+	final CTabFolder							tabFolder;
 
-	public DataTableWindow(OpenSerialDataExplorer currenApplication, TabFolder dataTab) {
+	public DataTableWindow(OpenSerialDataExplorer currenApplication, CTabFolder dataTab) {
 		this.application = currenApplication;
 		this.tabFolder = dataTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		this.table = new TabItem(this.tabFolder, SWT.NONE);
+		this.table = new CTabItem(this.tabFolder, SWT.NONE);
 		this.table.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
 		{
 			this.dataTable = new Table(this.tabFolder, SWT.BORDER);

@@ -21,12 +21,12 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 import osde.data.Channel;
 import osde.data.Channels;
@@ -43,7 +43,7 @@ import osde.ui.SWTResourceManager;
 public class AnalogWindow {
 	final static Logger											log	= Logger.getLogger(AnalogWindow.class.getName());
 
-	private TabItem													analogTab;
+	private CTabItem												analogTab;
 	private Composite												analogMainComposite;
 	private HashMap<String, AnalogDisplay>	displays;
 	private CLabel													infoText;
@@ -51,18 +51,18 @@ public class AnalogWindow {
 	private String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	private final Channels									channels;
-	private final TabFolder									displayTab;
+	private final CTabFolder								displayTab;
 	private RecordSet												oldRecordSet;
 	private Channel													oldChannel;
 	private String[] 												oldRecordsToDisplay;
 
-	public AnalogWindow(TabFolder currentDisplayTab) {
+	public AnalogWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		this.analogTab = new TabItem(this.displayTab, SWT.NONE);
+		this.analogTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		SWTResourceManager.registerResourceUser(this.analogTab);
 		

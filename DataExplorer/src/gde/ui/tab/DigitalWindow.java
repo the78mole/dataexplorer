@@ -21,12 +21,12 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 import osde.data.Channel;
 import osde.data.Channels;
@@ -44,25 +44,25 @@ public class DigitalWindow {
 	final static Logger							log	= Logger.getLogger(DigitalWindow.class.getName());
 
 	Composite												digitalMainComposite;
-	TabItem													digitalTab;
+	CTabItem												digitalTab;
 	HashMap<String, DigitalDisplay>	displays;
 	CLabel													infoText;
 	FillLayout 											digitalMainCompositeLayout;
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	final Channels									channels;
-	final TabFolder									displayTab;
+	final CTabFolder								displayTab;
 	RecordSet												oldRecordSet;
 	Channel													oldChannel;
 	String[] 												oldRecordsToDisplay;
 
-	public DigitalWindow(TabFolder currentDisplayTab) {
+	public DigitalWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		this.digitalTab = new TabItem(this.displayTab, SWT.NONE);
+		this.digitalTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		SWTResourceManager.registerResourceUser(this.digitalTab);
 		

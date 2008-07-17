@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -30,8 +32,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -53,7 +53,7 @@ public class FileCommentWindow {
 
 	final static Logger					log	= Logger.getLogger(FileCommentWindow.class.getName());
 
-	TabItem					commentTab;
+	CTabItem				commentTab;
 	Composite				commentMainComposite;
 	CLabel 					infoLabel;
 	Text						fileCommentText;
@@ -61,14 +61,14 @@ public class FileCommentWindow {
 	TableColumn			recordCommentTableHeader;
 	TableColumn			recordCommentTableHeader2;
 
-	final Channels	channels;
-	final TabFolder	displayTab;
+	final Channels		channels;
+	final CTabFolder	displayTab;
 
 	/**
-	 * constructor with TabFolder parent
+	 * constructor with CTabFolder parent
 	 * @param currentDisplayTab
 	 */
-	public FileCommentWindow(TabFolder currentDisplayTab) {
+	public FileCommentWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
@@ -77,7 +77,7 @@ public class FileCommentWindow {
 	 * method to create the window and register required event listener
 	 */
 	public void create() {
-		this.commentTab = new TabItem(this.displayTab, SWT.NONE);
+		this.commentTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 		SWTResourceManager.registerResourceUser(this.commentTab);
 

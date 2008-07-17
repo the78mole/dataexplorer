@@ -434,10 +434,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int sleepTime = 10;
 		int timeOutCounter = timeout_msec / sleepTime;
 
-		while ((!this.dataAvailable || 0 != this.inputStream.available()) && timeOutCounter-- > 0) {
+		while (!this.dataAvailable || 0 == this.inputStream.available()) {
+			log.info("this.dataAvailable = " + this.dataAvailable + " inStreamAvailable = " + this.inputStream.available());
 			Thread.sleep(sleepTime);	
 			if (timeOutCounter-- <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { 0, timeout_msec })); 
+				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 				log.log(Level.WARNING, e.getMessage(), e);
 				throw e;
 			}
