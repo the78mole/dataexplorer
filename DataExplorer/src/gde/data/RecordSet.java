@@ -210,14 +210,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelConfigName = newChannelConfiguration;
-				
-		// update child records to new channel or configuration key and to the new parent
-		for (String recordKey : this.keySet()) {
-			Record tmpRecord = this.get(recordKey);
-			tmpRecord.setChannelConfigKey(newChannelConfiguration);
-			tmpRecord.setParent(this);
-			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, recordKey));
-		}
 		
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
@@ -231,6 +223,14 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		this.recordNames = newRecordNames.clone();
+		
+		// update child records to new channel or configuration key and to the new parent
+		for (int i=0; i<this.recordNames.length; ++i) {
+			Record tmpRecord = this.get(this.recordNames[i]);
+			tmpRecord.setChannelConfigKey(newChannelConfiguration);
+			tmpRecord.setParent(this);
+			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
+		}
 
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
@@ -579,7 +579,7 @@ public class RecordSet extends HashMap<String, Record> {
 		Vector<String> calculationRecords = new Vector<String>();
 		String[] deviceMeasurements =  this.device.getMeasurementNames(this.channelConfigName);
 		for (int i=0; i<deviceMeasurements.length; ++i) { // record names may not match device measurements
-			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, deviceMeasurements[i]);
+			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
 			if (!measurement.isCalculation()) { // active or inactive 
 				calculationRecords.add(this.recordNames[i]);
 			}
@@ -633,8 +633,7 @@ public class RecordSet extends HashMap<String, Record> {
 		RecordSet newRecordSet = new RecordSet(device, channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
 
 		for (int i = 0; i < recordNames.length; i++) {
-			String recordKey = recordNames[i];
-			MeasurementType measurement = device.getMeasurement(channelKey, recordKey);
+			MeasurementType measurement = device.getMeasurement(channelKey, i);
 			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getProperty(), 5);
 
 			// set color defaults
@@ -1399,15 +1398,23 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.recordNames[0];
 	}
 	
+	public int getRecordNameIndex(String recordName) {
+		int index = 0;
+		while (index < this.recordNames.length) {
+			if (recordName.equals(this.recordNames[index])) break;
+			index++;
+		}
+		return index;
+	}
 	/**
 	 * set if a recalculation of depending calculated records are required
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
 		this.setTableDataCalculated(false);
-		for (String recordKey : this.device.getMeasurementNames(this.channelConfigName)) {
-			if (this.device.getMeasurement(this.channelConfigName, recordKey).isCalculation())
-				this.get(recordKey).resetMinMax();
+		for (int i=0; i<this.device.getMeasurementNames(this.channelConfigName).length; ++i) {
+			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation())
+				this.get(this.getRecordNames()[i]).resetMinMax();
 		}
 	}
 

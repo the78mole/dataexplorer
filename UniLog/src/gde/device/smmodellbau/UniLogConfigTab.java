@@ -170,42 +170,36 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
-							String recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[0];
-							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 0); // 0=VoltageReceiver
 							UniLogConfigTab.this.reveiverVoltageButton.setSelection(UniLogConfigTab.this.isActiveUe);
 							UniLogConfigTab.this.reveiverVoltageButton.setText(measurement.getName());
 							UniLogConfigTab.this.receiverVoltageSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.receiverVoltageUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[1];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 1); // 1=Voltage
 							UniLogConfigTab.this.voltageButton.setSelection(UniLogConfigTab.this.isActiveU);
 							UniLogConfigTab.this.voltageButton.setText(measurement.getName());
 							UniLogConfigTab.this.voltageSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.voltageUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[2];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 2); // 2=current
 							UniLogConfigTab.this.currentButton.setSelection(UniLogConfigTab.this.isActiveI);
 							UniLogConfigTab.this.currentButton.setText(measurement.getName());
 							UniLogConfigTab.this.currentSymbol.setText(" " + measurement.getSymbol()); //$NON-NLS-1$
 							UniLogConfigTab.this.currentUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 							UniLogConfigTab.this.currentOffset.setText(String.format("%.3f", UniLogConfigTab.this.offsetCurrent)); //$NON-NLS-1$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[3];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 3); // 3=charge/capacity
 							UniLogConfigTab.this.capacityLabel.setText(measurement.getName());
 							UniLogConfigTab.this.capacitySymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.capacityUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[4];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 4); // 4=power
 							UniLogConfigTab.this.powerLabel.setText(measurement.getName());
 							UniLogConfigTab.this.powerSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.powerUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[5];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 5); // 5=energy
 							UniLogConfigTab.this.energyLabel.setText(measurement.getName());
 							UniLogConfigTab.this.energySymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.energyUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -217,22 +211,19 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 
 							// number cells voltagePerCell
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 6);  // 6=voltagePerCell/cell
 							UniLogConfigTab.this.voltagePerCellLabel.setText(measurement.getName());
 							UniLogConfigTab.this.voltagePerCellSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.voltagePerCellUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 							UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue); //$NON-NLS-1$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[7];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 7); //7=revolution
 							UniLogConfigTab.this.revolutionButton.setSelection(UniLogConfigTab.this.isActiveRPM);
 							UniLogConfigTab.this.revolutionButton.setText(measurement.getName());
 							UniLogConfigTab.this.revolutionSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.revolutionUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 8); // 8=efficience
 							UniLogConfigTab.this.etaButton.setText(measurement.getName());
 							UniLogConfigTab.this.etaSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.etaUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,15 +233,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
 									&& UniLogConfigTab.this.revolutionButton.getSelection());
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[9];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 9); // 9=height
 							UniLogConfigTab.this.heightButton.setSelection(UniLogConfigTab.this.isActiveHeight);
 							UniLogConfigTab.this.heightButton.setText(measurement.getName());
 							UniLogConfigTab.this.heightSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.heightUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 
-							recordKey = UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[10];
-							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, recordKey);
+							measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 10); // 10=slope
 							UniLogConfigTab.this.slopeLabel.setText(measurement.getName());
 							UniLogConfigTab.this.slopeSymbol.setText(measurement.getSymbol());
 							UniLogConfigTab.this.slopeUnit.setText("[" + measurement.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1209,55 +1198,45 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * collect all configuration relevant data and update device configuration
 	 */
 	void collectAndUpdateConfiguration() {
-		String measurementKey = this.device.getMeasurementNames(this.configName)[0];
-		MeasurementType measurement = this.device.getMeasurement(this.configName, measurementKey);
+		MeasurementType measurement = this.device.getMeasurement(this.configName, 0); // 0=voltageReceiver
 		measurement.setActive(this.reveiverVoltageButton.getSelection());
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[1];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 1); // 1=voltage
 		measurement.setActive(this.voltageButton.getSelection());
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[2];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 2); // 2=current
 		measurement.setActive(this.currentButton.getSelection());
 		measurement.setOffset(new Double(this.currentOffset.getText().replace(',', '.').trim()));
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[6]; // 6=votagePerCell
-		this.device.setMeasurementPropertyValue(this.configName, measurementKey, UniLog.NUMBER_CELLS, DataTypes.INTEGER, this.numCellValue);
+		this.device.setMeasurementPropertyValue(this.configName, 6, UniLog.NUMBER_CELLS, DataTypes.INTEGER, this.numCellValue);
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[7];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 7); //7=revolution
 		measurement.setActive(this.revolutionButton.getSelection());
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[8]; // 8=efficiency
-		this.device.setMeasurementPropertyValue(this.configName, measurementKey, UniLog.PROP_N_100_WATT, DataTypes.INTEGER, this.prop100WValue);
+		this.device.setMeasurementPropertyValue(this.configName, 8, UniLog.PROP_N_100_WATT, DataTypes.INTEGER, this.prop100WValue);// 8=efficiency
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[9];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 9); // 9=height
 		measurement.setActive(this.heightButton.getSelection());
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[10]; // 10=slope
-		this.device.setMeasurementPropertyValue(this.configName, measurementKey, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, this.slopeTypeSelection);
-		this.device.setMeasurementPropertyValue(this.configName, measurementKey, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, this.slopeTimeSelection);
+		// 10=slope
+		this.device.setMeasurementPropertyValue(this.configName, 10, CalculationThread.REGRESSION_TYPE, DataTypes.STRING, this.slopeTypeSelection);
+		this.device.setMeasurementPropertyValue(this.configName, 10, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, this.slopeTimeSelection);
 		
-		measurementKey = this.device.getMeasurementNames(this.configName)[11];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 11); // 11=A1
 		measurement.setActive(this.a1Button.getSelection());
 		measurement.setName(this.a1Text.getText().trim());
 		measurement.setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 		measurement.setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.').trim()));
 		measurement.setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.').trim()));
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[12];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 12); // 12=A2
 		measurement.setActive(this.a2Button.getSelection());
 		measurement.setName(this.a2Text.getText().trim());
 		measurement.setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
 		measurement.setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.').trim()));
 		measurement.setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.').trim()));
 
-		measurementKey = this.device.getMeasurementNames(this.configName)[13];
-		measurement = this.device.getMeasurement(this.configName, measurementKey);
+		measurement = this.device.getMeasurement(this.configName, 13); // 13=A3
 		measurement.setActive(this.a3Button.getSelection());
 		measurement.setName(this.a3Text.getText().trim());
 		measurement.setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
@@ -1296,7 +1275,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;
-		String recordKey = null;
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // load all data from record set
 			String[] recordKeys = recordSet.getRecordNames();
@@ -1344,67 +1322,56 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.factorA3 = record.getFactor();
 		}
 		else { // no active record, load data from device properties
-			recordKey = this.device.getMeasurementNames(this.configName)[0];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
+			measurement = this.device.getMeasurement(this.configName, 0);
 			this.isActiveUe = measurement.isActive();
 
-			recordKey = this.device.getMeasurementNames(this.configName)[1];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
+			measurement = this.device.getMeasurement(this.configName, 1);
 			this.isActiveU = measurement.isActive();
 
-			recordKey = this.device.getMeasurementNames(this.configName)[2];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
+			measurement = this.device.getMeasurement(this.configName, 2);
 			this.isActiveI = measurement.isActive();
 			this.offsetCurrent = measurement.getOffset();
 
-			recordKey = this.device.getMeasurementNames(this.configName)[6];
-			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.NUMBER_CELLS);
+			property = this.device.getMeasruementProperty(this.configName, 6, UniLog.NUMBER_CELLS);
 			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
 
-			recordKey = this.device.getMeasurementNames(this.configName)[7];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
+			measurement = this.device.getMeasurement(this.configName, 7);
 			this.isActiveRPM = measurement.isActive();
 
-			recordKey = this.device.getMeasurementNames(this.configName)[8];
-			property = this.device.getMeasruementProperty(this.configName, recordKey, UniLog.PROP_N_100_WATT);
+			property = this.device.getMeasruementProperty(this.configName, 8, UniLog.PROP_N_100_WATT);
 			this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
 
-			recordKey = this.device.getMeasurementNames(this.configName)[9];
-			measurement = this.device.getMeasurement(this.configName, recordKey);
+			measurement = this.device.getMeasurement(this.configName, 9);
 			this.isActiveHeight = measurement.isActive();
 
-			recordKey = this.device.getMeasurementNames(this.configName)[10];
-			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_TYPE);
+			property = this.device.getMeasruementProperty(this.configName, 10, CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
-			property = this.device.getMeasruementProperty(this.configName, recordKey, CalculationThread.REGRESSION_INTERVAL_SEC);
+			property = this.device.getMeasruementProperty(this.configName, 10, CalculationThread.REGRESSION_INTERVAL_SEC);
 			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
 
 			if (this.nameA1.equals(OSDE.STRING_DASH)) {
-				recordKey = this.device.getMeasurementNames(this.configName)[11];
-				measurement = this.device.getMeasurement(this.configName, recordKey);
+				measurement = this.device.getMeasurement(this.configName, 11);
 				this.isActiveA1 = measurement.isActive();
 				this.nameA1 = measurement.getName();
 				this.unitA1 = measurement.getUnit();
-				this.offsetA1 = this.device.getMeasurementOffset(this.configName, recordKey);
-				this.factorA1 = this.device.getMeasurementFactor(this.configName, recordKey);
+				this.offsetA1 = this.device.getMeasurementOffset(this.configName, 11);
+				this.factorA1 = this.device.getMeasurementFactor(this.configName, 11);
 			}
 			if (this.nameA2.equals(OSDE.STRING_DASH)) {
-				recordKey = this.device.getMeasurementNames(this.configName)[12];
-				measurement = this.device.getMeasurement(this.configName, recordKey);
+				measurement = this.device.getMeasurement(this.configName, 12);
 				this.isActiveA2 = measurement.isActive();
 				this.nameA2 = measurement.getName();
 				this.unitA2 = measurement.getUnit();
-				this.offsetA2 = this.device.getMeasurementOffset(this.configName, recordKey);
-				this.factorA2 = this.device.getMeasurementFactor(this.configName, recordKey);
+				this.offsetA2 = this.device.getMeasurementOffset(this.configName, 12);
+				this.factorA2 = this.device.getMeasurementFactor(this.configName, 12);
 			}
 			if (this.nameA3.equals(OSDE.STRING_DASH)) {
-				recordKey = this.device.getMeasurementNames(this.configName)[13];
-				measurement = this.device.getMeasurement(this.configName, recordKey);
+				measurement = this.device.getMeasurement(this.configName, 13);
 				this.isActiveA3 = measurement.isActive();
 				this.nameA3 = measurement.getName();
 				this.unitA3 = measurement.getUnit();
-				this.offsetA3 = this.device.getMeasurementOffset(this.configName, recordKey);
-				this.factorA3 = this.device.getMeasurementFactor(this.configName, recordKey);
+				this.offsetA3 = this.device.getMeasurementOffset(this.configName, 13);
+				this.factorA3 = this.device.getMeasurementFactor(this.configName, 13);
 			}
 		}
 	}

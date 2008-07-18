@@ -482,7 +482,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordNames.length; ++i) {
 			// since actual record names can differ from device configuration measurement names, match by sequence
 			record = recordSet.get(recordNames[i]);		
-			measurement = this.getMeasurement(channelConfigKey, measurementNames[i]);
+			measurement = this.getMeasurement(channelConfigKey, i);
 			log.fine(recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names

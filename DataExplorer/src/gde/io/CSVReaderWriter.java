@@ -172,8 +172,9 @@ public class CSVReaderWriter {
 					String[] header = line.split(OSDE.STRING_SEMICOLON);
 					sizeRecords = header.length - 1;
 					int countNotMeasurement = 0;
-					for (String recordKey : recordNames) {
-						MeasurementType measurement = device.getMeasurement(fileConfig, recordKey);
+					for (int i=0; i<recordNames.length; ++i) {
+						String recordKey = recordNames[i];
+						MeasurementType measurement = device.getMeasurement(fileConfig, i);
 						headerStringConf.append(measurement.getName()).append(separator);
 
 						log.fine(measurement.getName() + " isCalculation = " + measurement.isCalculation()); //$NON-NLS-1$
@@ -204,7 +205,7 @@ public class CSVReaderWriter {
 						StringBuilder unitCompare = new StringBuilder().append(lineSep);
 						for (int i = 1; i < header.length; i++) {
 							String recordKey = recordKeys[i - 1];
-							String expectUnit = device.getMeasurementUnit(fileConfig, recordKey);
+							String expectUnit = device.getMeasurementUnit(fileConfig, (i - 1) );
 							String[] inMeasurement = header[i].trim().replace(OSDE.STRING_LEFT_BRACKET, OSDE.STRING_SEMICOLON).replace(OSDE.STRING_RIGHT_BRACKET, OSDE.STRING_SEMICOLON).split(OSDE.STRING_SEMICOLON);
 							String inUnit = inMeasurement.length == 2 ? inMeasurement[1] : Settings.EMPTY;
 							unitCompare.append(recordKey + Messages.getString(MessageIds.OSDE_MSGT0136) + inUnit + Messages.getString(MessageIds.OSDE_MSGT0137) + expectUnit).append(lineSep);
@@ -316,7 +317,7 @@ public class CSVReaderWriter {
 			// write the measurements signature
 			String[] recordNames = device.getMeasurementNames(recordSet.getChannelConfigName());
 			for (int i = 0; i < recordNames.length; i++) {
-				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigName(), recordNames[i]);
+				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigName(), i);
 				log.finest("append " + recordNames[i]); //$NON-NLS-1$
 				if (isRaw) {
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
@@ -346,7 +347,7 @@ public class CSVReaderWriter {
 					if (record == null)
 						throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0005, new Object[]{recordNames[j], recordSet.getChannelConfigName()}));
 
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigName(), recordNames[j]);
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigName(), j);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())

@@ -171,7 +171,7 @@ public class GraphicsWindow {
 			this.graphicSashForm = new SashForm(this.displayTab, SWT.HORIZONTAL);
 			this.graphic.setControl(this.graphicSashForm);
 			{ // curveSelector
-				this.curveSelector = new Composite(this.graphicSashForm, SWT.BORDER);
+				this.curveSelector = new Composite(this.graphicSashForm, SWT.NONE);
 				FormLayout curveSelectorLayout = new FormLayout();
 				this.curveSelector.setLayout(curveSelectorLayout);
 				GridData curveSelectorLData = new GridData();
@@ -187,7 +187,6 @@ public class GraphicsWindow {
 					this.curveSelectorHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0254));
 					this.curveSelectorHeader.pack();
 					this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x + 10;
-					//curveSelectorHeader.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
 					FormData curveSelectorHeaderLData = new FormData();
 					curveSelectorHeaderLData.width = this.selectorHeaderWidth;
 					curveSelectorHeaderLData.height = 24;
@@ -639,8 +638,7 @@ public class GraphicsWindow {
 	 */
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			//doRedrawGraphics();
-			this.graphicCanvas.redraw();
+			doRedrawGraphics();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
@@ -739,6 +737,7 @@ public class GraphicsWindow {
 	 * executes the update of the curve selector table
 	 */
 	void doUpdateCurveSelectorTable() {
+		log.info("entry");
 		IDevice device = this.application.getActiveDevice();
 		int itemWidth = this.selectorHeaderWidth;
 		RecordSet recordSet = this.type == GraphicsWindow.TYPE_NORMAL ? this.channels.getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
@@ -765,7 +764,7 @@ public class GraphicsWindow {
 				TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 				item.setForeground(record.getColor());
 				item.setText(record.getName());
-				//curveSelectorTable.pack();
+				//this.curveSelectorTable.pack();
 				//log.info(item.getText() + OSDE.STRING_BLANK + item.getBounds().width);
 				if (itemWidth < item.getBounds().width) itemWidth = item.getBounds().width;
 				//log.info(item.getText() + OSDE.STRING_BLANK + itemWidth);
@@ -801,7 +800,7 @@ public class GraphicsWindow {
 		if (this.isCurveSelectorEnabled) {
 			int sashformWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : this.selectorColumnWidth * 10;
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-10);
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-5);
 			this.sashformWeights = new int[] { this.selectorColumnWidth, sashformWidth - this.selectorColumnWidth};
 			this.graphicSashForm.setWeights(this.sashformWeights);
 		}

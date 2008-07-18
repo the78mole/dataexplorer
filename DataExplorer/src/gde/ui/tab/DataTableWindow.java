@@ -111,7 +111,7 @@ public class DataTableWindow {
 				String channelConfigKey = activeChannel.getConfigKey();
 				String[] measurements = device.getMeasurementNames(channelConfigKey);
 				for (int i = 0; i < measurements.length; i++) {
-					MeasurementType measurement = device.getMeasurement(channelConfigKey, measurements[i]);
+					MeasurementType measurement = device.getMeasurement(channelConfigKey, i);
 					StringBuilder sb = new StringBuilder();
 					sb.append(measurement.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);

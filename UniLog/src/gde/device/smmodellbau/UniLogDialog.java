@@ -209,7 +209,7 @@ public class UniLogDialog extends DeviceDialog {
 			UniLogDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
-					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
@@ -1078,7 +1078,8 @@ public class UniLogDialog extends DeviceDialog {
 					});
 				} // end tabs
 
-				this.deviceConfigTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber());
+				int index = Channels.getInstance().getActiveChannelNumber();
+				this.deviceConfigTabFolder.setSelection(index<0 || index>5 ? 1 : index);
 				//this.deviceConfigTabFolder.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
