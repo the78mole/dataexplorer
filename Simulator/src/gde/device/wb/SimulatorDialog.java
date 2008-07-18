@@ -130,7 +130,7 @@ public class SimulatorDialog extends DeviceDialog {
 			log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
-					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 				else
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
