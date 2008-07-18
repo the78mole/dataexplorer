@@ -544,6 +544,18 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		return visibleRecords.toArray(new String[0]);
 	}
+	
+	/**
+	 * query number of displayable records
+	 * @return
+	 */
+	public int getNumberOfVisibleAndDisplayableRecords() {
+		int displayable = 0;
+		for (String recordKey : this.recordNames) {
+			if (this.get(recordKey).isVisible && this.get(recordKey).isDisplayable) displayable++;
+		}
+		return displayable;
+	}
 
 	/**
 	 * method to get the sorted record active names as string array

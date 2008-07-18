@@ -111,18 +111,11 @@ public class GraphicsWindow {
 	String												oldRecordSetHeader, oldRecordSetComment;
 	
 	// update graphics only area required
-	int 													oldNumberActiveVisible	= 0;
+	int 													oldNumberVisibleDisplayable	= 0;
 	RecordSet											oldActiveRecordSet	= null;
 	int 													numScaleLeft = 0;
-	class MinMaxValues {
-		String min;
-		String max;
-		MinMaxValues(String newMin, String newMax) {
-			this.min = newMin;
-			this.max = newMax;
-		}
-	}
-	HashMap<String, MinMaxValues>	minMaxValues = new HashMap<String, MinMaxValues>();
+	HashMap<String, Integer>			scaleTicks = new HashMap<String, Integer>();
+	Rectangle											oldCanvasBounds = new Rectangle(0,0,0,0);
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -306,6 +299,28 @@ public class GraphicsWindow {
 							GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 						else
 							GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
+				this.graphicsComposite.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						GraphicsWindow.log.info("graphicsComposite.paintControl, event=" + evt); //$NON-NLS-1$
+						Point graphicsSize = GraphicsWindow.this.graphicsComposite.getSize();
+						int x = 0;
+						int y = GraphicsWindow.this.headerGap;
+						int width = graphicsSize.x;
+						int height = GraphicsWindow.this.headerHeight;
+						GraphicsWindow.this.recordSetHeader.setBounds(x, y, width, height);
+						
+						y = GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight;
+						height = graphicsSize.y - (GraphicsWindow.this.headerGap + GraphicsWindow.this.commentGap + GraphicsWindow.this.commentHeight + GraphicsWindow.this.headerHeight);
+						GraphicsWindow.this.graphicCanvas.setBounds(x, y, width, height);
+						
+						y =  GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight + height;
+						height = GraphicsWindow.this.commentHeight;
+						GraphicsWindow.this.recordSetComment.setBounds(20, y, width-20, height);
+						
+						clearHeaderAndComment();
+						doRedrawGraphics();
 					}
 				});
 				{
@@ -624,7 +639,8 @@ public class GraphicsWindow {
 	 */
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			doRedrawGraphics();
+			//doRedrawGraphics();
+			this.graphicCanvas.redraw();
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
@@ -643,30 +659,37 @@ public class GraphicsWindow {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
+				int numberVisibleDisplayable = activeRecordSet.getNumberOfVisibleAndDisplayableRecords();
+				log.info("numberVisibleDisplayable " + numberVisibleDisplayable + " oldNumberActiveVisible " + this.oldNumberVisibleDisplayable);
+				Rectangle graphicsBounds = this.graphicCanvas.getClientArea();
+				log.info(this.oldCanvasBounds + " - " + graphicsBounds);
 				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.equals(activeRecordSet)) {
-					this.minMaxValues = new HashMap<String, MinMaxValues>();
+					this.scaleTicks = new HashMap<String, Integer>();
 					isFullUpdateRequired = true;
 				}
-				if (this.numScaleLeft != activeRecordSet.getNumberVisibleWithAxisPosLeft()) {
+				else if (!this.oldCanvasBounds.equals(graphicsBounds)) {
 					isFullUpdateRequired = true;
 				}
-				int numberActiveVisible = activeRecordSet.getVisibleRecordNames().length;
-				if (this.oldNumberActiveVisible != numberActiveVisible) {
+				else if (this.numScaleLeft != activeRecordSet.getNumberVisibleWithAxisPosLeft()) {
 					isFullUpdateRequired = true;
 				}
-//				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-//					Record record = activeRecordSet.get(recordKey);
-//					String minFormated = record.getFormatedMinDisplayValue(), maxFormatted = record.getFormatedMaxDisplayValue();
-//					MinMaxValues minMax = this.minMaxValues.get(recordKey);
-//					if (minMax == null || !minFormated.equals(minMax.min) || !maxFormatted.equals(minMax.max)) {
-//						this.minMaxValues.remove(recordKey);
-//						this.minMaxValues.put(recordKey, new MinMaxValues(minFormated, maxFormatted));
-//						isFullUpdateRequired = true;
-//					}
-//				}
+				else if (this.oldNumberVisibleDisplayable != numberVisibleDisplayable) {
+					isFullUpdateRequired = true;
+				}
+				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
+					Record record = activeRecordSet.get(recordKey);
+					int numberScaleTicks = record.getNumberScaleTicks();
+					int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
+					if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
+						this.scaleTicks.remove(recordKey);
+						this.scaleTicks.put(recordKey, numberScaleTicks);
+						isFullUpdateRequired = true;
+					}
+				}
 				if (isFullUpdateRequired) {
 					doUpdateCurveSelectorTable();
-					this.graphicCanvas.redraw();
+					log.info("" + this.graphicCanvas.getClientArea());
+					this.graphicCanvas.redraw(graphicsBounds.x, graphicsBounds.y, graphicsBounds.width, graphicsBounds.height, true);
 				}
 				else {
 					doUpdateCurveSelectorTable();
@@ -680,9 +703,10 @@ public class GraphicsWindow {
 					else
 						this.graphicCanvas.redraw();
 				}
-				this.oldNumberActiveVisible = numberActiveVisible;
+				this.oldNumberVisibleDisplayable = numberVisibleDisplayable;
 				this.oldActiveRecordSet = activeRecordSet;
 				this.numScaleLeft = activeRecordSet.getNumberVisibleWithAxisPosLeft();
+				this.oldCanvasBounds = graphicsBounds;
 			}
 			else { // enable clear
 				doUpdateCurveSelectorTable();
@@ -777,8 +801,8 @@ public class GraphicsWindow {
 		if (this.isCurveSelectorEnabled) {
 			int sashformWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : this.selectorColumnWidth * 10;
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
-			this.sashformWeights = new int[] { this.selectorColumnWidth, sashformWidth - this.selectorColumnWidth };
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-10);
+			this.sashformWeights = new int[] { this.selectorColumnWidth, sashformWidth - this.selectorColumnWidth};
 			this.graphicSashForm.setWeights(this.sashformWeights);
 		}
 	}

@@ -80,6 +80,7 @@ public class Record extends Vector<Integer> {
 	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue		= this.maxScaleValue;
 	double							minZoomScaleValue		= this.minScaleValue;
+	int									numberScaleTicks		= 0;
 
 	double							displayScaleFactorTime;
 	double							displayScaleFactorValue;
@@ -1084,6 +1085,20 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setSourceRecordSetNames(String[] newSourceRecordSetNames) {
 		this.sourceRecordSetNames = newSourceRecordSetNames;
+	}
+
+	/**
+	 * @return the numberScaleTicks
+	 */
+	public int getNumberScaleTicks() {
+		return this.numberScaleTicks;
+	}
+
+	/**
+	 * @param newNumberScaleTicks the numberScaleTicks to set
+	 */
+	public void setNumberScaleTicks(int newNumberScaleTicks) {
+		this.numberScaleTicks = newNumberScaleTicks;
 	}
 }
 
