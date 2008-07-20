@@ -67,13 +67,14 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.CurveUtils;
+import osde.utils.GraphicsUtils;
 import osde.utils.TimeLine;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
-public class GraphicsWindow {
+public class GraphicsWindow implements ITabSashForm{
 	final static Logger						log											= Logger.getLogger(GraphicsWindow.class.getName());
 
 	public static final int				TYPE_NORMAL							= 0;
@@ -91,7 +92,7 @@ public class GraphicsWindow {
 	final CTabFolder							displayTab;
 	SashForm											graphicSashForm;
 	// Curve Selector Table with popup menu
-	Composite											curveSelector;
+	Composite											curveSelectorComposite;
 	CLabel												curveSelectorHeader;
 	Table													curveSelectorTable;
 	TableColumn										tableSelectorColumn;
@@ -171,38 +172,39 @@ public class GraphicsWindow {
 			this.graphicSashForm = new SashForm(this.displayTab, SWT.HORIZONTAL);
 			this.graphic.setControl(this.graphicSashForm);
 			{ // curveSelector
-				this.curveSelector = new Composite(this.graphicSashForm, SWT.NONE);
+				this.curveSelectorComposite = new Composite(this.graphicSashForm, SWT.NONE);
 				FormLayout curveSelectorLayout = new FormLayout();
-				this.curveSelector.setLayout(curveSelectorLayout);
+				this.curveSelectorComposite.setLayout(curveSelectorLayout);
 				GridData curveSelectorLData = new GridData();
-				this.curveSelector.setLayoutData(curveSelectorLData);
-				this.curveSelector.addHelpListener(new HelpListener() {
+				this.curveSelectorComposite.setLayoutData(curveSelectorLData);
+				this.curveSelectorComposite.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						GraphicsWindow.log.finer("curveSelector.helpRequested " + evt); //$NON-NLS-1$
 						GraphicsWindow.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				{
-					this.curveSelectorHeader = new CLabel(this.curveSelector, SWT.NONE);
-					this.curveSelectorHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0254));
+					this.curveSelectorHeader = new CLabel(this.curveSelectorComposite, SWT.NONE);
+					this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
+					this.curveSelectorHeader.setFont(GraphicsUtils.getFontWithStyle(this.curveSelectorHeader, SWT.BOLD));
 					this.curveSelectorHeader.pack();
-					this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x + 10;
+					this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 					FormData curveSelectorHeaderLData = new FormData();
 					curveSelectorHeaderLData.width = this.selectorHeaderWidth;
-					curveSelectorHeaderLData.height = 24;
+					curveSelectorHeaderLData.height = 25;
 					curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 0);
-					curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 3);
+					curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 					this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
 					this.curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					this.curveSelectorTable = new Table(this.curveSelector, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
+					this.curveSelectorTable = new Table(this.curveSelectorComposite, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
 					this.curveSelectorTable.setLinesVisible(true);
 					FormData curveTableLData = new FormData();
 					curveTableLData.width = 82;
 					curveTableLData.height = 457;
-					curveTableLData.left = new FormAttachment(0, 1000, 4);
-					curveTableLData.top = new FormAttachment(0, 1000, 37);
+					curveTableLData.left = new FormAttachment(0, 1000, 0);
+					curveTableLData.top = new FormAttachment(0, 1000, 25);
 					curveTableLData.bottom = new FormAttachment(1000, 1000, 0);
 					curveTableLData.right = new FormAttachment(1000, 1000, 0);
 					this.curveSelectorTable.setLayoutData(curveTableLData);
@@ -303,22 +305,6 @@ public class GraphicsWindow {
 				this.graphicsComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						GraphicsWindow.log.info("graphicsComposite.paintControl, event=" + evt); //$NON-NLS-1$
-						Point graphicsSize = GraphicsWindow.this.graphicsComposite.getSize();
-						int x = 0;
-						int y = GraphicsWindow.this.headerGap;
-						int width = graphicsSize.x;
-						int height = GraphicsWindow.this.headerHeight;
-						GraphicsWindow.this.recordSetHeader.setBounds(x, y, width, height);
-						
-						y = GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight;
-						height = graphicsSize.y - (GraphicsWindow.this.headerGap + GraphicsWindow.this.commentGap + GraphicsWindow.this.commentHeight + GraphicsWindow.this.headerHeight);
-						GraphicsWindow.this.graphicCanvas.setBounds(x, y, width, height);
-						
-						y =  GraphicsWindow.this.headerGap + GraphicsWindow.this.headerHeight + height;
-						height = GraphicsWindow.this.commentHeight;
-						GraphicsWindow.this.recordSetComment.setBounds(20, y, width-20, height);
-						
-						clearHeaderAndComment();
 						doRedrawGraphics();
 					}
 				});
@@ -658,39 +644,43 @@ public class GraphicsWindow {
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
 				int numberVisibleDisplayable = activeRecordSet.getNumberOfVisibleAndDisplayableRecords();
-				log.info("numberVisibleDisplayable " + numberVisibleDisplayable + " oldNumberActiveVisible " + this.oldNumberVisibleDisplayable);
-				Rectangle graphicsBounds = this.graphicCanvas.getClientArea();
-				log.info(this.oldCanvasBounds + " - " + graphicsBounds);
-				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.equals(activeRecordSet)) {
+				Rectangle graphicsBounds = this.graphicsComposite.getClientArea();
+				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 					this.scaleTicks = new HashMap<String, Integer>();
 					isFullUpdateRequired = true;
+					log.info(this.oldActiveRecordSet.getName() + " != " + activeRecordSet.getName());
 				}
 				else if (!this.oldCanvasBounds.equals(graphicsBounds)) {
+					log.info(this.oldCanvasBounds + " != " + graphicsBounds);
 					isFullUpdateRequired = true;
 				}
 				else if (this.numScaleLeft != activeRecordSet.getNumberVisibleWithAxisPosLeft()) {
+					log.info("numScaleLeft " + this.numScaleLeft + " activeRecordSet.getNumberVisibleWithAxisPosLeft " + activeRecordSet.getNumberVisibleWithAxisPosLeft());
 					isFullUpdateRequired = true;
 				}
 				else if (this.oldNumberVisibleDisplayable != numberVisibleDisplayable) {
 					isFullUpdateRequired = true;
+					log.info("numberVisibleDisplayable " + numberVisibleDisplayable + " oldNumberActiveVisible " + this.oldNumberVisibleDisplayable);
 				}
-				for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-					Record record = activeRecordSet.get(recordKey);
-					int numberScaleTicks = record.getNumberScaleTicks();
-					int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
-					if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
-						this.scaleTicks.remove(recordKey);
-						this.scaleTicks.put(recordKey, numberScaleTicks);
-						isFullUpdateRequired = true;
+				else {
+					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
+						Record record = activeRecordSet.get(recordKey);
+						int numberScaleTicks = record.getNumberScaleTicks();
+						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
+						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
+							this.scaleTicks.remove(recordKey);
+							this.scaleTicks.put(recordKey, numberScaleTicks);
+							isFullUpdateRequired = true;
+							log.info("scale ticks  changed" + oldNumberScaleTicks + " != " + numberScaleTicks);
+						}
 					}
 				}
 				if (isFullUpdateRequired) {
 					doUpdateCurveSelectorTable();
 					log.info("" + this.graphicCanvas.getClientArea());
-					this.graphicCanvas.redraw(graphicsBounds.x, graphicsBounds.y, graphicsBounds.width, graphicsBounds.height, true);
+					this.graphicCanvas.redraw();
 				}
 				else {
-					doUpdateCurveSelectorTable();
 					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
 					int timeScaleHeight = 40;
 					if (curveBounds != null) {
@@ -743,8 +733,8 @@ public class GraphicsWindow {
 		RecordSet recordSet = this.type == GraphicsWindow.TYPE_NORMAL ? this.channels.getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
 		if (this.isCurveSelectorEnabled && recordSet != null && device != null) {
 			this.curveSelectorTable.removeAll();
-			this.curveSelectorHeader.pack(true);
-			itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
+			//this.curveSelectorHeader.pack(true);
+			//itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
 
 			String[] recordKeys = recordSet.getRecordNames();
 			for (int i = 0; i < recordSet.size(); i++) {
@@ -792,30 +782,61 @@ public class GraphicsWindow {
 		else
 			this.curveSelectorTable.removeAll();
 
-		this.selectorColumnWidth = itemWidth + 30;
+		this.selectorColumnWidth = itemWidth + 10;
 		if (GraphicsWindow.log.isLoggable(Level.FINER)) {
 			GraphicsWindow.log.finer("curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 			GraphicsWindow.log.finer("graphicSashForm width = " + this.graphicSashForm.getSize().x); //$NON-NLS-1$
 		}
 		if (this.isCurveSelectorEnabled) {
-			int sashformWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : this.selectorColumnWidth * 10;
-			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-5);
-			this.sashformWeights = new int[] { this.selectorColumnWidth, sashformWidth - this.selectorColumnWidth};
-			this.graphicSashForm.setWeights(this.sashformWeights);
+			this.curveSelectorHeader.setSize(this.selectorColumnWidth-2, this.curveSelectorHeader.getSize().y);
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-2);
 		}
+		setSashFormWeights(this.selectorColumnWidth);
+	}
+
+	/**
+	 * set the sashForm weights
+	 */
+	public void setSashFormWeights(int newSelectorColumWidth) {
+		int sashSizeWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : newSelectorColumWidth * 10;
+		this.sashformWeights = new int[] { newSelectorColumWidth, sashSizeWidth - newSelectorColumWidth};
+		this.graphicSashForm.setWeights(this.sashformWeights);
+	}
+	/**
+	 * query the width
+	 */
+	public int getWidth() {
+		return this.graphicSashForm.getSize().x;
+	}
+
+	/**
+	 * @return the selectorColumnWidth
+	 */
+	public int[] getSashformWeights() {
+		return this.sashformWeights;
 	}
 
 	public Canvas getGraphicCanvas() {
 		return this.graphicCanvas;
 	}
 
+	/**
+	 * @return true if selector is enabled 
+	 */
 	public boolean isCurveSelectorEnabled() {
 		return this.isCurveSelectorEnabled;
 	}
 
+	/**
+	 * enable curve selector which relect to the sash form weights using the selector colum width
+	 * @param enabled
+	 */
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
+		if (enabled)
+			setSashFormWeights(this.curveSelectorComposite.getSize().x);
+		else 
+			setSashFormWeights(0);
 	}
 
 	public SashForm getGraphicSashForm() {
@@ -1080,7 +1101,7 @@ public class GraphicsWindow {
 	}
 
 	/**
-	 * check input x,y value against curve are bounds and correct to bound if required
+	 * check input x,y value against curve bounds and correct to bound if required
 	 * @param Point containing corrected x,y position value
 	 */
 	private Point checkCurveBounds(int xPos, int yPos) {
@@ -1099,13 +1120,6 @@ public class GraphicsWindow {
 		}
 		if (GraphicsWindow.log.isLoggable(Level.FINER)) GraphicsWindow.log.finer("out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
-	}
-
-	/**
-	 * @return the selectorColumnWidth
-	 */
-	public int[] getSashformWeights() {
-		return this.sashformWeights;
 	}
 
 	/**
