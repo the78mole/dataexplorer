@@ -630,7 +630,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.slopeCalculationTypeCombo = new CCombo(this.powerGroup, SWT.BORDER);
 						this.slopeCalculationTypeCombo.setBounds(133, 304, 97, 20);
-						this.slopeCalculationTypeCombo.setItems(new String[] { " " + CalculationThread.REGRESSION_TYPE_LINEAR, " " + CalculationThread.REGRESSION_TYPE_CURVE }); //$NON-NLS-1$ //$NON-NLS-2$
+						this.slopeCalculationTypeCombo.setItems(new String[] { " " + Messages.getString(MessageIds.OSDE_MSGT1479), " " + Messages.getString(MessageIds.OSDE_MSGT1480) });
 						this.slopeCalculationTypeCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1448));
 						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
