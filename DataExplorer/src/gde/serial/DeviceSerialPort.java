@@ -332,7 +332,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
-		int sleepTime = 10; // ms
+		int sleepTime = 4; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
@@ -341,7 +341,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(10);
+			Thread.sleep(4);
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
@@ -385,7 +385,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
-		int sleepTime = 10; // ms
+		int sleepTime = 8; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
@@ -395,7 +395,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(10);
+			Thread.sleep(8);
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
@@ -440,7 +440,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException 
 	 */
 	public void wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
-		int sleepTime = 10;
+		int sleepTime = 8;
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		while (0 == this.inputStream.available()) {
@@ -463,7 +463,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException 
 	 */
 	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
-		int sleepTime = 10; // msec
+		int sleepTime = 8; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
@@ -491,7 +491,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
-		int sleepTime = 10; // ms
+		int sleepTime = 8; // ms
 		int expectedBytes = readBuffer.length;
 		int readBytes = 0;
 		int lastRead = 0;
@@ -507,7 +507,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(20);
+			Thread.sleep(16);
 			while (readBytes < expectedBytes && !isStable && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
 
@@ -570,7 +570,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException 
 	 */
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
-		int sleepTime = 10; // ms
+		int sleepTime = 8; // ms
 		int timeOutCounter = timeout_msec / sleepTime;
 		int stableCounter = stableIndex;
 		boolean isStable = false;
@@ -578,7 +578,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 		// availableBytes are updated by event handler
 		int byteCounter = 0, numBytesAvailable = 0;
-		Thread.sleep(15);
+		Thread.sleep(16);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
 			Thread.sleep(sleepTime);
 
