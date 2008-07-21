@@ -540,7 +540,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else {
 					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
-					int timeScaleHeight = 20;
+					int timeScaleHeight = 30;
 					if (curveBounds != null) {
 						//int height = this.graphicCanvas.getClientArea().height;
 						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width+10, curveBounds.height+timeScaleHeight, true);
