@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.TooManyListenersException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +66,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	InputStream															inputStream				= null;
 	OutputStream														outputStream			= null;
-	boolean																	dataAvailable			= false;
+	
+	// event handling does not work reliable
+	//boolean																	dataAvailable			= false;
 
   //public static final int STOPBITS_1 = 1;
   //public static final int STOPBITS_2 = 2;
@@ -206,11 +207,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			this.serialPort.setRTS(this.deviceConfig.isRTS());
 			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
-			this.serialPort.addEventListener(this);
+			// event handling does not work reliable
+			//this.serialPort.addEventListener(this);
 			// activate the DATA_AVAILABLE notifier to read available data
-			this.serialPort.notifyOnDataAvailable(true);
+			//this.serialPort.notifyOnDataAvailable(true);
 			// activate the OUTPUT_BUFFER_EMPTY notifier
-			this.serialPort.notifyOnOutputEmpty(true);
+			//this.serialPort.notifyOnOutputEmpty(true);
 
 			// init in and out stream for writing and reading
 			this.inputStream = this.serialPort.getInputStream();
@@ -242,12 +244,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (this.serialPort != null) this.serialPort.close();
 			throw en;
 		}
-		catch (TooManyListenersException e) {
-			SerialPortException en = new SerialPortException(e.getMessage());
-			log.log(Level.SEVERE, en.getMessage(), en);
-			if (this.serialPort != null) this.serialPort.close();
-			throw en;
-		}
+		// event handling does not work reliable
+		//catch (TooManyListenersException e) {
+		//	SerialPortException en = new SerialPortException(e.getMessage());
+		//	log.log(Level.SEVERE, en.getMessage(), en);
+		//	if (this.serialPort != null) this.serialPort.close();
+		//	throw en;
+		//}
 		catch (PortInUseException e) {
 			SerialPortException en = new SerialPortException(e.getMessage());
 			log.log(Level.SEVERE, en.getMessage(), en);
@@ -309,10 +312,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		case SerialPortEvent.DSR:
 		case SerialPortEvent.RI:
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
-			this.dataAvailable = false;
+			//this.dataAvailable = false;
+			log.fine("OUTPUT_BUFFER_EMPTY");
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
-			this.dataAvailable = true;
+			//this.dataAvailable = true;
+			log.fine("DATA_AVAILABLE");
 			break;
 		}
 	}
@@ -327,12 +332,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
-		int sleepTime = 5; // ms
+		int sleepTime = 10; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
+			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
 			Thread.sleep(10);
@@ -340,6 +346,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
 			}
+			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { bytes, timeout_msec })); 
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -381,25 +388,27 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int sleepTime = 10; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
-		int retryCounter = timeout_msec / sleepTime;
+		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
 			long startTime_ms = new Date().getTime();
+			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
 			Thread.sleep(10);
-			while (bytes != readBytes && retryCounter-- > 0){
+			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
 			}
-			if (retryCounter <= 0) {
+			//this.dataAvailable = false;
+			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 				log.log(Level.SEVERE, e.getMessage(), e);
 				throw e;
 			}
 			
 			long ms = (new Date().getTime()) - startTime_ms;
-			log.info("waitTime = " + ms);
+			log.fine("waitTime = " + ms);
 			waitTimes.add(ms);
 			
 			if (log.isLoggable(Level.FINE)) {
@@ -434,8 +443,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int sleepTime = 10;
 		int timeOutCounter = timeout_msec / sleepTime;
 
-		while (!this.dataAvailable || 0 == this.inputStream.available()) {
-			log.info("this.dataAvailable = " + this.dataAvailable + " inStreamAvailable = " + this.inputStream.available());
+		while (0 == this.inputStream.available()) {
 			Thread.sleep(sleepTime);	
 			if (timeOutCounter-- <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
@@ -455,11 +463,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException 
 	 */
 	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
-		int sleepTime = 5; // msec
+		int sleepTime = 10; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
-			// wait until readbuffer has been filled by eventListener
 		while ((resBytes = this.inputStream.available()) < numBytes) {
 			Thread.sleep(sleepTime);
 			timeOutCounter--;
@@ -484,7 +491,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws TimeOutException
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
-		int sleepTime = 5; // ms
+		int sleepTime = 10; // ms
 		int expectedBytes = readBuffer.length;
 		int readBytes = 0;
 		int lastRead = 0;
@@ -497,10 +504,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 
 		try {
+			wait4Bytes(timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(15);
-			while (readBytes < expectedBytes && !isStable) {
+			Thread.sleep(20);
+			while (readBytes < expectedBytes && !isStable && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
 
 				if (expectedBytes != readBytes) {
@@ -515,11 +523,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					lastRead = readBytes;
 					stableCounter = stableIndex;
 				}
-				if (timeOutCounter-- <= 0) {
-					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
-					log.log(Level.SEVERE, e.getMessage(), e);
-					throw e;
-				}
+			}
+			//this.dataAvailable = false;
+			if (timeOutCounter <= 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
+				log.log(Level.SEVERE, e.getMessage(), e);
+				throw e;
 			}
 			
 			// resize the data buffer to real red data 
@@ -585,7 +594,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			--timeOutCounter;
 
 			if (log.isLoggable(Level.INFO)) {
-				log.info("stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter);
+				log.fine("stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter);
 			}
 			if (timeOutCounter == 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec })); 

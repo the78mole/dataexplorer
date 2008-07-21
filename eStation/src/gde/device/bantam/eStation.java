@@ -136,7 +136,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-			recordSet.addPoints(converDataBytes(points, convertBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		
 //		StringBuilder sb = new StringBuilder();
 //		for (byte b : dataBuffer) {
@@ -314,19 +314,36 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			try {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 				String[] recordNames = recordSet.getRecordNames();
+				int displayableCounter = 0;
 
+				
+				// check if measurements isActive == false and set to isDisplayable == false
+				for (String measurementKey : recordNames) {
+					Record record = recordSet.get(measurementKey);
+					
+					if (record.isActive()) {
+						++displayableCounter;
+					}
+				}
+				
 				String recordKey = recordNames[3]; //3=Leistung
 				Record record = recordSet.get(recordKey);
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 					this.calculationThreads.get(recordKey).start();
 				}
+				++displayableCounter;
+				
 				recordKey = recordNames[4]; //4=Energie
 				record = recordSet.get(recordKey);
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 					this.calculationThreads.get(recordKey).start();
-				}				
+				}		
+				++displayableCounter;
+				
+				log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				recordSet.setConfiguredDisplayable(displayableCounter);		
 			}
 			catch (RuntimeException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

@@ -288,7 +288,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 
-			recordSet.addPoints(converDataBytes(points, readBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, readBuffer), false);
 		}
 	}
 
@@ -298,7 +298,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] converDataBytes(int[] points, byte[] dataBuffer) {
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
 		String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
 		int tmpValue = 0;

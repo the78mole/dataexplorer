@@ -91,7 +91,7 @@ public class CalculationThread extends Thread {
 			CalculationThread.log.warning("only supported records are " + recordNames[3] + ", " + recordNames[4]); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//recordSet.updateDataTable();
-		this.application.updateGraphicsWindow();
+		if (record.isVisible()) this.application.updateGraphicsWindow();
 		CalculationThread.log.fine("finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
 	}
 }

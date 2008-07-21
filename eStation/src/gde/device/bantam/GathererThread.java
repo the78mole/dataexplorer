@@ -127,7 +127,6 @@ public class GathererThread extends Thread {
 						//if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 
 						// build the point array according curves from record set
-						GathererThread.this.serialPort.wait4Bytes(2000);
 						byte[] dataBuffer = GathererThread.this.serialPort.getData();
 
 						// check if device is ready for data capturing, discharge or charge allowed only
@@ -176,7 +175,7 @@ public class GathererThread extends Thread {
 							GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
 
 							// prepare the data for adding to record set
-							GathererThread.this.recordSet.addPoints(usedDevice.converDataBytes(points, dataBuffer), false);
+							GathererThread.this.recordSet.addPoints(usedDevice.convertDataBytes(points, dataBuffer), false);
 
 							GathererThread.this.application.updateGraphicsWindow();
 							GathererThread.this.application.updateDigitalWindowChilds();

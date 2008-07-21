@@ -640,6 +640,7 @@ public class MenuToolBar {
 										MenuToolBar.log.fine("deleted " + deleteRecordSetName); //$NON-NLS-1$
 										updateRecordSetSelectCombo();
 										// update viewable
+										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 										MenuToolBar.this.application.updateGraphicsWindow();
 										MenuToolBar.this.application.updateDataTable();
 										MenuToolBar.this.application.updateDigitalWindow();

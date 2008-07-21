@@ -1079,7 +1079,7 @@ public class UniLogDialog extends DeviceDialog {
 				} // end tabs
 
 				int index = Channels.getInstance().getActiveChannelNumber();
-				this.deviceConfigTabFolder.setSelection(index<0 || index>5 ? 1 : index);
+				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length-2 ? 1 : index);
 				//this.deviceConfigTabFolder.addMouseTrackListener(UniLogDialog.this.mouseTrackerEnterFadeOut);
 				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {

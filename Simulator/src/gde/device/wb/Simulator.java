@@ -125,7 +125,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
-	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		return points;
 	}
 

@@ -546,17 +546,29 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * query number of displayable records
+	 * query number of visible and displayable records
 	 * @return
 	 */
 	public int getNumberOfVisibleAndDisplayableRecords() {
+		int visibleAndDisplayable = 0;
+		for (String recordKey : this.recordNames) {
+			if (this.get(recordKey).isVisible && this.get(recordKey).isDisplayable) visibleAndDisplayable++;
+		}
+		return visibleAndDisplayable;
+	}
+
+	
+	/**
+	 * query number of displayable records
+	 * @return
+	 */
+	public int getNumberOfDisplayableRecords() {
 		int displayable = 0;
 		for (String recordKey : this.recordNames) {
-			if (this.get(recordKey).isVisible && this.get(recordKey).isDisplayable) displayable++;
+			if (this.get(recordKey).isDisplayable) displayable++;
 		}
 		return displayable;
 	}
-
 	/**
 	 * method to get the sorted record active names as string array
 	 * @return String[] containing record names 
@@ -626,7 +638,7 @@ public class RecordSet extends HashMap<String, Record> {
 		recordName = recordName.length() <= RecordSet.MAX_NAME_LENGTH ? recordName : recordName.substring(0, RecordSet.MAX_NAME_LENGTH);
 		
 		String[] recordNames = device.getMeasurementNames(channelKey);
-		if (recordNames.length == 1 && recordNames[0].length() < 3) { // simple check for valid record names
+		if (recordNames.length == 0) { // simple check for valid record names
 			channelKey = Channels.getInstance().getChannelNames()[0].split(OSDE.STRING_COLON)[1].trim();
 			recordNames = device.getMeasurementNames(channelKey);
 		}

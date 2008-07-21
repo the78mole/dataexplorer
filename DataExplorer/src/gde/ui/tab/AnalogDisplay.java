@@ -160,7 +160,7 @@ public class AnalogDisplay extends Composite {
 			int radiusW = (int) (this.width / 2 * 0.80);
 			//int radiusH = (int) (this.height / 2 * 0.90);
 			int radiusH = this.centerY - this.textHeight - 40;
-			//log.info("radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
+			//log.fine("radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
 			//radiusH = radiusH < radiusLimitH ? radiusH : radiusLimitH;
 			this.radius = radiusW < radiusH ? radiusW : radiusH;
 			this.angleStart = -20;

@@ -147,7 +147,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 
 			System.arraycopy(dataBuffer,  4 + i*lovDataSize, convertDataBuffer,  0, 14); //configurationBuffer.length
 			System.arraycopy(dataBuffer, 23 + i*lovDataSize, convertDataBuffer, 14, 16); //measurementsBuffer.length
-			recordSet.addPoints(converDataBytes(points, convertDataBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, convertDataBuffer), false);
 		}
 	}
 
@@ -158,7 +158,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
-	public int[] converDataBytes(int[] points, byte[] dataBuffer) {	
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {	
 
 		// build the point array according curves from record set
 		//int[] points = new int[getRecordSet().size()];
