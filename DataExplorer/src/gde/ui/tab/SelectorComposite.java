@@ -68,7 +68,7 @@ public class SelectorComposite extends Composite {
 	Table													curveSelectorTable;
 	TableColumn										tableSelectorColumn;
 	
-	int														oldSelectorClumWidth = 0; 
+	int														oldSelectorColumnWidth = 0; 
 	Point													oldSize = new Point(0,0);
 
 	/**
@@ -241,10 +241,10 @@ public class SelectorComposite extends Composite {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					item.setText(record.getName());
-					int textSize = record.getName().length() * 7;
+					int textSize = record.getName().length() * 8;
 					//this.curveSelectorTable.pack();
 					//log.info(item.getText() + " " + item.getBounds().width);
-					int checkBoxWidth = 25;
+					int checkBoxWidth = 20;
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
 					//log.info(item.getText() + " " + itemWidth);
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
@@ -275,10 +275,10 @@ public class SelectorComposite extends Composite {
 			this.selectorColumnWidth = this.initialSelectorHeaderWidth;
 		}
 		
-		if (this.oldSelectorClumWidth != this.selectorColumnWidth) {
-			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 1);
-			this.oldSelectorClumWidth = this.selectorColumnWidth;
+		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
+			this.curveSelectorHeader.setSize(this.selectorColumnWidth-1, this.curveSelectorHeader.getSize().y);
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-1);
+			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
 		}
 

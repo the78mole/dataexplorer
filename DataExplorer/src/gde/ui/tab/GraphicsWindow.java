@@ -150,12 +150,11 @@ public class GraphicsWindow {
 	 * set the sashForm weights
 	 */
 	public void setSashFormWeights(int newSelectorCopositeWidth) {
-		int sashSizeWidth = this.graphicSashForm.getSize().x > 100 ? this.graphicSashForm.getSize().x : newSelectorCopositeWidth * 10;
-		int[] newWeights = new int[] { newSelectorCopositeWidth, sashSizeWidth - newSelectorCopositeWidth};
+		int[] newWeights = new int[] { newSelectorCopositeWidth, this.parentDisplayTab.getClientArea().width - newSelectorCopositeWidth};
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			log.info("sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
+			log.fine("sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
 		}
 	}
 	
