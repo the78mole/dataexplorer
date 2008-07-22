@@ -133,7 +133,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, devicedataBufferSize);
-			recordSet.addPoints(converDataBytes(points, convertBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
-	public int[] converDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
 		points[0] = new Integer(dataBuffer[2]) * 1000;
 
@@ -201,8 +201,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 
 			// slope calculation needs height factor for calculation
-			else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
-				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
+			else if (recordKey.startsWith(recordNames[2])) { // 2=slope
+				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
 			}
 
 			newValue = offset + (value - reduction) * factor;
@@ -256,8 +256,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 
 		// slope calculation needs height factor for calculation
-		else if (recordKey.startsWith(recordNames[2])) { // 2=Steigung
-			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), recordNames[1]);
+		else if (recordKey.startsWith(recordNames[2])) { // 2=slope
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
 		}
 
 		double newValue = (value - offset) / factor + reduction;

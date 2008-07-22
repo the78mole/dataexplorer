@@ -104,12 +104,14 @@ public class PicolarioDialog extends DeviceDialog {
 		log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
-				this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+				this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+			else if (this.settings.isDeviceDialogsOnTop())
+				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
 			else
 				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 			SWTResourceManager.registerResourceUser(this.dialogShell);
-			this.dialogShell.setAlpha(254);
+			if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 			this.dialogShell.setLayout(null);
 			this.dialogShell.layout();
 			this.dialogShell.pack();
@@ -177,6 +179,7 @@ public class PicolarioDialog extends DeviceDialog {
 								}
 							}
 							catch (Exception e) {
+								PicolarioDialog.this.setClosePossible(true);
 								PicolarioDialog.this.serialPort.close();
 								PicolarioDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
@@ -356,7 +359,7 @@ public class PicolarioDialog extends DeviceDialog {
 				});
 			}
 
-			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-250, 80));
+			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-175, 100));
 			this.dialogShell.open();
 		}
 		else {

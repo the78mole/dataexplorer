@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
 import osde.exception.ReadWriteOutOfSyncException;
-import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
@@ -73,7 +72,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			this.write(this.readNumberRecordSets);
 
 			byte[] answer = new byte[4];
-			answer = this.read(answer, 2);
+			answer = this.read(answer, 2000);
 
 			if (answer[0] != this.readNumberRecordSets[0] && answer[2] != this.readNumberRecordSets[0])
 				throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1201));
@@ -108,13 +107,13 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			write(readRecordSetsWithNumber);
 			this.isTransmitFinished = false;
 
-			Thread.sleep(100); // give picolario time to prepare data
+			Thread.sleep(256); // give picolario time to prepare data
 
 			while (!this.isTransmitFinished) {
 
 				device.getDialog().setAlreadyRedText(numberRed++);
 				readBuffer = new byte[31];
-				readBuffer = read(readBuffer, 2, 50); // throws timeout exception
+				readBuffer = read(readBuffer, 2000, 100); // throws timeout exception
 			
 				if (readBuffer.length != 0) {
 					
@@ -130,16 +129,15 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					else {
 						// write wrong checksum to repeat data package receive cycle
 						log.warning("write wrong checksum required"); //$NON-NLS-1$
-						byte wrongChecksum = readBuffer[readBuffer.length - 1];
-						byte[] requestAgain = new byte[] { wrongChecksum, wrongChecksum };
+						byte[] requestAgain = new byte[] { 0x00, 0x00 };
 						this.write(requestAgain);
 						numberRed--;
 					}
-					this.isTransmitFinished = checkTransmissionFinished(2);
+					this.isTransmitFinished = checkTransmissionFinished(3000);
 				}
 				//}
 				else {
-					this.isTransmitFinished = checkTransmissionFinished(2);
+					this.isTransmitFinished = checkTransmissionFinished(3000);
 				}
 			} // end while receive loop
 		}
@@ -155,20 +153,15 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @return false if there are available bytes
 	 * @throws InterruptedException 
 	 * @throws IOException 
-	 * @throws TimeOutException 
 	 */
-	private boolean checkTransmissionFinished(int timeout_sec) throws InterruptedException, IOException, TimeOutException {
-		int sleepTime = 3;
-		int timeCounter = timeout_sec * 1000 / sleepTime;
+	private boolean checkTransmissionFinished(int timeout_msec) throws InterruptedException, IOException {
+		int sleepTime = 8;
+		int timeCounter = timeout_msec / sleepTime;
 		int availableBytes = 0;
 
+		Thread.sleep(8);
 		while (0 == (availableBytes = this.getInputStream().available()) && timeCounter-- > 0) {
 			Thread.sleep(sleepTime);	
-			if (timeCounter-- <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { 0, timeout_sec })); 
-				log.log(Level.SEVERE, e.getMessage(), e);
-				throw e;
-			}
 		}
 		return availableBytes == 0 || this.isTransmitFinished;
 	}
