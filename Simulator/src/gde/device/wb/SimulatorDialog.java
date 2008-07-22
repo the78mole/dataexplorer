@@ -124,7 +124,6 @@ public class SimulatorDialog extends DeviceDialog {
 	/**
 	 * default method where the default controls are defined, this needs to be overwritten by specific device dialog
 	 */
-	@Override
 	public void open() {
 		try {
 			log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
@@ -240,7 +239,6 @@ public class SimulatorDialog extends DeviceDialog {
 					this.voltageCombo.setLayoutData(voltageComboLData);
 					this.voltageCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.fine("voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for voltageCombo.widgetSelected
@@ -268,7 +266,6 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
 					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms())); //$NON-NLS-1$
 					this.timeCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.fine("timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setTimeStep_ms(new Integer(SimulatorDialog.this.timeCombo.getText()).intValue());
@@ -277,14 +274,12 @@ public class SimulatorDialog extends DeviceDialog {
 					});
 				}
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						//TODO check if some thing to do before exiting
 					}
 				});
 				this.dialogShell.addKeyListener(new KeyAdapter() {
-					@Override
 					public void keyReleased(KeyEvent evt) {
 						log.fine("dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
 						//TODO add your code for dialogShell.keyReleased
