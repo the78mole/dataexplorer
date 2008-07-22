@@ -511,7 +511,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 					{
 						this.revolutionUnit = new CLabel(this.powerGroup, SWT.NONE);
-						this.revolutionUnit.setBounds(198, 194, 40, 20);
+						this.revolutionUnit.setBounds(198, 194, 50, 20);
 					}
 					{
 						this.prop100WLabel = new CLabel(this.powerGroup, SWT.LEFT);
