@@ -76,6 +76,7 @@ public class GraphicsComposite extends Composite {
 	final TimeLine								timeLine								= new TimeLine();
 	final SashForm								graphicSashForm;
 	final int											windowType;
+	final boolean									isLinux = System.getProperty("os.name").toLowerCase().indexOf("linux") > -1; //$NON-NLS-1$ //$NON-NLS-2$
 
 	// drawing canvas
 	Text													recordSetHeader;
@@ -499,7 +500,7 @@ public class GraphicsComposite extends Composite {
 	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
 	 */
 	void doRedrawGraphics() {
-		if (Channels.getInstance().getActiveChannel() != null) {
+		if (Channels.getInstance().getActiveChannel() != null && !this.isLinux) { // Linux GTK has different update algorithm use always full update
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
