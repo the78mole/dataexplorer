@@ -98,7 +98,8 @@ public class SettingsDialog extends Dialog {
 	Group													fileOpenSaveDialogGroup;
 	CLabel												fileIOLevelLabel;
 	CCombo												fileIOLevelCombo;
-	Button												deviceDialogButton;
+	Button												deviceDialogModalButton;
+	Button												deviceDialogOnTopButton;
 	Button												deviceDialogAlphaButton;
 	Group													deviceDialogGroup;
 	Group													serialPortGroup;
@@ -291,22 +292,38 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									SettingsDialog.log.finest("deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.deviceDialogButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
+									SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
+									SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
+									SettingsDialog.this.deviceDialogOnTopButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsOnTop());
 									SettingsDialog.this.deviceDialogAlphaButton.setSelection(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
 									SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
 									SettingsDialog.this.alphaSlider.setSelection(SettingsDialog.this.settings.getDialogAlphaValue());
 								}
 							});
 							{
-								this.deviceDialogButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
-								this.deviceDialogButton.setText(Messages.getString(MessageIds.OSDE_MSGT0319));
-								this.deviceDialogButton.setBounds(16, 24, 254, 18);
-								this.deviceDialogButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
-								this.deviceDialogButton.addSelectionListener(new SelectionAdapter() {
+								this.deviceDialogModalButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceDialogModalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0319));
+								this.deviceDialogModalButton.setBounds(16, 24, 254, 18);
+								this.deviceDialogModalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
+								this.deviceDialogModalButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.enabelModalDeviceDialogs(SettingsDialog.this.deviceDialogButton.getSelection());
+										SettingsDialog.log.finest("deviceDialogModalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.enabelModalDeviceDialogs(SettingsDialog.this.deviceDialogModalButton.getSelection());
+										SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.deviceDialogModalButton.getSelection());
+									}
+								});
+							}
+							{
+								this.deviceDialogOnTopButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
+								this.deviceDialogOnTopButton.setBounds(282, 24, 165, 18);
+								this.deviceDialogOnTopButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
+								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.finest("deviceDialogOnTopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.enabelDeviceDialogsOnTop(SettingsDialog.this.deviceDialogOnTopButton.getSelection());
 									}
 								});
 							}
