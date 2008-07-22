@@ -241,10 +241,10 @@ public class SelectorComposite extends Composite {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					item.setText(record.getName());
-					int textSize = record.getName().length() * 8;
+					int textSize = record.getName().length() * 7;
 					//this.curveSelectorTable.pack();
 					//log.info(item.getText() + " " + item.getBounds().width);
-					int checkBoxWidth = 20;
+					int checkBoxWidth = 25;
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
 					//log.info(item.getText() + " " + itemWidth);
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
@@ -279,7 +279,7 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth, this.curveSelectorHeader.getSize().y);
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 1);
 			this.oldSelectorClumWidth = this.selectorColumnWidth;
-			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth);
+			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
 		}
 
 		if (log.isLoggable(Level.FINER)) log.finer("curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$

@@ -70,11 +70,11 @@ public class GraphicsWindow {
 	final Channels								channels;
 	final String									name;
 	final TimeLine								timeLine								= new TimeLine();
-	final int											type;
+	final int											windowType;
 	
 	public GraphicsWindow(CTabFolder currentDisplayTab, int currentType, String useName) {
 		this.parentDisplayTab = currentDisplayTab;
-		this.type = currentType;
+		this.windowType = currentType;
 		this.name = useName;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -93,12 +93,12 @@ public class GraphicsWindow {
 				this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 				this.contextMenu = new CurveSelectorContextMenu();
 				this.contextMenu.createMenu(this.popupmenu);
-				this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.type, "  " + Messages.getString(MessageIds.OSDE_MSGT0254), this.popupmenu);
+				this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254), this.popupmenu);
 				
 			} // curveSelector
 			
 			{ // graphics composite
-				this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.type);
+				this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.windowType);
 			} // graphics composite
 			
 		} // graphicSashForm
@@ -155,7 +155,7 @@ public class GraphicsWindow {
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			log.fine("sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1]);
+			log.info("sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
 		}
 	}
 	
@@ -187,7 +187,7 @@ public class GraphicsWindow {
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
 		if (enabled)
-			setSashFormWeights(this.curveSelectorComposite.getSize().x);
+			setSashFormWeights(this.curveSelectorComposite.selectorColumnWidth);
 		else 
 			setSashFormWeights(0);
 	}
