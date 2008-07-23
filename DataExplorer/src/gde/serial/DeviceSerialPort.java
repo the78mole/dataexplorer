@@ -338,10 +338,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
-			wait4Bytes(timeout_msec);
+			wait4Bytes(bytes, timeout_msec);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(4);
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				if (bytes != readBytes) Thread.sleep(sleepTime);
@@ -494,34 +493,21 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int sleepTime = 8; // ms
 		int expectedBytes = readBuffer.length;
 		int readBytes = 0;
-		int lastRead = 0;
-		boolean isStable = false;
 		int timeOutCounter = timeout_msec / sleepTime;
-		int stableCounter = stableIndex;
 		if (stableIndex >= timeOutCounter) {
 			log.severe(Messages.getString(MessageIds.OSDE_MSGE0013));
 		}
 
 
 		try {
-			wait4Bytes(timeout_msec);
+			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
 			if (this.application != null) this.application.setSerialRxOn();
 
-			Thread.sleep(16);
-			while (readBytes < expectedBytes && !isStable && timeOutCounter-- > 0) {
+			while (readBytes < expectedBytes && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
 
 				if (expectedBytes != readBytes) {
 					Thread.sleep(sleepTime);
-				}
-				if (lastRead == readBytes) {
-					if (stableCounter-- == 0) {
-						isStable = true;
-					}
-				}
-				else {
-					lastRead = readBytes;
-					stableCounter = stableIndex;
 				}
 			}
 			//this.dataAvailable = false;
@@ -578,14 +564,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 		// availableBytes are updated by event handler
 		int byteCounter = 0, numBytesAvailable = 0;
-		Thread.sleep(16);
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
 			Thread.sleep(sleepTime);
 
 			if (byteCounter == (numBytesAvailable = this.inputStream.available()))
 				--stableCounter;
 			else
-				stableCounter = 50;
+				stableCounter = stableIndex;
 
 			if (stableCounter == 0) isStable = true;
 
