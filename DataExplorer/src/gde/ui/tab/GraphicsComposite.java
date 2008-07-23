@@ -90,9 +90,8 @@ public class GraphicsComposite extends Composite {
 	Point													oldSize = new Point(0,0); // composite size - control resized
 	
 	// update graphics only area required
-	int 													oldNumberVisibleDisplayable	= 0;
 	RecordSet											oldActiveRecordSet	= null;
-	int 													numScaleLeft = 0;
+	int 													oldChangeCounter = 0;
 	HashMap<String, Integer>			scaleTicks = new HashMap<String, Integer>();
 	boolean												oldZoomLevel = false;
 
@@ -499,12 +498,11 @@ public class GraphicsComposite extends Composite {
 	/**
 	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
 	 */
-	void doRedrawGraphics() {
+	synchronized void doRedrawGraphics() {
 		if (Channels.getInstance().getActiveChannel() != null && !this.isLinux) { // Linux GTK has different update algorithm use always full update
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
-				int numberVisibleDisplayable = activeRecordSet.getNumberOfVisibleAndDisplayableRecords();
 				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 					this.scaleTicks = new HashMap<String, Integer>();
 					isFullUpdateRequired = true;
@@ -514,13 +512,10 @@ public class GraphicsComposite extends Composite {
 					log.finer("zoom mode changed");
 					isFullUpdateRequired = true;
 				}
-				else if (this.numScaleLeft != activeRecordSet.getNumberVisibleWithAxisPosLeft()) {
-					log.finer("numScaleLeft " + this.numScaleLeft + " activeRecordSet.getNumberVisibleWithAxisPosLeft " + activeRecordSet.getNumberVisibleWithAxisPosLeft());
+				else if (this.oldChangeCounter != activeRecordSet.getChangeCounter()) {
+					log.finer("change counter = " + activeRecordSet.getChangeCounter());
+					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 					isFullUpdateRequired = true;
-				}
-				else if (this.oldNumberVisibleDisplayable != numberVisibleDisplayable) {
-					isFullUpdateRequired = true;
-					log.finer("numberVisibleDisplayable " + numberVisibleDisplayable + " oldNumberActiveVisible " + this.oldNumberVisibleDisplayable);
 				}
 				else {
 					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
@@ -552,9 +547,7 @@ public class GraphicsComposite extends Composite {
 						this.graphicCanvas.redraw();
 					}
 				}
-				this.oldNumberVisibleDisplayable = numberVisibleDisplayable;
 				this.oldActiveRecordSet = activeRecordSet;
-				this.numScaleLeft = activeRecordSet.getNumberVisibleWithAxisPosLeft();
 				this.oldZoomLevel = activeRecordSet.isZoomMode();
 			}
 			else { // enable clear

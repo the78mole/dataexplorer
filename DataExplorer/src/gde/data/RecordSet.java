@@ -68,8 +68,8 @@ public class RecordSet extends HashMap<String, Record> {
 	//in compare set x min/max and y max (time) might be different
 	boolean												isCompareSet					= false;
 	int														maxSize								= 0;			// number of data point * time step = total time
-	double												maxValue							= -20000;
-	double												minValue 							= 20000;	// min max value
+	double												maxValue							= 0;
+	double												minValue 							= 0;			// min max value
 	
 	//zooming
 	int 													zoomLevel 						= 0; 			// 0 == not zoomed
@@ -119,6 +119,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.OSDE_MSGT0131);
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.OSDE_MSGT0132);
 	Vector<String>								unsaveReasons 								= new Vector<String>();
+	int														changeCounter									= 0; // indicates change in general
 	
 	final OpenSerialDataExplorer	application;				// pointer to main application
 	final Channels								channels;						// start point of data hierarchy
@@ -821,6 +822,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param unsavedReason
 	 */
 	public void setUnsaved(String unsavedReason) {
+		this.changeCounter++;
 		this.isSaved = false;
 		if(!this.unsaveReasons.contains(unsavedReason)) {
 			this.unsaveReasons.add(unsavedReason);
@@ -1520,5 +1522,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public Vector<String> getUnsaveReasons() {
 		return this.unsaveReasons;
+	}
+
+	/**
+	 * @return the changeCounter
+	 */
+	public int getChangeCounter() {
+		return this.changeCounter;
 	}
 }

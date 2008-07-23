@@ -162,8 +162,8 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(false);
 							CurveSelectorContextMenu.this.selectedItem.setChecked(false);
 						}
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -180,8 +180,8 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.selectedItem.setForeground(color);
 							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setColor(color);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
 					}
 				}
@@ -234,10 +234,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(1);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
 						CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -250,10 +250,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(2);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
 						CurveSelectorContextMenu.this.lineWidthMenuItem3.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -266,10 +266,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineWidth(3);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineWidthMenuItem1.setSelection(false);
 						CurveSelectorContextMenu.this.lineWidthMenuItem2.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -322,10 +322,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_SOLID);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
 						CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -338,10 +338,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_DASH);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
 						CurveSelectorContextMenu.this.lineTypeMenuItem3.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -354,10 +354,10 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setLineStyle(SWT.LINE_DOT);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.lineTypeMenuItem1.setSelection(false);
 						CurveSelectorContextMenu.this.lineTypeMenuItem2.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -419,8 +419,8 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -443,8 +443,8 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -467,8 +467,8 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setStartEndDefined(false, 0, 0);
 						}
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -489,8 +489,8 @@ public class CurveSelectorContextMenu {
 						double[] newMinMax = CurveSelectorContextMenu.this.axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -547,8 +547,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(0);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -560,8 +560,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(1);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -573,8 +573,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(2);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -586,8 +586,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setNumberFormat(3);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -625,8 +625,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setPositionLeft(true);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
 			});
@@ -638,6 +638,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setPositionLeft(false);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
@@ -685,8 +686,9 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridOff Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_NONE);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_NONE);
 						}
@@ -700,8 +702,9 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MAIN);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
@@ -717,8 +720,9 @@ public class CurveSelectorContextMenu {
 					log.finest("timeGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setTimeGridType(RecordSet.TIME_GRID_MOD60);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MOD60);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
@@ -736,8 +740,9 @@ public class CurveSelectorContextMenu {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
 							CurveSelectorContextMenu.this.recordSet.setTimeGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
@@ -807,8 +812,9 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
 						}
@@ -824,8 +830,9 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
@@ -843,8 +850,9 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
 						if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+
 						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
 							if (!isRecordVisible()) CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).setVisible(true);

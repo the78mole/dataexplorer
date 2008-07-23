@@ -198,6 +198,8 @@ public class SelectorComposite extends Composite {
 								SelectorComposite.this.application.updateCellVoltageWindow();
 								SelectorComposite.this.application.updateFileCommentWindow();
 							}
+							activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+
 						}
 						else {
 							log.log(Level.WARNING, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
