@@ -26,6 +26,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.config.Settings;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -41,8 +42,8 @@ public abstract class DeviceDialog extends Dialog {
 	
 	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port this flag eleminates warning loops in case of none modal dialog
 	
-	protected	int				shellAlpha = 50; //TODO settings
-	protected boolean		isAlphaEnabled = true;//TODO settings
+	protected	int				shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+	protected boolean		isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 	protected boolean 	isFadeOut = false; // false = aplha value is lower 254
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
