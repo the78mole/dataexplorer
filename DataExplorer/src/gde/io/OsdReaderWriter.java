@@ -236,6 +236,7 @@ public class OsdReaderWriter {
 					firstRecordSet[1] = recordSetName;
 				}
 				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
+				log.fine("recordDataSize = " + recordDataSize);
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);

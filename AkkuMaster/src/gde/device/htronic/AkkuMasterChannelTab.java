@@ -463,7 +463,7 @@ public class AkkuMasterChannelTab {
 										if (isMemorySelectionChanged()) {
 											int memoryNumber = getMemoryNumberSelectionIndex();
 											AkkuMasterChannelTab.log.fine("memoryNumber =" + memoryNumber); //$NON-NLS-1$
-											AkkuMasterChannelTab.this.serialPort.setMemoryNumberCycleCoundSleepTime(AkkuMasterChannelTab.this.channelSig, memoryNumber, 2, 2000);
+											AkkuMasterChannelTab.this.serialPort.setMemoryNumberCycleCountSleepTime(AkkuMasterChannelTab.this.channelSig, memoryNumber, 2, 2000);
 										}
 
 										if (AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + dischargeCurrent_mA || AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + chargeCurrent_mA) {

@@ -221,7 +221,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @throws IOException 
 	 * @throws TimeOutException 
 	 */
-	public synchronized void setMemoryNumberCycleCoundSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException, TimeOutException {
+	public synchronized void setMemoryNumberCycleCountSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException, TimeOutException {
 		byte[] command = new byte[5];
 		command[0] = new Integer(setMomoryCycleSleep + channel[0]).byteValue();
 		command[1] = new Integer(memoryNumber).byteValue();

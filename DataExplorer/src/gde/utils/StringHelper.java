@@ -23,6 +23,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.graphics.Point;
+
 import osde.OSDE;
 
 /**
@@ -141,5 +143,44 @@ public class StringHelper {
 			sb.append(tmp);
 		}
 		return sb.toString();
+	}
+	
+	public static String intArrayToString(int[] values) {
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; values != null && i < values.length; i++) {
+			sb.append(values[i]);
+			if (i != values.length - 1) sb.append(';');
+		}
+		return sb.toString();
+	}
+
+	public static int[] stringToIntArray(String values) {
+		String[] stringValues = values.split(";"); //$NON-NLS-1$
+		int[] array = new int[stringValues.length];
+		for (int i = 0; i < stringValues.length && stringValues.length > 1; i++) {
+			array[i] = new Integer(stringValues[i].trim()).intValue();
+		}
+		return array;
+	}
+
+	public static String pointArrayToString(Point[] points) {
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; points != null && i < points.length; i++) {
+			sb.append(points[i].x).append(':').append(points[i].y);
+			if (i != points.length - 1) sb.append(';');
+		}
+		return sb.toString();
+	}
+
+	public static Point[] stringToPointArray(String values) {
+		String[] stringValues = values.split(";"); //$NON-NLS-1$
+		Point[] points = new Point[stringValues.length];
+		for (int i = 0; i < points.length && points.length > 1; i++) {
+			String[] xy = stringValues[i].split(":"); //$NON-NLS-1$
+			points[i] = new Point(new Integer(xy[0].trim()).intValue(), new Integer(xy[1].trim()).intValue());
+		}
+		return points;
 	}
 }
