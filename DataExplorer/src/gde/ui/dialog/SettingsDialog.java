@@ -467,7 +467,6 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.finest("useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
 											SettingsDialog.this.settings.setIsGlobalSerialPort("true"); //$NON-NLS-1$
-											updateAvailablePorts();
 										}
 										else {
 											SettingsDialog.this.settings.setIsGlobalSerialPort("false"); //$NON-NLS-1$
@@ -796,13 +795,21 @@ public class SettingsDialog extends Dialog {
 		this.listPortsThread = new Thread() {
 			@Override
 			public void run() {
-				SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
-				if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
-					SettingsDialog.this.dialogShell.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							SettingsDialog.this.serialPortGroup.redraw();
+				while (!SettingsDialog.this.dialogShell.isDisposed()) {
+					SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+					if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) SettingsDialog.this.serialPortGroup.redraw();
+							}
+						});
+						try {
+							Thread.sleep(2500);
 						}
-					});
+						catch (InterruptedException e) {
+							// ignore
+						}
+					}
 				}
 			}
 		};

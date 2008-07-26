@@ -31,11 +31,9 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 
 import osde.OSDE;
 import osde.config.GraphicsTemplate;
@@ -65,12 +63,9 @@ import osde.utils.StringHelper;
  * menu bar implementation class for the OpenSerialDataExplorer
  * @author Winfried Brügmann
  */
-public class MenuBar {
-	
+public class MenuBar {	
 	final static Logger						log			= Logger.getLogger(MenuBar.class.getName());
 
-	static Display								display;
-	static Shell									shell;
 	MenuItem											fileMenuItem;
 	Menu													fileMenu;
 	MenuItem											openFileMenuItem;
@@ -798,11 +793,15 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 						CSVReaderWriter.write(listSeparator, recordSetName, csvFilePath, isRaw);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+					}
+					finally {
+						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 					}
 				}
 			};
@@ -953,11 +952,15 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 						OsdReaderWriter.write(useFilePath, activeChannel, 1);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+					}
+					finally {
+						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 					}
 				}
 			};

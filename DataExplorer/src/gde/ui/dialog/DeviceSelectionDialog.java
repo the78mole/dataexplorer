@@ -197,8 +197,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public void open() {
 		try {
-			updateAvailablePorts();
-
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 
@@ -462,9 +460,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setItems(DeviceSelectionDialog.this.availablePorts.toArray(new String[DeviceSelectionDialog.this.availablePorts.size()]));
 											int portIndex = 0;
-											if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0)
+											if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 												portIndex = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
-											DeviceSelectionDialog.this.portSelectCombo.select(portIndex);
+												
+												if (portIndex < 0) portIndex = 0; // port not found in the list
+											  DeviceSelectionDialog.this.portSelectCombo.select(portIndex);
+											}
 										}
 									}
 								});
@@ -758,7 +759,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 				});
 			}
-			updateDialogEntries(); // update all the entries according active device configuration
+			updateDialogEntries(); // update all the entries according active device configuration			
+			updateAvailablePorts();
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(566, 644);
@@ -1052,16 +1054,25 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		// execute independent from dialog UI
 		this.listPortsThread = new Thread() {
 			public void run() {
-				log.fine("updateAvailablePorts() - entry"); //$NON-NLS-1$
-				DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
-				if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-					DeviceSelectionDialog.this.dialogShell.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							DeviceSelectionDialog.this.portGroup.redraw();
-						}
-					});
+				while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+					log.fine("updateAvailablePorts() - entry"); //$NON-NLS-1$
+					DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+					if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								if (!DeviceSelectionDialog.this.dialogShell.isDisposed()) 
+									DeviceSelectionDialog.this.portGroup.redraw();
+							}
+						});
+					}
+					log.fine("updateAvailablePorts() - exit"); //$NON-NLS-1$
+					try {
+						Thread.sleep(2500);
+					}
+					catch (InterruptedException e) {
+						// ignore
+					}
 				}
-				log.fine("updateAvailablePorts() - exit"); //$NON-NLS-1$
 			}
 		};
 		this.listPortsThread.start();
