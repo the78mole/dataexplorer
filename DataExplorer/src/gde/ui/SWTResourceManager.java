@@ -154,7 +154,7 @@ public class SWTResourceManager {
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
-			Image img = new Image(Display.getCurrent(), x, y);
+			Image img = new Image(Display.getDefault(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
@@ -170,7 +170,7 @@ public class SWTResourceManager {
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
-			Image img = new Image(Display.getCurrent(), x, y);
+			Image img = new Image(Display.getDefault(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
