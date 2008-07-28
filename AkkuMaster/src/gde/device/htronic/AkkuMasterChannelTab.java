@@ -476,7 +476,7 @@ public class AkkuMasterChannelTab {
 										AkkuMasterChannelTab.this.serialPort.start(AkkuMasterChannelTab.this.channelSig);
 										AkkuMasterChannelTab.this.serialPort.ok(AkkuMasterChannelTab.this.channelSig);
 									}
-									getChannels().switchChannel(getChannel().getName());
+									AkkuMasterChannelTab.this.channels.switchChannel(AkkuMasterChannelTab.this.channel.getName());
 									// prepare timed data gatherer thread
 									int delay = 0;
 									int period = AkkuMasterChannelTab.this.application.getActiveDevice().getTimeStep_ms().intValue(); // repeat every 10 sec.
@@ -500,7 +500,7 @@ public class AkkuMasterChannelTab {
 												// check for no error state
 												AkkuMasterChannelTab.log.fine("error state = " + this.data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)); //$NON-NLS-1$
 												if (0 == (Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)) {
-													String processName = ((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[1]; //$NON-NLS-1$
+													String processName = ((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[1].trim(); //$NON-NLS-1$
 													AkkuMasterChannelTab.log.fine("processName = " + processName); //$NON-NLS-1$
 
 													// check if device is ready for data capturing
@@ -508,25 +508,25 @@ public class AkkuMasterChannelTab {
 													if (processNumber == 1 || processNumber == 2) { // 1=Laden; 2=Entladen - AkkuMaster activ
 														// check state change waiting to discharge to charge
 														// check if a record set matching for re-use is available and prepare a new if required
-														AkkuMasterChannelTab.log.fine(getChannel().getName() + "=" + getChannel().size()); //$NON-NLS-1$
-														if (getChannel().size() == 0 
-																|| !getChannel().getRecordSetNames()[getChannel().getRecordSetNames().length - 1].endsWith(processName)
+														AkkuMasterChannelTab.log.fine(AkkuMasterChannelTab.this.channel.getName() + "=" + AkkuMasterChannelTab.this.channel.size()); //$NON-NLS-1$
+														if (AkkuMasterChannelTab.this.channel.size() == 0 
+																|| !AkkuMasterChannelTab.this.channel.getRecordSetNames()[AkkuMasterChannelTab.this.channel.getRecordSetNames().length - 1].endsWith(" " + processName) //$NON-NLS-1$
 																|| (new Date().getTime() - getTimeStamp()) > 30000 || isCollectDataStopped()) {
 															setCollectDataStopped(false);
 															// record set does not exist or is outdated, build a new name and create
-															setRecordSetKey(getChannel().getNextRecordSetNumber() + ") " + processName); //$NON-NLS-1$
-															getChannel().put(getRecordSetKey(), RecordSet.createRecordSet(getName().trim(), getRecordSetKey(), AkkuMasterChannelTab.this.application.getActiveDevice(), true, false));
-															getChannel().applyTemplateBasics(getRecordSetKey());
-															AkkuMasterChannelTab.log.fine(getRecordSetKey() + " created for channel " + getChannel().getName()); //$NON-NLS-1$
-															if (getChannel().getActiveRecordSet() == null) getChannel().setActiveRecordSet(getRecordSetKey());
-															setRecordSet(getChannel().get(getRecordSetKey()));
-															getRecordSet().setTableDisplayable(false); // suppress table calc + display 
-															getRecordSet().setAllDisplayable();
-															getChannel().applyTemplate(getRecordSetKey());
+															AkkuMasterChannelTab.this.recordSetKey = AkkuMasterChannelTab.this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
+															AkkuMasterChannelTab.this.channel.put(AkkuMasterChannelTab.this.recordSetKey, RecordSet.createRecordSet(getName().trim(), AkkuMasterChannelTab.this.recordSetKey, AkkuMasterChannelTab.this.application.getActiveDevice(), true, false));
+															AkkuMasterChannelTab.this.channel.applyTemplateBasics(AkkuMasterChannelTab.this.recordSetKey);
+															AkkuMasterChannelTab.log.fine(AkkuMasterChannelTab.this.recordSetKey + " created for channel " + AkkuMasterChannelTab.this.channel.getName()); //$NON-NLS-1$
+															if (AkkuMasterChannelTab.this.channel.getActiveRecordSet() == null) AkkuMasterChannelTab.this.channel.setActiveRecordSet(AkkuMasterChannelTab.this.recordSetKey);
+															AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channel.get(AkkuMasterChannelTab.this.recordSetKey);
+															AkkuMasterChannelTab.this.recordSet.setTableDisplayable(false); // suppress table calc + display 
+															AkkuMasterChannelTab.this.recordSet.setAllDisplayable();
+															AkkuMasterChannelTab.this.channel.applyTemplate(AkkuMasterChannelTab.this.recordSetKey);
 															// switch the active record set if the current record set is child of active channel
-															if (getChannel().getName().equals(getChannels().getActiveChannel().getName())) {
-																AkkuMasterChannelTab.this.application.getMenuToolBar().addRecordSetName(getRecordSetKey());
-																getChannels().getActiveChannel().switchRecordSet(getRecordSetKey());
+															if (AkkuMasterChannelTab.this.channel.getName().equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getName())) {
+																AkkuMasterChannelTab.this.application.getMenuToolBar().addRecordSetName(AkkuMasterChannelTab.this.recordSetKey);
+																AkkuMasterChannelTab.this.channels.getActiveChannel().switchRecordSet(AkkuMasterChannelTab.this.recordSetKey);
 															}
 															// update discharge / charge current display
 															int actualCurrent = ((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue();
@@ -546,15 +546,13 @@ public class AkkuMasterChannelTab {
 															}
 														}
 														else {
-															setRecordSetKey(getChannel().size() + ") " + processName); //$NON-NLS-1$
-															AkkuMasterChannelTab.log.fine("re-using " + getRecordSetKey()); //$NON-NLS-1$
+															AkkuMasterChannelTab.log.fine("re-using " + AkkuMasterChannelTab.this.recordSetKey); //$NON-NLS-1$
 														}
 														setTimeStamp();
 
 														// prepare the data for adding to record set
-														setRecordSet(getChannel().get(getRecordSetKey()));
 														// build the point array according curves from record set
-														int[] points = new int[getRecordSet().size()];
+														int[] points = new int[AkkuMasterChannelTab.this.recordSet.size()];
 
 														points[0] = new Integer((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
 														points[1] = new Integer((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
@@ -564,17 +562,12 @@ public class AkkuMasterChannelTab {
 														points[4] = new Integer((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
 														AkkuMasterChannelTab.log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-														getRecordSet().addPoints(points, false); // updates data table and digital windows
+														AkkuMasterChannelTab.this.recordSet.addPoints(points, false); // updates data table and digital windows
 														AkkuMasterChannelTab.this.application.updateGraphicsWindow();
 														AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
 														AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
 													}
 													else {
-														// only the voltage can be displayed and updated
-														//String voltage = new Double(new Integer(measuredData[2]) / 1000.0).toString(); // V
-														//String current = new Double(new Integer(measuredData[3])).toString(); // mA
-														//application.updateDigitalLabelText(new String[] { voltage, current });
-
 														// enable switching records sets
 														if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 															stopTimer();
@@ -597,13 +590,15 @@ public class AkkuMasterChannelTab {
 												}
 											}
 											catch (DataInconsitsentException e) {
-												// exception is logged where it is thrown first log.log(Level.SEVERE, e.getMessage(), e);
+												// exception is logged where it is thrown first 
+												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
 												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 											catch (Exception e) {
-												// exception is logged where it is thrown first log.log(Level.SEVERE, e.getMessage(), e);
+												// exception is logged where it is thrown first 
+												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
 												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
@@ -641,8 +636,8 @@ public class AkkuMasterChannelTab {
 							}
 							stopTimer();
 							// hope this is the right record set
-							setRecordSet(getChannels().getActiveChannel().get(getRecordSetKey()));
-							if (getRecordSet() != null) getRecordSet().setTableDisplayable(true); // enable table display after calculation
+							AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channels.getActiveChannel().get(AkkuMasterChannelTab.this.recordSetKey);
+							if (AkkuMasterChannelTab.this.recordSet != null) AkkuMasterChannelTab.this.recordSet.setTableDisplayable(true); // enable table display after calculation
 							AkkuMasterChannelTab.this.application.updateDataTable();
 						}
 					});
@@ -1019,13 +1014,6 @@ public class AkkuMasterChannelTab {
 	}
 
 	/**
-	 * @return the channel
-	 */
-	Channel getChannel() {
-		return this.channel;
-	}
-
-	/**
 	 * set timeStamp using Date().getTime()
 	 */
 	public void setTimeStamp() {
@@ -1047,45 +1035,10 @@ public class AkkuMasterChannelTab {
 	}
 
 	/**
-	 * @param newRecordSetKey the recordSetKey to set
-	 */
-	public void setRecordSetKey(String newRecordSetKey) {
-		this.recordSetKey = newRecordSetKey;
-	}
-
-	/**
-	 * @return the recordSetKey
-	 */
-	public String getRecordSetKey() {
-		return this.recordSetKey;
-	}
-
-	/**
 	 * @return the name
 	 */
 	String getName() {
 		return this.name;
-	}
-
-	/**
-	 * @param newRecordSet the recordSet to set
-	 */
-	public void setRecordSet(RecordSet newRecordSet) {
-		this.recordSet = newRecordSet;
-	}
-
-	/**
-	 * @return the recordSet
-	 */
-	public RecordSet getRecordSet() {
-		return this.recordSet;
-	}
-
-	/**
-	 * @return the channels
-	 */
-	public Channels getChannels() {
-		return this.channels;
 	}
 
 	/**
