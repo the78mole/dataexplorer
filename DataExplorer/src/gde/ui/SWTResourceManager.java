@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Pattern;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -153,7 +154,7 @@ public class SWTResourceManager {
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
-			Image img = new Image(Display.getDefault(), x, y);
+			Image img = new Image(Display.getCurrent(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
@@ -169,10 +170,44 @@ public class SWTResourceManager {
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
-			Image img = new Image(Display.getDefault(), x, y);
+			Image img = new Image(Display.getCurrent(), x, y);
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * create an image containing a icon at left hand side and a text 
+	 * @param pt size of the image
+	 * @param imageURL image to be placed left hand side, image must fit the given size
+	 * @param text to be placed centered in the remaining space
+	 * @return
+	 */
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	public static Image getImage(Point pt, String imageURL, String text) {
+		String key = "IMAGE:" + pt.x + OSDE.STRING_UNDER_BAR + pt.y + OSDE.STRING_UNDER_BAR + imageURL + OSDE.STRING_UNDER_BAR + text; //$NON-NLS-1$
+		try {
+			if (resources.containsKey(key))
+				return (Image) resources.get(key);
+			
+			Image buttonImage = SWTResourceManager.getImage(imageURL);
+			Image img = SWTResourceManager.getImage(pt.x, pt.y);
+			GC gc = new GC(img);
+			gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			gc.fillRoundRectangle(0, 0, pt.x, pt.y, 3, 3);
+			gc.drawImage(buttonImage, 0,0);
+			Point textExtend = gc.textExtent(text);
+			gc.drawText(text, buttonImage.getBounds().width + (pt.x - buttonImage.getBounds().width - textExtend.x) / 2, (pt.y - textExtend.y) / 2);
+			gc.dispose();
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+			resources.put(key, img);
+			return img;
+			
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;

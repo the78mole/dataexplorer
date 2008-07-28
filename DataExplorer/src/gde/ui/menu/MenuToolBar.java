@@ -84,6 +84,8 @@ public class MenuToolBar {
 	CoolItem											zoomCoolItem;
 
 	ToolItem											portOpenCloseItem;
+	Point 												portOpenCloseButtonSize = new Point(122, 23);
+
 	Composite											dataBarComposite;
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, deleteRecord, editRecord;
 	CCombo												channelSelectCombo, recordSelectCombo;
@@ -398,9 +400,9 @@ public class MenuToolBar {
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletActiveRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletDisabledRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletHotRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -874,17 +876,15 @@ public class MenuToolBar {
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (isOpenStatus) {
-			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortCloseDisabled.gif")); //$NON-NLS-1$
-			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortClose.gif")); //$NON-NLS-1$
-			this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortCloseHot.gif")); //$NON-NLS-1$
-			//portOpenCloseLabel.setText("Port schliessen");
+			this.portOpenCloseItem.setImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletActiveGreen.gif", Messages.getString(MessageIds.OSDE_MSGT0048))); //$NON-NLS-1$
+			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletDisabledGreen.gif", Messages.getString(MessageIds.OSDE_MSGT0048))); //$NON-NLS-1$
+			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletHotGreen.gif", Messages.getString(MessageIds.OSDE_MSGT0048))); //$NON-NLS-1$
 		}
 		else {
 			if (!this.application.isDisposed()) {
-				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/PortOpenDisabled.gif")); //$NON-NLS-1$
-				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/PortOpenHot.gif")); //$NON-NLS-1$
-				this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/PortOpen.gif")); //$NON-NLS-1$
-				//portOpenCloseLabel.setText("Port öffnen         ");
+				this.portOpenCloseItem.setImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletActiveRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
+				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletDisabledRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
+				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage(this.portOpenCloseButtonSize, "osde/resource/BulletHotRed.gif", Messages.getString(MessageIds.OSDE_MSGT0049))); //$NON-NLS-1$
 			}
 		}
 	}
