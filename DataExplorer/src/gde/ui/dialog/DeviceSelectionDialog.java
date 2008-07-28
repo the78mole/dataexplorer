@@ -368,28 +368,28 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.manufacturerDescription = new Text(this.group1, SWT.MULTI | SWT.WRAP);
 									this.manufacturerDescription.setBounds(251, 70, 72, 16);
 									this.manufacturerDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0157));
-									this.manufacturerDescription.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+									this.manufacturerDescription.setFont(SWTResourceManager.getFont(this.manufacturerDescription, SWT.BOLD));
 									this.manufacturerDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								}
 								{
 									this.deviceNameDescription = new Text(this.group1, SWT.MULTI | SWT.WRAP);
 									this.deviceNameDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.deviceNameDescription.setBounds(251, 92, 89, 16);
-									this.deviceNameDescription.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+									this.deviceNameDescription.setFont(SWTResourceManager.getFont(this.manufacturerDescription, SWT.BOLD));
 									this.deviceNameDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0158));
 								}
 								{
 									this.deviceTypeDescription = new Text(this.group1, SWT.MULTI | SWT.WRAP);
 									this.deviceTypeDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.deviceTypeDescription.setBounds(251, 114, 31, 16);
-									this.deviceTypeDescription.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+									this.deviceTypeDescription.setFont(SWTResourceManager.getFont(this.manufacturerDescription, SWT.BOLD));
 									this.deviceTypeDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0159));
 								}
 								{
 									this.internetLinkDescription = new Text(this.group1, SWT.MULTI | SWT.WRAP);
 									this.internetLinkDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.internetLinkDescription.setBounds(251, 136, 55, 16);
-									this.internetLinkDescription.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+									this.internetLinkDescription.setFont(SWTResourceManager.getFont(this.manufacturerDescription, SWT.BOLD));
 									this.internetLinkDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0160));
 								}
 								{

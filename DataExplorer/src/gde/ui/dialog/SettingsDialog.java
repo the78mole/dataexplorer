@@ -383,14 +383,14 @@ public class SettingsDialog extends Dialog {
 								}
 							});
 							{
-								this.decimalSeparatorLabel = new CLabel(this.separatorGroup, SWT.LEFT);
+								this.decimalSeparatorLabel = new CLabel(this.separatorGroup, SWT.RIGHT);
 								this.decimalSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0326));
 								this.decimalSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0327));
-								this.decimalSeparatorLabel.setBounds(25, 24, 125, 22);
+								this.decimalSeparatorLabel.setBounds(10, 24, 140, 22);
 							}
 							{
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER);
-								this.decimalSeparator.getFont().getFontData()[0].setStyle(SWT.BOLD);
+								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
 								this.decimalSeparator.setItems(new String[] {" . ", " , "}); //$NON-NLS-1$ //$NON-NLS-2$
 								this.decimalSeparator.setBounds(153, 24, 43, 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
@@ -403,13 +403,14 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.listSeparatorLabel = new CLabel(this.separatorGroup, SWT.LEFT);
+								this.listSeparatorLabel = new CLabel(this.separatorGroup, SWT.RIGHT);
 								this.listSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0328));
 								this.listSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0329));
-								this.listSeparatorLabel.setBounds(240, 24, 125, 20);
+								this.listSeparatorLabel.setBounds(228, 24, 140, 20);
 							}
 							{
-								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER);
+								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
+								this.listSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
 								this.listSeparator.setItems(new String[] { " , ", " ; ", " : "}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								this.listSeparator.setBounds(370, 24, 47, 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {

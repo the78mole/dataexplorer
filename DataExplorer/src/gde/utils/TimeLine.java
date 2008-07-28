@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
@@ -271,21 +270,17 @@ public class TimeLine {
 				// prepare to make every minute or hour to bold
 				boolean isMod60 = (timeValue % 60) == 0;
 				String numberStr;
-				FontData[] fd;
 				if (timeFormat != TimeLine.TIME_LINE_MSEC) { // msec
 					double timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
 					if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.finer("timeValue = " + timeValue + ", timeValue60 = " + timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
 					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
-					fd = gc.getFont().getFontData();
 					if (isMod60 && timeValue != 0) {
-						fd[0].setStyle(SWT.BOLD);
-						gc.setFont(SWTResourceManager.getFont(fd[0]));
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
 						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) timeGrid.add(intXTickPosition);
 					}
 					GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 					if (isMod60 && timeValue != 0) { // reset font style
-						fd[0].setStyle(SWT.NORMAL);
-						gc.setFont(SWTResourceManager.getFont(fd[0]));
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
 					}
 				}
 				else

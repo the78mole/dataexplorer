@@ -44,7 +44,6 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.utils.GraphicsUtils;
 
 /**
  * This class defines a composite whith a header (Curve Selector, ..) and a table with checkable table items
@@ -122,7 +121,7 @@ public class SelectorComposite extends Composite {
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
 			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
-			this.curveSelectorHeader.setFont(GraphicsUtils.getFontWithStyle(this.curveSelectorHeader, SWT.BOLD));
+			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(this.curveSelectorHeader, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();

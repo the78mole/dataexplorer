@@ -132,7 +132,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.aboutText = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				this.aboutText.setLayoutData(aboutTextLData);
-				this.aboutText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 18, 2, false, false)); //$NON-NLS-1$
+				this.aboutText.setFont(SWTResourceManager.getFont("Sans Serif", 18, 2, false, false)); //$NON-NLS-1$
 				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());

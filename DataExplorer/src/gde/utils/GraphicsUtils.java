@@ -22,12 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import osde.data.Record;
@@ -200,19 +197,4 @@ public class GraphicsUtils {
 		// Draw the vertical image onto the original GC
 		gc.drawImage(SWTResourceManager.getRotatedImage(image, style, imgKey), x, y);
 	}
-	
-
-	/**
-	 * get the given font in style
-	 * @param control
-	 * @param style SWT.BOLD, SWT.NORMAL
-	 * @return the controls font in given style
-	 */
-	public static Font getFontWithStyle(Control control, int style) {
-		FontData[] fd = control.getFont().getFontData();
-		fd[0].setStyle(style);
-		return SWTResourceManager.getFont(fd[0]);
-	}
-
-
 }

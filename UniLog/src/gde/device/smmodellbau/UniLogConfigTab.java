@@ -365,7 +365,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.currentOffsetLabel = new CLabel(this.powerGroup, SWT.LEFT);
 						this.currentOffsetLabel.setBounds(247, 44, 46, 18);
-						//this.currentOffsetLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.currentOffsetLabel.setFont(SWTResourceManager.getFont("Sans Serif", 9, 1, false, false));
 						this.currentOffsetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1440));
 					}
 					{
@@ -742,25 +742,25 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.axName = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axName.setBounds(40, 50, 116, 18);
 						this.axName.setText(Messages.getString(MessageIds.OSDE_MSGT1453));
-						//this.axName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axName.setFont(SWTResourceManager.getFont("Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axUnit = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axUnit.setBounds(158, 50, 50, 18);
 						this.axUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1454));
-						//this.axUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axUnit.setFont(SWTResourceManager.getFont("Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axOffset = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axOffset.setBounds(209, 50, 46, 20);
 						this.axOffset.setText(Messages.getString(MessageIds.OSDE_MSGT1455));
-						//this.axOffset.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axOffset.setFont(SWTResourceManager.getFont("Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.axFactor = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axFactor.setBounds(257, 50, 48, 20);
 						this.axFactor.setText(Messages.getString(MessageIds.OSDE_MSGT1456));
-						//this.axFactor.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 9, 1, false, false));
+						//this.axFactor.setFont(SWTResourceManager.getFont("Sans Serif", 9, 1, false, false));
 					}
 					{
 						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
@@ -789,7 +789,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a1Unit.setBounds(160, 72, 45, 20);
-						//this.a1Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						//this.a1Unit.setFont(SWTResourceManager.getFont("Sans Serif", 8, 0, false, false));
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -857,7 +857,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a2Unit.setBounds(160, 93, 45, 20);
-						//this.a2Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						//this.a2Unit.setFont(SWTResourceManager.getFont("Sans Serif", 8, 0, false, false));
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -925,7 +925,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a3Unit.setBounds(160, 115, 45, 20);
-						//this.a3Unit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 8, 0, false, false));
+						//this.a3Unit.setFont(SWTResourceManager.getFont("Sans Serif", 8, 0, false, false));
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt); //$NON-NLS-1$

@@ -94,7 +94,7 @@ public class FileCommentWindow {
 			{
 				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
 				this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
-				this.infoLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+				this.infoLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 				this.infoLabel.setBounds(50, 10, 500, 26);
 			}
 			{

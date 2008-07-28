@@ -271,13 +271,13 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					this.totalChargeCurrentText = new Text(this.statusComposite, SWT.LEFT);
 					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1110));
 					this.totalChargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(this.totalChargeCurrentText, SWT.BOLD));
 					this.totalChargeCurrentText.setBounds(20, 10, 190, 20);
 				}
 				{
 					this.totalDischargeCurrentText = new Text(this.statusComposite, SWT.LEFT);
 					this.totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(this.totalChargeCurrentText, SWT.BOLD));
 					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1111));
 					this.totalDischargeCurrentText.setBounds(20, 35, 190, 20);
 				}
@@ -285,13 +285,13 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					this.totalDischargeCurrentUnit = new Text(this.statusComposite, SWT.NONE);
 					this.totalDischargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1112));
-					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(this.totalChargeCurrentText, SWT.BOLD));
 					this.totalDischargeCurrentUnit.setBounds(300, 10, 119, 20);
 				}
 				{
 					this.totalChargeCurrentUnit = new Text(this.statusComposite, SWT.NONE);
 					this.totalChargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(this.totalChargeCurrentText, SWT.BOLD));
 					this.totalChargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1113));
 					this.totalChargeCurrentUnit.setBounds(300, 35, 119, 20);
 				}

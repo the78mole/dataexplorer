@@ -185,7 +185,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
 						this.captureOnlyButton.setText(Messages.getString(MessageIds.OSDE_MSGT1174)); 
-						this.captureOnlyButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+						this.captureOnlyButton.setFont(SWTResourceManager.getFont(this.captureOnlyButton, SWT.BOLD));
 						this.captureOnlyButton.setBounds(12, 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -226,7 +226,7 @@ public class AkkuMasterChannelTab {
 						this.programmButton = new Button(this.programGroup, SWT.RADIO | SWT.LEFT);
 						this.programmButton.setText(Messages.getString(MessageIds.OSDE_MSGT1175));
 						this.programmButton.setBounds(12, 15, 295, 21);
-						this.programmButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+						this.programmButton.setFont(SWTResourceManager.getFont(this.captureOnlyButton, SWT.BOLD));
 						this.programmButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -431,7 +431,7 @@ public class AkkuMasterChannelTab {
 					this.startDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.startDataGatheringButton.setBounds(12, 360, 190, 28);
 					this.startDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0277));
-					this.startDataGatheringButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(this.captureOnlyButton, SWT.BOLD));
 					this.startDataGatheringButton.setSelection(this.isCollectData);
 					this.startDataGatheringButton.setEnabled(false);
 					this.startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
@@ -623,7 +623,7 @@ public class AkkuMasterChannelTab {
 					this.stopDataGatheringButton.setBounds(225, 360, 190, 28);
 					this.stopDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
 					this.stopDataGatheringButton.setEnabled(false);
-					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(this.captureOnlyButton, SWT.BOLD));
 					this.stopDataGatheringButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							AkkuMasterChannelTab.log.finest("stopAuzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$

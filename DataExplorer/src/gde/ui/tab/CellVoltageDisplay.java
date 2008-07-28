@@ -79,7 +79,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.cellTextLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellTextLabel.setText(this.displayHeaderText);
 			GridData text1LData = new GridData();
@@ -91,7 +91,7 @@ public class CellVoltageDisplay extends Composite {
 			this.cellVoltageDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellVoltageDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
-			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 32, 0, false, false)); //$NON-NLS-1$
+			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 32, 0, false, false)); //$NON-NLS-1$
 			GridData actualDigitalLabelLData = new GridData();
 			actualDigitalLabelLData.horizontalAlignment = GridData.FILL;
 			actualDigitalLabelLData.grabExcessHorizontalSpace = true;

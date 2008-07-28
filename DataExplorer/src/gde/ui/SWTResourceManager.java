@@ -111,6 +111,30 @@ public class SWTResourceManager {
 		return getFont(fd.getName(), fd.getHeight(), fd.getStyle(), false, false);
 	}
 
+	/**
+	 * get the given font in style
+	 * @param control
+	 * @param style SWT.BOLD, SWT.NORMAL
+	 * @return the controls font in given style
+	 */
+	public static Font getFont(Control control, int style) {
+		FontData[] fd = control.getFont().getFontData();
+		fd[0].setStyle(style);
+		return getFont(fd[0]);
+	}
+
+	/**
+	 * get the given font in style
+	 * @param control
+	 * @param style SWT.BOLD, SWT.NORMAL
+	 * @return the controls font in given style
+	 */
+	public static Font getFont(GC gc, int style) {
+		FontData[] fd = gc.getFont().getFontData();
+		fd[0].setStyle(style);
+		return getFont(fd[0]);
+	}
+
 	public static Font getFont(String name, int size, int style) {
 		return getFont(name, size, style, false, false);
 	}

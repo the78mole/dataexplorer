@@ -63,7 +63,7 @@ public class DigitalDisplay extends Composite {
 	public void create() {
 		{
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 1, false, false)); //$NON-NLS-1$
+			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 14, 1, false, false)); //$NON-NLS-1$
 			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
@@ -83,7 +83,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.actualDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.actualDigitalLabel.setText("00,00"); //$NON-NLS-1$
-			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 72, 0, false, false)); //$NON-NLS-1$
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 72, 0, false, false)); //$NON-NLS-1$
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
 					log.finest("digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
@@ -112,12 +112,12 @@ public class DigitalDisplay extends Composite {
 
 			this.minDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.minDigitalLabel.setText("MIN : 00,00"); //$NON-NLS-1$
-			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.minDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
 			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.maxDigitalLabel.setText("MAX : 00,00"); //$NON-NLS-1$
-			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 			this.maxDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		}
 	}

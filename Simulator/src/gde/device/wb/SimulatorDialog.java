@@ -327,7 +327,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.descriptionLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.WRAP | SWT.EMBEDDED);
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
 					this.descriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1057));
-					this.descriptionLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 14, 0, false, false)); //$NON-NLS-1$
+					this.descriptionLabel.setFont(SWTResourceManager.getFont("Sans Serif", 14, 0, false, false)); //$NON-NLS-1$
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.descriptionLabel.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
 				}
