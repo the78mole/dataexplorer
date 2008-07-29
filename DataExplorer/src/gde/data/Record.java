@@ -479,7 +479,15 @@ public class Record extends Vector<Integer> {
 		}
 		return size != 0 ? super.get(currentIndex) : 0;
 	}
-	
+
+	/**
+	 * 
+	 * @param index
+	 */
+	public Integer realGet(int index) {
+		return super.get(index);
+	}
+
 	/**
 	 * overwrites vector elementAt(int index) to enable zoom
 	 * @param index

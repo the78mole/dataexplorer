@@ -26,7 +26,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public abstract class CalculationThread extends Thread {
-	final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
+	private final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
 
 	public static final String REGRESSION_TYPE 					= "regression_type"; //$NON-NLS-1$
 	public static final String REGRESSION_TYPE_LINEAR 	= "regression_type_linear"; //$NON-NLS-1$
@@ -53,6 +53,7 @@ public abstract class CalculationThread extends Thread {
 		this.targetRecordKey = outRecordKey;
 		this.calcInterval_sec = calcIntervalSec;
 		this.application = OpenSerialDataExplorer.getInstance();
+		log.finer(this.getClass().getSimpleName() + " instanciated");
 	}
 
 	/**

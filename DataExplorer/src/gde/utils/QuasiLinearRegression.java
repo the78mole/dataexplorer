@@ -30,7 +30,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class QuasiLinearRegression extends CalculationThread {
-	final static Logger	logQl	= Logger.getLogger(QuasiLinearRegression.class.getName());
+	private final static Logger	log	= Logger.getLogger(QuasiLinearRegression.class.getName());
 
 	/**
 	 * constructor where calculation required parameters are given as parameter
@@ -49,11 +49,11 @@ public class QuasiLinearRegression extends CalculationThread {
 	@Override
 	public void run() {
 		if (this.recordSet == null || this.sourceRecordKey == null || this.targetRecordKey == null) {
-			QuasiLinearRegression.logQl.warning("Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
+			log.warning("Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
 			return;
 		}
 		synchronized (REGRESSION_INTERVAL_SEC) {
-			QuasiLinearRegression.logQl.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 
 			Record record = this.recordSet.get(this.targetRecordKey);
 			record.clear();
@@ -61,9 +61,10 @@ public class QuasiLinearRegression extends CalculationThread {
 			double time_ms = this.recordSet.getTimeStep_ms();
 			int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
 			int pointInterval = 2;
-			int modCounter = ((recordHeight.size() - (recordHeight.size() % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
+			int numberDataPoints = recordHeight.realSize();
+			int modCounter = ((numberDataPoints - (numberDataPoints % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
 			// fill mod interval + pontInterval / 2
-			int counter = (recordHeight.size() % pointsPerInterval) + (pointInterval / 2);
+			int counter = (numberDataPoints % pointsPerInterval) + (pointInterval / 2);
 			int padding = pointsPerInterval / 2 - pointInterval;
 			// padding data points which does not fit into interval
 			for (int i = 0; i < counter + padding; i++) { // 0,5 sec
@@ -77,57 +78,57 @@ public class QuasiLinearRegression extends CalculationThread {
 			avgX = avgX / pointsPerInterval;
 			// (xi - avgX)*(xi - avgX)
 			double ssXX = 0.0; // 10 sec = 0.053025;
-			for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
+			for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
 				ssXX = ssXX + (((1 / 0.05 * i) - avgX) * ((1 / 0.05 * i) - avgX));
 			}
 			ssXX = ssXX / pointsPerInterval;
-			if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINEST)) log.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
 			--modCounter;
 			while (modCounter > 0 && !this.threadStop) {
 				// calculate avg y
 				double avgY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-					avgY = avgY + (recordHeight.get(i + counter));
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
+					avgY = avgY + (recordHeight.realGet(i + counter));
 				}
 				avgY = avgY / pointsPerInterval;
 
 				// (yi - avgY)
 				double sumYi_avgY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-					sumYi_avgY = sumYi_avgY + ((recordHeight.get(i + counter)) - avgY);
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
+					sumYi_avgY = sumYi_avgY + ((recordHeight.realGet(i + counter)) - avgY);
 				}
 				sumYi_avgY = sumYi_avgY / pointsPerInterval;
 
 				// (xi - avgX)*(yi - avgY)
 				double ssXY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,5 sec
-					ssXY = ssXY + (((1 / 0.05 * i) - avgX) * ((recordHeight.get(i + counter)) - avgY));
+				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
+					ssXY = ssXY + (((1 / 0.05 * i) - avgX) * ((recordHeight.realGet(i + counter)) - avgY));
 				}
 				ssXY = ssXY / pointsPerInterval;
 
 				int slope = 0;
 				// ad point over pointInterval only
-				for (int i = 0; i < pointInterval; i++) { // 0,5 sec
+				for (int i = 0; i < pointInterval; i++) { // 0,05 sec
 					slope = new Double(ssXY / ssXX / 2).intValue(); // slope = ssXY / ssXX / 2; 2*0.5 = 1
 					record.add(slope * 1000);
 				}
 				counter = counter + pointInterval;
 
-				if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				--modCounter;
 			}
 			// pad the rest of the curve to make equal size
-			for (int i = record.size() - 1; i < recordHeight.size() - 1; i++) {
+			for (int i = counter - pointInterval; i < numberDataPoints - 1; i++) {
 				record.add(0);
 			}
-			if (QuasiLinearRegression.logQl.isLoggable(Level.FINEST)) QuasiLinearRegression.logQl.fine("counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 			if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
 				this.application.updateGraphicsWindow();
 			}
 			
 			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
-			QuasiLinearRegression.logQl.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}
 
