@@ -271,7 +271,7 @@ public class PicolarioConfigTab extends Composite {
 										if (activeChannel != null) {
 											RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 											if (activeRecordSet != null) {
-												String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+												String measurementKey = activeRecordSet.getRecordNames()[1]; // height
 												Record activeRecord = activeRecordSet.get(measurementKey);
 												activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 												PicolarioConfigTab.this.application.updateGraphicsWindow();
@@ -332,7 +332,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null) {
-										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
+										String measurementKey = activeRecordSet.getRecordNames()[2]; // slope
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.getProperty(CalculationThread.REGRESSION_TYPE).setValue(PicolarioConfigTab.this.slopeTypeSelection);
 										activeRecord.setDisplayable(false);
@@ -363,7 +363,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null) {
-										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[2]; // slope
+										String measurementKey = activeRecordSet.getRecordNames()[2]; // slope
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection); //$NON-NLS-1$
 										activeRecord.setDisplayable(false);
