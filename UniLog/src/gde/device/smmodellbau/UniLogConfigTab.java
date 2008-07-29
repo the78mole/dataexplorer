@@ -454,7 +454,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 										if (recordSet != null) {
-											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+											Record record = recordSet.get(recordSet.getRecordNames()[8]);
 											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.prop100WValue);
@@ -463,7 +463,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 											}
 											// update number cells too, if user has changed, but not hit enter 
-											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+											record = recordSet.get(recordSet.getRecordNames()[6]);
 											property = record.getProperty(UniLog.NUMBER_CELLS);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.numCellValue);
@@ -534,7 +534,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 										if (recordSet != null) {
-											Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[8]);
+											Record record = recordSet.get(recordSet.getRecordNames()[8]);
 											PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.prop100WValue);
@@ -543,7 +543,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 											}
 											// update number cells too, if user has changed, but not hit enter 
-											record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[6]);
+											record = recordSet.get(recordSet.getRecordNames()[6]);
 											property = record.getProperty(UniLog.NUMBER_CELLS);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.numCellValue);
