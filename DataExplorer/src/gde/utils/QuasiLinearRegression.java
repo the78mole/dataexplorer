@@ -58,70 +58,72 @@ public class QuasiLinearRegression extends CalculationThread {
 			Record record = this.recordSet.get(this.targetRecordKey);
 			record.clear();
 			Record recordHeight = this.recordSet.get(this.sourceRecordKey);
-			double time_ms = this.recordSet.getTimeStep_ms();
-			int pointsPerInterval = new Double(this.calcInterval_sec * 1000.0 / time_ms).intValue(); // 4000ms/50ms/point -> 80 points per interval
-			int pointInterval = 2;
+			double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
+			int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
+			int pointsPerInterval = timeStepsPerInterval + 1; 
+			if (log.isLoggable(Level.FINE)) log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
+			int pointInterval = 1;  // fix number of points where the calculation will result in slope values, rest is overlap
 			int numberDataPoints = recordHeight.realSize();
-			int modCounter = ((numberDataPoints - (numberDataPoints % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
-			// fill mod interval + pontInterval / 2
-			int counter = (numberDataPoints % pointsPerInterval) + (pointInterval / 2);
-			int padding = pointsPerInterval / 2 - pointInterval;
-			// padding data points which does not fit into interval
-			for (int i = 0; i < counter + padding; i++) { // 0,5 sec
+			int startPosition = 0;
+			int frontPadding = timeStepsPerInterval / 2 - pointInterval;
+			int modCounter = (numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
+			
+			for (int i = 0; i < frontPadding; i++) { // padding data points which does not fit into interval
 				record.add(0);
 			}
 			// calculate avg x
-			double avgX = 0; //(interval-1) * time_ms / 1000.0 / interval; // 9 * 0.05 / 10; --> 0,05 
-			for (int i = 0; i < pointsPerInterval; i++) {
-				avgX = avgX + (1 / 0.05 * i);
+			double avgX = 0; 
+			for (int i = 0; i < timeStepsPerInterval; i++) {
+				avgX = avgX + (1 / timeStep_sec * i);
 			}
-			avgX = avgX / pointsPerInterval;
+			avgX = avgX / timeStepsPerInterval;
 			// (xi - avgX)*(xi - avgX)
 			double ssXX = 0.0; // 10 sec = 0.053025;
-			for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
-				ssXX = ssXX + (((1 / 0.05 * i) - avgX) * ((1 / 0.05 * i) - avgX));
+			for (int i = 0; i < timeStepsPerInterval; i++) { 
+				ssXX = ssXX + (((1 / timeStep_sec * i) - avgX) * ((1 / timeStep_sec * i) - avgX));
 			}
-			ssXX = ssXX / pointsPerInterval;
+			ssXX = ssXX / timeStepsPerInterval;
 			if (log.isLoggable(Level.FINEST)) log.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+			
 			--modCounter;
 			while (modCounter > 0 && !this.threadStop) {
 				// calculate avg y
 				double avgY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
-					avgY = avgY + (recordHeight.realGet(i + counter));
+				for (int i = 0; i < timeStepsPerInterval; i++) { 
+					avgY = avgY + (recordHeight.realGet(i + startPosition));
 				}
-				avgY = avgY / pointsPerInterval;
+				avgY = avgY / timeStepsPerInterval;
 
 				// (yi - avgY)
 				double sumYi_avgY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
-					sumYi_avgY = sumYi_avgY + ((recordHeight.realGet(i + counter)) - avgY);
+				for (int i = 0; i < timeStepsPerInterval; i++) { 
+					sumYi_avgY = sumYi_avgY + ((recordHeight.realGet(i + startPosition)) - avgY);
 				}
-				sumYi_avgY = sumYi_avgY / pointsPerInterval;
+				sumYi_avgY = sumYi_avgY / timeStepsPerInterval;
 
 				// (xi - avgX)*(yi - avgY)
 				double ssXY = 0.0;
-				for (int i = 0; i < pointsPerInterval; i++) { // 0,05 sec
-					ssXY = ssXY + (((1 / 0.05 * i) - avgX) * ((recordHeight.realGet(i + counter)) - avgY));
+				for (int i = 0; i < timeStepsPerInterval; i++) { 
+					ssXY = ssXY + (((1 / timeStep_sec * i) - avgX) * ((recordHeight.realGet(i + startPosition)) - avgY));
 				}
-				ssXY = ssXY / pointsPerInterval;
+				ssXY = ssXY / timeStepsPerInterval;
 
 				int slope = 0;
-				// ad point over pointInterval only
-				for (int i = 0; i < pointInterval; i++) { // 0,05 sec
-					slope = new Double(ssXY / ssXX / 2).intValue(); // slope = ssXY / ssXX / 2; 2*0.5 = 1
-					record.add(slope * 1000);
+				// add point over pointInterval only
+				for (int i = 0; i < pointInterval; i++) { 
+					slope = new Double(ssXY / ssXX / timeStep_sec * 1/timeStep_sec).intValue(); 
+					record.add(slope);
 				}
-				counter = counter + pointInterval;
+				startPosition = startPosition + pointInterval;
 
-				if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				--modCounter;
 			}
 			// pad the rest of the curve to make equal size
-			for (int i = counter - pointInterval; i < numberDataPoints - 1; i++) {
+			for (int i = record.realSize(); i < numberDataPoints - 1; i++) {
 				record.add(0);
 			}
-			if (log.isLoggable(Level.FINEST)) log.fine("counter = " + counter + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINEST)) log.fine("counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 			if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
 				this.application.updateGraphicsWindow();
