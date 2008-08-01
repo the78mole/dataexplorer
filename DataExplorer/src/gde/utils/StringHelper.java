@@ -23,6 +23,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
 import osde.OSDE;
@@ -183,4 +185,86 @@ public class StringHelper {
 		}
 		return points;
 	}
+	
+	/**
+	 * print the SWT key code by log info
+	 * @param evt
+	 */
+	public static void printSWTKeyCode(KeyEvent evt) {
+		String keyCode = ""+evt.character;
+		switch (evt.keyCode) {
+		/* Keyboard and Mouse Masks */
+		case SWT.ALT: 		keyCode = "ALT"; break;
+		case SWT.SHIFT: 	keyCode = "SHIFT"; break;
+		case SWT.CONTROL:	keyCode = "CONTROL"; break;
+		case SWT.COMMAND:	keyCode = "COMMAND"; break;
+			
+		/* Non-Numeric Keypad Keys */
+		case SWT.ARROW_UP:		keyCode = "ARROW_UP"; break;
+		case SWT.ARROW_DOWN:	keyCode = "ARROW_DOWN"; break;
+		case SWT.ARROW_LEFT:	keyCode = "ARROW_LEFT"; break;
+		case SWT.ARROW_RIGHT:	keyCode = "ARROW_RIGHT"; break;
+		case SWT.PAGE_UP:			keyCode = "PAGE_UP"; break;
+		case SWT.PAGE_DOWN:		keyCode = "PAGE_DOWN"; break;
+		case SWT.HOME:				keyCode = "HOME"; break;
+		case SWT.END:					keyCode = "END"; break;
+		case SWT.INSERT:			keyCode = "INSERT"; break;
+
+		/* Virtual and Ascii Keys */
+		case SWT.BS:	keyCode = "BS"; break;
+		case SWT.CR:	keyCode = "CR"; break;		
+		case SWT.DEL:	keyCode = "DEL"; break;
+		case SWT.ESC:	keyCode = "ESC"; break;
+		case SWT.LF:	keyCode = "LF"; break;
+		case SWT.TAB:	keyCode = "TAB"; break;
+
+		/* Functions Keys */
+		case SWT.F1:	keyCode = "F1"; break;
+		case SWT.F2:	keyCode = "F2"; break;
+		case SWT.F3:	keyCode = "F3"; break;
+		case SWT.F4:	keyCode = "F4"; break;
+		case SWT.F5:	keyCode = "F5"; break;
+		case SWT.F6:	keyCode = "F6"; break;
+		case SWT.F7:	keyCode = "F7"; break;
+		case SWT.F8:	keyCode = "F8"; break;
+		case SWT.F9:	keyCode = "F9"; break;
+		case SWT.F10:	keyCode = "F10"; break;
+		case SWT.F11:	keyCode = "F11"; break;
+		case SWT.F12:	keyCode = "F12"; break;
+		case SWT.F13:	keyCode = "F13"; break;
+		case SWT.F14:	keyCode = "F14"; break;
+		case SWT.F15:	keyCode = "F15"; break;
+		
+		/* Numeric Keypad Keys */
+		case SWT.KEYPAD_ADD:			keyCode = "KEYPAD_ADD"; break;
+		case SWT.KEYPAD_SUBTRACT:	keyCode = "KEYPAD_SUBTRACT"; break;
+		case SWT.KEYPAD_MULTIPLY:	keyCode = "KEYPAD_MULTIPLY"; break;
+		case SWT.KEYPAD_DIVIDE:		keyCode = "KEYPAD_DIVIDE"; break;
+		case SWT.KEYPAD_DECIMAL:	keyCode = "KEYPAD_DECIMAL"; break;
+		case SWT.KEYPAD_CR:				keyCode = "KEYPAD_CR"; break;
+		case SWT.KEYPAD_0:				keyCode = "KEYPAD_0"; break;
+		case SWT.KEYPAD_1:				keyCode = "KEYPAD_1"; break;
+		case SWT.KEYPAD_2:				keyCode = "KEYPAD_2"; break;
+		case SWT.KEYPAD_3:				keyCode = "KEYPAD_3"; break;
+		case SWT.KEYPAD_4:				keyCode = "KEYPAD_4"; break;
+		case SWT.KEYPAD_5:				keyCode = "KEYPAD_5"; break;
+		case SWT.KEYPAD_6:				keyCode = "KEYPAD_6"; break;
+		case SWT.KEYPAD_7:				keyCode = "KEYPAD_7"; break;
+		case SWT.KEYPAD_8:				keyCode = "KEYPAD_8"; break;
+		case SWT.KEYPAD_9:				keyCode = "KEYPAD_9"; break;
+		case SWT.KEYPAD_EQUAL:		keyCode = "KEYPAD_EQUAL"; break;
+
+		/* Other keys */
+		case SWT.CAPS_LOCK:			keyCode = "CAPS_LOCK"; break;
+		case SWT.NUM_LOCK:			keyCode = "NUM_LOCK"; break;
+		case SWT.SCROLL_LOCK:		keyCode = "SCROLL_LOCK"; break;
+		case SWT.PAUSE:					keyCode = "PAUSE"; break;
+		case SWT.BREAK:					keyCode = "BREAK"; break;
+		case SWT.PRINT_SCREEN:	keyCode = "PRINT_SCREEN"; break;
+		case SWT.HELP:					keyCode = "HELP"; break;
+		default :								
+		}
+		log.info("keyCode = SWT." + keyCode);
+	}
+
 }

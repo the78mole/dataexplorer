@@ -642,7 +642,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 								RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 								if (recordSet != null) {
-									Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[10]);
+									Record record = recordSet.get(recordSet.getRecordNames()[10]);
 									PropertyType property = record.getProperty(CalculationThread.REGRESSION_TYPE);
 									if (property != null) {
 										property.setValue(UniLogConfigTab.this.slopeTypeSelection);
@@ -671,7 +671,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								UniLogConfigTab.this.slopeTimeSelection = UniLogConfigTab.this.regressionTime.getSelectionIndex() + 1;
 								RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 								if (recordSet != null) {
-									Record record = recordSet.get(UniLogConfigTab.this.device.getMeasurementNames(UniLogConfigTab.this.configName)[10]);
+									Record record = recordSet.get(recordSet.getRecordNames()[10]);
 									PropertyType property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 									if (property != null) {
 										property.setValue(UniLogConfigTab.this.slopeTimeSelection);

@@ -924,7 +924,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
 	public void setupDevice() {
-		IDevice activeDevice = this.getInstanceOfDevice();
+		IDevice activeDevice = this.application.getActiveDevice();
+		// check if any thing to clean up
+		if (activeDevice != null) { // there is an previous active device
+			if (activeDevice.getDialog() != null && !activeDevice.getDialog().isDisposed()) {
+				activeDevice.getDialog().dispose();
+			}
+		}
+		// prepare every thing for the new device
+		activeDevice = this.getInstanceOfDevice();
 		this.application.setActiveDevice(activeDevice);
 		setupDataChannels(activeDevice);
 		this.application.setupDataTableHeader();

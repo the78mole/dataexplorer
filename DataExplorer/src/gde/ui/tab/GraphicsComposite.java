@@ -247,6 +247,11 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 			});
+//			this.recordSetComment.addFocusListener(new FocusListener() {
+//				public void focusLost(FocusEvent evt) { log.info("focusLost"); }
+//				public void focusGained(FocusEvent evt) { log.info("focusGained"); }
+//			});
+			
 			this.recordSetComment.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.finer("recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
@@ -258,14 +263,17 @@ public class GraphicsComposite extends Composite {
 					if(log.isLoggable(Level.FINER)) log.finer("recordSetCommentText.keyPressed, event=" + evt); //$NON-NLS-1$
 					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-						//if (evt.character == SWT.CR || evt.character == '\0' || evt.character == '') {
+						//StringHelper.printSWTKeyCode(evt);
+						if (evt.keyCode == SWT.CR) {
 							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 							if (recordSet != null) {
-								recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+								String commentText = ""; //GraphicsComposite.this.recordSetComment.getText();
+								recordSet.setRecordSetDescription(commentText);
 								recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 							}
-						//}
+						}
 					}
+
 				}
 			});
 		}
@@ -532,15 +540,21 @@ public class GraphicsComposite extends Composite {
 				}
 				if (isFullUpdateRequired) {
 					log.fine("redrawing full " + this.graphicCanvas.getClientArea());
+					this.recordSetHeader.redraw();
 					this.graphicCanvas.redraw();
+					this.recordSetComment.redraw();
 				}
 				else {
 					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
-					int timeScaleHeight = 30;
+					int timeCaptionHeight = 15;
+					int timeCaptionWidth = 200;
 					if (curveBounds != null) {
-						//int height = this.graphicCanvas.getClientArea().height;
-						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width+10, curveBounds.height+timeScaleHeight, true);
-						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeScaleHeight).toString());
+						int height = this.graphicCanvas.getClientArea().height - this.offSetY - timeCaptionHeight;
+						log.info("this.top " + this.offSetY + " height = " + height);
+						this.graphicCanvas.redraw(curveBounds.x-5, curveBounds.y, curveBounds.width+10, height, true);
+						int timeCaptionX = curveBounds.x + (curveBounds.width - timeCaptionWidth/2);
+						this.graphicCanvas.redraw(timeCaptionX, height, timeCaptionWidth, timeCaptionHeight, true);
+						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeCaptionHeight).toString());
 					}
 					else {
 						log.finer("redrawing full curveBounds == null");
@@ -552,12 +566,16 @@ public class GraphicsComposite extends Composite {
 			}
 			else { // enable clear
 				log.finer("recordSet == null");
+				this.recordSetHeader.redraw();
 				this.graphicCanvas.redraw();
+				this.recordSetComment.redraw();
 			}
 		}
 		else { // enable clear
 			log.finer("channel == null");
+			this.recordSetHeader.redraw();
 			this.graphicCanvas.redraw();
+			this.recordSetComment.redraw();
 		}
 	}
 
