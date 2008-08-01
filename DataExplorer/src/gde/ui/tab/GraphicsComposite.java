@@ -363,15 +363,18 @@ public class GraphicsComposite extends Composite {
 		int startTime, endTime;
 		// Calculate the horizontal area to used for plotting graphs
 		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
-		dataScaleWidth = pt.x + pt.y * 2 + 5;
+		int horizontalGap = pt.x/5;
+		int horizontalNumberExtend = pt.x;
+		int horizontalCaptionExtend = pt.y;
+		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 		x0 = maxX - (maxX - spaceLeft) + 5;
 		int xMax = maxX - spaceRight;
 		int fitTimeWidth = (xMax - x0) - ((xMax - x0) % 10); // make time line modulo 10 to enable every 10 min/sec a tick mark
-		width = fitTimeWidth;
+		width = fitTimeWidth <= 0 ? 1 : fitTimeWidth;
 		xMax = x0 + width;
-		int verticalSpace = 3 * pt.y;// space used for text and scales with description or legend
+		int verticalSpace = 3 * pt.y;// space used for time scale text and scales with description or legend
 		int spaceTop = 20;
 		int spaceBot = verticalSpace;
 		y0 = maxY - spaceBot;

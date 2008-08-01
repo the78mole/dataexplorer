@@ -145,7 +145,7 @@ public class CurveUtils {
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
 			if (CurveUtils.log.isLoggable(Level.FINEST)) CurveUtils.log.finest("drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
-			GraphicsUtils.drawText(graphText, (xPos - pt.x - pt.y - 15), y0 / 2 + (y0 - height), gc, SWT.UP);
+			GraphicsUtils.drawText(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 		else {
 			int xPos = x0 + width + positionNumber * scaleWidthSpace;
@@ -153,7 +153,7 @@ public class CurveUtils {
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			if (CurveUtils.log.isLoggable(Level.FINEST)) CurveUtils.log.finest("y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
-			GraphicsUtils.drawText(graphText, (xPos + pt.x + 15), y0 / 2 + (y0 - height), gc, SWT.UP);
+			GraphicsUtils.drawText(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 
 		// set the values corresponding to the display area of this curve
