@@ -1064,14 +1064,13 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.fine("move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
 											activeChannel.remove(recordSetKey);
-
+											
+											channels.switchChannel(channelNumber, recordSetKey);
 											activeRecordSet = channels.get(channelNumber).get(recordSetKey);
 											activeRecordSet.setRecalculationRequired();
 											UniLogDialog.this.device.updateVisibilityStatus(activeRecordSet);
 											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
 											UniLogDialog.this.application.updateDataTable();
-
-											channels.switchChannel(channelNumber, recordSetKey);
 										}
 									}
 								}
