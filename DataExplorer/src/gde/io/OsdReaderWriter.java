@@ -183,7 +183,7 @@ public class OsdReaderWriter {
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
-					try { // try to get channel last digit
+					try { // try to get channel last digit and use as channel config ordinal
 						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);

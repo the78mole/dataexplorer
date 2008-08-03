@@ -510,7 +510,7 @@ public class GraphicsComposite extends Composite {
 	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
-		if (Channels.getInstance().getActiveChannel() != null && !this.isLinux) { // Linux GTK has different update algorithm use always full update
+		if (Channels.getInstance().getActiveChannel() != null && this.windowType == GraphicsWindow.TYPE_NORMAL && !this.isLinux) { // Linux GTK has different update algorithm use always full update
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				boolean isFullUpdateRequired = false;
@@ -549,12 +549,13 @@ public class GraphicsComposite extends Composite {
 				}
 				else {
 					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
+					int margin = 5;
 					int timeCaptionHeight = 15;
 					int timeCaptionWidth = 200;
 					if (curveBounds != null) {
-						int height = this.graphicCanvas.getClientArea().height - this.offSetY - timeCaptionHeight;
+						int height = this.graphicCanvas.getClientArea().height - curveBounds.y-margin - timeCaptionHeight;
 						log.info("this.top " + this.offSetY + " height = " + height);
-						this.graphicCanvas.redraw(curveBounds.x-5, curveBounds.y, curveBounds.width+10, height, true);
+						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y-margin, curveBounds.width+margin*2, height, true);
 						int timeCaptionX = curveBounds.x + (curveBounds.width - timeCaptionWidth/2);
 						this.graphicCanvas.redraw(timeCaptionX, height, timeCaptionWidth, timeCaptionHeight, true);
 						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeCaptionHeight).toString());

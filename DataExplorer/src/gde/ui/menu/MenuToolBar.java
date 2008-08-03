@@ -138,7 +138,7 @@ public class MenuToolBar {
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuToolBar.log.finest("openToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.getMenuBar().openOsdFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
+							MenuToolBar.this.application.getMenuBar().openFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
 				}

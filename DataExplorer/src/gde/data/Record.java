@@ -143,7 +143,6 @@ public class Record extends Vector<Integer> {
 		//this.channelConfigKey;
 		//this.keyName;
 		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
-		this.timeStep_ms = this.device.getTimeStep_ms();
 	}
 
 	/**
@@ -669,7 +668,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
-	 * qurey time step in milli seconds, this property is hold local to be independent
+	 * qurey time step in milli seconds, this property is hold local to be independent (compare window)
 	 * @return time step in ms
 	 */
 	public double getTimeStep_ms() {

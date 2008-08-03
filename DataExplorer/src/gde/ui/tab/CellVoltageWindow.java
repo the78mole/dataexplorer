@@ -237,8 +237,9 @@ public class CellVoltageWindow {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
 					//if (log.isLoggable(Level.FINER)) log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
-					if (record.getSymbol().endsWith(record.getName().substring(index - 1, index))) { // better use a propperty to flag as single cell voltage
-						if(record.getLast() > 0) {
+					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
+					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a propperty to flag as single cell voltage
+						if(record.getLast() > 0) { // last value is current value
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
 							cellCount++;
@@ -246,6 +247,12 @@ public class CellVoltageWindow {
 						//if (log.isLoggable(Level.INFO)) log.info("record.getLast() " + record.getLast());
 					}
 				}
+				// add test values here
+				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "ZellenSpannung");
+				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "CellVoltage");
+				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
+				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
+				
 				if (cellCount < 0 ) this.voltageAvg = this.voltageAvg/cellCount;
 				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
@@ -257,6 +264,19 @@ public class CellVoltageWindow {
 			}
 			log.fine("updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * add test voltage values for test and to create sceenshots for documentation
+	 * @param values array with dummy cell voltages
+	 * @return
+	 */
+	int addCellVoltages4Test(int[] values, String measurementName) {
+		this.voltageVector = new Vector<CellInfo>();
+		for (int i = 0; i < values.length; i++) {
+			this.voltageVector.add(new CellInfo(values[i], measurementName+(i+1), "V"));
+		}
+		return values.length;
 	}
 
 	/**

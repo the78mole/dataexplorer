@@ -157,7 +157,7 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							openOsdFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
+							openFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
 				}
@@ -824,10 +824,10 @@ public class MenuBar {
 	}
 
 	/**
-	 * handles the file dialog od OpenSerialData file
+	 * handles the file dialog to open OpenSerialData or LogView file
 	 * @param dialogName
 	 */
-	public void openOsdFileDialog(final String dialogName) {
+	public void openFileDialog(final String dialogName) {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
 			Settings deviceSetting = Settings.getInstance();
 			String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
@@ -868,15 +868,25 @@ public class MenuBar {
 			
 			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
-			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
-			if(channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
-				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelConfigName})); 
+			// channel/configuration type is outlet
+			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal();
+			if(isChannelTypeOutlet) {
+				String[] splitChannel = channelConfigName.split(" ");
+				int channelNumber = 1;
+				try {
+					channelNumber = splitChannel.length == 2 ? new Integer(splitChannel[1]) : (
+						splitChannel.length > 2 ? new Integer(splitChannel[0]) : 1);
+				}
+				catch (NumberFormatException e) {// ignore
+				}
+				// at this point we have a channel/config ordinal
+				Channel channel = this.channels.get(channelNumber);
+				if (channel.size() > 0) { // check for records to be exchanged
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channel.getConfigKey()})); 
 					if (answer != SWT.OK) 
 						return;				
 				}
-				// clean existing channel for new data, if channel does not exist ignore, 
-				// this will be covered by the reader by creating a new channel
+				// clean existing channel record sets for new data
 				for (String recordSetKey : channel.getRecordSetNames()) {
 					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
 				}

@@ -233,8 +233,8 @@ public class CellVoltageDisplay extends Composite {
 		int baseVoltage = 2300;
 
 		// spread display if voltage average is greater than 4.0 V and delta between cell voltages lower than 0.1 V
-		if (CellVoltageDisplay.this.parent.getVoltageDelta() < 100 && CellVoltageDisplay.this.parent.getVoltageAvg() > 3800) {
-			baseVoltage = 3500;
+		if (CellVoltageDisplay.this.parent.getVoltageDelta() < 100 && CellVoltageDisplay.this.parent.getVoltageAvg() > 4000) {
+			baseVoltage = 4000;
 		}
 
 		// 4,2 - 2,5  = 1,7 (max voltage - min voltage)

@@ -383,6 +383,13 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 	
 	/**
+	 * @param newActiveRecordSet to set
+	 */
+	public void setActiveRecordSet(RecordSet newActiveRecordSet) {
+		this.activeRecordSet = newActiveRecordSet;
+	}
+	
+	/**
 	 * switch the record set according selection and set applications active channel
 	 * @param recordSetName p.e. "1) Laden"
 	 */
