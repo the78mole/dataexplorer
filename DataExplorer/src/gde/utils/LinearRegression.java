@@ -63,7 +63,7 @@ public class LinearRegression extends CalculationThread {
 			int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 			int pointsPerInterval = timeStepsPerInterval + 1; 
 			if (log.isLoggable(Level.FINE)) log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
-			int pointInterval = 1;  // fix number of points where the calculation will result in slope values, rest is overlap
+			int pointInterval = 3;  // fix number of points where the calculation will result in slope values, rest is overlap
 			int numberDataPoints = recordHeight.realSize();
 			int startPosition = 0; // start position for interval calculation
 			
@@ -79,7 +79,7 @@ public class LinearRegression extends CalculationThread {
 			double avgX = timeStep_sec ; // timeStepsPerInterval * time_ms / 1000.0 / timeStepsPerInterval; 
 			// (xi - avgX)*(xi - avgX)
 			double ssXX = 0.0; 
-			for (int i = 0; i < timeStepsPerInterval; i++) {
+			for (int i = 1; i <= timeStepsPerInterval; i++) {
 				ssXX = ssXX + (((timeStep_sec * i) - avgX) * ((timeStep_sec * i) - avgX));
 			}
 			ssXX = ssXX / timeStepsPerInterval;
@@ -89,21 +89,21 @@ public class LinearRegression extends CalculationThread {
 			while (modCounter > 0 && !this.threadStop) {
 				// calculate avg y
 				double avgY = 0.0;
-				for (int i = 0; i < timeStepsPerInterval; i++) { 
+				for (int i = 1; i <= timeStepsPerInterval; i++) { 
 					avgY = avgY + (recordHeight.realGet(i + startPosition));
 				}
 				avgY = avgY / timeStepsPerInterval;
 
 				// (yi - avgY)
 				double sumYi_avgY = 0.0;
-				for (int i = 0; i < timeStepsPerInterval; i++) {
+				for (int i = 1; i <= timeStepsPerInterval; i++) {
 					sumYi_avgY = sumYi_avgY + ((recordHeight.realGet(i + startPosition)) - avgY);
 				}
 				sumYi_avgY = sumYi_avgY / timeStepsPerInterval;
 
 				// (xi - avgX)*(yi - avgY)
 				double ssXY = 0.0;
-				for (int i = 0; i < timeStepsPerInterval; i++) {
+				for (int i = 1; i <= timeStepsPerInterval; i++) {
 					ssXY = ssXY + (((timeStep_sec * i) - avgX) * ((recordHeight.realGet(i + startPosition)) - avgY));
 				}
 				ssXY = ssXY / timeStepsPerInterval;
