@@ -187,7 +187,7 @@ public class CurveUtils {
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
 		double timeStep = record.getTimeStep_ms();
-		double adaptXMaxValue = isCompareSet ? (1.0 * (recordSize - 1) * record.getParent().getRecordDataSize() / (recordSize - 1) * timeStep) : (1.0 * (recordSize - 1) * timeStep);
+		double adaptXMaxValue = isCompareSet ? (1.0 * (recordSize - 1) * record.getParent().getRecordDataSize(false) / (recordSize - 1) * timeStep) : (1.0 * (recordSize - 1) * timeStep);
 		if (CurveUtils.log.isLoggable(Level.FINE)) CurveUtils.log.fine("recordSize = " + recordSize + " adaptXMaxValue = " + adaptXMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// calculate scale factor to fit time into draw bounds

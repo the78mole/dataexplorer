@@ -335,7 +335,7 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
-			int recordEntries = recordSet.getRecordDataSize();
+			int recordEntries = recordSet.getRecordDataSize(true);
 			double stausIncrement = recordEntries/100.0;
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();

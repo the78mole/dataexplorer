@@ -318,7 +318,7 @@ public class OsdReaderWriter {
 				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
-				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[activeDevice.getChannelType(Channels.getInstance().getActiveChannelNumber())]).append(OSDE.STRING_NEW_LINE);
+				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[Channels.getInstance().getActiveChannel().getType()]).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
 				log.fine("line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -344,7 +344,7 @@ public class OsdReaderWriter {
 					for (String recordKey : recordSet.getRecordNames()) {
 						sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 					}
-					sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize())).append(OSDE.DATA_DELIMITER); //$NON-NLS-1$
+					sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(OSDE.DATA_DELIMITER); //$NON-NLS-1$
 					filePointer += OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 					filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
 					log.fine("line lenght = " //$NON-NLS-1$
@@ -360,14 +360,14 @@ public class OsdReaderWriter {
 					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
 					//data_out.writeInt(sbs[i].length());
 					data_out.writeUTF(sbs[i].toString());
-					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize());
+					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
 					log.fine("filePointer = " + (filePointer + dataSize)); //$NON-NLS-1$
 				}
 				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-					for (int j = 0; j < recordSet.getRecordDataSize(); j++) {
+					for (int j = 0; j < recordSet.getRecordDataSize(true); j++) {
 						for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 							data_out.writeInt(recordSet.get(recordKey).get(j));
 						}

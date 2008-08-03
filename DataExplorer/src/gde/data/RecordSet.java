@@ -422,7 +422,7 @@ public class RecordSet extends HashMap<String, Record> {
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
 			if (value != 0) dataTableRow.add(value);
-			else 						dataTableRow.add(new Double(this.getRecordDataSize() * this.getTimeStep_ms()).intValue());
+			else 						dataTableRow.add(new Double(this.getRecordDataSize(true) * this.getTimeStep_ms()).intValue());
 			for (int i=0; i<this.recordNames.length; ++i) {
 				dataTableRow.add(0);
 			}
@@ -896,16 +896,26 @@ public class RecordSet extends HashMap<String, Record> {
 	 * - zoomed set will return size of zoomOffset + zoomWith
 	 * @return the size of data point to calculate the time unit
 	 */
-	public int getRecordDataSize() {
+	public int getRecordDataSize(boolean isReal) {
 		int size = 0;
 		if (this.isCompareSet) {
 			size = this.isZoomMode ? this.recordZoomSize : this.maxSize;
 		}
 		else {
-			for (String recordKey : this.recordNames) {
-				if (get(recordKey).isActive()) {
-					size = get(recordKey).size();
-					break;
+			if (isReal) {
+				for (String recordKey : this.recordNames) {
+					if (get(recordKey).isActive()) {
+						size = get(recordKey).realSize();
+						break;
+					}
+				}
+			}
+			else {
+				for (String recordKey : this.recordNames) {
+					if (get(recordKey).isActive()) {
+						size = get(recordKey).size();
+						break;
+					}
 				}
 			}
 		}
@@ -1119,7 +1129,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return position integer value
 	 */
 	public int getPointIndexFromDisplayPoint(int xPos) {
-		return new Double(1.0 * xPos * this.getRecordDataSize() / this.drawAreaBounds.width).intValue();
+		return new Double(1.0 * xPos * this.getRecordDataSize(false) / this.drawAreaBounds.width).intValue();
 	}
 	
 	/**
@@ -1353,7 +1363,7 @@ public class RecordSet extends HashMap<String, Record> {
 				this.application2.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
 				int numberRecords = getRecordNamesLength();
-				int recordEntries = getRecordDataSize();
+				int recordEntries = getRecordDataSize(true);
 				int progress = this.application2.getProgressPercentage();
 
 				int maxWaitCounter = 10;

@@ -439,7 +439,7 @@ public class Record extends Vector<Integer> {
 		if (this.parent.isZoomMode())
 			tmpSize = this.parent.getRecordZoomSize();
 		else if (this.parent.isCompareSet())
-			tmpSize = this.parent.getRecordDataSize();
+			tmpSize = this.parent.getRecordDataSize(true); // for compare set size is different, real flag has no effect
 		
 		return tmpSize;
 	}

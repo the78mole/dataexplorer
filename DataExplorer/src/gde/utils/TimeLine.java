@@ -56,7 +56,7 @@ public class TimeLine {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
 		int format = TimeLine.TIME_LINE_MSEC; // the time format type 
 
-		int numberOfPoints = recordSet.getRecordDataSize();
+		int numberOfPoints = recordSet.getRecordDataSize(false);
 		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.fine("numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		long totalTime_msec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1)).longValue();
