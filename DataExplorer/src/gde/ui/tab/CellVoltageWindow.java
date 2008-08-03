@@ -253,7 +253,7 @@ public class CellVoltageWindow {
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
 				
-				if (cellCount < 0 ) this.voltageAvg = this.voltageAvg/cellCount;
+				if (cellCount > 0 ) this.voltageAvg = this.voltageAvg/cellCount;
 				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
