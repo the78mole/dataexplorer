@@ -21,6 +21,7 @@ import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -64,6 +65,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -80,6 +82,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
 
 	/**

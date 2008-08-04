@@ -30,6 +30,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -57,6 +58,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -71,6 +73,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**

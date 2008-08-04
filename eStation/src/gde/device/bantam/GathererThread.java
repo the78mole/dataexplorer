@@ -264,7 +264,7 @@ public class GathererThread extends Thread {
 	 * @param newRecordSetKey
 	 */
 	public void finalizeRecordSet(String newRecordSetKey, boolean doClosePort) {
-		if (doClosePort && this.isPortOpenedByLiveGatherer) 
+		if (doClosePort && this.isPortOpenedByLiveGatherer && this.serialPort.isConnected()) 
 			this.serialPort.close();
 
 		RecordSet tmpRecordSet = this.channel.get(newRecordSetKey);
@@ -290,7 +290,7 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			log.warning("During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true) {
+		if (this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
 		}
 	}

@@ -34,6 +34,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -65,6 +66,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -81,6 +83,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -288,5 +291,5 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 				this.serialPort.close();
 			}
 		}
-	}
+	}	
 }
