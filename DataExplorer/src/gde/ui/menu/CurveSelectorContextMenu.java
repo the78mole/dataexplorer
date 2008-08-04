@@ -68,7 +68,7 @@ public class CurveSelectorContextMenu {
 	
 	TableItem 										selectedItem;
 	boolean 											isRecordVisible = false;
-	String 												recordNameKey = OSDE.STRING_BLANK;
+	String 												recordNameKey = null;
 	String 												recordNameMeasurement = OSDE.STRING_BLANK;
 	int 													windowType = GraphicsWindow.TYPE_NORMAL;
 
@@ -84,8 +84,10 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.finest("popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					log.finer(CurveSelectorContextMenu.this.selectedItem.toString());
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
+						log.fine("===>>" +CurveSelectorContextMenu.this.recordNameKey);
 						CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
 						CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
 
@@ -172,7 +174,7 @@ public class CurveSelectorContextMenu {
 			this.lineColor.setText(Messages.getString(MessageIds.OSDE_MSGT0086));
 			this.lineColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event evt) {
-					log.finest("lineColor performed! " + evt); //$NON-NLS-1$
+					log.finer("lineColor performed! " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {

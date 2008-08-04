@@ -52,6 +52,7 @@ import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
@@ -102,6 +103,9 @@ public class MenuBar {
 	MenuItem											saveAsFileMenuItem;
 	MenuItem											saveFileMenuItem;
 	MenuItem											newFileMenuItem;
+	
+	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
+	
 	final Menu										parent;
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -1050,16 +1054,40 @@ public class MenuBar {
 	 * @param isOpenStatus
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
-		if (isOpenStatus) {
-			this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
-			this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048)); //$NON-NLS-1$
-		}
-		else {
-			if (!this.application.isDisposed()) {
-				this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
-				this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049)); //$NON-NLS-1$
+		if (!this.application.isDisposed()) {
+			switch (this.iconSet) {
+			case 1: // DeviceSerialPort.ICON_SET_START_STOP
+				if (isOpenStatus) {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/RectangleHotRed.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0071)); //$NON-NLS-1$
+				}
+				else {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/TriangleGreen.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0070)); //$NON-NLS-1$
+				}
+				break;
+			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
+			default:
+				if (isOpenStatus) {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048)); //$NON-NLS-1$
+				}
+				else {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049)); //$NON-NLS-1$
+				}
+				break;
 			}
 		}
+	}
+	
+	/**
+	 * method to switch icon set by active device
+	 * @param newIconSet
+	 */
+	public void setSerialPortIconSet(int newIconSet) {
+		this.iconSet = newIconSet;
+		this.setPortConnected(false);
 	}
 
 	/**

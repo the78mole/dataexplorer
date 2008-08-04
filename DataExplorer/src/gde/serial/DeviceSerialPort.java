@@ -89,6 +89,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
   //public static final int FLOWCONTROL_RTSCTS_OUT = 2;
   //public static final int FLOWCONTROL_XONXOFF_IN = 4;
   //public static final int FLOWCONTROL_XONXOFF_OUT = 8;
+	
+	public static final int ICON_SET_OPEN_CLOSE = 0;
+	public static final int ICON_SET_START_STOP = 1;
 
 
 	public DeviceSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
@@ -608,11 +611,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public synchronized void close() {
 		if (this.isConnected && DeviceSerialPort.this.serialPort != null) {
+			DeviceSerialPort.this.isConnected = false;
 			this.closeThread = new Thread() {
 				public void run() {
 					log.info("entry"); //$NON-NLS-1$
 					try {
-						Thread.sleep(10);
+						Thread.sleep(5);
 						byte[] buf = new byte[getInputStream().available()];
 						if (buf.length > 0) getInputStream().read(buf);
 					}

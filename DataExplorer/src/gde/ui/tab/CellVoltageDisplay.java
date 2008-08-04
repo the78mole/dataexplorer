@@ -208,17 +208,17 @@ public class CellVoltageDisplay extends Composite {
 	}
 
 	/**
-	 * @return 1 if voltage <2600 | >4200, 2 if voltage between 2600 and 4200, 3 for voltage == 4200
+	 * @return 1 if voltage <2600 | >4210, 2 if voltage between 2600 and 4190, 3 for voltage 4191 <-> 4209
 	 */
 	int checkVoltageLevel() {
 		int voltageLevel;
-		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4200) {
+		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4210) {
 			voltageLevel = 1;
 		}
-		else if (CellVoltageDisplay.this.voltage >= 2600 && CellVoltageDisplay.this.voltage < 4200) {
+		else if (CellVoltageDisplay.this.voltage >= 2600 && CellVoltageDisplay.this.voltage < 4190) {
 			voltageLevel = 2;
 		}
-		else { // == 4200
+		else { // 4191 <-> 4209
 			voltageLevel = 3;
 		}
 		return voltageLevel;

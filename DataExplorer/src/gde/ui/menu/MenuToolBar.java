@@ -46,6 +46,7 @@ import osde.device.DeviceDialog;
 import osde.device.IDevice;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
@@ -91,6 +92,8 @@ public class MenuToolBar {
 	ToolBar												channelToolBar, recordToolBar;
 	ToolItem											separator;
 
+	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
+	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
 	final String									language;
@@ -447,7 +450,7 @@ public class MenuToolBar {
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
-						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
+						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0075));
 						RowData channelSelectComboLData = new RowData();
 						channelSelectComboLData.width = 140;
 						channelSelectComboLData.height = 17;
@@ -873,21 +876,51 @@ public class MenuToolBar {
 
 	/**
 	 * this function must only called by application which make secure to choose the right thread
-	 * @param isOpenStatus
+	 * @param isPortOpen
 	 */
-	public void setPortConnected(final boolean isOpenStatus) {
-		if (isOpenStatus) {
-			this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$
-			this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$
-			this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$
-		}
-		else {
-			if (!this.application.isDisposed()) {
-				this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$
-				this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$
-				this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$
+	public void setPortConnected(final boolean isPortOpen) {
+		if (!this.application.isDisposed()) {
+			switch (this.iconSet) {
+			case 1: // DeviceSerialPort.ICON_SET_START_STOP
+				if (isPortOpen) {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0069));
+				}
+				else {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
+				}
+				break;
+			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
+			default:
+				if (isPortOpen) {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
+				}
+				else {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+				}
+				break;
 			}
 		}
+	}
+	
+	/**
+	 * method to switch icon set by active device
+	 * @param newIconSet
+	 */
+	public void setSerialPortIconSet(int newIconSet) {
+		this.iconSet = newIconSet;
+		this.setPortConnected(false);
 	}
 
 	public CCombo getChannelSelectCombo() {

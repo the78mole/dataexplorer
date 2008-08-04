@@ -524,7 +524,7 @@ public class GraphicsComposite extends Composite {
 					isFullUpdateRequired = true;
 				}
 				else if (this.oldChangeCounter != activeRecordSet.getChangeCounter()) {
-					log.finer("change counter = " + activeRecordSet.getChangeCounter());
+					log.fine("change counter = " + activeRecordSet.getChangeCounter());
 					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 					isFullUpdateRequired = true;
 				}
@@ -549,16 +549,18 @@ public class GraphicsComposite extends Composite {
 				}
 				else {
 					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
-					int margin = 5;
-					int timeCaptionHeight = 15;
-					int timeCaptionWidth = 200;
 					if (curveBounds != null) {
-						int height = this.graphicCanvas.getClientArea().height - curveBounds.y-margin - timeCaptionHeight;
-						log.info("this.top " + this.offSetY + " height = " + height);
-						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y-margin, curveBounds.width+margin*2, height, true);
-						int timeCaptionX = curveBounds.x + (curveBounds.width - timeCaptionWidth/2);
-						this.graphicCanvas.redraw(timeCaptionX, height, timeCaptionWidth, timeCaptionHeight, true);
-						log.finer("refresh rect = " + new Rectangle(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height+timeCaptionHeight).toString());
+						int margin = 10;
+						int timeCaptionHeight = 25;
+						int timeCaptionWidth = 200;
+						int timeCaptionY = curveBounds.y + curveBounds.height + timeCaptionHeight;
+						int timeCaptionX = curveBounds.x + ((curveBounds.width - timeCaptionWidth)/2);
+						//curve area
+						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, 50, 50, true); // damage a small area of image only -> redraw complete image ??
+						// time scale
+						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin, timeCaptionHeight, true);
+						// time caption
+						this.graphicCanvas.redraw(timeCaptionX, timeCaptionY, timeCaptionWidth, timeCaptionHeight, true);
 					}
 					else {
 						log.finer("redrawing full curveBounds == null");

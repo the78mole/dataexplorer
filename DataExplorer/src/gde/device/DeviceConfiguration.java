@@ -41,6 +41,7 @@ import osde.config.Settings;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -818,4 +819,17 @@ public class DeviceConfiguration {
 	public boolean isChangePropery() {
 		return this.isChangePropery;
 	}
+	
+	/**
+	 * method to modify open/close serial port menu toolbar button and device menu entry
+	 * this enable different naming instead open/close start/stop gathering data from device
+	 * and must be called within specific device constructor
+	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
+	 */
+	public void configureSerialPortMenu(int useIconSet) {
+		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
+		application.getMenuBar().setSerialPortIconSet(useIconSet);
+		application.getMenuToolBar().setSerialPortIconSet(useIconSet);
+	}
+
 }
