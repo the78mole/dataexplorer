@@ -413,4 +413,12 @@ public interface IDevice {
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
 	public void openCloseSerialPort(); 
+	
+	/**
+	 * method to modify open/close serial port menu toolbar button and device menu entry
+	 * this enable different naming instead open/close start/stop gathering data from device
+	 * and must be called within specific device constructor
+	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
+	 */
+	void configureSerialPortMenu(int useIconSet); 
 }
