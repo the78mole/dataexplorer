@@ -200,7 +200,7 @@ public class MenuToolBar {
 			this.menuCoolItem.setSize(this.size);
 			this.menuCoolItem.setPreferredSize(this.size);
 			this.menuCoolItem.setMinimumSize(this.size);
-			log.info("fileToolBar.size = " + this.size); //$NON-NLS-1$
+			log.fine("fileToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end file cool item
 
 		{ // begin device cool item
@@ -429,7 +429,7 @@ public class MenuToolBar {
 			this.portCoolItem.setSize(this.size);
 			this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.size);
-			log.info("this.portCoolItem.size = " + this.portCoolItem.getSize()); //$NON-NLS-1$
+			log.fine("this.portCoolItem.size = " + this.portCoolItem.getSize()); //$NON-NLS-1$
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
@@ -458,9 +458,9 @@ public class MenuToolBar {
 							}
 						});
 					}
-					//log.info("this.channelSelectComposite.size = " + this.channelSelectComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); //$NON-NLS-1$
+					//log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); //$NON-NLS-1$
 					//this.channelSelectComposite.pack();
-					log.info("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
+					log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
 				}
 				{
 					this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
@@ -507,11 +507,11 @@ public class MenuToolBar {
 						});
 					}
 					this.channelToolBar.pack();
-					log.info("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
+					log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
 					// adapt composite to tool bar items size
 					Point channelSelectCompositeSize = this.channelSelectComposite.getSize();
 					//this.channelSelectComposite.setSize(channelSelectCompositeSize.x, this.channelToolBar.getSize().y);
-					log.info("this.channelSelectComposite.size = " + channelSelectCompositeSize); //$NON-NLS-1$
+					log.fine("this.channelSelectComposite.size = " + channelSelectCompositeSize); //$NON-NLS-1$
 					this.channelSelectCombo.setLocation((channelSelectCompositeSize.x-this.channelSelectSize.x)/2, (channelSelectCompositeSize.y-this.channelSelectSize.y)/2);
 				}
 				{
@@ -562,7 +562,7 @@ public class MenuToolBar {
 						});
 					}
 						//this.recordSelectComposite.pack();
-						log.info("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
+						log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
 				}
 				{
 					this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
@@ -665,20 +665,20 @@ public class MenuToolBar {
 						});
 					}
 					this.recordToolBar.pack();
-					log.info("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
+					log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
 					// adapt composite to tool bar items size
 					Point recordSelectCompositeSize = this.recordSelectComposite.getSize();
 					//this.recordSelectComposite.setSize(recordSelectCompositeSize.x, this.recordToolBar.getSize().y);
-					log.info("this.recordSelectComposite.size = " + recordSelectCompositeSize); //$NON-NLS-1$
+					log.fine("this.recordSelectComposite.size = " + recordSelectCompositeSize); //$NON-NLS-1$
 					this.recordSelectCombo.setLocation((recordSelectCompositeSize.x-this.recordSelectSize.x)/2, (recordSelectCompositeSize.y-this.recordSelectSize.y)/2);
 				}
 				this.dataBarComposite.pack();
 				int height = this.size.y+2;
 				this.size = this.dataBarComposite.getSize();
-				log.info("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
+				log.fine("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
 				this.dataBarComposite.setSize(this.size.x, height);
 				this.size = this.dataBarComposite.getSize();
-				log.info("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
+				log.fine("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			}
 			this.dataCoolItem.setSize(this.size);
 			this.dataCoolItem.setPreferredSize(this.size);
