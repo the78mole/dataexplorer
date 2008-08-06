@@ -27,8 +27,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
@@ -93,6 +91,8 @@ public class MenuToolBar {
 	ToolItem											separator;
 
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
+	Point													channelSelectSize = new Point(140, 22);
+	Point													recordSelectSize = new Point(240, 22);;
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -106,7 +106,7 @@ public class MenuToolBar {
 	}
 
 	public void init() {
-		this.coolBar = new CoolBar(this.application, SWT.NONE);
+		this.coolBar = new CoolBar(this.application, SWT.BORDER);
 		SWTResourceManager.registerResourceUser(this.coolBar);
 		this.coolBar.setSize(800, 100);
 		create();
@@ -114,13 +114,13 @@ public class MenuToolBar {
 
 	public void create() {
 		{ // begin file cool item
-			this.menuCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.menuCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
 				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.menuCoolItem.setControl(this.fileToolBar);
 				//fileToolBar.setSize(116, 29);
 				{
-					this.newToolItem = new ToolItem(this.fileToolBar, SWT.PUSH);
+					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
 					this.newToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
 					this.newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif")); //$NON-NLS-1$
 					this.newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif")); //$NON-NLS-1$
@@ -200,11 +200,11 @@ public class MenuToolBar {
 			this.menuCoolItem.setSize(this.size);
 			this.menuCoolItem.setPreferredSize(this.size);
 			this.menuCoolItem.setMinimumSize(this.size);
-			MenuToolBar.log.fine("fileToolBar.size = " + this.size); //$NON-NLS-1$
+			log.info("fileToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end file cool item
 
 		{ // begin device cool item
-			this.deviceCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.deviceCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin device tool bar
 				this.deviceToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.deviceCoolItem.setControl(this.deviceToolBar);
@@ -322,7 +322,7 @@ public class MenuToolBar {
 			this.deviceCoolItem.setMinimumSize(this.size);
 		} // end device cool item
 		{ // begin zoom cool item
-			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin zoom tool bar
 				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.zoomCoolItem.setControl(this.zoomToolBar);
@@ -396,7 +396,7 @@ public class MenuToolBar {
 		} // end zoom cool item
 
 		{ // begin port cool item
-			this.portCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.portCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{
 				this.portToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.portCoolItem.setControl(this.portToolBar);
@@ -429,10 +429,11 @@ public class MenuToolBar {
 			this.portCoolItem.setSize(this.size);
 			this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.size);
+			log.info("this.portCoolItem.size = " + this.portCoolItem.getSize()); //$NON-NLS-1$
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
-			this.dataCoolItem = new CoolItem(this.coolBar, SWT.LEFT | SWT.SHADOW_OUT);
+			this.dataCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{
 				this.dataBarComposite = new Composite(this.coolBar, SWT.NONE);
 				RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -440,21 +441,14 @@ public class MenuToolBar {
 				this.dataCoolItem.setControl(this.dataBarComposite);
 				{
 					this.channelSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
-					RowData composite1LData = new RowData();
-					composite1LData.width = 150;
-					composite1LData.height = 24;
-					RowLayout composite1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					this.channelSelectComposite.setLayout(composite1Layout);
-					this.channelSelectComposite.setLayoutData(composite1LData);
+					this.channelSelectComposite.setLayout(null);
+					this.channelSelectComposite.setSize(150, this.size.y);
 					{
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0075));
-						RowData channelSelectComboLData = new RowData();
-						channelSelectComboLData.width = 140;
-						channelSelectComboLData.height = 17;
-						this.channelSelectCombo.setLayoutData(channelSelectComboLData);
+						this.channelSelectCombo.setSize(this.channelSelectSize);
 						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -464,114 +458,114 @@ public class MenuToolBar {
 							}
 						});
 					}
+					//log.info("this.channelSelectComposite.size = " + this.channelSelectComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); //$NON-NLS-1$
+					//this.channelSelectComposite.pack();
+					log.info("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
+				}
+				{
+					this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
 					{
-						this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
-						{
-							this.prevChannel = new ToolItem(this.channelToolBar, SWT.NONE);
-							this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
-							this.prevChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0076));
-							this.prevChannel.setEnabled(false);
-							this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
-							this.prevChannel.addSelectionListener(new SelectionAdapter() {
-								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("prevChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
-									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
-									if (selectionIndex > 0) MenuToolBar.this.channelSelectCombo.select(selectionIndex - 1);
-									if (selectionIndex == 1) MenuToolBar.this.prevChannel.setEnabled(false);
-									selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
-									MenuToolBar.this.nextChannel.setEnabled(true);
-									MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
+						this.prevChannel = new ToolItem(this.channelToolBar, SWT.NONE);
+						this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+						this.prevChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0076));
+						this.prevChannel.setEnabled(false);
+						this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
+						this.prevChannel.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								MenuToolBar.log.finest("prevChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
+								int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+								if (selectionIndex > 0) MenuToolBar.this.channelSelectCombo.select(selectionIndex - 1);
+								if (selectionIndex == 1) MenuToolBar.this.prevChannel.setEnabled(false);
+								selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+								MenuToolBar.this.nextChannel.setEnabled(true);
+								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
+							}
+						});
+					}
+					{
+						this.nextChannel = new ToolItem(this.channelToolBar, SWT.NONE);
+						this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+						this.nextChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0077));
+						this.nextChannel.setEnabled(false);
+						this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
+						this.nextChannel.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								MenuToolBar.log.finest("nextChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
+								int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
+								int maxIndex = MenuToolBar.this.channelSelectCombo.getItemCount() - 1;
+								if (maxIndex <= 0) {
+									MenuToolBar.this.nextChannel.setEnabled(false);
+									MenuToolBar.this.prevChannel.setEnabled(false);
 								}
-							});
-						}
-						{
-							this.nextChannel = new ToolItem(this.channelToolBar, SWT.NONE);
-							this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
-							this.nextChannel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0077));
-							this.nextChannel.setEnabled(false);
-							this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
-							this.nextChannel.addSelectionListener(new SelectionAdapter() {
-								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("nextChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
-									int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
-									int maxIndex = MenuToolBar.this.channelSelectCombo.getItemCount() - 1;
-									if (maxIndex <= 0) {
-										MenuToolBar.this.nextChannel.setEnabled(false);
-										MenuToolBar.this.prevChannel.setEnabled(false);
-									}
-									else {
-										if (selectionIndex < maxIndex) MenuToolBar.this.channelSelectCombo.select(selectionIndex + 1);
-										if (selectionIndex == maxIndex - 1) MenuToolBar.this.nextChannel.setEnabled(false);
-										MenuToolBar.this.prevChannel.setEnabled(true);
-									}
-									MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
+								else {
+									if (selectionIndex < maxIndex) MenuToolBar.this.channelSelectCombo.select(selectionIndex + 1);
+									if (selectionIndex == maxIndex - 1) MenuToolBar.this.nextChannel.setEnabled(false);
+									MenuToolBar.this.prevChannel.setEnabled(true);
 								}
-							});
-						}
+								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
+							}
+						});
 					}
 					this.channelToolBar.pack();
-					MenuToolBar.log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
+					log.info("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
+					// adapt composite to tool bar items size
+					Point channelSelectCompositeSize = this.channelSelectComposite.getSize();
+					//this.channelSelectComposite.setSize(channelSelectCompositeSize.x, this.channelToolBar.getSize().y);
+					log.info("this.channelSelectComposite.size = " + channelSelectCompositeSize); //$NON-NLS-1$
+					this.channelSelectCombo.setLocation((channelSelectCompositeSize.x-this.channelSelectSize.x)/2, (channelSelectCompositeSize.y-this.channelSelectSize.y)/2);
+				}
+				{
+					this.recordSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
+					this.recordSelectComposite.setLayout(null);
+					this.recordSelectComposite.setSize(250, this.size.y);
 					{
-						RowData composite2LData = new RowData();
-						composite2LData.width = 250;
-						composite2LData.height = 24;
-						this.recordSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
-						RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						this.recordSelectComposite.setLayout(composite2Layout);
-						this.recordSelectComposite.setLayoutData(composite2LData);
-						{
-							this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER);
-							FormLayout aufnahmeComboLayout = new FormLayout();
-							this.recordSelectCombo.setLayout(aufnahmeComboLayout);
-							this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });
-							this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
-							this.recordSelectCombo.setTextLimit(30);
-							RowData recordSelectComboLData = new RowData();
-							recordSelectComboLData.width = 240;
-							recordSelectComboLData.height = 17;
-							this.recordSelectCombo.setLayoutData(recordSelectComboLData);
-							this.recordSelectCombo.setEditable(false);
-							this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-							this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
-								public void widgetSelected(SelectionEvent evt) {
-									MenuToolBar.log.finest("recordSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
+						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });
+						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
+						this.recordSelectCombo.setTextLimit(30);
+						this.recordSelectCombo.setSize(this.recordSelectSize);
+						this.recordSelectCombo.setEditable(false);
+						this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								MenuToolBar.log.finest("recordSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
+								if (activeChannel != null) activeChannel.switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
+							}
+						});
+						this.recordSelectCombo.addKeyListener(new KeyAdapter() {
+							public void keyPressed(KeyEvent evt) {
+								MenuToolBar.log.finest("recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
+								if (evt.character == SWT.CR) {
 									Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
-									if (activeChannel != null) activeChannel.switchRecordSet(MenuToolBar.this.recordSelectCombo.getText());
-								}
-							});
-							this.recordSelectCombo.addKeyListener(new KeyAdapter() {
-								public void keyPressed(KeyEvent evt) {
-									MenuToolBar.log.finest("recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
-									if (evt.character == SWT.CR) {
-										Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
-										if (activeChannel != null) {
-											String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
-											String newRecordSetName = MenuToolBar.this.recordSelectCombo.getText();
-											MenuToolBar.log.fine("newRecordSetName = " + newRecordSetName); //$NON-NLS-1$
-											String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
-											for (int i = 0; i < recordSetNames.length; i++) {
-												if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
-											}
-											MenuToolBar.this.recordSelectCombo.setEditable(false);
-											MenuToolBar.this.recordSelectCombo.setItems(recordSetNames);
-											RecordSet recordSet = MenuToolBar.this.channels.getActiveChannel().get(oldRecordSetName);
-											recordSet.setName(newRecordSetName);
-											recordSet.setHeader(newRecordSetName);
-											recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-											activeChannel.put(newRecordSetName, recordSet);
-											activeChannel.remove(oldRecordSetName);
-											activeChannel.getRecordSetNames();
-											MenuToolBar.this.channels.getActiveChannel().switchRecordSet(newRecordSetName);
+									if (activeChannel != null) {
+										String oldRecordSetName = activeChannel.getActiveRecordSet().getName();
+										String newRecordSetName = MenuToolBar.this.recordSelectCombo.getText();
+										MenuToolBar.log.fine("newRecordSetName = " + newRecordSetName); //$NON-NLS-1$
+										String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
+										for (int i = 0; i < recordSetNames.length; i++) {
+											if (recordSetNames[i].equals(oldRecordSetName)) recordSetNames[i] = newRecordSetName;
 										}
+										MenuToolBar.this.recordSelectCombo.setEditable(false);
+										MenuToolBar.this.recordSelectCombo.setItems(recordSetNames);
+										RecordSet recordSet = MenuToolBar.this.channels.getActiveChannel().get(oldRecordSetName);
+										recordSet.setName(newRecordSetName);
+										recordSet.setHeader(newRecordSetName);
+										recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+										activeChannel.put(newRecordSetName, recordSet);
+										activeChannel.remove(oldRecordSetName);
+										activeChannel.getRecordSetNames();
+										MenuToolBar.this.channels.getActiveChannel().switchRecordSet(newRecordSetName);
 									}
 								}
-							});
-						}
-						this.recordSelectComposite.pack();
-						MenuToolBar.log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
+							}
+						});
 					}
-					{
-						this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.FLAT);
+						//this.recordSelectComposite.pack();
+						log.info("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
+				}
+				{
+					this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
 						{
 							this.prevRecord = new ToolItem(this.recordToolBar, SWT.NONE);
 							this.prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
@@ -613,9 +607,6 @@ public class MenuToolBar {
 								}
 							});
 						}
-						this.recordToolBar.pack();
-						MenuToolBar.log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
-					}
 					{
 						this.separator = new ToolItem(this.recordToolBar, SWT.SEPARATOR);
 					}
@@ -673,17 +664,22 @@ public class MenuToolBar {
 							}
 						});
 					}
-					this.channelSelectComposite.pack();
-					MenuToolBar.log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
+					this.recordToolBar.pack();
+					log.info("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
+					// adapt composite to tool bar items size
+					Point recordSelectCompositeSize = this.recordSelectComposite.getSize();
+					//this.recordSelectComposite.setSize(recordSelectCompositeSize.x, this.recordToolBar.getSize().y);
+					log.info("this.recordSelectComposite.size = " + recordSelectCompositeSize); //$NON-NLS-1$
+					this.recordSelectCombo.setLocation((recordSelectCompositeSize.x-this.recordSelectSize.x)/2, (recordSelectCompositeSize.y-this.recordSelectSize.y)/2);
 				}
+				this.dataBarComposite.pack();
+				//int height = this.size.y + 2;
+				//this.size = this.dataBarComposite.getSize();
+				//log.info("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
+				//this.dataBarComposite.setSize(this.size.x, height);
+				this.size = this.dataBarComposite.getSize();
+				log.info("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			}
-			this.dataBarComposite.pack();
-			//int height = this.size.y + 2;
-			this.size = this.dataBarComposite.getSize();
-			MenuToolBar.log.fine("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
-			//this.dataBarComposite.setSize(this.size.x, height);
-			this.size = this.dataBarComposite.getSize();
-			MenuToolBar.log.fine("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			this.dataCoolItem.setSize(this.size);
 			this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.size);
