@@ -92,7 +92,7 @@ public class MenuToolBar {
 
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
 	Point													channelSelectSize = new Point(140, 22);
-	Point													recordSelectSize = new Point(240, 22);;
+	Point													recordSelectSize = new Point(240, 22);
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -673,10 +673,10 @@ public class MenuToolBar {
 					this.recordSelectCombo.setLocation((recordSelectCompositeSize.x-this.recordSelectSize.x)/2, (recordSelectCompositeSize.y-this.recordSelectSize.y)/2);
 				}
 				this.dataBarComposite.pack();
-				//int height = this.size.y + 2;
-				//this.size = this.dataBarComposite.getSize();
-				//log.info("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
-				//this.dataBarComposite.setSize(this.size.x, height);
+				int height = this.size.y+2;
+				this.size = this.dataBarComposite.getSize();
+				log.info("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
+				this.dataBarComposite.setSize(this.size.x, height);
 				this.size = this.dataBarComposite.getSize();
 				log.info("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			}
