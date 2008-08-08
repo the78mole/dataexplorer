@@ -12,3 +12,4 @@ Name[en_US]=OSDE
 Path=@OSDE_DIR@
 StartupNotify=true
 Terminal=false
+Type=Application
