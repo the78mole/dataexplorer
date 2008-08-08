@@ -556,7 +556,7 @@ public class GraphicsComposite extends Composite {
 						int timeCaptionY = curveBounds.y + curveBounds.height + timeCaptionHeight;
 						int timeCaptionX = curveBounds.x + ((curveBounds.width - timeCaptionWidth)/2);
 						//curve area
-						this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, 50, 50, true); // damage a small area of image only -> redraw complete image ??
+						this.graphicCanvas.redraw(curveBounds.x+5, curveBounds.y+5, 10, 10, true); // damage a small area of image only -> redraw complete image ??
 						// time scale
 						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin, timeCaptionHeight, true);
 						// time caption
