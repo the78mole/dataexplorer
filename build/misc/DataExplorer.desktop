@@ -1,20 +1,14 @@
 [Desktop Entry]
-Comment=
+Comment=OpenSerialDataExplorer
 Comment[en_US]=
 Encoding=UTF-8
-Exec=/opt/jdk1.6.0_02/bin/java -jar -Xms40m -Xmx256m /opt/OpenSerialDataExplorer/OpenSerialDataExplorer.jar
+Exec=java -jar -Xms40m -Xmx256m @OSDE_DIR@OpenSerialDataExplorer.jar
 GenericName=OpenSerialDataExplorer
 GenericName[en_US]=OpenSerialDataExplorer
-Icon=/opt/OpenSerialDataExplorer/OpenSerialDataExplorer.xpm
+Icon=@OSDE_DIR@OpenSerialDataExplorer.xpm
 MimeType=
 Name=OSDE
 Name[en_US]=OSDE
-Path=/opt/OpenSerialDataExplorer
+Path=@OSDE_DIR@
 StartupNotify=true
 Terminal=false
-TerminalOptions=
-Type=Application
-X-DCOP-ServiceType=
-X-KDE-SubstituteUID=false
-X-KDE-Username=
-X-SuSE-translate=true

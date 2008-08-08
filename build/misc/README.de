@@ -1,0 +1,47 @@
+******** OpenSerialDataExplorer README ***********  08 Aug 2008 WB
+
+Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
+Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
+des Programms auf Windows, Linux und anderen Plattformen möglich. Getestet und gebaut wird zu Zeit nur die Version für 
+Windows und Linux.
+Der OSDE nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für weiteres Auswerten an. 
+Zur Zeit sind folgende Geräte eingebunden: 
+											 - AkkuMasterC4 (Htronic)
+											 - Picolario (Renschler)
+											 - UniLog (SM-Modellbau)
+											 - eStation BC6, BC610, BC8, 902 (Bantam)
+											 
+Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
+
+Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
+einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
+Für Windowsbenutzer wäre das z.B. %ProgramFiles% für Linuxbenutzer "/opt" oder "/usr".
+
+Für den ersten Start des Programms über ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
+wechseln und das launch Script ausführen (Windows lauch.bat, Linux launch.sh). 
+
+Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
+OpenSerialDataExplorer\launch.bat (Windows)
+OpenSerialDataExplorer\OpenSerialDataExplorer.ico (Windows)
+OpenSerialDataExplorer\OpenSerialDataExplorer.lnk (Windows)
+OpenSerialDataExplorer\launch.sh (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorer.jar
+OpenSerialDataExplorer\Devices\*.jar
+OpenSerialDataExplorer\help\*
+OpenSerialDataExplorer\init\Devices\*.jpg
+OpenSerialDataExplorer\init\Devices\language\*.xml
+OpenSerialDataExplorer\init\Devices\*.xsd
+OpenSerialDataExplorer\init\GraphicsTemplates\*.xsd
+
+Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
+OpenSerialDataExplorer\java\ext\*.jar
+
+Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter 
+%APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows), bzw. /home/<Benutzer>/.OpenSerialDataExplorer
+angelegt. Hier werden auch evtl. die Tracelogdaten abgelegt.
+Für das Verzeichnis der Nutzerdaten ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
+in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterlegt.
+
+Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite schicken.
