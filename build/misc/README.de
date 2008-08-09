@@ -2,8 +2,8 @@
 
 Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
 Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
-des Programms auf Windows, Linux und anderen Plattformen möglich. Getestet und gebaut wird zu Zeit nur die Version für 
-Windows und Linux.
+des Programms auf Windows, Linux und anderen Plattformen möglich. Voraussetzung ist eine Java Version 1.6 oder höher. 
+Getestet und gebaut wird zu Zeit nur die Version für Windows und Linux.
 Der OSDE nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für weiteres Auswerten an. 
 Zur Zeit sind folgende Geräte eingebunden: 
 											 - AkkuMasterC4 (Htronic)
@@ -43,5 +43,9 @@ Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeich
 angelegt. Hier werden auch evtl. die Tracelogdaten abgelegt.
 Für das Verzeichnis der Nutzerdaten ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterlegt.
+
+Hinweis: Erscheint nach der Ausführung von launch.bat folgende oder ähnliche Fehlermeldung 
+"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6"
+ist die installierte Java version (java -version) zu alt und muß gegen eine Version 1.6 ausgetauscht werden.
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite schicken.
