@@ -874,7 +874,7 @@ public class MenuBar {
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
 			// channel/configuration type is outlet
 			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal();
-			if(isChannelTypeOutlet) {
+			if(isChannelTypeOutlet && this.channels.size() > 1) {
 				String[] splitChannel = channelConfigName.split(" ");
 				int channelNumber = 1;
 				try {
@@ -1013,7 +1013,10 @@ public class MenuBar {
 			log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
 			
-			if(channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()) {
+			if(channel != null 
+					&& this.channels.getActiveChannel() != null 
+					&& this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()
+					&& this.channels.size() > 1) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0006, new Object[] {channelConfigName}));
 					if (answer != SWT.OK) 
