@@ -361,6 +361,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.this.dialogShell.setAlpha(254);
 											break;
 										}
+										SettingsDialog.this.settings.setDialogAlphaValue(SettingsDialog.this.alphaSlider.getSelection());
 									}
 								});
 							}

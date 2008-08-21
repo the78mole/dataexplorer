@@ -42,8 +42,8 @@ public abstract class DeviceDialog extends Dialog {
 	
 	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port this flag eleminates warning loops in case of none modal dialog
 	
-	protected	int				shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
-	protected boolean		isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+	protected	int				shellAlpha; 
+	protected boolean		isAlphaEnabled;
 	protected boolean 	isFadeOut = false; // false = aplha value is lower 254
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
@@ -71,6 +71,8 @@ public abstract class DeviceDialog extends Dialog {
 	public DeviceDialog(Shell parent) {
 		super(parent, SWT.NONE);
 		this.application = OpenSerialDataExplorer.getInstance();
+		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 	}
 
 	/**

@@ -127,6 +127,9 @@ public class EStationDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
+			this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+
 			EStationDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())

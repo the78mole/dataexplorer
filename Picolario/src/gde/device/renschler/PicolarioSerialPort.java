@@ -104,7 +104,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		byte[] readRecordSetsWithNumber = new byte[] { this.readRecordSets[0], (byte) datagramNumber, this.readRecordSets[0], (byte) datagramNumber };
 		
 		try {
-			write(readRecordSetsWithNumber);
+			this.write(readRecordSetsWithNumber);
 			this.isTransmitFinished = false;
 
 			Thread.sleep(256); // give picolario time to prepare data
@@ -129,7 +129,8 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					else {
 						// write wrong checksum to repeat data package receive cycle
 						log.warning("write wrong checksum required"); //$NON-NLS-1$
-						byte[] requestAgain = new byte[] { 0x00, 0x00 };
+						byte wrongChecksum = readBuffer[readBuffer.length - 1];
+						byte[] requestAgain = new byte[] { wrongChecksum, wrongChecksum };
 						this.write(requestAgain);
 						numberRed--;
 					}

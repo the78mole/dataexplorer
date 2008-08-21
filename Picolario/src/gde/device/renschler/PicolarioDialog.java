@@ -101,6 +101,9 @@ public class PicolarioDialog extends DeviceDialog {
 
 	@Override
 	public void open() {
+		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+
 		log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
