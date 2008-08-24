@@ -170,6 +170,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							initEditable();
+							
 							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 0); // 0=VoltageReceiver
 							UniLogConfigTab.this.reveiverVoltageButton.setSelection(UniLogConfigTab.this.isActiveUe);
 							UniLogConfigTab.this.reveiverVoltageButton.setText(measurement.getName());
