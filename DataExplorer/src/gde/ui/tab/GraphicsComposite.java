@@ -267,7 +267,7 @@ public class GraphicsComposite extends Composite {
 						if (evt.keyCode == SWT.CR) {
 							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 							if (recordSet != null) {
-								String commentText = ""; //GraphicsComposite.this.recordSetComment.getText();
+								String commentText = GraphicsComposite.this.recordSetComment.getText();
 								recordSet.setRecordSetDescription(commentText);
 								recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 							}
