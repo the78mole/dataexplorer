@@ -635,16 +635,21 @@ public class MenuToolBar {
 										activeChannel.get(deleteRecordSetName).clear();
 										activeChannel.remove(deleteRecordSetName);
 										MenuToolBar.log.fine("deleted " + deleteRecordSetName); //$NON-NLS-1$
-										updateRecordSetSelectCombo();
-										// update viewable
-										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
-										MenuToolBar.this.application.updateGraphicsWindow();
-										MenuToolBar.this.application.updateDataTable();
-										MenuToolBar.this.application.updateDigitalWindow();
-										MenuToolBar.this.application.updateAnalogWindow();
-										MenuToolBar.this.application.updateCellVoltageWindow();
-										MenuToolBar.this.application.updateFileCommentWindow();
-										MenuToolBar.this.application.updateDataTable();
+										String[] recordSetNames = updateRecordSetSelectCombo();
+										if (recordSetNames.length > 0 && recordSetNames[0] != null && recordSetNames[0].length() > 1) {
+											activeChannel.switchRecordSet(recordSetNames[0]);
+										}
+										else {
+											// only update viewable
+											MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
+											MenuToolBar.this.application.updateGraphicsWindow();
+											MenuToolBar.this.application.updateDataTable();
+											MenuToolBar.this.application.updateDigitalWindow();
+											MenuToolBar.this.application.updateAnalogWindow();
+											MenuToolBar.this.application.updateCellVoltageWindow();
+											MenuToolBar.this.application.updateFileCommentWindow();
+											MenuToolBar.this.application.updateDataTable();
+										}
 									}
 								}
 							}
@@ -788,33 +793,35 @@ public class MenuToolBar {
 	 * updates the netxtRecord , prevRecord tool items
 	 */
 	public void updateRecordToolItems() {
-		int numberRecords = this.channels.getActiveChannel().getRecordSetNames().length;
-		if (numberRecords <= 1) {
-			this.nextRecord.setEnabled(false);
-			this.prevRecord.setEnabled(false);
-		}
-		else {
-			int index = this.recordSelectCombo.getSelectionIndex();
-			int maxIndex = this.recordSelectCombo.getItemCount() - 1;
-			if (numberRecords == 2 && index == 0) {
-				this.nextRecord.setEnabled(true);
-				this.prevRecord.setEnabled(false);
-			}
-			else if (numberRecords == 2 && index == 1) {
+		if (this.recordSelectCombo.isEnabled()) {
+			int numberRecords = this.channels.getActiveChannel().getRecordSetNames().length;
+			if (numberRecords <= 1) {
 				this.nextRecord.setEnabled(false);
-				this.prevRecord.setEnabled(true);
-			}
-			if (numberRecords >= 2 && index == 0) {
-				this.nextRecord.setEnabled(true);
 				this.prevRecord.setEnabled(false);
-			}
-			else if (numberRecords >= 2 && index == maxIndex) {
-				this.nextRecord.setEnabled(false);
-				this.prevRecord.setEnabled(true);
 			}
 			else {
-				this.nextRecord.setEnabled(true);
-				this.prevRecord.setEnabled(true);
+				int index = this.recordSelectCombo.getSelectionIndex();
+				int maxIndex = this.recordSelectCombo.getItemCount() - 1;
+				if (numberRecords == 2 && index == 0) {
+					this.nextRecord.setEnabled(true);
+					this.prevRecord.setEnabled(false);
+				}
+				else if (numberRecords == 2 && index == 1) {
+					this.nextRecord.setEnabled(false);
+					this.prevRecord.setEnabled(true);
+				}
+				if (numberRecords >= 2 && index == 0) {
+					this.nextRecord.setEnabled(true);
+					this.prevRecord.setEnabled(false);
+				}
+				else if (numberRecords >= 2 && index == maxIndex) {
+					this.nextRecord.setEnabled(false);
+					this.prevRecord.setEnabled(true);
+				}
+				else {
+					this.nextRecord.setEnabled(true);
+					this.prevRecord.setEnabled(true);
+				}
 			}
 		}
 	}
@@ -823,33 +830,35 @@ public class MenuToolBar {
 	 * 
 	 */
 	void doUpdateChannelToolItems() {
-		int numberChannels = this.channels.size();
-		if (numberChannels <= 1) {
-			this.nextChannel.setEnabled(false);
-			this.prevChannel.setEnabled(false);
-		}
-		else {
-			int index = this.channelSelectCombo.getSelectionIndex();
-			int maxIndex = this.channelSelectCombo.getItemCount() - 1;
-			if (numberChannels == 2 && index == 0) {
-				this.nextChannel.setEnabled(true);
-				this.prevChannel.setEnabled(false);
-			}
-			else if (numberChannels == 2 && index == 1) {
+		if (this.channelSelectCombo.isEnabled()) {
+			int numberChannels = this.channels.size();
+			if (numberChannels <= 1) {
 				this.nextChannel.setEnabled(false);
-				this.prevChannel.setEnabled(true);
-			}
-			if (numberChannels >= 2 && index == 0) {
-				this.nextChannel.setEnabled(true);
 				this.prevChannel.setEnabled(false);
-			}
-			else if (numberChannels >= 2 && index == maxIndex) {
-				this.nextChannel.setEnabled(false);
-				this.prevChannel.setEnabled(true);
 			}
 			else {
-				this.nextChannel.setEnabled(true);
-				this.prevChannel.setEnabled(true);
+				int index = this.channelSelectCombo.getSelectionIndex();
+				int maxIndex = this.channelSelectCombo.getItemCount() - 1;
+				if (numberChannels == 2 && index == 0) {
+					this.nextChannel.setEnabled(true);
+					this.prevChannel.setEnabled(false);
+				}
+				else if (numberChannels == 2 && index == 1) {
+					this.nextChannel.setEnabled(false);
+					this.prevChannel.setEnabled(true);
+				}
+				if (numberChannels >= 2 && index == 0) {
+					this.nextChannel.setEnabled(true);
+					this.prevChannel.setEnabled(false);
+				}
+				else if (numberChannels >= 2 && index == maxIndex) {
+					this.nextChannel.setEnabled(false);
+					this.prevChannel.setEnabled(true);
+				}
+				else {
+					this.nextChannel.setEnabled(true);
+					this.prevChannel.setEnabled(true);
+				}
 			}
 		}
 	}
@@ -931,6 +940,22 @@ public class MenuToolBar {
 		this.prevDeviceToolItem.setEnabled(enabled);
 		this.nextDeviceToolItem.setEnabled(enabled);
 		updateChannelSelector();
+	}
+
+	public void enableChannelActions(boolean enabled) {
+		this.prevChannel.setEnabled(enabled);
+		this.nextChannel.setEnabled(enabled);
+		this.channelSelectCombo.setEnabled(enabled);
+		updateChannelSelector();
+	}
+
+	public void enableRecordSetActions(boolean enabled) {
+		this.prevRecord.setEnabled(enabled);
+		this.nextRecord.setEnabled(enabled);
+		this.deleteRecord.setEnabled(enabled);
+		this.editRecord.setEnabled(enabled);
+		this.recordSelectCombo.setEnabled(enabled);
+		updateRecordSetSelectCombo();
 	}
 
 	/**

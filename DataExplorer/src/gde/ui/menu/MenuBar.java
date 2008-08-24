@@ -797,8 +797,10 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.enableMenuActions(false);
 						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 						CSVReaderWriter.write(listSeparator, recordSetName, csvFilePath, isRaw);
+						MenuBar.this.application.enableMenuActions(true);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -901,7 +903,9 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.enableMenuActions(false);
 						OsdReaderWriter.read(openFilePath);
+						MenuBar.this.application.enableMenuActions(true);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -966,8 +970,10 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.enableMenuActions(false);
 						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 						OsdReaderWriter.write(useFilePath, activeChannel, 1);
+						MenuBar.this.application.enableMenuActions(true);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -1035,7 +1041,9 @@ public class MenuBar {
 			this.readerWriterThread = new Thread() {
 				public void run() {
 					try {
+						MenuBar.this.application.enableMenuActions(false);
 						LogViewReader.read(openFilePath);
+						MenuBar.this.application.enableMenuActions(true);
 					}
 					catch (Exception e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -1117,5 +1125,4 @@ public class MenuBar {
 		this.prevDeviceMenuItem.setEnabled(enabled);
 		this.nextDeviceMenuItem.setEnabled(enabled);
 	}
-
 }
