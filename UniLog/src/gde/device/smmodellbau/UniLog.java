@@ -602,7 +602,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			PropertyType property = record.getProperty(UniLog.NUMBER_CELLS);
 			int numberCells = property != null ? new Integer(property.getValue()) : 4;
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double((recordVoltage.get(i) / 1000.0 / numberCells) * 1000).intValue());
+				record.add(new Double(recordVoltage.get(i) / numberCells).intValue());
 				if (log.isLoggable(Level.FINEST)) log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable()) {
