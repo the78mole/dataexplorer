@@ -102,6 +102,10 @@ public class GraphicsComposite extends Composite {
 	int														yDown										= 0;
 	int														yUp											= 0;
 	int														yLast										= 0;
+	int														leftLast								= 0;
+	int														topLast									= 0;
+	int														rightLast								= 0;
+	int														bottomLast							= 0;
 	int														offSetX, offSetY;
 	Image													curveArea;
 	GC														curveAreaGC;
@@ -633,6 +637,9 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 			drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+			
+			drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
+			
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			this.application.setStatusMessage(
@@ -665,13 +672,27 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
+	 * draws line as defined relative to curve draw area, where there is an offset from left and an offset from top 
+	 * for performance reason specify line width, line style and line color outside 
+	 * @param posFromTop1
+	 * @param posFromLeft1
+	 * @param posFromTop2
+	 * @param posFromLeft2
+	 */
+	private void drawConnectingLine(int posFromLeft1, int posFromTop1, int posFromLeft2, int posFromTop2, int swtColor) {
+		this.canvasGC.setForeground(SWTResourceManager.getColor(swtColor));
+		this.canvasGC.setLineStyle(SWT.LINE_SOLID);
+		this.canvasGC.drawLine(posFromLeft1 + this.offSetX, posFromTop1 + this.offSetY, posFromLeft2 + this.offSetX, posFromTop2 + this.offSetY);
+	}
+
+	/**
 	 * erase a vertical line by re-drawing the curve area image 
 	 * @param posFromLeft
 	 * @param posFromTop
 	 * @param length
 	 * @param lineWidth
 	 */
-	private void eraseVerticalLine(int posFromLeft, int posFromTop, int length, int lineWidth) {
+	void eraseVerticalLine(int posFromLeft, int posFromTop, int length, int lineWidth) {
 		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
 	}
 
@@ -682,8 +703,59 @@ public class GraphicsComposite extends Composite {
 	 * @param length
 	 * @param lineWidth
 	 */
-	private void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
+	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
 		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+	}
+
+	/**
+	 * clean connecting line by re-drawing the untouched curve area image of this area
+	 */
+	void cleanConnectingLineObsoleteRectangle() {
+		this.leftLast = this.leftLast == 0 ? this.xPosMeasure : this.leftLast;
+		int left = this.xPosMeasure <= this.xPosDelta
+			?	this.leftLast < this.xPosMeasure ? this.leftLast : this.xPosMeasure
+			:	this.leftLast < this.xPosDelta ? this.leftLast : this.xPosDelta;
+			
+		this.topLast = this.topLast == 0 ? this.yPosDelta : this.topLast;
+		int top = this.yPosDelta <= this.yPosMeasure
+			? this.topLast < this.yPosDelta ? this.topLast : this.yPosDelta
+			: this.topLast < this.yPosMeasure ? this.topLast : this.yPosMeasure;
+			
+		this.rightLast = this.rightLast == 0 ? this.xPosDelta - left : this.rightLast;
+		int width = this.xPosDelta >= this.xPosMeasure
+			? this.rightLast > this.xPosDelta  ? this.rightLast - left : this.xPosDelta - left
+			: this.rightLast > this.xPosMeasure  ? this.rightLast - left : this.xPosMeasure - left;
+			
+		this.bottomLast = this.bottomLast == 0 ? this.yPosMeasure - top : this.bottomLast;
+		int height = this.yPosMeasure >= this.yPosDelta 
+			? this.bottomLast > this.yPosMeasure ? this.bottomLast - top : this.yPosMeasure - top
+			: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
+		
+		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + leftLast + " topLast = " + topLast + " rightLast = " + rightLast + " bottomLast = " + bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		
+		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
+			if (log.isLoggable(Level.FINER)) log.info("left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.canvasGC.drawImage(this.curveArea, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+		}
+		
+		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
+		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
+		this.rightLast = this.xPosDelta >= this.xPosMeasure ? this.xPosDelta : this.xPosMeasure;
+		this.bottomLast = this.yPosDelta >= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
+		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + leftLast + " topLast = " + topLast + " rightLast = " + rightLast + " bottomLast = " + bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
+	/**
+	 * erase connecting line by re-drawing the curve area image 
+	 * @param posFromLeft1
+	 * @param posFromTop1
+	 * @param posFromLeft2
+	 * @param posFromTop2
+	 */
+	void eraseConnectingLine(int left, int top, int width, int height) {
+		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
+			this.canvasGC.drawImage(this.curveArea, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+		}
 	}
 
 	/**
@@ -706,6 +778,7 @@ public class GraphicsComposite extends Composite {
 				if (this.xPosDelta > 0) {
 					eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 					eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+					cleanConnectingLineObsoleteRectangle();
 				}
 			}
 		}
@@ -820,6 +893,12 @@ public class GraphicsComposite extends Composite {
 			this.isRightCutMode = false;
 			this.application.setStatusMessage(OSDE.STRING_EMPTY);
 			this.xPosCut = -1;
+			this.xLast = 0;
+			this.yLast = 0;
+			this.leftLast = 0;
+			this.topLast = 0;
+			this.rightLast = 0;
+			this.bottomLast = 0;
 			updatePanMenueButton();
 			updateCutModeButtons();
 			//this.redrawGraphics();
@@ -924,8 +1003,12 @@ public class GraphicsComposite extends Composite {
 								//no change don't needs to be calculated, but the calculation limits to bounds
 								this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
 								eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
+								
+								//clean obsolete rectangle of connecting line
+								cleanConnectingLineObsoleteRectangle();
 
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+								this.canvasGC.setLineStyle(SWT.LINE_DASH);
 								drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 								drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 								this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -935,7 +1018,11 @@ public class GraphicsComposite extends Composite {
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							this.yPosMeasure = record.getDisplayPointDataValue(this.xPosMeasure, this.curveAreaBounds);
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
+							
 							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
+								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
+									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
+								}
 								this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
 										new Object[] { record.getName(), record.getDisplayDeltaValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
 										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds), record.getUnit() }
@@ -961,6 +1048,9 @@ public class GraphicsComposite extends Composite {
 							//no change don't needs to be calculated, but the calculation limits to bounds
 							this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
 							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
+							
+							//clean obsolete rectangle of connecting line
+							cleanConnectingLineObsoleteRectangle();
 
 							// always needs to draw measurement pointer
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -970,9 +1060,15 @@ public class GraphicsComposite extends Composite {
 							// update the new delta position
 							this.xPosDelta = evt.x; // evt.x is already relative to curve area
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 							this.yPosDelta = record.getDisplayPointDataValue(this.xPosDelta, this.curveAreaBounds);
 							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
+							
+							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
+								drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
+							}
+
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 							this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
