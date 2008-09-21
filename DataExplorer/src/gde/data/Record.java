@@ -817,7 +817,7 @@ public class Record extends Vector<Integer> {
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
 		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
-		return this.df.format(measureDelta / timeDelta);
+		return new DecimalFormat("0.0").format(measureDelta / timeDelta);
 	}
 	
 	/**
