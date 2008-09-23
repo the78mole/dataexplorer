@@ -35,6 +35,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.device.IDevice;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -45,41 +46,51 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class CellVoltageWindow {
-	final static Logger											log	= Logger.getLogger(CellVoltageWindow.class.getName());
+	final static Logger					log						= Logger.getLogger(CellVoltageWindow.class.getName());
 
-	Composite												cellVoltageMainComposite, coverComposite;
-	CTabItem												cellVoltageTab;
-	Vector<CellVoltageDisplay>			displays = new Vector<CellVoltageDisplay>();
-	int															voltageAvg = 0;
-	CLabel													infoText;
-	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
+	Composite										cellVoltageMainComposite, coverComposite;
+	CTabItem										cellVoltageTab;
+	Vector<CellVoltageDisplay>	displays			= new Vector<CellVoltageDisplay>();
+	int													voltageAvg		= 0;
+	CLabel											infoText;
+	Composite										digitalComposite;
+	CLabel											capacityUnit;
+	CLabel											capacitiyValue;
+	CLabel											voltageUnit;
+	CLabel											voltageValue;
+	String											info					= Messages.getString(MessageIds.OSDE_MSGT0230);
 
-	final Channels									channels;
-	final CTabFolder								displayTab;
-	RecordSet												oldRecordSet = null;
-	Channel													oldChannel = null;
-	
+	final Channels							channels;
+	final CTabFolder						displayTab;
+
+	RecordSet										oldRecordSet	= null;
+	Channel											oldChannel		= null;
+
 	class CellInfo { // class to hold voltage and unit information
-		final int voltage;
-		final String name;
-		final String unit;
+		final int			voltage;
+		final String	name;
+		final String	unit;
+
 		CellInfo(int newVoltage, String newName, String newUnit) {
 			this.voltage = newVoltage;
 			this.name = newName;
 			this.unit = newUnit;
 		}
+
 		/**
 		 * @return the voltage
 		 */
 		public int getVoltage() {
 			return this.voltage;
 		}
+
 		/**
 		 * @return the name
 		 */
 		public String getName() {
 			return this.name;
 		}
+
 		/**
 		 * @return the unit
 		 */
@@ -87,9 +98,10 @@ public class CellVoltageWindow {
 			return this.unit;
 		}
 	}
-	Vector<CellInfo> 								voltageVector = new Vector<CellInfo>();
-	int 														voltageDelta = 0;
-	Point 													displayCompositeSize = new Point(0,0);
+
+	Vector<CellInfo>	voltageVector					= new Vector<CellInfo>();
+	int								voltageDelta					= 0;
+	Point							displayCompositeSize	= new Point(0, 0);
 
 	public CellVoltageWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
@@ -116,13 +128,49 @@ public class CellVoltageWindow {
 					updateAndResize();
 				}
 			});
-			
+
 			this.coverComposite = new Composite(this.cellVoltageMainComposite, SWT.NONE);
 			FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
 			this.coverComposite.setLayout(fillLayout);
-			
+
 			this.cellVoltageMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellVoltageMainComposite.layout();
+		}
+		{
+			this.digitalComposite = new Composite(this.cellVoltageMainComposite, SWT.NONE);
+			FillLayout digitalCompositeLayout = new FillLayout(SWT.HORIZONTAL);
+			this.digitalComposite.setLayout(digitalCompositeLayout);
+			//this.digitalComposite.setBounds(50, 50, 200, 50);
+			this.digitalComposite.addPaintListener(new PaintListener() {
+				public void paintControl(final PaintEvent evt) {
+					log.finest("actualDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					updateVoltageAndCapacity();
+				}
+			});
+			{
+				this.voltageValue = new CLabel(this.digitalComposite, SWT.CENTER);
+				this.voltageValue.setText("00.00");
+				this.voltageValue.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.voltageValue.setFont(SWTResourceManager.getFont("Sans Serif", 25, SWT.NORMAL));
+			}
+			{
+				this.voltageUnit = new CLabel(this.digitalComposite, SWT.CENTER);
+				this.voltageUnit.setText("[V]");
+				this.voltageUnit.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.voltageUnit.setFont(SWTResourceManager.getFont("Sans Serif", 18, SWT.NORMAL));
+			}
+			{
+				this.capacitiyValue = new CLabel(this.digitalComposite, SWT.CENTER);
+				this.capacitiyValue.setText("0000");
+				this.capacitiyValue.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.capacitiyValue.setFont(SWTResourceManager.getFont("Sans Serif", 25, SWT.NORMAL));
+			}
+			{
+				this.capacityUnit = new CLabel(this.digitalComposite, SWT.CENTER);
+				this.capacityUnit.setText("[mAh]");
+				this.capacityUnit.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.capacityUnit.setFont(SWTResourceManager.getFont("Sans Serif", 18, SWT.NORMAL));
+			}
 		}
 	}
 
@@ -144,6 +192,7 @@ public class CellVoltageWindow {
 	 */
 	public void updateChilds() {
 		updateCellVoltageVector();
+		updateVoltageAndCapacity();
 		if (log.isLoggable(Level.FINER)) log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
@@ -167,14 +216,13 @@ public class CellVoltageWindow {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
-				
+
 				updateCellVoltageVector();
-				
+
 				// if recordSet name signature changed new displays need to be created
-				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
-				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
-						|| this.displays.size() != this.voltageVector.size();
-						
+				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
+						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
+
 				if (log.isLoggable(Level.FINE)) log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove into text 
@@ -190,8 +238,9 @@ public class CellVoltageWindow {
 					}
 					this.displays.removeAllElements();
 					// add new
-					for (int i=0; this.voltageVector!=null && i<this.voltageVector.size(); ++i) {
-						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);
+					for (int i = 0; this.voltageVector != null && i < this.voltageVector.size(); ++i) {
+						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(),
+								this);
 						display.create();
 						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
@@ -212,8 +261,10 @@ public class CellVoltageWindow {
 				}
 				this.displays.removeAllElements();
 				if (recordSet != null && !recordSet.getDevice().isVoltagePerCellTabRequested()) {
-					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
-					else this.infoText.setText(this.info);
+					if (this.infoText.isDisposed())
+						setActiveInfoText(this.info);
+					else
+						this.infoText.setText(this.info);
 				}
 			}
 			this.cellVoltageMainComposite.layout();
@@ -239,7 +290,7 @@ public class CellVoltageWindow {
 					//if (log.isLoggable(Level.FINER)) log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a propperty to flag as single cell voltage
-						if(record.getLast() > 0) { // last value is current value
+						if (record.getLast() > 0) { // last value is current value
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
 							cellCount++;
@@ -252,8 +303,8 @@ public class CellVoltageWindow {
 				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "CellVoltage");
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
-				
-				if (cellCount > 0 ) this.voltageAvg = this.voltageAvg/cellCount;
+
+				if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
 				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
@@ -274,7 +325,7 @@ public class CellVoltageWindow {
 	int addCellVoltages4Test(int[] values, String measurementName) {
 		this.voltageVector = new Vector<CellInfo>();
 		for (int i = 0; i < values.length; i++) {
-			this.voltageVector.add(new CellInfo(values[i], measurementName+(i+1), "V"));
+			this.voltageVector.add(new CellInfo(values[i], measurementName + (i + 1), "V"));
 		}
 		return values.length;
 	}
@@ -287,8 +338,9 @@ public class CellVoltageWindow {
 		int min = newValues.firstElement().getVoltage();
 		int max = newValues.firstElement().getVoltage();
 		for (CellInfo cellInfo : newValues) {
-			if (cellInfo.voltage < min) 			min = cellInfo.voltage;
-			else if (cellInfo.voltage > max) 	max = cellInfo.voltage;
+			if (cellInfo.voltage < min)
+				min = cellInfo.voltage;
+			else if (cellInfo.voltage > max) max = cellInfo.voltage;
 		}
 		return max - min;
 	}
@@ -321,9 +373,11 @@ public class CellVoltageWindow {
 			Rectangle bounds = new Rectangle(x, mainSize.y * 10 / 100, width, mainSize.y * 80 / 100);
 			//log.info("cover bounds = " + bounds.toString());
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
+			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y * 90 / 100, 350, 50);
+
 		}
 		else {
-			CellVoltageWindow.this.coverComposite.setSize(0,0);
+			CellVoltageWindow.this.coverComposite.setSize(0, 0);
 		}
 		update();
 	}
@@ -340,5 +394,29 @@ public class CellVoltageWindow {
 	 */
 	public int getVoltageAvg() {
 		return this.voltageAvg;
+	}
+
+	/**
+	 * 
+	 */
+	void updateVoltageAndCapacity() {
+		Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
+		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				String[] recordKeys = activeRecordSet.getActiveRecordNames();
+				Record record_U = activeRecordSet.getRecord(recordKeys[0]); // voltage U
+				Record record_C = activeRecordSet.getRecord(recordKeys[2]); // capacitiy C
+				if (record_U != null && record_C != null) {
+					CellVoltageWindow.this.voltageValue.setForeground(record_U.getColor());
+					CellVoltageWindow.this.voltageValue.setText(record_U.getDecimalFormat().format(device.translateValue(record_U, new Double(record_U.getLast() / 1000.0))));
+					CellVoltageWindow.this.voltageUnit.setText("[" + record_U.getUnit() + "]");
+					CellVoltageWindow.this.capacitiyValue.setForeground(record_C.getColor());
+					CellVoltageWindow.this.capacitiyValue.setText(record_C.getDecimalFormat().format(device.translateValue(record_C, new Double(record_C.getLast() / 1000.0))));
+					CellVoltageWindow.this.capacityUnit.setText("[" + record_C.getUnit() + "]");
+				}
+			}
+		}
 	}
 }
