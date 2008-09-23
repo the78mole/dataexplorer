@@ -54,11 +54,11 @@ public class LinearRegression extends CalculationThread {
 			log.warning("Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
 			return;
 		}
-		synchronized (REGRESSION_INTERVAL_SEC) {
+		synchronized (CalculationThread.REGRESSION_INTERVAL_SEC) {
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
-			
+
 			Record record = this.recordSet.get(this.targetRecordKey);
-			if (record != null && !threadStop) {
+			if (record != null && !this.threadStop) {
 				record.clear(); // make sure to clean the target record before calculate new data points
 				Record recordHeight = this.recordSet.get(this.sourceRecordKey);
 				double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
@@ -122,10 +122,11 @@ public class LinearRegression extends CalculationThread {
 					record.add(0);
 				}
 				if (log.isLoggable(Level.FINEST)) log.fine("startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
-			if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
-				this.application.updateGraphicsWindow();
+
+				if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
+				if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
+					this.application.updateGraphicsWindow();
+				}
 			}
 
 			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();

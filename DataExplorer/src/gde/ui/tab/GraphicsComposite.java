@@ -731,7 +731,7 @@ public class GraphicsComposite extends Composite {
 			? this.bottomLast > this.yPosMeasure ? this.bottomLast - top : this.yPosMeasure - top
 			: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
 		
-		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + leftLast + " topLast = " + topLast + " rightLast = " + rightLast + " bottomLast = " + bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
 			if (log.isLoggable(Level.FINER)) log.info("left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -742,7 +742,7 @@ public class GraphicsComposite extends Composite {
 		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
 		this.rightLast = this.xPosDelta >= this.xPosMeasure ? this.xPosDelta : this.xPosMeasure;
 		this.bottomLast = this.yPosDelta >= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
-		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + leftLast + " topLast = " + topLast + " rightLast = " + rightLast + " bottomLast = " + bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (log.isLoggable(Level.FINER)) log.info("leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**
