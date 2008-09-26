@@ -120,6 +120,7 @@ public class SWTResourceManager {
 	public static Font getFont(Control control, int style) {
 		FontData[] fd = control.getFont().getFontData();
 		fd[0].setStyle(style);
+		if (fd[0].getHeight() > 10) fd[0].setHeight(10); // limit default font size to 10
 		return getFont(fd[0]);
 	}
 
@@ -132,6 +133,7 @@ public class SWTResourceManager {
 	public static Font getFont(GC gc, int style) {
 		FontData[] fd = gc.getFont().getFontData();
 		fd[0].setStyle(style);
+		if (fd[0].getHeight() > 10) fd[0].setHeight(10); // limit default font size to 10
 		return getFont(fd[0]);
 	}
 

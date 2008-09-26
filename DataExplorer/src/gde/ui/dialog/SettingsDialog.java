@@ -390,7 +390,7 @@ public class SettingsDialog extends Dialog {
 								this.decimalSeparatorLabel.setBounds(10, 24, 140, 22);
 							}
 							{
-								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER);
+								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
 								this.decimalSeparator.setItems(new String[] {" . ", " , "}); //$NON-NLS-1$ //$NON-NLS-2$
 								this.decimalSeparator.setBounds(153, 24, 43, 20);
