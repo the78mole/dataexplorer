@@ -541,19 +541,19 @@ public class GraphicsComposite extends Composite {
 					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 					isFullUpdateRequired = true;
 				}
-//				else {
-//					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-//						Record record = activeRecordSet.get(recordKey);
-//						int numberScaleTicks = record.getNumberScaleTicks();
-//						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
-//						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
-//							this.scaleTicks.remove(recordKey);
-//							this.scaleTicks.put(recordKey, numberScaleTicks);
-//							isFullUpdateRequired = true;
-//							log.finer("scale ticks  changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
-//						}
-//					}
-//				}
+				else {
+					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
+						Record record = activeRecordSet.get(recordKey);
+						int numberScaleTicks = record.getNumberScaleTicks();
+						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
+						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
+							this.scaleTicks.remove(recordKey);
+							this.scaleTicks.put(recordKey, numberScaleTicks);
+							isFullUpdateRequired = true;
+							log.finer("scale ticks  changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
+						}
+					}
+				}
 				if (isFullUpdateRequired) {
 					if (log.isLoggable(Level.FINER)) log.info("redrawing full " + this.graphicCanvas.getClientArea());
 					this.recordSetHeader.redraw();
