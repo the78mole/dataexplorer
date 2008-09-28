@@ -331,6 +331,11 @@ public class CurveUtils {
 				outValues[0] = outValues[0] - (outValues[0] % 1 == 0 ? 0 : (1 + outValues[0] % 1));
 				outValues[1] = outValues[1] + (outValues[1] % 1 == 0 ? 0 : (1 - outValues[1] % 1));
 			}
+			else if (deltaScale <= 25) {
+				//numberTicks = (int)deltaScale;
+				outValues[0] = outValues[0] - (outValues[0] % 1.5 == 0 ? 0 : (1.5 + outValues[0] % 1.5));
+				outValues[1] = outValues[1] + (outValues[1] % 1.5 == 0 ? 0 : (1.5 - outValues[1] % 1.5));
+			}
 			else if (deltaScale <= 50) {
 				//numberTicks = (int)deltaScale;
 				outValues[0] = outValues[0] - (outValues[0] % 2.5 == 0 ? 0 : (2.5 + outValues[0] % 2.5));

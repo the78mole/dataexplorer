@@ -65,39 +65,39 @@ public class GraphicsUtils {
 		if (startNumber < 0 && endNumber > 0) {
 			if (deltaScale <= 1) {
 				numberTicks = new Double(deltaScale * 20 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1, height);
 			}
 			else if (deltaScale <= 2) {
 				numberTicks = new Double(deltaScale * 10 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.25);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.25, height);
 			}
 			else if (deltaScale <= 5) {
 				numberTicks = new Double(deltaScale * 5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.5);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.5, height);
 			}
 			else if (deltaScale <= 10) {
 				numberTicks = new Double(deltaScale * 2 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1, height);
 			}
 			else if (deltaScale <= 25) {
 				numberTicks = new Double(deltaScale * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1.5);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1.5, height);
 			}
 			else if (deltaScale <= 50) {
 				numberTicks = new Double(deltaScale/2.5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 2.5);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 2.5, height);
 			}
 			else if (deltaScale <= 100) {
 				numberTicks = new Double(deltaScale / 5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 5);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 5, height);
 			}
 			else if (deltaScale <= 300) {
 				numberTicks = new Double(deltaScale / 10 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 10);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 10, height);
 			}
 			else {
 				numberTicks = new Double(deltaScale / 20 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20);
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20, height);
 			}
 			if (log.isLoggable(Level.FINE)) log.info("numberTicks = " + numberTicks);
 		}
@@ -152,15 +152,17 @@ public class GraphicsUtils {
 	 * @param deltaScale
 	 * @return
 	 */
-	private static int fineTuneScaleToMeetZero(int numberTicks, double deltaScale, double modValue) {
+	private static int fineTuneScaleToMeetZero(int numberTicks, double deltaScale, double modValue, int height) {
 		/* 700 / 32 = 20 pixel minumum between main tick marks */
 		int modTicks = new Double(deltaScale / modValue).intValue();
-
-		if (numberTicks - modTicks > 0)
-			numberTicks = (numberTicks - modTicks < 5) ? modTicks : modTicks*2; 
-		else
-			numberTicks = (numberTicks - modTicks < -5) ? modTicks/2 : modTicks; 
 		
+		if (height / modTicks > 30)
+			numberTicks = modTicks * 2;
+		else if (height / modTicks < 15)
+			numberTicks = modTicks / 2;
+		else 
+			numberTicks = modTicks;
+
 		return numberTicks>2 ? numberTicks : 2;
 	}
 
