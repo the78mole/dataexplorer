@@ -378,6 +378,7 @@ public class CellVoltageWindow {
 		}
 		else {
 			CellVoltageWindow.this.coverComposite.setSize(0, 0);
+			clearVoltageAndCapacity();
 		}
 		update();
 	}
@@ -417,6 +418,22 @@ public class CellVoltageWindow {
 					CellVoltageWindow.this.capacityUnit.setText("[" + record_C.getUnit() + "]");
 				}
 			}
+			else {
+				clearVoltageAndCapacity();
+			}
 		}
+		else {
+			clearVoltageAndCapacity();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	void clearVoltageAndCapacity() {
+		CellVoltageWindow.this.voltageValue.setText("");
+		CellVoltageWindow.this.voltageUnit.setText("");
+		CellVoltageWindow.this.capacitiyValue.setText("");
+		CellVoltageWindow.this.capacityUnit.setText("");
 	}
 }
