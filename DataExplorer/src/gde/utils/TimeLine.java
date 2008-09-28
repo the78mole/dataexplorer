@@ -164,7 +164,7 @@ public class TimeLine {
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 */
-	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int ticklength, int miniticks, int gap) {
+	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, double scaleFactor, int timeFormat, int ticklength, int miniticks, int gap) {
 		// adapt x0 and width, measurement scales are outside the curve draw area
 		x0 = x0 - 1;
 		width = width + 1;
@@ -175,18 +175,26 @@ public class TimeLine {
 
 		// calculate a scale factor, a big time difference would have to much ticks
 		if (timeDelta > 0) {
-			switch (timeFormat * scaleFactor) { // TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
+			switch (timeFormat * (int)scaleFactor) { // TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
 			case TimeLine.TIME_LINE_MSEC * 1:
-				numberTicks = timeDelta / 100; // every 1'th units one tick
-				scaleFactor = 1;
+				if (timeDelta <= width*2) {
+					numberTicks = timeDelta / 100; // every 1'th units one tick
+					scaleFactor = 1;
+				}
+				else {
+					numberTicks = timeDelta / 200; // every 2'th units one tick
+					scaleFactor = 0.5;
+				}
+//				numberTicks = timeDelta / 100; // every 1'th units one tick
+//				scaleFactor = 1;
 				break;
 			case TimeLine.TIME_LINE_SEC * 100:
-				if (timeDelta <= 7000) {
+				if (timeDelta <= width*10) {
 					numberTicks = timeDelta / 1000; // every 1'th units one tick
 					scaleFactor = 100;
 				}
 				else {
-					numberTicks = timeDelta / 500; // every 1'th units one tick
+					numberTicks = timeDelta / 500; // every 2'th units one tick
 					scaleFactor = 200;
 				}
 				break;
@@ -194,19 +202,19 @@ public class TimeLine {
 			case TimeLine.TIME_LINE_SEC * 10:
 			case TimeLine.TIME_LINE_MIN * 10:
 			case TimeLine.TIME_LINE_HRS * 10:
-				if (timeDelta > 0 && timeDelta <= 7) {
+				if (timeDelta > 0 && timeDelta <= width/100) {
 					numberTicks = timeDelta * 2; // every 0.5'th units one tick
 					scaleFactor = scaleFactor * 20;
 				}
-				else if (timeDelta > 7 && timeDelta <= 10) {
+				else if (timeDelta > width/100 && timeDelta <= width/70) {
 					numberTicks = timeDelta; // every 1'th units one tick
 					scaleFactor = scaleFactor * 10;
 				}
-				else if (timeDelta > 10 && timeDelta <= 30) {
+				else if (timeDelta > width/70 && timeDelta <= width/25) {
 					numberTicks = timeDelta / 2.5; // every 2.5 th units one tick
 					scaleFactor = scaleFactor * 4;
 				}
-				else if (timeDelta > 30 && timeDelta < 60) {
+				else if (timeDelta > width/25 && timeDelta < width/10) {
 					numberTicks = timeDelta / 5.0; // every 5 th units one tick
 					scaleFactor = scaleFactor * 2;
 				}
@@ -220,11 +228,11 @@ public class TimeLine {
 					numberTicks = timeDelta / 2.5; // every 2.5 th units one tick
 					scaleFactor = scaleFactor * 4;
 				}
-				else if (timeDelta > 30 && timeDelta <= 100) {
+				else if (timeDelta > width/25 && timeDelta <= width/7) {
 					numberTicks = timeDelta / 5.0; // every 5 th units one tick
 					scaleFactor = scaleFactor * 2;
 				}
-				else if (timeDelta >= 100 && timeDelta <= 500) {
+				else if (timeDelta >= width/7 && timeDelta <= width/1.5) {
 					numberTicks = timeDelta / 10.0; // every 10 th units one tick
 					scaleFactor = scaleFactor * 1;
 				}

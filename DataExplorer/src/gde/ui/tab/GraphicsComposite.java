@@ -383,7 +383,7 @@ public class GraphicsComposite extends Composite {
 		int spaceBot = verticalSpace;
 		y0 = maxY - spaceBot;
 		int yMax = maxY - (maxY - spaceTop);
-		height = (y0 - yMax) - (y0 - yMax) % 10;
+		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
 		yMax = y0 - height;
 		if (GraphicsWindow.log.isLoggable(Level.FINE))
 			GraphicsWindow.log.fine("draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
@@ -397,7 +397,7 @@ public class GraphicsComposite extends Composite {
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(width, height);
 		this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
-		this.curveAreaBounds = this.curveArea.getBounds();
+		this.curveAreaBounds = getCurveAreaBounds();
 
 		// clear the image
 		this.curveAreaGC.setBackground(this.canvasGC.getBackground());
@@ -454,6 +454,15 @@ public class GraphicsComposite extends Composite {
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y / 2);
 		}
+	}
+
+	/**
+	 * get the bound rectangle of the curve area
+	 */
+	public Rectangle getCurveAreaBounds() {
+		Rectangle rect = this.curveArea.getBounds();
+		if (log.isLoggable(Level.FINE)) log.info("curveAreaBounds = " + rect);
+		return rect;
 	}
 
 	/**

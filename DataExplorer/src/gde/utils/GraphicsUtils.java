@@ -57,34 +57,49 @@ public class GraphicsUtils {
 	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
 		// enable scale value 0.0  -- algorithm must round algorithm
-		int numberTicks = 10;
+		double heightAdaptation = height / 350.0;
+		int numberTicks = new Double(10 * heightAdaptation).intValue();
+		
+		// check for zero scale value
 		double deltaScale = (endNumber - startNumber);
 		if (startNumber < 0 && endNumber > 0) {
-			if (deltaScale < 1) {
-				numberTicks = (int)(deltaScale * 20 / 1);
+			if (deltaScale <= 1) {
+				numberTicks = new Double(deltaScale * 20 / 1 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1);
 			}
-			else if (deltaScale < 2) {
-				numberTicks = (int)(deltaScale+0.5) * 10 / 1;
+			else if (deltaScale <= 2) {
+				numberTicks = new Double(deltaScale * 10 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.25);
 			}
-			else if (deltaScale < 5) {
-				numberTicks = (int)(deltaScale+1) * 5 / 1;
+			else if (deltaScale <= 5) {
+				numberTicks = new Double(deltaScale * 5 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.5);
 			}
-			else if (deltaScale < 10) {
-				numberTicks = (int)(deltaScale * 2);
+			else if (deltaScale <= 10) {
+				numberTicks = new Double(deltaScale * 2 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1);
 			}
-			else if (deltaScale < 50) {
-				numberTicks = (int)(deltaScale/2.5);
+			else if (deltaScale <= 25) {
+				numberTicks = new Double(deltaScale * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1.5);
 			}
-			else if (deltaScale < 100) {
-				numberTicks = (int)(deltaScale / 5);
+			else if (deltaScale <= 50) {
+				numberTicks = new Double(deltaScale/2.5 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 2.5);
 			}
-			else if (deltaScale < 300) {
-				numberTicks = (int)(deltaScale / 10);
+			else if (deltaScale <= 100) {
+				numberTicks = new Double(deltaScale / 5 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 5);
+			}
+			else if (deltaScale <= 300) {
+				numberTicks = new Double(deltaScale / 10 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 10);
 			}
 			else {
-				numberTicks = (int)(deltaScale / 20);
-				if (numberTicks > 20) numberTicks = 20;
+				numberTicks = new Double(deltaScale / 20 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20);
 			}
+			if (log.isLoggable(Level.FINE)) log.info("numberTicks = " + numberTicks);
 		}
 		
 		// prepare grid vector
@@ -108,9 +123,9 @@ public class GraphicsUtils {
 			gc.drawLine(x0, yPosition, x0 - ticklength, yPosition);
 			if (i != 0 && isBuildGridVector) horizontalGrid.add(yPosition);
 			//draw the sub scale according number of miniTicks
-			int deltaPosMini = (int) (deltaTick / miniticks);
+			double deltaPosMini = deltaTick / miniticks;
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
-				int yPosMini = yPosition - j * deltaPosMini;
+				int yPosMini = yPosition - (int)(j * deltaPosMini);
 				if(log.isLoggable(Level.FINEST)) log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
@@ -119,6 +134,23 @@ public class GraphicsUtils {
 		}
 		if (isBuildGridVector) recordSet.setHorizontalGrid(horizontalGrid);
 		record.setNumberScaleTicks(numberTicks);
+	}
+
+	/**
+	 * adjust the number of tick marks to enable the mark at 0.0 
+	 * @param numberTicks
+	 * @param deltaScale
+	 * @return
+	 */
+	private static int fineTuneScaleToMeetZero(int numberTicks, double deltaScale, double modValue) {
+		/* 700 / 32 = 20 pixel minumum between main tick marks */
+		int modTicks = new Double(deltaScale / modValue).intValue();
+		if (numberTicks - modTicks > 0)
+			numberTicks = (numberTicks - modTicks < 5) ? modTicks : modTicks*2; 
+		else
+			numberTicks = (numberTicks - modTicks < -5) ? modTicks/2 : modTicks; 
+			
+		return numberTicks;
 	}
 
 	/**
