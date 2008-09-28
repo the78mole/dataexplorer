@@ -385,8 +385,8 @@ public class GraphicsComposite extends Composite {
 		int yMax = maxY - (maxY - spaceTop);
 		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
 		yMax = y0 - height;
-		if (GraphicsWindow.log.isLoggable(Level.FINE))
-			GraphicsWindow.log.fine("draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+		if (GraphicsWindow.log.isLoggable(Level.FINER))
+			log.finer("draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		if (GraphicsWindow.log.isLoggable(Level.FINE)) GraphicsWindow.log.fine("curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -530,32 +530,32 @@ public class GraphicsComposite extends Composite {
 				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 					this.scaleTicks = new HashMap<String, Integer>();
 					isFullUpdateRequired = true;
-					log.finer(this.oldActiveRecordSet.getName() + " != " + activeRecordSet.getName());
+					if (log.isLoggable(Level.FINER)) log.finer(this.oldActiveRecordSet.getName() + " != " + activeRecordSet.getName());
 				}
 				else if (this.oldZoomLevel != activeRecordSet.isZoomMode()) {
-					log.finer("zoom mode changed");
+					if (log.isLoggable(Level.FINER)) log.finer("zoom mode changed");
 					isFullUpdateRequired = true;
 				}
 				else if (this.oldChangeCounter != activeRecordSet.getChangeCounter()) {
-					log.fine("change counter = " + activeRecordSet.getChangeCounter());
+					if (log.isLoggable(Level.FINER)) log.fine("change counter = " + activeRecordSet.getChangeCounter());
 					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 					isFullUpdateRequired = true;
 				}
-				else {
-					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-						Record record = activeRecordSet.get(recordKey);
-						int numberScaleTicks = record.getNumberScaleTicks();
-						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
-						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
-							this.scaleTicks.remove(recordKey);
-							this.scaleTicks.put(recordKey, numberScaleTicks);
-							isFullUpdateRequired = true;
-							log.finer("scale ticks  changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
-						}
-					}
-				}
+//				else {
+//					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
+//						Record record = activeRecordSet.get(recordKey);
+//						int numberScaleTicks = record.getNumberScaleTicks();
+//						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
+//						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
+//							this.scaleTicks.remove(recordKey);
+//							this.scaleTicks.put(recordKey, numberScaleTicks);
+//							isFullUpdateRequired = true;
+//							log.finer("scale ticks  changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
+//						}
+//					}
+//				}
 				if (isFullUpdateRequired) {
-					log.fine("redrawing full " + this.graphicCanvas.getClientArea());
+					if (log.isLoggable(Level.FINER)) log.info("redrawing full " + this.graphicCanvas.getClientArea());
 					this.recordSetHeader.redraw();
 					this.graphicCanvas.redraw();
 					this.recordSetComment.redraw();
@@ -576,7 +576,7 @@ public class GraphicsComposite extends Composite {
 						this.graphicCanvas.redraw(timeCaptionX, timeCaptionY, timeCaptionWidth, timeCaptionHeight, true);
 					}
 					else {
-						log.finer("redrawing full curveBounds == null");
+						if (log.isLoggable(Level.FINER)) log.finer("redrawing full curveBounds == null");
 						this.graphicCanvas.redraw();
 					}
 				}
@@ -584,14 +584,14 @@ public class GraphicsComposite extends Composite {
 				this.oldZoomLevel = activeRecordSet.isZoomMode();
 			}
 			else { // enable clear
-				log.finer("recordSet == null");
+				if (log.isLoggable(Level.FINER)) log.finer("recordSet == null");
 				this.recordSetHeader.redraw();
 				this.graphicCanvas.redraw();
 				this.recordSetComment.redraw();
 			}
 		}
 		else { // enable clear
-			log.finer("channel == null");
+			if (log.isLoggable(Level.FINER)) log.finer("channel == null");
 			this.recordSetHeader.redraw();
 			this.graphicCanvas.redraw();
 			this.recordSetComment.redraw();
