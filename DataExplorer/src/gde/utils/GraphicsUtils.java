@@ -64,7 +64,7 @@ public class GraphicsUtils {
 		double deltaScale = (endNumber - startNumber);
 		if (startNumber < 0 && endNumber > 0) {
 			if (deltaScale <= 1) {
-				numberTicks = new Double(deltaScale * 20 / 1 * heightAdaptation).intValue();
+				numberTicks = new Double(deltaScale * 20 * heightAdaptation).intValue();
 				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1);
 			}
 			else if (deltaScale <= 2) {
@@ -112,6 +112,15 @@ public class GraphicsUtils {
 		double deltaTick = 1.0 * height / numberTicks;
 		miniticks++;
 
+		if (record.getNumberScaleTicks() != numberTicks) {
+			record.setNumberScaleTicks(numberTicks);
+			int cleanwidth = 35; //ticklength + gap + dist;
+			if (isPositionLeft) 
+				gc.fillRectangle(x0 - cleanwidth, y0-height, cleanwidth, height);
+			else
+				gc.fillRectangle(x0+1, y0-height, cleanwidth, height);
+		}
+
 		if (!isPositionLeft) {
 			ticklength = ticklength * -1; // mirror drawing direction 
 			gap = gap * -1;
@@ -119,21 +128,22 @@ public class GraphicsUtils {
 		}
 		for (int i = 0; i <= numberTicks; i++) {
 			//draw the main scale, length = 5 and gap to scale = 2
-			int yPosition = (int) (y0 - i * deltaTick);
+			int yPosition = new Double(y0 - i * deltaTick).intValue();
 			gc.drawLine(x0, yPosition, x0 - ticklength, yPosition);
 			if (i != 0 && isBuildGridVector) horizontalGrid.add(yPosition);
 			//draw the sub scale according number of miniTicks
 			double deltaPosMini = deltaTick / miniticks;
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
 				int yPosMini = yPosition - (int)(j * deltaPosMini);
-				if(log.isLoggable(Level.FINEST)) log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+				if(log.isLoggable(Level.FINEST)) log.info("yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	
-			drawText(df.format(startNumber + i * deltaValue), x0 - ticklength - gap - dist, (int) (y0 - i * deltaTick), gc, SWT.HORIZONTAL);
+			drawText(df.format(startNumber + i * deltaValue), x0 - ticklength - gap - dist, yPosition, gc, SWT.HORIZONTAL);
 		}
-		if (isBuildGridVector) recordSet.setHorizontalGrid(horizontalGrid);
-		record.setNumberScaleTicks(numberTicks);
+		if (isBuildGridVector) {
+			recordSet.setHorizontalGrid(horizontalGrid);
+		}
 	}
 
 	/**
@@ -145,12 +155,13 @@ public class GraphicsUtils {
 	private static int fineTuneScaleToMeetZero(int numberTicks, double deltaScale, double modValue) {
 		/* 700 / 32 = 20 pixel minumum between main tick marks */
 		int modTicks = new Double(deltaScale / modValue).intValue();
+
 		if (numberTicks - modTicks > 0)
 			numberTicks = (numberTicks - modTicks < 5) ? modTicks : modTicks*2; 
 		else
 			numberTicks = (numberTicks - modTicks < -5) ? modTicks/2 : modTicks; 
-			
-		return numberTicks;
+		
+		return numberTicks>2 ? numberTicks : 2;
 	}
 
 	/**
