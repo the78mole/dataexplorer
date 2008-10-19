@@ -345,8 +345,12 @@ public class LogViewReader {
 			header = getRecordSetInfo_1_50_BETA(data_in, header);
 		}
 		else if (streamVersion.equals("4")) { //$NON-NLS-1$
-			header = getHeaderInfo_2_0(data_in, header);
-			header = getRecordSetInfo_2_0(data_in, header);
+			header = getHeaderInfo_4(data_in, header);
+			header = getRecordSetInfo_4(data_in, header);
+		}
+		else if (streamVersion.equals("5")) { //$NON-NLS-1$
+			header = getHeaderInfo_5(data_in, header);
+			header = getRecordSetInfo_5(data_in, header);
 		}
 		else {
 			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.OSDE_MSGI0021, new Object[] { useVersion } ));
@@ -859,22 +863,17 @@ public class LogViewReader {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
 		// read file comment
-		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[8];
 		position += data_in.read(buffer);
 		long fileCommentSize = parse2Long(buffer); 
 		buffer = new byte[(int)fileCommentSize];
 		position += data_in.read(buffer);
-		String tmpString = new String(buffer);
-		if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+		String rtfString = new String(buffer);
+		if (log.isLoggable(Level.FINEST)) log.finest(rtfString);
 		
-		int index = 0;
-		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
-			index += OSDE.LOV_RTF_START_USER_TEXT.length();
-		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
-		header.put(OSDE.FILE_COMMENT, fileComment.toString());
+		String fileComment = parseRtfString(rtfString);
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment); //$NON-NLS-1$
+		header.put(OSDE.FILE_COMMENT, fileComment);
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		// read data set channel
@@ -1036,17 +1035,12 @@ public class LogViewReader {
 			long rtfCommentSize = parse2Long(buffer);
 			buffer = new byte[(int)rtfCommentSize];
 			position += data_in.read(buffer);
-			String tmpString = new String(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+			String rtfString = new String(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest(rtfString);
 			
-			int index = 0;
-			StringBuilder recordSetComment = new StringBuilder();
-			while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
-				index += OSDE.LOV_RTF_START_USER_TEXT.length();
-			}
-			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
-			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment.toString()).append(OSDE.DATA_DELIMITER);
+			String recordSetComment = parseRtfString(rtfString);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment);
+			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
 
 			// rtf block
 			buffer = new byte[8];
@@ -1075,32 +1069,27 @@ public class LogViewReader {
 	}
 
 	/**
-	 * read extended header info which is part of base header of format version 2.0
+	 * read extended header info which is part of base header of format stream version 4
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
 	 * @throws NotSupportedException 
 	 */
-	private static HashMap<String, String> getHeaderInfo_2_0(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
+	private static HashMap<String, String> getHeaderInfo_4(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
 		// read file comment
-		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[8];
 		position += data_in.read(buffer);
 		long fileCommentSize = parse2Long(buffer); 
 		buffer = new byte[(int)fileCommentSize];
 		position += data_in.read(buffer);
-		String tmpString = new String(buffer);
-		if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+		String rtfString = new String(buffer);
+		if (log.isLoggable(Level.FINEST)) log.finest(rtfString);
 		
-		int index = 0;
-		while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-			fileComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
-			index += OSDE.LOV_RTF_START_USER_TEXT.length();
-		}
-		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment.toString()); //$NON-NLS-1$
-		header.put(OSDE.FILE_COMMENT, fileComment.toString());
+		String fileComment = parseRtfString(rtfString);
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment); //$NON-NLS-1$
+		header.put(OSDE.FILE_COMMENT, fileComment);
 		
 		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 		// read data set channel
@@ -1176,13 +1165,13 @@ public class LogViewReader {
 	}	
 
 	/**
-	 * get the record set and dependent record parameters of format version 2.0
+	 * get the record set and dependent record parameters of format stream version
 	 * @param device
 	 * @param data_in
 	 * @param header
 	 * @throws IOException
 	 */
-	private static HashMap<String, String> getRecordSetInfo_2_0(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+	private static HashMap<String, String> getRecordSetInfo_4(DataInputStream data_in, HashMap<String, String> header) throws IOException {
 		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
 		
 		position += data_in.skip(88);
@@ -1258,17 +1247,12 @@ public class LogViewReader {
 			long rtfCommentSize = parse2Long(buffer);
 			buffer = new byte[(int)rtfCommentSize];
 			position += data_in.read(buffer);
-			String tmpString = new String(buffer);
-			if (log.isLoggable(Level.FINEST)) log.finest(tmpString);
+			String rtfString = new String(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest(rtfString);
 			
-			int index = 0;
-			StringBuilder recordSetComment = new StringBuilder();
-			while ((index = tmpString.indexOf(OSDE.LOV_RTF_START_USER_TEXT, index)) != -1) {
-				recordSetComment.append(tmpString.substring(index+OSDE.LOV_RTF_START_USER_TEXT.length(), tmpString.indexOf(OSDE.LOV_RTF_END_USER_TEXT, index))).append(OSDE.STRING_BLANK);
-				index += OSDE.LOV_RTF_START_USER_TEXT.length();
-			}
-			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
-			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment.toString()).append(OSDE.DATA_DELIMITER);
+			String recordSetComment = parseRtfString(rtfString);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment);
+			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
 
 			// rtf block
 			buffer = new byte[8];
@@ -1279,6 +1263,261 @@ public class LogViewReader {
 			
 			
 			position += data_in.skip(175);
+
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long recordSetDataBytes = parse2Long(buffer);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
+
+			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+			
+			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.fine(header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
+		}
+		return header;
+	}
+
+	/**
+	 * read extended header info which is part of base header of format stream version 5
+	 * @param data_in
+	 * @param header
+	 * @throws IOException
+	 * @throws NotSupportedException 
+	 */
+	private static HashMap<String, String> getHeaderInfo_5(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
+		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
+		long headerSize = new Long(header.get(OSDE.LOV_HEADER_SIZE)).longValue();
+		byte[] buffer = new byte[0];
+		long fileCommentSize = 0;
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+		
+		// read file comment
+		buffer = new byte[8];
+		position += data_in.read(buffer);
+		fileCommentSize = parse2Long(buffer); 
+		buffer = new byte[(int)fileCommentSize];
+		position += data_in.read(buffer);
+		String rtfString = new String(buffer);
+		
+		String fileComment = parseRtfString(rtfString);
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.FILE_COMMENT + " = " + fileComment); //$NON-NLS-1$
+		header.put(OSDE.FILE_COMMENT, fileComment);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+
+		// read data set channel
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberChannels = parse2Int(buffer);
+		for (int i = 0; i < numberChannels; i++) {
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			fileCommentSize = parse2Int(buffer);
+			buffer = new byte[(int)fileCommentSize];
+			position += data_in.read(buffer);
+			String channelConfigName = new String(buffer);
+			header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NAME + channelConfigName);
+		}
+		int channelNumber = new Integer(new String(buffer).split(OSDE.STRING_EQUAL)[1].trim()).intValue();
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
+		header.put(OSDE.CHANNEL_CONFIG_NUMBER, OSDE.STRING_EMPTY+channelNumber);
+				
+		// read communication port
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int comStrSize = parse2Int(buffer);
+		if (comStrSize != 0) {
+			buffer = new byte[comStrSize];
+			position += data_in.read(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest("CommunicationPort = " + new String(buffer)); //$NON-NLS-1$
+		}
+		position += data_in.skipBytes(4);
+
+		// read device name
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int deviceNameSize = parse2Int(buffer);
+		buffer = new byte[deviceNameSize];
+		position += data_in.read(buffer);
+		String deviceName = new String(buffer);
+		deviceName = mapLovDeviceNames(deviceName);
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.DEVICE_NAME + deviceName);
+		header.put(OSDE.DEVICE_NAME, deviceName);
+		
+		position += data_in.skip(8);
+		
+		// read device configuration
+		buffer = new byte[4];
+		position += data_in.read(buffer);
+		int deviceConfigLineSize = parse2Int(buffer);
+		if (log.isLoggable(Level.FINEST)) log.finest("DeviceConfigLineSize = " + deviceConfigLineSize); //$NON-NLS-1$
+		
+		for (int i = 0; i < deviceConfigLineSize; i++) {
+			// read device ini line
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int lineSize = parse2Int(buffer);
+			buffer = new byte[lineSize];
+			position += data_in.read(buffer);
+			String configLine = new String(buffer);
+			if (configLine.startsWith(OSDE.LOV_TIME_STEP)) 
+				header.put(RecordSet.TIME_STEP_MS, configLine.split(OSDE.STRING_EQUAL)[1]);
+			else if (configLine.startsWith(OSDE.LOV_NUM_MEASUREMENTS))
+				header.put(OSDE.LOV_NUM_MEASUREMENTS, OSDE.STRING_EMPTY+ ((new Integer(configLine.split(OSDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
+			if (log.isLoggable(Level.FINEST)) log.finest(configLine);
+		}
+
+		// end of header sometimes after headerSize
+		position += data_in.skip(headerSize-position);
+		//**** end main header			
+		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+
+		return header;
+	}
+
+
+	/**
+	 * parse RTF String into plain text
+	 * @param rtfString
+	 * @return
+	 */
+	static String parseRtfString(String rtfString) {
+		if (log.isLoggable(Level.FINEST)) log.finest(rtfString);
+		StringBuilder fileComment = new StringBuilder();
+
+		if (rtfString.indexOf("\\plain ") != -1 ) { // plain text exist in RTF string
+			String[] array = rtfString.split("plain ");
+			for (int i = 1; i < array.length; i++) {
+				int beginIndex = 0, endIndex = 0;
+				while ((beginIndex = array[i].indexOf(" ", beginIndex)) != -1				// \fs22 Text
+						&& (endIndex = array[i].indexOf("\\", beginIndex)) != -1) { 
+					fileComment.append(array[i].substring(beginIndex+1, endIndex));
+					beginIndex = endIndex+1; 
+				}
+			}
+		}
+		return fileComment.toString();
+	}	
+
+	/**
+	 * get the record set and dependent record parameters of format stream version 5
+	 * @param device
+	 * @param data_in
+	 * @param header
+	 * @throws IOException
+	 */
+	private static HashMap<String, String> getRecordSetInfo_5(DataInputStream data_in, HashMap<String, String> header) throws IOException {
+		long position = new Long(header.get(OSDE.DATA_POINTER_POS)).longValue();
+		
+		position += data_in.skip(88);
+		if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+		
+		// read number record sets
+		byte[] buffer = new byte[4];
+		position += data_in.read(buffer);
+		int numberRecordSets = parse2Int(buffer);
+		if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_SIZE + numberRecordSets);
+		header.put(OSDE.RECORD_SET_SIZE, OSDE.STRING_EMPTY+numberRecordSets);
+	
+		position += data_in.skipBytes(8);
+		
+		for (int i = 0; i < numberRecordSets; i++) {
+			StringBuilder sb = new StringBuilder();
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int recordSetNameSize = parse2Int(buffer);
+			buffer = new byte[recordSetNameSize];
+			position += data_in.read(buffer);
+			String recordSetName = new String(buffer);
+			sb.append(OSDE.RECORD_SET_NAME).append(recordSetName).append(OSDE.DATA_DELIMITER);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_NAME + recordSetName);
+			
+			position += data_in.skipBytes(2);
+
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long recordSetConfigSize = parse2Long(buffer);
+			buffer = new byte[(int)recordSetConfigSize];
+			position += data_in.read(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest("RecordSetConfig = " + new String(buffer)); //$NON-NLS-1$			
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+			
+			position += data_in.skipBytes(112);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+
+			int tmpDataSize = 0;
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = parse2Int(buffer);
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			tmpDataSize = tmpDataSize > parse2Int(buffer) ? tmpDataSize : parse2Int(buffer);
+			
+			int dataSize = tmpDataSize;
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_DATA_SIZE + dataSize);
+			sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
+			
+			position += data_in.skipBytes(16);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+			
+			// config block n100W, ...
+			StringBuilder config = new StringBuilder();
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int numberLines = parse2Int(buffer);
+			if (log.isLoggable(Level.FINER)) log.finer("numberLines = " + numberLines); //$NON-NLS-1$
+			for (int j = 0; j < numberLines; j++) {
+				buffer = new byte[4];
+				position += data_in.read(buffer);
+				int stringSize = parse2Int(buffer);
+				buffer = new byte[stringSize];
+				position += data_in.read(buffer);
+				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
+				if (log.isLoggable(Level.FINER)) log.finer(new String(buffer));
+			}
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
+			
+			// rtf block
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			long rtfCommentSize = parse2Long(buffer);
+			buffer = new byte[(int)rtfCommentSize];
+			position += data_in.read(buffer);
+			String rtfString = new String(buffer);
+			
+			String recordSetComment = parseRtfString(rtfString);
+			if (log.isLoggable(Level.FINE)) log.fine(OSDE.RECORD_SET_COMMENT + recordSetComment.toString());
+			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment.toString()).append(OSDE.DATA_DELIMITER);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+
+			// rtf block
+			buffer = new byte[8];
+			position += data_in.read(buffer);
+			buffer = new byte[parse2Int(buffer)];
+			position += data_in.read(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest(new String(buffer));
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$			
+			
+			position += data_in.skip(115);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
+			
+			//time format
+			config = new StringBuilder();
+			buffer = new byte[4];
+			position += data_in.read(buffer);
+			int numberChars = parse2Int(buffer);
+			if (log.isLoggable(Level.FINER)) log.finer("numberChars = " + numberChars); //$NON-NLS-1$
+			buffer = new byte[parse2Int(buffer)];
+			position += data_in.read(buffer);
+			if (log.isLoggable(Level.FINEST)) log.finest(new String(buffer));			
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$			
+			
+			position += data_in.skip(56);
+			if (log.isLoggable(Level.FINER)) log.finer(String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			buffer = new byte[8];
 			position += data_in.read(buffer);
