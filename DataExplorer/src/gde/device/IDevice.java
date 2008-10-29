@@ -204,10 +204,10 @@ public interface IDevice {
 	/**
 	 * get the properties from a channel/configuration and record key name 
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @return
 	 */
-	public List<PropertyType> getProperties(String channelConfigKey, int measurementNumber);
+	public List<PropertyType> getProperties(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * @return the number of measurements of a channel, assume channels have different number of measurements
@@ -217,10 +217,10 @@ public interface IDevice {
 	/**
 	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @return PropertyType object
 	 */
-	public MeasurementType getMeasurement(String channelConfigKey, int measurementNumber);
+	public MeasurementType getMeasurement(String channelConfigKey, int measurementOrdinal);
 	
 	/**
 	 * @return the sorted measurement names
@@ -230,100 +230,108 @@ public interface IDevice {
 	/**
 	 * set new name of specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param name
 	 */
-	public void setMeasurementName(String channelConfigKey, int measurementNumber, String name);
+	public void setMeasurementName(String channelConfigKey, int measurementOrdinal, String name);
 
 	/**
 	 * method to query the unit of measurement data unit by a given record key
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @return dataUnit as string
 	 */
-	public String getMeasurementUnit(String channelConfigKey, int measurementNumber);
+	public String getMeasurementUnit(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * method to set the unit of measurement by a given measurement key
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param unit
 	 */
-	public void setMeasurementUnit(String channelConfigKey, int measurementNumber, String unit);
+	public void setMeasurementUnit(String channelConfigKey, int measurementOrdinal, String unit);
 
 	/**
 	 * get the symbol of specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 */
-	public String getMeasurementSymbol(String channelConfigKey, int measurementNumber);
+	public String getMeasurementSymbol(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * set new symbol of specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param symbol
 	 */
-	public void setMeasurementSymbol(String channelConfigKey, int measurementNumber, String symbol);
+	public void setMeasurementSymbol(String channelConfigKey, int measurementOrdinal, String symbol);
+	
+	/**
+	 * get the statistics type of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementOrdinal
+	 * @return statistics, if statistics does not exist return null
+	 */
+	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param propertyKey
 	 * @return PropertyType object
 	 */
-	public PropertyType getMeasruementProperty(String channelConfigKey, int measurementNumber, String propertyKey);
+	public PropertyType getMeasruementProperty(String channelConfigKey, int measurementOrdinal, String propertyKey);
 
 	/**
 	 * get the offset value of the specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
-	public double getMeasurementOffset(String channelConfigKey, int measurementNumber);
+	public double getMeasurementOffset(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * set new value for offset at the specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param offset the offset to set
 	 */
-	public void setMeasurementOffset(String channelConfigKey, int measurementNumber, double offset);
+	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset);
 
 	/**
 	 * get the factor value of the specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
-	public double getMeasurementFactor(String channelConfigKey, int measurementNumber);
+	public double getMeasurementFactor(String channelConfigKey, int measurementOrdinal);
 
 	/**
 	 * set new value for factor at the specified measurement
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param factor the offset to set
 	 */
-	public void setMeasurementFactor(String channelConfigKey, int measurementNumber, double factor);
+	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor);
 
 	/**
 	 * get a property of specified measurement, the data type must be known - data conversion is up to implementation
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param propertyKey
 	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
 	 */
-	public Object getMeasurementPropertyValue(String channelConfigKey, int measurementNumber, String propertyKey);
+	public Object getMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey);
 	/**
 	 * set new property value of specified measurement, if the property does not exist it will be created
 	 * @param channelConfigKey
-	 * @param measurementNumber
+	 * @param measurementOrdinal
 	 * @param propertyKey
 	 * @param type of DataTypes
 	 * @param value
 	 */
-	public void setMeasurementPropertyValue(String channelConfigKey, int measurementNumber, String propertyKey, DataTypes type, Object value);
+	public void setMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey, DataTypes type, Object value);
 	
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys

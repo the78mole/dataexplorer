@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.ui.OpenSerialDataExplorer;
 
 /**
  * This thread implementation calculates the slop of the height curve using quasi linear regression
@@ -130,7 +129,9 @@ public class QuasiLinearRegression extends CalculationThread {
 				}
 			}
 
-			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
+			this.application.updateCurveSelectorTable();
+			this.application.updateStatisticsData();
+			this.application.updateDataTable();
 			log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}

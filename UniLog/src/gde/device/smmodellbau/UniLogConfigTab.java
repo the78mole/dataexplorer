@@ -357,6 +357,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									Record currentRecord = activeChannel.getActiveRecordSet().get(recordKeys[2]);
 									UniLogConfigTab.this.device.invertRecordData(currentRecord);
 									UniLogConfigTab.this.application.updateGraphicsWindow();
+									UniLogConfigTab.this.application.updateStatisticsData();
 									UniLogConfigTab.this.application.updateDataTable();
 									UniLogConfigTab.this.application.updateDigitalWindow();
 									UniLogConfigTab.this.application.updateAnalogWindow();
@@ -479,6 +480,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												recordSet.setRecalculationRequired();
 												UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 												UniLogConfigTab.this.application.updateGraphicsWindow();
+												UniLogConfigTab.this.application.updateStatisticsData();
 												UniLogConfigTab.this.application.updateDataTable();
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}
@@ -563,6 +565,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												
 												recordSet.setRecalculationRequired();
 												UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+												UniLogConfigTab.this.application.updateStatisticsData();
 												UniLogConfigTab.this.application.updateGraphicsWindow();
 												UniLogConfigTab.this.application.updateDataTable();
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
@@ -663,6 +666,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+									UniLogConfigTab.this.application.updateStatisticsData();
 									UniLogConfigTab.this.application.updateDataTable();
 									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}
@@ -692,6 +696,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}	
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
+									UniLogConfigTab.this.application.updateStatisticsData();
 									UniLogConfigTab.this.application.updateDataTable();
 									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}

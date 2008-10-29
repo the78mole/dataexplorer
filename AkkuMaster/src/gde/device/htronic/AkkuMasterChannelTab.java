@@ -638,6 +638,7 @@ public class AkkuMasterChannelTab {
 							// hope this is the right record set
 							AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channels.getActiveChannel().get(AkkuMasterChannelTab.this.recordSetKey);
 							if (AkkuMasterChannelTab.this.recordSet != null) AkkuMasterChannelTab.this.recordSet.setTableDisplayable(true); // enable table display after calculation
+							AkkuMasterChannelTab.this.application.updateStatisticsData();
 							AkkuMasterChannelTab.this.application.updateDataTable();
 						}
 					});

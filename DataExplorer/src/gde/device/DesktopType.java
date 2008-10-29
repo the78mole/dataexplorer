@@ -10,6 +10,7 @@ package osde.device;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -46,7 +47,7 @@ public class DesktopType {
 	public static final String		TYPE_ANALOG_TAB						= "analog_tab"; //$NON-NLS-1$
 	public static final String		TYPE_VOLTAGE_PER_CELL_TAB	= "voltage_per_cell_tab"; //$NON-NLS-1$
 		
-    @XmlElement(name = "Property") //$NON-NLS-1$
+    @XmlElement(name = "property") //$NON-NLS-1$
     protected List<PropertyType> property;
 
     /**

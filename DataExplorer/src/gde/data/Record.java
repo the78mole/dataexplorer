@@ -35,6 +35,7 @@ import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
+import osde.device.StatisticsType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
@@ -64,6 +65,48 @@ public class Record extends Vector<Integer> {
 	boolean							isActive;
 	boolean							isDisplayable;
 	boolean							isVisible							= true;
+	StatisticsType			statistics						= null;
+	Boolean							triggerIsGreater			= null;
+	Integer							triggerLevel					= null;
+	Integer							minTriggerTimeSec 		= null;
+	class TriggerRange {
+		int in  = -1;
+		int out = -1;
+		public TriggerRange(int newIn, int newOut) { this.in = newIn; this.out = newOut; }
+		public TriggerRange(int newIn) { this.in = newIn; }
+		/**
+		 * @return the in value
+		 */
+		public int getIn() {
+			return this.in;
+		}
+		/**
+		 * @param newIn the in value to set
+		 */
+		public void setIn(int newIn) {
+			this.in = newIn;
+		}
+		/**
+		 * @return the out value
+		 */
+		public int getOut() {
+			return this.out;
+		}
+		/**
+		 * @param newOut the out value to set
+		 */
+		public void setOut(int newOut) {
+			this.out = newOut;
+		}
+		/**
+		 * query if bothe values has been set
+		 */
+		public boolean isComplete() {
+			return this.in >= 0 && this.out > 0 ? true : false;
+		}
+	}
+	TriggerRange				tmpTriggerRange				= null;
+	Vector<TriggerRange> triggerRanges				= null;
 	List<PropertyType>	properties						= new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 	boolean							isPositionLeft				= true;
 	Color								color									= OpenSerialDataExplorer.COLOR_BLUE;
@@ -76,6 +119,12 @@ public class Record extends Vector<Integer> {
 	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
+	int									maxValueTriggered			= Integer.MIN_VALUE;		 			// max value of the curve, according a set trigger level if any
+	int									minValueTriggered			= Integer.MAX_VALUE;					// min value of the curve, according a set trigger level if any
+	int									avgValue							= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
+	int									sigmaValue						= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
+	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
+	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue		= this.maxScaleValue;
@@ -123,16 +172,21 @@ public class Record extends Vector<Integer> {
 	 * @param newUnit
 	 * @param newSymbol
 	 * @param isActiveValue
+	 * @param newStatistics
 	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
-	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, List<PropertyType> newProperties, int initialCapacity) {
+	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
 		this.name = newName;
 		this.symbol = newSymbol;
 		this.unit = newUnit;
 		this.isActive = isActiveValue;
 		this.isDisplayable = isActiveValue ? true : false;
+		this.statistics = newStatistic;
+		this.triggerIsGreater = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().isGreater() : null;
+		this.triggerLevel = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().getLevel() : null;
+		this.minTriggerTimeSec = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().getMinTimeSec() : null;
 		for (PropertyType property : newProperties) {
 			this.properties.add(property.clone());
 		}
@@ -155,6 +209,10 @@ public class Record extends Vector<Integer> {
 		this.unit = record.unit;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
+		this.statistics = record.statistics;
+		this.triggerIsGreater = record.triggerIsGreater;
+		this.triggerLevel = record.triggerLevel;
+		this.minTriggerTimeSec = record.minTriggerTimeSec;
 		this.properties = new ArrayList<PropertyType>();
 		for (PropertyType property : record.properties) {
 			this.properties.add(property.clone());
@@ -208,6 +266,10 @@ public class Record extends Vector<Integer> {
 		this.unit = record.unit;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
+		this.statistics = record.statistics;
+		this.triggerIsGreater = record.triggerIsGreater;
+		this.triggerLevel = record.triggerLevel;
+		this.minTriggerTimeSec = record.minTriggerTimeSec;
 		this.properties = new ArrayList<PropertyType>();
 		for (PropertyType property : record.properties) {
 			this.properties.add(property.clone());
@@ -268,7 +330,7 @@ public class Record extends Vector<Integer> {
 		else {
 			if (point > this.maxValue) this.maxValue = point;
 			if (point < this.minValue) this.minValue = point;
-		}
+		}	
 		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point); //$NON-NLS-1$
 		return this.add(new Integer(point));
 	}
@@ -430,7 +492,119 @@ public class Record extends Vector<Integer> {
 		return this.minValue;
 	}
 
-/**
+	public int getMaxValueTriggered() {
+		if (this.tmpTriggerRange == null) this.evaluateMinMax();
+			return this.maxValueTriggered;
+	}
+
+	public int getMinValueTriggered() {
+		if (this.tmpTriggerRange == null) this.evaluateMinMax();
+			return this.minValueTriggered;
+	}
+
+	/**
+	 * evaluate min and max value within range according trigger configuration
+	 * while building vector of trigger range definitions as pre-requisite of avg and sigma calculation
+	 */
+	@SuppressWarnings("unchecked") // clone triggerRanges to be able to modify by time filter
+	synchronized void evaluateMinMax() {
+		if (this.triggerRanges == null) {
+			for (int i = 0; i < this.realSize(); ++i) {
+				int point = this.realGet(i);
+				if (this.triggerIsGreater != null && this.triggerLevel != null) { // preferences XML
+					if (this.triggerIsGreater) { // point value must above trigger level
+						if (point > this.triggerLevel) {
+							if (this.tmpTriggerRange == null) {
+								if (this.triggerRanges == null) {
+									this.triggerRanges = new Vector<TriggerRange>();
+									this.minValueTriggered = this.maxValueTriggered = point;
+								}
+								this.tmpTriggerRange = new TriggerRange(i);
+							}
+							else {
+								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+								if (point < this.minValueTriggered) this.minValueTriggered = point;
+							}
+						}
+						else {
+							if (this.triggerRanges != null && this.tmpTriggerRange != null) {
+								this.tmpTriggerRange.setOut(i);
+								this.triggerRanges.add(this.tmpTriggerRange);
+								this.tmpTriggerRange = null;
+							}
+						}
+					}
+					else { // point value must below trigger level
+						if (point < this.triggerLevel) {
+							if (this.tmpTriggerRange == null) {
+								if (this.triggerRanges == null) {
+									this.triggerRanges = new Vector<TriggerRange>();
+									this.minValueTriggered = this.maxValueTriggered = point;
+								}
+								this.tmpTriggerRange = new TriggerRange(i);
+							}
+							else {
+								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+								if (point < this.minValueTriggered) this.minValueTriggered = point;
+							}
+						}
+						else {
+							if (this.triggerRanges != null) {
+								this.tmpTriggerRange.setOut(i);
+								this.triggerRanges.add(this.tmpTriggerRange);
+								this.tmpTriggerRange = null;
+							}
+						}
+					}
+				}
+			}
+		}
+		// evaluate trigger ranges to meet minTimeSec requirement 
+		int countDelta = new Double(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
+		for (TriggerRange range : (Vector<TriggerRange>)this.triggerRanges.clone()) {
+			if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
+		}
+	}
+
+	/**
+	 * get/calcualte max value by referenced triggered other measurement
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
+		if (this.tmpTriggerRange == null)  {
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		if (this.maxValueTriggered == Integer.MIN_VALUE )this.setMinMaxValueTriggered();
+		return this.maxValueTriggered;
+	}
+
+	/**
+	 * get/calcualte max value by referenced triggered other measurement
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
+		if (this.tmpTriggerRange == null)  {
+			Record referencedRecord = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]);
+			System.out.println(this.getName() + " -> referencedRecord size = " + referencedRecord.realSize());
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();
+		return this.minValueTriggered;
+	}
+	
+	void setMinMaxValueTriggered() {
+		for (TriggerRange range : this.triggerRanges) {
+			for (int i = range.in; i < range.out; i++) {
+				int point = this.realGet(i);
+				if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+				if (point < this.minValueTriggered) this.minValueTriggered = point;
+			}
+		}
+	}
+	
+	/**
 	 * overwrites size method for zoom mode and not zoomed compare window
 	 */
 	public int size() {
@@ -484,6 +658,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
+		if (index > super.size()) System.out.println("index = " + index + " of " + super.size() + "/" + this.size());
 		return super.get(index);
 	}
 
@@ -955,6 +1130,13 @@ public class Record extends Vector<Integer> {
 	public void resetMinMax() {
 		this.maxValue = 0;
 		this.minValue = 0;
+		this.maxValueTriggered = Integer.MIN_VALUE;
+		this.minValueTriggered = Integer.MAX_VALUE;
+		this.avgValue = Integer.MIN_VALUE;
+		this.sigmaValue = Integer.MIN_VALUE;
+		this.avgValueTriggered = Integer.MIN_VALUE;
+		this.sigmaValueTriggered = Integer.MIN_VALUE;
+		this.triggerRanges = null;
 	}
 
 	/**
@@ -1106,6 +1288,183 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setNumberScaleTicks(int newNumberScaleTicks) {
 		this.numberScaleTicks = newNumberScaleTicks;
+	}
+
+	/**
+	 * @return the avgValue
+	 */
+	public int getAvgValue() {
+		if (this.avgValue == Integer.MIN_VALUE )this.setAvgValue();
+		return this.avgValue;
+	}
+	
+	/**
+	 * get/calcualte avg value by configuraed trigger
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getAvgValueTriggered() {
+		if (this.triggerRanges == null)  {
+			this.evaluateMinMax();
+		}
+		if (this.avgValueTriggered == Integer.MIN_VALUE )this.setAvgValueTriggered();
+		return this.avgValueTriggered;
+	}
+	
+	/**
+	 * get/calcualte avg value by referenced triggered other measurement
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getAvgValueTriggered(int referencedMeasurementOrdinal) {
+		if (this.triggerRanges == null)  {
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		if (this.avgValueTriggered == Integer.MIN_VALUE )this.setAvgValueTriggered();
+		return this.avgValueTriggered;
+	}
+	
+	/**
+	 * @param avgValue the avgValue to set
+	 */
+	public synchronized void setAvgValue() {
+		long sum = 0;
+		for (Integer xi : this) {
+			sum += xi;
+		}
+		this.avgValue = new Long(sum / this.realSize()).intValue() ;
+	}
+	
+	/**
+	 * set the avgValue using trigger ranges
+	 */
+	public synchronized void setAvgValueTriggered() {
+		long sum = 0;
+		int numPoints = 0;
+		//StringBuilder sb = new StringBuilder();
+		for (TriggerRange range : this.triggerRanges) {
+			for (int i = range.in; i < range.out; i++) {
+				sum += this.get(i);
+				//sb.append(this.realGet(i)/1000.0).append(", ");
+				numPoints++;
+			}
+			//sb.append("\n");
+		}
+		//System.out.println(sb.toString());
+		this.avgValueTriggered = new Long(sum / numPoints).intValue() ;
+	}
+
+	/**
+	 * @return the sigmaValue
+	 */
+	public int getSigmaValue() {
+		if (this.sigmaValue == Integer.MIN_VALUE) this.setSigmaValue();
+		return this.sigmaValue;
+	}
+	
+	/**
+	 * get/calcualte avg value by trigger configuration
+	 * @return
+	 */
+	public int getSigmaValueTriggered() {
+		if (this.triggerRanges == null)  {
+			this.evaluateMinMax();
+		}
+		if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
+		return this.sigmaValueTriggered;
+	}
+	
+	/**
+	 * get/calcualte avg value by referenced triggered other measurement
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
+		if (this.triggerRanges == null)  {
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
+		return this.sigmaValueTriggered;
+	}
+
+	/**
+	 * @param sigmaValue the sigmaValue to set
+	 */
+	public synchronized void setSigmaValue() {
+		double average = this.getAvgValue()/1000.0;
+		double sumPoweredValues = 0;
+		for (Integer xi : this) {
+			sumPoweredValues += Math.pow(xi/1000.0 - average, 2);
+		}
+		this.sigmaValue = new Double(Math.sqrt(sumPoweredValues/(this.realSize()-1))*1000).intValue();
+	}
+
+	/**
+	 * set the sigmaValue using trigger ranges
+	 */
+	public synchronized void setSigmaValueTriggered() {
+		double average = this.getAvgValueTriggered()/1000.0;
+		double sumPoweredDeviations = 0;
+		int numPoints = 0;
+		for (TriggerRange range : this.triggerRanges) {
+			for (int i = range.in; i < range.out; i++) {
+				sumPoweredDeviations += Math.pow(this.realGet(i)/1000.0 - average, 2);
+				numPoints++;
+			}
+		}
+		this.sigmaValueTriggered = new Double(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
+	}
+	
+	/**
+	 * get/calcualte sum of values by configuraed trigger
+	 * @return
+	 */
+	public int getSumTriggeredRange() {
+		if (this.triggerRanges == null)  {
+			this.evaluateMinMax();
+		}
+		if (this.avgValue == -1 )this.setAvgValueTriggered();
+		return this.avgValueTriggered;
+	}
+	
+	/**
+	 * get/calcualte sum of values by configuraed trigger
+	 * @param referencedMeasurementOrdinal
+	 * @return
+	 */
+	public int getSumTriggeredRange(int referencedMeasurementOrdinal) {
+		if (this.triggerRanges == null)  {
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		return this.calculateSum();
+	}
+	
+	/**
+	 * calculate sum of min/max delta of each trigger range
+	 */
+	int calculateSum() {
+		int sum = 0;
+		int min=0, max=0;
+		for (TriggerRange range : this.triggerRanges) {
+			for (int i = range.in; i < range.out; i++) {
+				if (i == range.in) min = max = this.realGet(i);
+				else {
+					int point = this.realGet(i);
+					if (point > max) max = point;
+					if (point < min) min = point;
+				}
+			}
+			sum += (max - min);
+		}
+		return sum;
+	}
+	
+	/**
+	 * @return the triggerRanges
+	 */
+	public Vector<TriggerRange> getTriggerRanges() {
+		this.evaluateMinMax();
+		return this.triggerRanges;
 	}
 }
 

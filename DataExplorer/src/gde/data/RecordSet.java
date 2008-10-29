@@ -570,6 +570,19 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		return displayable;
 	}
+
+	/**
+	 * method to get the sorted record displayable names as string array
+	 * @return String[] containing record names 
+	 */
+	public String[] getDisplayableRecordNames() {
+		Vector<String> displayableRecords = new Vector<String>();
+		for (String recordKey : this.recordNames) {
+			if (this.get(recordKey).isDisplayable()) displayableRecords.add(recordKey);
+		}
+		return displayableRecords.toArray(new String[0]);
+	}
+
 	/**
 	 * method to get the sorted record active names as string array
 	 * @return String[] containing record names 
@@ -647,7 +660,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getProperty(), 5);
+			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 
 			// set color defaults
 			switch (i) {
@@ -1138,7 +1151,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return string of time value in simple date format HH:ss:mm:SSS
 	 */
 	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTime(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms()).intValue());
+		return TimeLine.getFomatedTimeWithUnit(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms()).intValue());
 	}
 
 	public double getStartTime() {

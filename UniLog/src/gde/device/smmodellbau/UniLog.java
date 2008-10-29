@@ -547,6 +547,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[3]; // 3=capacity [Ah]
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			Record recordCurrent = recordSet.get(measurements[2]); // 2=current
 			double timeStep_ms = recordSet.getTimeStep_ms(); // timeStep_ms
@@ -579,6 +580,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[5]; // 5=energy [Wh]
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			recordCurrent = recordSet.get(measurements[2]); // 2=current
@@ -597,6 +599,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[6]; // 6=votagePerCell
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			PropertyType property = record.getProperty(UniLog.NUMBER_CELLS);
@@ -613,6 +616,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[8]; // 8=efficiency
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			Record recordRevolution = recordSet.get(measurements[7]); // 7=revolutionSpeed
 			property = recordRevolution.getProperty(UniLog.RPM_FACTOR);
@@ -638,6 +642,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[10]; // 10=slope
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 			int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
@@ -649,7 +654,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 			this.slopeCalculationThread.start();
 			if (recordSet.get(measurements[9]).isDisplayable()) {
-				record.setDisplayable(true);
+				//record.setDisplayable(true); // set within calculation thread
 				isNoSlopeCalculationStarted = false;
 				++displayableCounter;
 			}

@@ -643,6 +643,7 @@ public class MenuToolBar {
 											// only update viewable
 											MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 											MenuToolBar.this.application.updateGraphicsWindow();
+											MenuToolBar.this.application.updateStatisticsData();
 											MenuToolBar.this.application.updateDataTable();
 											MenuToolBar.this.application.updateDigitalWindow();
 											MenuToolBar.this.application.updateAnalogWindow();

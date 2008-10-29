@@ -1073,6 +1073,7 @@ public class UniLogDialog extends DeviceDialog {
 											activeRecordSet.setRecalculationRequired();
 											UniLogDialog.this.device.updateVisibilityStatus(activeRecordSet);
 											UniLogDialog.this.device.makeInActiveDisplayable(activeRecordSet);
+											UniLogDialog.this.application.updateStatisticsData();
 											UniLogDialog.this.application.updateDataTable();
 										}
 									}

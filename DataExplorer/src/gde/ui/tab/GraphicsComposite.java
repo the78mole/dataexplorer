@@ -449,7 +449,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
 
 		if (startTime != 0) { // scaled window 
-			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTime(recordSet.getStartTime());
+			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = this.canvasGC.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y / 2);

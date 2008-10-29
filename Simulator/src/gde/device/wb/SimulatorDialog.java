@@ -451,6 +451,7 @@ public class SimulatorDialog extends DeviceDialog {
 							SimulatorDialog.this.startButton.setEnabled(true);
 							SimulatorDialog.this.stopButton.setEnabled(false);
 							SimulatorDialog.this.channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
+							SimulatorDialog.this.application.updateStatisticsData();
 							SimulatorDialog.this.application.updateDataTable();
 						}
 					});

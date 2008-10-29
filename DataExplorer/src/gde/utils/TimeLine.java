@@ -330,10 +330,11 @@ public class TimeLine {
 
 	/**
 	 * get the formatted time of time value in m_sec, if hours are 0 or minutes are 0 the string will be cut of
+	 * unit string [HH:mm:ss:SSS] will be appended accordingly
 	 * @param milliSeconds
 	 * @return string of time value in simple date format HH:mm:ss:SSS
 	 */
-	public static String getFomatedTime(double milliSeconds) {
+	public static String getFomatedTimeWithUnit(double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
 			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
@@ -349,6 +350,32 @@ public class TimeLine {
 				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
 			else
 				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+		}
+		return time;
+	}
+
+	/**
+	 * get the formatted time of time value in m_sec, if hours are 0 or minutes are 0 the string will be cut of
+	 * no unit string [HH:mm:ss:SSS] will be appended
+	 * @param milliSeconds
+	 * @return string of time value in simple date format HH:mm:ss:SSS
+	 */
+	public static String getFomatedTime(double milliSeconds) {
+		String time = "0"; //$NON-NLS-1$
+		if (milliSeconds >= 0) {
+			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
+			milliSeconds %= 1000;
+			long lMinutes = lSeconds / 60;
+			lSeconds %= 60;
+			long lHours = lMinutes / 60;
+			lMinutes %= 60;
+
+			if (lMinutes == 0 && lHours == 0)
+				time = String.format("%02d:%03d", lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+			else if (lHours == 0)
+				time = String.format("%02d:%02d:%03d", lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+			else
+				time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
 		}
 		return time;
 	}

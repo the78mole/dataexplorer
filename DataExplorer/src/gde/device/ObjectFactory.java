@@ -129,4 +129,12 @@ public class ObjectFactory {
         return new JAXBElement<DevicePropertiesType>(_DeviceProperties_QNAME, DevicePropertiesType.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link StatisticsType }
+     * 
+     */
+    public StatisticsType createStatisticsType() {
+        return new StatisticsType();
+    }
+
 }

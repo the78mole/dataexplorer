@@ -172,6 +172,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAnalogWindow();
 				this.application.updateCellVoltageWindow();
 				this.application.updateFileCommentWindow();
+				this.application.updateStatisticsData();
 				this.application.updateDataTable();
 			}
 		}

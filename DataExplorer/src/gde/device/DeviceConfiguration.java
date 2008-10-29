@@ -593,6 +593,17 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setSymbol(symbol);
 	}
+
+	/**
+	 * get the statistics type of the specified measurement
+	 * @param channelConfigKey
+	 * @param measurementOrdinal
+	 * @return statistics, if statistics does not exist return null
+	 */
+	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal) {
+		if(log.isLoggable(Level.FINER)) log.finer("get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		return this.getMeasurement(channelConfigKey, measurementOrdinal).getStatistics();
+	}
 	
 	/**
 	 * @return the sorted measurement names

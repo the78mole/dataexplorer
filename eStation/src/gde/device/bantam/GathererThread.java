@@ -272,6 +272,7 @@ public class GathererThread extends Thread {
 		this.device.updateVisibilityStatus(tmpRecordSet);
 		this.device.makeInActiveDisplayable(tmpRecordSet);
 		this.channel.applyTemplate(newRecordSetKey);
+		this.application.updateStatisticsData();
 		this.application.updateDataTable();
 	}
 
@@ -311,6 +312,7 @@ public class GathererThread extends Thread {
 			this.channel.remove(useRecordSetKey);
 			if (Thread.currentThread().getId() == this.application.getThreadId()) {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
+				this.application.updateStatisticsData();
 				this.application.updateDataTable();
 				this.application.openMessageDialog(message);
 				this.device.getDialog().resetButtons();
@@ -319,6 +321,7 @@ public class GathererThread extends Thread {
 				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
+						GathererThread.this.application.updateStatisticsData();
 						GathererThread.this.application.updateDataTable();
 						GathererThread.this.application.openMessageDialog(message);
 						GathererThread.this.device.getDialog().resetButtons();

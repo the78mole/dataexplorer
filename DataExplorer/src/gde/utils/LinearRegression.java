@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
-import osde.ui.OpenSerialDataExplorer;
 
 /**
  * This thread implementation calculates the slop of the height curve using linear regression
@@ -129,7 +128,9 @@ public class LinearRegression extends CalculationThread {
 				}
 			}
 
-			OpenSerialDataExplorer.getInstance().updateCurveSelectorTable();
+			this.application.updateCurveSelectorTable();
+			this.application.updateStatisticsData();
+			this.application.updateDataTable();
 			if (log.isLoggable(Level.FINE)) log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}
