@@ -126,12 +126,12 @@ public class StatisticsWindow {
 				this.dataTable.setFont(SWTResourceManager.getFont(this.dataTable.getFont().getFontData()[0].getName(), 10, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				{
-					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
+					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.measurementTableColumn.setWidth(180);
 					this.measurementTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0352));
 				}
 				{
-					this.unitTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
+					this.unitTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.unitTableColumn.setWidth(120);
 					this.unitTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0353));
 					this.unitTableColumn.setAlignment(SWT.LEFT);
