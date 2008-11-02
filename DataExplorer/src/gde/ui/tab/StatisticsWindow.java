@@ -31,45 +31,35 @@ import osde.ui.SWTResourceManager;
 import osde.utils.TimeLine;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * class to represent statistics data according configuration in device properties XML file
+ */
 public class StatisticsWindow {
 	final static Logger						log						= Logger.getLogger(StatisticsWindow.class.getName());
 
-	static final String	DELIMITER	= "!";
-	static final String	NO_VALUE	= "---";
+	static final String	DELIMITER	= "!"; //$NON-NLS-1$
+	static final String	NO_VALUE	= "---"; //$NON-NLS-1$
 
 	CTabItem											statistics;
 	Composite											composite;
 	Composite											filler;
-	Group									descriptionGroup, group0, group1;
-	Group[]												measurementGroups;
-	Text								textLabel;
-	CLabel								minLabel;
-	CLabel								maxLabel;
-	CLabel								avgLabel;
-	Table									dataTable;
-	TableColumn						measurementTableColumn;
-	TableColumn						unitTableColumn;
-	TableColumn						sigmaTableColumn;
-	TableColumn						customTableColumn;
-	CLabel								sigmaLabel;
-	CLabel								extraLabel;
-	TableColumn						avgTableColumn;
-	TableColumn						maxTableColumn;
-	TableColumn						minTableColumn;
+	Group													descriptionGroup;
+	Text													textLabel;
+	CLabel												minLabel;
+	CLabel												maxLabel;
+	CLabel												avgLabel;
+	Table													dataTable;
+	TableColumn										measurementTableColumn;
+	TableColumn										unitTableColumn;
+	TableColumn										sigmaTableColumn;
+	TableColumn										customTableColumn;
+	CLabel												sigmaLabel;
+	CLabel												extraLabel;
+	TableColumn										avgTableColumn;
+	TableColumn										maxTableColumn;
+	TableColumn										minTableColumn;
 	
 	// internal display variables
-	String descriptionText = "";
+	String descriptionText = ""; //$NON-NLS-1$
 	Vector<String> tabelItemText = new Vector<String>();
 
 	final int											extentFactor	= 9;																									// factor to calculate column width
@@ -87,97 +77,90 @@ public class StatisticsWindow {
 
 	public void create() {
 		this.statistics = new CTabItem(this.tabFolder, SWT.NONE);
-		this.statistics.setText("Statistik"); //Messages.getString(MessageIds.OSDE_MSGT0233));
+		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 		SWTResourceManager.registerResourceUser(this.statistics);
 		initGUI();
 	}
 
 	private void initGUI() {
 		try {
-			this.composite = new Composite(this.tabFolder, SWT.BORDER);
+			this.composite = new Composite(this.tabFolder, SWT.NONE);
 			this.statistics.setControl(this.composite);
 			this.composite.setLayout(null);
 			this.composite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.composite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
-					log.fine("composite.controlResized evt=" + evt);
-					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 95);
-					StatisticsWindow.this.textLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-25);
+					log.fine("composite.controlResized evt=" + evt); //$NON-NLS-1$
+					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
+					StatisticsWindow.this.textLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
 				public void controlMoved(ControlEvent evt) {
-					log.finest("composite.controlMoved evt=" + evt);
+					log.finest("composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
 			});
 			{
 				this.descriptionGroup = new Group(this.composite, SWT.NONE);
 				this.descriptionGroup.setLayout(null);
-				this.descriptionGroup.setBounds(10, 5, 300, 95); // set top,left and maintain the rest by paint listener
-				this.descriptionGroup.setText("Beschreibung");
+				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
+				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
 				this.descriptionGroup.setBackground(SWTResourceManager.getColor(255, 255, 255));
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.fine("group0.paintControl, event=" + evt);
-						updateStatisticsData();
+						log.fine("group0.paintControl, event=" + evt); //$NON-NLS-1$
 						StatisticsWindow.this.textLabel.setText(StatisticsWindow.this.descriptionText);
 					}
 				});
 				{
-					this.textLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI );
-					this.textLabel.setText("recordSetName, (fileDescription), recordSetDescription");
+					this.textLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
+					this.textLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.textLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-					this.textLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-25);
+					this.textLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
 					this.textLabel.setEditable(false);
 				}
 			}
 			{
-				this.dataTable = new Table(this.composite, SWT.MULTI);
+				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
 				this.dataTable.setLinesVisible(false);
 				this.dataTable.setHeaderVisible(true);
 				this.dataTable.setFont(SWTResourceManager.getFont(this.dataTable.getFont().getFontData()[0].getName(), 10, SWT.NORMAL));
-				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by paint listener
-//				this.dataTable.addPaintListener(new PaintListener() {
-//					public void paintControl(PaintEvent evt) {
-//						log.fine("dataTable.paintControl, event=" + evt);
-//						updateStatisticsData();
-//						//updateDataTable();
-//					}
-//				});
+				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				{
 					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.measurementTableColumn.setWidth(180);
-					this.measurementTableColumn.setText("Messwert");
+					this.measurementTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0352));
 				}
 				{
 					this.unitTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.unitTableColumn.setWidth(120);
-					this.unitTableColumn.setText("Einheit");
+					this.unitTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0353));
 					this.unitTableColumn.setAlignment(SWT.LEFT);
 				}
 				{
 					this.minTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
-					this.minTableColumn.setWidth(80);
-					this.minTableColumn.setText("Minimum");
+					this.minTableColumn.setWidth(90);
+					this.minTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0354));
 				}
 				{
 					this.avgTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
-					this.avgTableColumn.setWidth(80);
-					this.avgTableColumn.setText("Mittelwert");
+					this.avgTableColumn.setWidth(90);
+					this.avgTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0355));
 				}
 				{
 					this.maxTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
-					this.maxTableColumn.setWidth(80);
-					this.maxTableColumn.setText("Maximum");
+					this.maxTableColumn.setWidth(90);
+					this.maxTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0356));
 				}
 				{
 					this.sigmaTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
-					this.sigmaTableColumn.setText("Standardabweichung");
-					this.sigmaTableColumn.setWidth(("Standardabweichung".length() * this.extentFactor > 80) ? "Standardabweichung".length() * this.extentFactor : 80);
+					String sigmaText = Messages.getString(MessageIds.OSDE_MSGT0357);
+					this.sigmaTableColumn.setText(sigmaText);
+					this.sigmaTableColumn.setWidth((sigmaText.length() * this.extentFactor > 90) ? sigmaText.length() * this.extentFactor : 80);
 				}
 				{
 					this.customTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.customTableColumn.setWidth(300);
-					//this.customTableColumn.setText("Custom");
+					this.customTableColumn.setText(Messages.getString(MessageIds.OSDE_MSGT0358));
 				}
 			}
 			this.composite.layout();
@@ -195,8 +178,8 @@ public class StatisticsWindow {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null ) {
 				if (activeRecordSet != this.oldRecordSet || activeRecordSet.getNumberOfDisplayableRecords() != this.oldNumberDisplayableRecords) {
-					StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n\n" + activeRecordSet.getRecordSetDescription();
-					StatisticsWindow.this.descriptionGroup.redraw();
+					StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n"  //$NON-NLS-1$
+						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
 					try {
 						String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
 						this.oldNumberDisplayableRecords = displayableRecords.length;
@@ -206,13 +189,13 @@ public class StatisticsWindow {
 
 						// time
 						String time = Messages.getString(MessageIds.OSDE_MSGT0234);
-						sb.append(time.split(" ")[0]).append(DELIMITER);
-						sb.append("[HH:mm:ss:SSS]").append(DELIMITER);
-						sb.append("0").append(DELIMITER);
+						sb.append(time.split(" ")[0]).append(DELIMITER); //$NON-NLS-1$
+						sb.append(Messages.getString(MessageIds.OSDE_MSGT0359)).append(DELIMITER);
+						sb.append("0").append(DELIMITER); //$NON-NLS-1$
 						sb.append(NO_VALUE).append(DELIMITER);
-						sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER);
+						sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
 						sb.append(NO_VALUE).append(DELIMITER);
-						sb.append("Interwall = ").append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(" ms ").append(DELIMITER);
+						sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)).append(DELIMITER); //$NON-NLS-1$
 						this.tabelItemText.add(sb.toString());
 
 						for (String recordName : displayableRecords) {
@@ -224,13 +207,13 @@ public class StatisticsWindow {
 								int triggerRefOrdinal = measurementStatistics.getTriggerRefOrdinal() == null ? -1 : measurementStatistics.getTriggerRefOrdinal().intValue();
 								boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
 								sb.append(record.getName()).append(DELIMITER);
-								sb.append("[").append(record.getUnit()).append("]").append(DELIMITER);
+								sb.append("[").append(record.getUnit()).append("]").append(DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (measurementStatistics.isMin()) {
 									if (isTriggerLevel)
-										sb.append(df.format(record.getMinValueTriggered() / 1000.0));
+										sb.append(formatOutput(df.format(record.getMinValueTriggered() / 1000.0)));
 									else
-										sb.append(df.format((triggerRefOrdinal < 0 ? record.getMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0));
+										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								}
 								else
 									sb.append(NO_VALUE);
@@ -238,54 +221,56 @@ public class StatisticsWindow {
 
 								if (measurementStatistics.isAvg())
 									if (isTriggerLevel)
-										sb.append(df.format(record.getAvgValueTriggered() / 1000.0));
+										sb.append(formatOutput(df.format(record.getAvgValueTriggered() / 1000.0)));
 									else
-										sb.append(df.format((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0));
+										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
 								if (measurementStatistics.isMax()) {
 									if (isTriggerLevel)
-										sb.append(df.format(record.getMaxValueTriggered() / 1000.0));
+										sb.append(formatOutput(df.format(record.getMaxValueTriggered() / 1000.0)));
 									else
-										sb.append(df.format((triggerRefOrdinal < 0 ? record.getMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0));
+										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								}
 								else
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
 								if (measurementStatistics.isSigma()) {
-									if (isTriggerLevel)
-										sb.append(df.format(record.getSigmaValueTriggered() / 1000.0));
+									DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
+									if (isTriggerLevel) {
+										sb.append(formatOutput(cdf.format(record.getSigmaValueTriggered() / 1000.0)));
+									}
 									else
-										sb.append(df.format((triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0));
+										sb.append(formatOutput(cdf.format((triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								}
 								else
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
-								if (measurementStatistics.isCountByTrigger() != null) sb.append(measurementStatistics.getCountTriggerText()).append(" = ").append(record.getTriggerRanges().size());
+								if (measurementStatistics.isCountByTrigger() != null) sb.append(measurementStatistics.getCountTriggerText()).append(" = ").append(record.getTriggerRanges().size()); //$NON-NLS-1$
 
 								if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 									if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
-										sb.append(measurementStatistics.getSumTriggerText()).append(" = ");
+										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
 									}
 									else {
-										sb.append("Summe min/max Delta aus Triggerbereich").append(" = ");
+										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
 									}
 									if (isTriggerLevel)
 										sb.append(df.format(record.getSumTriggeredRange() / 1000.0));
 									else {
 										if (measurementStatistics.getSumByTriggerRefOrdinal() != null)
 											sb.append(df.format(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
-										sb.append(" [").append(record.getUnit()).append("] ");
+										sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
 									}
 								}
-								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append(" (").append(measurementStatistics.getComment()).append(")");
+								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append(" (").append(measurementStatistics.getComment()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1)
-									sb.append(" (").append(measurementStatistics.getTrigger().getComment()).append(")");
+									sb.append(" (").append(measurementStatistics.getTrigger().getComment()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
@@ -299,17 +284,27 @@ public class StatisticsWindow {
 				}
 			}
 			else {
-				StatisticsWindow.this.descriptionText = "";
+				StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$
 				this.tabelItemText = new Vector<String>();
 				this.oldRecordSet = null;
 			}
 		}
 		else {
-			StatisticsWindow.this.descriptionText = "";
+			StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$
 			this.tabelItemText = new Vector<String>();
 			this.oldRecordSet = null;
 		}
+		StatisticsWindow.this.descriptionGroup.redraw();
 		updateDataTable();
+	}
+
+	/**
+	 * format value string
+	 * @param inDecimalString
+	 */
+	String formatOutput(String inDecimalString) {
+		String[] tmp = inDecimalString.replace('.', ';').replace(',', ';').split(";"); //$NON-NLS-1$
+		return tmp.length>1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -344,44 +339,11 @@ public class StatisticsWindow {
 		int columsWidth = 0;
 		for (int i = 0; i < this.dataTable.getColumnCount() - 1; i++) {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
-			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth());
+			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
-		int tableHeight = this.dataTable.getItemCount() * this.dataTable.getItemHeight() + this.dataTable.getHeaderHeight();
+		int tableHeight = this.dataTable.getItemCount() * this.dataTable.getItemHeight() + this.dataTable.getHeaderHeight() + 4;
 		tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
 		this.customTableColumn.setWidth(this.dataTable.getClientArea().width - columsWidth);
 	}
-
-	//	/**
-	//	* Auto-generated main method to display this 
-	//	* org.eclipse.swt.widgets.Composite inside a new Shell.
-	//	*/
-	//	public static void main(String[] args) {
-	//		showGUI();
-	//	}
-	//		
-	//	/**
-	//	* Auto-generated method to display this 
-	//	* org.eclipse.swt.widgets.Composite inside a new Shell.
-	//	*/
-	//	public static void showGUI() {
-	//		Display display = Display.getDefault();
-	//		Shell shell = new Shell(display);
-	//		StatisticsWindow inst = new StatisticsWindow(shell, SWT.NULL);
-	//		Point size = inst.getSize();
-	//		shell.setLayout(new FillLayout());
-	//		shell.layout();
-	//		if(size.x == 0 && size.y == 0) {
-	//			inst.pack();
-	//			shell.pack();
-	//		} else {
-	//			Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
-	//			shell.setSize(shellBounds.width, shellBounds.height);
-	//		}
-	//		shell.open();
-	//		while (!shell.isDisposed()) {
-	//			if (!display.readAndDispatch())
-	//				display.sleep();
-	//		}
-	//	}
 }
