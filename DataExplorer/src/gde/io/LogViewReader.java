@@ -1535,8 +1535,8 @@ public class LogViewReader {
 	}
 
 	/**
+	 * parse data buffer to integer value, length meight be 1, 2, 3, 4, 8 bytes
 	 * @param buffer
-	 * @return
 	 */
 	public static int parse2Int(byte[] buffer) {
 		switch (buffer.length) {
@@ -1554,6 +1554,10 @@ public class LogViewReader {
 		}
 	}
 
+	/**
+	 * parse data buffer to long value, data buffer length must be 8 bytes
+	 * @param buffer
+	 */
 	public static long parse2Long(byte[] buffer) {
 		long tmpLong1 = ((long)(buffer[3] & 0xff) << 24) + ((buffer[2] & 0xff) << 16) + ((buffer[1] & 0xff) << 8) + ((buffer[0] & 0xff) << 0);
 		long tmpLong2 = (((long)buffer[7] & 255) << 56) + ((long)(buffer[6] & 255) << 48) + ((long)(buffer[5] & 255) << 40) + ((long)(buffer[4] & 255) << 32);

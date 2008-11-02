@@ -205,7 +205,7 @@ public interface IDevice {
 	 * get the properties from a channel/configuration and record key name 
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
-	 * @return
+	 * @return list of properties according measurement
 	 */
 	public List<PropertyType> getProperties(String channelConfigKey, int measurementOrdinal);
 
@@ -345,7 +345,7 @@ public interface IDevice {
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber
-	 * @return
+	 * @return adapted record configuration as delimited string
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber);
 	

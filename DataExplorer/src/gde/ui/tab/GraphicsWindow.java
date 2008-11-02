@@ -106,7 +106,7 @@ public class GraphicsWindow {
 
 	/**
 	 * query if this component is visible 
-	 * @return
+	 * @return true if graphics window is visible
 	 */
 	public boolean isVisible() {
 		return this.graphicsComposite.isVisible();

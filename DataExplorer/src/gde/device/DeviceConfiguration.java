@@ -528,7 +528,7 @@ public class DeviceConfiguration {
 	 * get the properties from a channel/configuration and record key name 
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
-	 * @return
+	 * @return List of properties to according measurement
 	 */
 	public List<PropertyType> getProperties(String channelConfigKey, int measurementOrdinal) {
 		List<PropertyType> list = new ArrayList<PropertyType>();

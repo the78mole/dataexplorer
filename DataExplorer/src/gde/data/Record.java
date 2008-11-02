@@ -172,7 +172,7 @@ public class Record extends Vector<Integer> {
 	 * @param newUnit
 	 * @param newSymbol
 	 * @param isActiveValue
-	 * @param newStatistics
+	 * @param newStatistic
 	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
@@ -572,7 +572,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get/calcualte max value by referenced triggered other measurement
 	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return maximum value according trigger specification of referenced measurement
 	 */
 	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null)  {
@@ -585,7 +585,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get/calcualte max value by referenced triggered other measurement
 	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return minimum value according trigger specification of referenced measurement
 	 */
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null)  {
@@ -1303,8 +1303,7 @@ public class Record extends Vector<Integer> {
 	
 	/**
 	 * get/calcualte avg value by configuraed trigger
-	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return average value according trigger specification
 	 */
 	public int getAvgValueTriggered() {
 		if (this.triggerRanges == null)  {
@@ -1317,7 +1316,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get/calcualte avg value by referenced triggered other measurement
 	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return average value according trigger specification of referenced measurement
 	 */
 	public int getAvgValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
@@ -1328,7 +1327,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * @param avgValue the avgValue to set
+	 * calculates the avgValue
 	 */
 	public synchronized void setAvgValue() {
 		long sum = 0;
@@ -1339,7 +1338,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * set the avgValue using trigger ranges
+	 * calculates the avgValue using trigger ranges
 	 */
 	public synchronized void setAvgValueTriggered() {
 		long sum = 0;
@@ -1367,7 +1366,7 @@ public class Record extends Vector<Integer> {
 	
 	/**
 	 * get/calcualte avg value by trigger configuration
-	 * @return
+	 * @return sigma value according trigger specification
 	 */
 	public int getSigmaValueTriggered() {
 		if (this.triggerRanges == null)  {
@@ -1380,7 +1379,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get/calcualte avg value by referenced triggered other measurement
 	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return sigma value according trigger specification of referenced measurement
 	 */
 	public int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
@@ -1391,7 +1390,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * @param sigmaValue the sigmaValue to set
+	 * calculates the sigmaValue 
 	 */
 	public synchronized void setSigmaValue() {
 		double average = this.getAvgValue()/1000.0;
@@ -1403,7 +1402,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * set the sigmaValue using trigger ranges
+	 * calculates the sigmaValue using trigger ranges
 	 */
 	public synchronized void setSigmaValueTriggered() {
 		double average = this.getAvgValueTriggered()/1000.0;
@@ -1420,7 +1419,7 @@ public class Record extends Vector<Integer> {
 	
 	/**
 	 * get/calcualte sum of values by configuraed trigger
-	 * @return
+	 * @return sum value according trigger range specification of referenced measurement
 	 */
 	public int getSumTriggeredRange() {
 		if (this.triggerRanges == null)  {
@@ -1433,7 +1432,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get/calcualte sum of values by configuraed trigger
 	 * @param referencedMeasurementOrdinal
-	 * @return
+	 * @return sum value according trigger range specification of referenced measurement
 	 */
 	public int getSumTriggeredRange(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {

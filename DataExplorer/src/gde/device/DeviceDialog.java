@@ -40,7 +40,7 @@ public abstract class DeviceDialog extends Dialog {
 
 	protected Shell	dialogShell;
 	
-	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port this flag eleminates warning loops in case of none modal dialog
+	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port, this flag eleminates warning loops in case of none modal dialog
 	
 	protected	int				shellAlpha; 
 	protected boolean		isAlphaEnabled;
@@ -183,7 +183,7 @@ public abstract class DeviceDialog extends Dialog {
 	}
 
 	/**
-	 * @param isFailedConnectionWarned the isFailedConnectionWarned to set
+	 * @param enabled the enabled to set
 	 */
 	public void setFailedConnectionWarned(boolean enabled) {
 		this.isFailedConnectionWarned = enabled;
@@ -208,8 +208,8 @@ public abstract class DeviceDialog extends Dialog {
 	 * @param top gap
 	 * @param bottom gap
 	 */
-	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bot) {
-		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bot) ? true : false;
+	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bottom) {
+		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bottom) ? true : false;
 		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
@@ -225,8 +225,8 @@ public abstract class DeviceDialog extends Dialog {
 	 * @param top gap
 	 * @param bottom gap
 	 */
-	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bot) {
-		boolean isExitShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bot) ? true : false;
+	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bottom) {
+		boolean isExitShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bottom) ? true : false;
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());
@@ -242,8 +242,8 @@ public abstract class DeviceDialog extends Dialog {
 	 * @param top gap
 	 * @param bottom gap
 	 */
-	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bot) {
-		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bot) ? true : false;
+	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bottom) {
+		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
 		log.fine("isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
@@ -259,8 +259,8 @@ public abstract class DeviceDialog extends Dialog {
 	 * @param top gap
 	 * @param bottom gap
 	 */
-	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bot) {
-		boolean isExitShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bot) ? true : false;
+	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bottom) {
+		boolean isExitShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
 		log.fine("isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(getShellAlpha());

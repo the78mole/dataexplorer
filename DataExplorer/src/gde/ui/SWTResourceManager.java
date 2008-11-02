@@ -126,7 +126,7 @@ public class SWTResourceManager {
 
 	/**
 	 * get the given font in style
-	 * @param control
+	 * @param gc
 	 * @param style SWT.BOLD, SWT.NORMAL
 	 * @return the controls font in given style
 	 */
@@ -211,7 +211,7 @@ public class SWTResourceManager {
 	 * @param pt size of the image
 	 * @param imageURL image to be placed left hand side, image must fit the given size
 	 * @param text to be placed centered in the remaining space
-	 * @return
+	 * @return specified image
 	 */
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(Point pt, String imageURL, String text) {

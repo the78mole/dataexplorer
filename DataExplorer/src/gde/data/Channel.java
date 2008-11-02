@@ -109,7 +109,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	/**
 	 * method to calculate next record set number, usally a record starts with a number followed by ")"
 	 * this method is used to build a new record set name while gathering data "3") flight record
-	 * @return
+	 * @return preceeding record set number
 	 */
 	public int getNextRecordSetNumber() {
 		int recordNumber = 1;

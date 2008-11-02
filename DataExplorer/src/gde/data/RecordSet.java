@@ -548,7 +548,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * query number of visible and displayable records
-	 * @return
+	 * @return number of records visible and displayable (makeInActiveDisplayable)
 	 */
 	public int getNumberOfVisibleAndDisplayableRecords() {
 		int visibleAndDisplayable = 0;
@@ -561,7 +561,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * query number of displayable records
-	 * @return
+	 * @return number of records displayable (makeInActiveDisplayable)
 	 */
 	public int getNumberOfDisplayableRecords() {
 		int displayable = 0;
@@ -1517,7 +1517,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * query if the record set is zoomed and the zoomed data extract starts at first data point
-	 * @return
+	 * @return true if zoom is active and starts at left edge of curve
 	 */
 	public boolean isCutLeftEdgeEnabled() {
 		return this.isZoomMode && (this.recordZoomOffset == 0);
@@ -1525,7 +1525,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * query if the record set is zoomed and the zoomed data extract ends at last data point
-	 * @return
+	 * @return true if zoom is active and starts at right edge of curve
 	 */
 	public boolean isCutRightEdgeEnabled() {
 		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize()-1);
