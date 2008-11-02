@@ -332,6 +332,7 @@ public class Record extends Vector<Integer> {
 			if (point < this.minValue) this.minValue = point;
 		}	
 		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.finer(this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return this.add(new Integer(point));
 	}
 
@@ -564,6 +565,8 @@ public class Record extends Vector<Integer> {
 		for (TriggerRange range : (Vector<TriggerRange>)this.triggerRanges.clone()) {
 			if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
 		}
+		
+		if (log.isLoggable(Level.FINER)) log.finer(this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered);
 	}
 
 	/**
@@ -587,7 +590,7 @@ public class Record extends Vector<Integer> {
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null)  {
 			Record referencedRecord = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]);
-			System.out.println(this.getName() + " -> referencedRecord size = " + referencedRecord.realSize());
+			if (log.isLoggable(Level.FINER)) log.finer(this.getName() + " -> referencedRecord size = " + referencedRecord.realSize());
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
 		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();
@@ -658,7 +661,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
-		if (index > super.size()) System.out.println("index = " + index + " of " + super.size() + "/" + this.size());
+		if (index > super.size()) if (log.isLoggable(Level.FINEST)) log.finest("index = " + index + " of " + super.size() + "/" + this.size());
 		return super.get(index);
 	}
 
@@ -1341,16 +1344,16 @@ public class Record extends Vector<Integer> {
 	public synchronized void setAvgValueTriggered() {
 		long sum = 0;
 		int numPoints = 0;
-		//StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		for (TriggerRange range : this.triggerRanges) {
 			for (int i = range.in; i < range.out; i++) {
 				sum += this.get(i);
-				//sb.append(this.realGet(i)/1000.0).append(", ");
+				if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i)/1000.0).append(", ");
 				numPoints++;
 			}
-			//sb.append("\n");
+			if (log.isLoggable(Level.FINER)) sb.append("\n");
 		}
-		//System.out.println(sb.toString());
+		if (log.isLoggable(Level.FINER)) log.finer(sb.toString());
 		this.avgValueTriggered = new Long(sum / numPoints).intValue() ;
 	}
 

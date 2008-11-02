@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlType;
 		"unit", //$NON-NLS-1$
 		"active", //$NON-NLS-1$
 		"statistics", //$NON-NLS-1$
-		"property", //$NON-NLS-1$
+		"property" //$NON-NLS-1$
 })
 public class MeasurementType {
 
