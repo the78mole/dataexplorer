@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import osde.OSDE;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.device.StatisticsType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -230,6 +231,13 @@ public class RecordSet extends HashMap<String, Record> {
 			Record tmpRecord = this.get(this.recordNames[i]);
 			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
+			
+			tmpRecord.statistics = this.device.getMeasurementStatistic(newChannelConfiguration, i);
+			StatisticsType.Trigger tmpTrigger = tmpRecord.statistics.getTrigger();
+			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
+			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
+			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
+		
 			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
 		}
 
@@ -725,7 +733,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setPositionLeft(false); // position right
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
-			newRecordSet.put(recordNames[i], tmpRecord.clone());
+			newRecordSet.put(recordNames[i], tmpRecord);
 			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[i]); //$NON-NLS-1$
 		}
 		
