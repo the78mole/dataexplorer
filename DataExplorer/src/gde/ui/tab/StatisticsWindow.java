@@ -250,27 +250,26 @@ public class StatisticsWindow {
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
-								if (measurementStatistics.isCountByTrigger() != null) sb.append(measurementStatistics.getCountTriggerText()).append(" = ").append(record.getTriggerRanges().size()); //$NON-NLS-1$
+								if (measurementStatistics.isCountByTrigger() != null) 
+									sb.append(measurementStatistics.getCountTriggerText()).append(" = ").append(record.getTriggerRanges().size()).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 									if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
 										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
-									}
-									else {
-										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
-									}
-									if (isTriggerLevel)
-										sb.append(df.format(record.getSumTriggeredRange() / 1000.0));
-									else {
-										if (measurementStatistics.getSumByTriggerRefOrdinal() != null)
-											sb.append(df.format(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
-										sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+										if (isTriggerLevel)
+											sb.append(df.format(record.getSumTriggeredRange() / 1000.0));
+										else {
+											if (measurementStatistics.getSumByTriggerRefOrdinal() != null)
+												sb.append(df.format(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
+											sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+										}
 									}
 								}
-								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append(" (").append(measurementStatistics.getComment()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
+									sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1)
-									sb.append(" (").append(measurementStatistics.getTrigger().getComment()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
