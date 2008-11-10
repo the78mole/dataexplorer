@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.device.IDevice;
 import osde.device.StatisticsType;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -201,19 +202,20 @@ public class StatisticsWindow {
 						for (String recordName : displayableRecords) {
 							Record record = activeRecordSet.get(recordName);
 							DecimalFormat df = record.getDecimalFormat();
-							StatisticsType measurementStatistics = activeRecordSet.getDevice().getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.getRecordNameIndex(recordName));
+							IDevice device = activeRecordSet.getDevice();
+							StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.getRecordIndex(recordName));
 							if (measurementStatistics != null) {
 								sb = new StringBuilder();
-								int triggerRefOrdinal = measurementStatistics.getTriggerRefOrdinal() == null ? -1 : measurementStatistics.getTriggerRefOrdinal().intValue();
+								int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);
 								boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
 								sb.append(record.getName()).append(DELIMITER);
 								sb.append("[").append(record.getUnit()).append("]").append(DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (measurementStatistics.isMin()) {
 									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(record.getMinValueTriggered() / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
 									else
-										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
 								}
 								else
 									sb.append(NO_VALUE);
@@ -221,18 +223,18 @@ public class StatisticsWindow {
 
 								if (measurementStatistics.isAvg())
 									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(record.getAvgValueTriggered() / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
 									else
-										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
 								else
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
 								if (measurementStatistics.isMax()) {
 									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(record.getMaxValueTriggered() / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
 									else
-										sb.append(formatOutput(df.format((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
+										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
 								}
 								else
 									sb.append(NO_VALUE);
@@ -241,23 +243,28 @@ public class StatisticsWindow {
 								if (measurementStatistics.isSigma()) {
 									DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
 									if (isTriggerLevel) {
-										sb.append(formatOutput(cdf.format(record.getSigmaValueTriggered() / 1000.0)));
+										sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
 									}
 									else
-										sb.append(formatOutput(cdf.format((triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0)));
+										sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
 								}
 								else
 									sb.append(NO_VALUE);
 								sb.append(DELIMITER);
 
+								// counted trigger events fullfilling the level and time constrains 
 								if (measurementStatistics.isCountByTrigger() != null) 
-									sb.append(measurementStatistics.getCountTriggerText()).append(" = ").append(record.getTriggerRanges().size()).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+									sb.append(measurementStatistics.getCountTriggerText())
+										.append(" = ") //$NON-NLS-1$
+										.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0)
+										.append(" "); //$NON-NLS-1$
 
+								// evaluate sum value within trigger range
 								if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 									if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
 										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
 										if (isTriggerLevel)
-											sb.append(df.format(record.getSumTriggeredRange() / 1000.0));
+											sb.append(df.format(device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
 										else {
 											if (measurementStatistics.getSumByTriggerRefOrdinal() != null)
 												sb.append(df.format(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
@@ -265,9 +272,12 @@ public class StatisticsWindow {
 										}
 									}
 								}
+								
+								// append global comment
 								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
 									sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
+								// append trigger comment
 								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1)
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -295,6 +305,24 @@ public class StatisticsWindow {
 		}
 		StatisticsWindow.this.descriptionGroup.redraw();
 		updateDataTable();
+	}
+
+	/**
+	 * get the trigger refernce ordinal value while checking the referenced record is in state displayable
+	 * @param recordSet
+	 * @param measurementStatistics
+	 * @return -1 if referenced record does not fullfill the criterias required, else the ordinal of the referenced record
+	 */
+	int getTriggerReferenceOrdinal(RecordSet recordSet, StatisticsType measurementStatistics) {
+		int triggerRefOrdinal = -1;
+		if (measurementStatistics.getTriggerRefOrdinal() != null && recordSet != null) {
+			int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
+			Record record = recordSet.getRecord(recordSet.getRecordNames()[tmpOrdinal]);
+			if (record != null && record.isDisplayable()) {
+				triggerRefOrdinal = tmpOrdinal;
+			}
+		}
+		return triggerRefOrdinal;
 	}
 
 	/**

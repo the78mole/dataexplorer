@@ -39,6 +39,7 @@ import osde.device.StatisticsType;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
+import osde.utils.TimeLine;
 
 /**
  * @author Winfried Brügmann
@@ -176,8 +177,9 @@ public class Record extends Vector<Integer> {
 	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
-	public Record(String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
+	public Record(IDevice newDevice, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
+		this.device = newDevice;
 		this.name = newName;
 		this.symbol = newSymbol;
 		this.unit = newUnit;
@@ -196,7 +198,6 @@ public class Record extends Vector<Integer> {
 		// special keys for compare set record are handled with put method
 		//this.channelConfigKey;
 		//this.keyName;
-		this.device = OpenSerialDataExplorer.getInstance().getActiveDevice();
 	}
 
 	/**
@@ -419,7 +420,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.parent.getRecordNameIndex(this.name));
+			value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
 		return value;
 	}
 
@@ -437,7 +438,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.parent.getRecordNameIndex(this.name));
+			value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
 		return value;
 	}
 	
@@ -455,7 +456,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else {
-			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.parent.getRecordNameIndex(this.name), IDevice.REDUCTION);
+			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name), IDevice.REDUCTION);
 			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
 		}
 		return value;
@@ -509,63 +510,81 @@ public class Record extends Vector<Integer> {
 	 */
 	@SuppressWarnings("unchecked") // clone triggerRanges to be able to modify by time filter
 	synchronized void evaluateMinMax() {
-		if (this.triggerRanges == null) {
+		if (this.triggerRanges == null && this.isDisplayable && this.triggerIsGreater != null && this.triggerLevel != null) {
+			int deviceTriggerlevel = new Double(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
 			for (int i = 0; i < this.realSize(); ++i) {
 				int point = this.realGet(i);
-				if (this.triggerIsGreater != null && this.triggerLevel != null) { // preferences XML
-					if (this.triggerIsGreater) { // point value must above trigger level
-						if (point > this.triggerLevel) {
-							if (this.tmpTriggerRange == null) {
-								if (this.triggerRanges == null) {
-									this.triggerRanges = new Vector<TriggerRange>();
-									this.minValueTriggered = this.maxValueTriggered = point;
-								}
-								this.tmpTriggerRange = new TriggerRange(i);
+				if (this.triggerIsGreater) { // point value must above trigger level
+					if (point > deviceTriggerlevel) {
+						if (this.tmpTriggerRange == null) {
+							if (this.triggerRanges == null) {
+								this.triggerRanges = new Vector<TriggerRange>();
+								this.minValueTriggered = this.maxValueTriggered = point;
 							}
-							else {
-								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-								if (point < this.minValueTriggered) this.minValueTriggered = point;
-							}
+							this.tmpTriggerRange = new TriggerRange(i);
 						}
 						else {
-							if (this.triggerRanges != null && this.tmpTriggerRange != null) {
-								this.tmpTriggerRange.setOut(i);
-								this.triggerRanges.add(this.tmpTriggerRange);
-								this.tmpTriggerRange = null;
-							}
+							if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+							if (point < this.minValueTriggered) this.minValueTriggered = point;
 						}
 					}
-					else { // point value must below trigger level
-						if (point < this.triggerLevel) {
-							if (this.tmpTriggerRange == null) {
-								if (this.triggerRanges == null) {
-									this.triggerRanges = new Vector<TriggerRange>();
-									this.minValueTriggered = this.maxValueTriggered = point;
-								}
-								this.tmpTriggerRange = new TriggerRange(i);
+					else {
+						if (this.triggerRanges != null && this.tmpTriggerRange != null) {
+							this.tmpTriggerRange.setOut(i);
+							this.triggerRanges.add(this.tmpTriggerRange);
+							this.tmpTriggerRange = null;
+						}
+					}
+				}
+				else { // point value must below trigger level
+					if (point < deviceTriggerlevel) {
+						if (this.tmpTriggerRange == null) {
+							if (this.triggerRanges == null) {
+								this.triggerRanges = new Vector<TriggerRange>();
+								this.minValueTriggered = this.maxValueTriggered = point;
 							}
-							else {
-								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-								if (point < this.minValueTriggered) this.minValueTriggered = point;
-							}
+							this.tmpTriggerRange = new TriggerRange(i);
 						}
 						else {
-							if (this.triggerRanges != null) {
-								this.tmpTriggerRange.setOut(i);
-								this.triggerRanges.add(this.tmpTriggerRange);
-								this.tmpTriggerRange = null;
-							}
+							if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+							if (point < this.minValueTriggered) this.minValueTriggered = point;
+						}
+					}
+					else {
+						if (this.triggerRanges != null) {
+							this.tmpTriggerRange.setOut(i);
+							this.triggerRanges.add(this.tmpTriggerRange);
+							this.tmpTriggerRange = null;
 						}
 					}
 				}
 			}
 		}
-		// evaluate trigger ranges to meet minTimeSec requirement 
-		int countDelta = new Double(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
-		for (TriggerRange range : (Vector<TriggerRange>)this.triggerRanges.clone()) {
-			if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
+		if (log.isLoggable(Level.FINE)) {
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					log.fine(this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")");
+				}
+			}
+			else
+				log.fine(this.name + " triggerRanges = null");
 		}
-		
+		if (this.triggerRanges != null) {
+			// evaluate trigger ranges to meet minTimeSec requirement 
+			int countDelta = new Double(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
+			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
+				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
+			}
+		}
+		if (log.isLoggable(Level.FINE)) {
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					log.fine(this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")");
+				}
+			}
+			else
+				log.fine(this.name + " triggerRanges = null");
+		}
 		if (log.isLoggable(Level.FINER)) log.finer(this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered);
 	}
 
@@ -1133,13 +1152,7 @@ public class Record extends Vector<Integer> {
 	public void resetMinMax() {
 		this.maxValue = 0;
 		this.minValue = 0;
-		this.maxValueTriggered = Integer.MIN_VALUE;
-		this.minValueTriggered = Integer.MAX_VALUE;
-		this.avgValue = Integer.MIN_VALUE;
-		this.sigmaValue = Integer.MIN_VALUE;
-		this.avgValueTriggered = Integer.MIN_VALUE;
-		this.sigmaValueTriggered = Integer.MIN_VALUE;
-		this.triggerRanges = null;
+		log.finer(this.name);
 	}
 
 	/**
@@ -1148,6 +1161,21 @@ public class Record extends Vector<Integer> {
 	public void setMinMax(int newMin, int newMax) {
 		this.maxValue = newMax;
 		this.minValue = newMin;
+	}
+	
+	/**
+	 * reset all variables to enable recalcualation of statistics
+	 */
+	public void resetStatiticCalculationBase() {
+		this.maxValueTriggered = Integer.MIN_VALUE;
+		this.minValueTriggered = Integer.MAX_VALUE;
+		this.avgValue = Integer.MIN_VALUE;
+		this.sigmaValue = Integer.MIN_VALUE;
+		this.avgValueTriggered = Integer.MIN_VALUE;
+		this.sigmaValueTriggered = Integer.MIN_VALUE;
+		this.triggerRanges = null;
+		this.tmpTriggerRange = null;
+		log.finer(this.name);
 	}
 	
 	/**
@@ -1344,16 +1372,18 @@ public class Record extends Vector<Integer> {
 		long sum = 0;
 		int numPoints = 0;
 		StringBuilder sb = new StringBuilder();
-		for (TriggerRange range : this.triggerRanges) {
-			for (int i = range.in; i < range.out; i++) {
-				sum += this.get(i);
-				if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i)/1000.0).append(", ");
-				numPoints++;
+		if (this.triggerRanges != null) {
+			for (TriggerRange range : this.triggerRanges) {
+				for (int i = range.in; i < range.out; i++) {
+					sum += this.get(i);
+					if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", ");
+					numPoints++;
+				}
+				if (log.isLoggable(Level.FINER)) sb.append("\n");
 			}
-			if (log.isLoggable(Level.FINER)) sb.append("\n");
 		}
 		if (log.isLoggable(Level.FINER)) log.finer(sb.toString());
-		this.avgValueTriggered = new Long(sum / numPoints).intValue() ;
+		this.avgValueTriggered = numPoints > 0 ? new Long(sum / numPoints).intValue() : 0 ;
 	}
 
 	/**
@@ -1408,25 +1438,26 @@ public class Record extends Vector<Integer> {
 		double average = this.getAvgValueTriggered()/1000.0;
 		double sumPoweredDeviations = 0;
 		int numPoints = 0;
-		for (TriggerRange range : this.triggerRanges) {
-			for (int i = range.in; i < range.out; i++) {
-				sumPoweredDeviations += Math.pow(this.realGet(i)/1000.0 - average, 2);
-				numPoints++;
+		if (this.triggerRanges != null) {
+			for (TriggerRange range : this.triggerRanges) {
+				for (int i = range.in; i < range.out; i++) {
+					sumPoweredDeviations += Math.pow(this.realGet(i)/1000.0 - average, 2);
+					numPoints++;
+				}
 			}
 		}
 		this.sigmaValueTriggered = new Double(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
 	}
 	
 	/**
-	 * get/calcualte sum of values by configuraed trigger
+	 * get/calcualte sum of values by configured trigger
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
 	public int getSumTriggeredRange() {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
-		if (this.avgValue == -1 )this.setAvgValueTriggered();
-		return this.avgValueTriggered;
+		return this.calculateSum();
 	}
 	
 	/**
@@ -1447,16 +1478,19 @@ public class Record extends Vector<Integer> {
 	int calculateSum() {
 		int sum = 0;
 		int min=0, max=0;
-		for (TriggerRange range : this.triggerRanges) {
-			for (int i = range.in; i < range.out; i++) {
-				if (i == range.in) min = max = this.realGet(i);
-				else {
-					int point = this.realGet(i);
-					if (point > max) max = point;
-					if (point < min) min = point;
+		if (this.triggerRanges != null) {
+			for (TriggerRange range : this.triggerRanges) {
+				for (int i = range.in; i < range.out; i++) {
+					if (i == range.in)
+						min = max = this.realGet(i);
+					else {
+						int point = this.realGet(i);
+						if (point > max) max = point;
+						if (point < min) min = point;
+					}
 				}
+				sum += this.device.translateValue(this, (max - min));
 			}
-			sum += (max - min);
 		}
 		return sum;
 	}

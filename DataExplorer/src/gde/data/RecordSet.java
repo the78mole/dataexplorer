@@ -465,7 +465,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * query the record index by given string, if 0 is returned the given name is not found as record name
 	 * @param recordName
-	 * @return record number
+	 * @return record number if valid, else -1
 	 */
 	public int getRecordIndex(String recordName) {
 		int searchedNumber = -1;
@@ -668,7 +668,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
-			Record tmpRecord = new Record(measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
+			Record tmpRecord = new Record(device, measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 
 			// set color defaults
 			switch (i) {
@@ -895,7 +895,7 @@ public class RecordSet extends HashMap<String, Record> {
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
 			record.setVisible(record.isActive());
-			record.setDisplayable(true);
+			record.setDisplayable(!this.device.getMeasurement(this.channelConfigName, this.getRecordIndex(recordKey)).isCalculation());
 		}
 		for (String recordKey : this.getNoneCalculationRecordNames()) {
 			this.get(recordKey).setActive(true);
@@ -1443,14 +1443,6 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.recordNames[0];
 	}
 	
-	public int getRecordNameIndex(String recordName) {
-		int index = 0;
-		while (index < this.recordNames.length) {
-			if (recordName.equals(this.recordNames[index])) break;
-			index++;
-		}
-		return index;
-	}
 	/**
 	 * set if a recalculation of depending calculated records are required
 	 */
@@ -1460,6 +1452,8 @@ public class RecordSet extends HashMap<String, Record> {
 		for (int i=0; i<this.device.getMeasurementNames(this.channelConfigName).length; ++i) {
 			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation())
 				this.get(this.getRecordNames()[i]).resetMinMax();
+			
+			this.get(this.getRecordNames()[i]).resetStatiticCalculationBase();
 		}
 	}
 
