@@ -61,6 +61,7 @@ public class RecordSet extends HashMap<String, Record> {
 	boolean												isRecalculation				= true;		// indicates record is modified and need re-calculation
 	Rectangle											drawAreaBounds;
 	
+	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
 	Vector<Vector<Integer>>				dataTable;
 	boolean												isTableDataCalculated = false;  // value to manage only one time calculation
@@ -1375,42 +1376,40 @@ public class RecordSet extends HashMap<String, Record> {
 	public void calculateDataTable() {
 
 		this.dataTableCalcThread = new Thread() {
-			final Logger									logger				= Logger.getLogger(Thread.class.getName());
-			final OpenSerialDataExplorer 	application2 	= OpenSerialDataExplorer.getInstance(); 
 			final String[] 								recordKeys 		= getRecordNames();
 			
 			public void run() {
-				if (this.logger.isLoggable(Level.FINE)) this.logger.fine("entry data table calculation"); //$NON-NLS-1$
-				this.application2.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
+				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("entry data table calculation"); //$NON-NLS-1$
+				RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
 				int numberRecords = getRecordNamesLength();
 				int recordEntries = getRecordDataSize(true);
-				int progress = this.application2.getProgressPercentage();
+				int progress = RecordSet.this.application.getProgressPercentage();
 
 				int maxWaitCounter = 10;
 				int sleepTime = numberRecords*recordEntries/200;
 				while (!checkAllRecordsDisplayable() && maxWaitCounter > 0) {
 					try {
-						this.logger.fine("waiting for all records displayable"); //$NON-NLS-1$
+						RecordSet.log.fine("waiting for all records displayable"); //$NON-NLS-1$
 						Thread.sleep(sleepTime);
 						--maxWaitCounter;
 						if (maxWaitCounter == 0) return;
 					}
 					catch (InterruptedException e) {
-						this.logger.log(Level.SEVERE, e.getMessage(), e);
+						RecordSet.log.log(Level.SEVERE, e.getMessage(), e);
 					}
-					this.application2.setProgress(progress+=2);
+					RecordSet.this.application.setProgress(progress+=2, RecordSet.class.getCanonicalName());
 				}
-				if (this.logger.isLoggable(Level.FINE)) this.logger.fine("all records displayable now, create table"); //$NON-NLS-1$
+				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("all records displayable now, create table"); //$NON-NLS-1$
 
 				// calculate record set internal data table
-				if (this.logger.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
+				if (RecordSet.log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
-					if (this.logger.isLoggable(Level.FINE)) this.logger.fine("start build table entries"); //$NON-NLS-1$
+					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("start build table entries"); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
 
 					for (int i = 0; i < recordEntries; i++) {
-						this.application2.setProgress(new Double(i * progressInterval + progress).intValue());
+						RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), RecordSet.class.getCanonicalName());
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
@@ -1418,11 +1417,12 @@ public class RecordSet extends HashMap<String, Record> {
 						}
 						dataTableAddRow(dataTableRow);
 					}
+					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
-					if (this.logger.isLoggable(Level.FINE)) this.logger.fine("end build table entries"); //$NON-NLS-1$
+					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("end build table entries"); //$NON-NLS-1$
 				}
-				if (this.logger.isLoggable(Level.FINE)) this.logger.fine("exit data table calculation"); //$NON-NLS-1$
-				this.application2.updateDataTable();  // recall the table update function all prerequisites are checked
+				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("exit data table calculation"); //$NON-NLS-1$
+				RecordSet.this.application.updateDataTable();  // recall the table update function all prerequisites are checked
 			}
 		};
 		this.dataTableCalcThread.start();
@@ -1554,5 +1554,38 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public int getChangeCounter() {
 		return this.changeCounter;
+	}
+
+	/**
+	 * wait for all records are displayable, espally for this which needs some calculation like slope
+	 * @return
+	 */
+	public void waitForAllDisplayable() {
+		this.waitAllDisplayableThread = new Thread() {
+			
+			int numberRecords = getRecordNamesLength();
+			int recordEntries = getRecordDataSize(true);
+
+			public void run() {
+				int progress = RecordSet.this.application.getProgressPercentage();
+
+				int maxWaitCounter = 10;
+				int sleepTime = this.numberRecords * this.recordEntries / 200;
+				while (!checkAllRecordsDisplayable() && maxWaitCounter > 0) {
+					try {
+						RecordSet.log.fine("waiting for all records displayable"); //$NON-NLS-1$
+						Thread.sleep(sleepTime);
+						--maxWaitCounter;
+						if (maxWaitCounter == 0) return;
+					}
+					catch (InterruptedException e) {
+						RecordSet.log.log(Level.SEVERE, e.getMessage(), e);
+					}
+					RecordSet.this.application.setProgress(progress += 2, RecordSet.class.getCanonicalName());
+				}
+				if (RecordSet.log.isLoggable(Level.INFO)) RecordSet.log.info("all records displayable now, create table"); //$NON-NLS-1$
+			}
+		};
+		this.waitAllDisplayableThread.run();
 	}
 }

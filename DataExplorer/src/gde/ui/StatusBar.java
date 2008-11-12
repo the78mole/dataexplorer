@@ -158,8 +158,8 @@ public class StatusBar {
 		this.msgLabel.setText(text);
 	}
 	
-	public void setProgress(final int precent) {
-		this.progressBar.setSelection(precent);
+	public void setProgress(final int percentage) {
+		this.progressBar.setSelection(percentage);
 	}
 	
 	public int getProgressPercentage() {

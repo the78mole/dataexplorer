@@ -225,7 +225,7 @@ public class OsdReaderWriter {
 			}
 			OsdReaderWriter.application.getMenuToolBar().updateChannelSelector();
 			OsdReaderWriter.application.getMenuToolBar().updateRecordSetSelectCombo();
-			OsdReaderWriter.application.setProgress(50/numberRecordSets);
+			OsdReaderWriter.application.setProgress(50/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
 			int progressCycle = 0;
 
 			String[] firstRecordSet = new String[2];
@@ -247,7 +247,7 @@ public class OsdReaderWriter {
 						recordSet.get(recordKey).add(data_in.readInt());
 					}
 				}
-				OsdReaderWriter.application.setProgress((++progressCycle*100)/numberRecordSets);
+				OsdReaderWriter.application.setProgress((++progressCycle*100)/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
@@ -257,6 +257,8 @@ public class OsdReaderWriter {
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
+			OsdReaderWriter.application.setProgress((progressCycle*100)/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
+			
 			return recordSet;
 		}
 		finally {
