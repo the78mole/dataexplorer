@@ -147,7 +147,7 @@ public class DataTableWindow {
 				TableItem item;
 				
 				for (int i = 0; i < recordEntries; i++) {
-					this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), DataTableWindow.class.getCanonicalName());
+					this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), String.format("%06d", Thread.currentThread().getId()));
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataPoints(i));
 				}
@@ -157,7 +157,7 @@ public class DataTableWindow {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 
-			this.application.setProgress(100, DataTableWindow.class.getCanonicalName());
+			this.application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 			this.application.setStatusMessage(OSDE.STRING_BLANK);
 			if (log.isLoggable(Level.FINE)) log.fine("exit data table update"); //$NON-NLS-1$

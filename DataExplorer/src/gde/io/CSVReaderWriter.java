@@ -282,8 +282,8 @@ public class CSVReaderWriter {
 			throw new Exception(msg);
 		}
 		finally {
-			if (device.isTableTabRequested())	application.setProgress(10, CSVReaderWriter.class.getCanonicalName());
-			else application.setProgress(100, CSVReaderWriter.class.getCanonicalName());
+			if (device.isTableTabRequested())	application.setProgress(10, String.format("%06d", Thread.currentThread().getId()));
+			else application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
 			
 			application.setStatusMessage(OSDE.STRING_EMPTY);
 		}
@@ -362,14 +362,14 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
 				writer.write(sb.toString());
-				application.setProgress(new Double(stausIncrement * i).intValue(), CSVReaderWriter.class.getCanonicalName());
+				application.setProgress(new Double(stausIncrement * i).intValue(), String.format("%06d", Thread.currentThread().getId()));
 			}
 
 			writer.flush();
 			writer.close();
 			recordSet.setSaved(true);
 			log.fine("data line = " + sb.toString()); //$NON-NLS-1$
-			application.setProgress(100, CSVReaderWriter.class.getCanonicalName());
+			application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

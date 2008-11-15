@@ -394,7 +394,10 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public void switchRecordSet(String recordSetName) {
-		log.fine("switching to record set " + recordSetName); //$NON-NLS-1$
+		log.fine(String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
+		int percentage = this.application.getProgressPercentage();
+		if (percentage > 99 || percentage == 0)
+			this.application.setProgress(0, null);
 		final Channel activeChannel = this;
 		final String recordSetKey = recordSetName;
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {

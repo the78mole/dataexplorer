@@ -154,6 +154,7 @@ public class OsdReaderWriter {
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
 		String line;
 		boolean isFirstRecordSetDisplayed = false;
+		log.info(String.format("threadId = %06d", Thread.currentThread().getId()));
 		
 		HashMap<String, String> header = getHeader(filePath);
 		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
@@ -225,7 +226,7 @@ public class OsdReaderWriter {
 			}
 			OsdReaderWriter.application.getMenuToolBar().updateChannelSelector();
 			OsdReaderWriter.application.getMenuToolBar().updateRecordSetSelectCombo();
-			OsdReaderWriter.application.setProgress(50/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
+			OsdReaderWriter.application.setProgress(50/numberRecordSets, String.format("%06d", Thread.currentThread().getId()));
 			int progressCycle = 0;
 
 			String[] firstRecordSet = new String[2];
@@ -247,7 +248,7 @@ public class OsdReaderWriter {
 						recordSet.get(recordKey).add(data_in.readInt());
 					}
 				}
-				OsdReaderWriter.application.setProgress((++progressCycle*100)/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
+				OsdReaderWriter.application.setProgress((++progressCycle*100)/numberRecordSets, String.format("%06d", Thread.currentThread().getId()));
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
@@ -257,7 +258,7 @@ public class OsdReaderWriter {
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
-			OsdReaderWriter.application.setProgress((progressCycle*100)/numberRecordSets, OsdReaderWriter.class.getCanonicalName());
+			OsdReaderWriter.application.setProgress((progressCycle*100)/numberRecordSets, String.format("%06d", Thread.currentThread().getId()));
 			
 			return recordSet;
 		}
