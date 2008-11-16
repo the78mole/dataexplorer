@@ -77,6 +77,7 @@ public class CSVReaderWriter {
 	 * @throws Exception 
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws Exception {
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		String recordSetName = null;
 		RecordSet recordSet = null;
@@ -282,8 +283,8 @@ public class CSVReaderWriter {
 			throw new Exception(msg);
 		}
 		finally {
-			if (device.isTableTabRequested())	application.setProgress(10, String.format("%06d", Thread.currentThread().getId()));
-			else application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
+			if (device.isTableTabRequested())	application.setProgress(10, sThreadId);
+			else application.setProgress(100, sThreadId);
 			
 			application.setStatusMessage(OSDE.STRING_EMPTY);
 		}
@@ -297,6 +298,7 @@ public class CSVReaderWriter {
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		try {
 			application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0138) + filePath);
@@ -362,14 +364,14 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				log.fine("CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
 				writer.write(sb.toString());
-				application.setProgress(new Double(stausIncrement * i).intValue(), String.format("%06d", Thread.currentThread().getId()));
+				application.setProgress(new Double(stausIncrement * i).intValue(), sThreadId);
 			}
 
 			writer.flush();
 			writer.close();
 			recordSet.setSaved(true);
 			log.fine("data line = " + sb.toString()); //$NON-NLS-1$
-			application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
+			application.setProgress(100, sThreadId);
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
