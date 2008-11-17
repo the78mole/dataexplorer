@@ -273,7 +273,7 @@ public class GathererThread extends Thread {
 		this.device.makeInActiveDisplayable(tmpRecordSet);
 		this.channel.applyTemplate(newRecordSetKey);
 		this.application.updateStatisticsData();
-		this.application.updateDataTable();
+		this.application.updateDataTable(newRecordSetKey);
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class GathererThread extends Thread {
 			if (Thread.currentThread().getId() == this.application.getThreadId()) {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
-				this.application.updateDataTable();
+				this.application.updateDataTable(useRecordSetKey);
 				this.application.openMessageDialog(message);
 				this.device.getDialog().resetButtons();
 			}
@@ -322,7 +322,7 @@ public class GathererThread extends Thread {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
-						GathererThread.this.application.updateDataTable();
+						GathererThread.this.application.updateDataTable(useRecordSetKey);
 						GathererThread.this.application.openMessageDialog(message);
 						GathererThread.this.device.getDialog().resetButtons();
 					}

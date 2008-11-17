@@ -446,7 +446,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.application.updateCellVoltageWindow();
 			this.application.updateFileCommentWindow();
 			this.application.updateStatisticsData();
-			this.application.updateDataTable();
+			this.application.updateDataTable(recordSetKey);
 		}
 	}
 

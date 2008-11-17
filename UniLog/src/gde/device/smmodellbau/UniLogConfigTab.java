@@ -353,12 +353,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								Channel activeChannel = UniLogConfigTab.this.channels.getActiveChannel();
 								if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
-									String[] recordKeys = activeChannel.getActiveRecordSet().getRecordNames();
-									Record currentRecord = activeChannel.getActiveRecordSet().get(recordKeys[2]);
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									String[] recordKeys = activeRecordSet.getRecordNames();
+									Record currentRecord = activeRecordSet.get(recordKeys[2]);
 									UniLogConfigTab.this.device.invertRecordData(currentRecord);
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 									UniLogConfigTab.this.application.updateStatisticsData();
-									UniLogConfigTab.this.application.updateDataTable();
+									UniLogConfigTab.this.application.updateDataTable(activeRecordSet.getName());
 									UniLogConfigTab.this.application.updateDigitalWindow();
 									UniLogConfigTab.this.application.updateAnalogWindow();
 								}
@@ -481,7 +482,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 												UniLogConfigTab.this.application.updateGraphicsWindow();
 												UniLogConfigTab.this.application.updateStatisticsData();
-												UniLogConfigTab.this.application.updateDataTable();
+												UniLogConfigTab.this.application.updateDataTable(recordSet.getName());
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}
 										}
@@ -567,7 +568,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 												UniLogConfigTab.this.application.updateStatisticsData();
 												UniLogConfigTab.this.application.updateGraphicsWindow();
-												UniLogConfigTab.this.application.updateDataTable();
+												UniLogConfigTab.this.application.updateDataTable(recordSet.getName());
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}
 										}
@@ -667,7 +668,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 									UniLogConfigTab.this.application.updateStatisticsData();
-									UniLogConfigTab.this.application.updateDataTable();
+									UniLogConfigTab.this.application.updateDataTable(recordSet.getName());
 									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);
@@ -697,7 +698,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									recordSet.setRecalculationRequired();
 									UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
 									UniLogConfigTab.this.application.updateStatisticsData();
-									UniLogConfigTab.this.application.updateDataTable();
+									UniLogConfigTab.this.application.updateDataTable(recordSet.getName());
 									recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 								}
 								UniLogConfigTab.this.setConfigButton.setEnabled(true);

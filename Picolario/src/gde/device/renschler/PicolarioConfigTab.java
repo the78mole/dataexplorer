@@ -340,7 +340,7 @@ public class PicolarioConfigTab extends Composite {
 										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 										PicolarioConfigTab.this.application.updateStatisticsData();
-										PicolarioConfigTab.this.application.updateDataTable();
+										PicolarioConfigTab.this.application.updateDataTable(activeRecordSet.getName());
 										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 									}
 								}
@@ -372,7 +372,7 @@ public class PicolarioConfigTab extends Composite {
 										activeRecordSet.setRecalculationRequired();
 										PicolarioConfigTab.this.device.makeInActiveDisplayable(activeRecordSet);
 										PicolarioConfigTab.this.application.updateStatisticsData();
-										PicolarioConfigTab.this.application.updateDataTable();
+										PicolarioConfigTab.this.application.updateDataTable(activeRecordSet.getName());
 										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 									}
 								}

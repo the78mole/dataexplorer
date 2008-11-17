@@ -160,6 +160,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
 				if (recordSet != null) {
 					recordSet.resetZoomAndMeasurement();
+					recordSetKey = recordSet.getName();
 					if (recordSet.isRecalculation)
 						recordSet.checkAllDisplayable(); // updates graphics window
 				}
@@ -173,7 +174,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateCellVoltageWindow();
 				this.application.updateFileCommentWindow();
 				this.application.updateStatisticsData();
-				this.application.updateDataTable();
+				this.application.updateDataTable(recordSetKey);
 			}
 		}
 		else

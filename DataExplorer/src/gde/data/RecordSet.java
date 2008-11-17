@@ -1377,10 +1377,10 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.dataTableCalcThread = new Thread() {
 			final String[] 								recordKeys 		= getRecordNames();
+			final String sThreadId = String.format("%06d", Thread.currentThread().getId());
 			
 			public void run() {
-				String sThreadId = String.format("%06d", Thread.currentThread().getId());
-				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("entry data table calculation, threadId = " + sThreadId); //$NON-NLS-1$
+				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
 				RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
 				int numberRecords = getRecordNamesLength();
@@ -1399,18 +1399,18 @@ public class RecordSet extends HashMap<String, Record> {
 					catch (InterruptedException e) {
 						RecordSet.log.log(Level.SEVERE, e.getMessage(), e);
 					}
-					RecordSet.this.application.setProgress(progress+=2, sThreadId);
+					RecordSet.this.application.setProgress(progress+=2, this.sThreadId);
 				}
-				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("all records displayable now, create table, threadId = " + sThreadId); //$NON-NLS-1$
+				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 				// calculate record set internal data table
 				if (RecordSet.log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
-					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("start build table entries, threadId = " + sThreadId); //$NON-NLS-1$
+					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
 
 					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), sThreadId);
+						RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), this.sThreadId);
 						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
@@ -1420,17 +1420,17 @@ public class RecordSet extends HashMap<String, Record> {
 					}
 					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
-					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("end build table entries, threadId = " + sThreadId); //$NON-NLS-1$
+					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 				}
 				
 				// recall the table update function all prerequisites are checked
-				RecordSet.this.application.updateDataTable();  
-				
-				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("exit data table calculation, threadId = " + sThreadId); //$NON-NLS-1$
+				RecordSet.this.application.updateDataTable(RecordSet.this.getName());  
 			}
 		};
-		if (!this.dataTableCalcThread.isAlive()) 
+		if (!this.dataTableCalcThread.isAlive()) {
+			this.dataTableCalcThread.setPriority(Thread.NORM_PRIORITY);
 			this.dataTableCalcThread.start();
+		}
 	}
 
 	/**

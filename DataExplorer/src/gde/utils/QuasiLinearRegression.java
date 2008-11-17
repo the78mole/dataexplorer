@@ -131,7 +131,7 @@ public class QuasiLinearRegression extends CalculationThread {
 
 			this.application.updateCurveSelectorTable();
 			this.application.updateStatisticsData();
-			this.application.updateDataTable();
+			this.application.updateDataTable(this.recordSet.getName());
 			log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}

@@ -644,12 +644,11 @@ public class MenuToolBar {
 											MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 											MenuToolBar.this.application.updateGraphicsWindow();
 											MenuToolBar.this.application.updateStatisticsData();
-											MenuToolBar.this.application.updateDataTable();
+											MenuToolBar.this.application.updateDataTable("");
 											MenuToolBar.this.application.updateDigitalWindow();
 											MenuToolBar.this.application.updateAnalogWindow();
 											MenuToolBar.this.application.updateCellVoltageWindow();
 											MenuToolBar.this.application.updateFileCommentWindow();
-											MenuToolBar.this.application.updateDataTable();
 										}
 									}
 								}
