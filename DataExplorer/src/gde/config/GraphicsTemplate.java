@@ -24,6 +24,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import osde.OSDE;
+
 /**
  * CSlass managing graphics visualization, store, restore
  * @author Winfried Brügmann 
@@ -31,7 +33,6 @@ import java.util.logging.Logger;
 public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;
 	static final Logger		log								= Logger.getLogger(GraphicsTemplate.class.getName());
-	private final String	fileSep						= Settings.FILE_SEP;
 
 	private boolean				isAvailable				= false;
 	private boolean				isSaved						= false;																				// indicates if template is saved to file
@@ -71,7 +72,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			this.currentFileFilePath = this.templatePath + this.fileSep + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = this.templatePath + OSDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			log.fine("opening template file " + this.currentFileFilePath); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
 			this.isAvailable = true;
@@ -96,7 +97,7 @@ public class GraphicsTemplate extends Properties {
 				tmpPath.mkdir();
 			}
 
-			this.currentFileFilePath = this.templatePath + this.fileSep + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = this.templatePath + OSDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- OpenSerialDataExplorer GraphicsTemplate --"); //$NON-NLS-1$
 			this.isSaved = true;
 			this.selectedFileName = null;

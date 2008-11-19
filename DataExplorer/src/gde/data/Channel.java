@@ -253,7 +253,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, recordSet.getHorizontalGridRecordName());
 			}
 			this.template.store();
-			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + Settings.FILE_SEP + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
+			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
 		}
 	}
 	
