@@ -16,12 +16,15 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 
 import osde.data.Channels;
@@ -51,7 +54,7 @@ public class GraphicsWindow {
 	public final static int				MODE_CUT_LEFT						= 6;
 	public final static int				MODE_CUT_RIGHT					= 7;
 
-	final CTabFolder							parentDisplayTab;
+	final CTabFolder							tabFolder;
 	CTabItem											graphic;
 	
 	SashForm											graphicSashForm;
@@ -68,25 +71,31 @@ public class GraphicsWindow {
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
-	final String									name;
+	final String									tabName;
 	final TimeLine								timeLine								= new TimeLine();
 	final int											windowType;
 	
-	public GraphicsWindow(CTabFolder currentDisplayTab, int currentType, String useName) {
-		this.parentDisplayTab = currentDisplayTab;
+	public GraphicsWindow(OpenSerialDataExplorer currentApplication, CTabFolder currentDisplayTab, int currentType, String useTabName) {
+		this.application = currentApplication;
+		this.tabFolder = currentDisplayTab;
 		this.windowType = currentType;
-		this.name = useName;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
-		this.graphic = new CTabItem(this.parentDisplayTab, SWT.NONE);
-		this.graphic.setText(this.name);
+		this.graphic = new CTabItem(this.tabFolder, SWT.NONE);
+		this.graphic.setText(this.tabName);
 		SWTResourceManager.registerResourceUser(this.graphic);
+		this.graphic.addListener(SWT.RESIZE, new Listener() {
+			public void handleEvent(Event evt) {
+				log.fine("controlRezized " + evt);
+				GraphicsWindow.this.setSashFormWeights(GraphicsWindow.this.getCurveSelectorComposite().getSelectorColumnWidth());
+			}
+		});
 
 		{ // graphicSashForm
-			this.graphicSashForm = new SashForm(this.parentDisplayTab, SWT.HORIZONTAL);
+			this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
 			this.graphic.setControl(this.graphicSashForm);
 			
 			{ // curveSelector
@@ -148,9 +157,18 @@ public class GraphicsWindow {
 
 	/**
 	 * set the sashForm weights
+	 * @param newSelectorCompositeWidth the changed curve selector width
 	 */
-	public void setSashFormWeights(int newSelectorCopositeWidth) {
-		int[] newWeights = new int[] { newSelectorCopositeWidth, this.parentDisplayTab.getClientArea().width - newSelectorCopositeWidth};
+	public void setSashFormWeights(int newSelectorCompositeWidth) {
+		int tabFolderClientAreaWidth = this.tabFolder.getClientArea().width;
+		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
+		int bestGuessWidth = this.application.getClientArea().width-6;
+		if (tabFolderClientAreaWidth > bestGuessWidth) {
+			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth);
+			tabFolderClientAreaWidth = bestGuessWidth;
+		}
+		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
+		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);

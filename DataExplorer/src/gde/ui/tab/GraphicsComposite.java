@@ -149,10 +149,11 @@ public class GraphicsComposite extends Composite {
 		this.addControlListener(new ControlListener() {
 			public void controlResized(ControlEvent evt) {
 				log.finer("GraphicsComposite.controlResized() = " + evt);
-				Point size = GraphicsComposite.this.getSize();
+				Rectangle clientRect = GraphicsComposite.this.getClientArea();
+				Point size = new Point(clientRect.width, clientRect.height);
 				log.finer(GraphicsComposite.this.oldSize + " - " + size);
 				if (!GraphicsComposite.this.oldSize.equals(size)) {
-					log.finer(GraphicsComposite.this.oldSize + " - " + size);
+					log.fine("size changed, update " + GraphicsComposite.this.oldSize + " - " + size);
 					GraphicsComposite.this.oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
