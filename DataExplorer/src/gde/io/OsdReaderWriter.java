@@ -155,7 +155,6 @@ public class OsdReaderWriter {
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
 		String line;
 		boolean isFirstRecordSetDisplayed = false;
-		log.info("threadId = " + sThreadId);
 		
 		HashMap<String, String> header = getHeader(filePath);
 		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
@@ -191,6 +190,17 @@ public class OsdReaderWriter {
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
 					}
 					catch (NumberFormatException e) {
+						// ignore and keep channel as null
+					}
+					catch (NullPointerException e) {
+						// ignore and keep channel as null
+					}
+					try { // try to get channel startsWith configuration name
+						channel = channels.get(channels.getChannelNumber(channelConfig.split(" ")[0]));
+						channelConfig = channel.getConfigKey();
+						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
+					}
+					catch (NullPointerException e) {
 						// ignore and keep channel as null
 					}
 					if (channel == null) {
