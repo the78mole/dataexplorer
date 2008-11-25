@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Shell;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
-import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.messages.Messages;
@@ -234,9 +233,6 @@ public class PicolarioDialog extends DeviceDialog {
 									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
-									Record activeRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[2]);
-									activeRecord.setDisplayable(false);
-									PicolarioDialog.this.device.makeInActiveDisplayable(activeRecordSet);
 									PicolarioDialog.this.getDialogShell().redraw();
 								}
 							}

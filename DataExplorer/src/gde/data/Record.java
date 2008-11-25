@@ -680,7 +680,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
-		if (index > super.size()) if (log.isLoggable(Level.FINEST)) log.finest("index = " + index + " of " + super.size() + "/" + this.size());
+		if (index > super.size()) if (log.isLoggable(Level.FINE)) log.fine("index = " + index + " of " + super.size() + "/" + this.size());
 		return super.get(index);
 	}
 
@@ -1493,6 +1493,42 @@ public class Record extends Vector<Integer> {
 			}
 		}
 		return sum;
+	}
+	
+	/**
+	 * get/calcualte sum of time by configured trigger
+	 * @return sum value according trigger range specification of referenced measurement
+	 */
+	public String getTimeSumTriggeredRange() {
+		if (this.triggerRanges == null)  {
+			this.evaluateMinMax();
+		}
+		return this.calculateTimeSum();
+	}
+	
+	/**
+	 * get/calcualte sum of time by configuraed trigger
+	 * @param referencedMeasurementOrdinal
+	 * @return sum value according trigger range specification of referenced measurement
+	 */
+	public String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
+		if (this.triggerRanges == null)  {
+			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+		}
+		return this.calculateTimeSum();
+	}
+	
+	/**
+	 * calculate sum of min/max delta of each trigger range
+	 */
+	String calculateTimeSum() {
+		double sum = 0;
+		if (this.triggerRanges != null) {
+			for (TriggerRange range : this.triggerRanges) {
+				sum += (range.out - range.in) * this.parent.getTimeStep_ms();
+			}
+		}
+		return TimeLine.getFomatedTimeWithUnit(sum);
 	}
 	
 	/**

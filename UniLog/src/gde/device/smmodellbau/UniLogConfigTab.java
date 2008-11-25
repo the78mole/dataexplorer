@@ -566,8 +566,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												
 												recordSet.setRecalculationRequired();
 												UniLogConfigTab.this.device.makeInActiveDisplayable(recordSet);
-												UniLogConfigTab.this.application.updateStatisticsData();
 												UniLogConfigTab.this.application.updateGraphicsWindow();
+												UniLogConfigTab.this.application.updateStatisticsData();
 												UniLogConfigTab.this.application.updateDataTable(recordSet.getName());
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}

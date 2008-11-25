@@ -70,9 +70,9 @@ public class StatisticsWindow {
 	final Channels								channels;
 	final CTabFolder							tabFolder;
 
-	public StatisticsWindow(OpenSerialDataExplorer currentApplication, CTabFolder dataTab) {
+	public StatisticsWindow(OpenSerialDataExplorer currentApplication, CTabFolder currentDisplayTab) {
 		this.application = currentApplication;
-		this.tabFolder = dataTab;
+		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 	}
 
@@ -196,10 +196,11 @@ public class StatisticsWindow {
 						sb.append(NO_VALUE).append(DELIMITER);
 						sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
 						sb.append(NO_VALUE).append(DELIMITER);
-						sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)).append(DELIMITER); //$NON-NLS-1$
+						sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)); //$NON-NLS-1$
 						this.tabelItemText.add(sb.toString());
 
 						for (String recordName : displayableRecords) {
+							if (log.isLoggable(Level.FINE)) log.fine("updating record = " + recordName);
 							Record record = activeRecordSet.get(recordName);
 							DecimalFormat df = record.getDecimalFormat();
 							IDevice device = activeRecordSet.getDevice();
@@ -277,10 +278,11 @@ public class StatisticsWindow {
 								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
 									sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
-								// append trigger comment
-								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1)
+								// append trigger + comment
+								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1) {
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-
+									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
+								}
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}

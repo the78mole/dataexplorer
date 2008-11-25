@@ -565,6 +565,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordKey = measurements[4]; // 4=power [W]
 			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
+			record.setDisplayable(false);
 			record.clear();
 			Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			recordCurrent = recordSet.get(measurements[2]); // 2=current

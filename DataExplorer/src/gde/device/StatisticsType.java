@@ -81,6 +81,9 @@ public class StatisticsType {
 	@XmlAttribute
 	@XmlSchemaType(name = "anySimpleType")
 	protected String									comment;
+    @XmlAttribute
+    @XmlSchemaType(name = "anySimpleType")
+    protected String sumTriggerTimeText;
 
 	/**
 	 * Gets the value of the trigger property.
@@ -314,7 +317,30 @@ public class StatisticsType {
 		this.comment = value;
 	}
 
-	/**
+    /**
+     * Gets the value of the sumTriggerTimeText property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSumTriggerTimeText() {
+        return this.sumTriggerTimeText;
+    }
+
+    /**
+     * Sets the value of the sumTriggerTimeText property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSumTriggerTimeText(String value) {
+        this.sumTriggerTimeText = value;
+    }
+    /**
 	 * <p>Java class for anonymous complex type.
 	 * 
 	 * <p>The following schema fragment specifies the expected content contained within this class.
@@ -343,7 +369,6 @@ public class StatisticsType {
 		@XmlAttribute(required = true)
 		protected boolean			isGreater;
 		@XmlAttribute(required = true)
-		@XmlSchemaType(name = "anySimpleType")
 		protected Integer			minTimeSec;
 		@XmlAttribute
 		@XmlSchemaType(name = "anySimpleType")
