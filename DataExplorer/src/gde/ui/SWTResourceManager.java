@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 import osde.OSDE;
+import osde.device.IDevice;
 
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
@@ -307,6 +308,24 @@ public class SWTResourceManager {
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
 			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
+			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
+			resources.put(tmpUrl, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	public static Image getImage(IDevice activeDeviceInstance, String url) {
+		try {
+			String tmpUrl = url.replace('\\', '/');
+			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX))
+				tmpUrl = tmpUrl.substring(1);
+			if (resources.containsKey(tmpUrl))
+				return (Image) resources.get(tmpUrl);
+			Image img = new Image(Display.getDefault(), activeDeviceInstance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(tmpUrl, img);
 			return img;

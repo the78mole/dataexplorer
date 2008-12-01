@@ -28,8 +28,8 @@
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
-	    	<fileset dir="." includes="resource/**/*.xml"/>
-	    	<fileset dir="." includes="resource/*.jpg"/>
+	    	<fileset dir="src" includes="**/*.xml"/>
+	    	<fileset dir="src" includes="**/*.jpg"/>
 	    </jar>
 	</target>
 

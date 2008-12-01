@@ -38,7 +38,6 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -361,7 +360,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.deviceCanvas = new Canvas(this.group1, SWT.NONE);
 									this.deviceCanvas.setBounds(12, 70, 227, 165);
-									this.deviceCanvas.setBackgroundImage(new Image(this.dialogShell.getDisplay(), this.settings.getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + "NoDevicePicture.jpg")); //$NON-NLS-1$
+									this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
 								}
 								{
 									this.manufacturerDescription = new Text(this.group1, SWT.MULTI | SWT.WRAP);
@@ -825,7 +824,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		if (this.selectedActiveDeviceConfig == null) {
 			log.fine("activeDeviceConfig == null -> no device selected as active"); //$NON-NLS-1$
 			this.application.setActiveDevice(null);
-			this.deviceCanvas.setBackgroundImage(new Image(this.dialogShell.getDisplay(), this.settings.getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + "NoDevicePicture.jpg")); //$NON-NLS-1$
+			this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
 
 			this.manufacturerName.setText(Settings.EMPTY);
 			this.deviceText.setText(Settings.EMPTY);
@@ -846,7 +845,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		else {
 			log.fine(this.settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
-			this.deviceCanvas.setBackgroundImage(new Image(this.dialogShell.getDisplay(), this.settings.getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + this.selectedActiveDeviceConfig.getImageFileName()));
+			this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage(getInstanceOfDevice(), "resource/" + this.selectedActiveDeviceConfig.getImageFileName()));
 
 			this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
 			this.deviceText.setText(this.selectedActiveDeviceConfig.getName());
