@@ -18,18 +18,42 @@
 		</javac>
 	</target>
 
-	<target name="package" depends="compile">
+	<target name="package" depends="compile, init">
 		<echo message="Building using ${os.name} ${os.arch}" />
-	    <jar manifest="META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >
-			<metainf dir="src/META-INF" excludes="MANIFEST.MF"/>
-			<metainf dir="META-INF" excludes="MANIFEST.MF"/>
+		<!--
+		<manifest file="src/META-INF/MANIFEST.MF">
+    		<attribute name="Bundle-Version" value="${version.num}"/>
+    		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
+    		<attribute name="Bundle-Description" value="Implemntation for eStation devices from Bantam"/>
+    		<attribute name="Export-Service" value="osde.device.bantam.eStation902,
+    			${line.separator} osde.device.bantam.eStationBC6,  
+    			${line.separator} osde.device.bantam.eStationBC610,
+    			${line.separator} osde.device.bantam.eStationBC8"/>
+    	</manifest>
+    	-->
+	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
-	    	<fileset dir="src" includes="**/*.properties" />
+	    	<fileset dir="." includes="resource/**/*.xml"/>
+	    	<fileset dir="." includes="resource/*.jpg"/>
 	    </jar>
 	</target>
 
 	<target name="clean">
 		<delete dir="build" />
+	</target>
+	
+	<target name="echo:build.properties" if="build.properties.exists">
+		<echo message="Building using ${build.properties}" />
+	</target>
+
+	<target name="init">
+		<property name="build.properties" location="../build/build.properties" />
+
+		<property file="${build.properties}" />
+
+		<!-- this is to have nice message about used build.properties file -->
+		<available property="build.properties.exists" file="${build.properties}" />
+		<echo message="Building using ${build.properties}" />
 	</target>
 
 </project>
