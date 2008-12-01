@@ -183,8 +183,8 @@ public class OsdReaderWriter {
 				recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
-				if (channel == null) { // channelConfiguration not found
-					try { // try to get channel last digit and use as channel config ordinal
+				if (channel == null) { // 1.st try channelConfiguration not found
+					try { // get channel last digit and use as channel config ordinal
 						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
@@ -195,6 +195,8 @@ public class OsdReaderWriter {
 					catch (NullPointerException e) {
 						// ignore and keep channel as null
 					}
+				}
+				if (channel == null) { // 2.nd try channelConfiguration not found
 					try { // try to get channel startsWith configuration name
 						channel = channels.get(channels.getChannelNumber(channelConfig.split(" ")[0]));
 						channelConfig = channel.getConfigKey();
@@ -203,21 +205,22 @@ public class OsdReaderWriter {
 					catch (NullPointerException e) {
 						// ignore and keep channel as null
 					}
-					if (channel == null) {
-						String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + Messages.getString(MessageIds.OSDE_MSGI0019) + Messages.getString(MessageIds.OSDE_MSGI0020);
-						OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
-						int newChannelNumber = channels.size() + 1;
-						channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
-						// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-						channels.put(newChannelNumber, channel);
-						Vector<String> newChannelNames = new Vector<String>();
-						for (String channelConfigKey : channels.getChannelNames()) {
-							newChannelNames.add(channelConfigKey);
-						}
-						newChannelNames.add(newChannelNumber + " : " + channelConfig); //$NON-NLS-1$
-						channels.setChannelNames(newChannelNames.toArray(new String[1]));
-					}
 				}
+				if (channel == null) {
+					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + Messages.getString(MessageIds.OSDE_MSGI0019) + Messages.getString(MessageIds.OSDE_MSGI0020);
+					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
+					int newChannelNumber = channels.size() + 1;
+					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
+					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
+					channels.put(newChannelNumber, channel);
+					Vector<String> newChannelNames = new Vector<String>();
+					for (String channelConfigKey : channels.getChannelNames()) {
+						newChannelNames.add(channelConfigKey);
+					}
+					newChannelNames.add(newChannelNumber + " : " + channelConfig); //$NON-NLS-1$
+					channels.setChannelNames(newChannelNames.toArray(new String[1]));
+				}
+
 				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);

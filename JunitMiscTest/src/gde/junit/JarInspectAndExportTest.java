@@ -51,7 +51,7 @@ public class JarInspectAndExportTest extends TestCase {
 	public void testListDeviceJars() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-			File sourceDir = new File(FileUtils.getDeviceJarBasePath());
+			File sourceDir = new File(FileUtils.getDevicePluginJarBasePath());
 			String[] files = sourceDir.list();
 			for (String jarName : files) {
 				System.out.println(jarName);
@@ -67,7 +67,7 @@ public class JarInspectAndExportTest extends TestCase {
 	public void testListDeviceJarsManifest() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		String jarFileDir = FileUtils.getDeviceJarBasePath();
+		String jarFileDir = FileUtils.getDevicePluginJarBasePath();
 		File sourceDir = new File(jarFileDir);
 		String[] files = sourceDir.list();
 		for (String fileName : files) {
@@ -95,7 +95,7 @@ public class JarInspectAndExportTest extends TestCase {
 	public void testExtractDevicePictures() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		String jarFileDir = FileUtils.getDeviceJarBasePath();
+		String jarFileDir = FileUtils.getDevicePluginJarBasePath();
 		File sourceDir = new File(jarFileDir);
 		String[] files = sourceDir.list();
 		try {
@@ -105,8 +105,7 @@ public class JarInspectAndExportTest extends TestCase {
 				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 				for (String plugin : plugins) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					String sourceFileName = "resource/" + plugin + ".jpg";
-					FileUtils.extractFile(jarFile, sourceFileName, targetDirectory);
+					FileUtils.extract(jarFile, plugin + ".jpg", "resource/", targetDirectory, "555");
 				}
 			}
 		}
@@ -124,7 +123,7 @@ public class JarInspectAndExportTest extends TestCase {
 	public void testExtractDeviceProperties() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		String jarFileDir = FileUtils.getDeviceJarBasePath();
+		String jarFileDir = FileUtils.getDevicePluginJarBasePath();
 		File sourceDir = new File(jarFileDir);
 		String[] files = sourceDir.list();
 		try {
@@ -134,8 +133,7 @@ public class JarInspectAndExportTest extends TestCase {
 				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 				for (String plugin : plugins) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					String sourceFileName = "resource/en/" + plugin + ".xml";
-					FileUtils.extractFile(jarFile, sourceFileName, targetDirectory);
+					FileUtils.extract(jarFile, plugin + ".xml", "resource/en/", targetDirectory, "555");
 				}
 			}
 		}
