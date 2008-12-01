@@ -89,7 +89,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		int searchedNumber = 1;
 		boolean isFound = false;
 		for (String name : this.getChannelNames()) {
-			if (name != null && name.length() > 5 && name.split(OSDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
+			if (name != null && name.length() > 5 && (name.split(OSDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName) || name.split(OSDE.STRING_COLON)[1].trim().equals(channelName))) {
 				isFound = true;
 				break;
 			}
