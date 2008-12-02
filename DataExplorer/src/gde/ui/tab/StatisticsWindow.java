@@ -53,6 +53,7 @@ public class StatisticsWindow {
 	TableColumn										unitTableColumn;
 	TableColumn										sigmaTableColumn;
 	TableColumn										customTableColumn;
+	int														customTableColumnWidth = 0;
 	CLabel												sigmaLabel;
 	CLabel												extraLabel;
 	TableColumn										avgTableColumn;
@@ -63,7 +64,7 @@ public class StatisticsWindow {
 	String descriptionText = ""; //$NON-NLS-1$
 	Vector<String> tabelItemText = new Vector<String>();
 
-	final int											extentFactor	= 9;																									// factor to calculate column width
+	final int											extentFactor	= 8;																									// factor to calculate column width
 	RecordSet											oldRecordSet	= null;
 	int														oldNumberDisplayableRecords = 0;
 	final OpenSerialDataExplorer	application;
@@ -181,6 +182,7 @@ public class StatisticsWindow {
 				if (activeRecordSet != this.oldRecordSet || activeRecordSet.getNumberOfDisplayableRecords() != this.oldNumberDisplayableRecords) {
 					StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n"  //$NON-NLS-1$
 						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+					this.customTableColumnWidth = 0;
 					try {
 						String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
 						this.oldNumberDisplayableRecords = displayableRecords.length;
@@ -283,6 +285,9 @@ public class StatisticsWindow {
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
 								}
+								int textlength = sb.substring(sb.lastIndexOf(DELIMITER)+1).length() * this.extentFactor;
+								this.customTableColumnWidth = textlength > this.customTableColumnWidth ? textlength : this.customTableColumnWidth;
+								log.info("textLength = " + textlength + "/" + this.customTableColumnWidth);
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}
@@ -349,8 +354,8 @@ public class StatisticsWindow {
 		// set items (rows) of data table
 		TableItem row;
 
+		this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 		for (String itemsText : this.tabelItemText) {
-			this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 			row = new TableItem(this.dataTable, SWT.NONE);
 			row.setText(itemsText.split(DELIMITER));
 		}
@@ -370,9 +375,11 @@ public class StatisticsWindow {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
 			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
-		int tableHeight = this.dataTable.getItemCount() * this.dataTable.getItemHeight() + this.dataTable.getHeaderHeight() + 4;
+		int tableHeight = this.dataTable.getItemCount() * (2+this.dataTable.getItemHeight()) + this.dataTable.getHeaderHeight() + this.dataTable.getHorizontalBar().getSize().y;
 		tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
+		log.info("tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
-		this.customTableColumn.setWidth(this.dataTable.getClientArea().width - columsWidth);
+		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
+		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
 	}
 }
