@@ -301,8 +301,9 @@ public class SWTResourceManager {
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(String url) {
+		String tmpUrl = null;
 		try {
-			String tmpUrl = url.replace('\\', '/');
+			tmpUrl = url.replace('\\', '/');
 			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
@@ -312,6 +313,7 @@ public class SWTResourceManager {
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, instance.getClass().getName() + " - " + tmpUrl);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		}
@@ -319,8 +321,9 @@ public class SWTResourceManager {
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(IDevice activeDeviceInstance, String url) {
+		String tmpUrl = null;
 		try {
-			String tmpUrl = url.replace('\\', '/');
+			tmpUrl = url.replace('\\', '/');
 			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
@@ -330,6 +333,7 @@ public class SWTResourceManager {
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		}
