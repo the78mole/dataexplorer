@@ -65,6 +65,7 @@ public class StatisticsWindow {
 	String descriptionText = ""; //$NON-NLS-1$
 	Vector<String> tabelItemText = new Vector<String>();
 
+	final boolean									isWindows = System.getProperty("os.name").startsWith("Windows");
 	final int											extentFactor	= 8;																									// factor to calculate column width
 	RecordSet											oldRecordSet	= null;
 	int														oldNumberDisplayableRecords = 0;
@@ -286,8 +287,8 @@ public class StatisticsWindow {
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
 								}
-								int textlength = sb.substring(sb.lastIndexOf(DELIMITER)+1).length() * 7;
-								this.customTableColumnWidth = textlength > this.customTableColumnWidth ? textlength : this.customTableColumnWidth;
+								int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER)+1)).x;
+								this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}
@@ -351,11 +352,12 @@ public class StatisticsWindow {
 		// cleanup old data table
 		this.dataTable.removeAll();
 
+		
 		// set items (rows) of data table
 		TableItem row;
-
+		if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
 		for (String itemsText : this.tabelItemText) {
-			this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
+			if (this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer line for windows
 			row = new TableItem(this.dataTable, SWT.NONE);
 			row.setText(itemsText.split(DELIMITER));
 		}
@@ -376,17 +378,15 @@ public class StatisticsWindow {
 			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
 		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
-		log.info("computed size = " + tableSize);
-		//int tableHeight = this.dataTable.getItemCount() * (this.dataTable.getGridLineWidth()+this.dataTable.getItemHeight()) + this.dataTable.getHeaderHeight() + this.dataTable.getHorizontalBar().getSize().y;
+		//log.info("computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
 		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
-		log.info("tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
+		//log.info("tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
 		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
-		//this.customTableColumnWidth = tableSize.x - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
-		log.info("table width = " + (columsWidth + this.customTableColumn.getWidth()));
+		//log.info("table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
 }
