@@ -207,7 +207,7 @@ public class EStationDialog extends DeviceDialog {
 					});
 					{
 						FormData infoTextLData = new FormData();
-						infoTextLData.height = 70;
+						infoTextLData.height = 80;
 						infoTextLData.left = new FormAttachment(0, 1000, 12);
 						infoTextLData.top = new FormAttachment(0, 1000, 20);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
