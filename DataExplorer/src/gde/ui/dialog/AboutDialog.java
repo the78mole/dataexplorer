@@ -93,6 +93,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0149)  //$NON-NLS-1$
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.infoText.setEditable(false);
+				this.infoText.setEnabled(false);
 			}
 			{
 				FormData versionLData = new FormData();
@@ -105,6 +107,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version.setLayoutData(versionLData);
 				this.version.setText(OSDE.OSDE_VERSION);
 				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.version.setEditable(false);
+				this.version.setEnabled(false); 
 			}
 			{
 				FormData okLData = new FormData();
@@ -136,6 +140,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
+				this.aboutText.setEditable(false);
+				this.aboutText.setEnabled(false);
 			}
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
