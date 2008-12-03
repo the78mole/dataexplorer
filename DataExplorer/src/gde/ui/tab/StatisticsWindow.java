@@ -13,6 +13,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
@@ -285,9 +286,8 @@ public class StatisticsWindow {
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
 								}
-								int textlength = sb.substring(sb.lastIndexOf(DELIMITER)+1).length() * this.extentFactor;
+								int textlength = sb.substring(sb.lastIndexOf(DELIMITER)+1).length() * 7;
 								this.customTableColumnWidth = textlength > this.customTableColumnWidth ? textlength : this.customTableColumnWidth;
-								log.info("textLength = " + textlength + "/" + this.customTableColumnWidth);
 								log.finer(sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}
@@ -354,12 +354,12 @@ public class StatisticsWindow {
 		// set items (rows) of data table
 		TableItem row;
 
-		this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 		for (String itemsText : this.tabelItemText) {
+			this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 			row = new TableItem(this.dataTable, SWT.NONE);
 			row.setText(itemsText.split(DELIMITER));
 		}
-		this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
+		//this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 		adaptTableSize();
 
 		if (StatisticsWindow.log.isLoggable(Level.FINE)) StatisticsWindow.log.fine("exit data table update"); //$NON-NLS-1$
@@ -375,11 +375,18 @@ public class StatisticsWindow {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
 			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
-		int tableHeight = this.dataTable.getItemCount() * (2+this.dataTable.getItemHeight()) + this.dataTable.getHeaderHeight() + this.dataTable.getHorizontalBar().getSize().y;
-		tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
+		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
+		log.info("computed size = " + tableSize);
+		//int tableHeight = this.dataTable.getItemCount() * (this.dataTable.getGridLineWidth()+this.dataTable.getItemHeight()) + this.dataTable.getHeaderHeight() + this.dataTable.getHorizontalBar().getSize().y;
+		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
+		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
+		tableHeight = tableHeight > 0 ? tableHeight : 0;
 		log.info("tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
+		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
+		//this.customTableColumnWidth = tableSize.x - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
+		log.info("table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
 }
