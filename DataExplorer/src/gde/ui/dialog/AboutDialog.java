@@ -82,9 +82,9 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
-				infoTextLData.height = 240;
+				infoTextLData.height = 260;
 				infoTextLData.left =  new FormAttachment(0, 1000, 20);
-				infoTextLData.top =  new FormAttachment(0, 1000, 111);
+				infoTextLData.top =  new FormAttachment(0, 1000, 90);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.infoText = new Text(this.dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
 				this.infoText.setLayoutData(infoTextLData);
@@ -99,7 +99,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.width = 610;
 				versionLData.height = 25;
 				versionLData.left =  new FormAttachment(0, 1000, 20);
-				versionLData.top =  new FormAttachment(0, 1000, 72);
+				versionLData.top =  new FormAttachment(0, 1000, 65);
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
 				this.version = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
 				this.version.setLayoutData(versionLData);

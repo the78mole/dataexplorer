@@ -91,8 +91,8 @@ public class MenuToolBar {
 	ToolItem											separator;
 
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
-	Point													channelSelectSize = new Point(140, 22);
-	Point													recordSelectSize = new Point(240, 22);
+	Point													channelSelectSize = new Point(180, 22);
+	Point													recordSelectSize = new Point(260, 22);
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -442,7 +442,7 @@ public class MenuToolBar {
 				{
 					this.channelSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
 					this.channelSelectComposite.setLayout(null);
-					this.channelSelectComposite.setSize(150, this.size.y);
+					this.channelSelectComposite.setSize(this.channelSelectSize.x+10, this.size.y);
 					{
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
@@ -517,7 +517,7 @@ public class MenuToolBar {
 				{
 					this.recordSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
 					this.recordSelectComposite.setLayout(null);
-					this.recordSelectComposite.setSize(250, this.size.y);
+					this.recordSelectComposite.setSize(this.recordSelectSize.x+10, this.size.y);
 					{
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });

@@ -660,7 +660,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							this.auswahlTabItem.setControl(this.deviceGroup);
 							this.deviceGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0187));
 							{
-								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK);
+								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK | SWT.BORDER);
 								this.deviceTable.setBounds(17, 40, 497, 401);
 								this.deviceTable.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {

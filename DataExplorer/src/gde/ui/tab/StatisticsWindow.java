@@ -125,7 +125,7 @@ public class StatisticsWindow {
 			}
 			{
 				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
-				this.dataTable.setLinesVisible(false);
+				this.dataTable.setLinesVisible(!this.isWindows);
 				this.dataTable.setHeaderVisible(true);
 				this.dataTable.setFont(SWTResourceManager.getFont(this.dataTable.getFont().getFontData()[0].getName(), 10, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
