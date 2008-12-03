@@ -481,7 +481,7 @@ public class DeviceConfiguration {
 	private ChannelType getChannel(String channelConfigKey) {
 		ChannelType channel = null;
 		for (ChannelType c : this.deviceProps.getChannel()) {
-			if(c.getName().trim().equals(channelConfigKey)) {
+			if(c.getName().trim().startsWith(channelConfigKey)) {
 				channel = c;
 				break;
 			}
