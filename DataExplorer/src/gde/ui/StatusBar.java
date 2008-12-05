@@ -30,7 +30,6 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages
@@ -41,9 +40,9 @@ public class StatusBar {
 	
 	final Composite					statusComposite;
 	Composite								connectionComposite;
-	Text										txText;
-	Text										rxText;
-	Text										conText;
+	Label										txText;
+	Label										rxText;
+	Label										conText;
 	CLabel									portButton;
 	CLabel									txButton;
 	CLabel									rxButton;
@@ -92,10 +91,9 @@ public class StatusBar {
 					this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
-					this.conText = new Text(this.comComposite, SWT.LEFT);
+					this.conText = new Label(this.comComposite, SWT.LEFT);
 					this.conText.setText("CON"); //$NON-NLS-1$
 					this.conText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
-					this.conText.setEditable(false);
 					this.conText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
@@ -105,10 +103,9 @@ public class StatusBar {
 					this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
-					this.rxText = new Text(this.comComposite, SWT.LEFT);
+					this.rxText = new Label(this.comComposite, SWT.LEFT);
 					this.rxText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					this.rxText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
-					this.rxText.setEditable(false);
 					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
@@ -118,10 +115,9 @@ public class StatusBar {
 					this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
-					this.txText = new Text(this.comComposite, SWT.LEFT);
+					this.txText = new Label(this.comComposite, SWT.LEFT);
 					this.txText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					this.txText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
-					this.txText.setEditable(false);
 					this.txText.setText("TX"); //$NON-NLS-1$
 				}
 				this.comComposite.pack();
