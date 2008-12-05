@@ -27,8 +27,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.messages.MessageIds;
@@ -44,10 +44,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	final static Logger log = Logger.getLogger(AboutDialog.class.getName());
 
 	Shell dialogShell;
-	private Text aboutText;
+	private Label aboutText;
 	private Button ok;
-	private Text infoText;
-	private Text version;
+	private Label infoText;
+	private Label version;
 
 	/**
 	* Auto-generated main method to display this 
@@ -86,29 +86,27 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.left =  new FormAttachment(0, 1000, 20);
 				infoTextLData.top =  new FormAttachment(0, 1000, 90);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
-				this.infoText = new Text(this.dialogShell, SWT.LEFT | SWT.MULTI | SWT.WRAP);
+				this.infoText = new Label(this.dialogShell, SWT.LEFT | SWT.WRAP);
 				this.infoText.setLayoutData(infoTextLData);
 				this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT0147)
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0148)  //$NON-NLS-1$ 
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0149)  //$NON-NLS-1$
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				this.infoText.setEditable(false);
-				this.infoText.setEnabled(false);
+				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+				//this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			}
 			{
 				FormData versionLData = new FormData();
 				versionLData.width = 610;
 				versionLData.height = 25;
 				versionLData.left =  new FormAttachment(0, 1000, 20);
-				versionLData.top =  new FormAttachment(0, 1000, 65);
+				versionLData.top =  new FormAttachment(0, 1000, 50);
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
-				this.version = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+				this.version = new Label(this.dialogShell, SWT.CENTER);
 				this.version.setLayoutData(versionLData);
 				this.version.setText(OSDE.OSDE_VERSION);
 				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				this.version.setEditable(false);
-				this.version.setEnabled(false); 
 			}
 			{
 				FormData okLData = new FormData();
@@ -134,14 +132,12 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.left =  new FormAttachment(0, 1000, 20);
 				aboutTextLData.top =  new FormAttachment(0, 1000, 21);
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
-				this.aboutText = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+				this.aboutText = new Label(this.dialogShell, SWT.CENTER);
 				this.aboutText.setLayoutData(aboutTextLData);
 				this.aboutText.setFont(SWTResourceManager.getFont("Sans Serif", 18, 2, false, false)); //$NON-NLS-1$
 				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
-				this.aboutText.setEditable(false);
-				this.aboutText.setEnabled(false);
 			}
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
