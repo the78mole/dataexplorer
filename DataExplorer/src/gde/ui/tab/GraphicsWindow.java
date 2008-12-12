@@ -162,10 +162,12 @@ public class GraphicsWindow {
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
 		int tabFolderClientAreaWidth = this.tabFolder.getClientArea().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
-		int bestGuessWidth = this.application.getClientArea().width-6;
+		int bestGuessWidth = this.application.getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
 			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth);
 			tabFolderClientAreaWidth = bestGuessWidth;
+			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getSize().y);
+			this.tabFolder.layout(true);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
