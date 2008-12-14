@@ -61,6 +61,7 @@ public class GathererThread extends Thread {
 	boolean												isTimerRunning							= false;
 	boolean												isPortOpenedByLiveGatherer	= false;
 	boolean												isSwitchedRecordSet					= false;
+	boolean												isGatheredRecordSetVisible	= true;
 
 	RecordSet											recordSet;
 	int														retryCounter								= WAIT_TIME_RETRYS;				// 90 * 2 sec timeout = 180 sec
@@ -177,10 +178,6 @@ public class GathererThread extends Thread {
 							// prepare the data for adding to record set
 							GathererThread.this.recordSet.addPoints(usedDevice.convertDataBytes(points, dataBuffer), false);
 
-							GathererThread.this.application.updateGraphicsWindow();
-							GathererThread.this.application.updateDigitalWindowChilds();
-							GathererThread.this.application.updateAnalogWindowChilds();
-
 							int posCells = GathererThread.this.device.getName().endsWith("BC6") ? 6 : 8; //$NON-NLS-1$
 							GathererThread.this.numberBatteryCells = 0; //GathererThread.this.device.getNumberOfLithiumXCells(dataBuffer);
 							String[] recordKeys = GathererThread.this.recordSet.getRecordNames();
@@ -191,10 +188,19 @@ public class GathererThread extends Thread {
 									log.fine("record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								}
 							}
-							GathererThread.log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
-
-							if (GathererThread.this.numberBatteryCells > 0) {
-								GathererThread.this.application.updateCellVoltageChilds();
+							
+							GathererThread.this.isGatheredRecordSetVisible = GathererThread.this.recordSetKey.equals(GathererThread.this.channels.getActiveChannel().getActiveRecordSet().getName());						
+							if (GathererThread.this.isGatheredRecordSetVisible) {
+								GathererThread.this.application.updateGraphicsWindow();
+								GathererThread.this.application.updateStatisticsData();
+								GathererThread.this.application.updateDataTable(GathererThread.this.recordSetKey);
+								GathererThread.this.application.updateDigitalWindowChilds();
+								GathererThread.this.application.updateAnalogWindowChilds();
+								
+								GathererThread.log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
+								if (GathererThread.this.numberBatteryCells > 0) {
+									GathererThread.this.application.updateCellVoltageChilds();
+								}
 							}
 
 							//switch off single cell voltage lines if not battery type of lithium where cell voltages are available

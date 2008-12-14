@@ -104,6 +104,7 @@ public class AkkuMasterChannelTab {
 	int														memoryNumberValue					= 1;
 
 	boolean												isCollectData							= false;
+	boolean												isGatheredRecordSetVisible	= true;
 	RecordSet											recordSet;
 	int														retryCounter							= 3;
 	long													timeStamp;
@@ -562,10 +563,15 @@ public class AkkuMasterChannelTab {
 														points[4] = new Integer((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
 														AkkuMasterChannelTab.log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-														AkkuMasterChannelTab.this.recordSet.addPoints(points, false); // updates data table and digital windows
-														AkkuMasterChannelTab.this.application.updateGraphicsWindow();
-														AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
-														AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
+														AkkuMasterChannelTab.this.isGatheredRecordSetVisible = AkkuMasterChannelTab.this.recordSetKey.equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getActiveRecordSet().getName());						
+														if (AkkuMasterChannelTab.this.isGatheredRecordSetVisible) {
+															AkkuMasterChannelTab.this.recordSet.addPoints(points, false); // updates data table and digital windows
+															AkkuMasterChannelTab.this.application.updateGraphicsWindow();
+															AkkuMasterChannelTab.this.application.updateStatisticsData();
+															AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey);
+															AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
+															AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
+														}
 													}
 													else {
 														// enable switching records sets

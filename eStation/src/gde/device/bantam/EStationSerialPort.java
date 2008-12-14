@@ -46,7 +46,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			
 			answer = new byte[13];
-			answer = this.read(answer, 2000);
+			answer = this.read(answer, 5000);
 			// synchronize received data to begin of sent data 
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;

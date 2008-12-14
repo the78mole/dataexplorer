@@ -181,7 +181,7 @@ public class StatisticsWindow {
 		if (StatisticsWindow.this.channels.getActiveChannel() != null) {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null ) {
-				if (activeRecordSet != this.oldRecordSet || activeRecordSet.getNumberOfDisplayableRecords() != this.oldNumberDisplayableRecords) {
+				//if (activeRecordSet != this.oldRecordSet || activeRecordSet.getNumberOfDisplayableRecords() != this.oldNumberDisplayableRecords) {
 					StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n"  //$NON-NLS-1$
 						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
 					this.customTableColumnWidth = 0;
@@ -298,7 +298,7 @@ public class StatisticsWindow {
 						StatisticsWindow.log.log(Level.WARNING, e.getMessage(), e);
 					}
 					this.oldRecordSet = activeRecordSet;
-				}
+				//}
 			}
 			else {
 				StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$
@@ -311,8 +311,9 @@ public class StatisticsWindow {
 			this.tabelItemText = new Vector<String>();
 			this.oldRecordSet = null;
 		}
-		StatisticsWindow.this.descriptionGroup.redraw();
+		//StatisticsWindow.this.descriptionGroup.redraw();
 		updateDataTable();
+		this.dataTable.redraw();
 	}
 
 	/**
