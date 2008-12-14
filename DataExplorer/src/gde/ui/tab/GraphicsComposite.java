@@ -336,9 +336,10 @@ public class GraphicsComposite extends Composite {
 	 */
 	private void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
-		int maxTime = timeScale[0];
+		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
+		int maxTime_ms = timeScale[3];
 
 		//prepare measurement scales
 		int numberCurvesRight = 0;
@@ -365,7 +366,7 @@ public class GraphicsComposite extends Composite {
 		int y0;
 		int height; // make modulo 20
 		// draw x coordinate	- time scale
-		int startTime, endTime;
+		int startTimeFormated, endTimeFormated;
 		// Calculate the horizontal area to used for plotting graphs
 		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
 		int horizontalGap = pt.x/5;
@@ -391,9 +392,9 @@ public class GraphicsComposite extends Composite {
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		if (GraphicsWindow.log.isLoggable(Level.FINE)) GraphicsWindow.log.fine("curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		startTime = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
-		endTime = startTime + maxTime;
-		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, fitTimeWidth, startTime, endTime, scaleFactor, timeFormat, OpenSerialDataExplorer.COLOR_BLACK);
+		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
+		endTimeFormated = startTimeFormated + maxTimeFormated;
+		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, fitTimeWidth, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC)), OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(width, height);
@@ -449,7 +450,7 @@ public class GraphicsComposite extends Composite {
 
 		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
 
-		if (startTime != 0) { // scaled window 
+		if (startTimeFormated != 0) { // scaled window 
 			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = this.canvasGC.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
