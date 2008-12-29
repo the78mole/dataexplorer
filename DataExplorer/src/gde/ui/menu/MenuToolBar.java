@@ -200,9 +200,9 @@ public class MenuToolBar {
 			} // end file tool bar
 			this.coolSize = this.fileCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
 			log.fine("fileCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.fileCoolItem.setSize(this.coolSize);
+			this.fileCoolItem.setSize(this.toolSize);
 			//this.fileCoolItem.setPreferredSize(this.size);
-			this.fileCoolItem.setMinimumSize(this.coolSize);
+			this.fileCoolItem.setMinimumSize(this.toolSize);
 		} // end file cool item
 
 		{ // begin device cool item
@@ -322,9 +322,9 @@ public class MenuToolBar {
 			} // end device tool bar
 			this.coolSize = this.deviceCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
 			log.fine("deviceCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.deviceCoolItem.setSize(this.coolSize);
+			this.deviceCoolItem.setSize(this.toolSize);
 			//this.deviceCoolItem.setPreferredSize(this.size);
-			this.deviceCoolItem.setMinimumSize(this.coolSize);
+			this.deviceCoolItem.setMinimumSize(this.toolSize);
 		} // end device cool item
 		{ // begin zoom cool item
 			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
@@ -398,9 +398,9 @@ public class MenuToolBar {
 			} // end zoom tool bar
 			this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
 			log.fine("zoomCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.zoomCoolItem.setSize(this.coolSize);
+			this.zoomCoolItem.setSize(this.toolSize);
 			//this.zoomCoolItem.setPreferredSize(this.size);
-			this.zoomCoolItem.setMinimumSize(this.coolSize);
+			this.zoomCoolItem.setMinimumSize(this.toolSize);
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -437,9 +437,9 @@ public class MenuToolBar {
 			}
 			this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
 			log.fine("portCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.portCoolItem.setSize(this.coolSize);
+			this.portCoolItem.setSize(this.toolSize);
 			//this.portCoolItem.setPreferredSize(this.size);
-			this.portCoolItem.setMinimumSize(this.coolSize);
+			this.portCoolItem.setMinimumSize(this.toolSize);
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
@@ -690,9 +690,9 @@ public class MenuToolBar {
 			}
 			this.coolSize = this.dataCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
 			log.fine("dataCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.dataCoolItem.setSize(this.coolSize);
+			this.dataCoolItem.setSize(this.toolSize);
 			//this.dataCoolItem.setPreferredSize(this.size);
-			this.dataCoolItem.setMinimumSize(this.coolSize);
+			this.dataCoolItem.setMinimumSize(this.toolSize);
 		} // end record cool item
 	}
 
