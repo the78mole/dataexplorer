@@ -149,7 +149,7 @@ public class GraphicsComposite extends Composite {
 		this.addControlListener(new ControlListener() {
 			public void controlResized(ControlEvent evt) {
 				log.finer("GraphicsComposite.controlResized() = " + evt);
-				Rectangle clientRect = GraphicsComposite.this.getClientArea();
+				Rectangle clientRect = GraphicsComposite.this.getParent().getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
 				log.finer(GraphicsComposite.this.oldSize + " - " + size);
 				if (!GraphicsComposite.this.oldSize.equals(size)) {
@@ -1334,7 +1334,7 @@ public class GraphicsComposite extends Composite {
 	 * 
 	 */
 	void setComponentBounds() {
-		Rectangle graphicsBounds = this.getClientArea();
+		Rectangle graphicsBounds = this.getParent().getClientArea();
 		//this.application.setGraphicsSashFormWeights(this.graphicSashForm.getSize().x - graphicsBounds.width);
 		int x = 0;
 		int y = this.headerGap;

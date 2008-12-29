@@ -68,7 +68,7 @@ public class MenuToolBar {
 	CoolItem											deviceCoolItem;
 
 	CoolBar												coolBar;
-	CoolItem											menuCoolItem;
+	CoolItem											fileCoolItem;
 	ToolItem											toolBoxToolItem;
 	ToolItem											nextDeviceToolItem;
 	ToolItem											prevDeviceToolItem;
@@ -108,17 +108,16 @@ public class MenuToolBar {
 	public void init() {
 		this.coolBar = new CoolBar(this.application, SWT.BORDER);
 		SWTResourceManager.registerResourceUser(this.coolBar);
-		this.coolBar.setSize(800, 100);
+		//this.coolBar.setSize(800, 100);
 		create();
 	}
 
 	public void create() {
 		{ // begin file cool item
-			this.menuCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.fileCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
 				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
-				this.menuCoolItem.setControl(this.fileToolBar);
-				//fileToolBar.setSize(116, 29);
+				this.fileCoolItem.setControl(this.fileToolBar);
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
 					this.newToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
@@ -197,9 +196,9 @@ public class MenuToolBar {
 			} // end file tool bar
 			this.fileToolBar.pack();
 			this.size = this.fileToolBar.getSize();
-			this.menuCoolItem.setSize(this.size);
-			this.menuCoolItem.setPreferredSize(this.size);
-			this.menuCoolItem.setMinimumSize(this.size);
+			this.fileCoolItem.setSize(this.size);
+			//this.fileCoolItem.setPreferredSize(this.size);
+			this.fileCoolItem.setMinimumSize(this.size);
 			log.fine("fileToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end file cool item
 
@@ -208,7 +207,6 @@ public class MenuToolBar {
 			{ // begin device tool bar
 				this.deviceToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.deviceCoolItem.setControl(this.deviceToolBar);
-				//deviceToolBar.setSize(120, 29);
 				{
 					this.deviceSelectToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
 					this.deviceSelectToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0057));
@@ -318,15 +316,15 @@ public class MenuToolBar {
 			this.deviceToolBar.pack();
 			this.size = this.deviceToolBar.getSize();
 			this.deviceCoolItem.setSize(this.size);
-			this.deviceCoolItem.setPreferredSize(this.size);
+			//this.deviceCoolItem.setPreferredSize(this.size);
 			this.deviceCoolItem.setMinimumSize(this.size);
+			log.fine("deviceToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end device cool item
 		{ // begin zoom cool item
 			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin zoom tool bar
 				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.zoomCoolItem.setControl(this.zoomToolBar);
-				//zoomToolBar.setSize(90, 29);
 				{
 					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);
 					this.zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif")); //$NON-NLS-1$
@@ -391,8 +389,9 @@ public class MenuToolBar {
 			this.zoomToolBar.pack();
 			this.size = this.zoomToolBar.getSize();
 			this.zoomCoolItem.setSize(this.size);
-			this.zoomCoolItem.setPreferredSize(this.size);
+			//this.zoomCoolItem.setPreferredSize(this.size);
 			this.zoomCoolItem.setMinimumSize(this.size);
+			log.fine("zoomToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -400,7 +399,6 @@ public class MenuToolBar {
 			{
 				this.portToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.portCoolItem.setControl(this.portToolBar);
-				//portToolBar.setSize(129, 29);
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
@@ -427,9 +425,9 @@ public class MenuToolBar {
 			this.portToolBar.pack();
 			this.size = this.portToolBar.getSize();
 			this.portCoolItem.setSize(this.size);
-			this.portCoolItem.setPreferredSize(this.size);
+			//this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.size);
-			log.fine("this.portCoolItem.size = " + this.portCoolItem.getSize()); //$NON-NLS-1$
+			log.fine("portToolBar.size = " + this.size); //$NON-NLS-1$
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
@@ -458,9 +456,9 @@ public class MenuToolBar {
 							}
 						});
 					}
-					//log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT)); //$NON-NLS-1$
-					//this.channelSelectComposite.pack();
-					log.fine("this.channelSelectComposite.size = " + this.channelSelectComposite.getSize()); //$NON-NLS-1$
+					Point channelSelectCompositeSize = this.channelSelectComposite.getSize();
+					this.channelSelectCombo.setLocation((channelSelectCompositeSize.x-this.channelSelectSize.x)/2, (this.size.y-this.channelSelectSize.y)/2);
+					log.fine("channelSelectComposite.size = " + channelSelectCompositeSize); //$NON-NLS-1$
 				}
 				{
 					this.channelToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
@@ -507,12 +505,7 @@ public class MenuToolBar {
 						});
 					}
 					this.channelToolBar.pack();
-					log.fine("this.channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
-					// adapt composite to tool bar items size
-					Point channelSelectCompositeSize = this.channelSelectComposite.getSize();
-					//this.channelSelectComposite.setSize(channelSelectCompositeSize.x, this.channelToolBar.getSize().y);
-					log.fine("this.channelSelectComposite.size = " + channelSelectCompositeSize); //$NON-NLS-1$
-					this.channelSelectCombo.setLocation((channelSelectCompositeSize.x-this.channelSelectSize.x)/2, (channelSelectCompositeSize.y-this.channelSelectSize.y)/2);
+					log.fine("channelToolBar.size = " + this.channelToolBar.getSize()); //$NON-NLS-1$
 				}
 				{
 					this.recordSelectComposite = new Composite(this.dataBarComposite, SWT.NONE);
@@ -561,8 +554,10 @@ public class MenuToolBar {
 							}
 						});
 					}
-						//this.recordSelectComposite.pack();
-						log.fine("this.recordSelectComposite.size = " + this.recordSelectComposite.getSize()); //$NON-NLS-1$
+					// adapt composite to tool bar items size
+					Point recordSelectCompositeSize = this.recordSelectComposite.getSize();
+					this.recordSelectCombo.setLocation((recordSelectCompositeSize.x-this.recordSelectSize.x)/2, (this.size.y-this.recordSelectSize.y)/2);
+					log.fine("recordSelectComposite.size = " + recordSelectCompositeSize); //$NON-NLS-1$
 				}
 				{
 					this.recordToolBar = new ToolBar(this.dataBarComposite, SWT.NONE);
@@ -670,23 +665,18 @@ public class MenuToolBar {
 						});
 					}
 					this.recordToolBar.pack();
-					log.fine("this.recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
-					// adapt composite to tool bar items size
-					Point recordSelectCompositeSize = this.recordSelectComposite.getSize();
-					//this.recordSelectComposite.setSize(recordSelectCompositeSize.x, this.recordToolBar.getSize().y);
-					log.fine("this.recordSelectComposite.size = " + recordSelectCompositeSize); //$NON-NLS-1$
-					this.recordSelectCombo.setLocation((recordSelectCompositeSize.x-this.recordSelectSize.x)/2, (recordSelectCompositeSize.y-this.recordSelectSize.y)/2);
+					log.fine("recordToolBar.size = " + this.recordToolBar.getSize()); //$NON-NLS-1$
 				}
 				this.dataBarComposite.pack();
-				//int height = this.size.y+2;
-				//this.size = this.dataBarComposite.getSize();
-				//log.fine("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
-				//this.dataBarComposite.setSize(this.size.x, height);
+				int height = this.size.y;
+				this.size = this.dataBarComposite.computeSize(SWT.DEFAULT, height);
+				log.fine("pre dataBarComposite.size = " + this.size); //$NON-NLS-1$
+				this.dataBarComposite.setSize(this.size.x, height);
 				this.size = this.dataBarComposite.getSize();
 				log.fine("post dataBarComposite.size = " + this.size); //$NON-NLS-1$
 			}
 			this.dataCoolItem.setSize(this.size);
-			this.dataCoolItem.setPreferredSize(this.size);
+			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.size);
 		} // end record cool item
 	}
