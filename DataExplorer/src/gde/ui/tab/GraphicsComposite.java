@@ -149,7 +149,7 @@ public class GraphicsComposite extends Composite {
 		this.addControlListener(new ControlListener() {
 			public void controlResized(ControlEvent evt) {
 				log.finer("GraphicsComposite.controlResized() = " + evt);
-				Rectangle clientRect = GraphicsComposite.this.getParent().getClientArea();
+				Rectangle clientRect = GraphicsComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
 				log.finer(GraphicsComposite.this.oldSize + " - " + size);
 				if (!GraphicsComposite.this.oldSize.equals(size)) {
@@ -571,7 +571,7 @@ public class GraphicsComposite extends Composite {
 						int timeCaptionY = curveBounds.y + curveBounds.height + timeCaptionHeight;
 						int timeCaptionX = curveBounds.x + ((curveBounds.width - timeCaptionWidth)/2);
 						//curve area
-						this.graphicCanvas.redraw(curveBounds.x+5, curveBounds.y+5, 10, 10, true); // damage a small area of image only -> redraw complete image ??
+						//this.graphicCanvas.redraw(curveBounds.x+5, curveBounds.y+5, 1, 1, true); // damage a small area of image only -> redraw complete image ??
 						// time scale
 						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin, timeCaptionHeight, true);
 						// time caption
@@ -1334,7 +1334,7 @@ public class GraphicsComposite extends Composite {
 	 * 
 	 */
 	void setComponentBounds() {
-		Rectangle graphicsBounds = this.getParent().getClientArea();
+		Rectangle graphicsBounds = this.getClientArea();
 		//this.application.setGraphicsSashFormWeights(this.graphicSashForm.getSize().x - graphicsBounds.width);
 		int x = 0;
 		int y = this.headerGap;
