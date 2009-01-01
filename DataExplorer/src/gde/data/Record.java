@@ -110,12 +110,14 @@ public class Record extends Vector<Integer> {
 	Vector<TriggerRange> triggerRanges				= null;
 	List<PropertyType>	properties						= new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 	boolean							isPositionLeft				= true;
-	Color								color									= OpenSerialDataExplorer.COLOR_BLUE;
+	Color								color									= OpenSerialDataExplorer.COLOR_BLACK;
 	int									lineWidth							= 1;
 	int									lineStyle							= new Integer(SWT.LINE_SOLID);
 	boolean							isRoundOut						= false;
 	boolean							isStartpointZero			= false;
 	boolean							isStartEndDefined			= false;
+	boolean							isScaleSynced					= false; // indicates if record is part of syncable records and scale sync is requested
+	boolean							isSyncPlaceholder			= false;
 	DecimalFormat				df;
 	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
@@ -332,8 +334,8 @@ public class Record extends Vector<Integer> {
 			if (point > this.maxValue) this.maxValue = point;
 			if (point < this.minValue) this.minValue = point;
 		}	
-		if (log.isLoggable(Level.FINEST)) log.finest("adding point = " + point); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.finer(this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINEST, "adding point = " + point); //$NON-NLS-1$
+		log.log(Level.FINER, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return this.add(new Integer(point));
 	}
 
@@ -563,11 +565,11 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.fine(this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")");
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
-				log.fine(this.name + " triggerRanges = null");
+				log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
@@ -579,13 +581,13 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.fine(this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")");
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
-				log.fine(this.name + " triggerRanges = null");
+				log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 		}
-		if (log.isLoggable(Level.FINER)) log.finer(this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered);
+		log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -609,7 +611,7 @@ public class Record extends Vector<Integer> {
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null)  {
 			Record referencedRecord = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]);
-			if (log.isLoggable(Level.FINER)) log.finer(this.getName() + " -> referencedRecord size = " + referencedRecord.realSize());
+			log.log(Level.FINER, this.getName() + " -> referencedRecord size = " + referencedRecord.realSize()); //$NON-NLS-1$
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
 		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();
@@ -680,7 +682,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
-		if (index > super.size()) if (log.isLoggable(Level.FINE)) log.fine("index = " + index + " of " + super.size() + "/" + this.size());
+		if (index > super.size()) log.log(Level.FINE, "index = " + index + " of " + super.size() + "/" + this.size()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return super.get(index);
 	}
 
@@ -743,8 +745,8 @@ public class Record extends Vector<Integer> {
 	public void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue) {
 		this.isStartEndDefined = enabled;
 		if (enabled) {
-			this.maxScaleValue = newMaxScaleValue;
-			this.minScaleValue = newMinScaleValue;
+			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
+			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
 		}
 		else {
 			if (this.channelConfigKey == null || this.channelConfigKey.length() < 1)
@@ -943,11 +945,11 @@ public class Record extends Vector<Integer> {
 	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		scaledIndex = this.parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - this.parent.getRecordZoomOffset() -1 : scaledIndex;
-		if (log.isLoggable(Level.FINER))log.finer("scaledIndex = " + scaledIndex); //$NON-NLS-1$
+		log.log(Level.FINER, "scaledIndex = " + scaledIndex); //$NON-NLS-1$
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
 		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height-1 : pointY;
-		if (log.isLoggable(Level.FINER))log.finer("pointY = " + pointY); //$NON-NLS-1$
+		log.log(Level.FINER, "pointY = " + pointY); //$NON-NLS-1$
 		return pointY;
 	}
 	
@@ -1006,15 +1008,15 @@ public class Record extends Vector<Integer> {
 	 * @return string of value
 	 */
 	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
-		if(log.isLoggable(Level.FINE)) log.fine(OSDE.STRING_EMPTY + points.toString());
+		log.log(Level.FINE, OSDE.STRING_EMPTY + points.toString());
 		double measureDelta;
 		if(this.parent.isZoomMode())
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
-		if(log.isLoggable(Level.FINE)) log.fine("measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
-		return new DecimalFormat("0.0").format(measureDelta / timeDelta);
+		log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
+		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
 	
 	/**
@@ -1029,7 +1031,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorTime(double newDisplayScaleFactorTime) {
 		this.displayScaleFactorTime = newDisplayScaleFactorTime;
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
+		log.log(Level.FINER, String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
 	}
 
 	/**
@@ -1044,7 +1046,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		if (log.isLoggable(Level.FINER)) log.finer(String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
+		log.log(Level.FINER, String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
 
@@ -1098,7 +1100,7 @@ public class Record extends Vector<Integer> {
 	public void setMinMaxZoomScaleValues(double newMinZoomScaleValue, double newMaxZoomScaleValue) {
 		this.minZoomScaleValue				= newMinZoomScaleValue;
 		this.maxZoomScaleValue				= newMaxZoomScaleValue;
-		if (log.isLoggable(Level.FINE)) log.fine(this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		log.log(Level.FINE, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**
@@ -1152,7 +1154,7 @@ public class Record extends Vector<Integer> {
 	public void resetMinMax() {
 		this.maxValue = 0;
 		this.minValue = 0;
-		log.finer(this.name);
+		log.log(Level.FINER, this.name);
 	}
 
 	/**
@@ -1175,7 +1177,7 @@ public class Record extends Vector<Integer> {
 		this.sigmaValueTriggered = Integer.MIN_VALUE;
 		this.triggerRanges = null;
 		this.tmpTriggerRange = null;
-		log.finer(this.name);
+		log.log(Level.FINER, this.name);
 	}
 	
 	/**
@@ -1376,13 +1378,13 @@ public class Record extends Vector<Integer> {
 			for (TriggerRange range : this.triggerRanges) {
 				for (int i = range.in; i < range.out; i++) {
 					sum += this.get(i);
-					if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", ");
+					if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", "); //$NON-NLS-1$
 					numPoints++;
 				}
-				if (log.isLoggable(Level.FINER)) sb.append("\n");
+				if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 			}
 		}
-		if (log.isLoggable(Level.FINER)) log.finer(sb.toString());
+		log.log(Level.FINER, sb.toString());
 		this.avgValueTriggered = numPoints > 0 ? new Long(sum / numPoints).intValue() : 0 ;
 	}
 
@@ -1537,6 +1539,36 @@ public class Record extends Vector<Integer> {
 	public Vector<TriggerRange> getTriggerRanges() {
 		this.evaluateMinMax();
 		return this.triggerRanges;
+	}
+
+	/**
+	 * query if the record display scale is synced with an other record
+	 * @return the isScaleSynced
+	 */
+	public boolean isScaleSynced() {
+		return this.isScaleSynced;
+	}
+
+	/**
+	 * set isScaleSynced to true if the to be displaed scale is in sync with other record
+	 * @param enabled the isScaleSynced value to set
+	 */
+	public void setScaleSynced(boolean enabled) {
+		this.isScaleSynced = enabled;
+	}
+
+	/**
+	 * @return the isSyncPlaceholder
+	 */
+	public boolean isSyncPlaceholder() {
+		return this.isSyncPlaceholder;
+	}
+
+	/**
+	 * @param enable the value of isSyncPlaceholder to set
+	 */
+	public void setSyncPlaceholder(boolean enable) {
+		this.isSyncPlaceholder = enable;
 	}
 }
 

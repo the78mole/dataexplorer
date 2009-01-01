@@ -18,6 +18,7 @@ package osde.data;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,8 +29,11 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import osde.OSDE;
+import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.device.ObjectFactory;
+import osde.device.PropertyType;
 import osde.device.StatisticsType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.MessageIds;
@@ -44,89 +48,99 @@ import osde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class RecordSet extends HashMap<String, Record> {
-	static final long							serialVersionUID			= 26031957;
-	static Logger									log										= Logger.getLogger(RecordSet.class.getName());
-	final DecimalFormat						df 										= new DecimalFormat("0.000"); //$NON-NLS-1$
-	
-	String												name;														// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	static final long							serialVersionUID							= 26031957;
+	static Logger									log														= Logger.getLogger(RecordSet.class.getName());
+	final DecimalFormat						df														= new DecimalFormat("0.000");														//$NON-NLS-1$
+
+	String												name;																																									// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
-	String												objectKey							= OSDE.STRING_EMPTY;
-	String												header 								= null;
-	String[]											recordNames;										// Spannung, Strom, ..
-	double												timeStep_ms						= 0;			// Zeitbasis der Messpunkte
-	String												recordSetDescription	= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
-	boolean												isSaved								= false;	// indicates if the record set is saved to file
-	boolean												isRaw									= false;	// indicates imported file with raw data, no translation at all
-	boolean												isFromFile						= false;	// indicates that this record set was created by loading data from file
-	boolean												isRecalculation				= true;		// indicates record is modified and need re-calculation
+	String												objectKey											= OSDE.STRING_EMPTY;
+	String												header												= null;
+	String[]											recordNames;																																						// Spannung, Strom, ..
+	double												timeStep_ms										= 0;																											// Zeitbasis der Messpunkte
+	String												recordSetDescription					= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
+	boolean												isSaved												= false;																									// indicates if the record set is saved to file
+	boolean												isRaw													= false;																									// indicates imported file with raw data, no translation at all
+	boolean												isFromFile										= false;																									// indicates that this record set was created by loading data from file
+	boolean												isRecalculation								= true;																									// indicates record is modified and need re-calculation
 	Rectangle											drawAreaBounds;
-	
+
+	// data table
 	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
 	Vector<Vector<Integer>>				dataTable;
-	boolean												isTableDataCalculated = false;  // value to manage only one time calculation
-	boolean												isTableDisplayable		= true;		// value to suppress table data calculation(live view)
-	
-	//in compare set x min/max and y max (time) might be different
-	boolean												isCompareSet					= false;
-	int														maxSize								= 0;			// number of data point * time step = total time
-	double												maxValue							= 0;
-	double												minValue 							= 0;			// min max value
-	
+	boolean												isTableDataCalculated					= false;																									// value to manage only one time calculation
+	boolean												isTableDisplayable						= true;																									// value to suppress table data calculation(live view)
+
+	// sync enabled records
+	Vector<String>								potentialSyncableRecords			= new Vector<String>();																	// collection of record keys where scales might be synchronized
+	Vector<String>								syncableRecords								= new Vector<String>();																	// collection of potential syncable and displayable record keys
+	boolean												isSyncableChecked							= false;
+	boolean												isSyncRequested								= false;
+	int														syncMin												= 0;
+	int														syncMax												= 0;
+	boolean												syncScalePositionLeft					= false;
+
+	//for compare set x min/max and y max (time) might be different
+	boolean												isCompareSet									= false;
+	int														maxSize												= 0;																											// number of data point * time step = total time
+	double												maxValue											= 0;
+	double												minValue											= 0;																											// min max value
+
 	//zooming
-	int 													zoomLevel 						= 0; 			// 0 == not zoomed
-	boolean 											isZoomMode = false;
+	int														zoomLevel											= 0;																											// 0 == not zoomed
+	boolean												isZoomMode										= false;
 	int														recordZoomOffset;
 	int														recordZoomSize;
-	
+
 	// measurement
-	String 												recordKeyMeasurement;
-	
-	public static final String		DESCRIPTION_TEXT_LEAD	= Messages.getString(MessageIds.OSDE_MSGT0129);
-	
-	public static final int				MAX_NAME_LENGTH 			= 30;
-	
-	public static final String 		TIME_STEP_MS 					= "timeStep_ms"; //$NON-NLS-1$
-	public static final String 		TIME 									= "time"; //$NON-NLS-1$
-	public static final String		TIME_GRID_TYPE				= "RecordSet_timeGridType"; //$NON-NLS-1$
-	public static final String		TIME_GRID_COLOR				= "RecordSet_timeGridColor"; //$NON-NLS-1$
-	public static final String		TIME_GRID_LINE_STYLE	= "RecordSet_timeGridLineStyle"; //$NON-NLS-1$
-	public static final int				TIME_GRID_NONE				= 0;		// no time grid
-	public static final int				TIME_GRID_MAIN				= 1;		// each main tickmark
-	public static final int				TIME_GRID_MOD60				= 2;		// each mod60 tickmark
-	int														timeGridType					= TIME_GRID_NONE;
-	Vector<Integer>								timeGrid 							= new Vector<Integer>();		// contains the time grid position, updated from TimeLine.drawTickMarks
-	Color													timeGridColor					= OpenSerialDataExplorer.COLOR_GREY;
-	int														timeGridLineStyle			= new Integer(SWT.LINE_DOT);
-	
-	public static final String		HORIZONTAL_GRID_RECORD			= "RecordSet_horizontalGridRecord"; //$NON-NLS-1$
-	public static final String		HORIZONTAL_GRID_TYPE				= "RecordSet_horizontalGridType"; //$NON-NLS-1$
-	public static final String		HORIZONTAL_GRID_COLOR				= "RecordSet_horizontalGridColor"; //$NON-NLS-1$
-	public static final String		HORIZONTAL_GRID_LINE_STYLE	= "RecordSet_horizontalGridLineStyle"; //$NON-NLS-1$
-	public static final int				HORIZONTAL_GRID_NONE				= 0;		// no time grid
-	public static final int				HORIZONTAL_GRID_EVERY				= 1;		// each main tickmark
-	public static final int				HORIZONTAL_GRID_SECOND			= 2;		// each main tickmark
-	int														horizontalGridType					= HORIZONTAL_GRID_NONE;
-	Vector<Integer>								horizontalGrid 							= new Vector<Integer>();		// contains the time grid position, updated from TimeLine.drawTickMarks
-	Color													horizontalGridColor					= OpenSerialDataExplorer.COLOR_GREY;
-	int														horizontalGridLineStyle			= new Integer(SWT.LINE_DASH);
-	String												horizontalGridRecordKey			= OSDE.STRING_DASH;					// recordNames[horizontalGridRecord]
-	
-	private final String[] 				propertyKeys = new String[] {TIME_STEP_MS, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR};
+	String												recordKeyMeasurement;
 
+	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.OSDE_MSGT0129);
 
-	int														configuredDisplayable = 0;  // number of record which must be displayable before table calculation begins
+	public static final int				MAX_NAME_LENGTH								= 30;
 
-	public final static String		UNSAVED_REASON_GRAPHICS 			= Messages.getString(MessageIds.OSDE_MSGT0130);
+	public static final String		TIME_STEP_MS									= "timeStep_ms";																					//$NON-NLS-1$
+	public static final String		TIME													= "time";																								//$NON-NLS-1$
+	public static final String		TIME_GRID_TYPE								= "RecordSet_timeGridType";															//$NON-NLS-1$
+	public static final String		TIME_GRID_COLOR								= "RecordSet_timeGridColor";															//$NON-NLS-1$
+	public static final String		TIME_GRID_LINE_STYLE					= "RecordSet_timeGridLineStyle";													//$NON-NLS-1$
+	public static final int				TIME_GRID_NONE								= 0;																											// no time grid
+	public static final int				TIME_GRID_MAIN								= 1;																											// each main tickmark
+	public static final int				TIME_GRID_MOD60								= 2;																											// each mod60 tickmark
+	int														timeGridType									= TIME_GRID_NONE;
+	Vector<Integer>								timeGrid											= new Vector<Integer>();																	// contains the time grid position, updated from TimeLine.drawTickMarks
+	Color													timeGridColor									= OpenSerialDataExplorer.COLOR_GREY;
+	int														timeGridLineStyle							= new Integer(SWT.LINE_DOT);
+
+	public static final String		HORIZONTAL_GRID_RECORD				= "RecordSet_horizontalGridRecord";											//$NON-NLS-1$
+	public static final String		HORIZONTAL_GRID_TYPE					= "RecordSet_horizontalGridType";												//$NON-NLS-1$
+	public static final String		HORIZONTAL_GRID_COLOR					= "RecordSet_horizontalGridColor";												//$NON-NLS-1$
+	public static final String		HORIZONTAL_GRID_LINE_STYLE		= "RecordSet_horizontalGridLineStyle";										//$NON-NLS-1$
+	public static final int				HORIZONTAL_GRID_NONE					= 0;																											// no time grid
+	public static final int				HORIZONTAL_GRID_EVERY					= 1;																											// each main tickmark
+	public static final int				HORIZONTAL_GRID_SECOND				= 2;																											// each main tickmark
+	int														horizontalGridType						= HORIZONTAL_GRID_NONE;
+	Vector<Integer>								horizontalGrid								= new Vector<Integer>();																	// contains the time grid position, updated from TimeLine.drawTickMarks
+	Color													horizontalGridColor						= OpenSerialDataExplorer.COLOR_GREY;
+	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
+	String												horizontalGridRecordKey				= OSDE.STRING_DASH;																			// recordNames[horizontalGridRecord]
+
+	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR			};
+
+	int														configuredDisplayable					= 0;																											// number of record which must be displayable before table calculation begins
+
+	public final static String		UNSAVED_REASON_GRAPHICS				= Messages.getString(MessageIds.OSDE_MSGT0130);
 	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.OSDE_MSGT0131);
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.OSDE_MSGT0132);
-	Vector<String>								unsaveReasons 								= new Vector<String>();
-	int														changeCounter									= 0; // indicates change in general
-	
-	final OpenSerialDataExplorer	application;				// pointer to main application
-	final Channels								channels;						// start point of data hierarchy
+	Vector<String>								unsaveReasons									= new Vector<String>();
+	int														changeCounter									= 0;																											// indicates change in general
+
+	final OpenSerialDataExplorer	application;																																						// pointer to main application
+	final Channels								channels;																																							// start point of data hierarchy
 	final IDevice									device;
-	
+
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
@@ -149,7 +163,9 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
-		this.dataTable = new Vector<Vector<Integer>>(); 
+		this.dataTable = new Vector<Vector<Integer>>();
+
+		this.check4SyncableRecords();
 	}
 
 	/**
@@ -173,7 +189,9 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
-		this.dataTable = new Vector<Vector<Integer>>(); 
+		this.dataTable = new Vector<Vector<Integer>>();
+
+		this.check4SyncableRecords();
 	}
 
 	/**
@@ -196,7 +214,9 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isCompareSet = isCompareSetValue;
 		this.channels = null;
-		this.dataTable = new Vector<Vector<Integer>>(); 
+		this.dataTable = new Vector<Vector<Integer>>();
+
+		this.check4SyncableRecords();
 	}
 
 	/**
@@ -213,12 +233,12 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelConfigName = newChannelConfiguration;
-		
+
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
 		String[] newRecordNames = this.device.getMeasurementNames(newChannelConfiguration);
 		for (int i = 0; i < newRecordNames.length; i++) {
-			if (!oldRecordNames[i].equals(newRecordNames[i])){
+			if (!oldRecordNames[i].equals(newRecordNames[i])) {
 				// add the old record with new name
 				this.put(newRecordNames[i], this.getRecord(oldRecordNames[i]).clone(newRecordNames[i]));
 				// remove the old record
@@ -226,19 +246,19 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		this.recordNames = newRecordNames.clone();
-		
+
 		// update child records to new channel or configuration key and to the new parent
-		for (int i=0; i<this.recordNames.length; ++i) {
+		for (int i = 0; i < this.recordNames.length; ++i) {
 			Record tmpRecord = this.get(this.recordNames[i]);
 			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
-			
+
 			tmpRecord.statistics = this.device.getMeasurementStatistic(newChannelConfiguration, i);
 			StatisticsType.Trigger tmpTrigger = tmpRecord.statistics.getTrigger();
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
-		
+
 			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
 		}
 
@@ -278,8 +298,10 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
+
+		this.check4SyncableRecords();
 	}
-	
+
 	/**
 	 * clone method used to move record sets to other configuration or channel
 	 * @param newChannelConfiguration 
@@ -287,7 +309,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public RecordSet clone(String newChannelConfiguration) {
 		return new RecordSet(this, newChannelConfiguration);
 	}
-	
+
 	/**
 	 * copy constructor - used to copy a record set to another channel/configuration, 
 	 * wherer the configuration comming from the device properties file
@@ -298,17 +320,17 @@ public class RecordSet extends HashMap<String, Record> {
 		super(recordSet);
 
 		this.device = recordSet.device; // this is a reference
-		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name+OSDE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH-1)+OSDE.STRING_UNDER_BAR;
+		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + OSDE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + OSDE.STRING_UNDER_BAR;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelConfigName = recordSet.channelConfigName;
 		this.recordNames = recordSet.recordNames.clone();
-				
+
 		// update child records
 		for (String recordKey : this.keySet()) {
 			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
 		}
-		
+
 		this.timeStep_ms = recordSet.timeStep_ms;
 		this.recordSetDescription = recordSet.recordSetDescription;
 		this.isSaved = false;
@@ -345,6 +367,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
+
+		this.check4SyncableRecords();
 	}
 
 	/**
@@ -368,11 +392,11 @@ public class RecordSet extends HashMap<String, Record> {
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.recordNames) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
-			log.fine(recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
+			log.log(Level.FINE, recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
 		}
 
-		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable; 
-		log.fine("targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
+		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable;
+		log.log(Level.FINE, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (displayableRecordEntries == targetDisplayable) {
 			allDisplayable = true;
@@ -406,7 +430,7 @@ public class RecordSet extends HashMap<String, Record> {
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
-				log.fine(sb.toString());
+				log.log(Level.FINE, sb.toString());
 			}
 			if (doUpdate) {
 				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -416,10 +440,10 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 		}
-		else 
+		else
 			throw new DataInconsitsentException("RecordSet.addPoints - points.length != recordNames.length"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * add a data point at specified index to the data table
 	 * @param recordkey
@@ -427,12 +451,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param value
 	 */
 	public void dataTableAddPoint(String recordkey, int index, int value) {
-		log.fine(recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
-			if (value != 0) dataTableRow.add(value);
-			else 						dataTableRow.add(new Double(this.getRecordDataSize(true) * this.getTimeStep_ms()).intValue());
-			for (int i=0; i<this.recordNames.length; ++i) {
+			if (value != 0)
+				dataTableRow.add(value);
+			else
+				dataTableRow.add(new Double(this.getRecordDataSize(true) * this.getTimeStep_ms()).intValue());
+			for (int i = 0; i < this.recordNames.length; ++i) {
 				dataTableRow.add(0);
 			}
 			this.dataTable.add(dataTableRow);
@@ -443,7 +469,8 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tableRow != null) {
 				tableRow.set(columnIndex, new Double(this.device.translateValue(this.get(recordkey), value)).intValue());
 			}
-			else log.log(Level.WARNING, "add time point before adding other values !"); //$NON-NLS-1$
+			else
+				log.log(Level.WARNING, "add time point before adding other values !"); //$NON-NLS-1$
 		}
 	}
 
@@ -454,7 +481,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public void dataTableAddRow(Vector<Integer> dataTableRow) {
 		this.dataTable.add(dataTableRow);
 	}
-	
+
 	/**
 	 * query the number of calculated rows of the data table
 	 * @return number of rows of the data table
@@ -462,7 +489,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public int getNumberDataTableRows() {
 		return this.dataTable.size();
 	}
-	
+
 	/**
 	 * query the record index by given string, if 0 is returned the given name is not found as record name
 	 * @param recordName
@@ -470,7 +497,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public int getRecordIndex(String recordName) {
 		int searchedNumber = -1;
-		for (int i=0; i<this.recordNames.length; ++i) {
+		for (int i = 0; i < this.recordNames.length; ++i) {
 			if (this.recordNames[i].equals(recordName)) {
 				searchedNumber = i;
 				break;
@@ -487,7 +514,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String[] getDataPoints(int index) {
 		Vector<String> dfValues = new Vector<String>();
 		for (Integer integer : this.dataTable.get(index)) {
-			dfValues.add(this.df.format(integer/1000.0));
+			dfValues.add(this.df.format(integer / 1000.0));
 		}
 		return dfValues.toArray(new String[this.size() + 1]);
 	}
@@ -512,7 +539,18 @@ public class RecordSet extends HashMap<String, Record> {
 		String[] newRecordNames = new String[this.recordNames.length + 1];
 		System.arraycopy(this.recordNames, 0, newRecordNames, 0, this.recordNames.length);
 		newRecordNames[this.recordNames.length] = newRecordName;
-		this.recordNames = newRecordNames.clone();
+		this.recordNames = newRecordNames;
+	}
+
+	/**
+	 * method to remove a record name 
+	 */
+	void removeRecordName(String deleteRecordName) {
+		Vector<String> newRecordNames = new Vector<String>();
+		for (String recordKey : this.recordNames) {
+			if (!recordKey.equals(deleteRecordName)) newRecordNames.add(recordKey);
+		}
+		this.recordNames = newRecordNames.toArray(new String[0]);
 	}
 
 	/**
@@ -522,15 +560,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void replaceRecordName(String oldRecordName, String newRecordName) {
 		for (int i = 0; i < this.recordNames.length; i++) {
-			if (this.recordNames[i].equals(oldRecordName)) 
-				this.recordNames[i] = newRecordName;
+			if (this.recordNames[i].equals(oldRecordName)) this.recordNames[i] = newRecordName;
 		}
 		if (this.get(newRecordName) == null) { // record may be created previously
 			this.put(newRecordName, this.get(oldRecordName).clone(newRecordName));
 			this.remove(oldRecordName);
 		}
 	}
-	
+
 	/**
 	 * method to get the sorted record active names which are visible as string array
 	 * @return String[] containing record names 
@@ -554,7 +591,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		return visibleRecords.toArray(new String[0]);
 	}
-	
+
 	/**
 	 * query number of visible and displayable records
 	 * @return number of records visible and displayable (makeInActiveDisplayable)
@@ -567,7 +604,6 @@ public class RecordSet extends HashMap<String, Record> {
 		return visibleAndDisplayable;
 	}
 
-	
 	/**
 	 * query number of displayable records
 	 * @return number of records displayable (makeInActiveDisplayable)
@@ -612,8 +648,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public String[] getNoneCalculationRecordNames() {
 		Vector<String> calculationRecords = new Vector<String>();
-		String[] deviceMeasurements =  this.device.getMeasurementNames(this.channelConfigName);
-		for (int i=0; i<deviceMeasurements.length; ++i) { // record names may not match device measurements
+		String[] deviceMeasurements = this.device.getMeasurementNames(this.channelConfigName);
+		for (int i = 0; i < deviceMeasurements.length; ++i) { // record names may not match device measurements
 			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
 			if (!measurement.isCalculation()) { // active or inactive 
 				calculationRecords.add(this.recordNames[i]);
@@ -621,7 +657,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		return calculationRecords.toArray(new String[0]);
 	}
-	
+
 	/**
 	 *	clear the record set compare view 
 	 */
@@ -659,7 +695,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public static RecordSet createRecordSet(String channelKey, String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
 		recordName = recordName.length() <= RecordSet.MAX_NAME_LENGTH ? recordName : recordName.substring(0, RecordSet.MAX_NAME_LENGTH);
-		
+
 		String[] recordNames = device.getMeasurementNames(channelKey);
 		if (recordNames.length == 0) { // simple check for valid record names
 			channelKey = Channels.getInstance().getChannelNames()[0].split(OSDE.STRING_COLON)[1].trim();
@@ -692,34 +728,34 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 128)); //(SWT.COLOR_DARK_YELLOW));
 				break;
 			case 6: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 128, 0)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 128, 0));
 				break;
 			case 7: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 128)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 128));
 				break;
 			case 8: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 255)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 255));
 				break;
 			case 9: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 0)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 0));
 				break;
 			case 10: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 255, 0, 128)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 255, 0, 128));
 				break;
 			case 11: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 64, 128)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 64, 128));
 				break;
 			case 12: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 64, 128, 0)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 64, 128, 0));
 				break;
 			case 13: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 64)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 64));
 				break;
 			case 14: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 64, 0)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 64, 0));
 				break;
 			case 15: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 64)); 
+				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 64));
 				break;
 			default:
 				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 128)); //(SWT.COLOR_GREEN));
@@ -735,10 +771,10 @@ public class RecordSet extends HashMap<String, Record> {
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
 			newRecordSet.put(recordNames[i], tmpRecord);
-			if (log.isLoggable(Level.FINE)) log.fine("added record for " + recordNames[i]); //$NON-NLS-1$
+			log.log(Level.FINE, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}
-		
-		if(log.isLoggable(Level.FINE)) printRecordNames("createRecordSet", newRecordSet.getRecordNames()); //$NON-NLS-1$
+
+		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet", newRecordSet.getRecordNames()); //$NON-NLS-1$
 		return newRecordSet;
 	}
 
@@ -748,10 +784,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	static void printRecordNames(String methodName, String[] recordNames) {
 		StringBuilder sb = new StringBuilder().append(methodName + OSDE.STRING_BLANK + OSDE.STRING_NEW_LINE);
-		for (int i=0; i<recordNames.length; ++i){
+		for (int i = 0; i < recordNames.length; ++i) {
 			sb.append(recordNames[i]).append(OSDE.STRING_MESSAGE_CONCAT);
 		}
-		sb.delete(sb.length()-3, sb.length());
+		sb.delete(sb.length() - 3, sb.length());
 		log.info(sb.toString());
 	}
 
@@ -763,20 +799,21 @@ public class RecordSet extends HashMap<String, Record> {
 		if (isLeft) {
 			for (String recordName : getRecordNames()) {
 				Record tmpRecord = this.get(recordName);
-				if (tmpRecord.isPositionLeft() && tmpRecord.isVisible() && tmpRecord.isDisplayable()) ++value;
+				if (tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
 		else {
 			for (String recordName : getRecordNames()) {
+				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
 				Record tmpRecord = this.get(recordName);
-				if (!tmpRecord.isPositionLeft() && tmpRecord.isVisible() && tmpRecord.isDisplayable()) ++value;
+				if (!tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
 		return value;
 	}
-	
+
 	/**
 	 * calculate number of records with axis position is left
 	 */
@@ -809,11 +846,10 @@ public class RecordSet extends HashMap<String, Record> {
 		//for compare set record following properties has to be checked at the point where
 		newRecord.setKeyName(key);
 		newRecord.setParent(this);
-		
+
 		// add key to recordNames[] in case of TYPE_COMPARE_SET
-		if(this.isCompareSet)
-			this.addRecordName(key);
-		
+		if (this.isCompareSet) this.addRecordName(key);
+
 		return newRecord;
 	}
 
@@ -846,7 +882,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setUnsaved(String unsavedReason) {
 		this.changeCounter++;
 		this.isSaved = false;
-		if(!this.unsaveReasons.contains(unsavedReason)) {
+		if (!this.unsaveReasons.contains(unsavedReason)) {
 			this.unsaveReasons.add(unsavedReason);
 		}
 	}
@@ -888,7 +924,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.get(recordKey).setDisplayable(true);
 		}
 	}
-	
+
 	/**
 	 * force enable all records to be displayed and active if none calculation, this is used for unknown data import or unknown configurations
 	 */
@@ -902,7 +938,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.get(recordKey).setActive(true);
 		}
 	}
-	
+
 	/**
 	 * @return the isFromFile, this flag indicates to call the make allInActiveDisplayable 
 	 * - the handling might be different if data captured directly from device
@@ -1052,7 +1088,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param recordKey the key which record should be measured
 	 * @return the isMeasurementMode
@@ -1081,7 +1117,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
 	public void setZoomMode(boolean zoomModeEnabled) {
-		if (!this.isZoomMode) {			
+		if (!this.isZoomMode) {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				this.recordZoomSize = this.isCompareSet ? this.getMaxSize() : this.get(this.recordNames[0]).realSize();
@@ -1114,14 +1150,14 @@ public class RecordSet extends HashMap<String, Record> {
 		this.setMeasurementMode(this.recordKeyMeasurement, false);
 		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
 	}
-	
+
 	/**
 	 * @return the recordKeyMeasurement
 	 */
 	public String getRecordKeyMeasurement() {
 		return this.recordKeyMeasurement;
 	}
-	
+
 	/**
 	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
 	 */
@@ -1136,7 +1172,7 @@ public class RecordSet extends HashMap<String, Record> {
 			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
 		}
 	}
-	
+
 	public int getRecordZoomOffset() {
 		return this.recordZoomOffset;
 	}
@@ -1144,7 +1180,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public int getRecordZoomSize() {
 		return this.recordZoomSize;
 	}
-	
+
 	/**
 	 * calculate index in data vector from given display point
 	 * @param xPos
@@ -1153,7 +1189,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public int getPointIndexFromDisplayPoint(int xPos) {
 		return new Double(1.0 * xPos * this.getRecordDataSize(false) / this.drawAreaBounds.width).intValue();
 	}
-	
+
 	/**
 	 * get the formatted time at given position
 	 * @param xPos of the display point
@@ -1173,16 +1209,16 @@ public class RecordSet extends HashMap<String, Record> {
 	public boolean isPanMode() {
 		return this.recordZoomOffset != 0 || this.isZoomMode;
 	}
-	
+
 	public void shift(int xPercent, int yPercent) {
-		int xShift = new Double(1.0 * this.recordZoomSize * xPercent / 100).intValue(); 
+		int xShift = new Double(1.0 * this.recordZoomSize * xPercent / 100).intValue();
 		if (this.recordZoomOffset + xShift <= 0)
 			this.recordZoomOffset = 0;
-		else if(this.recordZoomOffset + this.recordZoomSize + xShift > this.get(this.recordNames[0]).realSize())
+		else if (this.recordZoomOffset + this.recordZoomSize + xShift > this.get(this.recordNames[0]).realSize())
 			this.recordZoomOffset = this.get(this.recordNames[0]).realSize() - this.recordZoomSize;
 		else
 			this.recordZoomOffset = this.recordZoomOffset + xShift;
-		
+
 		// iterate children and set min/max values
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
@@ -1260,7 +1296,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newConfiguredDisplayableNumber the configuredDisplayable to set
 	 */
 	public void setConfiguredDisplayable(int newConfiguredDisplayableNumber) {
-		log.fine("configuredDisplayable = " + newConfiguredDisplayableNumber); //$NON-NLS-1$
+		log.log(Level.FINE, "configuredDisplayable = " + newConfiguredDisplayableNumber); //$NON-NLS-1$
 		this.configuredDisplayable = newConfiguredDisplayableNumber;
 	}
 
@@ -1282,7 +1318,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newValue - boolean value if the table need to be calculated before it can be displayed
 	 */
 	public void setTableDataCalculated(boolean newValue) {
-		if (!newValue) this.dataTable = new Vector<Vector<Integer>>(); 
+		if (!newValue) this.dataTable = new Vector<Vector<Integer>>();
 		this.isTableDataCalculated = newValue;
 	}
 
@@ -1369,18 +1405,18 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setHorizontalGridRecordKey(String newHorizontalGridRecordKey) {
 		this.horizontalGridRecordKey = newHorizontalGridRecordKey;
 	}
-	
+
 	/**
 	 * starts a thread executing the dataTable entries
 	 */
 	public void calculateDataTable() {
 
 		this.dataTableCalcThread = new Thread() {
-			final String[] 								recordKeys 		= getRecordNames();
-			final String sThreadId = String.format("%06d", Thread.currentThread().getId());
-			
+			final String[]	recordKeys	= getRecordNames();
+			final String		sThreadId		= String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+
 			public void run() {
-				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
+				log.log(Level.FINE, "entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
 				RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
 				int numberRecords = getRecordNamesLength();
@@ -1388,25 +1424,25 @@ public class RecordSet extends HashMap<String, Record> {
 				int progress = RecordSet.this.application.getProgressPercentage();
 
 				int maxWaitCounter = 10;
-				int sleepTime = numberRecords*recordEntries/200;
+				int sleepTime = numberRecords * recordEntries / 200;
 				while (!checkAllRecordsDisplayable() && maxWaitCounter > 0) {
 					try {
-						RecordSet.log.fine("waiting for all records displayable"); //$NON-NLS-1$
+						log.log(Level.FINE, "waiting for all records displayable"); //$NON-NLS-1$
 						Thread.sleep(sleepTime);
 						--maxWaitCounter;
 						if (maxWaitCounter == 0) return;
 					}
 					catch (InterruptedException e) {
-						RecordSet.log.log(Level.SEVERE, e.getMessage(), e);
+						log.log(Level.SEVERE, e.getMessage(), e);
 					}
-					RecordSet.this.application.setProgress(progress+=2, this.sThreadId);
+					RecordSet.this.application.setProgress(progress += 2, this.sThreadId);
 				}
-				if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
+				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 				// calculate record set internal data table
-				if (RecordSet.log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
+				printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
-					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
+					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
 
 					for (int i = 0; i < recordEntries; i++) {
@@ -1420,11 +1456,11 @@ public class RecordSet extends HashMap<String, Record> {
 					}
 					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
-					if (RecordSet.log.isLoggable(Level.FINE)) RecordSet.log.fine("end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
+					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 				}
-				
+
 				// recall the table update function all prerequisites are checked
-				RecordSet.this.application.updateDataTable(RecordSet.this.getName());  
+				RecordSet.this.application.updateDataTable(RecordSet.this.getName());
 			}
 		};
 		if (!this.dataTableCalcThread.isAlive()) {
@@ -1439,7 +1475,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public boolean isRecalculation() {
 		return this.isRecalculation;
 	}
-	
+
 	public int getRecordNamesLength() {
 		return this.recordNames.length;
 	}
@@ -1447,17 +1483,16 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getFirstRecordName() {
 		return this.recordNames[0];
 	}
-	
+
 	/**
 	 * set if a recalculation of depending calculated records are required
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
 		this.setTableDataCalculated(false);
-		for (int i=0; i<this.device.getMeasurementNames(this.channelConfigName).length; ++i) {
-			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation())
-				this.get(this.getRecordNames()[i]).resetMinMax();
-			
+		for (int i = 0; i < this.device.getMeasurementNames(this.channelConfigName).length; ++i) {
+			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation()) this.get(this.getRecordNames()[i]).resetMinMax();
+
 			this.get(this.getRecordNames()[i]).resetStatiticCalculationBase();
 		}
 	}
@@ -1468,6 +1503,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public IDevice getDevice() {
 		return this.device != null ? this.device : this.application.getActiveDevice();
 	}
+
 	/**
 	 * get all record properties in serialized form
 	 * @return serializedRecordProperties
@@ -1479,16 +1515,18 @@ public class RecordSet extends HashMap<String, Record> {
 
 		sb.append(TIME_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
-		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getBlue()).append(Record.DELIMITER);
+		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(
+				this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
 		sb.append(HORIZONTAL_GRID_RECORD).append(OSDE.STRING_EQUAL).append(this.horizontalGridRecordKey).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
+				.append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 
 		return sb.toString().endsWith(Record.DELIMITER) ? sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) : sb.toString();
 	}
-	
+
 	/**
 	 * set all record properties by given serialized form
 	 * @param serializedRecordSetProperties
@@ -1498,30 +1536,34 @@ public class RecordSet extends HashMap<String, Record> {
 		String tmpValue = null;
 		try {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
-			if (tmpValue!=null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
 
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
-			if (tmpValue!=null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_LINE_STYLE);
-			if (tmpValue!=null && tmpValue.length() > 0) this.timeGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeGridLineStyle = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_COLOR);
-			if (tmpValue!=null && tmpValue.length() > 5) this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[2]));
-			
+			if (tmpValue != null && tmpValue.length() > 5)
+				this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
+						.split(OSDE.STRING_COMMA)[2]));
+
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
-			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
-			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);
-			if (tmpValue!=null && tmpValue.length() > 0) this.horizontalGridLineStyle = new Integer(tmpValue.trim()).intValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridLineStyle = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_COLOR);
-			if (tmpValue!=null && tmpValue.length() > 5) this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[2]));
+			if (tmpValue != null && tmpValue.length() > 5)
+				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
+						.split(OSDE.STRING_COMMA)[2]));
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0002) + OSDE.STRING_NEW_LINE + e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * query if the record set is zoomed and the zoomed data extract starts at first data point
 	 * @return true if zoom is active and starts at left edge of curve
@@ -1529,13 +1571,13 @@ public class RecordSet extends HashMap<String, Record> {
 	public boolean isCutLeftEdgeEnabled() {
 		return this.isZoomMode && (this.recordZoomOffset == 0);
 	}
-	
+
 	/**
 	 * query if the record set is zoomed and the zoomed data extract ends at last data point
 	 * @return true if zoom is active and starts at right edge of curve
 	 */
 	public boolean isCutRightEdgeEnabled() {
-		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize()-1);
+		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize() - 1);
 	}
 
 	public String getHeader() {
@@ -1559,5 +1601,197 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public int getChangeCounter() {
 		return this.changeCounter;
+	}
+
+	/**
+	 * find syncable record names, checking for equal first word "CellVoltage 1"
+	 * and check for equal unit using device measurement
+	 */
+	void check4SyncableRecords() {
+		this.potentialSyncableRecords = new Vector<String>();
+
+		for (int j = 0; j < this.recordNames.length; j++) {
+			if (j > 0 && this.recordNames[j - 1].split(" ")[0].equals(this.recordNames[j].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
+					&& this.device.getMeasurement(this.channelConfigName, j - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, j).getUnit())) {
+				if (this.potentialSyncableRecords.isEmpty()) {
+					this.potentialSyncableRecords.add(this.recordNames[j - 1]);
+				}
+				this.potentialSyncableRecords.add(this.recordNames[j]);
+			}
+		}
+
+		log.info(this.potentialSyncableRecords.toString());
+	}
+
+	/**
+	 * find syncable and displayable record names and place the record names in a vector 
+	 * @param forceRenew - true will recreate syncableRecordsVector
+	 */
+	public boolean isSyncableDisplayableRecords(boolean forceRenew) {
+		if (forceRenew || !this.isSyncableChecked) {
+			this.syncableRecords = new Vector<String>();
+			for (String syncableRecordKey : this.potentialSyncableRecords) {
+				Record record = this.get(syncableRecordKey);
+				if (record != null && record.isDisplayable) this.syncableRecords.add(syncableRecordKey);
+			}
+			this.isSyncableChecked = true;
+
+			//create a new record with syncableName to hold the data for drawing the scale
+			String syncRecName = this.getSyncableName();
+			String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
+			String unit = this.get(this.syncableRecords.firstElement()).getUnit();
+			int ordinal = this.getRecordIndex(this.syncableRecords.firstElement());
+			List<PropertyType> properties = this.device.getProperties(this.channelConfigName, ordinal);
+			addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
+			addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
+			addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
+
+			Record tmpRecord = new Record(this.device, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
+			this.put(syncRecName, tmpRecord);
+			tmpRecord.isSyncPlaceholder = true;
+			tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
+			tmpRecord.isVisible = false;
+			tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
+			this.addRecordName(syncRecName);
+		}
+
+		log.log(Level.FINER, this.syncableRecords.toString());
+		return !this.syncableRecords.isEmpty();
+	}
+
+	/**
+	 * method to query syncable record name stem
+	 * @return syncable record name stem or empty sting
+	 */
+	public String getSyncableName() {
+		return this.syncableRecords.isEmpty() ? "" : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void syncScaleOfSyncableRecords() {
+		// find min/max
+		for (String syncableRecordKey : this.syncableRecords) {
+			Record record = this.get(syncableRecordKey);
+			if (record != null) {
+				int tmpMin = record.getMinValue();
+				int tmpMax = record.getMaxValue();
+				if (this.syncMin == 0 && this.syncMax == 0) {
+					this.syncMin = tmpMin;
+					this.syncMax = tmpMax;
+				}
+				else {
+					if (tmpMin < this.syncMin) this.syncMin = tmpMin;
+					if (tmpMax > this.syncMax) this.syncMax = tmpMin;
+				}
+			}
+		}
+		log.info("syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+
+		Record tmpRecord = this.get(this.getSyncableName());
+		if (tmpRecord != null) {
+			tmpRecord.setMinMax(this.syncMin, this.syncMax);
+
+			// update referenced record to enable drawing of curve, set min/max
+			for (String syncableRecordKey : this.syncableRecords) {
+				Record record = this.get(syncableRecordKey);
+				if (record != null) {
+					record.minDisplayValue = this.syncMin / 1000.0;
+					record.maxDisplayValue = this.syncMax / 1000.0;
+					record.setScaleSynced(true);
+				}
+			}
+		}
+	}
+
+	/**
+	 * update the display scale values, only called for records which have synced scale
+	 * setting display values directly requires to have the scale drawn previously, this will set adapted display values
+	 */
+	public void updateSyncedScaleValues() {
+		Record tmpRecord = this.get(this.getSyncableName());
+		if (tmpRecord != null) {
+			for (String syncedRecordName : this.syncableRecords) {
+				Record record = this.get(syncedRecordName);
+				if (record != null) {
+					record.minDisplayValue = tmpRecord.minDisplayValue;
+					record.maxDisplayValue = tmpRecord.maxDisplayValue;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param properties
+	 * @param propertyKey
+	 * @param type
+	 * @param value
+	 */
+	private void addProperty(List<PropertyType> properties, String propertyKey, DataTypes type, double value) {
+		ObjectFactory factory = new ObjectFactory();
+		PropertyType newProperty = factory.createPropertyType();
+		newProperty.setName(propertyKey);
+		newProperty.setType(type);
+		newProperty.setValue(OSDE.STRING_EMPTY + value);
+		properties.add(newProperty);
+	}
+
+	/**
+	 * @return true onlx if both isSyncableSynced && isOneSyncableVisible are true
+	 */
+	public boolean isSyncableSynced() {
+		return this.isSyncRequested && isOneSyncableVisible();
+	}
+
+	/**
+	 * query if one of the syncable records is switched visible
+	 * @return true if one of the syncable records is visible
+	 */
+	public boolean isOneSyncableVisible() {
+		boolean isOneSynceableVisible = false;
+		for (String syncableRecordKey : this.potentialSyncableRecords) {
+			Record record = this.get(syncableRecordKey);
+			if (record != null && record.isVisible) {
+				isOneSynceableVisible = true;
+				break;
+			}
+		}
+		return isOneSynceableVisible;
+	}
+
+	/**
+	 * @param newValue the isSyncableSynced to set
+	 */
+	public void setSyncRequested(boolean newValue) {
+		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+		this.isSyncRequested = newValue;
+		if (newValue) {
+			this.syncScaleOfSyncableRecords();
+		}
+		else {
+			for (String recordName : this.syncableRecords) {
+				this.get(recordName).setScaleSynced(false);
+			}
+		}
+		this.get(this.getSyncableName()).isVisible = this.isSyncRequested();
+	}
+
+	/**
+	 * overwritten size method to care about added sync record (placeholder)
+	 */
+	public int size() {
+		return this.isSyncRequested ? super.size() - 1 : super.size();
+	}
+
+	/**
+	 * @return the isSyncRequested
+	 */
+	public boolean isSyncRequested() {
+		return this.isSyncRequested;
+	}
+
+	/**
+	 * @return the syncableRecords
+	 */
+	public Vector<String> getSyncableRecords() {
+		return this.syncableRecords;
 	}
 }

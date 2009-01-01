@@ -109,12 +109,12 @@ public class SelectorComposite extends Composite {
 //				}
 //			}
 //			public void controlMoved(ControlEvent evt) {
-//				log.finest("SelectorComposite.controlMoved() = " + evt);
+//				log.log(Level.FINEST, "SelectorComposite.controlMoved() = " + evt);
 //			}
 //		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.finer("curveSelector.helpRequested " + evt); //$NON-NLS-1$
+				log.log(Level.FINER, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
 				SelectorComposite.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -151,16 +151,16 @@ public class SelectorComposite extends Composite {
 			//this.contextMenu.createMenu(this.popupmenu);
 //			this.curveSelectorTable.addPaintListener(new PaintListener() {
 //				public void paintControl(PaintEvent evt) {
-//					log.finest("curveSelectorTable.paintControl, event=" + evt); //$NON-NLS-1$
+//					log.log(Level.FINEST, "curveSelectorTable.paintControl, event=" + evt); //$NON-NLS-1$
 //					doUpdateCurveSelectorTable();
 //				}
 //			});
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					log.finest("curveTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "curveTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					TableItem item = (TableItem) evt.item;
 					String recordName = ((TableItem) evt.item).getText();
-					log.fine("selected = " + recordName); //$NON-NLS-1$
+					log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
 					SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
 					SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
 					if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
@@ -181,27 +181,35 @@ public class SelectorComposite extends Composite {
 								SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 								item.setData(OpenSerialDataExplorer.OLD_STATE, true);
 								item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
-								SelectorComposite.this.application.updateGraphicsWindow();
-								SelectorComposite.this.application.updateDigitalWindow();
-								SelectorComposite.this.application.updateAnalogWindow();
-								SelectorComposite.this.application.updateCellVoltageWindow();
-								SelectorComposite.this.application.updateFileCommentWindow();
 							}
 							else {
 								activeRecord.setVisible(false);
 								SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 								item.setData(OpenSerialDataExplorer.OLD_STATE, false);
 								item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
-								SelectorComposite.this.application.updateGraphicsWindow();
-								SelectorComposite.this.application.updateDigitalWindow();
-								SelectorComposite.this.application.updateAnalogWindow();
-								SelectorComposite.this.application.updateCellVoltageWindow();
-								SelectorComposite.this.application.updateFileCommentWindow();
 							}
 						}
 						else {
-							log.log(Level.WARNING, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
+							RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
+							if (recordSet != null && recordSet.size() > 0) {
+								if (item.getChecked()) {
+									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+									recordSet.setSyncRequested(true);
+									//item.setChecked(recordSet.isSyncableSynced()); // only allow check if at least one of the syncable records are visible
+								}
+								else {
+									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+									recordSet.setSyncRequested(false);
+								}
+							}
 						}
+						SelectorComposite.this.application.updateGraphicsWindow();
+						SelectorComposite.this.application.updateDigitalWindow();
+						SelectorComposite.this.application.updateAnalogWindow();
+						SelectorComposite.this.application.updateCellVoltageWindow();
+						SelectorComposite.this.application.updateFileCommentWindow();
 					}
 				}
 			});
@@ -224,6 +232,8 @@ public class SelectorComposite extends Composite {
 				//this.curveSelectorHeader.pack(true);
 				//itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
 				String[] recordKeys = recordSet.getRecordNames();
+				int checkBoxWidth = 20;
+				int textSize = 10;
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record;
 					switch (this.windowType) {
@@ -236,19 +246,18 @@ public class SelectorComposite extends Composite {
 						record = recordSet.getRecord(recordKeys[i]);
 						break;
 					}
-					if (log.isLoggable(Level.FINER)) log.finer(record.getName());
+					log.log(Level.FINER, record.getName());
 
-					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-					item.setForeground(record.getColor());
-					item.setText(record.getName());
-					int textSize = record.getName().length() * 8;
+					textSize = record.getName().length() * 8;
 					//this.curveSelectorTable.pack();
 					//log.info(item.getText() + " " + item.getBounds().width);
-					int checkBoxWidth = 20;
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
 					//log.info(item.getText() + " " + itemWidth);
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 					if (record.isDisplayable()) {
+						TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
+						item.setForeground(record.getColor());
+						item.setText(record.getName());
 						if (record.isVisible()) {
 							item.setChecked(true);
 							item.setData(OpenSerialDataExplorer.OLD_STATE, true);
@@ -260,15 +269,27 @@ public class SelectorComposite extends Composite {
 							item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
 						}
 					}
-					else {
-						item.setChecked(false);
-						item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-						item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-						item.dispose();
-					}
+//					else {
+//						item.setChecked(false);
+//						item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+//						item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+//						item.dispose();
+//					}
 				}
+				if (recordSet.isSyncableDisplayableRecords(false) && recordSet.isOneSyncableVisible() && this.windowType == GraphicsWindow.TYPE_NORMAL) {
+					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
+					item.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+					item.setText("Sync " + recordSet.getSyncableName());
+					item.setChecked(recordSet.isSyncRequested());
+					item.setData(OpenSerialDataExplorer.OLD_STATE, recordSet.isSyncRequested());
+					item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+					item.setData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER, true);
+					textSize = item.getText().length() * 7;
+					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
+				}
+				
 				this.selectorColumnWidth = itemWidth;
-				if (log.isLoggable(Level.FINER)) log.fine("*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+				log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		}
 		else {
 			this.curveSelectorTable.removeAll();
@@ -282,7 +303,7 @@ public class SelectorComposite extends Composite {
 			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
 		}
 
-		if (log.isLoggable(Level.FINER)) log.finer("curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+		log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
 
 	/**
