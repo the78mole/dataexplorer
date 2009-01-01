@@ -274,12 +274,14 @@ public class GathererThread extends Thread {
 			this.serialPort.close();
 
 		RecordSet tmpRecordSet = this.channel.get(newRecordSetKey);
-		tmpRecordSet.setTableDisplayable(true); // enable table display after calculation
-		this.device.updateVisibilityStatus(tmpRecordSet);
-		this.device.makeInActiveDisplayable(tmpRecordSet);
-		this.channel.applyTemplate(newRecordSetKey);
-		this.application.updateStatisticsData();
-		this.application.updateDataTable(newRecordSetKey);
+		if (tmpRecordSet != null) {
+			tmpRecordSet.setTableDisplayable(true); // enable table display after calculation
+			this.device.updateVisibilityStatus(tmpRecordSet);
+			this.device.makeInActiveDisplayable(tmpRecordSet);
+			this.channel.applyTemplate(newRecordSetKey);
+			this.application.updateStatisticsData();
+			this.application.updateDataTable(newRecordSetKey);
+		}
 	}
 
 	/**
