@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channels;
@@ -61,7 +60,7 @@ public class QuasiLinearRegression extends CalculationThread {
 				double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
 				int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
-				if (log.isLoggable(Level.FINE)) log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
 				int numberDataPoints = recordHeight.realSize();
 				int startPosition = 0;
@@ -82,7 +81,7 @@ public class QuasiLinearRegression extends CalculationThread {
 					ssXX = ssXX + (((1 / timeStep_sec * i) - avgX) * ((1 / timeStep_sec * i) - avgX));
 				}
 				ssXX = ssXX / timeStepsPerInterval;
-				if (log.isLoggable(Level.FINEST)) log.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
 				--modCounter;
 				while (modCounter > 0 && !this.threadStop) {
 					// calculate avg y
@@ -114,14 +113,14 @@ public class QuasiLinearRegression extends CalculationThread {
 					}
 					startPosition = startPosition + pointInterval;
 
-					if (log.isLoggable(Level.FINEST)) log.finest("slope = " + slope + " counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					log.finest("slope = " + slope + " counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					--modCounter;
 				}
 				// pad the rest of the curve to make equal size
 				for (int i = record.realSize(); i < numberDataPoints - 1; i++) {
 					record.add(0);
 				}
-				if (log.isLoggable(Level.FINEST)) log.fine("counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 				if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {

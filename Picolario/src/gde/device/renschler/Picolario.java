@@ -165,7 +165,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double translateValue(Record record, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
 		String recordKey = "?"; //$NON-NLS-1$
 		double newValue = 0.0;
@@ -214,7 +214,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 
-		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
+		log.finer(String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -223,7 +223,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		if (Picolario.log.isLoggable(Level.FINEST)) Picolario.log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
 		String[] recordNames = record.getRecordSetNames(); 
@@ -265,7 +265,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - offset) / factor + reduction;
 
-		if (Picolario.log.isLoggable(Level.FINER)) Picolario.log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
+		log.finer(String.format("new value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 

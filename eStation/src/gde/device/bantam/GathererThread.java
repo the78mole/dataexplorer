@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channel;
@@ -110,7 +109,7 @@ public class GathererThread extends Thread {
 		// prepare timed data gatherer thread
 		int delay = 0;
 		int period = this.timeStep_ms;
-		if (log.isLoggable(Level.FINE)) log.fine("timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		log.fine("timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		this.isCollectDataStopped = false;
 		this.isUpdatedRecordSetCellState = false;
 
@@ -121,11 +120,11 @@ public class GathererThread extends Thread {
 		this.timerTask = new TimerTask() {
 
 			public void run() {
-				if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("====> entry"); //$NON-NLS-1$
+				log.fine("====> entry"); //$NON-NLS-1$
 				try {
 					if (GathererThread.this.isTimerRunning) {
 						// prepare the data for adding to record set
-						//if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
+						//log.fine("recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName());
 
 						// build the point array according curves from record set
 						byte[] dataBuffer = GathererThread.this.serialPort.getData();
@@ -133,9 +132,7 @@ public class GathererThread extends Thread {
 						// check if device is ready for data capturing, discharge or charge allowed only
 						// else wait for 180 seconds max. for actions
 						String processName = GathererThread.this.device.USAGE_MODE[usedDevice.getProcessingMode(dataBuffer)];
-						if (log.isLoggable(Level.FINE)) {
-							GathererThread.log.fine("processing mode = " + processName); //$NON-NLS-1$
-						}
+						log.fine("processing mode = " + processName); //$NON-NLS-1$
 						usedDevice.getConfigurationValues(GathererThread.this.configData, dataBuffer);
 						if ((processName.equals(GathererThread.this.device.USAGE_MODE[1]) || processName.equals(GathererThread.this.device.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
 							&& !GathererThread.this.isCollectDataStopped) { 
@@ -156,7 +153,7 @@ public class GathererThread extends Thread {
 								GathererThread.this.channel.put(GathererThread.this.recordSetKey, RecordSet.createRecordSet(getName().trim(), GathererThread.this.recordSetKey, GathererThread.this.application
 										.getActiveDevice(), true, false));
 								GathererThread.this.channel.applyTemplateBasics(GathererThread.this.recordSetKey);
-								GathererThread.log.fine(GathererThread.this.recordSetKey + " created for channel " + GathererThread.this.channel.getName()); //$NON-NLS-1$
+								log.fine(GathererThread.this.recordSetKey + " created for channel " + GathererThread.this.channel.getName()); //$NON-NLS-1$
 								if (GathererThread.this.channel.getActiveRecordSet() == null) GathererThread.this.channel.setActiveRecordSet(GathererThread.this.recordSetKey);
 								GathererThread.this.recordSet = GathererThread.this.channel.get(GathererThread.this.recordSetKey);
 								GathererThread.this.recordSet.setTableDisplayable(false); // suppress table calc + display 
@@ -170,7 +167,7 @@ public class GathererThread extends Thread {
 							}
 							else {
 								GathererThread.this.recordSetKey = GathererThread.this.channel.size() + ") [" + GathererThread.this.configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
-								GathererThread.log.fine("re-using " + GathererThread.this.recordSetKey); //$NON-NLS-1$
+								log.fine("re-using " + GathererThread.this.recordSetKey); //$NON-NLS-1$
 							}
 							setTimeStamp();
 							GathererThread.this.dialog.updateGlobalConfigData(GathererThread.this.configData);
@@ -197,7 +194,7 @@ public class GathererThread extends Thread {
 								GathererThread.this.application.updateDigitalWindowChilds();
 								GathererThread.this.application.updateAnalogWindowChilds();
 								
-								GathererThread.log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
+								log.fine("numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
 								if (GathererThread.this.numberBatteryCells > 0) {
 									GathererThread.this.application.updateCellVoltageChilds();
 								}
@@ -214,7 +211,7 @@ public class GathererThread extends Thread {
 						else { // else wait for 180 seconds max. for actions
 							if (0 == (setRetryCounter(getRetryCounter() - 1)) || GathererThread.this.isCollectDataStopped) {
 								stopTimerThread();
-								GathererThread.log.fine("Timer stopped eStation inactiv"); //$NON-NLS-1$
+								log.fine("Timer stopped eStation inactiv"); //$NON-NLS-1$
 								setRetryCounter(WAIT_TIME_RETRYS); // 90 * receive timeout sec timeout = 180 sec
 							}
 							log.fine("retryCounter = " + getRetryCounter()); //$NON-NLS-1$
@@ -254,7 +251,7 @@ public class GathererThread extends Thread {
 						cleanup(GathererThread.this.recordSetKey, message);
 					}
 				}
-				if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.fine("======> exit"); //$NON-NLS-1$
+				log.fine("======> exit"); //$NON-NLS-1$
 			}
 		};
 
@@ -262,7 +259,7 @@ public class GathererThread extends Thread {
 		this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
 		this.isTimerRunning = true;
 		
-		GathererThread.log.fine("exit"); //$NON-NLS-1$
+		log.fine("exit"); //$NON-NLS-1$
 	}
 
 	/**

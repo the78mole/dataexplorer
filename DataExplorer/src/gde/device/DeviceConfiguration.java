@@ -143,7 +143,7 @@ public class DeviceConfiguration {
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
 		
-		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
+		log.fine(this.toString());
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class DeviceConfiguration {
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = deviceConfig.isChangePropery;
 
-		if (log.isLoggable(Level.FINE)) log.fine(this.toString());
+		log.fine(this.toString());
 	}
 
 	/**
@@ -496,7 +496,7 @@ public class DeviceConfiguration {
 	 * @param isActive
 	 */
 	public void setMeasurementActive(String channelConfigKey, int measurementOrdinal, boolean isActive) {
-		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
 	}
@@ -545,7 +545,7 @@ public class DeviceConfiguration {
 	 * @param name
 	 */
 	public void setMeasurementName(String channelConfigKey, int measurementOrdinal, String name) {
-		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setName(name);
 	}
@@ -557,7 +557,7 @@ public class DeviceConfiguration {
 	 * @return dataUnit as string
 	 */
 	public String getMeasurementUnit(String channelConfigKey, int measurementOrdinal) {
-		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return this.getMeasurement(channelConfigKey, measurementOrdinal).getUnit(); //$NON-NLS-1$
 	}
 
@@ -568,7 +568,7 @@ public class DeviceConfiguration {
 	 * @param unit
 	 */
 	public void setMeasurementUnit(String channelConfigKey, int measurementOrdinal, String unit) {
-		if(log.isLoggable(Level.FINER)) log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer("channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setUnit(unit);
 	}
@@ -601,7 +601,7 @@ public class DeviceConfiguration {
 	 * @return statistics, if statistics does not exist return null
 	 */
 	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal) {
-		if(log.isLoggable(Level.FINER)) log.finer("get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		return this.getMeasurement(channelConfigKey, measurementOrdinal).getStatistics();
 	}
 	
@@ -654,7 +654,7 @@ public class DeviceConfiguration {
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementOffset(String channelConfigKey, int measurementOrdinal) {
-		if(log.isLoggable(Level.FINER)) log.finer("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property != null)
@@ -670,7 +670,7 @@ public class DeviceConfiguration {
 	 * @param offset the offset to set
 	 */
 	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset) {
-		if(log.isLoggable(Level.FINER)) log.finer("set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
@@ -687,7 +687,7 @@ public class DeviceConfiguration {
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
 	public double getMeasurementFactor(String channelConfigKey, int measurementOrdinal) {
-		if(log.isLoggable(Level.FINER)) log.finer("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property != null)
@@ -703,7 +703,7 @@ public class DeviceConfiguration {
 	 * @param factor the offset to set
 	 */
 	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor) {
-		if(log.isLoggable(Level.FINER)) log.finer("set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
@@ -720,7 +720,7 @@ public class DeviceConfiguration {
 	 * @return the reduction, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementReduction(String channelConfigKey, int measurementOrdinal) {
-		if(log.isLoggable(Level.FINER)) log.finer("get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property != null)
@@ -736,7 +736,7 @@ public class DeviceConfiguration {
 	 * @param reduction of the direct measured value
 	 */
 	public void setMeasurementReduction(String channelConfigKey, int measurementOrdinal, double reduction) {
-		if(log.isLoggable(Level.FINER)) log.finer("set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		log.finer("set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);

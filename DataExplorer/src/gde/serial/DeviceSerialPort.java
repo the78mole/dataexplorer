@@ -134,10 +134,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 							((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
 						}
 						availablePorts.add(serialPortStr);
-						if (log.isLoggable(Level.FINER)) log.finer("Found available port: " + serialPortStr); //$NON-NLS-1$
+						log.finer("Found available port: " + serialPortStr); //$NON-NLS-1$
 					}
 					catch (Exception e) {
-						if (log.isLoggable(Level.FINER)) log.finer("Found port, but can't open: " + serialPortStr); //$NON-NLS-1$
+						log.finer("Found port, but can't open: " + serialPortStr); //$NON-NLS-1$
 					}
 				}
 		}
@@ -471,7 +471,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		while ((resBytes = this.inputStream.available()) < numBytes) {
 			Thread.sleep(sleepTime);
 			timeOutCounter--;
-			//if(log.isLoggable(Level.FINER)) log.finer("time out counter = " + counter);
+			//log.finer("time out counter = " + counter);
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -580,9 +580,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			
 			--timeOutCounter;
 
-			if (log.isLoggable(Level.INFO)) {
-				log.fine("stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter);
-			}
+			log.fine("stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter);
+
 			if (timeOutCounter == 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec })); 
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -601,7 +600,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public void checkForLeftBytes() throws ReadWriteOutOfSyncException, IOException {
 		//check available bytes in receive buffer == 0
-		if (log.isLoggable(Level.FINER)) log.finer("inputStream available bytes = " + this.inputStream.available()); //$NON-NLS-1$
+		log.finer("inputStream available bytes = " + this.inputStream.available()); //$NON-NLS-1$
 		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException(Messages.getString(MessageIds.OSDE_MSGE0014));
 	}
 

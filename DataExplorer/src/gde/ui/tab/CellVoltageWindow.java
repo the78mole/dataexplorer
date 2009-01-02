@@ -193,13 +193,13 @@ public class CellVoltageWindow {
 	public void updateChilds() {
 		updateCellVoltageVector();
 		updateVoltageAndCapacity();
-		if (log.isLoggable(Level.FINER)) log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
 				this.displays.get(i).redraw();
-				if (log.isLoggable(Level.FINE)) log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else {
@@ -223,7 +223,7 @@ public class CellVoltageWindow {
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
 						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
 
-				if (log.isLoggable(Level.FINE)) log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
@@ -242,7 +242,7 @@ public class CellVoltageWindow {
 						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(),
 								this);
 						display.create();
-						if (log.isLoggable(Level.FINER)) log.finer("created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
+						log.finer("created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
@@ -287,7 +287,7 @@ public class CellVoltageWindow {
 				for (String recordKey : activeRecordKeys) {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
-					//if (log.isLoggable(Level.FINER)) log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
+					//log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a propperty to flag as single cell voltage
 						if (record.getLast() > 0) { // last value is current value
@@ -295,7 +295,7 @@ public class CellVoltageWindow {
 							this.voltageAvg += record.getLast();
 							cellCount++;
 						}
-						//if (log.isLoggable(Level.INFO)) log.info("record.getLast() " + record.getLast());
+						//log.info("record.getLast() " + record.getLast());
 					}
 				}
 				// add test values here

@@ -204,7 +204,7 @@ public class StatisticsWindow {
 						this.tabelItemText.add(sb.toString());
 
 						for (String recordName : displayableRecords) {
-							if (log.isLoggable(Level.FINE)) log.fine("updating record = " + recordName);
+							log.fine("updating record = " + recordName);
 							Record record = activeRecordSet.get(recordName);
 							DecimalFormat df = record.getDecimalFormat();
 							IDevice device = activeRecordSet.getDevice();
@@ -295,7 +295,7 @@ public class StatisticsWindow {
 						}
 					}
 					catch (RuntimeException e) {
-						StatisticsWindow.log.log(Level.WARNING, e.getMessage(), e);
+						log.log(Level.WARNING, e.getMessage(), e);
 					}
 					this.oldRecordSet = activeRecordSet;
 				//}
@@ -348,7 +348,7 @@ public class StatisticsWindow {
 	 */
 	void updateDataTable() {
 
-		if (StatisticsWindow.log.isLoggable(Level.FINE)) StatisticsWindow.log.fine("entry data table update"); //$NON-NLS-1$
+		log.fine("entry data table update"); //$NON-NLS-1$
 
 		// cleanup old data table
 		this.dataTable.removeAll();
@@ -365,7 +365,7 @@ public class StatisticsWindow {
 		//this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 		adaptTableSize();
 
-		if (StatisticsWindow.log.isLoggable(Level.FINE)) StatisticsWindow.log.fine("exit data table update"); //$NON-NLS-1$
+		log.fine("exit data table update"); //$NON-NLS-1$
 	}
 
 	/**

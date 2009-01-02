@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -122,7 +121,7 @@ public class CellVoltageDisplay extends Composite {
 				this.cellCanvas.setDragDetect(false);
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						CellVoltageDisplay.log.fine("cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
+						log.fine("cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
 						voltagePaintControl();
 					}
 				});
@@ -177,10 +176,10 @@ public class CellVoltageDisplay extends Composite {
 		this.cellVoltageDigitalLabel.setText(valueText);
 
 		Rectangle rect = this.cellCanvas.getClientArea();
-		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("cellCanvas.getBounds = " + rect); //$NON-NLS-1$
+		log.fine("cellCanvas.getBounds = " + rect); //$NON-NLS-1$
 		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
 		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.INFO)) log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
+		log.fine(this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
 		log.fine(valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y);
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
@@ -200,7 +199,7 @@ public class CellVoltageDisplay extends Composite {
 			break;
 		}
 
-		if (log.isLoggable(Level.FINE)) CellVoltageDisplay.log.fine("fillRectangle = " + rect); //$NON-NLS-1$
+		log.fine("fillRectangle = " + rect); //$NON-NLS-1$
 		gc.fillRectangle(1, topHeight.x, rect.width-1, topHeight.y);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
@@ -242,7 +241,7 @@ public class CellVoltageDisplay extends Composite {
 		
 		topHeight.x = (int)(delta+0.5);
 		topHeight.y = cellCanvasBounds.height-topHeight.x;
-		if (log.isLoggable(Level.INFO)) log.fine(topHeight.toString());
+		log.fine(topHeight.toString());
 		return topHeight;
 	}
 }

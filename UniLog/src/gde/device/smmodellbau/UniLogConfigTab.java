@@ -1,6 +1,5 @@
 package osde.device.smmodellbau;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -169,7 +168,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					this.powerGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							log.finest("powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
 							initEditable();
 							
 							MeasurementType measurement = UniLogConfigTab.this.device.getMeasurement(UniLogConfigTab.this.configName, 0); // 0=VoltageReceiver
@@ -258,7 +257,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.reveiverVoltageButton.setBounds(23, 20, 132, 18);
 						this.reveiverVoltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("reveiverVoltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("reveiverVoltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveUe = UniLogConfigTab.this.reveiverVoltageButton.getSelection();
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
@@ -286,7 +285,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.voltageButton.setBounds(23, 42, 120, 18);
 						this.voltageButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("voltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("voltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveU = UniLogConfigTab.this.voltageButton.getSelection();
 								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.isActiveU && UniLogConfigTab.this.isActiveI);
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
@@ -317,7 +316,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.currentButton.setBounds(23, 64, 120, 18);
 						this.currentButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								updateStateCurrentDependent(UniLogConfigTab.this.isActiveI = UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageAndCurrentDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection());
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.voltageButton.getSelection() && UniLogConfigTab.this.currentButton.getSelection()
@@ -350,7 +349,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.currentInvertButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1439));
 						this.currentInvertButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("currentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								Channel activeChannel = UniLogConfigTab.this.channels.getActiveChannel();
 								if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -378,7 +377,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.currentOffset.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1441));
 						this.currentOffset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("currentOffset.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("currentOffset.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.offsetCurrent = new Double(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')).doubleValue();
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -448,7 +447,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.numCellInput.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1443));
 						this.numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("numCellInput.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("numCellInput.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									if (evt.character == SWT.CR) {
 										UniLogConfigTab.this.setConfigButton.setEnabled(true);
@@ -499,7 +498,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.revolutionButton.setBounds(23, 196, 135, 18);
 						this.revolutionButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("revolutionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("revolutionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveRPM = UniLogConfigTab.this.revolutionButton.getSelection();
 								updateStateVoltageCurrentRevolutionDependent(UniLogConfigTab.this.isActiveU && UniLogConfigTab.this.isActiveI	&& UniLogConfigTab.this.isActiveRPM);
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
@@ -534,7 +533,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.prop100WInput.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1445));
 						this.prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("prop100WInput.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("prop100WInput.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									if (evt.character == SWT.CR) {
 										UniLogConfigTab.this.setConfigButton.setEnabled(true);
@@ -602,7 +601,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.heightButton.setBounds(23, 262, 120, 18);
 						this.heightButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("heightButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("heightButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								updateHeightDependent(UniLogConfigTab.this.isActiveHeight = UniLogConfigTab.this.heightButton.getSelection());
 								if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 									RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
@@ -649,7 +648,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.slopeCalculationTypeCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1448));
 						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("slopeCalculationTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (UniLogConfigTab.this.slopeCalculationTypeCombo.getSelectionIndex() == 1)
 									UniLogConfigTab.this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 								else
@@ -683,7 +682,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.regressionTime.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1449));
 						this.regressionTime.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("regressionTime.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("regressionTime.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.slopeTimeSelection = UniLogConfigTab.this.regressionTime.getSelectionIndex() + 1;
 								RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 								if (recordSet != null) {
@@ -715,7 +714,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.axModusGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					this.axModusGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("axModusGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							log.finest("axModusGroup.paintControl, event=" + evt); //$NON-NLS-1$
 							UniLogConfigTab.this.a1Button.setSelection(UniLogConfigTab.this.isActiveA1);
 							UniLogConfigTab.this.a1Text.setText(UniLogConfigTab.this.nameA1);
 							UniLogConfigTab.this.a1Unit.setText("[" + UniLogConfigTab.this.unitA1 + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -741,7 +740,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1UniLogModus.setText(Messages.getString(MessageIds.OSDE_MSGT1452));
 						this.a1UniLogModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1UniLogModus.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a1UniLogModus.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
 									if (!UniLogConfigTab.this.isA1ModusAvailable) {
 										UniLogConfigTab.this.dialog.updateConfigurationValues(UniLogConfigTab.this.device.getSerialPort().readConfiguration());
@@ -785,7 +784,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Button.setText(Messages.getString(MessageIds.OSDE_MSGT1457));
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a1ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveA1 = UniLogConfigTab.this.a1Button.getSelection();
 								checkUpdateAnalog();
 							}
@@ -797,7 +796,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1458));
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Text.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a1Text.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.nameA1 = UniLogConfigTab.this.a1Text.getText().trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -809,7 +808,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Unit.setFont(SWTResourceManager.getFont(this.axName, SWT.NORMAL));
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Unit.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a1Unit.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.unitA1 = UniLogConfigTab.this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -820,7 +819,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Offset.setBounds(207, 72, 48, 20);
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Offset.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a1Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.offsetA1 = new Double(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -836,7 +835,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a1Factor.setBounds(257, 72, 48, 20);
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a1Factor.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a1Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.factorA1 = new Double(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -853,7 +852,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Button.setText(Messages.getString(MessageIds.OSDE_MSGT1459));
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a2ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveA2 = UniLogConfigTab.this.a2Button.getSelection();
 								checkUpdateAnalog();
 							}
@@ -865,7 +864,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1460));
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Text.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a2Text.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.nameA2 = UniLogConfigTab.this.a2Text.getText().trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -877,7 +876,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Unit.setFont(SWTResourceManager.getFont(this.axName, SWT.NORMAL));
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Unit.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a2Unit.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.unitA2 = UniLogConfigTab.this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -888,7 +887,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Offset.setBounds(207, 93, 48, 20);
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Offset.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a2Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.offsetA2 = new Double(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -904,7 +903,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a2Factor.setBounds(257, 93, 48, 20);
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a2Factor.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a2Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.factorA2 = new Double(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -921,7 +920,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Button.setText(Messages.getString(MessageIds.OSDE_MSGT1461));
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a3ValueButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.isActiveA3 = UniLogConfigTab.this.a3Button.getSelection();
 								checkUpdateAnalog();
 							}
@@ -933,7 +932,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1462));
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Text.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a3Text.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.nameA3 = UniLogConfigTab.this.a3Text.getText().trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -945,7 +944,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Unit.setFont(SWTResourceManager.getFont(this.axName, SWT.NORMAL));
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Unit.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a3Unit.keyReleased, event=" + evt); //$NON-NLS-1$
 								UniLogConfigTab.this.unitA3 = UniLogConfigTab.this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim();
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
@@ -956,7 +955,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Offset.setBounds(207, 115, 48, 20);
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Offset.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a3Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.offsetA3 = new Double(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -972,7 +971,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a3Factor.setBounds(257, 115, 48, 20);
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a3Factor.keyReleased, event=" + evt); //$NON-NLS-1$
+								log.finest("a3Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
 									UniLogConfigTab.this.factorA3 = new Double(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.'));
 									if (evt.character == SWT.CR) checkUpdateAnalog();
@@ -989,7 +988,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a23InternModus.setText(Messages.getString(MessageIds.OSDE_MSGT1463));
 						this.a23InternModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23InternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a23InternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
 								setA23Defaults('I');
 								checkUpdateAnalog();
 							}
@@ -1001,7 +1000,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						this.a23ExternModus.setText(Messages.getString(MessageIds.OSDE_MSGT1464));
 						this.a23ExternModus.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("a23ExternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.finest("a23ExternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
 								setA23Defaults('E');
 								checkUpdateAnalog();
 							}
@@ -1015,7 +1014,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.setConfigButton.setEnabled(false);
 					this.setConfigButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							if (UniLogConfigTab.log.isLoggable(Level.FINEST)) UniLogConfigTab.log.finest("setConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.finest("setConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							collectAndUpdateConfiguration();
 							UniLogConfigTab.this.setConfigButton.setEnabled(false);
 						}

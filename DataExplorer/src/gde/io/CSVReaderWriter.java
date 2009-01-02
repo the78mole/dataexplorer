@@ -234,13 +234,11 @@ public class CSVReaderWriter {
 						double tmpDoubleValue = new Double(data).doubleValue();
 						double dPoint = tmpDoubleValue > 500000 ? tmpDoubleValue : tmpDoubleValue * 1000; // multiply by 1000 reduces rounding errors for small values
 						int point = (int) dPoint;
-						if (log.isLoggable(Level.FINE)) {
-							sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						}
+						if (log.isLoggable(Level.FINE)) sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						recordSet.getRecord(recordNames[i]).add(point);
-						if (log.isLoggable(Level.FINE)) log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
+						log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					if (log.isLoggable(Level.FINE)) log.fine(sb.toString());
+					log.fine(sb.toString());
 				}
 
 				// set time base in msec

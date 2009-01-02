@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channels;
@@ -54,7 +53,7 @@ public class LinearRegression extends CalculationThread {
 			return;
 		}
 		synchronized (CalculationThread.REGRESSION_INTERVAL_SEC) {
-			if (log.isLoggable(Level.FINE)) log.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 
 			Record record = this.recordSet.get(this.targetRecordKey);
 			if (record != null && !this.threadStop) {
@@ -63,14 +62,14 @@ public class LinearRegression extends CalculationThread {
 				double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
 				int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
-				if (log.isLoggable(Level.FINE)) log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
 				int numberDataPoints = recordHeight.realSize();
 				int startPosition = 0; // start position for interval calculation
 				int frontPadding = (pointsPerInterval - pointInterval) / 2; // |-----..-----|		
 				//int modCounter = ((numberDataPoints - (numberDataPoints % pointsPerInterval)) - (pointsPerInterval - pointInterval)) / pointInterval;
 				int modCounter = (numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
-				if (log.isLoggable(Level.FINE)) log.fine("numberDataPoints = " + numberDataPoints + " modCounter = " + modCounter + " frontPadding = " + frontPadding); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				log.fine("numberDataPoints = " + numberDataPoints + " modCounter = " + modCounter + " frontPadding = " + frontPadding); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				for (int i = 0; i < frontPadding; i++) { // padding data points which does not fit into interval, begin and end
 					record.add(0);
 				}
@@ -82,7 +81,7 @@ public class LinearRegression extends CalculationThread {
 					ssXX = ssXX + (((timeStep_sec * i) - avgX) * ((timeStep_sec * i) - avgX));
 				}
 				ssXX = ssXX / timeStepsPerInterval;
-				if (log.isLoggable(Level.FINE)) log.fine("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
 				modCounter = modCounter - 1;
 				while (modCounter > 0 && !this.threadStop) {
 					// calculate avg y
@@ -113,14 +112,14 @@ public class LinearRegression extends CalculationThread {
 					}
 					startPosition = startPosition + pointInterval;
 
-					if (log.isLoggable(Level.FINE)) log.fine("slope = " + slope + " startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					log.fine("slope = " + slope + " startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					--modCounter;
 				}
 				// fill the rest of the curve to make equal lenght
 				for (int i = record.realSize(); i < numberDataPoints; i++) {
 					record.add(0);
 				}
-				if (log.isLoggable(Level.FINEST)) log.fine("startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
+				log.fine("startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 				if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
@@ -131,7 +130,7 @@ public class LinearRegression extends CalculationThread {
 			this.application.updateCurveSelectorTable();
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSet.getName());
-			if (log.isLoggable(Level.FINE)) log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}
 

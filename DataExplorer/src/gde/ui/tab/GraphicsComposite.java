@@ -404,7 +404,7 @@ public class GraphicsComposite extends Composite {
 		y0 = maxY - spaceBot;
 		int yMax = maxY - (maxY - spaceTop);
 		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
-		yMax = y0 - height;		if (log.isLoggable(Level.FINER))
+		yMax = y0 - height;		
 		log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));

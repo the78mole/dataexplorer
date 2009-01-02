@@ -163,7 +163,7 @@ public class SWTResourceManager {
 			}
 		}
 		Font font = new Font(Display.getDefault(), fd);
-		if (log.isLoggable(Level.FINE)) log.fine("new font created = " + fontName); //$NON-NLS-1$
+		log.fine("new font created = " + fontName); //$NON-NLS-1$
 		resources.put(fontName, font);
 		return font;
 	}
@@ -182,7 +182,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+			log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -198,7 +198,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), x, y);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+			log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -231,7 +231,7 @@ public class SWTResourceManager {
 			Point textExtend = gc.textExtent(text);
 			gc.drawText(text, buttonImage.getBounds().width + (pt.x - buttonImage.getBounds().width - textExtend.x) / 2, (pt.y - textExtend.y) / 2);
 			gc.dispose();
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+			log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 			
@@ -272,7 +272,7 @@ public class SWTResourceManager {
 				}
 				// Create the vertical image
 				Image vertical = new Image(Display.getDefault(), dd);
-				if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+				log.fine("new image created = " + key); //$NON-NLS-1$
 				resources.put(key, vertical);
 				resultImg = vertical;
 			}
@@ -290,7 +290,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
 			Image img = new Image(Display.getDefault(), imageData);
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + key); //$NON-NLS-1$
+			log.fine("new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
 		} catch (Exception e) {
@@ -309,7 +309,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
 			Image img = new Image(Display.getDefault(), instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
+			log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
@@ -329,7 +329,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
 			Image img = new Image(Display.getDefault(), activeDeviceInstance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
-			if (log.isLoggable(Level.FINE)) log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
+			log.fine("new image created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(tmpUrl, img);
 			return img;
 		} catch (Exception e) {
@@ -345,7 +345,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = Display.getDefault().getSystemColor(swtColor);
-		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name); //$NON-NLS-1$
+		log.fine("new color created = " + name); //$NON-NLS-1$
 		resources.put(name, color);
 		return color;
 	}
@@ -356,7 +356,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = new Color(Display.getDefault(), red, green, blue);
-		if (log.isLoggable(Level.FINE)) log.fine("new color created = " + name); //$NON-NLS-1$
+		log.fine("new color created = " + name); //$NON-NLS-1$
 		resources.put(name, color);
 		return color;
 	}
@@ -367,7 +367,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), alpha1, SWTResourceManager.getColor(swtColor2), alpha2);
-		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name); //$NON-NLS-1$
+		log.fine("new pattern created = " + name); //$NON-NLS-1$
 		resources.put(name, pattern);
 		return pattern;
 	}
@@ -378,7 +378,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), SWTResourceManager.getColor(swtColor2));
-		if (log.isLoggable(Level.FINE)) log.fine("new pattern created = " + name); //$NON-NLS-1$
+		log.fine("new pattern created = " + name); //$NON-NLS-1$
 		resources.put(name, pattern);
 		return pattern;
 	}
@@ -389,7 +389,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (Cursor) resources.get(name);
 		Cursor cursor = new Cursor(Display.getDefault(), type);
-		if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + name); //$NON-NLS-1$
+		log.fine("new cursor created = " + name); //$NON-NLS-1$
 		resources.put(name, cursor);
 		return cursor;
 	}
@@ -402,7 +402,7 @@ public class SWTResourceManager {
 			if (resources.containsKey(tmpUrl)) return (Cursor) resources.get(tmpUrl);
 			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);
-			if (log.isLoggable(Level.FINE)) log.fine("new cursor created = " + tmpUrl); //$NON-NLS-1$
+			log.fine("new cursor created = " + tmpUrl); //$NON-NLS-1$
 			resources.put(url, cursor);
 			return cursor;
 		}
@@ -418,7 +418,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(img);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
+		log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
@@ -429,7 +429,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(display);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
+		log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
@@ -440,7 +440,7 @@ public class SWTResourceManager {
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
 		GC gc = new GC(canvas);
-		if (log.isLoggable(Level.FINE)) log.fine("new GC created = " + name); //$NON-NLS-1$
+		log.fine("new GC created = " + name); //$NON-NLS-1$
 		resources.put(name, gc);
 		return gc;
 	}
