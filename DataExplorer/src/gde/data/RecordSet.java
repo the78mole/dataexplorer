@@ -422,8 +422,18 @@ public class RecordSet extends HashMap<String, Record> {
 	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
-				Record record = this.getRecord(this.recordNames[i]);
-				record.add((new Integer(points[i])).intValue());
+				this.getRecord(this.recordNames[i]).add(points[i]);
+				
+				if (this.syncableRecords.contains(this.recordNames[i])) {
+					if (this.syncMin == 0 && this.syncMax == 0) {
+						this.syncMin = points[i];
+						this.syncMax = points[i];
+					}
+					else {
+						if (points[i] < this.syncMin) this.syncMin = points[i];
+						if (points[i] > this.syncMax) this.syncMax = points[i];
+					}
+				}
 			}
 			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
@@ -437,6 +447,12 @@ public class RecordSet extends HashMap<String, Record> {
 					this.application.updateGraphicsWindow();
 					this.application.updateDigitalWindowChilds();
 					this.application.updateAnalogWindowChilds();
+				}
+			}
+			// check if record synchronisation is activated and update syncMin/syncMax
+			if (this.isSyncRequested) {
+				for (String syncRecordKey : this.syncableRecords) {
+					this.get(syncRecordKey).getLast();
 				}
 			}
 		}
@@ -1793,5 +1809,13 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public Vector<String> getSyncableRecords() {
 		return this.syncableRecords;
+	}
+	
+	/**
+	 * query if the given record key is one of syncable records
+	 * @return 
+	 */
+	public boolean isOneOfSyncableRecord(String queryRecordKey) {
+		return this.syncableRecords.contains(queryRecordKey);
 	}
 }
