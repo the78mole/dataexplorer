@@ -1650,28 +1650,29 @@ public class RecordSet extends HashMap<String, Record> {
 				Record record = this.get(syncableRecordKey);
 				if (record != null && record.isDisplayable) this.syncableRecords.add(syncableRecordKey);
 			}
+
+			if (!this.syncableRecords.isEmpty()) {
+				//create a new record with syncableName to hold the data for drawing the scale
+				String syncRecName = this.getSyncableName();
+				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
+				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
+				int ordinal = this.getRecordIndex(this.syncableRecords.firstElement());
+				List<PropertyType> properties = this.device.getProperties(this.channelConfigName, ordinal);
+				addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
+				addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
+				addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
+				Record tmpRecord = new Record(this.device, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
+				this.put(syncRecName, tmpRecord);
+				tmpRecord.isSyncPlaceholder = true;
+				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
+				tmpRecord.isVisible = false;
+				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
+				this.addRecordName(syncRecName);
+			}
 			this.isSyncableChecked = true;
-
-			//create a new record with syncableName to hold the data for drawing the scale
-			String syncRecName = this.getSyncableName();
-			String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
-			String unit = this.get(this.syncableRecords.firstElement()).getUnit();
-			int ordinal = this.getRecordIndex(this.syncableRecords.firstElement());
-			List<PropertyType> properties = this.device.getProperties(this.channelConfigName, ordinal);
-			addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
-			addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
-			addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
-
-			Record tmpRecord = new Record(this.device, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
-			this.put(syncRecName, tmpRecord);
-			tmpRecord.isSyncPlaceholder = true;
-			tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
-			tmpRecord.isVisible = false;
-			tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
-			this.addRecordName(syncRecName);
+			log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString());
 		}
 
-		log.log(Level.FINER, this.syncableRecords.toString());
 		return !this.syncableRecords.isEmpty();
 	}
 
@@ -1690,17 +1691,18 @@ public class RecordSet extends HashMap<String, Record> {
 			if (record != null) {
 				int tmpMin = record.getMinValue();
 				int tmpMax = record.getMaxValue();
+				log.log(Level.FINE, syncableRecordKey + " tmpMin = " + tmpMin / 1000.0 + "; tmpMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 				if (this.syncMin == 0 && this.syncMax == 0) {
 					this.syncMin = tmpMin;
 					this.syncMax = tmpMax;
 				}
 				else {
 					if (tmpMin < this.syncMin) this.syncMin = tmpMin;
-					if (tmpMax > this.syncMax) this.syncMax = tmpMin;
+					if (tmpMax > this.syncMax) this.syncMax = tmpMax;
 				}
 			}
 		}
-		log.log(Level.FINER, "syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 
 		Record tmpRecord = this.get(this.getSyncableName());
 		if (tmpRecord != null) {
