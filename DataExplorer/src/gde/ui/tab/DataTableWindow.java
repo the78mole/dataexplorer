@@ -132,7 +132,7 @@ public class DataTableWindow {
 	public void updateDataTable(final RecordSet recordSet) {
 
 		if (recordSet.isTableDisplayable() && recordSet.isTableDataCalculated()) {
-			log.fine("entry data table update"); //$NON-NLS-1$
+			log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 			this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0235));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
@@ -160,7 +160,7 @@ public class DataTableWindow {
 			this.application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 			this.application.setStatusMessage(OSDE.STRING_BLANK);
-			log.fine("exit data table update"); //$NON-NLS-1$
+			log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
 		}
 	}
 	

@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.renschler;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -103,7 +104,7 @@ public class PicolarioDialog extends DeviceDialog {
 		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-		log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
 				this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -122,32 +123,32 @@ public class PicolarioDialog extends DeviceDialog {
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (PicolarioDialog.this.gatherThread != null && PicolarioDialog.this.gatherThread.isAlive()) PicolarioDialog.this.gatherThread.setThreadStop(true);
 				}
 			});
 			this.dialogShell.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.finest("dialogShell.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.paintControl, event=" + evt); //$NON-NLS-1$
 					PicolarioDialog.this.configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.finest("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					PicolarioDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-2$
 				}
 			});
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 				public void mouseEnter(MouseEvent evt) {
-					log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 					fadeOutAplhaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 				}
 				public void mouseHover(MouseEvent evt) {
-					log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 				}
 				public void mouseExit(MouseEvent evt) {
-					log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 					fadeInAlpaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
 				}
 			});
@@ -165,7 +166,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("anzahlAufzeichnungenButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "anzahlAufzeichnungenButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							try {
 								if (PicolarioDialog.this.serialPort != null) {
 									PicolarioDialog.this.setClosePossible(false);
@@ -217,19 +218,19 @@ public class PicolarioDialog extends DeviceDialog {
 				this.configTabFolder.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				this.configTabFolder.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 						int channelNumber = PicolarioDialog.this.configTabFolder.getSelectionIndex() + 1;
 						String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText();
 						Channels channels = Channels.getInstance();
 						Channel activeChannel = channels.getActiveChannel();
 						if (activeChannel != null) {
-							log.fine("activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+							log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
 								int answer = PicolarioDialog.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGT1202));
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
-									log.fine("move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+									log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
@@ -255,7 +256,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("switchRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "switchRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							PicolarioDialog.this.doSwtichRecordSet = PicolarioDialog.this.switchRecordSetButton.getSelection();
 						}
 					});
@@ -268,7 +269,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.readSingle.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("ausleseButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "ausleseButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							PicolarioDialog.this.setClosePossible(false);
 							PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(false);
 							PicolarioDialog.this.readSingle.setEnabled(false);
@@ -277,7 +278,7 @@ public class PicolarioDialog extends DeviceDialog {
 							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort,
 									new String[] { PicolarioDialog.this.recordSetSelectCombo.getText() });
 							PicolarioDialog.this.gatherThread.start();
-							log.fine("gatherThread.run() - executing"); //$NON-NLS-1$
+							log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
 						} // end widget selected
 					}); // end selection adapter
 				}
@@ -305,7 +306,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.readAllRecords.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("readAllRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "readAllRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
 							PicolarioDialog.this.setClosePossible(false);
 							PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(false);
 							PicolarioDialog.this.readAllRecords.setEnabled(false);
@@ -314,7 +315,7 @@ public class PicolarioDialog extends DeviceDialog {
 							String[] itemNames = PicolarioDialog.this.recordSetSelectCombo.getItems();
 							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort, itemNames);
 							PicolarioDialog.this.gatherThread.start();
-							log.fine("gatherThread.run() - executing"); //$NON-NLS-1$
+							log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
 						}
 					});
 				}
@@ -337,7 +338,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.finest("stopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "stopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							PicolarioDialog.this.gatherThread.setThreadStop(true);
 							PicolarioDialog.this.setClosePossible(true);
 						}
@@ -352,7 +353,7 @@ public class PicolarioDialog extends DeviceDialog {
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						log.fine("closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINE, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						dispose();
 					}
 				});

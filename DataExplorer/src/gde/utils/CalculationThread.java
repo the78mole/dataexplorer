@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.utils;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.RecordSet;
@@ -53,7 +54,7 @@ public abstract class CalculationThread extends Thread {
 		this.targetRecordKey = outRecordKey;
 		this.calcInterval_sec = calcIntervalSec;
 		this.application = OpenSerialDataExplorer.getInstance();
-		log.finer(this.getClass().getSimpleName() + " instanciated");
+		log.log(Level.FINER, this.getClass().getSimpleName() + " instanciated");
 	}
 
 	/**

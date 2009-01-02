@@ -19,6 +19,7 @@ package osde.data;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -141,7 +142,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param recordSetKey or empty string if switched to first record set
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
-		log.fine("switching to channel " + channelNumber);		 //$NON-NLS-1$
+		log.log(Level.FINE, "switching to channel " + channelNumber);		 //$NON-NLS-1$
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
 				this.setActiveChannelNumber(channelNumber);
@@ -152,7 +153,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 			}
 			else {
-				log.fine("nothing to do selected channel == active channel"); //$NON-NLS-1$
+				log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			Channel activeChannel = this.getActiveChannel();
@@ -228,7 +229,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			channel.clear(); // clear record set
 		}
 		this.clear(); // clear channel
-		log.fine("visited"); //$NON-NLS-1$
+		log.log(Level.FINE, "visited"); //$NON-NLS-1$
 	}
 
 	public String getFileDescription() {

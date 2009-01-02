@@ -68,7 +68,7 @@ public class DataGathererThread extends Thread {
 	public void run() {
 		boolean isPortOpenedByMe = false;
 		try {
-			DataGathererThread.log.fine("entry data gatherer"); //$NON-NLS-1$
+			DataGathererThread.log.log(Level.FINE, "entry data gatherer"); //$NON-NLS-1$
 			Channel channel = Channels.getInstance().getActiveChannel();
 			String[] measurements = this.device.getMeasurementNames(channel.getConfigKey()); // 0=Spannung, 1=Höhe, 2=Steigrate
 			String recordSetKey;
@@ -85,7 +85,7 @@ public class DataGathererThread extends Thread {
 				Vector<byte[]> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device);
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 				channel.put(recordSetKey, RecordSet.createRecordSet(this.configKey, recordSetKey, this.application.getActiveDevice(), true, false));
-				DataGathererThread.log.fine(recordSetKey + " created"); //$NON-NLS-1$
+				DataGathererThread.log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 				if (channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(recordSetKey);
 				RecordSet recordSet = channel.get(recordSetKey);
 
@@ -113,7 +113,7 @@ public class DataGathererThread extends Thread {
 				channel.applyTemplate(recordSetKey);
 			}// end for
 			this.dialog.enableReadButtons();
-			DataGathererThread.log.fine("exit data gatherer"); //$NON-NLS-1$
+			DataGathererThread.log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {

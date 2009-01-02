@@ -87,7 +87,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		finally {
 			if (isPortOpenedByMe) this.close();
 		}
-		log.fine("number available record sets = " + recordSets); //$NON-NLS-1$
+		log.log(Level.FINE, "number available record sets = " + recordSets); //$NON-NLS-1$
 		return recordSets;
 	}
 
@@ -128,7 +128,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 					}
 					else {
 						// write wrong checksum to repeat data package receive cycle
-						log.warning("write wrong checksum required"); //$NON-NLS-1$
+						log.log(Level.WARNING, "write wrong checksum required"); //$NON-NLS-1$
 						byte wrongChecksum = readBuffer[readBuffer.length - 1];
 						byte[] requestAgain = new byte[] { wrongChecksum, wrongChecksum };
 						this.write(requestAgain);

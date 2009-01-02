@@ -96,7 +96,7 @@ public class CurveSelectorContextMenu {
 						if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
 						}
-						log.info("===>>" + CurveSelectorContextMenu.this.recordNameKey);
+						log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 						CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
 						CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
 

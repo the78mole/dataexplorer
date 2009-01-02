@@ -94,13 +94,13 @@ public class StatisticsWindow {
 			this.composite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.composite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
-					log.fine("composite.controlResized evt=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "composite.controlResized evt=" + evt); //$NON-NLS-1$
 					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
 					StatisticsWindow.this.textLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
 				public void controlMoved(ControlEvent evt) {
-					log.finest("composite.controlMoved evt=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
 			});
 			{
@@ -111,7 +111,7 @@ public class StatisticsWindow {
 				this.descriptionGroup.setBackground(SWTResourceManager.getColor(255, 255, 255));
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.fine("group0.paintControl, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINE, "group0.paintControl, event=" + evt); //$NON-NLS-1$
 						StatisticsWindow.this.textLabel.setText(StatisticsWindow.this.descriptionText);
 					}
 				});
@@ -204,7 +204,7 @@ public class StatisticsWindow {
 						this.tabelItemText.add(sb.toString());
 
 						for (String recordName : displayableRecords) {
-							log.fine("updating record = " + recordName);
+							log.log(Level.FINE, "updating record = " + recordName);
 							Record record = activeRecordSet.get(recordName);
 							DecimalFormat df = record.getDecimalFormat();
 							IDevice device = activeRecordSet.getDevice();
@@ -289,7 +289,7 @@ public class StatisticsWindow {
 								}
 								int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER)+1)).x;
 								this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
-								log.finer(sb.toString());
+								log.log(Level.FINER, sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}
 						}
@@ -348,7 +348,7 @@ public class StatisticsWindow {
 	 */
 	void updateDataTable() {
 
-		log.fine("entry data table update"); //$NON-NLS-1$
+		log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 
 		// cleanup old data table
 		this.dataTable.removeAll();
@@ -365,7 +365,7 @@ public class StatisticsWindow {
 		//this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
 		adaptTableSize();
 
-		log.fine("exit data table update"); //$NON-NLS-1$
+		log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
 	}
 
 	/**
@@ -376,18 +376,18 @@ public class StatisticsWindow {
 		int columsWidth = 0;
 		for (int i = 0; i < this.dataTable.getColumnCount() - 1; i++) {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
-			log.fine("ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
+			log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
 		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
-		//log.info("computed size = " + tableSize);
+		//log.log(Level.INFO, "computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
 		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
-		//log.info("tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
+		//log.log(Level.INFO, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
 		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
-		//log.info("table width = " + (columsWidth + this.customTableColumn.getWidth()));
+		//log.log(Level.INFO, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
 }

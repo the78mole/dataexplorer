@@ -126,7 +126,7 @@ public class MenuBar {
 			this.fileMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0001));
 			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
@@ -134,11 +134,11 @@ public class MenuBar {
 				this.fileMenu = new Menu(this.fileMenuItem);
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
-						MenuBar.log.finest("fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
+						MenuBar.log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
 						MenuBar.this.updateSubHistoryMenuItem(OSDE.STRING_EMPTY); //$NON-NLS-1$
 					}
 					public void menuHidden(MenuEvent evt) {
-						log.finest("fileMenu.menuHidden " + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "fileMenu.menuHidden " + evt); //$NON-NLS-1$
 					}
 				});
 				{
@@ -147,7 +147,7 @@ public class MenuBar {
 					this.newFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("newFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "newFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
 								MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
 							}
@@ -160,7 +160,7 @@ public class MenuBar {
 					this.openFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							openFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
@@ -171,7 +171,7 @@ public class MenuBar {
 					this.saveFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("saveFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "saveFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
@@ -188,7 +188,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY); //$NON-NLS-1$
 						}
 					});
@@ -215,7 +215,7 @@ public class MenuBar {
 							this.csvImportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0011));
 							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									importFileCSV(Messages.getString(MessageIds.OSDE_MSGT0012), false);
 								}
 							});
@@ -225,7 +225,7 @@ public class MenuBar {
 							this.csvImportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0013));
 							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.finest("csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									importFileCSV(Messages.getString(MessageIds.OSDE_MSGT0014), true);
 								}
 							});
@@ -243,7 +243,7 @@ public class MenuBar {
 							this.csvExportMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0016));
 							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									exportFileCSV(Messages.getString(MessageIds.OSDE_MSGT0017), false);
 								}
 							});
@@ -254,7 +254,7 @@ public class MenuBar {
 						this.csvExportMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0018));
 						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								MenuBar.log.finest("csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+								MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 								exportFileCSV(Messages.getString(MessageIds.OSDE_MSGT0019), true); 
 							}
 						});
@@ -269,7 +269,7 @@ public class MenuBar {
 					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if other none modal dialog is open
 							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
@@ -289,7 +289,7 @@ public class MenuBar {
 					this.exitMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0021));
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelect.checkDataSaved()) {
 								MenuBar.this.parent.getParent().dispose();
@@ -305,7 +305,7 @@ public class MenuBar {
 			this.editMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0022));
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
@@ -318,7 +318,7 @@ public class MenuBar {
 					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif")); //$NON-NLS-1$
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
 						}
 					});
@@ -329,7 +329,7 @@ public class MenuBar {
 					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif")); //$NON-NLS-1$
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
 						}
 					});
@@ -340,7 +340,7 @@ public class MenuBar {
 					this.panGraphicMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PanHot.gif")); //$NON-NLS-1$
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
 						}
 					});
@@ -354,7 +354,7 @@ public class MenuBar {
 					this.copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("copyGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "copyGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//							Clipboard clipboard = new Clipboard(display);
 							//			        RTFTransfer rftTransfer = RTFTransfer.getInstance();
 							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
@@ -368,7 +368,7 @@ public class MenuBar {
 					this.copyTableMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("copyTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "copyTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//							Clipboard clipboard = new Clipboard(display);
 							//			        TextTransfer transfer = TextTransfer.getInstance();
 							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
@@ -383,7 +383,7 @@ public class MenuBar {
 			this.deviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0028));
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
@@ -396,7 +396,7 @@ public class MenuBar {
 					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openDeviceDialog();
 						}
 					});
@@ -410,7 +410,7 @@ public class MenuBar {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
 					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuBar.this.application.getActiveDevice();
 							if(activeDevice != null) activeDevice.openCloseSerialPort();
 						}
@@ -425,7 +425,7 @@ public class MenuBar {
 					this.selectDeviceMenuItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelection = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelection.checkDataSaved()) {
 								deviceSelection.open();
@@ -439,7 +439,7 @@ public class MenuBar {
 					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0031)); 
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
@@ -473,7 +473,7 @@ public class MenuBar {
 					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0032)); 
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
@@ -507,7 +507,7 @@ public class MenuBar {
 			this.graphicsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0033));
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
@@ -519,7 +519,7 @@ public class MenuBar {
 					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0034));
 					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.channels.getActiveChannel().saveTemplate();
 						}
 					});
@@ -529,14 +529,14 @@ public class MenuBar {
 					this.saveAsGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0035)); 
 					this.saveAsGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.log.fine("templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								GraphicsTemplate template = activeChannel.getTemplate();
 								FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog(Messages.getString(MessageIds.OSDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 										.getGraphicsTemplatePath(), template.getDefaultFileName());
-								MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
+								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 								template.setNewFileName(fileDialog.getFileName());
 								activeChannel.saveTemplate();
 							}
@@ -548,13 +548,13 @@ public class MenuBar {
 					this.restoreGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0037));
 					this.restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 									.getGraphicsTemplatePath());
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(fileDialog.getFileName());
-							MenuBar.log.fine("templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
 								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName());
@@ -570,7 +570,7 @@ public class MenuBar {
 			this.viewMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0039)); 
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
@@ -583,7 +583,7 @@ public class MenuBar {
 					this.curveSelectionMenuItem.setSelection(true);
 					this.curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.curveSelectionMenuItem.getSelection()) {
 								MenuBar.this.application.setCurveSelectorEnabled(true);
 							}
@@ -602,7 +602,7 @@ public class MenuBar {
 					this.graphicsHeaderMenuItem.setSelection(false);
 					this.graphicsHeaderMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("graphicsHeaderMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "graphicsHeaderMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.graphicsHeaderMenuItem.getSelection()) {
 								MenuBar.this.application.enableGraphicsHeader(true);
 								MenuBar.this.application.updateDisplayTab();
@@ -623,7 +623,7 @@ public class MenuBar {
 					this.recordCommentMenuItem.setSelection(false);
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("recordCommentMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "recordCommentMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
 								MenuBar.this.application.enableRecordSetComment(true);
 								MenuBar.this.application.updateDisplayTab();
@@ -642,7 +642,7 @@ public class MenuBar {
 			this.helpMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0043)); 
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.fine("helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
+					MenuBar.log.log(Level.FINE, "helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
 					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
@@ -653,7 +653,7 @@ public class MenuBar {
 					this.contentsMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0044)); 
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
 						}
 					});
@@ -663,7 +663,7 @@ public class MenuBar {
 					this.webCheckMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0045)); 
 					this.webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openWebBrowser(Messages.getString(MessageIds.OSDE_MSGT0046));
 						}
 					});
@@ -673,7 +673,7 @@ public class MenuBar {
 					this.aboutMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0047)); 
 					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.finest("aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openAboutDialog();
 						}
 					});
@@ -711,11 +711,11 @@ public class MenuBar {
 			historyImportMenuItem.setData(shortFileReference, fullQualifiedFileReference);
 			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
-					MenuBar.log.finest("historyImportMenuItem.widgetSelected, event=" + evt);//$NON-NLS-1$
+					MenuBar.log.log(Level.FINEST, "historyImportMenuItem.widgetSelected, event=" + evt);//$NON-NLS-1$
 					String fileName = (String) historyImportMenuItem.getData(historyImportMenuItem.getText());
 					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
 					if (fileType != null && fileType.length() > 2) {
-						MenuBar.log.fine("opening file = " + fileName);//$NON-NLS-1$
+						MenuBar.log.log(Level.FINE, "opening file = " + fileName);//$NON-NLS-1$
 						if (fileType.equalsIgnoreCase(OSDE.FILE_ENDING_OSD)) { 
 							openOsdFile(fileName);
 						}
@@ -1016,7 +1016,7 @@ public class MenuBar {
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = ChannelTypes.values()[activeDevice.getChannelType(channelNumber)].name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
-			log.fine("channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
 			
 			if(channel != null 

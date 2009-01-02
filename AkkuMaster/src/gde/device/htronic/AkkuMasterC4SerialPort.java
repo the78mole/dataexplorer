@@ -608,9 +608,9 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public void print(String[] array) {
 		for (String string : array) {
 			if (string != null)
-				log.fine(string);
+				log.log(Level.FINE, string);
 			else
-				log.fine("no data"); //$NON-NLS-1$
+				log.log(Level.FINE, "no data"); //$NON-NLS-1$
 		}
 	}
 

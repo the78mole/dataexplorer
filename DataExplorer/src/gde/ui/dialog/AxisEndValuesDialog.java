@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.dialog;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -95,7 +96,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setLocation(100, 100);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.finest("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
 					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
 				}
@@ -103,7 +104,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					if (AxisEndValuesDialog.this.isInit) {
-						log.finest("paintControl.paintControl, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "paintControl.paintControl, event=" + evt); //$NON-NLS-1$
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.maxValueSelect, oldMinMax[1], 20);
 						generateAndSetSelectionValues(AxisEndValuesDialog.this.minValueSelect, oldMinMax[0], 20);
 					}
@@ -121,7 +122,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("okBbutton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "okBbutton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						AxisEndValuesDialog.this.dialogShell.dispose();
 					}
 				});
@@ -160,7 +161,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				this.maxValueSelect.select(7);
 				this.maxValueSelect.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 							AxisEndValuesDialog.this.dialogShell.dispose();
 						}
@@ -189,7 +190,7 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				this.minValueSelect.select(5);
 				this.minValueSelect.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 							AxisEndValuesDialog.this.dialogShell.dispose();
 						}

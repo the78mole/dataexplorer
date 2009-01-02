@@ -138,7 +138,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 //		for (byte b : dataBuffer) {
 //			sb.append(String.format("%02x", b)).append(" ");
 //		}
-//		log.info(sb.toString());
+//		log.log(Level.INFO, sb.toString());
 //discharge   			      Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
 //	                      Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
 //33 00 00 00 51 82 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 ca 00 00 07 a3 01 25 19 00 00 00 01 00 3c 0d 0a 20 20 35 38 33 30 00 00 00 00 48 02 00 00             
@@ -180,7 +180,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		points[2] = new Integer((Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
 		points[3] = new Double((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); 							// power U*I [W]
 		points[4] = new Double((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
-		log.fine(points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 		return points;
 	}
@@ -191,8 +191,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
-		log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
-		log.finest(String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
+		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		log.log(Level.FINEST, String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -202,8 +202,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public double reverseTranslateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
-		log.finest(String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
-		log.finest(String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
+		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		log.log(Level.FINEST, String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
 		return newValue;
 	}
 
@@ -216,7 +216,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 	
 	/**

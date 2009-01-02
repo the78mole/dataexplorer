@@ -287,7 +287,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF);
 				if (timeStep_ms != 0) {
 					recordSet.setTimeStep_ms(timeStep_ms);
-					log.fine("timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
+					log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				}
 			}
 
@@ -397,7 +397,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				sb.append("tempIntern = " + points[13]).append(lineSep); //$NON-NLS-1$
 		}
 		
-		log.fine(sb.toString());
+		log.log(Level.FINE, sb.toString());
 		return points;
 	}
 
@@ -486,14 +486,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			// since actual record names can differ from device configuration measurement names, match by sequence
 			record = recordSet.get(recordNames[i]);		
 			measurement = this.getMeasurement(channelConfigKey, i);
-			log.fine(recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.fine("switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
 		}
 		
@@ -545,7 +545,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[3]; // 3=capacity [Ah]
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -555,7 +555,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			for (int i = 0; i < recordCurrent.size(); i++) {
 				capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
 				record.add(capacity.intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -563,7 +563,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[4]; // 4=power [W]
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -571,7 +571,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			recordCurrent = recordSet.get(measurements[2]); // 2=current
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -579,7 +579,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[5]; // 5=energy [Wh]
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -590,7 +590,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				power = i > 0 ? power + ((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
 				record.add(power.intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
 				record.setDisplayable(true);
@@ -598,7 +598,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[6]; // 6=votagePerCell
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -607,7 +607,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int numberCells = property != null ? new Integer(property.getValue()) : 4;
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double(recordVoltage.get(i) / numberCells).intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable()) {
 				record.setDisplayable(true);
@@ -615,7 +615,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 
 			recordKey = measurements[8]; // 8=efficiency
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -629,10 +629,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 			for (int i = 0; i < recordRevolution.size(); i++) {
 				double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-				//if (recordRevolution.get(i)> 100) log.info("recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
+				//if (recordRevolution.get(i)> 100) log.log(Level.INFO, "recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
 				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
 				record.add(new Double(eta * 1000).intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
 				record.setDisplayable(true);
@@ -641,7 +641,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 			boolean isNoSlopeCalculationStarted = true;
 			recordKey = measurements[10]; // 10=slope
-			log.fine("start data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
 			record = recordSet.get(recordKey);
 			record.setDisplayable(false);
 			record.clear();
@@ -660,11 +660,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				++displayableCounter;
 			}
 			
-			log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
+			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 			recordSet.setConfiguredDisplayable(displayableCounter);
 
 			if (isNoSlopeCalculationStarted) this.application.updateGraphicsWindow();
-			log.fine("finished data calculation for record = " + recordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "finished data calculation for record = " + recordKey); //$NON-NLS-1$
 		}
 	}
 

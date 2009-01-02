@@ -89,7 +89,7 @@ public class GraphicsWindow {
 		SWTResourceManager.registerResourceUser(this.graphic);
 		this.graphic.addListener(SWT.RESIZE, new Listener() {
 			public void handleEvent(Event evt) {
-				log.fine("controlRezized " + evt);
+				log.log(Level.FINE, "controlRezized " + evt);
 				GraphicsWindow.this.setSashFormWeights(GraphicsWindow.this.getCurveSelectorComposite().getSelectorColumnWidth());
 			}
 		});
@@ -174,7 +174,7 @@ public class GraphicsWindow {
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			log.fine("sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
+			log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
 		}
 	}
 	

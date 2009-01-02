@@ -159,7 +159,7 @@ public class CurveUtils {
 		// set the values corresponding to the display area of this curve
 		record.setMinDisplayValue(yMinValue);
 		record.setMaxDisplayValue(yMaxValue);
-		log.log(Level.INFO, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -174,9 +174,8 @@ public class CurveUtils {
 	 * @param isZoomMode
 	 */
 	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, boolean isZoomMode) {
-		log.log(Level.INFO, record.getName());
-		log.log(Level.FINE, String.format("x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		log.log(Level.FINE, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -356,7 +355,7 @@ public class CurveUtils {
 				outValues[0] = outValues[0] - (outValues[0] % 20 == 0 ? 0 : (20 + outValues[0] % 20));
 				outValues[1] = outValues[1] + (outValues[1] % 20 == 0 ? 0 : (20 - outValues[1] % 20));
 			}
-			log.info("reminder = " +  (outValues[1] - outValues[0]) % 20);
+			log.log(Level.FINER, "reminder = " +  (outValues[1] - outValues[0]) % 20);
 		}
 
 		log.log(Level.FINE, minValue + " --> " + outValues[0] + " " + maxValue + " --> " + outValues[1]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

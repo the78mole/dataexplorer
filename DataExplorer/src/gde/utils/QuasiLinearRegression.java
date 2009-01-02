@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.utils;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channels;
@@ -47,11 +48,11 @@ public class QuasiLinearRegression extends CalculationThread {
 	@Override
 	public void run() {
 		if (this.recordSet == null || this.sourceRecordKey == null || this.targetRecordKey == null) {
-			log.warning("Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
+			log.log(Level.WARNING, "Slope can not be calculated -> recordSet == null || sourceRecordKey == null || targetRecordKey == null"); //$NON-NLS-1$
 			return;
 		}
 		synchronized (CalculationThread.REGRESSION_INTERVAL_SEC) {
-			log.fine("start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "start data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 
 			Record record = this.recordSet.get(this.targetRecordKey);
 			if (record != null && !this.threadStop) {
@@ -60,7 +61,7 @@ public class QuasiLinearRegression extends CalculationThread {
 				double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
 				int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
-				log.fine("calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
 				int numberDataPoints = recordHeight.realSize();
 				int startPosition = 0;
@@ -81,7 +82,7 @@ public class QuasiLinearRegression extends CalculationThread {
 					ssXX = ssXX + (((1 / timeStep_sec * i) - avgX) * ((1 / timeStep_sec * i) - avgX));
 				}
 				ssXX = ssXX / timeStepsPerInterval;
-				log.finest("avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINEST, "avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
 				--modCounter;
 				while (modCounter > 0 && !this.threadStop) {
 					// calculate avg y
@@ -113,14 +114,14 @@ public class QuasiLinearRegression extends CalculationThread {
 					}
 					startPosition = startPosition + pointInterval;
 
-					log.finest("slope = " + slope + " counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					log.log(Level.FINEST, "slope = " + slope + " counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					--modCounter;
 				}
 				// pad the rest of the curve to make equal size
 				for (int i = record.realSize(); i < numberDataPoints - 1; i++) {
 					record.add(0);
 				}
-				log.fine("counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
 				if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
@@ -131,7 +132,7 @@ public class QuasiLinearRegression extends CalculationThread {
 			this.application.updateCurveSelectorTable();
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSet.getName());
-			log.fine("finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
+			log.log(Level.FINE, "finished data calculation for record = " + this.targetRecordKey); //$NON-NLS-1$
 		}
 	}
 

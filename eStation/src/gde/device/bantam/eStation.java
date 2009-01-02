@@ -155,7 +155,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 //		for (byte b : dataBuffer) {
 //			sb.append(String.format("%02x", b)).append(" ");
 //		}
-//		log.info(sb.toString());
+//		log.log(Level.INFO, sb.toString());
 
 //		int modeIndex = getProcessingMode(dataBuffer);
 //		String mode = USAGE_MODE[modeIndex];
@@ -241,7 +241,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80))); //$NON-NLS-1$
 		}
 		for (String key : configData.keySet()) {
-			log.fine(key + " = " + configData.get(key)); //$NON-NLS-1$
+			log.log(Level.FINE, key + " = " + configData.get(key)); //$NON-NLS-1$
 		}
 		return configData;
 	}
@@ -265,7 +265,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value * factor + offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -288,7 +288,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		
 		double newValue = value / factor - offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -301,7 +301,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -345,7 +345,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}		
 				++displayableCounter;
 				
-				log.fine("displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 				recordSet.setConfiguredDisplayable(displayableCounter);		
 			}
 			catch (RuntimeException e) {

@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.bantam;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Record;
@@ -62,7 +63,7 @@ public class CalculationThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		log.fine("start data calculation for record = " + this.recordKey); //$NON-NLS-1$
+		log.log(Level.FINE, "start data calculation for record = " + this.recordKey); //$NON-NLS-1$
 		Record record = this.recordSet.get(this.recordKey);
 		// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 		String[] recordNames = this.recordSet.getRecordNames();
@@ -72,7 +73,7 @@ public class CalculationThread extends Thread {
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
 		}
@@ -82,15 +83,15 @@ public class CalculationThread extends Thread {
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
-				log.finest("adding value = " + record.get(i)); //$NON-NLS-1$
+				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
 		}
 		else
-			log.warning("only supported records are " + recordNames[3] + ", " + recordNames[4]); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.WARNING, "only supported records are " + recordNames[3] + ", " + recordNames[4]); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//recordSet.updateDataTable();
 		if (record.isVisible()) this.application.updateGraphicsWindow();
-		log.fine("finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
+		log.log(Level.FINE, "finished data calculation for record = " + this.recordKey); //$NON-NLS-1$
 	}
 }

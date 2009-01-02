@@ -18,6 +18,7 @@ package osde.utils;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -98,7 +99,7 @@ public class GraphicsUtils {
 				numberTicks = new Double(deltaScale / 20 * heightAdaptation).intValue();
 				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20, height);
 			}
-			log.fine("numberTicks = " + numberTicks);
+			log.log(Level.FINE, "numberTicks = " + numberTicks);
 		}
 		
 		// prepare grid vector
@@ -134,7 +135,7 @@ public class GraphicsUtils {
 			double deltaPosMini = deltaTick / miniticks;
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
 				int yPosMini = yPosition - (int)(j * deltaPosMini);
-				log.finest("yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINEST, "yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	

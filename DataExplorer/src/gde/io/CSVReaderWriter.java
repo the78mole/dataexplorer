@@ -66,7 +66,7 @@ public class CSVReaderWriter {
 
 		line = reader.readLine();
 		String fileDeviceName = line.split(OSDE.STRING_EMPTY + separator)[0].trim();
-		log.fine("file device name = " + fileDeviceName); //$NON-NLS-1$
+		log.log(Level.FINE, "file device name = " + fileDeviceName); //$NON-NLS-1$
 
 		reader.close();
 		return fileDeviceName;
@@ -105,7 +105,7 @@ public class CSVReaderWriter {
 				while (isDeviceName && (line = reader.readLine()) != null) {
 					String activeDeviceName = application.getActiveDevice().getName();
 					String fileDeviceName = line.split(OSDE.STRING_EMPTY + separator)[0].trim();
-					log.fine("active device name = " + activeDeviceName + ", file device name = " + fileDeviceName); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.FINE, "active device name = " + activeDeviceName + ", file device name = " + fileDeviceName); //$NON-NLS-1$ //$NON-NLS-2$
 
 					if (activeDeviceName.equals(fileDeviceName)) {
 						isDeviceName = false;
@@ -116,10 +116,10 @@ public class CSVReaderWriter {
 
 					String activeConfig = channels.getActiveChannel().getConfigKey();
 					fileConfig = line.split(OSDE.STRING_EMPTY + separator).length > 1 ? line.split(OSDE.STRING_EMPTY + separator)[1].trim() : null;
-					log.fine("active channel name = " + activeConfig + ", file channel name = " + fileConfig); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.FINE, "active channel name = " + activeConfig + ", file channel name = " + fileConfig); //$NON-NLS-1$ //$NON-NLS-2$
 					if (fileConfig == null) {
 						fileConfig = activeConfig;
-						log.fine("using as file channel name = " + fileConfig); //$NON-NLS-1$
+						log.log(Level.FINE, "using as file channel name = " + fileConfig); //$NON-NLS-1$
 					}
 					else if (!activeConfig.equals(fileConfig)) {
 						//check if config exist
@@ -128,18 +128,18 @@ public class CSVReaderWriter {
 							String msg = Messages.getString(MessageIds.OSDE_MSGW0008);
 							int answer = application.openYesNoCancelMessageDialog(msg);
 							if (answer == SWT.YES) {
-								log.fine("SWT.YES"); //$NON-NLS-1$
+								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								channels.setActiveChannelNumber(channelNumber);
 								channels.switchChannel(channelNumber, OSDE.STRING_EMPTY);
 								application.getMenuToolBar().updateChannelSelector();
 								activeChannel = channels.getActiveChannel();
 							}
 							else if (answer == SWT.NO) {
-								log.fine("SWT.NO"); //$NON-NLS-1$
+								log.log(Level.FINE, "SWT.NO"); //$NON-NLS-1$
 								fileConfig = channels.getActiveChannel().getConfigKey();
 							}
 							else {
-								log.fine("SWT.CANCEL"); //$NON-NLS-1$
+								log.log(Level.FINE, "SWT.CANCEL"); //$NON-NLS-1$
 								return null;
 							}
 						}
@@ -147,17 +147,17 @@ public class CSVReaderWriter {
 							String msg = Messages.getString(MessageIds.OSDE_MSGW0009);
 							int answer = application.openOkCancelMessageDialog(msg);
 							if (answer == SWT.OK) {
-								log.fine("SWT.OK"); //$NON-NLS-1$
+								log.log(Level.FINE, "SWT.OK"); //$NON-NLS-1$
 								fileConfig = channels.getActiveChannel().getConfigKey();
 							}
 							else {
-								log.fine("SWT.CANCEL"); //$NON-NLS-1$
+								log.log(Level.FINE, "SWT.CANCEL"); //$NON-NLS-1$
 								return null;
 							}
 						}
 					}
 				} // end isDeviceName
-				log.fine("device name check ok, channel/configuration ok"); //$NON-NLS-1$
+				log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 					
 				recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				// shorten the record set name to the allowed maximum
@@ -178,7 +178,7 @@ public class CSVReaderWriter {
 						MeasurementType measurement = device.getMeasurement(fileConfig, i);
 						headerStringConf.append(measurement.getName()).append(separator);
 
-						log.fine(measurement.getName() + " isCalculation = " + measurement.isCalculation()); //$NON-NLS-1$
+						log.log(Level.FINE, measurement.getName() + " isCalculation = " + measurement.isCalculation()); //$NON-NLS-1$
 						if (!measurement.isCalculation()) {
 							keys.append(measurement.getName()).append(separator);
 							++countNotMeasurement; // update count for possible raw
@@ -212,7 +212,7 @@ public class CSVReaderWriter {
 							unitCompare.append(recordKey + Messages.getString(MessageIds.OSDE_MSGT0136) + inUnit + Messages.getString(MessageIds.OSDE_MSGT0137) + expectUnit).append(lineSep);
 							if (inUnit.equals(expectUnit) || inUnit.equals(Settings.EMPTY)) ++match; //$NON-NLS-1$
 						}
-						log.fine(unitCompare.toString());
+						log.log(Level.FINE, unitCompare.toString());
 						if (match != header.length - 1) {
 							throw new Exception("2" + unitCompare.toString()); // mismatch data header units //$NON-NLS-1$
 						}
@@ -236,14 +236,14 @@ public class CSVReaderWriter {
 						int point = (int) dPoint;
 						if (log.isLoggable(Level.FINE)) sb.append("recordKeys[" + i + "] = ").append(recordNames[i]).append(" = ").append(point).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						recordSet.getRecord(recordNames[i]).add(point);
-						log.fine("add point data to recordKeys[" + i + "] = " + recordNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
+						log.log(Level.FINE, "add point data to recordKeys[" + i + "] = " + recordNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					log.fine(sb.toString());
+					log.log(Level.FINE, sb.toString());
 				}
 
 				// set time base in msec
 				recordSet.setTimeStep_ms(timeStep_ms);
-				log.fine("timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
+				log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				recordSet.setSaved(true);
 				
 				activeChannel.put(recordSetName, recordSet);
@@ -310,7 +310,7 @@ public class CSVReaderWriter {
 			// write device name , manufacturer, and serial port string
 			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 			writer.write(sb.toString());
-			log.fine("written header line = " + sb.toString());  //$NON-NLS-1$
+			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
 			
 			sb = new StringBuffer();
 			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
@@ -318,20 +318,20 @@ public class CSVReaderWriter {
 			String[] recordNames = device.getMeasurementNames(recordSet.getChannelConfigName());
 			for (int i = 0; i < recordNames.length; i++) {
 				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigName(), i);
-				log.finest("append " + recordNames[i]); //$NON-NLS-1$
+				log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 				if (isRaw) {
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
 						sb.append(measurement.getName()).append(" [---]").append(separator);	 //$NON-NLS-1$
-						log.finest("append " + recordNames[i]); //$NON-NLS-1$
+						log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 					}
 				}
 				else {
 					sb.append(measurement.getName()).append(" [").append(measurement.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
-					log.finest("append " + recordNames[i]); //$NON-NLS-1$
+					log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 				}
 			}
 			sb.deleteCharAt(sb.length() - 1).append(lineSep);
-			log.finer("header line = " + sb.toString()); //$NON-NLS-1$
+			log.log(Level.FINER, "header line = " + sb.toString()); //$NON-NLS-1$
 			writer.write(sb.toString());
 
 			// write data
@@ -360,7 +360,7 @@ public class CSVReaderWriter {
 						sb.append(df3.format(device.translateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
-				log.fine("CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
 				writer.write(sb.toString());
 				application.setProgress(new Double(stausIncrement * i).intValue(), sThreadId);
 			}
@@ -368,7 +368,7 @@ public class CSVReaderWriter {
 			writer.flush();
 			writer.close();
 			recordSet.setSaved(true);
-			log.fine("data line = " + sb.toString()); //$NON-NLS-1$
+			log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			application.setProgress(100, sThreadId);
 		}
 		catch (IOException e) {

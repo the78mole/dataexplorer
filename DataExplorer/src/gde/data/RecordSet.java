@@ -804,7 +804,7 @@ public class RecordSet extends HashMap<String, Record> {
 			sb.append(recordNames[i]).append(OSDE.STRING_MESSAGE_CONCAT);
 		}
 		sb.delete(sb.length() - 3, sb.length());
-		log.info(sb.toString());
+		log.log(Level.FINE, sb.toString());
 	}
 
 	/**
@@ -1456,7 +1456,7 @@ public class RecordSet extends HashMap<String, Record> {
 				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 				// calculate record set internal data table
-				printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
 					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
@@ -1636,7 +1636,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 
-		log.info(this.potentialSyncableRecords.toString());
+		log.log(Level.FINER, this.potentialSyncableRecords.toString());
 	}
 
 	/**
@@ -1700,7 +1700,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 		}
-		log.info("syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINER, "syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 
 		Record tmpRecord = this.get(this.getSyncableName());
 		if (tmpRecord != null) {

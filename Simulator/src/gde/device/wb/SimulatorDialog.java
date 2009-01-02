@@ -129,7 +129,7 @@ public class SimulatorDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -179,9 +179,9 @@ public class SimulatorDialog extends DeviceDialog {
 					this.clusterCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setDataBlockSize(new Integer(SimulatorDialog.this.clusterCombo.getText()).intValue());
-							log.fine(" new clusterSize = " + SimulatorDialog.this.device.getDataBlockSize()); //$NON-NLS-1$
+							log.log(Level.FINE, " new clusterSize = " + SimulatorDialog.this.device.getDataBlockSize()); //$NON-NLS-1$
 						}
 					});
 				}
@@ -217,7 +217,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.currentCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("currentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "currentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for currentCombo.widgetSelected
 						}
 					});
@@ -243,7 +243,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.voltageCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for voltageCombo.widgetSelected
 						}
 					});
@@ -270,40 +270,40 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms())); //$NON-NLS-1$
 					this.timeCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setTimeStep_ms(new Integer(SimulatorDialog.this.timeCombo.getText()).intValue());
-							log.fine(" new timeStep_ms = " + SimulatorDialog.this.device.getTimeStep_ms()); //$NON-NLS-1$
+							log.log(Level.FINE, " new timeStep_ms = " + SimulatorDialog.this.device.getTimeStep_ms()); //$NON-NLS-1$
 						}
 					});
 				}
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
-						log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						//TODO check if some thing to do before exiting
 					}
 				});
 				this.dialogShell.addKeyListener(new KeyAdapter() {
 					public void keyReleased(KeyEvent evt) {
-						log.fine("dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINE, "dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
 						//TODO add your code for dialogShell.keyReleased
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.fine("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						SimulatorDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-2$
 					}
 				});
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
-						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 10);
 					}
 					public void mouseHover(MouseEvent evt) {
-						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 					public void mouseExit(MouseEvent evt) {
-						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 10);
 					}
 				});
@@ -345,7 +345,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.startButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.startButton.setEnabled(false);
 							SimulatorDialog.this.stopButton.setEnabled(true);
 							SimulatorDialog.this.channel = SimulatorDialog.this.channels.getActiveChannel();
@@ -354,7 +354,7 @@ public class SimulatorDialog extends DeviceDialog {
 							// prepare timed data gatherer thread
 							int delay = 0;
 							int period = new Double(SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize()).intValue();
-							log.fine("timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+							log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
 								String									recordSetKeyStem	= Messages.getString(MessageIds.OSDE_MSGT1058); 
@@ -375,7 +375,7 @@ public class SimulatorDialog extends DeviceDialog {
 											this.recordSetKey = (SimulatorDialog.this.channel.size() + 1) + this.recordSetKeyStem;
 											SimulatorDialog.this.channel.put(this.recordSetKey, RecordSet.createRecordSet(SimulatorDialog.this.device.getChannelName(1), this.recordSetKey, SimulatorDialog.this.application
 													.getActiveDevice(), true, false));
-											log.fine(this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
+											log.log(Level.FINE, this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
 											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
@@ -388,11 +388,11 @@ public class SimulatorDialog extends DeviceDialog {
 												SimulatorDialog.this.application.getMenuToolBar().addRecordSetName(this.recordSetKey);
 												SimulatorDialog.this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 											}
-											log.fine("recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+											log.log(Level.FINE, "recordSetKey = " + this.recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else {
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
-											log.fine("re-using " + this.recordSetKey); //$NON-NLS-1$
+											log.log(Level.FINE, "re-using " + this.recordSetKey); //$NON-NLS-1$
 										}
 										// prepare the data for adding to record set
 										
@@ -409,7 +409,7 @@ public class SimulatorDialog extends DeviceDialog {
 										while (iterV.hasNext()) {
 											points[0] = iterV.next().intValue();//Spannung 
 											points[1] = iterA.next().intValue();//Strom 
-											log.fine(String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1])); //$NON-NLS-1$
+											log.log(Level.FINE, String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1])); //$NON-NLS-1$
 											recordSet.addPoints(points, false);
 										}
 
@@ -445,7 +445,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.fine("stopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINE, "stopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							stopTimer();
 							SimulatorDialog.this.isCollectDataStopped = true;
 							SimulatorDialog.this.startButton.setEnabled(true);

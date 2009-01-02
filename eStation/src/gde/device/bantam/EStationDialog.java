@@ -130,7 +130,7 @@ public class EStationDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			EStationDialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			EStationDialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -150,7 +150,7 @@ public class EStationDialog extends DeviceDialog {
 				this.dialogShell.addFocusListener(new FocusAdapter() {
 					@Override
 					public void focusGained(FocusEvent evt) {
-						EStationDialog.log.finer("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
+						EStationDialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
 						// if port is already connected, do not read the data update will be done by gathere thread
 						if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
 							EStationDialog.this.updateConfigTread = new Thread() {
@@ -179,7 +179,7 @@ public class EStationDialog extends DeviceDialog {
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						EStationDialog.log.finer("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						EStationDialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						EStationDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
@@ -194,7 +194,7 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.setLayout(new FormLayout());
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							EStationDialog.log.finer("boundsComposite.paintControl() " + evt); //$NON-NLS-1$
+							EStationDialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
 							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
 								EStationDialog.this.startCollectDataButton.setEnabled(false);
 								EStationDialog.this.stopColletDataButton.setEnabled(true);
@@ -229,7 +229,7 @@ public class EStationDialog extends DeviceDialog {
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								EStationDialog.log.finest("startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								EStationDialog.log.log(Level.FINEST, "startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (!EStationDialog.this.serialPort.isConnected()) {
 									try {
 										if (Channels.getInstance().getActiveChannel() != null) {
@@ -266,7 +266,7 @@ public class EStationDialog extends DeviceDialog {
 						this.stopColletDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								EStationDialog.log.finest("stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								EStationDialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
 									EStationDialog.this.dataGatherThread.stopTimerThread();
 									//dataGatherThread.interrupt();
@@ -297,7 +297,7 @@ public class EStationDialog extends DeviceDialog {
 						this.configGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1407));
 						this.configGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
-								EStationDialog.log.finest("configGroup.paintControl, event=" + evt); //$NON-NLS-1$
+								EStationDialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
 								EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff);
 								EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff);
 								EStationDialog.this.safetyTimerText.setText(EStationDialog.this.safetyTimer);
@@ -419,7 +419,7 @@ public class EStationDialog extends DeviceDialog {
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								EStationDialog.log.finest("okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								EStationDialog.log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								close();
 							}
 						});
@@ -428,18 +428,18 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
 						@Override
 						public void mouseEnter(MouseEvent evt) {
-							EStationDialog.log.fine("boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
+							EStationDialog.log.log(Level.FINE, "boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
 							fadeOutAplhaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 10, 10, 10, 15);
 						}
 
 						@Override
 						public void mouseHover(MouseEvent evt) {
-							EStationDialog.log.finest("boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
+							EStationDialog.log.log(Level.FINEST, "boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
 						}
 
 						@Override
 						public void mouseExit(MouseEvent evt) {
-							EStationDialog.log.fine("boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
+							EStationDialog.log.log(Level.FINE, "boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
 							fadeInAlpaBlending(evt, EStationDialog.this.boundsComposite.getSize(), 10, 10, -10, 15);
 						}
 					});

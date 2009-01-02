@@ -107,7 +107,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-		AkkuMasterC4Dialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+		AkkuMasterC4Dialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
 				this.dialogShell = new Shell(this.getApplication().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -126,14 +126,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 				public void mouseEnter(MouseEvent evt) {
-					log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 					fadeOutAplhaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 				}
 				public void mouseHover(MouseEvent evt) {
-					log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 				}
 				public void mouseExit(MouseEvent evt) {
-					log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 					fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
 				}
 			});
@@ -142,14 +142,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.tabFolder.setBounds(0, 0, 430, 425);
 //				this.tabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 //					public void mouseEnter(MouseEvent evt) {
-//						log.finer("tabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
+//						log.log(Level.FINER, "tabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
 //						fadeOutAplhaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
 //					}
 //					public void mouseHover(MouseEvent evt) {
-//						log.finest("tabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
+//						log.log(Level.FINEST, "tabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
 //					}
 //					public void mouseExit(MouseEvent evt) {
-//						log.finer("tabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
+//						log.log(Level.FINER, "tabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
 //						fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, -10);
 //					}
 //				});
@@ -196,7 +196,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						this.versionTabItem.setControl(this.versionComposite);
 						this.versionComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
-								AkkuMasterC4Dialog.log.finest("versionComposite.paintControl, event=" + evt); //$NON-NLS-1$
+								AkkuMasterC4Dialog.log.log(Level.FINEST, "versionComposite.paintControl, event=" + evt); //$NON-NLS-1$
 								if (getVersion() != null) {
 									updateVersionText(
 											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_NUMBER, "\t\t", getVersion().get(AkkuMasterC4SerialPort.VERSION_NUMBER)), //$NON-NLS-1$ //$NON-NLS-2$
@@ -253,7 +253,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.statusComposite.setBounds(0, 430, 430, 65);
 				this.statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						AkkuMasterC4Dialog.log.finest("statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
+						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setTotalDischargeCurrentLabelText(getTotalDischargeCurrent());
 						setTotalChargeCurrentLabelText(getTotalChargeCurrent());
 					}
@@ -301,14 +301,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			}
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					AkkuMasterC4Dialog.log.finest("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (getSerialPort() != null && getSerialPort().isConnected()) getSerialPort().close();
 					if (getVersionThread() != null && getVersionThread().isAlive()) getVersionThread().interrupt();
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					AkkuMasterC4Dialog.log.finest("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					getApplication().openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
 				}
 			});
@@ -318,7 +318,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.closeButton.setBounds(82, 509, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						AkkuMasterC4Dialog.log.finest("closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						AkkuMasterC4Dialog.log.log(Level.FINEST, "closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() || getChannelTab(4).isDataColletionActive())
 							setClosePossible(false);
 						else

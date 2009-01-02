@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -253,7 +254,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, recordSet.getHorizontalGridRecordName());
 			}
 			this.template.store();
-			log.fine("creating graphics template file " + Settings.getInstance().getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
+			log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
 		}
 	}
 	
@@ -301,7 +302,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0")); //$NON-NLS-1$
 			}
-			log.fine("applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (this.getActiveRecordSet() != null && recordSet.equals(this.getActiveRecordSet())) 
 				this.application.updateGraphicsWindow();
 		}
@@ -351,7 +352,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0")); //$NON-NLS-1$
 			}
-			log.fine("applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			//if (recordSet.equals(this.getActiveRecordSet())) 
 			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName())) 
 				this.application.updateGraphicsWindow();
@@ -394,7 +395,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public void switchRecordSet(String recordSetName) {
-		log.fine(String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
+		log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
 		int percentage = this.application.getProgressPercentage();
 		if (percentage > 99 || percentage == 0)
 			this.application.setProgress(0, null);

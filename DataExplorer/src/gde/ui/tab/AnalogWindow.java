@@ -17,6 +17,7 @@
 package osde.ui.tab;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -74,17 +75,17 @@ public class AnalogWindow {
 			this.analogMainCompositeLayout.numColumns = 2;
 			this.analogTab.setControl(this.analogMainComposite);
 			this.analogMainComposite.setLayout(null);
-			log.fine("digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
+			log.log(Level.FINE, "digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
 			this.analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					update();
 				}
 			});
 			setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("infoText.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "infoText.paintControl, event=" + evt); //$NON-NLS-1$
 					update();
 				}
 			});
@@ -134,12 +135,12 @@ public class AnalogWindow {
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
-				log.fine(activeChannel.getName());
+				log.log(Level.FINE, activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
-				log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove the info text
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
@@ -157,7 +158,7 @@ public class AnalogWindow {
 					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
 						AnalogDisplay display = new AnalogDisplay(this.analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 						display.create();
-						log.fine("created analog display for " + recordKey); //$NON-NLS-1$
+						log.log(Level.FINE, "created analog display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);
 					}
 					this.oldRecordSet = recordSet;
@@ -168,7 +169,7 @@ public class AnalogWindow {
 				for (String recordKey : this.displays.keySet().toArray(new String[0])) {
 					AnalogDisplay display = this.displays.get(recordKey);
 					if (display != null) {
-						log.fine("clean child " + recordKey); //$NON-NLS-1$
+						log.log(Level.FINE, "clean child " + recordKey); //$NON-NLS-1$
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}

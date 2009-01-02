@@ -253,8 +253,8 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 //			this.recordSetComment.addFocusListener(new FocusListener() {
-//				public void focusLost(FocusEvent evt) { log.info("focusLost"); }
-//				public void focusGained(FocusEvent evt) { log.info("focusGained"); }
+//				public void focusLost(FocusEvent evt) { log.log(Level.INFO, "focusLost"); }
+//				public void focusGained(FocusEvent evt) { log.log(Level.INFO, "focusGained"); }
 //			});
 			
 			this.recordSetComment.addHelpListener(new HelpListener() {
@@ -579,7 +579,7 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 				if (isFullUpdateRequired) {
-					log.log(Level.INFO, "redrawing full " + this.graphicCanvas.getClientArea());
+					log.log(Level.FINE, "redrawing full " + this.graphicCanvas.getClientArea());
 					this.recordSetHeader.redraw();
 					this.graphicCanvas.redraw();
 					this.recordSetComment.redraw();
@@ -764,10 +764,10 @@ public class GraphicsComposite extends Composite {
 			? this.bottomLast > this.yPosMeasure ? this.bottomLast - top : this.yPosMeasure - top
 			: this.bottomLast > this.yPosDelta ? this.bottomLast - top : this.yPosDelta - top;
 		
-		log.info("leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
-			log.info("left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			this.canvasGC.drawImage(this.curveArea, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
 		}
 		
@@ -775,7 +775,7 @@ public class GraphicsComposite extends Composite {
 		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
 		this.rightLast = this.xPosDelta >= this.xPosMeasure ? this.xPosDelta : this.xPosMeasure;
 		this.bottomLast = this.yPosDelta >= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
-		log.info("leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		log.log(Level.FINER, "leftLast = " + this.leftLast + " topLast = " + this.topLast + " rightLast = " + this.rightLast + " bottomLast = " + this.bottomLast); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**

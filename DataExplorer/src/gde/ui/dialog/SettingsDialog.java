@@ -17,6 +17,7 @@
 package osde.ui.dialog;
 
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -181,7 +182,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("localCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "localCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 										String newLanguage = SettingsDialog.this.supportedLocals[SettingsDialog.this.localCombo.getSelectionIndex()];
 										SettingsDialog.this.isLocaleLanguageChanged = !SettingsDialog.this.settings.getLocale().getLanguage().equals(newLanguage);
 										SettingsDialog.this.settings.setLocaleLanguage(newLanguage);
@@ -207,7 +208,7 @@ public class SettingsDialog extends Dialog {
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0310));
 							this.defaultDataPathGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.finest("defaultDataPathGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "defaultDataPathGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
 								}
 							});
@@ -227,9 +228,9 @@ public class SettingsDialog extends Dialog {
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("defaultDataPathAdjustButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "defaultDataPathAdjustButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										String defaultDataDirectory = SettingsDialog.this.application.openDirFileDialog(Messages.getString(MessageIds.OSDE_MSGT0312), SettingsDialog.this.settings.getDataFilePath());
-										SettingsDialog.log.fine("default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 										SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
 									}
@@ -248,7 +249,7 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0315));
 							this.fileOpenSaveDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.fine("fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINE, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
 									SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
 								}
@@ -260,7 +261,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.fine("suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINE, "suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageDateAsFileNameLeader(SettingsDialog.this.suggestDate.getSelection());
 									}
 								});
@@ -273,7 +274,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.fine("suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINE, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageObjectKeyInFileName(SettingsDialog.this.suggestObjectKey.getSelection());
 									}
 								});
@@ -291,7 +292,7 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0318));
 							this.deviceDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.finest("deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
 									SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
 									SettingsDialog.this.deviceDialogOnTopButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsOnTop());
@@ -308,7 +309,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogModalButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("deviceDialogModalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "deviceDialogModalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.enabelModalDeviceDialogs(SettingsDialog.this.deviceDialogModalButton.getSelection());
 										SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.deviceDialogModalButton.getSelection());
 									}
@@ -322,7 +323,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("deviceDialogOnTopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "deviceDialogOnTopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.enabelDeviceDialogsOnTop(SettingsDialog.this.deviceDialogOnTopButton.getSelection());
 									}
 								});
@@ -335,7 +336,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogAlphaButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDeviceDialogAlphaEnabled(SettingsDialog.this.deviceDialogAlphaButton.getSelection());
 										SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.deviceDialogAlphaButton.getSelection());
 									}
@@ -350,7 +351,7 @@ public class SettingsDialog extends Dialog {
 								this.alphaSlider.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finer("alphaSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINER, "alphaSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 										switch (evt.detail) {
 										case SWT.DRAG:
 											SettingsDialog.this.dialogShell.setAlpha(SettingsDialog.this.alphaSlider.getSelection());
@@ -378,7 +379,7 @@ public class SettingsDialog extends Dialog {
 							this.separatorGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0325));
 							this.separatorGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.finest("separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.decimalSeparator.setText(SettingsDialog.this.settings.getDecimalSeparator() + OSDE.STRING_EMPTY);
 									SettingsDialog.this.listSeparator.setText(SettingsDialog.this.settings.getListSeparator() + OSDE.STRING_EMPTY);
 								}
@@ -397,7 +398,7 @@ public class SettingsDialog extends Dialog {
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("decimalSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "decimalSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDecimalSeparator(SettingsDialog.this.decimalSeparator.getText().trim());
 										SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.decimalSeparator.getText().trim() + OSDE.STRING_BLANK);
 									}
@@ -417,7 +418,7 @@ public class SettingsDialog extends Dialog {
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("listSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "listSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setListSeparator(SettingsDialog.this.listSeparator.getText().trim());
 										SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.listSeparator.getText().trim() + OSDE.STRING_BLANK);
 									}
@@ -436,7 +437,7 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0330));
 							this.serialPortGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.finest("serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
 									SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
 									//serialPort.setText(settings.getSerialPort());
@@ -453,7 +454,7 @@ public class SettingsDialog extends Dialog {
 								this.doPortAvailabilityCheck.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.fine("doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
 									}
 								});
@@ -466,7 +467,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
 											SettingsDialog.this.settings.setIsGlobalSerialPort("true"); //$NON-NLS-1$
 										}
@@ -484,7 +485,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.finest("serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText());
 									}
 								});
@@ -517,7 +518,7 @@ public class SettingsDialog extends Dialog {
 							this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0340));
 							this.loggingGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.finest("loggingGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "loggingGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
 									if (SettingsDialog.this.settings.isGlobalLogLevel()) {
 										enableIndividualLogging(false);
@@ -543,7 +544,7 @@ public class SettingsDialog extends Dialog {
 									this.globalLogLevel.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("globalLogLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "globalLogLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
 											if (SettingsDialog.this.globalLogLevel.getSelection()) {
 												enableIndividualLogging(false);
 												SettingsDialog.this.globalLoggingCombo.setEnabled(true);
@@ -565,7 +566,7 @@ public class SettingsDialog extends Dialog {
 									this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("globalLoggingCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "globalLoggingCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.this.globalLoggingCombo.getText());
 											SettingsDialog.this.globalLoggingCombo.setText(SettingsDialog.this.globalLoggingCombo.getText());
 										}
@@ -591,7 +592,7 @@ public class SettingsDialog extends Dialog {
 									this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("uiLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "uiLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.this.uiLevelCombo.getText());
 										}
 									});
@@ -611,7 +612,7 @@ public class SettingsDialog extends Dialog {
 									this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("deviceLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "deviceLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.this.deviceLevelCombo.getText());
 										}
 									});
@@ -631,7 +632,7 @@ public class SettingsDialog extends Dialog {
 									this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("commonLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "commonLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.this.commonLevelCombo.getText());
 										}
 									});
@@ -651,7 +652,7 @@ public class SettingsDialog extends Dialog {
 									this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("configLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "configLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.this.configLevelCombo.getText());
 										}
 									});
@@ -671,7 +672,7 @@ public class SettingsDialog extends Dialog {
 									this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("utilsLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "utilsLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.this.utilsLevelCombo.getText());
 										}
 									});
@@ -690,7 +691,7 @@ public class SettingsDialog extends Dialog {
 									this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("fileIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "fileIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.this.fileIOLevelCombo.getText());
 										}
 									});
@@ -710,7 +711,7 @@ public class SettingsDialog extends Dialog {
 									this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.finest("serialIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.log.log(Level.FINEST, "serialIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.this.serialIOLevelCombo.getText());
 										}
 									});
@@ -725,13 +726,13 @@ public class SettingsDialog extends Dialog {
 
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					SettingsDialog.log.fine("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					SettingsDialog.log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					SettingsDialog.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_1.html"); //$NON-NLS-1$
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					SettingsDialog.log.finest("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					SettingsDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (SettingsDialog.this.settings.getActiveDevice().startsWith(Settings.EMPTY)) SettingsDialog.this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
 					SettingsDialog.this.settings.store();
 					if (SettingsDialog.this.settings.isGlobalSerialPort()) SettingsDialog.this.application.setGloabalSerialPort(SettingsDialog.this.serialPort.getText());
@@ -756,7 +757,7 @@ public class SettingsDialog extends Dialog {
 				this.okButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						SettingsDialog.log.finest("okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						SettingsDialog.log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						SettingsDialog.this.dialogShell.dispose();
 					}
 				});

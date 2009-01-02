@@ -68,7 +68,7 @@ public class StringHelper {
 			}
 			if (log.isLoggable(Level.FINER)) {
 				for (String key : hashKeys) {
-					log.finer(key + " = " + resultMap.get(key)); //$NON-NLS-1$
+					log.log(Level.FINER, key + " = " + resultMap.get(key)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -105,7 +105,7 @@ public class StringHelper {
 			}
 			if (log.isLoggable(Level.FINER)) {
 				for (String string : result) {
-					log.finer(stripString + " = " + string); //$NON-NLS-1$
+					log.log(Level.FINER, stripString + " = " + string); //$NON-NLS-1$
 				}
 			}
 		}
@@ -264,7 +264,7 @@ public class StringHelper {
 		case SWT.HELP:					keyCode = "HELP"; break;
 		default :								
 		}
-		log.info("keyCode = SWT." + keyCode);
+		log.log(Level.INFO, "keyCode = SWT." + keyCode);
 	}
 
 }

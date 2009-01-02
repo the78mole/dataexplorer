@@ -120,7 +120,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.ok.setText("OK"); //$NON-NLS-1$
 				this.ok.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.finest("ok.widgetSelected, event="+evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "ok.widgetSelected, event="+evt); //$NON-NLS-1$
 						AboutDialog.this.dialogShell.dispose();
 					}
 				});

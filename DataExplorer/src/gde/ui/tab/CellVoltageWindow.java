@@ -117,14 +117,14 @@ public class CellVoltageWindow {
 			this.cellVoltageTab.setControl(this.cellVoltageMainComposite);
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
 			setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("infoText.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "infoText.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
@@ -143,7 +143,7 @@ public class CellVoltageWindow {
 			//this.digitalComposite.setBounds(50, 50, 200, 50);
 			this.digitalComposite.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
-					log.finest("actualDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "actualDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					updateVoltageAndCapacity();
 				}
 			});
@@ -193,13 +193,13 @@ public class CellVoltageWindow {
 	public void updateChilds() {
 		updateCellVoltageVector();
 		updateVoltageAndCapacity();
-		log.finer("voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINER, "voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
 				this.displays.get(i).redraw();
-				log.fine("setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else {
@@ -223,7 +223,7 @@ public class CellVoltageWindow {
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
 						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
 
-				log.fine("isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// remove into text 
 					if (!this.infoText.isDisposed()) this.infoText.dispose();
@@ -242,7 +242,7 @@ public class CellVoltageWindow {
 						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(),
 								this);
 						display.create();
-						log.finer("created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
+						log.log(Level.FINER, "created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
@@ -287,7 +287,7 @@ public class CellVoltageWindow {
 				for (String recordKey : activeRecordKeys) {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
-					//log.finer("record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
+					//log.log(Level.FINER, "record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a propperty to flag as single cell voltage
 						if (record.getLast() > 0) { // last value is current value
@@ -295,7 +295,7 @@ public class CellVoltageWindow {
 							this.voltageAvg += record.getLast();
 							cellCount++;
 						}
-						//log.info("record.getLast() " + record.getLast());
+						//log.log(Level.INFO, "record.getLast() " + record.getLast());
 					}
 				}
 				// add test values here
@@ -305,7 +305,7 @@ public class CellVoltageWindow {
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
 
 				if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
-				//log.info("cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
+				//log.log(Level.INFO, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
@@ -313,7 +313,7 @@ public class CellVoltageWindow {
 			for (CellInfo cellInfo : this.voltageVector) {
 				sb.append(cellInfo.getVoltage()).append(" "); //$NON-NLS-1$
 			}
-			log.fine("updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
+			log.log(Level.FINE, "updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
 	}
 
@@ -366,12 +366,12 @@ public class CellVoltageWindow {
 		updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
 		if (this.voltageVector.size() > 0) {
-			//log.info("mainSize = " + mainSize.toString());
+			//log.log(Level.INFO, "mainSize = " + mainSize.toString());
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
 			int width = mainSize.x - (2 * x);
 			Rectangle bounds = new Rectangle(x, mainSize.y * 10 / 100, width, mainSize.y * 80 / 100);
-			//log.info("cover bounds = " + bounds.toString());
+			//log.log(Level.INFO, "cover bounds = " + bounds.toString());
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
 			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y * 90 / 100, 350, 50);
 

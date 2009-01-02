@@ -94,16 +94,16 @@ public class SelectorComposite extends Composite {
 		this.setLayoutData(curveSelectorLData);
 //		this.addPaintListener(new PaintListener() {
 //			public void paintControl(PaintEvent evt) {
-//				log.info("SelectorComposite.paintControl() = " + evt);
+//				log.log(Level.INFO, "SelectorComposite.paintControl() = " + evt);
 //				doUpdateCurveSelectorTable();
 //			}
 //		});
 //		this.addControlListener(new ControlListener() {
 //			public void controlResized(ControlEvent evt) {
-//				log.info("SelectorComposite.controlResized() = " + evt);
+//				log.log(Level.INFO, "SelectorComposite.controlResized() = " + evt);
 //				Point size = SelectorComposite.this.getSize();
 //				if (!SelectorComposite.this.oldSize.equals(size)) {
-//					log.info(SelectorComposite.this.oldSize + " - " + size);
+//					log.log(Level.INFO, SelectorComposite.this.oldSize + " - " + size);
 //					SelectorComposite.this.oldSize = size;
 //					doUpdateCurveSelectorTable();
 //				}
@@ -250,9 +250,9 @@ public class SelectorComposite extends Composite {
 
 					textSize = record.getName().length() * 8;
 					//this.curveSelectorTable.pack();
-					//log.info(item.getText() + " " + item.getBounds().width);
+					//log.log(Level.INFO, item.getText() + " " + item.getBounds().width);
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
-					//log.info(item.getText() + " " + itemWidth);
+					//log.log(Level.INFO, item.getText() + " " + itemWidth);
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 					if (record.isDisplayable()) {
 						TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);

@@ -50,7 +50,7 @@ public class GraphicsTemplate extends Properties {
 		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
-		log.fine("graphics template file is " + this.templateFilePath); //$NON-NLS-1$
+		log.log(Level.FINE, "graphics template file is " + this.templateFilePath); //$NON-NLS-1$
 	}
 
 	/**
@@ -73,10 +73,10 @@ public class GraphicsTemplate extends Properties {
 	public void load() {
 		try {
 			this.currentFileFilePath = this.templatePath + OSDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
-			log.fine("opening template file " + this.currentFileFilePath); //$NON-NLS-1$
+			log.log(Level.FINE, "opening template file " + this.currentFileFilePath); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
 			this.isAvailable = true;
-			log.fine("template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
+			log.log(Level.FINE, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
 		}
 		catch (InvalidPropertiesFormatException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

@@ -17,6 +17,7 @@
 package osde.ui.tab;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -87,7 +88,7 @@ public class FileCommentWindow {
 			this.commentMainComposite.setLayout(null);
 			this.commentMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.fine("commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					updateRecordSetTable();
 				}
 			});
@@ -104,13 +105,13 @@ public class FileCommentWindow {
 				this.fileCommentText.setText(this.channels.getFileDescription());
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.finer("fileCommentText.helpRequested " + evt); //$NON-NLS-1$
+						log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.fileCommentText.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.finest("recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
 						}
@@ -147,10 +148,10 @@ public class FileCommentWindow {
 	 */
 	void updateRecordSetTable() {
 		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
-		//log.info("mainSize = " + mainSize.toString());
+		//log.log(Level.INFO, "mainSize = " + mainSize.toString());
 		Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
 				, mainSize.x * 90/100, mainSize.y * 40/100);
-		//log.info("cover bounds = " + bounds.toString());
+		//log.log(Level.INFO, "cover bounds = " + bounds.toString());
 		FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
 		FileCommentWindow.this.fileCommentText.setBounds(bounds);
 		FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());

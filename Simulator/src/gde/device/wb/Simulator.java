@@ -139,7 +139,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 */
 	public double translateValue(Record record, double value) {
 		double newValues = record.getFactor() * value + record.getOffset();
-		Simulator.log.fine("newValue = " + newValues); //$NON-NLS-1$
+		Simulator.log.log(Level.FINE, "newValue = " + newValues); //$NON-NLS-1$
 		// do some calculation
 		return newValues;
 	}
@@ -164,7 +164,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.fine("no update required for " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
-		log.fine("working with " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "working with " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**

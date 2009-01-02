@@ -17,6 +17,7 @@
 package osde.ui.tab;
 
 import java.text.DecimalFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -67,12 +68,12 @@ public class DigitalDisplay extends Composite {
 			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.finest("textDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "textDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							log.fine("update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
+							log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 							DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
 						}
 					}
@@ -86,7 +87,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 72, 0, false, false)); //$NON-NLS-1$
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
-					log.finest("digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
