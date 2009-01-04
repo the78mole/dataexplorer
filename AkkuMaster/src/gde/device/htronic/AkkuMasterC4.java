@@ -124,7 +124,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
 		int lovDataSize = this.getLovDataByteSize();
 		
 		//byte[] configurationBuffer	= new byte[14];
@@ -183,6 +183,40 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 		return points;
+	}
+	
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 */
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.getRecordNames().length];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		this.application.setProgress(progressCycle, sThreadId);
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
+			points[3] = new Double((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); 							// power U*I [W]
+			points[4] = new Double((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
+			log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			
+			recordSet.addPoints(points, false);
+			
+			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		this.application.setProgress(100, sThreadId);
 	}
 
 	/**

@@ -160,6 +160,9 @@ public class Channels extends HashMap<Integer, Channel> {
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
 				if (recordSet != null) {
+					if (!recordSet.hasDisplayableData) {
+						recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
+					}
 					recordSet.resetZoomAndMeasurement();
 					recordSetKey = recordSet.getName();
 					if (recordSet.isRecalculation)

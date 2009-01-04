@@ -124,7 +124,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
 		// prepare the hash map containing the calculation values like factor offset, reduction, ...
 		//String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
 		//HashMap<String, Double> calcValues = new HashMap<String, Double>();
@@ -244,6 +244,48 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINE, key + " = " + configData.get(key)); //$NON-NLS-1$
 		}
 		return configData;
+	}
+	
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 */
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.getRecordNames().length];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		this.application.setProgress(progressCycle, sThreadId);
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
+			points[3] = new Double((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); 							// power U*I [W]
+			points[4] = new Double((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
+			points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
+			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
+			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
+			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
+			for (int j=0, k=0; j<points.length - 8; ++j, k+=OSDE.SIZE_BYTES_INTEGER) {
+				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
+				points[j+8] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
+			}
+			
+			recordSet.addPoints(points, false);
+			
+			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		this.application.setProgress(100, sThreadId);
 	}
 
 	/**

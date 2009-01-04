@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
@@ -122,22 +123,27 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
 		int offset = 4;
 		int size = this.getLovDataByteSize();
-		int devicedataBufferSize = 3;
-		byte[] convertBuffer = new byte[devicedataBufferSize];
-		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
-		
+		int deviceDataBufferSize = 3; // meight not equal as this.getNumberOfMeasurements(recordSet.getChannelConfigName());
+		byte[] convertBuffer = new byte[deviceDataBufferSize];
+		int[] points = new int[deviceDataBufferSize];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = this.application.getProgressPercentage();
+	
 		for (int i = 0; i < recordDataSize; i++) { 
-			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, devicedataBufferSize);
+			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -158,6 +164,36 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			points[1] = (((dataBuffer[0] & 0xFF) + ((dataBuffer[1] & 0x7F) << 8)) * -1) * 1000; // height is negative
 
 		return points;
+	}
+	
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte the emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 */
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		this.application.setProgress(progressCycle, sThreadId);
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+			
+			recordSet.addPoints(points);
+			
+			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		this.application.setProgress(100, sThreadId);
 	}
 
 	/**

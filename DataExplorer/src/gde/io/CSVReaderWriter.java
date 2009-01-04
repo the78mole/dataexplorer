@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +43,7 @@ import osde.device.MeasurementType;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.StringHelper;
 
 /**
  * Class to read and write comma separated value files
@@ -227,7 +229,7 @@ public class CSVReaderWriter {
 					new_time_ms = (int) (new Double(data).doubleValue() * 1000);
 					timeStep_ms = new_time_ms - old_time_ms;
 					old_time_ms = new_time_ms;
-					if (log.isLoggable(Level.FINE)) sb = new StringBuffer().append(lineSep);
+					sb = new StringBuffer().append(lineSep);
 					// use only measurement which are isCalculation == false
 					for (int i = 0; i < sizeRecords; i++) {
 						data = dataStr[i + 1].trim().replace(',', '.');
@@ -253,6 +255,7 @@ public class CSVReaderWriter {
 //				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 				reader.close();
+				reader = null;
 			}
 		}
 		catch (UnsupportedEncodingException e) {
@@ -335,8 +338,10 @@ public class CSVReaderWriter {
 			writer.write(sb.toString());
 
 			// write data
+			long startTime = new Date().getTime();
 			int recordEntries = recordSet.getRecordDataSize(true);
-			double stausIncrement = recordEntries/100.0;
+			int progressCycle = 0;
+			application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
@@ -360,15 +365,18 @@ public class CSVReaderWriter {
 						sb.append(df3.format(device.translateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
-				log.log(Level.FINE, "CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
 				writer.write(sb.toString());
-				application.setProgress(new Double(stausIncrement * i).intValue(), sThreadId);
+				if (i % 50 == 0) application.setProgress(((++progressCycle*5000)/recordEntries), sThreadId);
+				log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			}
+			sb = null;
+			log.log(Level.FINE, "CSV file = " + filePath + " erfolgreich geschieben"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.INFO, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
 			writer.flush();
 			writer.close();
+			writer = null;
 			recordSet.setSaved(true);
-			log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			application.setProgress(100, sThreadId);
 		}
 		catch (IOException e) {

@@ -363,14 +363,26 @@ public interface IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer);
 
 	/**
-	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
-	 * adaption from LogView stream data format into the device data buffer format is required
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 */
-	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
+
+	/**
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 */
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
 	
 	/**
 	 * function to translate measured value from a device to values represented

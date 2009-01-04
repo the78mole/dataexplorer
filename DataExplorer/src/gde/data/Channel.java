@@ -434,6 +434,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
+			if (!recordSet.hasDisplayableData)
+				recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
 			recordSet.resetZoomAndMeasurement();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
 			if (recordSet.isRecalculation)

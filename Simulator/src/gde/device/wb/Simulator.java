@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -117,7 +118,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
-	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
 		// unknown device for LogView
 	}
 
@@ -130,6 +131,36 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		return points;
+	}
+	
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 */
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.getRecordNames().length];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		this.application.setProgress(progressCycle, sThreadId);
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+			
+			recordSet.addPoints(points, false);
+			
+			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		this.application.setProgress(100, sThreadId);
 	}
 
 	/**

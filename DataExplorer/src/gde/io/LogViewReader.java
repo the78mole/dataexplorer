@@ -2,8 +2,11 @@ package osde.io;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -17,6 +20,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.ChannelTypes;
 import osde.device.IDevice;
+import osde.exception.DataInconsitsentException;
 import osde.exception.NotSupportedException;
 import osde.exception.NotSupportedFileFormatException;
 import osde.messages.MessageIds;
@@ -62,6 +66,7 @@ public class LogViewReader {
 		String recordSetProperties = OSDE.STRING_EMPTY;
 		String[] recordsProperties;
 		int recordDataSize = 0;
+		long recordSetDataPointer;
 		Channel channel = null;
 		RecordSet recordSet = null;
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
@@ -158,19 +163,28 @@ public class LogViewReader {
 					firstRecordSet[1] = recordSetName;
 				}
 				recordDataSize = new Integer(recordSetInfo.get(OSDE.RECORD_DATA_SIZE).trim()).intValue();
-				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
+				log.log(Level.INFO, "recordDataSize = " + recordDataSize);
+				recordSetDataPointer = position;
+				log.log(Level.INFO, "recordSetDataPointer = " + recordSetDataPointer);
+				//log.log(Level.INFO, String.format("data pointer position = 0x%x", position));				 //$NON-NLS-1$
+				//log.log(Level.INFO, String.format("data pointer position = %s", position));				 //$NON-NLS-1$
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
+				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize);
 				
-				log.log(Level.FINER, String.format("data pointer position = 0x%x", position));				 //$NON-NLS-1$
-				int dataBufferSize = device.getLovDataByteSize();
+				int dataBufferSize = device.getLovDataByteSize();				
 				byte[] buffer = new byte[dataBufferSize * recordDataSize];
-				log.log(Level.FINE, "data buffer size = " + buffer.length); //$NON-NLS-1$
+				
+				if (recordSetName.equals(firstRecordSet[1])) {
+					long startTime = new Date().getTime();
+					log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
+					data_in.readFully(buffer);
+					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize);
+					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				}
 
-				data_in.readFully(buffer);
 				position += buffer.length;
-				device.addAdaptedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize);
-
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
 					isFirstRecordSetDisplayed = true;
@@ -192,7 +206,47 @@ public class LogViewReader {
 			file_input = null;
 		}
 	}
-
+	
+	/**
+	 * read record set data with given file seek pointer and record size
+	 * @param recordSet
+	 * @param filePath
+	 * @throws DataInconsitsentException 
+	 */
+	public static void readRecordSetsData(RecordSet recordSet, String filePath) throws FileNotFoundException, IOException, DataInconsitsentException {
+		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$
+		try {
+			String sThreadId = String.format("%06d", Thread.currentThread().getId());
+			long recordSetFileDataPointer = recordSet.getFileDataPointer();
+			int recordFileDataSize = recordSet.getFileDataSize();
+			IDevice device = recordSet.getDevice();
+			OsdReaderWriter.application.setProgress(0, sThreadId);
+			random_in.seek(recordSetFileDataPointer);
+			long startTime = new Date().getTime();
+			int dataBufferSize = device.getLovDataByteSize();
+			byte[] buffer = new byte[dataBufferSize * recordFileDataSize];
+			log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
+			random_in.readFully(buffer);
+			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize);
+			log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			OsdReaderWriter.application.setProgress(100, sThreadId);
+		}
+		catch (FileNotFoundException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		catch (DataInconsitsentException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			random_in.close();
+		}
+	}
 
 	/**
 	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS 
@@ -1373,7 +1427,7 @@ public class LogViewReader {
 		position += data_in.skip(headerSize-position);
 		//**** end main header			
 		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
-		log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
+		log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		return header;
 	}
@@ -1522,11 +1576,11 @@ public class LogViewReader {
 			buffer = new byte[8];
 			position += data_in.read(buffer);
 			long recordSetDataBytes = parse2Long(buffer);
-			log.log(Level.FINE, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			log.log(Level.INFO, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
 			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
-			log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
+			log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
 			log.log(Level.FINE, header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));

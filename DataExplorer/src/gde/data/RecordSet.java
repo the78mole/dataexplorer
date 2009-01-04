@@ -36,6 +36,8 @@ import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.device.StatisticsType;
 import osde.exception.DataInconsitsentException;
+import osde.io.LogViewReader;
+import osde.io.OsdReaderWriter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -52,29 +54,33 @@ public class RecordSet extends HashMap<String, Record> {
 	static Logger									log														= Logger.getLogger(RecordSet.class.getName());
 	final DecimalFormat						df														= new DecimalFormat("0.000");														//$NON-NLS-1$
 
-	String												name;																																									// 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	String												name;																																									//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
 	String												objectKey											= OSDE.STRING_EMPTY;
 	String												header												= null;
-	String[]											recordNames;																																						// Spannung, Strom, ..
-	double												timeStep_ms										= 0;																											// Zeitbasis der Messpunkte
+	String[]											recordNames;																																					//Spannung, Strom, ..
+	String[]											noneCalculationRecords 						= new String[0];		// records/measurements which are active or inactive
+	double												timeStep_ms										= 0;																										//Zeitbasis der Messpunkte
 	String												recordSetDescription					= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
-	boolean												isSaved												= false;																									// indicates if the record set is saved to file
-	boolean												isRaw													= false;																									// indicates imported file with raw data, no translation at all
-	boolean												isFromFile										= false;																									// indicates that this record set was created by loading data from file
-	boolean												isRecalculation								= true;																									// indicates record is modified and need re-calculation
+	boolean												isSaved												= false;																								//indicates if the record set is saved to file
+	boolean												isRaw													= false;																								//indicates imported file with raw data, no translation at all
+	boolean												isFromFile										= false;																								//indicates that this record set was created by loading data from file
+	boolean												isRecalculation								= true;																									//indicates record is modified and need re-calculation
+	int														fileDataSize									= 0; //number of integer values of all active/inactive records
+	long													fileDataPointer								= 0; // file pointer where the data of this record begins
+	boolean												hasDisplayableData						= false;
 	Rectangle											drawAreaBounds;
 
 	// data table
 	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
 	Vector<Vector<Integer>>				dataTable;
-	boolean												isTableDataCalculated					= false;																									// value to manage only one time calculation
-	boolean												isTableDisplayable						= true;																									// value to suppress table data calculation(live view)
+	boolean												isTableDataCalculated					= false;																								//value to manage only one time calculation
+	boolean												isTableDisplayable						= true;																									//value to suppress table data calculation(live view)
 
 	// sync enabled records
-	Vector<String>								potentialSyncableRecords			= new Vector<String>();																	// collection of record keys where scales might be synchronized
-	Vector<String>								syncableRecords								= new Vector<String>();																	// collection of potential syncable and displayable record keys
+	Vector<String>								potentialSyncableRecords			= new Vector<String>();																	//collection of record keys where scales might be synchronized
+	Vector<String>								syncableRecords								= new Vector<String>();																	//collection of potential syncable and displayable record keys
 	boolean												isSyncableChecked							= false;
 	boolean												isSyncRequested								= false;
 	int														syncMin												= 0;
@@ -83,12 +89,12 @@ public class RecordSet extends HashMap<String, Record> {
 
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
-	int														maxSize												= 0;																											// number of data point * time step = total time
+	int														maxSize												= 0;																											//number of data point * time step = total time
 	double												maxValue											= 0;
-	double												minValue											= 0;																											// min max value
+	double												minValue											= 0;																											//min max value
 
 	//zooming
-	int														zoomLevel											= 0;																											// 0 == not zoomed
+	int														zoomLevel											= 0;																											//0 == not zoomed
 	boolean												isZoomMode										= false;
 	int														recordZoomOffset;
 	int														recordZoomSize;
@@ -424,6 +430,7 @@ public class RecordSet extends HashMap<String, Record> {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
 				
+				// check if record synchronisation is activated and update syncMin/syncMax
 				if (this.syncableRecords.contains(this.recordNames[i])) {
 					if (this.syncMin == 0 && this.syncMax == 0) {
 						this.syncMin = points[i];
@@ -449,15 +456,35 @@ public class RecordSet extends HashMap<String, Record> {
 					this.application.updateAnalogWindowChilds();
 				}
 			}
-			// check if record synchronisation is activated and update syncMin/syncMax
-			if (this.isSyncRequested) {
-				for (String syncRecordKey : this.syncableRecords) {
-					this.get(syncRecordKey).getLast();
-				}
-			}
 		}
 		else
 			throw new DataInconsitsentException("RecordSet.addPoints - points.length != recordNames.length"); //$NON-NLS-1$
+		
+		this.hasDisplayableData = true;
+	}
+
+	/**
+	 * method to add a series of points to none calculation records (records active or inactive)
+	 * @param points as int[], where the length must fit records.size()
+	 * @throws DataInconsitsentException 
+	 */
+	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
+		if (points.length == this.noneCalculationRecords.length) {
+			for (int i = 0; i < points.length; i++) {
+				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
+			}
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < points.length; i++) {
+					sb.append(points[i]).append(OSDE.STRING_BLANK);
+				}
+				log.log(Level.FINE, sb.toString());
+			}
+		}
+		else
+			throw new DataInconsitsentException("RecordSet.addPoints - points.length != noneCalculationRecords.length"); //$NON-NLS-1$
+		
+		this.hasDisplayableData = true;
 	}
 
 	/**
@@ -663,15 +690,18 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getNoneCalculationRecordNames() {
-		Vector<String> calculationRecords = new Vector<String>();
-		String[] deviceMeasurements = this.device.getMeasurementNames(this.channelConfigName);
-		for (int i = 0; i < deviceMeasurements.length; ++i) { // record names may not match device measurements
-			MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
-			if (!measurement.isCalculation()) { // active or inactive 
-				calculationRecords.add(this.recordNames[i]);
+		if (this.noneCalculationRecords.length == 0) {
+			Vector<String> tmpCalculationRecords = new Vector<String>();
+			String[] deviceMeasurements = this.device.getMeasurementNames(this.channelConfigName);
+			for (int i = 0; i < deviceMeasurements.length; ++i) { // record names may not match device measurements
+				MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
+				if (!measurement.isCalculation()) { // active or inactive 
+					tmpCalculationRecords.add(this.recordNames[i]);
+				}
 			}
+			this.noneCalculationRecords = tmpCalculationRecords.toArray(new String[0]);
 		}
-		return calculationRecords.toArray(new String[0]);
+		return this.noneCalculationRecords;
 	}
 
 	/**
@@ -1819,5 +1849,72 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isOneOfSyncableRecord(String queryRecordKey) {
 		return this.syncableRecords.contains(queryRecordKey);
+	}
+
+	/**
+	 * @return the fileDataSize
+	 */
+	public int getFileDataSize() {
+		return this.fileDataSize;
+	}
+
+	/**
+	 * @param newFileDataSize the fileDataSize to set
+	 */
+	public void setFileDataSize(int newFileDataSize) {
+		this.fileDataSize = newFileDataSize;
+	}
+
+	/**
+	 * @return the fileDataPointer
+	 */
+	public long getFileDataPointer() {
+		return this.fileDataPointer;
+	}
+
+	/**
+	 * @param newFileDataPointer the fileDataPointer to set
+	 */
+	public void setFileDataPointer(long newFileDataPointer) {
+		this.fileDataPointer = newFileDataPointer;
+	}
+
+	/**
+	 * @param newFileDataPointer the fileDataPointer to set
+	 * @param newFileDataSize the fileDataSize to set
+	 */
+	public void setFileDataPointerAndSize(long newFileDataPointer, int newFileDataSize) {
+		this.fileDataPointer = newFileDataPointer;
+		this.fileDataSize = newFileDataSize;
+	}
+
+	/**
+	 * @return the hasDisplayableData
+	 */
+	public boolean hasDisplayableData() {
+		return this.hasDisplayableData;
+	}
+
+	/**
+	 * @param enable the hasDisplayableData to set
+	 */
+	public void setDisplayableData(boolean enable) {
+		this.hasDisplayableData = enable;
+	}
+	
+	/**
+	 * load data from file
+	 */
+	public void loadFileData(String fullQualifiedFileName) {
+		try {
+			if (this.fileDataSize != 0 && this.fileDataPointer != 0) {
+				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName);
+				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName);
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(),e);
+			this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+		}
 	}
 }

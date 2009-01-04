@@ -109,7 +109,6 @@ public class MenuBar {
 	final Menu										parent;
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
-	Thread 												readerWriterThread;
 
 	public MenuBar(OpenSerialDataExplorer currentApplication, Menu menuParent) {
 		this.application = currentApplication;
@@ -754,12 +753,16 @@ public class MenuBar {
 			final char listSeparator = deviceSetting.getListSeparator();
 			final String recordSetNameExtend = fileName;
 			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				CSVReaderWriter.read(listSeparator, csvFilePath, recordSetNameExtend, isRaw);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
 				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 	}
 
@@ -788,30 +791,21 @@ public class MenuBar {
 		final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
-			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0007, new Object[]{csvFilePath}))) { 
+			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0007, new Object[] { csvFilePath }))) {
 				return;
 			}
 
-			final char listSeparator = deviceSetting.getListSeparator();
-			final String recordSetName = recordSetKey;
-			this.readerWriterThread = new Thread() {
-				public void run() {
-					try {
-						MenuBar.this.application.enableMenuActions(false);
-						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-						CSVReaderWriter.write(listSeparator, recordSetName, csvFilePath, isRaw);
-						MenuBar.this.application.enableMenuActions(true);
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
-					}
-					finally {
-						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-					}
-				}
-			};
-			this.readerWriterThread.start();
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				CSVReaderWriter.write(deviceSetting.getListSeparator(), recordSetKey, csvFilePath, isRaw);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 	}
 
@@ -898,27 +892,22 @@ public class MenuBar {
 				}
 			}
 			else
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 
-			this.readerWriterThread = new Thread() {
-				public void run() {
-					try {
-						MenuBar.this.application.enableMenuActions(false);
-						OsdReaderWriter.read(openFilePath);
-						MenuBar.this.application.enableMenuActions(true);
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
-					}
-				}
-			};
-			this.readerWriterThread.start();
+			try {
+				this.application.enableMenuActions(false);
+				OsdReaderWriter.read(openFilePath);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
 			updateSubHistoryMenuItem(openFilePath);
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 
@@ -965,29 +954,22 @@ public class MenuBar {
 			}
 			// rename existing file to *.bak
 			FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK);
+
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				OsdReaderWriter.write(filePath, activeChannel, 1);
+				activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
+				activeChannel.setSaved(true);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
 			
-			final String useFilePath = filePath;
-			this.readerWriterThread = new Thread() {
-				public void run() {
-					try {
-						MenuBar.this.application.enableMenuActions(false);
-						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-						OsdReaderWriter.write(useFilePath, activeChannel, 1);
-						MenuBar.this.application.enableMenuActions(true);
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
-					}
-					finally {
-						MenuBar.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-					}
-				}
-			};
-			this.readerWriterThread.start();
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 			updateSubHistoryMenuItem(filePath);
-			activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
-			activeChannel.setSaved(true);
 		}
 	}
 
@@ -1036,22 +1018,17 @@ public class MenuBar {
 				}
 			}
 			else
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 
-			this.readerWriterThread = new Thread() {
-				public void run() {
-					try {
-						MenuBar.this.application.enableMenuActions(false);
-						LogViewReader.read(openFilePath);
-						MenuBar.this.application.enableMenuActions(true);
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-						MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
-					}
-				}
-			};
-			this.readerWriterThread.start();
+			try {
+				this.application.enableMenuActions(false);
+				LogViewReader.read(openFilePath);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
 			updateSubHistoryMenuItem(openFilePath);
 		}
 		catch (Exception e) {
