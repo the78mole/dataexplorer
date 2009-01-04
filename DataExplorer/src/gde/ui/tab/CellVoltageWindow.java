@@ -283,7 +283,7 @@ public class CellVoltageWindow {
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
 				int cellCount = this.voltageAvg = 0;
-				String[] activeRecordKeys = recordSet.getRecordNames();
+				String[] activeRecordKeys = recordSet.getSyncableRecords().toArray(new String[0]);
 				for (String recordKey : activeRecordKeys) {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
