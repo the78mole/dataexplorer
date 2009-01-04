@@ -27,7 +27,7 @@
         <unit>ms</unit>
         <timeStep>5</timeStep>
     </TimeBase>
-    <Channel type="TYPE_CONFIG" name="Sinus">
+    <Channel type="TYPE_CONFIG" name="Sinus 1">
         <Measurement>
             <name>Spannung</name>
             <symbol>U</symbol>
@@ -43,7 +43,7 @@
 			<statistics min="true" max="true" avg="true" sigma="true"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Sägezahn">
+    <Channel type="TYPE_OUTLET" name="Sägezahn 2">
         <Measurement>
             <name>Spannung</name>
             <symbol>U</symbol>
