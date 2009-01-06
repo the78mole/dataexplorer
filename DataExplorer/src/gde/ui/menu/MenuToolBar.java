@@ -113,6 +113,7 @@ public class MenuToolBar {
 	}
 
 	public void create() {
+		//long startTime = new Date().getTime();
 		{ // begin file cool item
 			this.fileCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
@@ -198,11 +199,11 @@ public class MenuToolBar {
 				this.fileToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "fileToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end file tool bar
-			this.coolSize = this.fileCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			log.log(Level.FINE, "fileCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.fileCoolItem.setSize(this.toolSize.x, this.coolSize.y);
+			//this.coolSize = this.fileCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
+			//log.log(Level.FINE, "fileCoolItem.size = " + this.coolSize); //$NON-NLS-1$
+			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.fileCoolItem.setPreferredSize(this.size);
-			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.coolSize.y);
+			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end file cool item
 
 		{ // begin device cool item
@@ -320,11 +321,11 @@ public class MenuToolBar {
 				this.deviceToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "deviceToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end device tool bar
-			this.coolSize = this.deviceCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			log.log(Level.FINE, "deviceCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.deviceCoolItem.setSize(this.toolSize.x, this.coolSize.y);
+			//this.coolSize = this.deviceCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
+			//log.log(Level.FINE, "deviceCoolItem.size = " + this.coolSize); //$NON-NLS-1$
+			this.deviceCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.deviceCoolItem.setPreferredSize(this.size);
-			this.deviceCoolItem.setMinimumSize(this.toolSize.x, this.coolSize.y);
+			this.deviceCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end device cool item
 		{ // begin zoom cool item
 			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
@@ -396,11 +397,11 @@ public class MenuToolBar {
 				this.zoomToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "zoomToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end zoom tool bar
-			this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			log.log(Level.FINE, "zoomCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.zoomCoolItem.setSize(this.toolSize.x, this.coolSize.y);
+			//this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
+			//log.log(Level.FINE, "zoomCoolItem.size = " + this.coolSize); //$NON-NLS-1$
+			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.zoomCoolItem.setPreferredSize(this.size);
-			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.coolSize.y);
+			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -435,11 +436,11 @@ public class MenuToolBar {
 				this.portToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "portToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			}
-			this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			log.log(Level.FINE, "portCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.portCoolItem.setSize(this.toolSize.x, this.coolSize.y);
+			//this.coolSize = this.zoomCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
+			//log.log(Level.FINE, "portCoolItem.size = " + this.coolSize); //$NON-NLS-1$
+			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.portCoolItem.setPreferredSize(this.size);
-			this.portCoolItem.setMinimumSize(this.toolSize.x, this.coolSize.y);
+			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
@@ -688,12 +689,13 @@ public class MenuToolBar {
 				log.log(Level.FINE, "dataToolBarComposite.size = " + this.toolSize); //$NON-NLS-1$
 				this.dataToolBarComposite.setSize(this.toolSize);
 			}
-			this.coolSize = this.dataCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			log.log(Level.FINE, "dataCoolItem.size = " + this.coolSize); //$NON-NLS-1$
-			this.dataCoolItem.setSize(this.toolSize.x, this.coolSize.y);
+			//this.coolSize = this.dataCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
+			//log.log(Level.FINE, "dataCoolItem.size = " + this.coolSize); //$NON-NLS-1$
+			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.dataCoolItem.setPreferredSize(this.size);
-			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.coolSize.y);
+			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end record cool item
+		//log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
 	}
 
 	/**

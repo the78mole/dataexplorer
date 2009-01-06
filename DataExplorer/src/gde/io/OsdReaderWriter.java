@@ -369,17 +369,17 @@ public class OsdReaderWriter {
 							+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ " filePointer = " + filePointer); //$NON-NLS-1$
 				}
-				int dataSize = 0;
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					// channel/configuration :: record set name :: recordSet description :: data pointer 
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
-					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", (dataSize + filePointer))).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
+					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
+					log.log(Level.INFO, sbs[i].toString());
 					//data_out.writeInt(sbs[i].length());
 					data_out.writeUTF(sbs[i].toString());
-					dataSize += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
-					log.log(Level.FINE, "filePointer = " + (filePointer + dataSize)); //$NON-NLS-1$
+					filePointer += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
+					log.log(Level.FINE, "filePointer = " + filePointer); //$NON-NLS-1$
 				}
 				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
 				long startTime = new Date().getTime();

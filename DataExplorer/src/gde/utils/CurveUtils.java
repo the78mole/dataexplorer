@@ -194,8 +194,8 @@ public class CurveUtils {
 		double factorX = (1.0 * width) / adaptXMaxValue;
 		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
 		double xScale = 1;
-		if (recordSize > (width * 2)) {
-			xScale = recordSize / (width * 2);
+		if (recordSize > (width*1.5)) {
+			xScale = recordSize / (width*1.5);
 			factorX = factorX * xScale;
 		}
 		record.setDisplayScaleFactorTime(factorX);
