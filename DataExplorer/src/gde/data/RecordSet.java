@@ -17,6 +17,7 @@
 package osde.data;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -50,8 +51,9 @@ import osde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class RecordSet extends HashMap<String, Record> {
-	static final long							serialVersionUID							= 26031957;
-	static Logger									log														= Logger.getLogger(RecordSet.class.getName());
+	final static String						$CLASS_NAME 									= RecordSet.class.getName();
+	final static long							serialVersionUID							= 26031957;
+	final static Logger						log														= Logger.getLogger(RecordSet.class.getName());
 	final DecimalFormat						df														= new DecimalFormat("0.000");														//$NON-NLS-1$
 
 	String												name;																																									//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
@@ -426,6 +428,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
+		final String $METHOD_NAME = "addPoints()";
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
@@ -435,10 +438,17 @@ public class RecordSet extends HashMap<String, Record> {
 					if (this.syncMin == 0 && this.syncMax == 0) {
 						this.syncMin = points[i];
 						this.syncMax = points[i];
+						this.updateSyncRecordScale();	
 					}
 					else {
-						if (points[i] < this.syncMin) this.syncMin = points[i];
-						if (points[i] > this.syncMax) this.syncMax = points[i];
+						if (points[i] < this.syncMin) {
+							this.syncMin = points[i];
+							this.updateSyncRecordScale();	
+						}
+						else if (points[i] > this.syncMax) {
+							this.syncMax = points[i];
+							this.updateSyncRecordScale();	
+						}
 					}
 				}
 			}
@@ -447,7 +457,7 @@ public class RecordSet extends HashMap<String, Record> {
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
-				log.log(Level.FINE, sb.toString());
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			if (doUpdate) {
 				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -469,6 +479,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
+		final String $METHOD_NAME = "addPoints()";
 		if (points.length == this.noneCalculationRecords.length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
@@ -478,7 +489,7 @@ public class RecordSet extends HashMap<String, Record> {
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
-				log.log(Level.FINE, sb.toString());
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 		}
 		else
@@ -494,7 +505,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param value
 	 */
 	public void dataTableAddPoint(String recordkey, int index, int value) {
-		log.log(Level.FINE, recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
+		final String $METHOD_NAME = "dataTableAddPoint()";
+		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
 			if (value != 0)
@@ -513,7 +525,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tableRow.set(columnIndex, new Double(this.device.translateValue(this.get(recordkey), value)).intValue());
 			}
 			else
-				log.log(Level.WARNING, "add time point before adding other values !"); //$NON-NLS-1$
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "add time point before adding other values !"); //$NON-NLS-1$
 		}
 	}
 
@@ -1488,21 +1500,24 @@ public class RecordSet extends HashMap<String, Record> {
 				// calculate record set internal data table
 				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
+					long startTime = new Date().getTime();
 					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
 
+					Vector<Integer> dataTableRow;
 					for (int i = 0; i < recordEntries; i++) {
 						RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), this.sThreadId);
-						Vector<Integer> dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
+						dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
 							dataTableRow.add(new Double(1000.0 * RecordSet.this.device.translateValue(get(recordKey), get(recordKey).get(i) / 1000.0)).intValue());
 						}
-						dataTableAddRow(dataTableRow);
+						RecordSet.this.dataTable.add(dataTableRow);
 					}
 					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
+					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 
 				// recall the table update function all prerequisites are checked
@@ -1678,7 +1693,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.syncableRecords = new Vector<String>();
 			for (String syncableRecordKey : this.potentialSyncableRecords) {
 				Record record = this.get(syncableRecordKey);
-				if (record != null && record.isDisplayable) this.syncableRecords.add(syncableRecordKey);
+				if (record != null && record.isDisplayable && record.size() > 2) this.syncableRecords.add(syncableRecordKey);
 			}
 
 			if (!this.syncableRecords.isEmpty()) {
@@ -1698,9 +1713,10 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.isVisible = false;
 				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
 				this.addRecordName(syncRecName);
+
+				this.isSyncableChecked = true;
+				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString());
 			}
-			this.isSyncableChecked = true;
-			log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString());
 		}
 
 		return !this.syncableRecords.isEmpty();
@@ -1734,6 +1750,14 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		log.log(Level.FINE, "syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 
+		updateSyncRecordScale();
+	}
+
+	/**
+	 * update the scale values from sync record 
+	 * and update referenced records to enable drawing of curve, set min/max
+	 */
+	void updateSyncRecordScale() {
 		Record tmpRecord = this.get(this.getSyncableName());
 		if (tmpRecord != null) {
 			tmpRecord.setMinMax(this.syncMin, this.syncMax);
@@ -1826,7 +1850,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * overwritten size method to care about added sync record (placeholder)
 	 */
 	public int size() {
-		return this.isSyncRequested ? super.size() - 1 : super.size();
+		return this.syncableRecords.isEmpty() ? super.size() : super.size() - 1;
 	}
 
 	/**

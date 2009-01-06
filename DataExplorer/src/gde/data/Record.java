@@ -46,8 +46,9 @@ import osde.utils.TimeLine;
  * class record holds data points of one measurement or line or curve
  */
 public class Record extends Vector<Integer> {
-	static final long					serialVersionUID			= 26031957;
-	static final Logger				log										= Logger.getLogger(Record.class.getName());
+	final static String	$CLASS_NAME 					= Record.class.getName();
+	final static long		serialVersionUID			= 26031957;
+	final static Logger	log										= Logger.getLogger(Record.class.getName());
 	
 	public static final String DELIMITER 			= "|-|"; 		//$NON-NLS-1$
 	public static final String END_MARKER 		= "|:-:|"; 	//$NON-NLS-1$
@@ -122,12 +123,12 @@ public class Record extends Vector<Integer> {
 	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
-	int									maxValueTriggered			= Integer.MIN_VALUE;		 			// max value of the curve, according a set trigger level if any
-	int									minValueTriggered			= Integer.MAX_VALUE;					// min value of the curve, according a set trigger level if any
-	int									avgValue							= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
-	int									sigmaValue						= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
-	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
-	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
+	int									maxValueTriggered			= 0;		 											// max value of the curve, according a set trigger level if any
+	int									minValueTriggered			= 0;													// min value of the curve, according a set trigger level if any
+	int									avgValue							= 0;		 											// avarage value (avg = sum(xi)/n)
+	int									sigmaValue						= 0;		 											// sigma value of data, according a set trigger level if any
+	int									avgValueTriggered			= 0;		 											// avarage value (avg = sum(xi)/n)
+	int									sigmaValueTriggered		= 0;		 											// sigma value of data, according a set trigger level if any
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue		= this.maxScaleValue;
@@ -327,15 +328,16 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	public boolean add(int point) {
+		final String $METHOD_NAME = "add()";
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
 		}
 		else {
 			if (point > this.maxValue) this.maxValue = point;
-			if (point < this.minValue) this.minValue = point;
+			else if (point < this.minValue) this.minValue = point;
 		}	
-		log.log(Level.FINEST, "adding point = " + point); //$NON-NLS-1$
-		log.log(Level.FINER, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "adding point = " + point); //$NON-NLS-1$
+		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		return this.add(new Integer(point));
 	}
 
@@ -1327,7 +1329,7 @@ public class Record extends Vector<Integer> {
 	 * @return the avgValue
 	 */
 	public int getAvgValue() {
-		if (this.avgValue == Integer.MIN_VALUE )this.setAvgValue();
+		this.setAvgValue();
 		return this.avgValue;
 	}
 	
@@ -1339,7 +1341,7 @@ public class Record extends Vector<Integer> {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
-		if (this.avgValueTriggered == Integer.MIN_VALUE )this.setAvgValueTriggered();
+		this.setAvgValueTriggered();
 		return this.avgValueTriggered;
 	}
 	
@@ -1352,7 +1354,7 @@ public class Record extends Vector<Integer> {
 		if (this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
-		if (this.avgValueTriggered == Integer.MIN_VALUE )this.setAvgValueTriggered();
+		this.setAvgValueTriggered();
 		return this.avgValueTriggered;
 	}
 	
@@ -1360,11 +1362,13 @@ public class Record extends Vector<Integer> {
 	 * calculates the avgValue
 	 */
 	public synchronized void setAvgValue() {
-		long sum = 0;
-		for (Integer xi : this) {
-			sum += xi;
+		if (super.size() >= 2) {
+			long sum = 0;
+			for (Integer xi : this) {
+				sum += xi;
+			}
+			this.avgValue = new Long(sum / this.realSize()).intValue();
 		}
-		this.avgValue = new Long(sum / this.realSize()).intValue() ;
 	}
 	
 	/**
@@ -1383,16 +1387,16 @@ public class Record extends Vector<Integer> {
 				}
 				if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 			}
+			log.log(Level.FINER, sb.toString());
+			this.avgValueTriggered = numPoints > 0 ? new Long(sum / numPoints).intValue() : 0 ;
 		}
-		log.log(Level.FINER, sb.toString());
-		this.avgValueTriggered = numPoints > 0 ? new Long(sum / numPoints).intValue() : 0 ;
 	}
 
 	/**
 	 * @return the sigmaValue
 	 */
 	public int getSigmaValue() {
-		if (this.sigmaValue == Integer.MIN_VALUE) this.setSigmaValue();
+		this.setSigmaValue();
 		return this.sigmaValue;
 	}
 	
@@ -1425,12 +1429,14 @@ public class Record extends Vector<Integer> {
 	 * calculates the sigmaValue 
 	 */
 	public synchronized void setSigmaValue() {
-		double average = this.getAvgValue()/1000.0;
-		double sumPoweredValues = 0;
-		for (Integer xi : this) {
-			sumPoweredValues += Math.pow(xi/1000.0 - average, 2);
+		if (super.size() >= 2) {
+			double average = this.getAvgValue() / 1000.0;
+			double sumPoweredValues = 0;
+			for (Integer xi : this) {
+				sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
+			}
+			this.sigmaValue = new Double(Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000).intValue();
 		}
-		this.sigmaValue = new Double(Math.sqrt(sumPoweredValues/(this.realSize()-1))*1000).intValue();
 	}
 
 	/**
@@ -1447,8 +1453,8 @@ public class Record extends Vector<Integer> {
 					numPoints++;
 				}
 			}
+			this.sigmaValueTriggered = new Double(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
 		}
-		this.sigmaValueTriggered = new Double(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
 	}
 	
 	/**
