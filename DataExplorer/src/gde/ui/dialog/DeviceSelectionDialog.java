@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -66,6 +67,7 @@ import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.StringHelper;
 
 /**
  * Dialog class to select the device to be used
@@ -160,6 +162,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 		this.activeDevices = new Vector<String>(2, 1);
 
+		long startTime = new Date().getTime();
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
 				// loop through all device properties XML and check if device used
@@ -190,6 +193,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
+		log.log(Level.INFO, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 
@@ -855,11 +859,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 			this.portSelectCombo.setItems(this.availablePorts.toArray(new String[this.availablePorts.size()]));
 			int portIndex = this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort()); // -1 means not available
-			if(portIndex < 0 && this.availablePorts.size() > 0) {
-				this.selectedActiveDeviceConfig.setPort(this.availablePorts.firstElement());
-				this.selectedActiveDeviceConfig.setPort(this.availablePorts.firstElement());
-			}
-			this.portSelectCombo.select(this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort()));
+//			if(portIndex < 0 && this.availablePorts.size() > 0) {
+//				this.selectedActiveDeviceConfig.setPort(this.availablePorts.firstElement());
+//			}
+			this.portSelectCombo.select(portIndex > 0 ? portIndex : 0);
 
 			// com port adjustments group
 			this.baudeSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
