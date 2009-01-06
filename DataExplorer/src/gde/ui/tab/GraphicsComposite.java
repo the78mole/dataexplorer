@@ -595,7 +595,7 @@ public class GraphicsComposite extends Composite {
 						//curve area
 						//this.graphicCanvas.redraw(curveBounds.x+5, curveBounds.y+5, 1, 1, true); // damage a small area of image only -> redraw complete image ??
 						// time scale
-						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin, timeCaptionHeight, true);
+						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin+7, timeCaptionHeight, true);
 						// time caption
 						this.graphicCanvas.redraw(timeCaptionX, timeCaptionY, timeCaptionWidth, timeCaptionHeight, true);
 					}
