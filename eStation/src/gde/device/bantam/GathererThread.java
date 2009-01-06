@@ -208,6 +208,7 @@ public class GathererThread extends Thread {
 								GathererThread.this.recordSet.get(recordKeys[i]).setVisible(false);
 							}
 							GathererThread.this.isConfigUpdated = true;
+							//OsdReaderWriter.write("E:\\Temp\\not.osd", GathererThread.this.channel, 1);
 						}
 						else { // else wait for 180 seconds max. for actions
 							if (0 == (setRetryCounter(getRetryCounter() - 1)) || GathererThread.this.isCollectDataStopped) {

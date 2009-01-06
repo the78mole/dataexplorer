@@ -462,8 +462,10 @@ public class EStationDialog extends DeviceDialog {
 	}
 
 	public void resetButtons() {
-		this.startCollectDataButton.setEnabled(true);
-		this.stopColletDataButton.setEnabled(false);
+		if (!this.isDisposed()) {
+			this.startCollectDataButton.setEnabled(true);
+			this.stopColletDataButton.setEnabled(false);
+		}
 	}
 
 	/**
