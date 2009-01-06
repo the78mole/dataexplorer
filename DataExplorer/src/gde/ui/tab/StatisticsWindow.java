@@ -269,11 +269,30 @@ public class StatisticsWindow {
 									if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
 										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
 										if (isTriggerLevel)
-											sb.append(df.format(device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
+											sb.append(String.format("%.1f", device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
 										else {
-											if (measurementStatistics.getSumByTriggerRefOrdinal() != null)
-												sb.append(df.format(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
-											sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+												sb.append(String.format("%.1f", record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
+												sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											}
+										}
+									}
+									
+									// append ratio text + ratio value
+									if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+										sb.append("  ").append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
+										Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
+										StatisticsType referencedStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), measurementStatistics.getRatioRefOrdinal());
+
+										if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
+											if (referencedStatistics.isAvg()) {
+												sb.append(String.format("%.2f", (device.translateValue(referencedRecord, referencedRecord.getAvgValue() / 1000.0)/(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0))));
+												sb.append(" [").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											}
+											else if (referencedStatistics.isMax()) {
+												sb.append(String.format("%.2f", (device.translateValue(referencedRecord, referencedRecord.getMaxValue() / 1000.0)/(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0))));
+												sb.append(" [").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											}
 										}
 									}
 								}
@@ -287,8 +306,10 @@ public class StatisticsWindow {
 									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
 								}
+								
 								int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER)+1)).x;
 								this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
+								
 								log.log(Level.FINER, sb.toString());
 								this.tabelItemText.add(sb.toString());
 							}

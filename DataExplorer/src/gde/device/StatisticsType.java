@@ -7,10 +7,11 @@
 
 package osde.device;
 
+import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -45,6 +46,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="sumTriggerText" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="countByTrigger" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="countTriggerText" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+ *       &lt;attribute name="ratioRefOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
+ *       &lt;attribute name="ratioText" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -67,23 +70,23 @@ public class StatisticsType {
 	@XmlAttribute(required = true)
 	protected boolean									sigma;
 	@XmlAttribute
-	protected Integer							triggerRefOrdinal;
+	protected Integer									triggerRefOrdinal;
 	@XmlAttribute
-	protected Integer							sumByTriggerRefOrdinal;
+	protected Integer									sumByTriggerRefOrdinal;
 	@XmlAttribute
-	@XmlSchemaType(name = "anySimpleType")
 	protected String									sumTriggerText;
 	@XmlAttribute
 	protected Boolean									countByTrigger;
 	@XmlAttribute
-	@XmlSchemaType(name = "anySimpleType")
 	protected String									countTriggerText;
 	@XmlAttribute
-	@XmlSchemaType(name = "anySimpleType")
 	protected String									comment;
-    @XmlAttribute
-    @XmlSchemaType(name = "anySimpleType")
-    protected String sumTriggerTimeText;
+	@XmlAttribute
+	protected String									sumTriggerTimeText;
+	@XmlAttribute
+	protected Integer									ratioRefOrdinal;
+	@XmlAttribute
+	protected String									ratioText;
 
 	/**
 	 * Gets the value of the trigger property.
@@ -317,30 +320,79 @@ public class StatisticsType {
 		this.comment = value;
 	}
 
-    /**
-     * Gets the value of the sumTriggerTimeText property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSumTriggerTimeText() {
-        return this.sumTriggerTimeText;
-    }
+	/**
+	 * Gets the value of the sumTriggerTimeText property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getSumTriggerTimeText() {
+		return this.sumTriggerTimeText;
+	}
 
-    /**
-     * Sets the value of the sumTriggerTimeText property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSumTriggerTimeText(String value) {
-        this.sumTriggerTimeText = value;
-    }
-    /**
+	/**
+	 * Sets the value of the sumTriggerTimeText property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setSumTriggerTimeText(String value) {
+		this.sumTriggerTimeText = value;
+	}
+
+	/**
+	 * Gets the value of the ratioRefOrdinal property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link BigInteger }
+	 *     
+	 */
+	public Integer getRatioRefOrdinal() {
+		return this.ratioRefOrdinal;
+	}
+
+	/**
+	 * Sets the value of the ratioRefOrdinal property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link BigInteger }
+	 *     
+	 */
+	public void setRatioRefOrdinal(int value) {
+		this.ratioRefOrdinal = value;
+	}
+
+	/**
+	 * Gets the value of the ratioComment property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link String }
+	 *     
+	 */
+	public String getRatioText() {
+		return this.ratioText;
+	}
+
+	/**
+	 * Sets the value of the ratioComment property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link String }
+	 *     
+	 */
+	public void setRatioText(String value) {
+		this.ratioText = value;
+	}
+
+	/**
 	 * <p>Java class for anonymous complex type.
 	 * 
 	 * <p>The following schema fragment specifies the expected content contained within this class.
@@ -367,12 +419,11 @@ public class StatisticsType {
 		@XmlAttribute(required = true)
 		protected Integer	level;
 		@XmlAttribute(required = true)
-		protected boolean			isGreater;
+		protected boolean	isGreater;
 		@XmlAttribute(required = true)
-		protected Integer			minTimeSec;
+		protected Integer	minTimeSec;
 		@XmlAttribute
-		@XmlSchemaType(name = "anySimpleType")
-		protected String			comment;
+		protected String	comment;
 
 		/**
 		 * Gets the value of the level property.
