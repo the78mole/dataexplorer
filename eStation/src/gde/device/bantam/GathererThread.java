@@ -277,8 +277,8 @@ public class GathererThread extends Thread {
 			tmpRecordSet.setTableDisplayable(true); // enable table display after calculation
 			this.device.updateVisibilityStatus(tmpRecordSet);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
-			this.channel.applyTemplate(newRecordSetKey);
-			this.application.updateStatisticsData();
+			//this.channel.applyTemplate(newRecordSetKey);
+			//this.application.updateStatisticsData();
 			this.application.updateDataTable(newRecordSetKey);
 		}
 	}
