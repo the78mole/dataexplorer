@@ -897,6 +897,7 @@ public class MenuBar {
 			try {
 				this.application.enableMenuActions(false);
 				OsdReaderWriter.read(openFilePath);
+				this.channels.getActiveChannel().setFileName(openFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
@@ -1023,6 +1024,7 @@ public class MenuBar {
 			try {
 				this.application.enableMenuActions(false);
 				LogViewReader.read(openFilePath);
+				this.channels.getActiveChannel().setFileName(openFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
