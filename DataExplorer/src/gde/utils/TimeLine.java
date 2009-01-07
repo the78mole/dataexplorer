@@ -94,7 +94,7 @@ public class TimeLine {
 		else if (totalTime_sec > 1) {
 			maxTimeNumberFormated = (int) totalTime_msec;
 			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
-			factor = 100; // 2900 -> 2,9 sec
+			factor = 1000; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else {
@@ -215,6 +215,16 @@ public class TimeLine {
 				else {
 					numberTicks = timeDelta / 500.0; // every 2'th units one tick
 					scaleFactor = 200;
+				}
+				break;
+			case TimeLine.TIME_LINE_SEC * 1000:
+				if (timeDeltaValue <= width*10) {
+					numberTicks = timeDelta / 0.5; // every 1'th units one tick
+					scaleFactor = 200;
+				}
+				else {
+					numberTicks = timeDelta / 1.0; // every 2'th units one tick
+					scaleFactor = 100;
 				}
 				break;
 			default:

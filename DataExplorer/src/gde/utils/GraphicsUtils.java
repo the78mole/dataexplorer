@@ -63,15 +63,15 @@ public class GraphicsUtils {
 		// check for zero scale value
 		double deltaScale = (endNumber - startNumber);
 		if (startNumber < 0 && endNumber > 0) {
-			//if (deltaScale <= 0.1) {
-			//	numberTicks = new Double(deltaScale * 100 * heightAdaptation).intValue();
-			//	numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.01, height);
-			//}
-			//else if (deltaScale <= 0.5) {
-			//	numberTicks = new Double(deltaScale * 50 * heightAdaptation).intValue();
-			//	numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.05, height);
-			//}
-			if (deltaScale <= 1) {
+			if (deltaScale <= 0.1) {
+				numberTicks = new Double(deltaScale * 100 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.01, height);
+			}
+			else if (deltaScale <= 0.5) {
+				numberTicks = new Double(deltaScale * 50 * heightAdaptation).intValue();
+				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.05, height);
+			}
+			else if (deltaScale <= 1) {
 				numberTicks = new Double(deltaScale * 20 * heightAdaptation).intValue();
 				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1, height);
 			}
