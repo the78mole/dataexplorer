@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
+import osde.device.ChannelTypes;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -151,6 +152,10 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getFirstRecordSetName()); // set record set to the first
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
+				
+				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET.ordinal() && this.getActiveChannel().getFileName() != null) {
+					this.application.updateTitleBar(this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+				}
 			}
 			else {
 				log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
