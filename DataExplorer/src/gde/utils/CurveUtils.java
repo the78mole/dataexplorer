@@ -193,9 +193,13 @@ public class CurveUtils {
 		// calculate scale factor to fit time into draw bounds
 		double factorX = (1.0 * width) / adaptXMaxValue;
 		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
-		double xScale = 1;
-		if (recordSize > (width*1.5)) {
-			xScale = recordSize / (width*1.5);
+		int xScale = 1;
+		if (recordSize > (width * 2)) {
+			xScale = new Double(recordSize / (width * 2)).intValue();
+			while (!(recordSize % xScale <= 1) && xScale > 1) {
+				--xScale;
+				log.log(Level.INFO, record.getName() + " xScale = " + xScale);
+			}
 			factorX = factorX * xScale;
 		}
 		record.setDisplayScaleFactorTime(factorX);
@@ -218,7 +222,7 @@ public class CurveUtils {
 
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-			for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = new Double(j + xScale).intValue()) {
+			for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j+xScale) {
 				// get the point to be drawn
 				newPoint = record.getDisplayPoint(i, j, x0, y0);
 				if (log.isLoggable(Level.FINEST)) sb.append(CurveUtils.lineSep).append(newPoint.toString());
