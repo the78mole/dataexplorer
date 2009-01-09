@@ -19,6 +19,7 @@ package osde.device.wb;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
 import osde.serial.DeviceSerialPort;
@@ -29,6 +30,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class SimulatorSerialPort extends DeviceSerialPort {
+	final static Logger						log		= Logger.getLogger(SimulatorSerialPort.class.getName());
 
 	int	lastRecord	= -1;
 	int	lastVoltage	= 0;
@@ -50,11 +52,18 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public HashMap<String, Object> getData(int recordNumber, String channelConfigKey) throws Exception {
+		int numPoints,i;
 		if (recordNumber != this.lastRecord) {
 			this.lastRecord = recordNumber;
 			this.lastVoltage = 0;
 			this.lastCurrent = 0;
 			this.xBound = 0;
+			numPoints = this.deviceConfig.getDataBlockSize()+1;
+			i=0;
+		}
+		else {
+			numPoints = this.deviceConfig.getDataBlockSize();
+			i=1;
 		}
 
 		HashMap<String, Object> data = new HashMap<String, Object>();
@@ -65,11 +74,13 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 		this.xBound = this.xBound + 100;
 		this.lastVoltage = this.xBound / 2;
 		int yBound = this.deviceConfig.getDataBlockSize();
-		for (int i = 0; i < this.deviceConfig.getDataBlockSize(); i++) {
-			current.add(i * 3000 + this.lastCurrent);
-			voltage.add(getNormalizedSine(i, this.xBound / 2, yBound) - this.lastVoltage);
+		log.fine("numPoints = " + numPoints);
+		for (; i < this.deviceConfig.getDataBlockSize()+1; i++) {
+			current.add(i * 1000 + this.lastCurrent);
+			voltage.add(getNormalizedSine(i, this.xBound/2, yBound) - this.lastVoltage);
+			//log.info("i = " + i);
 		}
-		this.lastCurrent = yBound * 3000;
+		this.lastCurrent = 0; //yBound * 1000;
 
 		String[] measurements = this.deviceConfig.getMeasurementNames(channelConfigKey); // 0=Spannung, 1=Strom
 		data.put(measurements[0], voltage);

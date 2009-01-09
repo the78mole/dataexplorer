@@ -395,8 +395,7 @@ public class GraphicsComposite extends Composite {
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 		x0 = maxX - (maxX - spaceLeft) + 5;
 		int xMax = maxX - spaceRight;
-		int fitTimeWidth = (xMax - x0) - ((xMax - x0) % 10); // make time line modulo 10 to enable every 10 min/sec a tick mark
-		width = fitTimeWidth <= 0 ? 1 : fitTimeWidth;
+		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 		xMax = x0 + width;
 		int verticalSpace = 3 * pt.y;// space used for time scale text and scales with description or legend
 		int spaceTop = 20;
@@ -405,13 +404,13 @@ public class GraphicsComposite extends Composite {
 		int yMax = maxY - (maxY - spaceTop);
 		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
 		yMax = y0 - height;		
-		log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ",xMax=" + xMax + ", yMax=" + yMax + "width=" + width + ", height=" + height + ", timeWidth=" + fitTimeWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+		log.log(Level.FINE, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		log.log(Level.FINE, "curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, fitTimeWidth, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC)), OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC)), OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(width, height);
@@ -467,7 +466,8 @@ public class GraphicsComposite extends Composite {
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
 				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, dash);
 
-			if (isActualRecordEnabled) CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+			if (isActualRecordEnabled) 
+				CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
 		}
 
 		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);

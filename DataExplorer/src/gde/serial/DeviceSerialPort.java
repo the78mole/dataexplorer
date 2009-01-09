@@ -435,12 +435,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	/**
 	 * function check for available bytes on receive buffer
-	 * @return false if there are available bytes
+	 * @return System.currentTimeMillis() if data available within time out, else an exception
 	 * @throws InterruptedException 
 	 * @throws TimeOutException 
 	 * @throws IOException 
 	 */
-	public void wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
+	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
 		int sleepTime = 2;
 		int timeOutCounter = timeout_msec / sleepTime;
 
@@ -452,6 +452,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				throw e;
 			}
 		}
+		return System.currentTimeMillis();
 	}
 
 	/**
