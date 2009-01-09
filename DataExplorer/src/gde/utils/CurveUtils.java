@@ -198,7 +198,6 @@ public class CurveUtils {
 			xScale = new Double(recordSize / (width * 2)).intValue();
 			while (!(recordSize % xScale <= 1) && xScale > 1) {
 				--xScale;
-				log.log(Level.INFO, record.getName() + " xScale = " + xScale);
 			}
 			factorX = factorX * xScale;
 		}
