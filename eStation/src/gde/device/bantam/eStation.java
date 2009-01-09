@@ -445,7 +445,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 			else {
 				if (this.getDialog().dataGatherThread != null) {
-					this.getDialog().dataGatherThread.stopTimerThread();
+					this.getDialog().dataGatherThread.stopGathererThread();
 					this.getDialog().dataGatherThread.interrupt();
 					
 					if (Channels.getInstance().getActiveChannel() != null) {

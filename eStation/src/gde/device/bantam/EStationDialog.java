@@ -195,7 +195,7 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							EStationDialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
-							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
+							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
 								EStationDialog.this.startCollectDataButton.setEnabled(false);
 								EStationDialog.this.stopColletDataButton.setEnabled(true);
 							}
@@ -240,8 +240,8 @@ public class EStationDialog extends DeviceDialog {
 										}
 									}
 									catch (Exception e) {
-										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isTimerRunning) {
-											EStationDialog.this.dataGatherThread.stopTimerThread();
+										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
+											EStationDialog.this.dataGatherThread.stopGathererThread();
 											//dataGatherThread.interrupt();
 										}
 										EStationDialog.this.boundsComposite.redraw();
@@ -268,7 +268,7 @@ public class EStationDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
-									EStationDialog.this.dataGatherThread.stopTimerThread();
+									EStationDialog.this.dataGatherThread.stopGathererThread();
 									//dataGatherThread.interrupt();
 
 									if (Channels.getInstance().getActiveChannel() != null) {
