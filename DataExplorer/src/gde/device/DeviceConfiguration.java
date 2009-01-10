@@ -42,6 +42,7 @@ import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.CalculationThread;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -73,6 +74,9 @@ public class DeviceConfiguration {
 	public final static int										DEVICE_TYPE_GPS						= 5;
 	public final static int										DEVICE_TYPE_RECEIVER			= 7;
 	public final static int										DEVICE_TYPE_MULTIMETER		= 8;
+	
+	protected 					CalculationThread			calculationThread 				= null; // universal device calculation thread (slope)
+
 
 	/**
 	 * method to test this class
@@ -841,6 +845,13 @@ public class DeviceConfiguration {
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		application.getMenuBar().setSerialPortIconSet(useIconSet);
 		application.getMenuToolBar().setSerialPortIconSet(useIconSet);
+	}
+
+	/**
+	 * @return the calculationThread
+	 */
+	public CalculationThread getCalculationThread() {
+		return this.calculationThread;
 	}
 
 }

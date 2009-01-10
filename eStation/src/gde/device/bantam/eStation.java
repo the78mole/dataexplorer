@@ -122,9 +122,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the hash map containing the calculation values like factor offset, reduction, ...
 		//String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
 		//HashMap<String, Double> calcValues = new HashMap<String, Double>();
@@ -136,11 +137,17 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		int deviceDataBufferSize = 72;
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+			
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -254,14 +261,16 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
-		this.application.setProgress(progressCycle, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
@@ -283,9 +292,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			
 			recordSet.addPoints(points, false);
 			
-			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.application.setProgress(100, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**

@@ -122,15 +122,19 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int lovDataSize = this.getLovDataByteSize();
 		
 		//byte[] configurationBuffer	= new byte[14];
 		//byte[] measurementsBuffer		= new byte[16];
 		byte[] convertDataBuffer = new byte[14 + 16];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) { 
 			
@@ -151,7 +155,10 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer,  4 + i*lovDataSize, convertDataBuffer,  0, 14); //configurationBuffer.length
 			System.arraycopy(dataBuffer, 23 + i*lovDataSize, convertDataBuffer, 14, 16); //measurementsBuffer.length
 			recordSet.addPoints(convertDataBytes(points, convertDataBuffer), false);
+			
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -193,14 +200,16 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
-		this.application.setProgress(progressCycle, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
@@ -214,9 +223,9 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			
 			recordSet.addPoints(points, false);
 			
-			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.application.setProgress(100, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**

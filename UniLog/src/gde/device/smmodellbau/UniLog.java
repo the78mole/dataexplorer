@@ -108,7 +108,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	final OpenSerialDataExplorer	application;
 	final UniLogSerialPort				serialPort;
 	final UniLogDialog						dialog;
-	CalculationThread							slopeCalculationThread;
 
 	/**
 	 * constructor using properties file
@@ -270,13 +269,17 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int timeStep_ms = 0;		
 		int size = this.getLovDataByteSize();
 		byte[] readBuffer = new byte[size];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 2; i < recordDataSize; i++) { // skip UniLog min/max line
 			
@@ -290,9 +293,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				}
 			}
-
 			recordSet.addPoints(convertDataBytes(points, readBuffer), false);
+			
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -409,14 +414,16 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
-		this.application.setProgress(progressCycle, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
@@ -438,9 +445,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			
 			recordSet.addPoints(points, false);
 			
-			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.application.setProgress(100, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -691,11 +698,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 			property = record.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
-				this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 			else
-				this.slopeCalculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
+				this.calculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 
-			this.slopeCalculationThread.start();
+			this.calculationThread.start();
 			if (recordSet.get(measurements[9]).isDisplayable()) {
 				//record.setDisplayable(true); // set within calculation thread
 				isNoSlopeCalculationStarted = false;

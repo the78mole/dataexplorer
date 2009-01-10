@@ -23,6 +23,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.exception.DataInconsitsentException;
 import osde.serial.DeviceSerialPort;
+import osde.utils.CalculationThread;
 
 /**
  * Defines the interface for all device implementations, it also covers some interface methods from 
@@ -369,9 +370,9 @@ public interface IDevice {
 	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
 	 * @param recordSet
 	 * @param dataBuffer
-	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -381,8 +382,9 @@ public interface IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 */
-	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException;
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 	
 	/**
 	 * function to translate measured value from a device to values represented
@@ -441,4 +443,9 @@ public interface IDevice {
 	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
 	 */
 	void configureSerialPortMenu(int useIconSet); 
+	
+	/**
+	 * get calculation thread to enable join , isAlive, ...
+	 */
+	public CalculationThread getCalculationThread();
 }

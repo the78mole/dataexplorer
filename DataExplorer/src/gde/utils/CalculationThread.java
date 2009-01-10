@@ -55,6 +55,7 @@ public abstract class CalculationThread extends Thread {
 		this.calcInterval_sec = calcIntervalSec;
 		this.application = OpenSerialDataExplorer.getInstance();
 		log.log(Level.FINER, this.getClass().getSimpleName() + " instanciated");
+		this.setPriority(Thread.MAX_PRIORITY);
 	}
 
 	/**

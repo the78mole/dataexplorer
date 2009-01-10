@@ -55,7 +55,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	final PicolarioDialog					dialog;
 	final PicolarioSerialPort			serialPort;
 	final Channels								channels;
-	CalculationThread							slopeCalculationThread;
 
 	/**
 	 * @param iniFile
@@ -127,23 +126,25 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int offset = 4;
 		int size = this.getLovDataByteSize();
 		int deviceDataBufferSize = 3; // meight not equal as this.getNumberOfMeasurements(recordSet.getChannelConfigName());
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
 		int[] points = new int[deviceDataBufferSize];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
-		int progressCycle = this.application.getProgressPercentage();
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 	
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
-			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.application.setProgress(100, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -174,14 +175,15 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
+	 * @param doUpdateProgressBar
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
-		this.application.setProgress(progressCycle, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
@@ -191,9 +193,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			
 			recordSet.addPoints(points);
 			
-			if (i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.application.setProgress(100, sThreadId);
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -331,11 +333,11 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
 			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
-				this.slopeCalculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 			else
-				this.slopeCalculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				this.calculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 
-			this.slopeCalculationThread.start();
+			this.calculationThread.start();
 		}
 	}
 

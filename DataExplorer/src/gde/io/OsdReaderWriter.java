@@ -262,7 +262,7 @@ public class OsdReaderWriter {
 					int deviceDataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 					byte[] buffer = new byte[deviceDataBufferSize * recordDataSize];
 					data_in.readFully(buffer);
-					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize);
+					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, true);
 					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
@@ -425,19 +425,17 @@ public class OsdReaderWriter {
 	 * @param filePath
 	 * @throws DataInconsitsentException 
 	 */
-	public static void readRecordSetsData(RecordSet recordSet, String filePath) throws FileNotFoundException, IOException, DataInconsitsentException {
+	public static void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
 		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$
 		try {
-			String sThreadId = String.format("%06d", Thread.currentThread().getId());
 			long recordSetFileDataPointer = recordSet.getFileDataPointer();
 			int recordFileDataSize = recordSet.getFileDataSize();
-			OsdReaderWriter.application.setProgress(0, sThreadId);
 			random_in.seek(recordSetFileDataPointer);
 			long startTime = new Date().getTime();
 			int deviceDataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 			byte[] buffer = new byte[deviceDataBufferSize * recordFileDataSize];
 			random_in.readFully(buffer);
-			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize);
+			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {

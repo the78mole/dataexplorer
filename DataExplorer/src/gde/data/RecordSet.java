@@ -43,6 +43,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.CalculationThread;
 import osde.utils.StringHelper;
 import osde.utils.TimeLine;
 
@@ -61,7 +62,7 @@ public class RecordSet extends HashMap<String, Record> {
 	String												objectKey											= OSDE.STRING_EMPTY;
 	String												header												= null;
 	String[]											recordNames;																																					//Spannung, Strom, ..
-	String[]											noneCalculationRecords 						= new String[0];		// records/measurements which are active or inactive
+	String[]											noneCalculationRecords 				= new String[0];		// records/measurements which are active or inactive
 	double												timeStep_ms										= 0;																										//Zeitbasis der Messpunkte
 	String												recordSetDescription					= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	boolean												isSaved												= false;																								//indicates if the record set is saved to file
@@ -71,6 +72,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int														fileDataSize									= 0; //number of integer values of all active/inactive records
 	long													fileDataPointer								= 0; // file pointer where the data of this record begins
 	boolean												hasDisplayableData						= false;
+	int														xScaleStep										= 0; // steps in x direction to draw the curves, normally 1
 	Rectangle											drawAreaBounds;
 
 	// data table
@@ -972,6 +974,40 @@ public class RecordSet extends HashMap<String, Record> {
 	public void checkAllDisplayable() {
 		this.application.getActiveDevice().makeInActiveDisplayable(this);
 		this.isRecalculation = false;
+		
+		// start a low prio tread to load other record set data
+		final Channel activeChannel = this.channels.getActiveChannel();
+		Thread dataLoadThread = new Thread(new Runnable() {
+      public void run() {
+      	CalculationThread ct = RecordSet.this.device.getCalculationThread();
+      	try {
+      		while (ct != null && ct.isAlive()) {
+      			Thread.sleep(1000);
+      		}
+				}
+				catch (InterruptedException e) {
+				}
+				String fullQualifiedFileName = activeChannel.getFullQualifiedFileName();
+				for (String tmpRecordSetName : activeChannel.getRecordSetNames()) {
+					RecordSet tmpRecordSet = activeChannel.get(tmpRecordSetName);
+					if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
+						try {
+							if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
+								if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
+								else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
+							}
+						}
+						catch (Exception e) {
+							log.log(Level.SEVERE, e.getMessage(),e);
+							RecordSet.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+						}
+					}
+				}
+			}
+		});
+		dataLoadThread.setPriority(Thread.MIN_PRIORITY);
+		dataLoadThread.start();
+
 	}
 
 	/**
@@ -1932,13 +1968,27 @@ public class RecordSet extends HashMap<String, Record> {
 	public void loadFileData(String fullQualifiedFileName) {
 		try {
 			if (this.fileDataSize != 0 && this.fileDataPointer != 0) {
-				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName);
-				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName);
+				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, true);
+				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, true);
 			}
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(),e);
 			this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
 		}
+	}
+
+	/**
+	 * @return the xScale
+	 */
+	public int getXScale() {
+		return this.xScaleStep;
+	}
+
+	/**
+	 * @param value the x scale step to set
+	 */
+	public void setXScale(int value) {
+		this.xScaleStep = value;
 	}
 }

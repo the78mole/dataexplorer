@@ -180,7 +180,7 @@ public class LogViewReader {
 					log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
 					data_in.readFully(buffer);
 					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize);
+					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, true);
 					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 
@@ -213,23 +213,20 @@ public class LogViewReader {
 	 * @param filePath
 	 * @throws DataInconsitsentException 
 	 */
-	public static void readRecordSetsData(RecordSet recordSet, String filePath) throws FileNotFoundException, IOException, DataInconsitsentException {
+	public static void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
 		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$
 		try {
-			String sThreadId = String.format("%06d", Thread.currentThread().getId());
 			long recordSetFileDataPointer = recordSet.getFileDataPointer();
 			int recordFileDataSize = recordSet.getFileDataSize();
 			IDevice device = recordSet.getDevice();
-			OsdReaderWriter.application.setProgress(0, sThreadId);
 			random_in.seek(recordSetFileDataPointer);
 			long startTime = new Date().getTime();
 			int dataBufferSize = device.getLovDataByteSize();
 			byte[] buffer = new byte[dataBufferSize * recordFileDataSize];
 			log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
 			random_in.readFully(buffer);
-			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize);
+			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-			OsdReaderWriter.application.setProgress(100, sThreadId);
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

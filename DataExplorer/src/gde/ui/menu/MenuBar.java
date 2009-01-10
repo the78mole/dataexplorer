@@ -953,12 +953,17 @@ public class MenuBar {
 			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0013, new Object[]{filePath}))) { 
 				return;
 			}
-			// rename existing file to *.bak
-			FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK);
 
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				for (String recordSetName : activeChannel.getRecordSetNames()) {
+					RecordSet recordSet = activeChannel.get(recordSetName);
+					if (recordSet != null && !recordSet.hasDisplayableData()) {
+						recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
+					}
+				}
+				FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				OsdReaderWriter.write(filePath, activeChannel, 1);
 				activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
 				activeChannel.setSaved(true);
