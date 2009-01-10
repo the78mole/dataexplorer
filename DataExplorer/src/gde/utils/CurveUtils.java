@@ -195,10 +195,14 @@ public class CurveUtils {
 		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
 		int xScale = 1;
 		if (recordSize > (width * 2)) {
-			xScale = new Double(recordSize / (width * 2)).intValue();
-			while (!(recordSize % xScale <= 1) && xScale > 1) {
-				--xScale;
+			if (record.getParent().getXScale() == 0) {
+				xScale = new Double(recordSize / (width * 2)).intValue();
+				while (!(recordSize % xScale <= 5) && xScale > 1) {
+					--xScale;
+				}
+				record.getParent().setXScale(xScale);
 			}
+			xScale = record.getParent().getXScale();
 			factorX = factorX * xScale;
 		}
 		record.setDisplayScaleFactorTime(factorX);
