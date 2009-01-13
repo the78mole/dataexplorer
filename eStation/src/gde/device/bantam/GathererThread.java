@@ -108,13 +108,15 @@ public class GathererThread extends Thread {
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "====> entry "); //$NON-NLS-1$
 		while (!this.isCollectDataStopped) {
 			try {
-				// build the point array according curves from record set
+				// get data from device
 				dataBuffer = this.serialPort.getData();
+				
+				// calculate time step average to enable adjustment
 				tmpCycleTime = System.currentTimeMillis();
 				if (this.isProgrammExecuting) {
 					++cycleCount;
 					sumCycleTime += tmpCycleTime - startCycleTime;
-					if (log.isLoggable(Level.INFO)) sb.append(", ").append(tmpCycleTime - startCycleTime);
+					if (log.isLoggable(Level.FINE)) sb.append(", ").append(tmpCycleTime - startCycleTime);
 					if (cycleCount % 10 == 0 ) {
 						String avgCycleTime = String.format("%.1f", 1.0*sumCycleTime/cycleCount);
 						this.device.setTimeStep_ms(new Double(avgCycleTime).doubleValue());
@@ -129,12 +131,15 @@ public class GathererThread extends Thread {
 				String processName = this.device.USAGE_MODE[this.device.getProcessingMode(dataBuffer)];
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
 				this.device.getConfigurationValues(this.configData, dataBuffer);
-				if ((processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2]))// 1=discharge; 2=charge -> eStation active
-						&& !this.isCollectDataStopped) {
+				
+				
+				if (processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2])) { // 1=discharge; 2=charge -> eStation active
 					// check state change waiting to discharge to charge
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (this.channel.size() == 0 || !this.channel.getRecordSetNames()[this.channel.getRecordSetNames().length - 1].endsWith(processName)
-							|| !this.isWaitTimeChargeDischarge || (System.currentTimeMillis() - getTimeStamp()) > 3 * 60000) {
+					if (this.channel.size() == 0 
+							|| !this.isProgrammExecuting  
+							|| !this.recordSetKey.endsWith(processName) ) {
+							//|| (System.currentTimeMillis() - this.getTimeStamp()) > 3 * 60000) {
 						this.isWaitTimeChargeDischarge = true;
 						this.isConfigUpdated = false;
 						this.isProgrammExecuting = true;
@@ -158,11 +163,10 @@ public class GathererThread extends Thread {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
 					}
-					else {
-						this.recordSetKey = this.channel.size() + ") [" + this.configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
+					else { //this.device.USAGE_MODE[0].equals("off");
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "re-using " + this.recordSetKey); //$NON-NLS-1$
 					}
-					setTimeStamp();
+					//this.setTimeStamp();
 					this.dialog.updateGlobalConfigData(this.configData);
 
 					// prepare the data for adding to record set
@@ -203,21 +207,19 @@ public class GathererThread extends Thread {
 					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}
 				else { // else wait for 180 seconds max. for actions
+					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "eStation inactiv"); //$NON-NLS-1$
 					this.isProgrammExecuting = false;
 					cycleCount = 0;
 					if (this.recordSet != null && this.recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
-						this.stopGathererThread();
 						finalizeRecordSet(this.recordSetKey, false);
+						this.recordSetKey	= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
+						this.recordSet = null;
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGT1409));
-						return;
 					}
-					if (0 == (setRetryCounter(getRetryCounter() - 1)) || this.isCollectDataStopped) {
+					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						stopGathererThread();
-						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "eStation inactiv"); //$NON-NLS-1$
-						setRetryCounter(WAIT_TIME_RETRYS); // 90 * receive timeout sec timeout = 180 sec
-						wait($METHOD_NAME, this.device.getTimeStep_ms().longValue());
 					}
-					log.log(Level.INFO, "inner retry counter = " + getRetryCounter());
+					log.log(Level.FINE, "inner retry counter = " + getRetryCounter());
 				}
 			}
 			catch (DataInconsitsentException e) {
@@ -225,35 +227,42 @@ public class GathererThread extends Thread {
 				cleanup(this.recordSetKey, message);
 			}
 			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage(), e);
 				if (e instanceof TimeOutException && this.isWaitTimeChargeDischarge) {
 					String batteryType = this.configData.get(eStation.CONFIG_BATTERY_TYPE);
 					if (!batteryType.equals(this.device.ACCU_TYPES[0])) { // Lithium programm has no charge/discharge
 						try {
 							finalizeRecordSet(this.recordSetKey, false);
-							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
-							Thread.sleep(this.waitTime_ms + new Double(this.device.getTimeStep_ms()).intValue());
+							log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
+							Thread.sleep(this.waitTime_ms);
 							this.isWaitTimeChargeDischarge = false;
-							return;
+							this.isProgrammExecuting = false;
 						}
 						catch (InterruptedException e1) {
 							// ignore
 						}
 					}
 				}
-				if (this.recordSet != null && this.recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
+				else if (e instanceof TimeOutException && !this.isProgrammExecuting) {
+					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
+						log.log(Level.INFO, "waiting for eStation activation ..."); //$NON-NLS-1$
+						setRetryCounter(WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
+					}
+					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "retry counter = " + getRetryCounter());
+				}
+				else if (this.recordSet != null && this.recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 					this.stopGathererThread();
 					finalizeRecordSet(this.recordSetKey, false);
 					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT1409));
 				}
 				else {
+					log.log(Level.WARNING, e.getMessage(), e);
 					this.stopGathererThread();
 					cleanup(this.recordSetKey, 
 							Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + Messages.getString(MessageIds.OSDE_MSGT1408));
 				}
 			}
-			//log.logp(Level.INFO,$CLASS_NAME, $METHOD_NAME, "processTime = " + (System.currentTimeMillis()-tmpCycleTime));
-			wait($METHOD_NAME, this.device.getTimeStep_ms().longValue()-10-(System.currentTimeMillis()-tmpCycleTime));
+			//log.logp(Level.INFO,$CLASS_NAME, $METHOD_NAME, "processTime = " + (this.device.getTimeStep_ms().longValue()-10));
+			wait($METHOD_NAME, this.device.getTimeStep_ms().longValue()-50);
 		}
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
