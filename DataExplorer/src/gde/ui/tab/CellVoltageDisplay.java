@@ -62,8 +62,18 @@ public class CellVoltageDisplay extends Composite {
 	int									voltage;
 	int 								lastTop = 0;
 	int 								lastVoltageLevel = 0;
+	
+	// all initial values fit to LiPo akku type
+	int lowerLimitColorRed = 2600;
+	int upperLimitColorRed = 4110; 		// 4210;
+	int lowerLimitColorGreen = 4050; 	// 4150
+	int deltaSpreadVoltage = 100;
+	int beginSpreadVoltage = 3900; 		// 4000
+	int upperLimitVoltage = 4100; 		// 4200
+	int lowerLimitVoltage = 2300;
 
-	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
+
+	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent, int[] voltageLimits) {
 		super(cellVoltageMainComposite, SWT.BORDER);
 		this.voltage = measurementValue;
 		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit);
@@ -74,6 +84,13 @@ public class CellVoltageDisplay extends Composite {
 		mainCompositeLayout.marginHeight = 0;
 		mainCompositeLayout.marginWidth = 0;
 		this.setLayout(mainCompositeLayout);
+		//voltageLimits = new int[] {this.lowerLimitColorRed, this.upperLimitColorRed, this.lowerLimitColorGreen, this.beginSpreadVoltage, this.upperLimitVoltage, this.lowerLimitVoltage}; 
+		this.lowerLimitColorRed = voltageLimits[0];
+		this.upperLimitColorRed = voltageLimits[1];
+		this.lowerLimitColorGreen = voltageLimits[2];
+		this.beginSpreadVoltage = voltageLimits[3];
+		this.upperLimitVoltage = voltageLimits[4];
+		this.lowerLimitVoltage = voltageLimits[5];
 	}
 
 	public void create() {
@@ -212,14 +229,14 @@ public class CellVoltageDisplay extends Composite {
 	 */
 	int checkVoltageLevel() {
 		int voltageLevel;
-		if (CellVoltageDisplay.this.voltage < 2600 || CellVoltageDisplay.this.voltage > 4210) {
-			voltageLevel = 1;
+		if (CellVoltageDisplay.this.voltage < this.lowerLimitColorRed || CellVoltageDisplay.this.voltage > this.upperLimitColorRed) {
+			voltageLevel = 1; //red
 		}
-		else if (CellVoltageDisplay.this.voltage >= 2600 && CellVoltageDisplay.this.voltage < 4190) {
-			voltageLevel = 2;
+		else if (CellVoltageDisplay.this.voltage >= this.lowerLimitColorRed && CellVoltageDisplay.this.voltage <= this.lowerLimitColorGreen) {
+			voltageLevel = 2; // yellow
 		}
 		else { // 4191 <-> 4209
-			voltageLevel = 3;
+			voltageLevel = 3; // green
 		}
 		return voltageLevel;
 	}
@@ -230,15 +247,15 @@ public class CellVoltageDisplay extends Composite {
 	 */
 	Point calculateBarGraph(Rectangle cellCanvasBounds) {
 		Point topHeight = new Point(0,0);
-		int baseVoltage = 2300;
+		int baseVoltage = this.lowerLimitVoltage;
 
 		// spread display if voltage average is greater than 4.0 V and delta between cell voltages lower than 0.1 V
-		if (CellVoltageDisplay.this.parent.getVoltageDelta() < 100 && CellVoltageDisplay.this.parent.getVoltageAvg() > 4000) {
-			baseVoltage = 4000;
+		if (CellVoltageDisplay.this.parent.getVoltageDelta() < this.deltaSpreadVoltage && CellVoltageDisplay.this.parent.getVoltageAvg() > this.beginSpreadVoltage) {
+			baseVoltage = this.beginSpreadVoltage;
 		}
 
 		// 4,2 - 2,5  = 1,7 (max voltage - min voltage)
-		Double delta = cellCanvasBounds.height / (4200.0 - baseVoltage) * (4200.0 - CellVoltageDisplay.this.voltage);
+		Double delta = cellCanvasBounds.height / (1.0 * this.upperLimitVoltage - baseVoltage) * (1.0 * this.upperLimitVoltage - CellVoltageDisplay.this.voltage);
 		
 		topHeight.x = (int)(delta+0.5);
 		topHeight.y = cellCanvasBounds.height-topHeight.x;

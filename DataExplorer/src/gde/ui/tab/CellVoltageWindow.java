@@ -26,10 +26,16 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 import osde.data.Channel;
 import osde.data.Channels;
@@ -40,31 +46,51 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.dialog.LithiumValuesDialog;
+import osde.utils.LithiumBatteryValues;
 
 /**
  * Display window parent of cellVoltage displays
  * @author Winfried Brügmann
  */
 public class CellVoltageWindow {
-	final static Logger					log						= Logger.getLogger(CellVoltageWindow.class.getName());
+	final static String					$CLASS_NAME						= CellVoltageWindow.class.getName();
+	final static Logger					log										= Logger.getLogger(CellVoltageWindow.$CLASS_NAME);
 
 	Composite										cellVoltageMainComposite, coverComposite;
+	Group 											voltageLimitsSelection;
 	CTabItem										cellVoltageTab;
-	Vector<CellVoltageDisplay>	displays			= new Vector<CellVoltageDisplay>();
-	int													voltageAvg		= 0;
+	Vector<CellVoltageDisplay>	displays							= new Vector<CellVoltageDisplay>();
+	int													voltageAvg						= 0;
 	CLabel											infoText;
 	Composite										digitalComposite;
 	CLabel											capacityUnit;
 	CLabel											capacitiyValue;
 	CLabel											voltageUnit;
 	CLabel											voltageValue;
-	String											info					= Messages.getString(MessageIds.OSDE_MSGT0230);
+	Button											liPoButton;
+	Button											liIoButton;
+	Button											liFeButton;
+	Button											individualButton;
+
+	String											info									= Messages.getString(MessageIds.OSDE_MSGT0230);
 
 	final Channels							channels;
 	final CTabFolder						displayTab;
+	final LithiumValuesDialog		lithiumValuesDialog;
 
-	RecordSet										oldRecordSet	= null;
-	Channel											oldChannel		= null;
+	RecordSet										oldRecordSet					= null;
+	Channel											oldChannel						= null;
+
+	// all initial values fit to LiPo akku type
+	int													lowerLimitColorRed		= 2600;
+	int													upperLimitColorRed		= 4110;																						// 4210;
+	int													lowerLimitColorGreen	= 4050;																						// 4150
+	int													beginSpreadVoltage		= 3900;																						// 4000
+	int													upperLimitVoltage			= 4100;																						// 4200
+	int													lowerLimitVoltage			= 2300;
+	int[]												voltageLimits					= new int[] { this.lowerLimitColorRed, this.upperLimitColorRed, this.lowerLimitColorGreen, this.beginSpreadVoltage, this.upperLimitVoltage,
+			this.lowerLimitVoltage												};
 
 	class CellInfo { // class to hold voltage and unit information
 		final int			voltage;
@@ -102,32 +128,147 @@ public class CellVoltageWindow {
 	Vector<CellInfo>	voltageVector					= new Vector<CellInfo>();
 	int								voltageDelta					= 0;
 	Point							displayCompositeSize	= new Point(0, 0);
+	boolean 					isUpdateForced 				= false;
 
 	public CellVoltageWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
 		this.channels = Channels.getInstance();
+		this.lithiumValuesDialog = new LithiumValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+
 	}
 
 	public void create() {
+		final String $METHOD_NAME = "create()";
+
 		this.cellVoltageTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		SWTResourceManager.registerResourceUser(this.displayTab);
 		{
 			this.cellVoltageMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.cellVoltageTab.setControl(this.cellVoltageMainComposite);
+//			this.cellVoltageMainComposite.addListener(SWT.MouseUp, new Listener() {
+//				public void handleEvent(Event evt) {
+//					System.out.println("valueSelectionComposite.mouseUp, event=" + evt);
+//					CellVoltageWindow.this.voltageLimits = CellVoltageWindow.this.lithiumValuesDialog.open();
+//				}
+//			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINE, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
-			setActiveInfoText(this.info);
+			this.setActiveInfoText(this.info);
 			this.infoText.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINE, "infoText.paintControl, event=" + evt); //$NON-NLS-1$
 					updateAndResize();
 				}
 			});
+
+			this.voltageLimitsSelection = new Group(this.cellVoltageMainComposite, SWT.NONE);
+			this.voltageLimitsSelection.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.voltageLimitsSelection.setText("voltage limits adjustment");
+			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+			this.voltageLimitsSelection.setLayout(thisLayout);
+			this.voltageLimitsSelection.setBounds(0, 0, 338, 45);
+			{
+				RowData liPoButtonLData = new RowData();
+				liPoButtonLData.width = 80;
+				liPoButtonLData.height = 25;
+				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
+				this.liPoButton.setLayoutData(liPoButtonLData);
+				this.liPoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.liPoButton.setText("LiPo");
+				this.liPoButton.setSelection(true);
+				this.liPoButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "buttonLiPo.widgetSelected, event=" + evt);
+						CellVoltageWindow.this.liPoButton.setSelection(true);
+						CellVoltageWindow.this.liIoButton.setSelection(false);
+						CellVoltageWindow.this.liFeButton.setSelection(false);
+						CellVoltageWindow.this.individualButton.setSelection(false);
+						//{lowerLimitColorRed, upperLimitColorRed, lowerLimitColorGreen, beginSpreadVoltage, upperLimitVoltage, lowerLimitVoltage}; 
+						CellVoltageWindow.this.voltageLimits = LithiumBatteryValues.getLiPoVoltageLimits();
+						CellVoltageWindow.this.isUpdateForced = true;
+						update();
+					}
+				});
+			}
+			{
+				RowData button1LData = new RowData();
+				button1LData.width = 80;
+				button1LData.height = 25;
+				this.liIoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
+				this.liIoButton.setLayoutData(button1LData);
+				this.liIoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.liIoButton.setText("LiIo");
+				this.liIoButton.setSelection(false);
+				this.liIoButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "buttonLiPo.widgetSelected, event=" + evt);
+						CellVoltageWindow.this.liIoButton.setSelection(true);
+						CellVoltageWindow.this.liPoButton.setSelection(false);
+						CellVoltageWindow.this.liFeButton.setSelection(false);
+						CellVoltageWindow.this.individualButton.setSelection(false);
+						//{lowerLimitColorRed, upperLimitColorRed, lowerLimitColorGreen, beginSpreadVoltage, upperLimitVoltage, lowerLimitVoltage}; 
+						CellVoltageWindow.this.voltageLimits = LithiumBatteryValues.getLiIoVoltageLimits();
+						CellVoltageWindow.this.isUpdateForced = true;
+						update();
+					}
+				});
+			}
+			{
+				RowData button2LData = new RowData();
+				button2LData.width = 80;
+				button2LData.height = 25;
+				this.liFeButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
+				this.liFeButton.setLayoutData(button2LData);
+				this.liFeButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.liFeButton.setText("LiFe");
+				this.liFeButton.setSelection(false);
+				this.liFeButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "buttonLiPo.widgetSelected, event=" + evt);
+						CellVoltageWindow.this.liFeButton.setSelection(true);
+						CellVoltageWindow.this.liPoButton.setSelection(false);
+						CellVoltageWindow.this.liIoButton.setSelection(false);
+						CellVoltageWindow.this.individualButton.setSelection(false);
+						//{lowerLimitColorRed, upperLimitColorRed, lowerLimitColorGreen, beginSpreadVoltage, upperLimitVoltage, lowerLimitVoltage}; 
+						CellVoltageWindow.this.voltageLimits = LithiumBatteryValues.getLiFeVoltageLimits();
+						CellVoltageWindow.this.isUpdateForced = true;
+						update();
+					}
+				});
+			}
+			{
+				RowData button1LData1 = new RowData();
+				button1LData1.width = 80;
+				button1LData1.height = 25;
+				this.individualButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
+				this.individualButton.setLayoutData(button1LData1);
+				this.individualButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.individualButton.setText("other");
+				this.individualButton.setSelection(false);
+				this.individualButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "buttonLiPo.widgetSelected, event=" + evt);
+						CellVoltageWindow.this.individualButton.setSelection(true);
+						CellVoltageWindow.this.liPoButton.setSelection(false);
+						CellVoltageWindow.this.liIoButton.setSelection(false);
+						CellVoltageWindow.this.liFeButton.setSelection(false);
+						//{lowerLimitColorRed, upperLimitColorRed, lowerLimitColorGreen, beginSpreadVoltage, upperLimitVoltage, lowerLimitVoltage}; 
+						CellVoltageWindow.this.voltageLimits = new LithiumValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open();
+						CellVoltageWindow.this.isUpdateForced = true;
+						update();
+					}
+				});
+			}
+			this.voltageLimitsSelection.layout();
 
 			this.coverComposite = new Composite(this.cellVoltageMainComposite, SWT.NONE);
 			FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
@@ -179,11 +320,12 @@ public class CellVoltageWindow {
 	 */
 	private void setActiveInfoText(String updateInfo) {
 		if (this.infoText == null || this.infoText.isDisposed()) {
-			this.infoText = new CLabel(this.cellVoltageMainComposite, SWT.LEFT);
+			this.infoText = new CLabel(this.cellVoltageMainComposite, SWT.CENTER);
 			this.infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.infoText.setBounds(10, 10, 200, 30);
+			this.infoText.setBounds(0, 0, 338, 45);
 			this.infoText.setText(updateInfo);
+			this.infoText.redraw(0, 0, 338, 45, true);
 		}
 	}
 
@@ -215,13 +357,13 @@ public class CellVoltageWindow {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && !this.voltageVector.isEmpty()) {
 
 				updateCellVoltageVector();
 
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
-						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
+						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size() || this.isUpdateForced;
 
 				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
@@ -240,7 +382,7 @@ public class CellVoltageWindow {
 					// add new
 					for (int i = 0; this.voltageVector != null && i < this.voltageVector.size(); ++i) {
 						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(),
-								this);
+								this, this.voltageLimits);
 						display.create();
 						log.log(Level.FINER, "created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
@@ -260,9 +402,9 @@ public class CellVoltageWindow {
 					}
 				}
 				this.displays.removeAllElements();
-				if (recordSet != null && !recordSet.getDevice().isVoltagePerCellTabRequested()) {
+				if (recordSet != null && (!recordSet.getDevice().isVoltagePerCellTabRequested() || this.voltageVector.isEmpty())) {
 					if (this.infoText.isDisposed())
-						setActiveInfoText(this.info);
+						this.setActiveInfoText(this.info);
 					else
 						this.infoText.setText(this.info);
 				}
@@ -270,6 +412,7 @@ public class CellVoltageWindow {
 			this.cellVoltageMainComposite.layout();
 			this.coverComposite.layout();
 		}
+		this.isUpdateForced = false;
 	}
 
 	/**
