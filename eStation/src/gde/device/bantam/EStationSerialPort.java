@@ -15,7 +15,8 @@ import osde.utils.Checksum;
  * @author Winfried Brügmann
  */
 public class EStationSerialPort extends DeviceSerialPort {
-	final static Logger	log	= Logger.getLogger(EStationSerialPort.class.getName());
+	final static String $CLASS_NAME = EStationSerialPort.class.getName();
+	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 	
 	boolean isInSync = false;
 	
@@ -35,6 +36,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {
+		final String $METHOD_NAME = "getData";
 		byte[] data = new byte[76];
 		byte[] answer = new byte[] {0x00};
 
@@ -46,7 +48,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			
 			answer = new byte[13];
-			answer = this.read(answer, 5000);
+			answer = this.read(answer, 3000);
 			// synchronize received data to begin of sent data 
 			while (answer[0] != 0x7b) {
 				this.isInSync = false;
@@ -57,7 +59,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 						answer = this.read(answer, 1000);
 						System.arraycopy(answer, 0, data, 13-i, i);
 						this.isInSync = true;
-						log.log(Level.FINE, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
@@ -92,18 +94,18 @@ public class EStationSerialPort extends DeviceSerialPort {
 				for (byte b : data) {
 					sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
 				}
-				log.log(Level.FINER, sb.toString());
+				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			
 			if (!isChecksumOK(data)) {
 				this.xferErrors++;
-				log.log(Level.WARNING, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
 				data = getData();
 			}
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
 		}
@@ -120,11 +122,12 @@ public class EStationSerialPort extends DeviceSerialPort {
 	 * @return true/false
 	 */
 	private boolean isChecksumOK(byte[] buffer) {
+		final String $METHOD_NAME = "isChecksumOK";
 		boolean isOK = false;
 		int check_sum = Checksum.ADD(buffer, 1, 72);
 		if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
 			isOK = true;
-		log.log(Level.FINER, "Check_sum = " + isOK); //$NON-NLS-1$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
 	}
 

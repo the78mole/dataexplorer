@@ -1,6 +1,19 @@
-/**
- * 
- */
+/**************************************************************************************
+  	This file is part of OpenSerialDataExplorer.
+
+    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.bantam;
 
 import java.io.FileNotFoundException;
@@ -137,7 +150,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		int deviceDataBufferSize = 72;
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
@@ -187,6 +200,36 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 		return points;
 	}
+	
+	/**
+	 * query if the eStation executes discharge > charge > discharge cycles
+	 */
+	boolean isCycleMode(byte[] dataBuffer) {
+		return (((dataBuffer[8] & 0xFF)-0x80) & 0x10) > 0;
+	}
+
+	
+	/**
+	 * getNumberOfCycle for NiCd and NiMh, for LiXx it  will return 0
+	 * accuCellType -> Lithium=1, NiMH=2, NiCd=3, Pb=4
+	 * @param dataBuffer
+	 * @return cycle count
+	 */
+	public int getNumberOfCycle(byte[] dataBuffer) {
+		int cycleCount = 0;
+		int accuCellType = getAccuCellType(dataBuffer);
+		
+		if 			(accuCellType == 2) {
+			cycleCount = (dataBuffer[16] & 0xFF)- 0x80;
+			//log.info("NiMh D<C " + ((dataBuffer[15] & 0xFF)- 0x80));
+		}
+		else if (accuCellType == 3) {
+			cycleCount = (dataBuffer[12] & 0xFF)- 0x80;
+			//log.info("NiCd D<C " + ((dataBuffer[11] & 0xFF)- 0x80));
+		}
+		
+		return cycleCount;
+	}
 
 	/**
 	 * @param dataBuffer
@@ -205,11 +248,19 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * @param dataBuffer
+	 * @return for Lithium=1, NiMH=2, NiCd=3, Pb=4
+	 */
+	public boolean isProcessing(byte[] dataBuffer) {
+		return ((dataBuffer[24] & 0xFF)- 0x80) == 1; //processing = 1; stop = 0
+	}
+
+	/**
 	 * @param dataBuffer [lenght 76 bytes]
 	 * @return 0 = no processing, 1 = discharge, 2 = charge
 	 */
 	public int getProcessingMode(byte[] dataBuffer) {
-		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // 0=off, no processing; 1=discharge or charge
+		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // 0=off, no processing; 1=discharge or 2=charge
 		if(modeIndex != 0) {
 			modeIndex = (dataBuffer[8] & 0xFF)-0x80 == 0x01 || (dataBuffer[8] & 0xFF)-0x80 == 0x11 ? 2 : 1;
 		}
@@ -268,7 +319,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
@@ -454,16 +505,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 			else {
 				if (this.getDialog().dataGatherThread != null) {
-					this.getDialog().dataGatherThread.stopGathererThread();
-					this.getDialog().dataGatherThread.interrupt();
-					
-					if (Channels.getInstance().getActiveChannel() != null) {
-							RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-							if (activeRecordSet != null) {
-								// active record set name == life gatherer record name
-								this.getDialog().dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
-							}
-					}
+					this.getDialog().dataGatherThread.stopDataGatheringThread(false, null);
 				}
 				if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 				this.serialPort.close();

@@ -1,3 +1,19 @@
+/**************************************************************************************
+  	This file is part of OpenSerialDataExplorer.
+
+    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.bantam;
 
 import java.util.HashMap;
@@ -30,25 +46,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import osde.config.Settings;
 import osde.data.Channels;
-import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * e-Station dialog implementation (902, BC6, BC610, BC8)
  * @author Winfried Brügmann
@@ -195,7 +197,7 @@ public class EStationDialog extends DeviceDialog {
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							EStationDialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
-							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
+							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isAlive()) {
 								EStationDialog.this.startCollectDataButton.setEnabled(false);
 								EStationDialog.this.stopColletDataButton.setEnabled(true);
 							}
@@ -241,8 +243,7 @@ public class EStationDialog extends DeviceDialog {
 									}
 									catch (Exception e) {
 										if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isCollectDataStopped) {
-											EStationDialog.this.dataGatherThread.stopGathererThread();
-											//dataGatherThread.interrupt();
+											EStationDialog.this.dataGatherThread.stopDataGatheringThread(false, e);
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
@@ -268,16 +269,7 @@ public class EStationDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.serialPort.isConnected()) {
-									EStationDialog.this.dataGatherThread.stopGathererThread();
-									//dataGatherThread.interrupt();
-
-									if (Channels.getInstance().getActiveChannel() != null) {
-										RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-										if (activeRecordSet != null) {
-											// active record set name == life gatherer record name
-											EStationDialog.this.dataGatherThread.finalizeRecordSet(activeRecordSet.getName(), true);
-										}
-									}
+									EStationDialog.this.dataGatherThread.stopDataGatheringThread(false, null);
 								}
 								EStationDialog.this.boundsComposite.redraw();
 							}

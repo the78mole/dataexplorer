@@ -22,6 +22,9 @@ package osde.device.bantam;
  */ 
 public class MessageIds { 
 
+	public final static String	OSDE_MSGW1400 = "OSDE_MSGT142512";
+	public final static String	OSDE_MSGI1400 = "OSDE_MSGT142511";
+	public final static String	OSDE_MSGI1401 = "OSDE_MSGT142515";
 	public final static String	OSDE_MSGT1400 = "OSDE_MSGT1400";
 	public final static String	OSDE_MSGT1401 = "OSDE_MSGT1401";
 	public final static String	OSDE_MSGT1402 = "OSDE_MSGT1402";
@@ -38,13 +41,11 @@ public class MessageIds {
 	public final static String	OSDE_MSGT1416 = "OSDE_MSGT1416";
 	public final static String	OSDE_MSGT1417 = "OSDE_MSGT1417";
 	public final static String	OSDE_MSGT1418 = "OSDE_MSGT1418";
-	public final static String	OSDE_MSGT1419 = "OSDE_MSGT1419";
 	public final static String	OSDE_MSGT1420 = "OSDE_MSGT1420";
 	public final static String	OSDE_MSGT1421 = "OSDE_MSGT1421";
 	public final static String	OSDE_MSGT1422 = "OSDE_MSGT1422";
 	public final static String	OSDE_MSGT1423 = "OSDE_MSGT1423";
 	public final static String	OSDE_MSGT1424 = "OSDE_MSGT1424";
 	public final static String	OSDE_MSGT1425 = "OSDE_MSGT1425";
-	public final static String	OSDE_MSGT1426 = "OSDE_MSGT1426";
 
  }
