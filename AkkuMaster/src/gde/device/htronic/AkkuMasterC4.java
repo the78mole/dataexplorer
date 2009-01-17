@@ -167,7 +167,6 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {	
 
 		// build the point array according curves from record set
@@ -232,7 +231,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double translateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
+	public double translateValue(Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 		log.log(Level.FINEST, String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$
@@ -243,7 +242,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
-	public double reverseTranslateValue(@SuppressWarnings("unused")Record record, double value) { //$NON-NLS-1$
+	public double reverseTranslateValue(Record record, double value) { //$NON-NLS-1$
 		double newValue = value;
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 		log.log(Level.FINEST, String.format("value calculated for %s - %f", record.getName(), newValue)); //$NON-NLS-1$

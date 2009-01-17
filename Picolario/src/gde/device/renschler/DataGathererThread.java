@@ -64,7 +64,6 @@ public class DataGathererThread extends Thread {
 	 * if more than one available record set is created the status bar shows the status how many record sets are done
 	 * this gives not a real feeling since the record sets may have big differences in number of available telegrams
 	 */
-	@SuppressWarnings("unchecked") // cast from Object to Vector<Integer> //$NON-NLS-1$
 	public void run() {
 		boolean isPortOpenedByMe = false;
 		try {

@@ -153,7 +153,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
 		points[0] = new Integer(dataBuffer[2]) * 1000;

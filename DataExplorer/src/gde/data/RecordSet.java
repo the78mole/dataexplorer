@@ -470,7 +470,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else
-			throw new DataInconsitsentException("RecordSet.addPoints - points.length != recordNames.length"); //$NON-NLS-1$
+			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
 		
 		this.hasDisplayableData = true;
 	}
@@ -495,7 +495,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else
-			throw new DataInconsitsentException("RecordSet.addPoints - points.length != noneCalculationRecords.length"); //$NON-NLS-1$
+			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
 		
 		this.hasDisplayableData = true;
 	}

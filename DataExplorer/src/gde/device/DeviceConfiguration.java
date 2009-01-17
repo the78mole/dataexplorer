@@ -244,7 +244,7 @@ public class DeviceConfiguration {
 	}
 
 	public Double getTimeStep_ms() {
-		return this.timeBase.getTimeStep();
+		return this.timeBase.getTimeStep() > 0 ? this.timeBase.getTimeStep() : 1000;
 	}
 
 	public void setTimeStep_ms(double newTimeStep_ms) {
