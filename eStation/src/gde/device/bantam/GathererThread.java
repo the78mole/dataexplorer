@@ -109,7 +109,7 @@ public class GathererThread extends Thread {
 		byte[] dataBuffer = null;
 
 		this.isCollectDataStopped = false;
-		GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -121,21 +121,21 @@ public class GathererThread extends Thread {
 				if (isProgrammExecuting && recordSet != null) {
 					++measurementCount;
 					deltaTime = startCycleTime > 0 ? tmpCycleTime - startCycleTime : 1250;
-					GathererThread.log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
+					log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
 							(newTimeStep_ms - FILTER_TIME_DELTA_MS)));
 					if ((deltaTime < newTimeStep_ms + FILTER_TIME_DELTA_MS && deltaTime > newTimeStep_ms - FILTER_TIME_DELTA_MS) || newTimeStep_ms == 0) { // delta ~ 10 %
-						if (GathererThread.log.isLoggable(Level.FINER)) sb.append(", ").append(deltaTime); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) sb.append(", ").append(deltaTime); //$NON-NLS-1$
 						sumCycleTime += deltaTime;
 					}
 					else {
-						GathererThread.log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
+						log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
 						--measurementCount;
 					}
 					if (measurementCount % 10 == 0) {
 						newTimeStep_ms = new Double(String.format("%.1f", 1.0 * sumCycleTime / measurementCount)); //$NON-NLS-1$
 						this.device.setTimeStep_ms(newTimeStep_ms);
 						recordSet.setTimeStep_ms(newTimeStep_ms);
-						GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
 						sb = new StringBuilder();
 					}
 				}
@@ -148,7 +148,7 @@ public class GathererThread extends Thread {
 				isProgrammExecuting = this.device.isProcessing(dataBuffer);
 				isCycleMode = this.device.isCycleMode(dataBuffer);
 				if (isCycleMode && measurementCount < 5) dryTimeCycleCount = this.device.getNumberOfCycle(dataBuffer) > 0 ? this.device.getNumberOfCycle(dataBuffer) * 2 - 1 : 0;
-				GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, GathererThread.$CLASS_NAME,
+				log.logp(Level.FINER, GathererThread.$CLASS_NAME, GathererThread.$CLASS_NAME,
 						"processing mode = " + processName + " isCycleMode = " + isCycleMode + " dryTimeCycleCount = " + dryTimeCycleCount); //$NON-NLS-1$	//$NON-NLS-2$ //$NON-NLS-3$
 
 				if (isProgrammExecuting && (processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2]))) {
@@ -160,12 +160,12 @@ public class GathererThread extends Thread {
 						isConfigUpdated = false;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						waitTime_ms = new Integer(configData.get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
-						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(getName().trim(), this.recordSetKey, this.application.getActiveDevice(), true, false));
 						this.channel.applyTemplateBasics(this.recordSetKey);
-						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setTableDisplayable(false); // suppress table calc + display 
@@ -187,7 +187,7 @@ public class GathererThread extends Thread {
 						Record record = recordSet.get(recordKeys[i]);
 						if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
 							numberBatteryCells++;
-							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
 					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
@@ -198,7 +198,7 @@ public class GathererThread extends Thread {
 						this.application.updateDigitalWindowChilds();
 						this.application.updateAnalogWindowChilds();
 
-						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "numberBatteryCells = " + numberBatteryCells); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "numberBatteryCells = " + numberBatteryCells); //$NON-NLS-1$
 						if (numberBatteryCells > 0) {
 							this.application.updateCellVoltageChilds();
 						}
@@ -214,7 +214,7 @@ public class GathererThread extends Thread {
 				}
 				else { // no eStation program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1400));
-					GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation"); //$NON-NLS-1$
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
@@ -225,7 +225,7 @@ public class GathererThread extends Thread {
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGT1408));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						GathererThread.log.log(Level.INFO, "eStation activation timeout"); //$NON-NLS-1$
+						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
@@ -240,7 +240,7 @@ public class GathererThread extends Thread {
 				if (e instanceof TimeOutException && isCycleMode && dryTimeCycleCount > 0) {
 					try {
 						finalizeRecordSet(false);
-						GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
 						this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1401));
 						recordSet = null;
 						--dryTimeCycleCount;
@@ -253,21 +253,22 @@ public class GathererThread extends Thread {
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1400));
-					GathererThread.log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						GathererThread.log.log(Level.INFO, "eStation activation timeout"); //$NON-NLS-1$
+						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
-				// some unexpected exception occurred, stop it to enable save data by user
+				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
+					log.log(Level.FINE, "eStation program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
 		}
 		this.application.setStatusMessage(""); //$NON-NLS-1$
-		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
 	/**
@@ -281,7 +282,7 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
