@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.LithiumBatteryValues;
 
 /**
  * Child display class displaying cell voltage display
@@ -64,19 +65,19 @@ public class CellVoltageDisplay extends Composite {
 	int 								lastVoltageLevel = 0;
 	
 	// all initial values fit to LiPo akku type
-	int lowerLimitColorRed = 2600;
-	int upperLimitColorRed = 4110; 		// 4210;
-	int lowerLimitColorGreen = 4050; 	// 4150
-	int deltaSpreadVoltage = 100;
-	int beginSpreadVoltage = 3900; 		// 4000
-	int upperLimitVoltage = 4100; 		// 4200
-	int lowerLimitVoltage = 2300;
+	final int lowerLimitColorRed;
+	final int upperLimitColorRed; 		
+	final int lowerLimitColorGreen; 	
+	final int deltaSpreadVoltage = 100;
+	final int beginSpreadVoltage; 		
+	final int upperLimitVoltage; 		
+	final int lowerLimitVoltage;
 
 
-	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent, int[] voltageLimits) {
+	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
 		super(cellVoltageMainComposite, SWT.BORDER);
 		this.voltage = measurementValue;
-		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit);
+		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit); //$NON-NLS-1$
 		this.parent = useParent;
 		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		GridLayout mainCompositeLayout = new GridLayout();
@@ -84,12 +85,12 @@ public class CellVoltageDisplay extends Composite {
 		mainCompositeLayout.marginHeight = 0;
 		mainCompositeLayout.marginWidth = 0;
 		this.setLayout(mainCompositeLayout);
-		//voltageLimits = new int[] {this.lowerLimitColorRed, this.upperLimitColorRed, this.lowerLimitColorGreen, this.beginSpreadVoltage, this.upperLimitVoltage, this.lowerLimitVoltage}; 
-		this.lowerLimitColorRed = voltageLimits[0];
+		int[] voltageLimits = LithiumBatteryValues.getVoltageLimits();
+		this.upperLimitVoltage = voltageLimits[0];
 		this.upperLimitColorRed = voltageLimits[1];
 		this.lowerLimitColorGreen = voltageLimits[2];
 		this.beginSpreadVoltage = voltageLimits[3];
-		this.upperLimitVoltage = voltageLimits[4];
+		this.lowerLimitColorRed = voltageLimits[4];
 		this.lowerLimitVoltage = voltageLimits[5];
 	}
 
@@ -168,19 +169,19 @@ public class CellVoltageDisplay extends Composite {
 			Point topHeight = calculateBarGraph(rect);
 			if (this.lastVoltageLevel != checkVoltageLevel()) {
 				this.cellCanvas.redraw();
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y);
+				log.log(Level.FINER, newVoltage + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else if (this.lastTop < topHeight.x) {
 				int top = this.lastTop-1 < 0 ? 0 : this.lastTop-1;
 				int height = topHeight.x+1 > rect.height-1 ? rect.height-1 : topHeight.x+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true);
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height);
+				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else {
 				int top = topHeight.x-1 < 0 ? 0 : topHeight.x-1;
 				int height = this.lastTop+1 > rect.height-1 ? rect.height-1 : this.lastTop+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true); 
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height);
+				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -199,7 +200,7 @@ public class CellVoltageDisplay extends Composite {
 		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
-		log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y);
+		log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		this.lastTop = topHeight.x;
 

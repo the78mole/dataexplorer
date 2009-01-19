@@ -574,7 +574,7 @@ public class GraphicsComposite extends Composite {
 							this.scaleTicks.remove(recordKey);
 							this.scaleTicks.put(recordKey, numberScaleTicks);
 							isFullUpdateRequired = true;
-							log.log(Level.FINER, "scale ticks  changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
+							log.log(Level.FINER, "scale ticks changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
 						}
 					}
 				}
