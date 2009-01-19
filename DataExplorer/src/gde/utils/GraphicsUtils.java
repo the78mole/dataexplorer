@@ -107,8 +107,8 @@ public class GraphicsUtils {
 				numberTicks = new Double(deltaScale / 20 * heightAdaptation).intValue();
 				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20, height);
 			}
-			log.log(Level.FINE, "numberTicks = " + numberTicks);
 		}
+		log.log(Level.FINE, record.getName() + " numberTicks = " + numberTicks); //$NON-NLS-1$
 		
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();

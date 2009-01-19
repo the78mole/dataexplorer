@@ -44,6 +44,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
+import osde.utils.LithiumBatteryValues;
 import osde.utils.StringHelper;
 import osde.utils.TimeLine;
 
@@ -136,8 +137,11 @@ public class RecordSet extends HashMap<String, Record> {
 	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
 	String												horizontalGridRecordKey				= OSDE.STRING_DASH;																			// recordNames[horizontalGridRecord]
 
+	int[] 												voltageLimits									= LithiumBatteryValues.getVoltageLimits(); // voltage limits for LiXx cells, initial LiPo
+	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										//$NON-NLS-1$																											// each main tickmark
+	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
-			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR			};
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																											// number of record which must be displayable before table calculation begins
 
@@ -1990,5 +1994,20 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setXScale(int value) {
 		this.xScaleStep = value;
+	}
+
+	/**
+	 * @return the voltageLimits for LiXx cells if enabled
+	 */
+	public int[] getVoltageLimits() {
+		return this.voltageLimits;
+	}
+
+	/**
+	 * @param newVoltageLimits the voltageLimits to set for LiXx cells if enabled
+	 */
+	public void setVoltageLimits() {
+		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+		this.voltageLimits = LithiumBatteryValues.getVoltageLimits();
 	}
 }
