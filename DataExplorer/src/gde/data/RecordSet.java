@@ -17,7 +17,6 @@
 package osde.data;
 
 import java.text.DecimalFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -80,6 +79,7 @@ public class RecordSet extends HashMap<String, Record> {
 	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
 	Vector<Vector<Integer>>				dataTable;
+	int[][]												intDataTable;
 	boolean												isTableDataCalculated					= false;																								//value to manage only one time calculation
 	boolean												isTableDisplayable						= true;																									//value to suppress table data calculation(live view)
 
@@ -1540,13 +1540,21 @@ public class RecordSet extends HashMap<String, Record> {
 				// calculate record set internal data table
 				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
-					long startTime = new Date().getTime();
 					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 					double progressInterval = (60.0 - progress) / recordEntries;
 
+					long startTime = System.currentTimeMillis();
+					RecordSet.this.intDataTable = new int[numberRecords+1][recordEntries];
+					for (int i = 0; i < recordEntries; i++) {
+						RecordSet.this.intDataTable[0][i] = new Double(getTimeStep_ms() * i).intValue();
+					}
+					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.intDataTable);
+					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
+					
+					startTime = System.currentTimeMillis();
 					Vector<Integer> dataTableRow;
 					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), this.sThreadId);
+						//RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), this.sThreadId);
 						dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
 						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
 						for (String recordKey : this.recordKeys) {
@@ -1554,10 +1562,10 @@ public class RecordSet extends HashMap<String, Record> {
 						}
 						RecordSet.this.dataTable.add(dataTableRow);
 					}
+					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
-					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 
 				// recall the table update function all prerequisites are checked

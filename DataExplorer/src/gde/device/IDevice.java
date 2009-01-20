@@ -385,7 +385,13 @@ public interface IDevice {
 	 * @param doUpdateProgressBar
 	 */
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
-	
+
+	/**
+	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
+	 * @return double with the adapted value
+	 */
+	public double prepareDataTable(RecordSet recordSet, int[][] dataTable);
+
 	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
