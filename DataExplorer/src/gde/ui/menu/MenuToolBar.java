@@ -453,7 +453,7 @@ public class MenuToolBar {
 				{
 					this.channelSelectComposite = new Composite(this.dataToolBarComposite, SWT.NONE);
 					this.channelSelectComposite.setLayout(null);
-					this.channelSelectComposite.setSize(this.channelSelectSize.x+10, this.toolSize.y-3);
+					this.channelSelectComposite.setSize(this.channelSelectSize.x+10, this.toolSize.y-2);
 					{
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
@@ -525,7 +525,7 @@ public class MenuToolBar {
 				{
 					this.recordSelectComposite = new Composite(this.dataToolBarComposite, SWT.NONE);
 					this.recordSelectComposite.setLayout(null);
-					this.recordSelectComposite.setSize(this.recordSelectSize.x+10, this.toolSize.y-3);
+					this.recordSelectComposite.setSize(this.recordSelectSize.x+10, this.toolSize.y-2);
 					{
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });
