@@ -1624,6 +1624,12 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
 				.append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
+		
+		sb.append(VOLTAGE_LIMITS).append(OSDE.STRING_EQUAL);
+		for (int value : this.voltageLimits) {
+			sb.append(value).append(OSDE.STRING_COMMA);
+		}
+		sb.deleteCharAt(sb.length()-1);
 
 		return sb.toString().endsWith(Record.DELIMITER) ? sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) : sb.toString();
 	}
@@ -1658,6 +1664,15 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 5)
 				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(OSDE.STRING_COMMA)[2]));
+			
+			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
+			if (tmpValue != null && tmpValue.length() > 0) {
+				String[] strVoltageValues = tmpValue.trim().split(OSDE.STRING_COMMA);
+				for (int i = 0; i < strVoltageValues.length && i < this.voltageLimits.length; i++) {
+					this.voltageLimits[i] = new Integer(strVoltageValues[i].trim());
+				}
+			}
+			
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);

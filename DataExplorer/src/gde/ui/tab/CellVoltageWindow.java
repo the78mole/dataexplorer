@@ -160,6 +160,15 @@ public class CellVoltageWindow {
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
 			this.voltageLimitsSelection.setBounds(0, 0, 338, 48);
+			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
+					CellVoltageWindow.this.liPoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
+					CellVoltageWindow.this.liIoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
+					CellVoltageWindow.this.liFeButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
+					CellVoltageWindow.this.individualButton.setSelection(!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
+				}
+			});
 			{
 				RowData liPoButtonLData = new RowData();
 				liPoButtonLData.width = 80;
