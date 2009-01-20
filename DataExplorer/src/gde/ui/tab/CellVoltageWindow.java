@@ -159,7 +159,7 @@ public class CellVoltageWindow {
 			this.voltageLimitsSelection.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
-			this.voltageLimitsSelection.setBounds(0, 0, 338, 48);
+			this.voltageLimitsSelection.setBounds(0, 0, 350, 50);
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
@@ -177,6 +177,7 @@ public class CellVoltageWindow {
 				this.liPoButton.setLayoutData(liPoButtonLData);
 				this.liPoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.liPoButton.setText(Messages.getString(MessageIds.OSDE_MSGT0371));
+				this.liPoButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 				this.liPoButton.setSelection(false);
 				this.liPoButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -203,6 +204,7 @@ public class CellVoltageWindow {
 				this.liIoButton.setLayoutData(button1LData);
 				this.liIoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.liIoButton.setText(Messages.getString(MessageIds.OSDE_MSGT0372));
+				this.liIoButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 				this.liIoButton.setSelection(false);
 				this.liIoButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -229,6 +231,7 @@ public class CellVoltageWindow {
 				this.liFeButton.setLayoutData(button2LData);
 				this.liFeButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.liFeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0373));
+				this.liFeButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 				this.liFeButton.setSelection(false);
 				this.liFeButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -255,6 +258,7 @@ public class CellVoltageWindow {
 				this.individualButton.setLayoutData(button1LData1);
 				this.individualButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.individualButton.setText(Messages.getString(MessageIds.OSDE_MSGT0375));
+				this.individualButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 				this.individualButton.setSelection(false);
 				this.individualButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -328,9 +332,9 @@ public class CellVoltageWindow {
 			this.infoText = new CLabel(this.cellVoltageMainComposite, SWT.CENTER);
 			this.infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.infoText.setBounds(0, 0, 338, 48);
+			this.infoText.setBounds(0, 0, 350, 50);
 			this.infoText.setText(updateInfo);
-			this.infoText.redraw(0, 0, 338, 48, true);
+			this.infoText.redraw(0, 0, 350, 50, true);
 		}
 	}
 
