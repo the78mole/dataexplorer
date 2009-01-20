@@ -256,6 +256,70 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
+	 * @return double with the adapted value
+	 */
+	public double prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		//log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+
+		String recordKey = "?"; //$NON-NLS-1$
+		int newValue = 0;
+		try {
+			// 0=Spannung, 1=Höhe, 2=Steigung
+			String[] recordNames = recordSet.getRecordNames(); 
+			
+			recordKey = record.getName();
+			double offset = record.getOffset(); // != 0 if curve has an defined offset
+			double reduction = record.getReduction();
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+
+			for (int j = 0; j < numberRecords; j++) {
+				for (int i = 0; i < recordEntries; i++) {
+					RecordSet.this.intDataTable[j+1][i] = new Double(1000.0 * RecordSet.this.device.translateValue(get(this.recordKeys[j]), get(this.recordKeys[j]).get(i) / 1000.0)).intValue();
+				}
+			}
+
+			// height calculation need special procedure
+			if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
+				PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
+				boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
+				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+
+				if (subtractFirst) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+
+					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
+				}
+				else if (subtractLast) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+
+					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+				}
+				else
+					reduction = 0;
+			}
+
+			// slope calculation needs height factor for calculation
+			else if (recordKey.startsWith(recordNames[2])) { // 2=slope
+				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
+			}
+
+			newValue = offset + (value - reduction) * factor;
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		log.log(Level.FINER, String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
+		return newValue;
+	}
+
+	/**
 	 * function to translate measured value from a device to values represented (((value - offset + firstLastAdaption)/factor) + reduction)
 	 * @return double with the adapted value
 	 */
