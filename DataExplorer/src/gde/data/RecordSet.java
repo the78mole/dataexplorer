@@ -434,7 +434,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
-		final String $METHOD_NAME = "addPoints()";
+		final String $METHOD_NAME = "addPoints";
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
@@ -485,7 +485,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
-		final String $METHOD_NAME = "addPoints()";
+		final String $METHOD_NAME = "addPoints";
 		if (points.length == this.noneCalculationRecords.length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
@@ -511,7 +511,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param value
 	 */
 	public void dataTableAddPoint(String recordkey, int index, int value) {
-		final String $METHOD_NAME = "dataTableAddPoint()";
+		final String $METHOD_NAME = "dataTableAddPoint";
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
 		if (recordkey.equals(RecordSet.TIME)) {
 			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 

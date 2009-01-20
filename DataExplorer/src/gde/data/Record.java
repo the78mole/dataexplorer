@@ -328,7 +328,7 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	public boolean add(int point) {
-		final String $METHOD_NAME = "add()";
+		final String $METHOD_NAME = "add";
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
 		}

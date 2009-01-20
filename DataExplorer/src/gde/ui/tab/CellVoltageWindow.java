@@ -131,7 +131,7 @@ public class CellVoltageWindow {
 	}
 
 	public void create() {
-		final String $METHOD_NAME = "create()"; //$NON-NLS-1$
+		final String $METHOD_NAME = "create"; //$NON-NLS-1$
 
 		this.cellVoltageTab = new CTabItem(this.displayTab, SWT.NONE);
 		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
