@@ -106,7 +106,7 @@ public class MenuToolBar {
 	}
 
 	public void init() {
-		this.coolBar = new CoolBar(this.application, SWT.BORDER);
+		this.coolBar = new CoolBar(this.application, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.coolBar);
 		//this.coolBar.setSize(800, 100);
 		create();

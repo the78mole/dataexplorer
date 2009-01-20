@@ -171,7 +171,7 @@ public class CellVoltageWindow {
 			});
 			{
 				RowData liPoButtonLData = new RowData();
-				liPoButtonLData.width = 80;
+				liPoButtonLData.width = 70;
 				liPoButtonLData.height = 25;
 				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liPoButton.setLayoutData(liPoButtonLData);
@@ -198,7 +198,7 @@ public class CellVoltageWindow {
 			}
 			{
 				RowData button1LData = new RowData();
-				button1LData.width = 80;
+				button1LData.width = 70;
 				button1LData.height = 25;
 				this.liIoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liIoButton.setLayoutData(button1LData);
@@ -225,7 +225,7 @@ public class CellVoltageWindow {
 			}
 			{
 				RowData button2LData = new RowData();
-				button2LData.width = 80;
+				button2LData.width = 70;
 				button2LData.height = 25;
 				this.liFeButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liFeButton.setLayoutData(button2LData);
@@ -252,7 +252,7 @@ public class CellVoltageWindow {
 			}
 			{
 				RowData button1LData1 = new RowData();
-				button1LData1.width = 80;
+				button1LData1.width = 100;
 				button1LData1.height = 25;
 				this.individualButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.individualButton.setLayoutData(button1LData1);
