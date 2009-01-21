@@ -78,7 +78,7 @@ public class RecordSet extends HashMap<String, Record> {
 	// data table
 	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
-	String[][]										dataTable;
+	int[][]												dataTable;
 	boolean												isTableDataCalculated					= false;																								//value to manage only one time calculation
 	boolean												isTableDisplayable						= true;																									//value to suppress table data calculation(live view)
 
@@ -282,8 +282,8 @@ public class RecordSet extends HashMap<String, Record> {
 		if (recordSet.dataTable != null) {
 			int numCols = recordSet.dataTable.length;
 			int numRows = recordSet.dataTable[0].length;
-			//this.dataTable = new int[numRows][numCols];
-			this.dataTable = new String[numRows][numCols];
+			this.dataTable = new int[numRows][numCols];
+			//this.dataTable = new String[numRows][numCols];
 			for (int i = 0; i < numRows; i++) {
 				System.arraycopy(this.dataTable[i], 0, recordSet.dataTable[i], 0, numCols);
 			}
@@ -557,14 +557,13 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return string array including time
 	 */
 	public String[] getDataTableRow(int index) {
-		//int[] tmpValues = this.dataTable[index];
-		//String[] strValues = new String[tmpValues.length];
-		//for (int i = 0; i < strValues.length; i++) {
-		//	strValues[i] = this.df.format(tmpValues[i] / 1000.0);
-		//}
-		//return strValues;
-	
-		return this.dataTable[index];
+		int[] tmpValues = this.dataTable[index];
+		String[] strValues = new String[tmpValues.length];
+		for (int i = 0; i < strValues.length; i++) {
+			strValues[i] = this.df.format(tmpValues[i] / 1000.0);
+		}
+		return strValues;
+		//return this.dataTable[index];
 	}
 
 	public double getTimeStep_ms() {
@@ -1528,11 +1527,11 @@ public class RecordSet extends HashMap<String, Record> {
 					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 					long startTime = System.currentTimeMillis();
-					//RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
-					RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
+					RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
+					//RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
 					for (int i = 0; i < recordEntries; i++) {
-						//RecordSet.this.dataTable[i][0] = new Double(getTimeStep_ms() * i).intValue();					
-						RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
+						RecordSet.this.dataTable[i][0] = new Double(getTimeStep_ms() * i).intValue();					
+						//RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
 					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));

@@ -137,12 +137,12 @@ public class DataTableWindow {
 			this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0235));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
+			this.dataTable.setRedraw(false);
 			// cleanup old data table
 			this.dataTable.removeAll();
 
 			// display data table
 			try {
-				this.dataTable.setVisible(false);
 				int recordEntries = recordSet.getNumberDataTableRows();
 				int progressStart = this.application.getProgressPercentage();
 				double progressInterval = (100.0 - progressStart) / recordEntries;
@@ -154,13 +154,13 @@ public class DataTableWindow {
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}
-				this.dataTable.setVisible(true);
 				log.log(Level.INFO, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 
+			this.dataTable.setRedraw(true);
 			this.application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 			this.application.setStatusMessage(OSDE.STRING_BLANK);

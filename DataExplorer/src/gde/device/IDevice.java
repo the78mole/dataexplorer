@@ -390,8 +390,8 @@ public interface IDevice {
 	 * function to prepare complete data table of record set while translating avalable measurement values
 	 * @return pointer to filled data table with formated "%.3f" values
 	 */
-	//public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable);
-	public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable);
+	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable);
+	//public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable);
 
 	/**
 	 * function to translate measured value from a device to values represented
