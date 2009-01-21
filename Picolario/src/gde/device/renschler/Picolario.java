@@ -17,7 +17,6 @@
 package osde.device.renschler;
 
 import java.io.FileNotFoundException;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,7 +207,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			String[] recordNames = recordSet.getRecordNames();  // 0=Spannung, 1=Höhe, 2=Steigung
 			int numberRecords = recordNames.length;
 			int recordEntries = recordSet.getRecordDataSize(true);
-			DecimalFormat df = new DecimalFormat("0.000");
+			//DecimalFormat df = new DecimalFormat("0.000");
 			
 
 			for (int j = 0; j < numberRecords; j++) {

@@ -136,6 +136,8 @@ public class DataTableWindow {
 			log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 			this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0235));
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+			String threadId = String.format("%06d", Thread.currentThread().getId());
+			this.application.setProgress(0, threadId);
 
 			this.dataTable.setRedraw(false);
 			// cleanup old data table
@@ -144,13 +146,12 @@ public class DataTableWindow {
 			// display data table
 			try {
 				int recordEntries = recordSet.getNumberDataTableRows();
-				int progressStart = this.application.getProgressPercentage();
-				double progressInterval = (100.0 - progressStart) / recordEntries;
+				double progressInterval = 100.0 / recordEntries * 20;
 				TableItem item;
 				
 				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < recordEntries; i++) {
-					if (recordEntries % 20 == 0) this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), String.format("%06d", Thread.currentThread().getId()));
+					if (i % 20 == 0) this.application.setProgress(new Double(i * progressInterval).intValue(), threadId);
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}
@@ -161,7 +162,7 @@ public class DataTableWindow {
 			}
 
 			this.dataTable.setRedraw(true);
-			this.application.setProgress(100, String.format("%06d", Thread.currentThread().getId()));
+			this.application.setProgress(100, threadId);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 			this.application.setStatusMessage(OSDE.STRING_BLANK);
 			log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
