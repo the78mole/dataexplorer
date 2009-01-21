@@ -150,7 +150,7 @@ public class DataTableWindow {
 				
 				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < recordEntries; i++) {
-					this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), String.format("%06d", Thread.currentThread().getId()));
+					if (recordEntries % 20 == 0) this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), String.format("%06d", Thread.currentThread().getId()));
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}

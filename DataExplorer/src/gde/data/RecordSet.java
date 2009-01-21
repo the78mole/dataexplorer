@@ -1501,7 +1501,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 			public void run() {
 				log.log(Level.FINE, "entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
-				RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
+				//RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
 				int numberRecords = getRecordNamesLength();
 				int recordEntries = getRecordDataSize(true);
