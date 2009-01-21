@@ -202,8 +202,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * function to prepare complete data table of record set while translating avalable measurement values
 	 * @return pointer to filled datatable
 	 */
-	//public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
-	public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable) {
+	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+	//public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable) {
 		try {
 			String[] recordNames = recordSet.getRecordNames();  // 0=Spannung, 1=Höhe, 2=Steigung
 			int numberRecords = recordNames.length;
@@ -245,8 +245,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 				
 				for (int i = 0; i < recordEntries; i++) {
-					//dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
-					dataTable[i][j+1] = df.format((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0);
+					dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
+					//dataTable[i][j+1] = df.format((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0);
 				}
 			}
 		}
