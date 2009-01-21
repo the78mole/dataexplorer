@@ -228,6 +228,14 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * function to prepare complete data table of record set while translating avalable measurement values
+	 * @return pointer to filled data table with formated "%.3f" values
+	 */
+	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		return dataTable;
+	}
+
+	/**
 	 * function to translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
