@@ -167,6 +167,14 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * function to prepare complete data table of record set while translating avalable measurement values
+	 * @return pointer to filled data table with formated "%.3f" values
+	 */
+	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		return dataTable;
+	}
+
+	/**
 	 * function to translate measured values from a device to values represented
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
