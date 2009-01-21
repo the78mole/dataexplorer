@@ -78,8 +78,7 @@ public class RecordSet extends HashMap<String, Record> {
 	// data table
 	Thread												waitAllDisplayableThread;
 	Thread												dataTableCalcThread;
-	Vector<Vector<Integer>>				dataTable;
-	int[][]												intDataTable;
+	String[][]										dataTable;
 	boolean												isTableDataCalculated					= false;																								//value to manage only one time calculation
 	boolean												isTableDisplayable						= true;																									//value to suppress table data calculation(live view)
 
@@ -177,7 +176,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
-		this.dataTable = new Vector<Vector<Integer>>();
 
 		this.check4SyncableRecords();
 	}
@@ -203,7 +201,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
-		this.dataTable = new Vector<Vector<Integer>>();
 
 		this.check4SyncableRecords();
 	}
@@ -228,7 +225,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isCompareSet = isCompareSetValue;
 		this.channels = null;
-		this.dataTable = new Vector<Vector<Integer>>();
 
 		this.check4SyncableRecords();
 	}
@@ -283,7 +279,15 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
 
-		this.dataTable = new Vector<Vector<Integer>>(recordSet.dataTable);
+		if (recordSet.dataTable != null) {
+			int numCols = recordSet.dataTable.length;
+			int numRows = recordSet.dataTable[0].length;
+			//this.dataTable = new int[numRows][numCols];
+			this.dataTable = new String[numRows][numCols];
+			for (int i = 0; i < numRows; i++) {
+				System.arraycopy(this.dataTable[i], 0, recordSet.dataTable[i], 0, numCols);
+			}
+		}
 		this.isTableDataCalculated = recordSet.isTableDataCalculated;
 		this.isTableDisplayable = recordSet.isTableDisplayable;
 
@@ -352,7 +356,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
 
-		this.dataTable = new Vector<Vector<Integer>>();
+		this.dataTable = null; // table calculation will create array
 		this.isTableDataCalculated = false;
 		this.isTableDisplayable = true;
 
@@ -505,42 +509,22 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * add a data point at specified index to the data table
-	 * @param recordkey
-	 * @param index
-	 * @param value
-	 */
-	public void dataTableAddPoint(String recordkey, int index, int value) {
-		final String $METHOD_NAME = "dataTableAddPoint";
-		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, recordkey + " - " + index + " - " + value); //$NON-NLS-1$ //$NON-NLS-2$
-		if (recordkey.equals(RecordSet.TIME)) {
-			Vector<Integer> dataTableRow = new Vector<Integer>(this.size() + 1); // time as well 
-			if (value != 0)
-				dataTableRow.add(value);
-			else
-				dataTableRow.add(new Double(this.getRecordDataSize(true) * this.getTimeStep_ms()).intValue());
-			for (int i = 0; i < this.recordNames.length; ++i) {
-				dataTableRow.add(0);
-			}
-			this.dataTable.add(dataTableRow);
-		}
-		else {
-			int columnIndex = getRecordIndex(recordkey) + 1; // + time column
-			Vector<Integer> tableRow = this.dataTable.get(index);
-			if (tableRow != null) {
-				tableRow.set(columnIndex, new Double(this.device.translateValue(this.get(recordkey), value)).intValue());
-			}
-			else
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "add time point before adding other values !"); //$NON-NLS-1$
-		}
-	}
-
-	/**
 	 * add a row to the data table where all values are integers multiplied with 1000 to enable 3 decimals
 	 * @param dataTableRow
 	 */
-	public void dataTableAddRow(Vector<Integer> dataTableRow) {
-		this.dataTable.add(dataTableRow);
+	public void addDataTableRow(int[] dataTableRow) {
+		int numCols = this.size()+1;
+		if (numCols == dataTableRow.length) {
+			int numRows = getRecordDataSize(true);
+			int[][] tmpDataTable = new int[numRows + 1][numCols]; // [existing rows + 1][size+time]
+			for (int i = 0; i < numRows; i++) {
+				System.arraycopy(this.dataTable[i], 0, tmpDataTable[i], 0, numCols);
+			}
+			System.arraycopy(this.dataTable[numRows], 0, dataTableRow, 0, numCols);
+		}
+		else {
+			log.log(Level.WARNING, "no data table row added -> numCols != dataTableRow.length");
+		}
 	}
 
 	/**
@@ -548,7 +532,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return number of rows of the data table
 	 */
 	public int getNumberDataTableRows() {
-		return this.dataTable.size();
+		return this.dataTable.length;
 	}
 
 	/**
@@ -568,16 +552,19 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * get all calculated and formated data points of a given index, decimal format is "0.000"
+	 * get all calculated and formated data table points of a given index, decimal format is "0.000"
 	 * @param index of the data points
 	 * @return string array including time
 	 */
-	public String[] getDataPoints(int index) {
-		Vector<String> dfValues = new Vector<String>();
-		for (Integer integer : this.dataTable.get(index)) {
-			dfValues.add(this.df.format(integer / 1000.0));
-		}
-		return dfValues.toArray(new String[this.size() + 1]);
+	public String[] getDataTableRow(int index) {
+		//int[] tmpValues = this.dataTable[index];
+		//String[] strValues = new String[tmpValues.length];
+		//for (int i = 0; i < strValues.length; i++) {
+		//	strValues[i] = this.df.format(tmpValues[i] / 1000.0);
+		//}
+		//return strValues;
+	
+		return this.dataTable[index];
 	}
 
 	public double getTimeStep_ms() {
@@ -1416,7 +1403,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newValue - boolean value if the table need to be calculated before it can be displayed
 	 */
 	public void setTableDataCalculated(boolean newValue) {
-		if (!newValue) this.dataTable = new Vector<Vector<Integer>>();
+		if (!newValue) this.dataTable = null;
 		this.isTableDataCalculated = newValue;
 	}
 
@@ -1519,7 +1506,6 @@ public class RecordSet extends HashMap<String, Record> {
 
 				int numberRecords = getRecordNamesLength();
 				int recordEntries = getRecordDataSize(true);
-				int progress = RecordSet.this.application.getProgressPercentage();
 
 				int maxWaitCounter = 10;
 				int sleepTime = numberRecords * recordEntries / 200;
@@ -1533,7 +1519,6 @@ public class RecordSet extends HashMap<String, Record> {
 					catch (InterruptedException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
 					}
-					RecordSet.this.application.setProgress(progress += 2, this.sThreadId);
 				}
 				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
@@ -1541,29 +1526,17 @@ public class RecordSet extends HashMap<String, Record> {
 				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
 				if (!isTableDataCalculated()) {
 					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
-					double progressInterval = (60.0 - progress) / recordEntries;
 
 					long startTime = System.currentTimeMillis();
-					RecordSet.this.intDataTable = new int[numberRecords+1][recordEntries];
+					//RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
+					RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
 					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.intDataTable[0][i] = new Double(getTimeStep_ms() * i).intValue();
+						//RecordSet.this.dataTable[i][0] = new Double(getTimeStep_ms() * i).intValue();					
+						RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
 					}
-					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.intDataTable);
+					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
 					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 					
-					startTime = System.currentTimeMillis();
-					Vector<Integer> dataTableRow;
-					for (int i = 0; i < recordEntries; i++) {
-						//RecordSet.this.application.setProgress(new Double(i * progressInterval + progress).intValue(), this.sThreadId);
-						dataTableRow = new Vector<Integer>(numberRecords + 1); // time as well 
-						dataTableRow.add(new Double(getTimeStep_ms() * i).intValue());
-						for (String recordKey : this.recordKeys) {
-							dataTableRow.add(new Double(1000.0 * RecordSet.this.device.translateValue(get(recordKey), get(recordKey).get(i) / 1000.0)).intValue());
-						}
-						RecordSet.this.dataTable.add(dataTableRow);
-					}
-					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
-					RecordSet.this.application.setProgress(60, null);
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
 				}

@@ -17,6 +17,7 @@
 package osde.device.renschler;
 
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -198,6 +199,64 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * function to prepare complete data table of record set while translating avalable measurement values
+	 * @return pointer to filled datatable
+	 */
+	//public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+	public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable) {
+		try {
+			String[] recordNames = recordSet.getRecordNames();  // 0=Spannung, 1=Höhe, 2=Steigung
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+			DecimalFormat df = new DecimalFormat("0.000");
+			
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				double offset = record.getOffset(); // != 0 if curve has an defined offset
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				
+				switch (j) { // 0=Spannung, 1=Höhe, 2=Steigung
+				case 0: //Spannung/Voltage
+					break;
+				case 1: //Höhe/Height
+					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
+					boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+					property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
+					boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+					
+					if (subtractFirst) {
+						reduction = record.getFirst()/1000.0;
+					}
+					else if (subtractLast) {
+						reduction = record.getLast()/1000.0;
+					}
+					else {
+						reduction = 0;
+					}
+					break;
+				case 2: //Steigung/Slope
+					factor = recordSet.get(recordNames[1]).getFactor(); // 1=height
+					break;
+				default:
+					log.log(Level.WARNING, "exceed known record names"); //$NON-NLS-1$
+					break;
+				}
+				
+				for (int i = 0; i < recordEntries; i++) {
+					//dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
+					dataTable[i][j+1] = df.format((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0);
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTable;
+	}
+
+	/**
 	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
 	 * @return double with the adapted value
 	 */
@@ -214,70 +273,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			double offset = record.getOffset(); // != 0 if curve has an defined offset
 			double reduction = record.getReduction();
 			double factor = record.getFactor(); // != 1 if a unit translation is required
-
-			// height calculation need special procedure
-			if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-				PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-				boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
-
-				if (subtractFirst) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
-				}
-				else if (subtractLast) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
-				}
-				else
-					reduction = 0;
-			}
-
-			// slope calculation needs height factor for calculation
-			else if (recordKey.startsWith(recordNames[2])) { // 2=slope
-				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
-			}
-
-			newValue = offset + (value - reduction) * factor;
-		}
-		catch (RuntimeException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-
-		log.log(Level.FINER, String.format("value calculated for %s - inValue %f - outValue %f", recordKey, value, newValue)); //$NON-NLS-1$
-		return newValue;
-	}
-
-	/**
-	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
-	 * @return double with the adapted value
-	 */
-	public double prepareDataTable(RecordSet recordSet, int[][] dataTable) {
-		//log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
-
-		String recordKey = "?"; //$NON-NLS-1$
-		int newValue = 0;
-		try {
-			// 0=Spannung, 1=Höhe, 2=Steigung
-			String[] recordNames = recordSet.getRecordNames(); 
-			
-			recordKey = record.getName();
-			double offset = record.getOffset(); // != 0 if curve has an defined offset
-			double reduction = record.getReduction();
-			double factor = record.getFactor(); // != 1 if a unit translation is required
-
-			for (int j = 0; j < numberRecords; j++) {
-				for (int i = 0; i < recordEntries; i++) {
-					RecordSet.this.intDataTable[j+1][i] = new Double(1000.0 * RecordSet.this.device.translateValue(get(this.recordKeys[j]), get(this.recordKeys[j]).get(i) / 1000.0)).intValue();
-				}
-			}
 
 			// height calculation need special procedure
 			if (recordKey.startsWith(recordNames[1])) { // 1=Höhe

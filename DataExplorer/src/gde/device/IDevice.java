@@ -387,10 +387,11 @@ public interface IDevice {
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
-	 * function to translate measured value from a device to values represented (((value - reduction) * factor) + offset - firstLastAdaption)
-	 * @return double with the adapted value
+	 * function to prepare complete data table of record set while translating avalable measurement values
+	 * @return pointer to filled data table with formated "%.3f" values
 	 */
-	public double prepareDataTable(RecordSet recordSet, int[][] dataTable);
+	//public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable);
+	public String[][] prepareDataTable(RecordSet recordSet, String[][] dataTable);
 
 	/**
 	 * function to translate measured value from a device to values represented

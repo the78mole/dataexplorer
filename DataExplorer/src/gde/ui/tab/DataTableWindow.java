@@ -37,6 +37,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.utils.StringHelper;
 
 /**
  * Table display class, displays the data in table form
@@ -141,17 +142,20 @@ public class DataTableWindow {
 
 			// display data table
 			try {
+				this.dataTable.setVisible(false);
 				int recordEntries = recordSet.getNumberDataTableRows();
 				int progressStart = this.application.getProgressPercentage();
 				double progressInterval = (100.0 - progressStart) / recordEntries;
 				TableItem item;
 				
+				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < recordEntries; i++) {
 					this.application.setProgress(new Double(i * progressInterval + progressStart).intValue(), String.format("%06d", Thread.currentThread().getId()));
 					item = new TableItem(this.dataTable, SWT.RIGHT);
-					item.setText(recordSet.getDataPoints(i));
+					item.setText(recordSet.getDataTableRow(i));
 				}
-				//dataTable.setVisible(true);
+				this.dataTable.setVisible(true);
+				log.log(Level.INFO, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
