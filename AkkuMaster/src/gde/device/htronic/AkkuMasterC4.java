@@ -232,6 +232,21 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @return pointer to filled data table with formated "%.3f" values
 	 */
 	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		try {
+			String[] recordNames = recordSet.getRecordNames();	// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				for (int i = 0; i < recordEntries; i++) {
+					dataTable[i][j+1] = record.get(i);
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 		return dataTable;
 	}
 

@@ -171,6 +171,24 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return pointer to filled data table with formated "%.3f" values
 	 */
 	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		try {
+			String[] recordNames = recordSet.getRecordNames();	// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				double offset = record.getOffset(); // != 0 if curve has an defined offset
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				for (int i = 0; i < recordEntries; i++) {
+					dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 		return dataTable;
 	}
 

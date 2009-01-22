@@ -353,6 +353,25 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return pointer to filled data table with formated "%.3f" values
 	 */
 	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		try {
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
+			String[] recordNames = recordSet.getRecordNames();	
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				for (int i = 0; i < recordEntries; i++) {
+					dataTable[i][j+1] = new Double(((record.get(i)/1000.0) - reduction) * factor * 1000.0).intValue();				
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 		return dataTable;
 	}
 
@@ -362,17 +381,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-		
-		String recordKey = record.getName();
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-
-		// example height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-			// do some calculation
-		}
 		
 		double newValue = value * factor + offset;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -385,18 +397,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-		
-		String recordKey = record.getName();
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
-		// example height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-			// do some calculation
-		}
-		
 		double newValue = value / factor - offset;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;

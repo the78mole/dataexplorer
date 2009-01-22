@@ -455,6 +455,63 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return pointer to filled data table with formated "%.3f" values
 	 */
 	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		try {
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			String[] recordNames = recordSet.getRecordNames();	
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				double offset = record.getOffset(); // != 0 if curve has an defined offset
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				double currentOffset = 0;
+				double rpmFactor = 1;
+				double numberMotor = 1;
+				PropertyType property = null;
+				
+				switch (j) { 
+				case 0: //voltageReceiver
+				case 1: //voltage
+					break;
+				case 2: //current
+					property = record.getProperty(UniLog.CURRENT_OFFSET);
+					currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 0;
+					//newValues = value + currentOffset;
+					break;
+				case 3: //capacity
+				case 4: //power
+				case 5: //energy
+				case 6: //votagePerCell
+					break;
+				case 7: //revolutionSpeed
+					property = record.getProperty(UniLog.RPM_FACTOR);
+					rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+					property = record.getProperty(UniLog.NUMBER_MOTOR);
+					numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+					//newValues = value * rpmFactor / numberMotor;
+					break;
+				case 8: //efficiency
+				case 9: //height
+				case 10: //slope
+				case 11: //a1Value
+				case 12: //a2Value
+				case 13: //a3Value
+					break;
+				default:
+					log.log(Level.WARNING, "exceed known record names"); //$NON-NLS-1$
+					break;
+				}
+				
+				for (int i = 0; i < recordEntries; i++) {
+					dataTable[i][j+1] = new Double((offset + (((record.get(i)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor) * 1000.0).intValue();				
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 		return dataTable;
 	}
 
@@ -596,7 +653,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			for (String measurementKey : measurements) {
 				record = recordSet.get(measurementKey);
 				
-				if (record.isActive()) {
+				if (record.isActive() && record.isDisplayable()) {
+					log.log(Level.INFO, "add to displayable counter: " + record.getName());
 					++displayableCounter;
 				}
 			}
