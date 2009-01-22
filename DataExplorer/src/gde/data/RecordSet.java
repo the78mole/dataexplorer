@@ -279,16 +279,17 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
 
-		if (recordSet.dataTable != null) {
-			int numCols = recordSet.dataTable.length;
-			int numRows = recordSet.dataTable[0].length;
-			this.dataTable = new int[numRows][numCols];
-			//this.dataTable = new String[numRows][numCols];
-			for (int i = 0; i < numRows; i++) {
-				System.arraycopy(this.dataTable[i], 0, recordSet.dataTable[i], 0, numCols);
-			}
-		}
-		this.isTableDataCalculated = recordSet.isTableDataCalculated;
+//		if (recordSet.dataTable != null) {
+//			int numCols = recordSet.dataTable.length;
+//			int numRows = recordSet.dataTable[0].length;
+//			this.dataTable = new int[numRows][numCols];
+//			//this.dataTable = new String[numRows][numCols];
+//			for (int i = 0; i < numRows; i++) {
+//				System.arraycopy(this.dataTable[i], 0, recordSet.dataTable[i], 0, numCols);
+//			}
+//		}
+		this.dataTable = null;
+		this.isTableDataCalculated = false;
 		this.isTableDisplayable = recordSet.isTableDisplayable;
 
 		this.isCompareSet = recordSet.isCompareSet;
@@ -406,20 +407,16 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true/false	
 	 */
 	public synchronized boolean checkAllRecordsDisplayable() {
-		boolean allDisplayable = false;
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.recordNames) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
-			log.log(Level.FINE, recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
+			log.log(Level.FINER, recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
 		}
 
 		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable;
 		log.log(Level.FINE, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
 
-		if (displayableRecordEntries == targetDisplayable) {
-			allDisplayable = true;
-		}
-		return allDisplayable;
+		return displayableRecordEntries >= targetDisplayable;
 	}
 
 	/**
@@ -1519,7 +1516,7 @@ public class RecordSet extends HashMap<String, Record> {
 						log.log(Level.SEVERE, e.getMessage(), e);
 					}
 				}
-				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
+				log.log(Level.INFO, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 				// calculate record set internal data table
 				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
