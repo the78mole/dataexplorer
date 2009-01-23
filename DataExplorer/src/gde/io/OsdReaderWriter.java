@@ -263,7 +263,7 @@ public class OsdReaderWriter {
 					byte[] buffer = new byte[deviceDataBufferSize * recordDataSize];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, true);
-					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
@@ -375,7 +375,7 @@ public class OsdReaderWriter {
 					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
 					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
-					log.log(Level.INFO, sbs[i].toString());
+					log.log(Level.FINE, sbs[i].toString());
 					//data_out.writeInt(sbs[i].length());
 					data_out.writeUTF(sbs[i].toString());
 					filePointer += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
@@ -393,7 +393,7 @@ public class OsdReaderWriter {
 					for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
 						for (int k = 0; k < noneCalculationRecordNames.length; ++k, l+=OSDE.SIZE_BYTES_INTEGER) {
 							int point = recordSet.get(noneCalculationRecordNames[k]).get(j);
-							//log.log(Level.INFO, ""+point);
+							//log.log(Level.FINE, ""+point);
 							bytes[0] = (byte)((point >>> 24) & 0xFF);
 							bytes[1] = (byte)((point >>> 16) & 0xFF);
 							bytes[2] = (byte)((point >>>  8) & 0xFF);
@@ -404,7 +404,7 @@ public class OsdReaderWriter {
 					data_out.write(buffer, 0, buffer.length);
 					recordSet.setSaved(true);
 				}
-				log.log(Level.INFO, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.log(Level.FINE, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 			finally {
 				data_out.flush();
@@ -436,7 +436,7 @@ public class OsdReaderWriter {
 			byte[] buffer = new byte[deviceDataBufferSize * recordFileDataSize];
 			random_in.readFully(buffer);
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
-			log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

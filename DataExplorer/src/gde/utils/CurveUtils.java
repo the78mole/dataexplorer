@@ -85,7 +85,7 @@ public class CurveUtils {
 			log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
-			// TODO exclude imported data where values don't need correction
+			//exclude imported data where values don't need correction
 			if (device != null && isRaw) { // adapt to device specific range
 				yMinValueDisplay = device.translateValue(record, yMinValue);
 				yMaxValueDisplay = device.translateValue(record, yMaxValue);

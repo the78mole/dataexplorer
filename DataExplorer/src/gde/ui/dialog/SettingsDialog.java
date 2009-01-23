@@ -718,6 +718,20 @@ public class SettingsDialog extends Dialog {
 								}
 
 							} // end individual package based logging settings
+							
+							//test searcing for all classes known by LogManager
+							//if (log.isLoggable(Level.CONFIG)) {
+							//	LogManager manager = LogManager.getLogManager();
+							//	Enumeration<String> loggerNames = manager.getLoggerNames();
+							//	StringBuilder sb = new StringBuilder();
+							//	while (loggerNames.hasMoreElements()) {
+							//		String loggerName = loggerNames.nextElement();
+							//		if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >=3 ) 
+							//			sb.append(loggerName).append("\n");
+							//	}
+							//	log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, sb.toString());
+							//}
+
 						} // end logging group
 					} // end analysis composite
 				} // end analysis tab item

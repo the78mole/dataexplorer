@@ -105,11 +105,11 @@ public class DeviceConfiguration {
 			elememt = (JAXBElement<DevicePropertiesType>)unmarshaller.unmarshal(new File (basePath + "Picolario.xml")); //$NON-NLS-1$
 			DevicePropertiesType devProps = elememt.getValue();
 			DeviceType device = devProps.getDevice();
-			log.log(Level.INFO, "device.getName() = " + device.getName()); //$NON-NLS-1$
+			log.log(Level.ALL, "device.getName() = " + device.getName()); //$NON-NLS-1$
 			SerialPortType serialPort = devProps.getSerialPort();
-			log.log(Level.INFO, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
+			log.log(Level.ALL, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
 			serialPort.setPort("COM10"); //$NON-NLS-1$
-			log.log(Level.INFO, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
+			log.log(Level.ALL, "serialPort.getPort() = " + serialPort.getPort()); //$NON-NLS-1$
 			
 			
 			

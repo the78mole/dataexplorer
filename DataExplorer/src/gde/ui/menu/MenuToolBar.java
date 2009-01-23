@@ -695,7 +695,6 @@ public class MenuToolBar {
 			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 		} // end record cool item
-		//log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
 	}
 
 	/**

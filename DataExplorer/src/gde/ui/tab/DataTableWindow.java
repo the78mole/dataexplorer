@@ -155,7 +155,7 @@ public class DataTableWindow {
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}
-				log.log(Level.INFO, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
+				log.log(Level.FINE, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);

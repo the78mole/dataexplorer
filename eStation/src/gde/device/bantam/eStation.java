@@ -171,17 +171,17 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		
-//		StringBuilder sb = new StringBuilder();
-//		for (byte b : dataBuffer) {
-//			sb.append(String.format("%02x", b)).append(" ");
-//		}
-//		log.log(Level.INFO, sb.toString());
-
-//		int modeIndex = getProcessingMode(dataBuffer);
-//		String mode = USAGE_MODE[modeIndex];
-//		int accuIndex = getAccuCellType(dataBuffer);
-//		String accuType = ACCU_TYPES[accuIndex - 1]; 
-//		getNumberOfLithiumXCells(dataBuffer);
+		//StringBuilder sb = new StringBuilder();
+		//for (byte b : dataBuffer) {
+		//	sb.append(String.format("%02x", b)).append(" ");
+		//}
+		//log.log(Level.FINE, sb.toString());
+		
+		//int modeIndex = getProcessingMode(dataBuffer);
+		//String mode = USAGE_MODE[modeIndex];
+		//int accuIndex = getAccuCellType(dataBuffer);
+		//String accuType = ACCU_TYPES[accuIndex - 1]; 
+		//getNumberOfLithiumXCells(dataBuffer);
 		
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 		points[0] = new Integer((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage

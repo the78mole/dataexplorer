@@ -26,7 +26,6 @@ public class DeclinedException extends Exception {
 	 * 
 	 */
 	public DeclinedException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -34,7 +33,6 @@ public class DeclinedException extends Exception {
 	 */
 	public DeclinedException(String arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -42,7 +40,6 @@ public class DeclinedException extends Exception {
 	 */
 	public DeclinedException(Throwable arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -51,7 +48,6 @@ public class DeclinedException extends Exception {
 	 */
 	public DeclinedException(String arg0, Throwable arg1) {
 		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
 	}
 
 

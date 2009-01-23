@@ -28,7 +28,6 @@ public class ApplicationConfigurationException extends Exception {
 	 */
 	public ApplicationConfigurationException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -37,7 +36,6 @@ public class ApplicationConfigurationException extends Exception {
 	 */
 	public ApplicationConfigurationException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

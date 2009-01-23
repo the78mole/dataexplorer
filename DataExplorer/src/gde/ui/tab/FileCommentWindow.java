@@ -148,10 +148,10 @@ public class FileCommentWindow {
 	 */
 	void updateRecordSetTable() {
 		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
-		//log.log(Level.INFO, "mainSize = " + mainSize.toString());
+		//log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		Rectangle bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 10/100
 				, mainSize.x * 90/100, mainSize.y * 40/100);
-		//log.log(Level.INFO, "cover bounds = " + bounds.toString());
+		//log.log(Level.FINE, "cover bounds = " + bounds.toString());
 		FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
 		FileCommentWindow.this.fileCommentText.setBounds(bounds);
 		FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());

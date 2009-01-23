@@ -193,7 +193,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
-		log.log(Level.INFO, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		log.log(Level.FINE, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 

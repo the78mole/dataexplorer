@@ -163,11 +163,11 @@ public class LogViewReader {
 					firstRecordSet[1] = recordSetName;
 				}
 				recordDataSize = new Integer(recordSetInfo.get(OSDE.RECORD_DATA_SIZE).trim()).intValue();
-				log.log(Level.INFO, "recordDataSize = " + recordDataSize);
+				log.log(Level.FINE, "recordDataSize = " + recordDataSize);
 				recordSetDataPointer = position;
-				log.log(Level.INFO, "recordSetDataPointer = " + recordSetDataPointer);
-				//log.log(Level.INFO, String.format("data pointer position = 0x%x", position));				 //$NON-NLS-1$
-				//log.log(Level.INFO, String.format("data pointer position = %s", position));				 //$NON-NLS-1$
+				log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
+				//log.log(Level.FINE, String.format("data pointer position = 0x%x", position));				 //$NON-NLS-1$
+				//log.log(Level.FINE, String.format("data pointer position = %s", position));				 //$NON-NLS-1$
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
 				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize);
@@ -177,11 +177,11 @@ public class LogViewReader {
 				
 				if (recordSetName.equals(firstRecordSet[1])) {
 					long startTime = new Date().getTime();
-					log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
+					log.log(Level.FINE, "data buffer size = " + buffer.length); //$NON-NLS-1$
 					data_in.readFully(buffer);
-					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, true);
-					log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 
 				position += buffer.length;
@@ -223,10 +223,10 @@ public class LogViewReader {
 			long startTime = new Date().getTime();
 			int dataBufferSize = device.getLovDataByteSize();
 			byte[] buffer = new byte[dataBufferSize * recordFileDataSize];
-			log.log(Level.INFO, "data buffer size = " + buffer.length); //$NON-NLS-1$
+			log.log(Level.FINE, "data buffer size = " + buffer.length); //$NON-NLS-1$
 			random_in.readFully(buffer);
 			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
-			log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -1424,7 +1424,7 @@ public class LogViewReader {
 		position += data_in.skip(headerSize-position);
 		//**** end main header			
 		header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
-		log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+		log.log(Level.FINE, String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 		return header;
 	}
@@ -1573,11 +1573,11 @@ public class LogViewReader {
 			buffer = new byte[8];
 			position += data_in.read(buffer);
 			long recordSetDataBytes = parse2Long(buffer);
-			log.log(Level.INFO, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			log.log(Level.FINE, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
 			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
-			log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+			log.log(Level.FINE, String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
 			log.log(Level.FINE, header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));

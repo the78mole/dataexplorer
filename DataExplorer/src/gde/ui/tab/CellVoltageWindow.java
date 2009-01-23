@@ -446,7 +446,7 @@ public class CellVoltageWindow {
 							this.voltageAvg += record.getLast();
 							cellCount++;
 						}
-						//log.log(Level.INFO, "record.getLast() " + record.getLast());
+						//log.log(Level.FINE, "record.getLast() " + record.getLast());
 					}
 				}
 				// add test values here
@@ -456,7 +456,7 @@ public class CellVoltageWindow {
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
 
 				if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
-				//log.log(Level.INFO, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
+				//log.log(Level.FINE, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
@@ -517,12 +517,12 @@ public class CellVoltageWindow {
 		updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
 		if (this.voltageVector.size() > 0) {
-			//log.log(Level.INFO, "mainSize = " + mainSize.toString());
+			//log.log(Level.FINE, "mainSize = " + mainSize.toString());
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
 			int width = mainSize.x - (2 * x);
 			Rectangle bounds = new Rectangle(x, mainSize.y * 10 / 100, width, mainSize.y * 80 / 100);
-			//log.log(Level.INFO, "cover bounds = " + bounds.toString());
+			//log.log(Level.FINE, "cover bounds = " + bounds.toString());
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
 			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y * 90 / 100, 350, 50);
 

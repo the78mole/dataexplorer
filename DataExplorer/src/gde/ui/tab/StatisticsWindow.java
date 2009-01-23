@@ -402,15 +402,15 @@ public class StatisticsWindow {
 			log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
 		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
-		//log.log(Level.INFO, "computed size = " + tableSize);
+		//log.log(Level.FINE, "computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
 		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
-		//log.log(Level.INFO, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
+		//log.log(Level.FINE, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
 		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
-		//log.log(Level.INFO, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
+		//log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
 }

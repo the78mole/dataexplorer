@@ -92,26 +92,6 @@ public class SelectorComposite extends Composite {
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
-//		this.addPaintListener(new PaintListener() {
-//			public void paintControl(PaintEvent evt) {
-//				log.log(Level.INFO, "SelectorComposite.paintControl() = " + evt);
-//				doUpdateCurveSelectorTable();
-//			}
-//		});
-//		this.addControlListener(new ControlListener() {
-//			public void controlResized(ControlEvent evt) {
-//				log.log(Level.INFO, "SelectorComposite.controlResized() = " + evt);
-//				Point size = SelectorComposite.this.getSize();
-//				if (!SelectorComposite.this.oldSize.equals(size)) {
-//					log.log(Level.INFO, SelectorComposite.this.oldSize + " - " + size);
-//					SelectorComposite.this.oldSize = size;
-//					doUpdateCurveSelectorTable();
-//				}
-//			}
-//			public void controlMoved(ControlEvent evt) {
-//				log.log(Level.FINEST, "SelectorComposite.controlMoved() = " + evt);
-//			}
-//		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
@@ -143,18 +123,7 @@ public class SelectorComposite extends Composite {
 			curveTableLData.bottom = new FormAttachment(1000, 1000, 0);
 			curveTableLData.right = new FormAttachment(1000, 1000, 0);
 			this.curveSelectorTable.setLayoutData(curveTableLData);
-
-			//this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 			if (this.popupmenu != null) this.curveSelectorTable.setMenu(this.popupmenu);
-			//this.curveSelectorTable.layout();
-			//TODO this.contextMenu = new CurveSelectorContextMenu();
-			//this.contextMenu.createMenu(this.popupmenu);
-//			this.curveSelectorTable.addPaintListener(new PaintListener() {
-//				public void paintControl(PaintEvent evt) {
-//					log.log(Level.FINEST, "curveSelectorTable.paintControl, event=" + evt); //$NON-NLS-1$
-//					doUpdateCurveSelectorTable();
-//				}
-//			});
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "curveTable.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -250,9 +219,9 @@ public class SelectorComposite extends Composite {
 
 					textSize = record.getName().length() * 8;
 					//this.curveSelectorTable.pack();
-					//log.log(Level.INFO, item.getText() + " " + item.getBounds().width);
+					//log.log(Level.FINE, item.getText() + " " + item.getBounds().width);
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
-					//log.log(Level.INFO, item.getText() + " " + itemWidth);
+					//log.log(Level.FINE, item.getText() + " " + itemWidth);
 					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 					if (record.isDisplayable()) {
 						TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);

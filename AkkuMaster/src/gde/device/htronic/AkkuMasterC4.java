@@ -127,30 +127,27 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int lovDataSize = this.getLovDataByteSize();
-		
-		//byte[] configurationBuffer	= new byte[14];
-		//byte[] measurementsBuffer		= new byte[16];
 		byte[] convertDataBuffer = new byte[14 + 16];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		for (int i = 0; i < recordDataSize; i++) { 
+		for (int i = 0; i < recordDataSize; i++) { 		
+			//StringBuilder sb = new StringBuilder();
+			//for (byte b : dataBuffer) {
+			//	sb.append(String.format("%02x", b)).append(" ");
+			//}
+			//log.log(Level.FINE, sb.toString());
 			
-//		StringBuilder sb = new StringBuilder();
-//		for (byte b : dataBuffer) {
-//			sb.append(String.format("%02x", b)).append(" ");
-//		}
-//		log.log(Level.INFO, sb.toString());
-//discharge   			      Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
-//	                      Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
-//33 00 00 00 51 82 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 ca 00 00 07 a3 01 25 19 00 00 00 01 00 3c 0d 0a 20 20 35 38 33 30 00 00 00 00 48 02 00 00             
-//offset      51 82 00 03 00 0C 08 98 02 58 02 58                      52 00 02 00 00 0B C7 00 00 0D 00 00 00 01
-//charge  				        Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
-//		                    Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
-//33 00 00 00 51 81 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 cb 07 f0 0d 02 01 25 1f 03 17 38 01 00 3c 0d 0a 20 31 38 31 30 30 00 00 00 00 13 07 00 00 
-//offset      51 81 00 03 00 0C 08 98 02 58 02 58                      52 02 85 0A 4A 0C DE 01 04 1F 04 17 1B 01
+			//discharge   			      Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
+			//	                      Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
+			//33 00 00 00 51 82 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 ca 00 00 07 a3 01 25 19 00 00 00 01 00 3c 0d 0a 20 20 35 38 33 30 00 00 00 00 48 02 00 00             
+			//offset      51 82 00 03 00 0C 08 98 02 58 02 58                      52 00 02 00 00 0B C7 00 00 0D 00 00 00 01
+			//charge  				        Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
+			//		                    Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
+			//33 00 00 00 51 81 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 cb 07 f0 0d 02 01 25 1f 03 17 38 01 00 3c 0d 0a 20 31 38 31 30 30 00 00 00 00 13 07 00 00 
+			//offset      51 81 00 03 00 0C 08 98 02 58 02 58                      52 02 85 0A 4A 0C DE 01 04 1F 04 17 1B 01
 
 			System.arraycopy(dataBuffer,  4 + i*lovDataSize, convertDataBuffer,  0, 14); //configurationBuffer.length
 			System.arraycopy(dataBuffer, 23 + i*lovDataSize, convertDataBuffer, 14, 16); //measurementsBuffer.length

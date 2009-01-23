@@ -252,10 +252,6 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 			});
-//			this.recordSetComment.addFocusListener(new FocusListener() {
-//				public void focusLost(FocusEvent evt) { log.log(Level.INFO, "focusLost"); }
-//				public void focusGained(FocusEvent evt) { log.log(Level.INFO, "focusGained"); }
-//			});
 			
 			this.recordSetComment.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {

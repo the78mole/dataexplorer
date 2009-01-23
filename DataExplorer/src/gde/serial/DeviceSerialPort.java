@@ -631,7 +631,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			DeviceSerialPort.this.isConnected = false;
 			this.closeThread = new Thread() {
 				public void run() {
-					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 					try {
 						Thread.sleep(5);
 						byte[] buf = new byte[getInputStream().available()];
@@ -640,12 +640,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					catch (Exception e) {
 						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					}
-					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "before close"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, "before close"); //$NON-NLS-1$
 					DeviceSerialPort.this.serialPort.close();
-					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "after close"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, "after close"); //$NON-NLS-1$
 					DeviceSerialPort.this.isConnected = false;
 					if (DeviceSerialPort.this.application != null) DeviceSerialPort.this.application.setPortConnected(false);
-					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
 				}
 			};
 			try {

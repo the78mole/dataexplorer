@@ -47,7 +47,6 @@ public class PicolarioSerialPortTest {
 			serialPort.close();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("fertig !"); //$NON-NLS-1$

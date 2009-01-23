@@ -1531,7 +1531,7 @@ public class RecordSet extends HashMap<String, Record> {
 						log.log(Level.SEVERE, e.getMessage(), e);
 					}
 				}
-				log.log(Level.INFO, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
+				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
 
 				// calculate record set internal data table
 				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
@@ -1546,7 +1546,7 @@ public class RecordSet extends HashMap<String, Record> {
 						//RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
-					log.log(Level.INFO, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
+					log.log(Level.FINE, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 					
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$

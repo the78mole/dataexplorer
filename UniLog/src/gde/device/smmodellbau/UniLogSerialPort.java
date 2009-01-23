@@ -47,7 +47,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
 	final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
 
-	final static int			DATA_LENGTH_BYTES				= 24;			//TODO exchange with deviceConfig.get()
+	final static int			DATA_LENGTH_BYTES				= 24;			
 	
 	boolean 							isLoggingActive 				= false;
 	boolean 							isTransmitFinished			= false;
