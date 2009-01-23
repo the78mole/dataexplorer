@@ -455,18 +455,12 @@ public class RecordSet extends HashMap<String, Record> {
 					if (this.syncMin == 0 && this.syncMax == 0) {
 						this.syncMin = points[i];
 						this.syncMax = points[i];
-						this.updateSyncRecordScale();	
 					}
 					else {
-						if (points[i] < this.syncMin) {
-							this.syncMin = points[i];
-							this.updateSyncRecordScale();	
-						}
-						else if (points[i] > this.syncMax) {
-							this.syncMax = points[i];
-							this.updateSyncRecordScale();	
-						}
+						if (points[i] < this.syncMin) 			this.syncMin = points[i];
+						else if (points[i] > this.syncMax) 	this.syncMax = points[i];
 					}
+					if (this.isSyncRequested) this.updateSyncRecordScale();	
 				}
 			}
 			if (log.isLoggable(Level.FINE)) {

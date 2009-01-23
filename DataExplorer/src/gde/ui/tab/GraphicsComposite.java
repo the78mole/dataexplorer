@@ -454,8 +454,8 @@ public class GraphicsComposite extends Composite {
 		// draw each record using sorted record set names
 		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
-			log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
 				CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);
 

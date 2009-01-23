@@ -89,9 +89,10 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
 					log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
-					CurveSelectorContextMenu.this.isSyncPlaceholder = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
-					CurveSelectorContextMenu.this.isScaleSynced = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
+					
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						CurveSelectorContextMenu.this.isSyncPlaceholder = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
+						CurveSelectorContextMenu.this.isScaleSynced = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
 						CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
 						if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
