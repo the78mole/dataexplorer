@@ -768,7 +768,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			else
 				this.calculationThread = new LinearRegression(recordSet, measurements[9], measurements[10], regressionInterval);
 
-			this.calculationThread.start();
+			try {
+				this.calculationThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
 			if (recordSet.get(measurements[9]).isDisplayable()) {
 				//record.setDisplayable(true); // set within calculation thread
 				isNoSlopeCalculationStarted = false;

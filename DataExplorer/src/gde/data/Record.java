@@ -123,12 +123,12 @@ public class Record extends Vector<Integer> {
 	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
-	int									maxValueTriggered			= 0;		 											// max value of the curve, according a set trigger level if any
-	int									minValueTriggered			= 0;													// min value of the curve, according a set trigger level if any
-	int									avgValue							= 0;		 											// avarage value (avg = sum(xi)/n)
-	int									sigmaValue						= 0;		 											// sigma value of data, according a set trigger level if any
-	int									avgValueTriggered			= 0;		 											// avarage value (avg = sum(xi)/n)
-	int									sigmaValueTriggered		= 0;		 											// sigma value of data, according a set trigger level if any
+	int									maxValueTriggered			= Integer.MIN_VALUE;		 			// max value of the curve, according a set trigger level if any
+	int									minValueTriggered			= Integer.MAX_VALUE;					// min value of the curve, according a set trigger level if any
+	int									avgValue							= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
+	int									sigmaValue						= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
+	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
+	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue		= this.maxScaleValue;
@@ -612,8 +612,6 @@ public class Record extends Vector<Integer> {
 	 */
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null)  {
-			Record referencedRecord = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]);
-			log.log(Level.FINER, this.getName() + " -> referencedRecord size = " + referencedRecord.realSize()); //$NON-NLS-1$
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
 		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();

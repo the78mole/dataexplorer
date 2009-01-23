@@ -246,7 +246,22 @@ public class RecordSet extends HashMap<String, Record> {
 
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
+		if(log.isLoggable(Level.FINER)) {
+			StringBuilder sb = new StringBuilder();
+			for (String string : oldRecordNames) {
+				sb.append(string).append(" ");
+			}
+			log.log(Level.FINER, "oldRecordNames = "+ sb.toString());
+		}
 		String[] newRecordNames = this.device.getMeasurementNames(newChannelConfiguration);
+		if(log.isLoggable(Level.FINER)) {
+			StringBuilder sb = new StringBuilder();
+			for (String string : newRecordNames) {
+				sb.append(string).append(" ");
+			}
+			log.log(Level.FINER, "newRecordNames = "+ sb.toString());
+		}
+		//copy records while exchange record name (may change to other language!)
 		for (int i = 0; i < newRecordNames.length; i++) {
 			if (!oldRecordNames[i].equals(newRecordNames[i])) {
 				// add the old record with new name
@@ -269,7 +284,11 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
 
-			tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
+			//copy record properties if -> record properties available == name equal 
+			if (recordSet.get(this.recordNames[i]) != null)
+				tmpRecord.setProperties(recordSet.get(this.recordNames[i]).getProperties());
+			else
+				tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
 		}
 
 		this.timeStep_ms = recordSet.timeStep_ms;
@@ -279,15 +298,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
 
-//		if (recordSet.dataTable != null) {
-//			int numCols = recordSet.dataTable.length;
-//			int numRows = recordSet.dataTable[0].length;
-//			this.dataTable = new int[numRows][numCols];
-//			//this.dataTable = new String[numRows][numCols];
-//			for (int i = 0; i < numRows; i++) {
-//				System.arraycopy(this.dataTable[i], 0, recordSet.dataTable[i], 0, numCols);
-//			}
-//		}
 		this.dataTable = null;
 		this.isTableDataCalculated = false;
 		this.isTableDisplayable = recordSet.isTableDisplayable;
@@ -992,8 +1002,13 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 		});
-		dataLoadThread.setPriority(Thread.MIN_PRIORITY);
-		dataLoadThread.start();
+		try {
+			dataLoadThread.setPriority(Thread.MIN_PRIORITY);
+			dataLoadThread.start();
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
 
 	}
 
@@ -1541,9 +1556,13 @@ public class RecordSet extends HashMap<String, Record> {
 				RecordSet.this.application.updateDataTable(RecordSet.this.getName());
 			}
 		};
-		if (!this.dataTableCalcThread.isAlive()) {
-			this.dataTableCalcThread.setPriority(Thread.NORM_PRIORITY);
-			this.dataTableCalcThread.start();
+		if (!this.dataTableCalcThread.isAlive() && !this.isTableDataCalculated) {
+			try {
+				this.dataTableCalcThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
 		}
 	}
 

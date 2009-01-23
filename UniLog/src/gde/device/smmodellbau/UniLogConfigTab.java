@@ -1289,6 +1289,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * retrieve initial values from device properties file for editable fields
 	 */
 	void initEditable() {
+		log.log(Level.INFO, "entry");
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;
@@ -1397,7 +1398,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * updates the analog record descriptors according input fields
 	 * attention: set new record name replaces the record, setName() must the last operation in sequence
 	 */
-	void checkUpdateAnalog() {
+	public void checkUpdateAnalog() {
 		if (this.channels.getActiveChannel() != null) {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {

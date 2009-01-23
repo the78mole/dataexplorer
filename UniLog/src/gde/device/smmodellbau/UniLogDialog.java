@@ -824,7 +824,12 @@ public class UniLogDialog extends DeviceDialog {
 											log.log(Level.FINEST, "readDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
 											UniLogDialog.this.gatherThread = new DataGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName);
-											UniLogDialog.this.gatherThread.start();
+											try {
+												UniLogDialog.this.gatherThread.start();
+											}
+											catch (RuntimeException e) {
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
 											UniLogDialog.this.setClosePossible(false);
 
 											UniLogDialog.this.readDataButton.setEnabled(false);
@@ -914,7 +919,12 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.this.editConfigButton.setEnabled(false);
 												UniLogDialog.this.setClosePossible(false);
 												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
-												UniLogDialog.this.liveThread.start();
+												try {
+													UniLogDialog.this.liveThread.start();
+												}
+												catch (RuntimeException e) {
+													log.log(Level.WARNING, e.getMessage(), e);
+												}
 											}
 											catch (Exception e) {
 												if (UniLogDialog.this.liveThread != null && UniLogDialog.this.liveThread.isTimerRunning) {
@@ -1068,7 +1078,20 @@ public class UniLogDialog extends DeviceDialog {
 											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
 											activeChannel.remove(recordSetKey);										
 											channels.switchChannel(channelNumber, recordSetKey);
-											UniLogDialog.this.getDialogShell().redraw();
+											switch (channelNumber) {
+											case 1:
+												UniLogDialog.this.configTab1.initEditable();
+												break;
+											case 2:
+												UniLogDialog.this.configTab2.initEditable();
+												break;
+											case 3:
+												UniLogDialog.this.configTab3.initEditable();
+												break;
+											case 4:
+												UniLogDialog.this.configTab4.initEditable();
+												break;
+											}
 										}
 									}
 								}
