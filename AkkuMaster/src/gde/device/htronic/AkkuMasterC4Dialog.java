@@ -426,7 +426,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							}
 						}
 					};
-					this.versionThread.start();
+					try {
+						this.versionThread.start();
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
 				}
 			}
 		}

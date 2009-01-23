@@ -816,7 +816,12 @@ public class SettingsDialog extends Dialog {
 				}
 			}
 		};
-		this.listPortsThread.start();
+		try {
+			this.listPortsThread.start();
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
 	}
 
 	/**

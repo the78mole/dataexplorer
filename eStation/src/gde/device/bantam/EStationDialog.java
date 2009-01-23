@@ -175,7 +175,12 @@ public class EStationDialog extends DeviceDialog {
 									EStationDialog.this.serialPort.close();
 								}
 							};
-							EStationDialog.this.updateConfigTread.start();
+							try {
+								EStationDialog.this.updateConfigTread.start();
+							}
+							catch (RuntimeException e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 						}
 					}
 				});
@@ -237,7 +242,12 @@ public class EStationDialog extends DeviceDialog {
 										if (Channels.getInstance().getActiveChannel() != null) {
 											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
 											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey, EStationDialog.this);
-											EStationDialog.this.dataGatherThread.start();
+											try {
+												EStationDialog.this.dataGatherThread.start();
+											}
+											catch (RuntimeException e) {
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
 											EStationDialog.this.boundsComposite.redraw();
 										}
 									}

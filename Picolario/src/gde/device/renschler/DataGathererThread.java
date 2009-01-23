@@ -102,7 +102,12 @@ public class DataGathererThread extends Thread {
 				PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
 				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
-				this.calculationThread.start();
+				try {
+					this.calculationThread.start();
+				}
+				catch (RuntimeException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
 
 				this.application.getMenuToolBar().addRecordSetName(recordSetKey);
 				if (channel.getRecordSetNames().length <= 1 || this.dialog.isDoSwtichRecordSet()) channel.switchRecordSet(recordSetKey);

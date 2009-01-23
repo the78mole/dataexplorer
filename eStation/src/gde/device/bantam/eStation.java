@@ -448,7 +448,12 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				Record record = recordSet.get(recordKey);
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					this.calculationThreads.get(recordKey).start();
+					try {
+						this.calculationThreads.get(recordKey).start();
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
 				}
 				++displayableCounter;
 				
@@ -456,7 +461,12 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				record = recordSet.get(recordKey);
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					this.calculationThreads.get(recordKey).start();
+					try {
+						this.calculationThreads.get(recordKey).start();
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
 				}		
 				++displayableCounter;
 				
@@ -502,7 +512,12 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					if (Channels.getInstance().getActiveChannel() != null) {
 						String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
 						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, channelConfigKey, this.getDialog());
-						this.getDialog().dataGatherThread.start();
+						try {
+							this.getDialog().dataGatherThread.start();
+						}
+						catch (RuntimeException e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+						}
 						if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 					}
 				}

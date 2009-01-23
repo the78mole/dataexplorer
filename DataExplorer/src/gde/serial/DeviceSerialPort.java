@@ -648,7 +648,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
 				}
 			};
-			this.closeThread.start();
+			try {
+				this.closeThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
 		}
 	}
 

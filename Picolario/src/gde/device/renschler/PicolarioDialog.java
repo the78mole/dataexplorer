@@ -277,7 +277,12 @@ public class PicolarioDialog extends DeviceDialog {
 							PicolarioDialog.this.stopButton.setEnabled(true);
 							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort,
 									new String[] { PicolarioDialog.this.recordSetSelectCombo.getText() });
-							PicolarioDialog.this.gatherThread.start();
+							try {
+								PicolarioDialog.this.gatherThread.start();
+							}
+							catch (RuntimeException e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 							log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
 						} // end widget selected
 					}); // end selection adapter
@@ -314,8 +319,13 @@ public class PicolarioDialog extends DeviceDialog {
 							PicolarioDialog.this.stopButton.setEnabled(true);
 							String[] itemNames = PicolarioDialog.this.recordSetSelectCombo.getItems();
 							PicolarioDialog.this.gatherThread = new DataGathererThread(PicolarioDialog.this.application, PicolarioDialog.this.device, PicolarioDialog.this.serialPort, itemNames);
-							PicolarioDialog.this.gatherThread.start();
-							log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
+							try {
+								PicolarioDialog.this.gatherThread.start();
+								log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
+							}
+							catch (RuntimeException e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 						}
 					});
 				}

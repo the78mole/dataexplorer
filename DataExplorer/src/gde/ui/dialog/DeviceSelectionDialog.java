@@ -1084,7 +1084,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 			}
 		};
-		this.listPortsThread.start();
+		try {
+			this.listPortsThread.start();
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
 
 	}
 	

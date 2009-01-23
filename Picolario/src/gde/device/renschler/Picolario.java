@@ -394,7 +394,12 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			else
 				this.calculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 
-			this.calculationThread.start();
+			try {
+				this.calculationThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
 		}
 	}
 
