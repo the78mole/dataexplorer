@@ -260,9 +260,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return 0 = no processing, 1 = discharge, 2 = charge
 	 */
 	public int getProcessingMode(byte[] dataBuffer) {
-		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // 0=off, no processing; 1=discharge or 2=charge
+		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // processing=1, stop=0 
 		if(modeIndex != 0) {
-			modeIndex = (dataBuffer[8] & 0xFF)-0x80 == 0x01 || (dataBuffer[8] & 0xFF)-0x80 == 0x11 ? 2 : 1;
+			modeIndex = (dataBuffer[8] & 0x0F) == 0x01 ? 2 : 1;
 		}
 		return modeIndex;
 	}

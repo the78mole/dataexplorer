@@ -222,7 +222,7 @@ public class GathererThread extends Thread {
 						sumCycleTime = measurementCount = 0;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGT1408));
+						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGT1408, new Object[] {}));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
@@ -297,10 +297,10 @@ public class GathererThread extends Thread {
 			if (throwable != null) {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 				cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
-						+ Messages.getString(MessageIds.OSDE_MSGT1408));
+						+ Messages.getString(MessageIds.OSDE_MSGT1408, new Object[] {throwable.getClass().getSimpleName(), throwable.getLocalizedMessage()}));
 			}
 			else {
-				cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022)	+ Messages.getString(MessageIds.OSDE_MSGT1408));
+				cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022)	+ Messages.getString(MessageIds.OSDE_MSGT1408, new Object[] {}));
 			}
 		}
 	}
