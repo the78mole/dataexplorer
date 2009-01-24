@@ -187,7 +187,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param header
 	 * @param lov2osdMap
 	 * @param channelNumber
-	 * @return
+	 * @return string with delimited record keys
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		String recordSetInfo = new String();
