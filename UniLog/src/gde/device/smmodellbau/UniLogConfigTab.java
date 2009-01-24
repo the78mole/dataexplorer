@@ -1289,7 +1289,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * retrieve initial values from device properties file for editable fields
 	 */
 	void initEditable() {
-		log.log(Level.INFO, "entry");
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;

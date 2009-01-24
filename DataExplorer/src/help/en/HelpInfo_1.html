@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
+<TITLE>OpenSerialDataExplorer - Information and Help</TITLE>
+</HEAD>
+<BODY LANG="en-US">
+
+<DIV ID="Header">
+OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
+
+<DIV ID="Menu"><A HREF="HelpInfo.html">Information and Help</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo.html">Introduction</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_01.html">Used directories</A>
+<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_02.html">Main window</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_1.html">Preferences dialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_2.html">Device selection dialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_3.html">Menu- and Tool- Bar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"File"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Edit"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Device"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics
+templates"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A>
+<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Dataset-ToolBar</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and
+positioning</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Table view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digital view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analog view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Cell voltage view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Curve compare</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">File comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Dataset comment</A> <BR />
+<BR />
+<A HREF="HelpInfo_A.html">Device properties files</A> <BR />
+<BR />
+<A HREF="HelpInfo_B.html">File format</A></DIV>
+
+<DIV ID="Content" DIR="LTR">
+<H1>The Preferences Dialog</H1>
+<H2>General Tab</H2>
+
+<P>The settings dialog is used to configure:
+<IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=RIGHT ></P>
+<UL>
+	<LI>The language to be used
+	<LI>The data path, where the application is locking for and
+	placing the device specific log data files.
+	<LI>The file save dialog might be use the current date as leader
+	of the file name.
+	<LI>Decimal separator and list separator characters. This might
+	not the same as comes from the system locales to secure working
+	together with the used spread sheet program (used for import/export of
+	CSV files) .
+	<LI>Behavior of the device dialogs. A primary modal behavior is
+	some times unhandy, if some adjustments are tke place in parallel while
+	gathering data. Some times this cost more effort while programming
+	this.
+	<LI>While opening this dialog it scans for available serial ports
+	and updates the results delayed. The delay can be reduced on slow
+	systems by switching off the availability check. If this is the case
+	used ports are displayed too which might not be used in future. Dann
+	werden belegte Ports halt auch angezeigt und k&ouml;nnen eventuell
+	sp&auml;ter nicht benutzt werden. At UNIX based systems this is not
+	relevant. This adjustment reflect also to the device selection dialog
+	which also scans for available pserial ports.
+	<LI>If system wide only one serial port is available it is
+	possible to configure global serial port usage, but in most cases the
+	single available port will be found automatically.
+</UL>
+
+<H2>Analysis Tab</H2>
+<P><img src="images/Settingsdialog_2.png" name="graphics 2" align="RIGHT" >
+Using the analyse tab only adjustments for problem analysis can
+be found. After a program failure function a trace log entry should
+appear which may help to find the reason for it appearance. Pay
+attention, modifying trace log level away from INFO will result in
+slowed down execution an may lead in unknown side effects. So adust this
+values using this knowledge. The adjustments are scaled in detail level,
+</P>
+<UL>
+	<LI>SEVERE writes only program execution errors,
+	<LI>WARNING writing errors and warnings,
+	<LI>INFO writing errors, warnings and some informational
+	(default),
+	<LI>FINE writing all errors warnings and informational, in
+	addition traces of the level fine,
+	<LI>FINER writing more than FINE
+	<li>FINEST writing more than FINER
+</UL>
+<P>Without a good reason do not adjust above level FINE.</P>
+<UL>
+	<LI>the global setting of the &quot;trace log&quot; level, is in
+	normal the level INFO
+	<LI>Graphical user interface, here all statements are included
+	called during main window execution
+	<LI>Devices, all statements called during device relevant
+	execution
+	<LI>Data model, all executions involved by the data model itself
+	<LI>Utility functions, all the helper functions, drawing curves,
+	calculate checksum, etc.
+	<LI>File I/O, function calls involved in file input/output
+	<LI>Serial I/O, will used a memory logger above the level INFO to
+	archieve a low performance impact. As logical consequence the memory
+	usage of the application is higher as before. It might be required to
+	start the application using &quot;java -jar -Xmx512m
+	OpenSerialDataExplorer.jar&quot; where the maximal memory usage is
+	limited to 512 Mbyte.
+</UL>
+<P>In every case only three level of trace log files are written
+with a limited size. The files in this rolled approach will over write
+after a certain amount of statements.</P>
+<P><B>Hint: </B>In case of error please have a look into the trace
+log files this will give help indicators to fix the problem.</P>
+
+<P ALIGN=LEFT><A HREF="HelpInfo_02.html">&lt;&lt;== previous</A></P>
+<P ALIGN=RIGHT><A HREF="HelpInfo_2.html">next ==&gt;&gt;</A></P>
+</DIV>
+</BODY>
+</HTML>

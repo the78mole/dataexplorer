@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
+<TITLE>OpenSerialDataExplorer - Information and Help</TITLE>
+</HEAD>
+<BODY LANG="en-US">
+
+<DIV ID="Header">
+OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
+
+<DIV ID="Menu"><A HREF="HelpInfo.html">Information and Help</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo.html">Introduction</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_01.html">Used directories</A>
+<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_02.html">Main window</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_1.html">Preferences dialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_2.html">Device selection dialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_3.html">Menu- and Tool- Bar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"File"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Edit"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Device"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics
+templates"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A>
+<BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Dataset-ToolBar</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and
+positioning</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Table view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digital view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analog view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Cell voltage view</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Curve compare</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">File comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Dataset comment</A> <BR />
+<BR />
+<A HREF="HelpInfo_A.html">Device properties files</A> <BR />
+<BR />
+<A HREF="HelpInfo_B.html">File format</A></DIV>
+
+<DIV ID="Content" DIR="LTR">
+<H2>The Curve Selector Context Menu</H2>
+<P><IMG SRC="images/CurveSelector_ContextMenue.png" NAME="graphics1" ALIGN=RIGHT>
+The curve selector
+context menu gets activated by selecting a curve name with the right
+mouse button. On top of the context menu the name of the selected curve
+is written which is in focus. All adjustments and visualization changes
+are applied to just this curve.</P>
+<P>Using the context menu <B>Curve visible</B> the curve can made
+visible or invisible. While the curve is invisible and some properties
+gets changed it will be visible afterwards. As sample a invisible curve
+should be measured, the curve gets visible and the measurement point are
+displayed.</P>
+<P>Selecting <B>Curve line color</B> a color selection dialog
+pops up to chose the curve color. The selected color gets also used
+drawing the base line of the vertical scale of this particular curve to
+get easy color match. This color is used to display the digital numbers
+and the circle base line of the analog display.</P>
+<P>Adjusting <B>Curve line width</B> the curve gets differentiated
+from the others.</P>
+<P>Changing the <B>Curve line type</B> will only small change the
+visibility. Since the most curves has such small difference between data
+points there are only small impression changes. This has to be tested
+individually.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Scale.png" NAME="graphics2" ALIGN=LEFT>
+The next block <B>Axis end values</B> manipulates the scales. <B>Automatic</B>
+uses the real minumum and maximum values of the curve. <B>Rounded</B>,
+rounds depending of the values in use. The selection of <B>starts at
+0</B> can be used together with “rounded” or “automatic”. The starting point
+of the scale is set to zero.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Manual.png" NAME="graphics3" ALIGN=LEFT>
+While selecting <B>manual</B> a small dialog gets active to enable adjustment
+of the end values. Values can not only changed by combo box selection it
+can be overwritten as well. Pushing the OK button or hit the enter
+button of the keyboard will close the dialog and make the changes
+active.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Precision.png" NAME="graphics4" ALIGN=RIGHT>
+With the menu <B>Axis number format</B> the precision of the displayd values gets
+adjusted. To many digits might suggest a precision what is not real by
+means of the measurement device itself.</P>
+<P><B>Axis position</B> defines the side where the scale of this
+measurement is displayed.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Vertical_Grid.png" NAME="graphics5" ALIGN=LEFT>
+The context menu to adjust grid lines enables displaying vertical, time line
+and horizontal, for the measurement. The color adjustments enables to
+leaf the grid lines in background. For <B>vertical grid lines</B>, time
+line related, the “mod 60” reduces the grid lines to minutes (60 sec) or
+hours(60 min) depending on the time line scale.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Horizontal_Grid.png" NAME="graphics6" ALIGN=RIGHT>
+<B>Horizontal grid linies</B> are bound to only one measurement. The curve name used to
+adjust this will be displayed. Each second will only draw a grid line
+each second major scale mark.</P>
+<P>The context menu <B>Measurement</B> it is possible to measure
+curve points with snapping crossing hairlines. To do this select the
+menu <B>measure curve point</B>. To move the hairlines position the
+mouse pointer direct over the vertical line. While the mouse pointer
+changes to arrows push the mouse button and move the hairlines to the
+point of interest. Meanwhile the measured value is displayed in the
+status bar.</P>
+<P ALIGN=CENTER>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure.png" NAME="graphics7" ALIGN=MIDDLE>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure_Pointer.png" NAME="graphics8" ALIGN=MIDDLE>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure_Value.png" NAME="graphics9" ALIGN=MIDDLE></P>
+<P>To <B>measure point difference</B> the difference between
+two point are measured using two different crossed hairlines. The delta
+value and unit gets displayed in the status bar.</P>
+<P ALIGN=CENTER><IMG SRC="images/CurveSelector_ContextMenue_Deltameasure.png" NAME="graphics10" ALIGN=MIDDLE></P>
+<P>As measurement hairlines black and blue hairlines are displayed.
+Adjust both as described before to measure a single curve point value.
+Especially in zoomed curved this makes sense. As additional information
+the starting point of the zoomed area is displayed.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Compare.png" NAME="graphics11" ALIGN=LEFT>
+The last sections in the context menu are used to copy selected curves into
+the compare window <B>Copy to curve compare</B>. The last entry allowes
+to clean the curve compare view by selecting <B>Clean curve compare</B>.
+This entry gets active when at least one curve is within this area.</P>
+<P>The actual release allows comparing curves of same type and same
+time raster. It is ssenseless to compare voltage with height as example.
+</P>
+<P ALIGN=LEFT><A HREF="HelpInfo_4.html">&lt;&lt;== previous</A></P>
+<P ALIGN=RIGHT><A HREF="HelpInfo_42.html">next ==&gt;&gt;</A></P>
+</DIV>
+</BODY>
+</HTML>

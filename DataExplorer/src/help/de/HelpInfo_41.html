@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+<TITLE>OpenSerialDataExplorer - Information und Hilfe</TITLE>
+<META NAME="AUTHOR" CONTENT="Winfried Brügmann">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information und Hilfe</DIV>
+
+<DIV ID="Menu"><A HREF="HelpInfo.html">Information und Hilfe</A><BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo.html">Einleitung</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_01.html">Verwendete Verzeichnisse</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_02.html">Das Anwendungsfenster</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_1.html">Der Einstellungsdialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_2.html">Der Geräteauswahldialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_3.html">Menü- und Tool- Bar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"Datei"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Bearbeiten"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Gerät"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Grafikvorlagen"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Ansicht"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Hilfe"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Kanalwahl-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Konfigurationswahl-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Datensatzauswahl-ToolBar</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphische Anzeige</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Der Kurvenselektor</A><BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoomen und Positionieren</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Tabellarisches Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digitale Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analoge Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Zellenspannungs Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Kurvenvergleichs Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Datei-Kommentar</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Datensatz-Kommentar</A> <BR />
+<BR />
+<A HREF="HelpInfo_A.html">Gerätekonfigurationsdateien</A> <BR />
+<BR />
+<A HREF="HelpInfo_B.html">Dateiformat</A>
+</DIV>
+
+<DIV ID="Content" DIR="LTR">
+<H2><A NAME="curve_selector"></A>Der Kurvenselektor</H2>
+<P><IMG SRC="images/CurveSelector_ContextMenue.png" NAME="graphics1" ALIGN=RIGHT>
+Ganz oben im Kontextmen&uuml; befindet sich der Name der Kurve, die man gerade im
+Fokus hat. Alle &Auml;nderungen der Einstellung beziehen sich also auf
+die Darstellungseigenschaften dieser Kurve.</P>
+<P>&Uuml;ber das Kontextmen&uuml; kann man die <B>Kurve sichtbar</B>
+oder unsichtbar schalten. Ist eine Kurve unsichtbar geschaltet und eine
+Ver&auml;nderung der Kurveneigentschaften wird ausgel&ouml;st, wird die
+Kurve automatisch sichtbar geschaltet. Als Beispiel soll eine nicht
+sichtbare Kurve vermessen werden, so werden die Messlinien aktiviert und
+die Kurve, die man vermessen m&ouml;chte sichtbar geschaltet.</P>
+<P>Durch Selektion von <B>KurvenLinienFarbe</B> wird ein
+Farbauswahldialog gestartet, durch den die Linienfarbe der Kurve
+eingestellt werden kann. Die Farbe wird auch f&uuml;r die Basislinie der
+vertikalen Achse verwendet, um eine leichte optische Zuordnung zu
+erreichen. Au&szlig;erdem wird die Farbe f&uuml;r die Zahlen in der
+Digitalanzeige und die Kreisskalagrundlinie in der Analoganzeige
+verwendet.</P>
+<P>Die Einstellung der <B>KurvenLinienDicke</B> erlaubt ein
+optisches hervorheben einer einzelnen Kurve.</P>
+<P>Die Ver&auml;nderung des <B>KurvenLinienTypes</B> hat nur geringe
+Bedeutung. Da, bei den meisten Kurven, der Abstand zwischen den
+einzelnen Kurvenpunkten gering ist, ist die Wirkung in den meisten
+F&auml;llen nicht gegeben. Hier muss die Wirkung in Abh&auml;ngigkeit
+der Punktabst&auml;nde individuell ausprobiert werden.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Scale.png" NAME="graphics2" ALIGN=LEFT>Der
+n&auml;chste Block im Kontextmen&uuml; konfiguriert die Achsen und damit
+auch die Skalen der jeweiligen Kurve. <B>Automatik</B> nimmt die Minimum
+und Maximum Werte, wie sie in den Kurvendaten vorkommen als
+Endbegrenzung. <B>Gerundet</B>, rundet in Abh&auml;ngigkeit der
+Wertgr&ouml;&szlig;e auf oder im negativen Fall ab. Die Selektion <B>beginnt
+bei 0</B> kann mit &quot;gerundet &quot; oder &quot;automatik&quot; zusammen
+verwendet werden. Der Anfangspunkt der Skala wir auf Null gesetzt.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Manual.png" NAME="graphics3" ALIGN=LEFT>
+W&auml;hlt man <B>manuell</B> &ouml;ffnet sich ein kleiner Dialog der die
+Einstellung der Achsenendwerte erlaubt. Werte k&ouml;nnen nicht nur
+durch Selektion ver&auml;ndert werden, sonder durch Eingabe &uuml;ber
+die Tastatur, also durch &Uuml;berschreiben. Als Dezimalseparator kann
+Punkt oder Komma verwendet werden. Dr&uuml;cken der Entertaste oder
+Selektion des OK Knopfes schlie&szlig;t die Eingabe ab.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Precision.png" NAME="graphics4" ALIGN=RIGHT>
+Mit dem Men&uuml;punkt <B>Achsen-Zahlenformat</B> bestimmt man die Genauigkeit
+der Anzeige. Zu viele Stellen hinter dem Komma suggerieren aber auch
+eine Genauigkeit, die m&ouml;glicherweise durch die Messung oder das
+Messmittel gar nicht gegeben sind.</P>
+<P>Mit der <B>Achsen-Position</B> bestimmt man die Seite auf der die
+Achse zu der Kurve mit der Skala dargestellt werden soll. Da wir von
+links nach rechts lesen, sind bei mir die wichtigeren Kurvenachsen
+vorzugsweise links angeordnet.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Vertical_Grid.png" NAME="graphics5" ALIGN=LEFT>Der
+Kontextmen&uuml;-Block zur Einstellung von <B>Gridlinien</B> gibt die
+M&ouml;glichkeit <B>vertikale</B>, also auf der Zeitachse, Gridlinien zu
+zeichnen. Die Einstellung der Farbe der Gridlinien erlaubt, Gridlinien
+im Hintergrund zu belassen. Sonst sieht man vor lauter Gridlinien
+wom&ouml;glich die eigentlichen Kurven nicht mehr. Die Einstellung auf
+&quot;mod 60&quot; bedeutet einen geraden Teiler, je nach dargestellter
+Gesamtzeit 60 Sekunden oder 60 Minuten.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Horizontal_Grid.png" NAME="graphics6" ALIGN=RIGHT>
+Die <B>horizontalen
+Gridlinien</B> haben eine Zuordnung zu einer Kurve. Die Kurve, mit der die
+Einstellung vorgenommen wurde wird angezeigt. Die Einstellung auf
+&quot;jede zweite Zeitmarke&quot; (Hauptskalenteilung) d&uuml;nnt die
+horizontalen Gridlinien etwas aus. Horizontale Gridlinien k&ouml;nnen
+immer nur f&uuml;r eine Kurve angezeigt werden.</P>
+<P>&Uuml;ber den Kontextmen&uuml;punkt <B>Kurven Vermessen</B> kann
+man &uuml;ber ein eingeblendetes Fadenkreuz Kurvenpunkte vermessen. Dazu
+wird im Kontextmen&uuml; <B>Kurvenpunkt messen</B> selektiert. Nachdem
+das Kontextmen&uuml; verschwunden ist wird ein Fadenkreuz aus
+gestrichelten Linien dargestellt. Bewegt man den Mauszeiger unmittelbar
+&uuml;ber der senkrechten Linie, &auml;ndert sich der Mauszeiger, so wie
+im Bild vergr&ouml;&szlig;ert dargestellt. Durch dr&uuml;cken und halten
+der linke Maustaste kann nun der senkrechte Strich verschoben werden,
+wobei der waagerechte Strich automatisch der Kurve folgt. Dabei wird der
+aktuelle Messwert unten in der Statusleiste, rechts neben dem
+Fortschrittsbalken angezeigt.</P>
+<P ALIGN=CENTER>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure.png" NAME="graphics7" ALIGN=BOTTOM>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure_Pointer.png" NAME="graphics8" ALIGN=BOTTOM>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure_Value.png" NAME="graphics9" ALIGN=BOTTOM></P>
+<P>Mit <B>Punktdifferenz messen</B> wird der Differenzwert zwischen
+zwei Kurvenpunkten gemessen. Dabei wird dann auch die Einheit &uuml;ber
+die Zeit gebildet und angezeigt.</P>
+<P ALIGN=CENTER><IMG SRC="images/CurveSelector_ContextMenue_Deltameasure.png" NAME="graphics10" ALIGN=BOTTOM></P>
+<P>Als Messfadenkreuz werden ein schwarzes und ein blaues Fadenkreuz
+eingeblendet. Beide werden genau so bewegt, wie bei der
+Einzelpunktvermessung. Besonders sinnvoll sind solche Messungen im
+vergr&ouml;&szlig;ertem Zustand. Hier wird als Zusatzinformation noch
+die Anfangszeit des Kurvenausschnittes angezeigt.</P>
+<P><IMG SRC="images/CurveSelector_ContextMenue_Compare.png" NAME="graphics11" ALIGN=LEFT >
+Als letzter Block im Kontextmen&uuml; sind die Funktionen zur
+&Uuml;bertragung in das Kurvenvergleichsfenster <B>Kopiere
+Kurvenvergleich</B> und das S&auml;ubern des Kurvenvergleichsfensters <B>L&ouml;sche
+Kurvenvergleich</B> angeordnet. Letzter Punkt wird erst aktiv geschaltet,
+wenn sich mindestens einen Kurve im Vergleichsfenster befindet.</P>
+<P>Im aktuellen Release des Programms ist es nur m&ouml;glich
+gleichartige Kurven gleichzeitig darzustellen. So z.B. Spannungskurven
+eines Akkus aus verschiedenen Messungen des selben Messger&auml;tes.</P>
+<P ALIGN=LEFT><A HREF="HelpInfo_4.html">&lt;&lt;== zur&uuml;ck</A></P>
+<P ALIGN=RIGHT><A HREF="HelpInfo_42.html">weiter ==&gt;&gt;</A></P>
+</DIV>
+</BODY>
+</HTML>
