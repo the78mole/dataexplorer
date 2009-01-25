@@ -1,1 +1,481 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">	<Device>		<name>UniLog</name>		<manufacturer>SM-Modellbau</manufacturer>		<manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>		<group>logger</group>		<image>UniLog.jpg</image>		<usage>false</usage>	</Device>	<SerialPort>		<port>COM2</port>		<baudeRate>115200</baudeRate>		<dataBits>8</dataBits>		<stopBits>STOPBITS_1</stopBits>		<parity>PARITY_NONE</parity>		<flowControlMode>FLOWCONTROL_NONE</flowControlMode>		<isRTS>true</isRTS>		<isDTR>true</isDTR>		<DataBlock>			<size>24</size>			<checkSum>XOR</checkSum>		</DataBlock>	</SerialPort>	<TimeBase>		<name>Zeit</name>		<symbol>t</symbol>		<unit>ms</unit>		<timeStep>250</timeStep>	</TimeBase>	<Channel type="TYPE_CONFIG" name="Höhe 1">		<Measurement>			<name>SpannungEmpf</name>			<symbol>Ue</symbol>			<unit>V</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung</name>			<symbol>U</symbol>			<unit>V</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Strom</name>			<symbol>I</symbol>			<unit>A</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>			<property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>		</Measurement>		<Measurement>			<name>Ladung</name>			<symbol>C</symbol>			<unit>mAh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Leistung</name>			<symbol>P</symbol>			<unit>W</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Energie</name>			<symbol>E</symbol>			<unit>Wh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung/Zelle</name>			<symbol>U*</symbol>			<unit>V</unit>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="4" name="number_cells"/>		</Measurement>		<Measurement>			<name>Drehzahl</name>			<symbol>n</symbol>			<unit>1/min</unit>			<active>false</active>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>			<property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>			<property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>			<property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>		</Measurement>		<Measurement>			<name>Wirkungsgrad</name>			<symbol>eta</symbol>			<unit>%</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property type="Integer" value="3400" name="prop_n100W"/>		</Measurement>		<Measurement>			<name>Höhe</name>			<symbol>h</symbol>			<unit>m</unit>			<active>true</active>			<statistics sigma="false" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Steigrate</name>			<symbol>Vs</symbol>			<unit>m/s</unit>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="10" name="regression_interval_sec"/>			<property type="String" value="regression_type_curve" name="regression_type"/>		</Measurement>		<Measurement>			<name>Geschwindigkeit</name>			<symbol>A1</symbol>			<unit>km/h</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>ServoImpuls</name>			<symbol>A2</symbol>			<unit>µs</unit>			<active>true</active>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>TempIntern</name>			<symbol>A3</symbol>			<unit>°C</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>	</Channel>	<Channel type="TYPE_CONFIG" name="Empfänger 2">		<Measurement>			<name>SpannungEmpf</name>			<symbol>Ue</symbol>			<unit>V</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung</name>			<symbol>U</symbol>			<unit>V</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Strom</name>			<symbol>I</symbol>			<unit>A</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>			<property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>		</Measurement>		<Measurement>			<name>Ladung</name>			<symbol>C</symbol>			<unit>mAh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Leistung</name>			<symbol>P</symbol>			<unit>W</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Energie</name>			<symbol>E</symbol>			<unit>Wh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung/Zelle</name>			<symbol>U*</symbol>			<unit>V</unit>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="2" name="number_cells"/>		</Measurement>		<Measurement>			<name>Drehzahl</name>			<symbol>n</symbol>			<unit>1/min</unit>			<active>false</active>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>			<property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>			<property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>			<property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>		</Measurement>		<Measurement>			<name>Wirkungsgrad</name>			<symbol>eta</symbol>			<unit>%</unit>			<statistics sigma="false" avg="true" max="false" min="false"/>			<property type="Integer" value="3400" name="prop_n100W"/>		</Measurement>		<Measurement>			<name>Höhe</name>			<symbol>h</symbol>			<unit>m</unit>			<active>true</active>			<statistics sigma="false" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Steigrate</name>			<symbol>Vs</symbol>			<unit>m/s</unit>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="10" name="regression_interval_sec"/>			<property type="String" value="Kurve" name="regression_type"/>		</Measurement>		<Measurement>			<name>Geschwindigkeit</name>			<symbol>A1</symbol>			<unit>km/h</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>ServoImpuls</name>			<symbol>A2</symbol>			<unit>µs</unit>			<active>false</active>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>TempIntern</name>			<symbol>A3</symbol>			<unit>°C</unit>			<active>true</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>	</Channel>	<Channel type="TYPE_CONFIG" name="Motormessung 3">		<Measurement>			<name>SpannungEmpf</name>			<symbol>Ue</symbol>			<unit>V</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung</name>			<symbol>U</symbol>			<unit>V</unit>			<active>true</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Strom</name>			<symbol>I</symbol>			<unit>A</unit>			<active>true</active>			<statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">				<trigger comment="Trigger: Strom &gt; 2A" minTimeSec="5" isGreater="true" level="2000"/>			</statistics>			<property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>			<property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>		</Measurement>		<Measurement>			<name>Ladung</name>			<symbol>C</symbol>			<unit>mAh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Leistung</name>			<symbol>P</symbol>			<unit>W</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>		</Measurement>		<Measurement>			<name>Energie</name>			<symbol>E</symbol>			<unit>Wh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung/Zelle</name>			<symbol>U*</symbol>			<unit>V</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>			<property description="Anzahl der Zellen vom Akku" type="Integer" value="4" name="number_cells"/>		</Measurement>		<Measurement>			<name>Drehzahl</name>			<symbol>n</symbol>			<unit>1/min</unit>			<active>true</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>			<property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>			<property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>			<property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>			<property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>		</Measurement>		<Measurement>			<name>Wirkungsgrad</name>			<symbol>eta</symbol>			<unit>%</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>			<property description="Propellerdrehzahl bei 100 W" type="Integer" value="3400" name="prop_n100W"/>		</Measurement>		<Measurement>			<name>Höhe</name>			<symbol>h</symbol>			<unit>m</unit>			<active>true</active>			<statistics ratioText="Leistung/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Steigrate</name>			<symbol>Vs</symbol>			<unit>m/s</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="10" name="regression_interval_sec"/>			<property type="String" value="regression_type_curve" name="regression_type"/>		</Measurement>		<Measurement>			<name>Geschwindigkeit</name>			<symbol>A1</symbol>			<unit>km/h</unit>			<active>false</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>ServoImpuls</name>			<symbol>A2</symbol>			<unit>Âµs</unit>			<active>false</active>			<statistics sigma="false" avg="false" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>TempIntern</name>			<symbol>A3</symbol>			<unit>Â°C</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>	</Channel>	<Channel type="TYPE_CONFIG" name="Geschwindigkeit 4">		<Measurement>			<name>SpannungEmpf</name>			<symbol>Ue</symbol>			<unit>V</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung</name>			<symbol>U</symbol>			<unit>V</unit>			<active>true</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Strom</name>			<symbol>I</symbol>			<unit>A</unit>			<active>true</active>			<statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="true" max="true" min="false">				<trigger comment="Trigger: Strom &gt; 2A" minTimeSec="5" isGreater="true" level="2000"/>			</statistics>			<property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>			<property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>		</Measurement>		<Measurement>			<name>Ladung</name>			<symbol>C</symbol>			<unit>mAh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Leistung</name>			<symbol>P</symbol>			<unit>W</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Energie</name>			<symbol>E</symbol>			<unit>Wh</unit>			<statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung/Zelle</name>			<symbol>U*</symbol>			<unit>V</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>		</Measurement>		<Measurement>			<name>Drehzahl</name>			<symbol>n</symbol>			<unit>1/min</unit>			<active>true</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>			<property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>			<property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>			<property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>			<property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>		</Measurement>		<Measurement>			<name>Wirkungsgrad</name>			<symbol>eta</symbol>			<unit>%</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>			<property description="Propellerdrehzahl bei 100 W" type="Integer" value="3400" name="prop_n100W"/>		</Measurement>		<Measurement>			<name>Höhe</name>			<symbol>h</symbol>			<unit>m</unit>			<active>true</active>			<statistics ratioText="Leistung/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Steigrate</name>			<symbol>Vs</symbol>			<unit>m/s</unit>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property type="Integer" value="10" name="regression_interval_sec"/>			<property type="String" value="regression_type_curve" name="regression_type"/>		</Measurement>		<Measurement>			<name>Geschwindigkeit</name>			<symbol>A1</symbol>			<unit>km/h</unit>			<active>true</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>Temperatur A2</name>			<symbol>A2</symbol>			<unit>°C</unit>			<active>false</active>			<statistics sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>		<Measurement>			<name>Temperatur A3</name>			<symbol>A3</symbol>			<unit>°C</unit>			<active>false</active>			<statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>			<property type="Double" value="0.0" name="offset"/>			<property type="Double" value="1.0" name="factor"/>		</Measurement>	</Channel>	<Desktop>		<property type="Boolean" value="false" name="table_tab"/>		<property type="Boolean" value="true" name="digital_tab"/>		<property type="Boolean" value="true" name="analog_tab"/>		<property type="Boolean" value="false" name="voltage_per_cell_tab"/>	</Desktop></DeviceProperties>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">
+    <Device>
+        <name>UniLog</name>
+        <manufacturer>SM-Modellbau</manufacturer>
+        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <group>logger</group>
+        <image>UniLog.jpg</image>
+        <usage>false</usage>
+    </Device>
+    <SerialPort>
+        <port>COM2</port>
+        <baudeRate>115200</baudeRate>
+        <dataBits>8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>true</isRTS>
+        <isDTR>true</isDTR>
+        <DataBlock>
+            <size>24</size>
+            <checkSum>XOR</checkSum>
+        </DataBlock>
+    </SerialPort>
+    <TimeBase>
+        <name>Zeit</name>
+        <symbol>t</symbol>
+        <unit>ms</unit>
+        <timeStep>250</timeStep>
+    </TimeBase>
+    <Channel type="TYPE_CONFIG" name="Höhe 1">
+        <Measurement>
+            <name>SpannungEmpf</name>
+            <symbol>Ue</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Strom</name>
+            <symbol>I</symbol>
+            <unit>A</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+            <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+        </Measurement>
+        <Measurement>
+            <name>Ladung</name>
+            <symbol>C</symbol>
+            <unit>mAh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Leistung</name>
+            <symbol>P</symbol>
+            <unit>W</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Energie</name>
+            <symbol>E</symbol>
+            <unit>Wh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung/Zelle</name>
+            <symbol>U*</symbol>
+            <unit>V</unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="number_cells"/>
+        </Measurement>
+        <Measurement>
+            <name>Drehzahl</name>
+            <symbol>n</symbol>
+            <unit>1/min</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
+            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
+            <property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Wirkungsgrad</name>
+            <symbol>eta</symbol>
+            <unit>%</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Integer" value="3400" name="prop_n100W"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Steigrate</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="10" name="regression_interval_sec"/>
+            <property type="String" value="regression_type_curve" name="regression_type"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>A1</symbol>
+            <unit>km/h</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls</name>
+            <symbol>A2</symbol>
+            <unit>µs</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>TempIntern</name>
+            <symbol>A3</symbol>
+            <unit>°C</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+    </Channel>
+    <Channel type="TYPE_CONFIG" name="Empfänger 2">
+        <Measurement>
+            <name>SpannungEmpf</name>
+            <symbol>Ue</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Strom</name>
+            <symbol>I</symbol>
+            <unit>A</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+            <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+        </Measurement>
+        <Measurement>
+            <name>Ladung</name>
+            <symbol>C</symbol>
+            <unit>mAh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Leistung</name>
+            <symbol>P</symbol>
+            <unit>W</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Energie</name>
+            <symbol>E</symbol>
+            <unit>Wh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung/Zelle</name>
+            <symbol>U*</symbol>
+            <unit>V</unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="2" name="number_cells"/>
+        </Measurement>
+        <Measurement>
+            <name>Drehzahl</name>
+            <symbol>n</symbol>
+            <unit>1/min</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
+            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
+            <property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Wirkungsgrad</name>
+            <symbol>eta</symbol>
+            <unit>%</unit>
+            <statistics sigma="false" avg="true" max="false" min="false"/>
+            <property type="Integer" value="3400" name="prop_n100W"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Steigrate</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="10" name="regression_interval_sec"/>
+            <property type="String" value="Kurve" name="regression_type"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>A1</symbol>
+            <unit>km/h</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls</name>
+            <symbol>A2</symbol>
+            <unit>µs</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>TempIntern</name>
+            <symbol>A3</symbol>
+            <unit>°C</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+    </Channel>
+    <Channel type="TYPE_CONFIG" name="Motormessung 3">
+        <Measurement>
+            <name>SpannungEmpf</name>
+            <symbol>Ue</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Strom</name>
+            <symbol>I</symbol>
+            <unit>A</unit>
+            <active>true</active>
+            <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
+                <trigger comment="Trigger: Strom &gt; 2 A + &gt; 5 sek." minTimeSec="5" isGreater="true" level="2000"/>
+            </statistics>
+            <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+            <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+        </Measurement>
+        <Measurement>
+            <name>Ladung</name>
+            <symbol>C</symbol>
+            <unit>mAh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Leistung</name>
+            <symbol>P</symbol>
+            <unit>W</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+        </Measurement>
+        <Measurement>
+            <name>Energie</name>
+            <symbol>E</symbol>
+            <unit>Wh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung/Zelle</name>
+            <symbol>U*</symbol>
+            <unit>V</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+            <property description="Anzahl der Zellen vom Akku" type="Integer" value="4" name="number_cells"/>
+        </Measurement>
+        <Measurement>
+            <name>Drehzahl</name>
+            <symbol>n</symbol>
+            <unit>1/min</unit>
+            <active>true</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
+            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
+            <property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Wirkungsgrad</name>
+            <symbol>eta</symbol>
+            <unit>%</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
+            <property description="Propellerdrehzahl bei 100 W" type="Integer" value="3400" name="prop_n100W"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics ratioText="Leistung/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Steigrate</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="10" name="regression_interval_sec"/>
+            <property type="String" value="regression_type_curve" name="regression_type"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>A1</symbol>
+            <unit>km/h</unit>
+            <active>false</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls</name>
+            <symbol>A2</symbol>
+            <unit>Âµs</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>TempIntern</name>
+            <symbol>A3</symbol>
+            <unit>Â°C</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+    </Channel>
+    <Channel type="TYPE_CONFIG" name="Geschwindigkeit 4">
+        <Measurement>
+            <name>SpannungEmpf</name>
+            <symbol>Ue</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Strom</name>
+            <symbol>I</symbol>
+            <unit>A</unit>
+            <active>true</active>
+            <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+                <trigger comment="Trigger: Strom &gt; 2 A + &gt; 5 sek." minTimeSec="5" isGreater="true" level="2000"/>
+            </statistics>
+            <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
+            <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+        </Measurement>
+        <Measurement>
+            <name>Ladung</name>
+            <symbol>C</symbol>
+            <unit>mAh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Leistung</name>
+            <symbol>P</symbol>
+            <unit>W</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+        </Measurement>
+        <Measurement>
+            <name>Energie</name>
+            <symbol>E</symbol>
+            <unit>Wh</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Spannung/Zelle</name>
+            <symbol>U*</symbol>
+            <unit>V</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>
+        </Measurement>
+        <Measurement>
+            <name>Drehzahl</name>
+            <symbol>n</symbol>
+            <unit>1/min</unit>
+            <active>true</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
+            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
+            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
+            <property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Wirkungsgrad</name>
+            <symbol>eta</symbol>
+            <unit>%</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
+            <property description="Propellerdrehzahl bei 100 W" type="Integer" value="3400" name="prop_n100W"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics ratioText="Leistung/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Steigrate</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="10" name="regression_interval_sec"/>
+            <property type="String" value="regression_type_curve" name="regression_type"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>A1</symbol>
+            <unit>km/h</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Temperatur A2</name>
+            <symbol>A2</symbol>
+            <unit>°C</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Temperatur A3</name>
+            <symbol>A3</symbol>
+            <unit>°C</unit>
+            <active>false</active>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+    </Channel>
+    <Desktop>
+        <property type="Boolean" value="false" name="table_tab"/>
+        <property type="Boolean" value="true" name="digital_tab"/>
+        <property type="Boolean" value="true" name="analog_tab"/>
+        <property type="Boolean" value="false" name="voltage_per_cell_tab"/>
+    </Desktop>
+</DeviceProperties>

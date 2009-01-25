@@ -180,148 +180,145 @@ public class StatisticsWindow {
 	public void updateStatisticsData() {
 		if (StatisticsWindow.this.channels.getActiveChannel() != null) {
 			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-			if (activeRecordSet != null ) {
-				//if (activeRecordSet != this.oldRecordSet || activeRecordSet.getNumberOfDisplayableRecords() != this.oldNumberDisplayableRecords) {
-					StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n"  //$NON-NLS-1$
+			if (activeRecordSet != null) {
+				StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
 						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
-					this.customTableColumnWidth = 0;
-					try {
-						String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
-						this.oldNumberDisplayableRecords = displayableRecords.length;
+				this.descriptionGroup.redraw();
+				this.customTableColumnWidth = 0;
+				try {
+					String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
+					this.oldNumberDisplayableRecords = displayableRecords.length;
 
-						StringBuilder sb = new StringBuilder();
-						this.tabelItemText = new Vector<String>();
+					StringBuilder sb = new StringBuilder();
+					this.tabelItemText = new Vector<String>();
 
-						// time
-						String time = Messages.getString(MessageIds.OSDE_MSGT0234);
-						sb.append(time.split(" ")[0]).append(DELIMITER); //$NON-NLS-1$
-						sb.append(Messages.getString(MessageIds.OSDE_MSGT0359)).append(DELIMITER);
-						sb.append("0").append(DELIMITER); //$NON-NLS-1$
-						sb.append(NO_VALUE).append(DELIMITER);
-						sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
-						sb.append(NO_VALUE).append(DELIMITER);
-						sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)); //$NON-NLS-1$
-						this.tabelItemText.add(sb.toString());
+					// time
+					String time = Messages.getString(MessageIds.OSDE_MSGT0234);
+					sb.append(time.split(" ")[0]).append(DELIMITER); //$NON-NLS-1$
+					sb.append(Messages.getString(MessageIds.OSDE_MSGT0359)).append(DELIMITER);
+					sb.append("0").append(DELIMITER); //$NON-NLS-1$
+					sb.append(NO_VALUE).append(DELIMITER);
+					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
+					sb.append(NO_VALUE).append(DELIMITER);
+					sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)); //$NON-NLS-1$
+					this.tabelItemText.add(sb.toString());
 
-						for (String recordName : displayableRecords) {
-							log.log(Level.FINE, "updating record = " + recordName);
-							Record record = activeRecordSet.get(recordName);
-							DecimalFormat df = record.getDecimalFormat();
-							IDevice device = activeRecordSet.getDevice();
-							StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.getRecordIndex(recordName));
-							if (measurementStatistics != null) {
-								sb = new StringBuilder();
-								int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);
-								boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
-								sb.append(record.getName()).append(DELIMITER);
-								sb.append("[").append(record.getUnit()).append("]").append(DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
+					for (String recordName : displayableRecords) {
+						log.log(Level.FINE, "updating record = " + recordName);
+						Record record = activeRecordSet.get(recordName);
+						DecimalFormat df = record.getDecimalFormat();
+						IDevice device = activeRecordSet.getDevice();
+						StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.getRecordIndex(recordName));
+						if (measurementStatistics != null) {
+							sb = new StringBuilder();
+							int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);
+							boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
+							sb.append(record.getName()).append(DELIMITER);
+							sb.append("[").append(record.getUnit()).append("]").append(DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
 
-								if (measurementStatistics.isMin()) {
-									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
-									else
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
-								}
+							if (measurementStatistics.isMin()) {
+								if (isTriggerLevel)
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getMinValueTriggered() / 1000.0))));
 								else
-									sb.append(NO_VALUE);
-								sb.append(DELIMITER);
-
-								if (measurementStatistics.isAvg())
-									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
-									else
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
-								else
-									sb.append(NO_VALUE);
-								sb.append(DELIMITER);
-
-								if (measurementStatistics.isMax()) {
-									if (isTriggerLevel)
-										sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
-									else
-										sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
-								}
-								else
-									sb.append(NO_VALUE);
-								sb.append(DELIMITER);
-
-								if (measurementStatistics.isSigma()) {
-									DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
-									if (isTriggerLevel) {
-										sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
-									}
-									else
-										sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
-								}
-								else
-									sb.append(NO_VALUE);
-								sb.append(DELIMITER);
-
-								// counted trigger events fullfilling the level and time constrains 
-								if (measurementStatistics.isCountByTrigger() != null) 
-									sb.append(measurementStatistics.getCountTriggerText())
-										.append(" = ") //$NON-NLS-1$
-										.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0)
-										.append(" "); //$NON-NLS-1$
-
-								// evaluate sum value within trigger range
-								if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-									if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
-										sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
-										if (isTriggerLevel)
-											sb.append(String.format("%.1f", device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
-										else {
-											if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-												sb.append(String.format("%.1f", record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
-												sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
-											}
-										}
-									}
-									
-									// append ratio text + ratio value
-									if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-										sb.append("  ").append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
-										Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
-										StatisticsType referencedStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), measurementStatistics.getRatioRefOrdinal());
-
-										if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
-											if (referencedStatistics.isAvg()) {
-												double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValue() / 1000.0)/(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
-												sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-												sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
-											}
-											else if (referencedStatistics.isMax()) {
-												double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValue() / 1000.0)/(record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
-												sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-												sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
-											}
-										}
-									}
-								}
-								
-								// append global comment
-								if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) 
-									sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-
-								// append trigger + comment
-								if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1) {
-									sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-									this.tabelItemText.set(0, this.tabelItemText.get(0)+ ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange()); 
-								}
-								
-								int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER)+1)).x;
-								this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
-								
-								log.log(Level.FINER, sb.toString());
-								this.tabelItemText.add(sb.toString());
+									sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0))));
 							}
+							else
+								sb.append(NO_VALUE);
+							sb.append(DELIMITER);
+
+							if (measurementStatistics.isAvg())
+								if (isTriggerLevel)
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getAvgValueTriggered() / 1000.0))));
+								else
+									sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0))));
+							else
+								sb.append(NO_VALUE);
+							sb.append(DELIMITER);
+
+							if (measurementStatistics.isMax()) {
+								if (isTriggerLevel)
+									sb.append(formatOutput(df.format(device.translateValue(record, record.getMaxValueTriggered() / 1000.0))));
+								else
+									sb.append(formatOutput(df.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0))));
+							}
+							else
+								sb.append(NO_VALUE);
+							sb.append(DELIMITER);
+
+							if (measurementStatistics.isSigma()) {
+								DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
+								if (isTriggerLevel) {
+									sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
+								}
+								else
+									sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
+							}
+							else
+								sb.append(NO_VALUE);
+							sb.append(DELIMITER);
+
+							// counted trigger events fullfilling the level and time constrains 
+							if (measurementStatistics.isCountByTrigger() != null) sb.append(measurementStatistics.getCountTriggerText()).append(" = ") //$NON-NLS-1$
+									.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append(" "); //$NON-NLS-1$
+
+							// evaluate sum value within trigger range
+							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
+									sb.append(measurementStatistics.getSumTriggerText()).append(" = "); //$NON-NLS-1$
+									if (isTriggerLevel)
+										sb.append(String.format("%.1f", device.translateValue(record, record.getSumTriggeredRange() / 1000.0)));
+									else {
+										if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+											sb.append(String.format("%.1f", record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
+											sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+										}
+									}
+								}
+
+								// append ratio text + ratio value
+								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+									sb.append("  ").append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
+									Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
+									StatisticsType referencedStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), measurementStatistics.getRatioRefOrdinal());
+
+									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
+										if (referencedStatistics.isAvg()) {
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValue() / 1000.0)
+													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
+											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+										}
+										else if (referencedStatistics.isMax()) {
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValue() / 1000.0)
+													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
+											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+										}
+									}
+								}
+							}
+
+							// append global comment
+							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+
+							// append trigger + comment
+							if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1) {
+								sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+								this.tabelItemText.set(0, this.tabelItemText.get(0) + ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
+							}
+
+							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
+							this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
+
+							log.log(Level.FINER, sb.toString());
+							this.tabelItemText.add(sb.toString());
 						}
 					}
-					catch (RuntimeException e) {
-						log.log(Level.WARNING, e.getMessage(), e);
-					}
-					this.oldRecordSet = activeRecordSet;
-				//}
+				}
+				catch (RuntimeException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+				this.oldRecordSet = activeRecordSet;
 			}
 			else {
 				StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$

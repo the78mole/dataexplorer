@@ -654,7 +654,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				record = recordSet.get(measurementKey);
 				
 				if (record.isActive() && record.isDisplayable()) {
-					log.log(Level.INFO, "add to displayable counter: " + record.getName());
+					log.log(Level.FINE, "add to displayable counter: " + record.getName());
 					++displayableCounter;
 				}
 			}
