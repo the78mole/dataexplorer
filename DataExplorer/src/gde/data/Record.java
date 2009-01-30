@@ -192,9 +192,7 @@ public class Record extends Vector<Integer> {
 		this.triggerIsGreater = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().isGreater() : null;
 		this.triggerLevel = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().getLevel() : null;
 		this.minTriggerTimeSec = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().getMinTimeSec() : null;
-		for (PropertyType property : newProperties) {
-			this.properties.add(property.clone());
-		}
+		this.initializeProperties(this, newProperties);
 		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 		this.numberFormat = 1;
 		
@@ -217,10 +215,7 @@ public class Record extends Vector<Integer> {
 		this.triggerIsGreater = record.triggerIsGreater;
 		this.triggerLevel = record.triggerLevel;
 		this.minTriggerTimeSec = record.minTriggerTimeSec;
-		this.properties = new ArrayList<PropertyType>();
-		for (PropertyType property : record.properties) {
-			this.properties.add(property.clone());
-		}
+		this.initializeProperties(record, record.properties);
 		this.maxValue = record.maxValue;
 		this.minValue = record.minValue;
 		this.df = (DecimalFormat) record.df.clone();
@@ -239,7 +234,7 @@ public class Record extends Vector<Integer> {
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
 		this.timeStep_ms = record.timeStep_ms;
-		this.device = record.device; // reference to device
+		this.device = record.device; // reference to device	
 	}
 
 	/**
@@ -274,10 +269,7 @@ public class Record extends Vector<Integer> {
 		this.triggerIsGreater = record.triggerIsGreater;
 		this.triggerLevel = record.triggerLevel;
 		this.minTriggerTimeSec = record.minTriggerTimeSec;
-		this.properties = new ArrayList<PropertyType>();
-		for (PropertyType property : record.properties) {
-			this.properties.add(property.clone());
-		}
+		this.initializeProperties(record, record.properties);
 		this.maxValue = 0;
 		this.minValue = 0;
 		this.clear();
@@ -321,6 +313,22 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record clone(int dataIndex, boolean isFromBegin) {
 		return new Record(this, dataIndex, isFromBegin);
+	}
+
+	/**
+	 * initialize properties, at least all record will have as default a factor, an offset and a reduction property
+	 * @param recordRef
+	 * @param newProperties
+	 */
+	private void initializeProperties(Record recordRef, List<PropertyType> newProperties) {
+		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>();	// offset, factor, reduction, ...
+		for (PropertyType property : newProperties) {
+			this.properties.add(property.clone());
+		}
+		// initialize factor, offset, reduction if not exist only
+		if (!this.properties.contains(IDevice.FACTOR)) this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, recordRef.getFactor())); 
+		if (!this.properties.contains(IDevice.OFFSET)) this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, recordRef.getOffset()));
+		if (!this.properties.contains(IDevice.REDUCTION)) this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, recordRef.getReduction()));
 	}
 	
 	/**
@@ -424,7 +432,12 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+			try {
+				value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+			}
+			catch (RuntimeException e) {
+				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
+			}
 		return value;
 	}
 
@@ -442,7 +455,12 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else
-			value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+			try {
+				value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+			}
+			catch (RuntimeException e) {
+				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
+			}
 		return value;
 	}
 	
@@ -460,8 +478,13 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			value = new Double(property.getValue()).doubleValue();
 		else {
-			String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name), IDevice.REDUCTION);
-			if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
+			try {
+				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name), IDevice.REDUCTION);
+				if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
+			}
+			catch (RuntimeException e) {
+				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
+			}
 		}
 		return value;
 	}
