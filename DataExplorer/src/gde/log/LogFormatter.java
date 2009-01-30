@@ -29,12 +29,10 @@ import java.util.logging.LogRecord;
  */
 public class LogFormatter extends Formatter {
 
-	//private static final DateFormat	format	= new SimpleDateFormat("HH:mm:ss:SSS");
 	private static final String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
-	//private static final DateFormat tf = new SimpleDateFormat("HH:mm:ss:SSS");
-	Date dat = new Date();
-  private final static String format = "{0,date,yyyy-MM-dd HH:mm:ss.SSS} {1,number,000000} {2}.{3}() - {4}" + lineSep; //$NON-NLS-1$
-  private Object args[] = new Object[5];
+	Date date = new Date();
+  private final static String format = "{0,date,yyyy-MM-dd HH:mm:ss.SSS} {1,number,000000} {2} {3}.{4}() - {5}" + lineSep; //$NON-NLS-1$
+  private Object args[] = new Object[6];
   private MessageFormat formatter;
 	/*
 	SEVERE  	 The highest value; intended for extremely important messages (e.g. fatal program errors).
@@ -49,30 +47,26 @@ public class LogFormatter extends Formatter {
 	/**
 	 * A Custom format implementation that is designed for brevity.
 	 */
-	public synchronized String format(LogRecord record) {
+	public synchronized String format(LogRecord logRecord) {
 		//StringBuilder sb = new StringBuilder();
 		// Minimize memory allocations here.
-		this.dat.setTime(record.getMillis());
-		this.args[0] = this.dat;
-		this.args[1] = record.getThreadID();
-		this.args[2] = record.getLoggerName();
-		this.args[3] = record.getSourceMethodName();
-		this.args[4] = record.getMessage();
+		this.date.setTime(logRecord.getMillis());
+		this.args[0] = this.date;
+		this.args[1] = logRecord.getThreadID();
+		this.args[2] = String.format("%-7s",logRecord.getLevel());
+		this.args[3] = logRecord.getLoggerName();
+		this.args[4] = logRecord.getSourceMethodName();
+		this.args[5] = logRecord.getMessage();
 		StringBuffer text = new StringBuffer();
 		if (this.formatter == null) {
 			this.formatter = new MessageFormat(format);
 		}
 		this.formatter.format(this.args, text, null);
-		//sb.append(text).append(" ").append(tf.format(dat)).append(" ");
-		//sb.append(String.format(" %06X ", ));
-		//sb.append(record.getLoggerName()).append('.');
-		//sb.append(record.getSourceMethodName()).append("() - ");
-		//sb.append(record.getMessage()).append(lineSep);
-		if (record.getThrown() != null) {
+		if (logRecord.getThrown() != null) {
 			try {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
-				record.getThrown().printStackTrace(pw);
+				logRecord.getThrown().printStackTrace(pw);
 				pw.close();
 				text.append(sw.toString());
 			}

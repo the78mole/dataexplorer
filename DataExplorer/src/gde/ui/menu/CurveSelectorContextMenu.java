@@ -88,97 +88,100 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
-					log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
-					
-					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.isSyncPlaceholder = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
-						CurveSelectorContextMenu.this.isScaleSynced = new Boolean(""+CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
-						CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
-						if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
-						}
-						log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
-						CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-						CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : CurveSelectorContextMenu.this.application.getCompareSet();
+					if (CurveSelectorContextMenu.this.selectedItem != null) {
+						log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
+						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+							CurveSelectorContextMenu.this.isSyncPlaceholder = new Boolean("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
+							CurveSelectorContextMenu.this.isScaleSynced = new Boolean("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
+							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
+							if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
+								CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
+							}
+							log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
+							CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
+							CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
+									: CurveSelectorContextMenu.this.application.getCompareSet();
 
-						if (CurveSelectorContextMenu.this.recordSet != null) {
-							setAllEnabled(true);						
-							
-							if (CurveSelectorContextMenu.this.recordNameKey != null && CurveSelectorContextMenu.this.recordNameKey.length() > 1) {
-								CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey);
-								if (CurveSelectorContextMenu.this.actualRecord != null) {
-									CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
-									if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-										CurveSelectorContextMenu.this.lineVisible.setText("Sync " + CurveSelectorContextMenu.this.recordSet.getSyncableName());
-										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.recordSet.isSyncableSynced();
+							if (CurveSelectorContextMenu.this.recordSet != null) {
+								setAllEnabled(true);
+
+								if (CurveSelectorContextMenu.this.recordNameKey != null && CurveSelectorContextMenu.this.recordNameKey.length() > 1) {
+									CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey);
+									if (CurveSelectorContextMenu.this.actualRecord != null) {
+										CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
+										if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
+											CurveSelectorContextMenu.this.lineVisible.setText("Sync " + CurveSelectorContextMenu.this.recordSet.getSyncableName());
+											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.recordSet.isSyncableSynced();
+										}
+										else {
+											CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.OSDE_MSGT0085));
+											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
+										}
+										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
+										// check measurement selections
+										//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
+										//disable all menu items which makes only sense if record is visible
+										if (!CurveSelectorContextMenu.this.isRecordVisible) {
+											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+										}
 									}
 									else {
-										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.OSDE_MSGT0085));
-										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
+										return; // actual record is null, record related operations not possible
 									}
-									CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
-									// check measurement selections
-									//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
-									//disable all menu items which makes only sense if record is visible
+								}
+								// check sync placeholder record
+								if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
+									CurveSelectorContextMenu.this.lineColor.setEnabled(false);
+									CurveSelectorContextMenu.this.lineType.setEnabled(false);
+									CurveSelectorContextMenu.this.lineWidth.setEnabled(false);
+									CurveSelectorContextMenu.this.horizontalGrid.setEnabled(false);
+									CurveSelectorContextMenu.this.measurement.setEnabled(false);
+									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 									if (!CurveSelectorContextMenu.this.isRecordVisible) {
-										CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+										CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
+										CurveSelectorContextMenu.this.axisNumberFormat.setEnabled(false);
 									}
 								}
-								else {
-									return; // actual record is null, record related operations not possible
-								}
-							}
-							// check sync placeholder record
-							if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-								CurveSelectorContextMenu.this.lineColor.setEnabled(false);
-								CurveSelectorContextMenu.this.lineType.setEnabled(false);
-								CurveSelectorContextMenu.this.lineWidth.setEnabled(false);
-								CurveSelectorContextMenu.this.horizontalGrid.setEnabled(false);
-								CurveSelectorContextMenu.this.measurement.setEnabled(false);
-								CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
-								if (!CurveSelectorContextMenu.this.isRecordVisible) {
+								// check for scale synced
+								if (CurveSelectorContextMenu.this.actualRecord.isScaleSynced()) {
 									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
 									CurveSelectorContextMenu.this.axisNumberFormat.setEnabled(false);
+									CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
+								}
+								// check zoom mode
+								if (CurveSelectorContextMenu.this.recordSet.isZoomMode()) {
+									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
+									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0083));
+								}
+								else {
+									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0084));
+								}
+
+								// check if record switched and measurement mode needs to be reset
+								if (!CurveSelectorContextMenu.this.recordSet.isMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)
+										&& !CurveSelectorContextMenu.this.recordSet.isDeltaMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)) {
+									CurveSelectorContextMenu.this.recordNameMeasurement = OSDE.STRING_BLANK;
+									CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
+									CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
+
+								}
+
+								if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE) {
+									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+								}
+
+								// disable clear, if nothing to clear
+								if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0) {
+									CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
+								}
+								// compare window has fixed defined scale end values
+								if (CurveSelectorContextMenu.this.recordSet.isCompareSet()) {
+									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
 								}
 							}
-							// check for scale synced
-							if (CurveSelectorContextMenu.this.actualRecord.isScaleSynced()) {
-								CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-								CurveSelectorContextMenu.this.axisNumberFormat.setEnabled(false);
-								CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
-							}
-							// check zoom mode
-							if (CurveSelectorContextMenu.this.recordSet.isZoomMode()) {
-								CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-								CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0083));
-							}
-							else {
-								CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0084));
-							}
-							
-							// check if record switched and measurement mode needs to be reset
-							if (!CurveSelectorContextMenu.this.recordSet.isMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement) && !CurveSelectorContextMenu.this.recordSet.isDeltaMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)) {
-								CurveSelectorContextMenu.this.recordNameMeasurement = OSDE.STRING_BLANK;
-								CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
-								CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
-
-							}
-														
-							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
-								CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
-							}
-							
-							// disable clear, if nothing to clear
-							if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0) {
-								CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
-							}
-							// compare window has fixed defined scale end values
-							if (CurveSelectorContextMenu.this.recordSet.isCompareSet()) {
-								CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-							}
+							else
+								setAllEnabled(false);
 						}
-						else
-							setAllEnabled(false);
 					}
 				}
 

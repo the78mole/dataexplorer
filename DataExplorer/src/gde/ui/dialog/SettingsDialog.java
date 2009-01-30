@@ -16,8 +16,11 @@
 ****************************************************************************************/
 package osde.ui.dialog;
 
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Vector;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,6 +30,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -42,9 +47,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 import osde.OSDE;
 import osde.config.Settings;
@@ -53,73 +62,95 @@ import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.LogLevelSelectionContextMenu;
 
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
  */
 public class SettingsDialog extends Dialog {
-	final static Logger						log										= Logger.getLogger(SettingsDialog.class.getName());
-	static final String						STRING_LOG_LEVEL_INFO	= "INFO";																					//$NON-NLS-1$
+	final static Logger									log											= Logger.getLogger(SettingsDialog.class.getName());
+	static final String									STRING_LOG_LEVEL_INFO		= "INFO";																					//$NON-NLS-1$
 
-	CCombo												configLevelCombo;
-	CLabel												utilsLevelLabel;
-	CCombo												utilsLevelCombo;
-	CLabel												serialIOLevelLabel;
-	CCombo												serialIOLevelCombo;
-	CLabel												configLevelLabel;
-	Button												okButton;
-	Button												globalLogLevel;
-	CLabel												commonLevelLabel;
-	CCombo												commonLevelCombo;
-	CLabel												deviceLevelLabel;
-	CCombo												deviceLevelCombo;
-	CCombo												uiLevelCombo;
-	CLabel												uiLevelLabel;
-	Composite											individualLoggingComosite;
-	Composite											globalLoggingComposite;
-	Shell													dialogShell;
-	CLabel												defaultDataPathLabel;
-	Group													defaultDataPathGroup;
-	CLabel												Port;
-	CCombo												serialPort;
-	Button												useGlobalSerialPort;
-	CLabel												localLabel;
-	CCombo												localCombo;
-	Group													groupLocale;
-	Button												doPortAvailabilityCheck;
-	Button												suggestObjectKey;
-	Composite											tabComposite1;
-	Composite											analysisComposite;
-	CTabItem											generalTabItem;
-	CTabItem											analysisTabItem;
-	CTabFolder										cTabFolder1;
-	Slider												alphaSlider;
-	Button												suggestDate;
-	Group													fileOpenSaveDialogGroup;
-	CLabel												fileIOLevelLabel;
-	CCombo												fileIOLevelCombo;
-	Button												deviceDialogModalButton;
-	Button												deviceDialogOnTopButton;
-	Button												deviceDialogAlphaButton;
-	Group													deviceDialogGroup;
-	Group													serialPortGroup;
-	Group													separatorGroup;
-	CCombo												listSeparator;
-	CLabel												listSeparatorLabel;
-	CCombo												decimalSeparator;
-	CLabel												decimalSeparatorLabel;
-	Button												defaultDataPathAdjustButton;
-	Text													defaultDataPath;
-	CCombo												globalLoggingCombo;
-	Group													loggingGroup;
+	public static final String					LOGGER_NAME							= "logger_name";																		//$NON-NLS-1$
+	public static final String					LOG_LEVEL								= "log_level";																		//$NON-NLS-1$
 
-	Thread												listPortsThread;
-	Vector<String>								availablePorts					= new Vector<String>();
-	final Settings								settings;
-	final OpenSerialDataExplorer	application;
-	final String[] 								supportedLocals					= {"en", "de"}; //$NON-NLS-1$ //$NON-NLS-2$
-	boolean 											isLocaleLanguageChanged = false;
+	CCombo															configLevelCombo;
+	CLabel															utilsLevelLabel;
+	CCombo															utilsLevelCombo;
+	CLabel															serialIOLevelLabel;
+	CCombo															serialIOLevelCombo;
+	CLabel															configLevelLabel;
+	Button															okButton;
+	Button															globalLogLevel;
+	CLabel															commonLevelLabel;
+	CCombo															commonLevelCombo;
+	CLabel															deviceLevelLabel;
+	CCombo															deviceLevelCombo;
+	CCombo															uiLevelCombo;
+	CLabel															uiLevelLabel;
+	Composite														individualLoggingComosite;
+	Composite														globalLoggingComposite;
+	Shell																dialogShell;
+	CLabel															defaultDataPathLabel;
+	Group																defaultDataPathGroup;
+	CLabel															Port;
+	CCombo															serialPort;
+	Button															useGlobalSerialPort;
+	CLabel															localLabel;
+	CCombo															localCombo;
+	Group																groupLocale;
+	Button															doPortAvailabilityCheck;
+	Button															suggestObjectKey;
+	Composite														tabComposite1;
+	Composite														analysisComposite;
+	CTabItem														generalTabItem;
+	CTabItem														analysisTabItem;
+	CTabFolder													cTabFolder1;
+	Slider															alphaSlider;
+	Button															suggestDate;
+	Group																fileOpenSaveDialogGroup;
+	CLabel															fileIOLevelLabel;
+	CCombo															fileIOLevelCombo;
+	Button															deviceDialogModalButton;
+	Button															deviceDialogOnTopButton;
+	Button															deviceDialogAlphaButton;
+	Group																deviceDialogGroup;
+	Group																serialPortGroup;
+	Group																separatorGroup;
+	CCombo															listSeparator;
+	CLabel															listSeparatorLabel;
+	CCombo															decimalSeparator;
+	CLabel															decimalSeparatorLabel;
+	Button															defaultDataPathAdjustButton;
+	Text																defaultDataPath;
+	CCombo															globalLoggingCombo;
+	Group																loggingGroup;
+	Group																classSelectionGroup;
+	Label																classBasedLabel;
+	Tree																tree;
+
+	Thread															listPortsThread;
+	Vector<String>											availablePorts					= new Vector<String>();
+	final Settings											settings;
+	final OpenSerialDataExplorer				application;
+	final String[]											supportedLocals					= { "en", "de" };																	//$NON-NLS-1$ //$NON-NLS-2$
+	boolean															isLocaleLanguageChanged	= false;
+
+	final LogLevelSelectionContextMenu	logLevelMenu						= new LogLevelSelectionContextMenu();
+	Menu																popupmenu;
 
 	public SettingsDialog(Shell parent, int style) {
 		super(parent, style);
@@ -129,8 +160,6 @@ public class SettingsDialog extends Dialog {
 
 	public void open() {
 		try {
-			{
-			}
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
@@ -182,7 +211,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "localCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "localCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 										String newLanguage = SettingsDialog.this.supportedLocals[SettingsDialog.this.localCombo.getSelectionIndex()];
 										SettingsDialog.this.isLocaleLanguageChanged = !SettingsDialog.this.settings.getLocale().getLanguage().equals(newLanguage);
 										SettingsDialog.this.settings.setLocaleLanguage(newLanguage);
@@ -199,16 +228,16 @@ public class SettingsDialog extends Dialog {
 						{ // begin default data path group
 							this.defaultDataPathGroup = new Group(this.tabComposite1, SWT.NONE);
 							this.defaultDataPathGroup.setLayout(null);
-							FormData group1LData = new FormData();
-							group1LData.width = 451;
-							group1LData.height = 42;
-							group1LData.left = new FormAttachment(0, 1000, 12);
-							group1LData.top = new FormAttachment(0, 1000, 66);
-							this.defaultDataPathGroup.setLayoutData(group1LData);
+							FormData classSelectionGroupLData = new FormData();
+							classSelectionGroupLData.width = 451;
+							classSelectionGroupLData.height = 42;
+							classSelectionGroupLData.left = new FormAttachment(0, 1000, 12);
+							classSelectionGroupLData.top = new FormAttachment(0, 1000, 66);
+							this.defaultDataPathGroup.setLayoutData(classSelectionGroupLData);
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0310));
 							this.defaultDataPathGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "defaultDataPathGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									log.log(Level.FINEST, "defaultDataPathGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
 								}
 							});
@@ -228,9 +257,9 @@ public class SettingsDialog extends Dialog {
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "defaultDataPathAdjustButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "defaultDataPathAdjustButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										String defaultDataDirectory = SettingsDialog.this.application.openDirFileDialog(Messages.getString(MessageIds.OSDE_MSGT0312), SettingsDialog.this.settings.getDataFilePath());
-										SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
+										log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 										SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
 									}
@@ -249,7 +278,7 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0315));
 							this.fileOpenSaveDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINE, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									log.log(Level.FINE, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
 									SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
 								}
@@ -261,7 +290,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINE, "suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageDateAsFileNameLeader(SettingsDialog.this.suggestDate.getSelection());
 									}
 								});
@@ -274,7 +303,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINE, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageObjectKeyInFileName(SettingsDialog.this.suggestObjectKey.getSelection());
 									}
 								});
@@ -292,7 +321,7 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0318));
 							this.deviceDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									log.log(Level.FINEST, "deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
 									SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
 									SettingsDialog.this.deviceDialogOnTopButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsOnTop());
@@ -309,7 +338,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogModalButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "deviceDialogModalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "deviceDialogModalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.enabelModalDeviceDialogs(SettingsDialog.this.deviceDialogModalButton.getSelection());
 										SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.deviceDialogModalButton.getSelection());
 									}
@@ -323,7 +352,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "deviceDialogOnTopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "deviceDialogOnTopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.enabelDeviceDialogsOnTop(SettingsDialog.this.deviceDialogOnTopButton.getSelection());
 									}
 								});
@@ -336,7 +365,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogAlphaButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDeviceDialogAlphaEnabled(SettingsDialog.this.deviceDialogAlphaButton.getSelection());
 										SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.deviceDialogAlphaButton.getSelection());
 									}
@@ -351,7 +380,7 @@ public class SettingsDialog extends Dialog {
 								this.alphaSlider.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINER, "alphaSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINER, "alphaSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 										switch (evt.detail) {
 										case SWT.DRAG:
 											SettingsDialog.this.dialogShell.setAlpha(SettingsDialog.this.alphaSlider.getSelection());
@@ -379,7 +408,7 @@ public class SettingsDialog extends Dialog {
 							this.separatorGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0325));
 							this.separatorGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									log.log(Level.FINEST, "separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.decimalSeparator.setText(SettingsDialog.this.settings.getDecimalSeparator() + OSDE.STRING_EMPTY);
 									SettingsDialog.this.listSeparator.setText(SettingsDialog.this.settings.getListSeparator() + OSDE.STRING_EMPTY);
 								}
@@ -393,12 +422,12 @@ public class SettingsDialog extends Dialog {
 							{
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
-								this.decimalSeparator.setItems(new String[] {" . ", " , "}); //$NON-NLS-1$ //$NON-NLS-2$
+								this.decimalSeparator.setItems(new String[] { " . ", " , " }); //$NON-NLS-1$ //$NON-NLS-2$
 								this.decimalSeparator.setBounds(153, 24, 43, 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "decimalSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "decimalSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDecimalSeparator(SettingsDialog.this.decimalSeparator.getText().trim());
 										SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.decimalSeparator.getText().trim() + OSDE.STRING_BLANK);
 									}
@@ -413,12 +442,12 @@ public class SettingsDialog extends Dialog {
 							{
 								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.listSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
-								this.listSeparator.setItems(new String[] { " , ", " ; ", " : "}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								this.listSeparator.setItems(new String[] { " , ", " ; ", " : " }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								this.listSeparator.setBounds(370, 24, 47, 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "listSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "listSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setListSeparator(SettingsDialog.this.listSeparator.getText().trim());
 										SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.listSeparator.getText().trim() + OSDE.STRING_BLANK);
 									}
@@ -437,7 +466,7 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0330));
 							this.serialPortGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									log.log(Level.FINEST, "serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
 									SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
 									//serialPort.setText(settings.getSerialPort());
@@ -454,7 +483,7 @@ public class SettingsDialog extends Dialog {
 								this.doPortAvailabilityCheck.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
 									}
 								});
@@ -467,7 +496,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
 											SettingsDialog.this.settings.setIsGlobalSerialPort("true"); //$NON-NLS-1$
 										}
@@ -485,7 +514,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText());
 									}
 								});
@@ -501,252 +530,309 @@ public class SettingsDialog extends Dialog {
 				{ // begin analysis tab item
 					this.analysisTabItem = new CTabItem(this.cTabFolder1, SWT.NONE);
 					this.analysisTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0302));
-					{ // begin analysis composite
-						FormData analysisCompositeLData = new FormData();
-						analysisCompositeLData.width = 451;
-						analysisCompositeLData.height = 184;
-						analysisCompositeLData.left = new FormAttachment(0, 1000, 12);
-						analysisCompositeLData.top = new FormAttachment(0, 1000, 427);
-						this.analysisComposite = new Composite(this.cTabFolder1, SWT.NONE);
-						this.analysisTabItem.setControl(this.analysisComposite);
-						this.analysisComposite.setLayout(null);
-						this.analysisComposite.setLayoutData(analysisCompositeLData);
-						{ // begin logging group
-							this.loggingGroup = new Group(this.analysisComposite, SWT.NONE);
-							this.loggingGroup.setLayout(null);
-							this.loggingGroup.setBounds(13, 8, 456, 216);
-							this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0340));
-							this.loggingGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "loggingGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
-									if (SettingsDialog.this.settings.isGlobalLogLevel()) {
-										enableIndividualLogging(false);
-										SettingsDialog.this.globalLoggingCombo.setEnabled(true);
+					{ // begin logging group
+						this.loggingGroup = new Group(this.cTabFolder1, SWT.NONE);
+						this.loggingGroup.setLayout(null);
+						this.loggingGroup.setBounds(13, 8, 456, 399);
+						this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0340));
+						this.analysisTabItem.setControl(this.loggingGroup);
+						this.loggingGroup.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent evt) {
+								log.log(Level.FINEST, "loggingGroup.paintControl, event=" + evt); //$NON-NLS-1$
+								SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
+								if (SettingsDialog.this.settings.isGlobalLogLevel()) {
+									enableIndividualLogging(false);
+									SettingsDialog.this.globalLoggingCombo.setEnabled(true);
+								}
+								else {
+									enableIndividualLogging(true);
+									SettingsDialog.this.globalLoggingCombo.setEnabled(false);
+									SettingsDialog.this.globalLogLevel.setSelection(false);
+								}
+								updateLoggingLevels();
+							}
+						});
+						{ // begin gloabal logging settings
+							this.globalLoggingComposite = new Composite(this.loggingGroup, SWT.NONE);
+							this.globalLoggingComposite.setLayout(null);
+							this.globalLoggingComposite.setBounds(12, 26, 466, 41);
+							{
+								this.globalLogLevel = new Button(this.globalLoggingComposite, SWT.CHECK | SWT.LEFT);
+								this.globalLogLevel.setBounds(12, 12, 190, 22);
+
+								this.globalLogLevel.setText(Messages.getString(MessageIds.OSDE_MSGT0341));
+								this.globalLogLevel.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "globalLogLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (SettingsDialog.this.globalLogLevel.getSelection()) {
+											enableIndividualLogging(false);
+											SettingsDialog.this.globalLoggingCombo.setEnabled(true);
+											SettingsDialog.this.settings.setIsGlobalLogLevel("true"); //$NON-NLS-1$
+										}
+										else {
+											enableIndividualLogging(true);
+											SettingsDialog.this.globalLoggingCombo.setEnabled(false);
+											SettingsDialog.this.settings.setIsGlobalLogLevel("false"); //$NON-NLS-1$
+										}
+
 									}
-									else {
-										enableIndividualLogging(true);
-										SettingsDialog.this.globalLoggingCombo.setEnabled(false);
-										SettingsDialog.this.globalLogLevel.setSelection(false);
+								});
+							}
+							{
+								this.globalLoggingCombo = new CCombo(this.globalLoggingComposite, SWT.BORDER);
+								this.globalLoggingCombo.setBounds(214, 12, 212, 22);
+								this.globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
+								this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "globalLoggingCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.this.globalLoggingCombo.getText());
+										SettingsDialog.this.globalLoggingCombo.setText(SettingsDialog.this.globalLoggingCombo.getText());
 									}
-									updateLoggingLevels();
+								});
+							}
+						} // end gloabal logging settings
+						{ // begin individual package based logging settings
+							this.individualLoggingComosite = new Composite(this.loggingGroup, SWT.NONE);
+							this.individualLoggingComosite.setLayout(null);
+							this.individualLoggingComosite.setBounds(11, 90, 263, 317);
+							{
+								this.uiLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout uiLevelLabelLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.uiLevelLabel.setLayout(uiLevelLabelLayout);
+								this.uiLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0342));
+								this.uiLevelLabel.setBounds(3, 3, 170, 20);
+							}
+							{
+								this.uiLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.uiLevelCombo.setBounds(183, 3, 79, 21);
+								this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "uiLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.this.uiLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.deviceLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.deviceLevelLabel.setLayout(cLabel1Layout);
+								this.deviceLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0343));
+								this.deviceLevelLabel.setBounds(3, 27, 170, 20);
+							}
+							{
+								this.deviceLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.deviceLevelCombo.setBounds(183, 27, 79, 21);
+								this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "deviceLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.this.deviceLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.commonLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.commonLevelLabel.setLayout(cLabel2Layout);
+								this.commonLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0344));
+								this.commonLevelLabel.setBounds(3, 51, 170, 20);
+							}
+							{
+								this.commonLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.commonLevelCombo.setBounds(183, 51, 79, 21);
+								this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "commonLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.this.commonLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.configLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.configLevelLabel.setLayout(cLabel3Layout);
+								this.configLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0345));
+								this.configLevelLabel.setBounds(3, 75, 170, 20);
+							}
+							{
+								this.configLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.configLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.configLevelCombo.setBounds(183, 75, 79, 21);
+								this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "configLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.this.configLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.utilsLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.utilsLevelLabel.setLayout(cLabel4Layout);
+								this.utilsLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0346));
+								this.utilsLevelLabel.setBounds(3, 99, 170, 20);
+							}
+							{
+								this.utilsLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.utilsLevelCombo.setBounds(183, 99, 79, 21);
+								this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "utilsLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.this.utilsLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.fileIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+								this.fileIOLevelLabel.setLayout(cLabel4Layout);
+								this.fileIOLevelLabel.setBounds(3, 124, 170, 20);
+								this.fileIOLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0347));
+							}
+							{
+								this.fileIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.fileIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.fileIOLevelCombo.setBounds(183, 124, 79, 21);
+								this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "fileIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.this.fileIOLevelCombo.getText());
+									}
+								});
+							}
+							{
+								this.serialIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+
+								this.serialIOLevelLabel.setLayout(cLabel4Layout);
+								this.serialIOLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0348));
+								this.serialIOLevelLabel.setBounds(3, 149, 170, 20);
+							}
+							{
+								this.serialIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
+								this.serialIOLevelCombo.setBounds(183, 149, 79, 21);
+								this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "serialIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.this.serialIOLevelCombo.getText());
+									}
+								});
+							}
+
+						} // end individual package based logging settings
+						{
+							this.classBasedLabel = new Label(this.loggingGroup, SWT.CENTER);
+							this.classBasedLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0349));
+							this.classBasedLabel.setBounds(286, 95, 192, 18);
+							
+							this.popupmenu = new Menu(this.dialogShell, SWT.POP_UP);
+							this.logLevelMenu.createMenu(this.popupmenu);
+
+							this.tree = new Tree(this.loggingGroup, SWT.NONE);
+							this.tree.setLayout(null);
+							this.tree.setBounds(286, 120, 192, 290);
+							this.tree.setMenu(this.popupmenu);
+							this.tree.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									log.log(Level.FINEST, "tree.widgetSelected, event=" + evt + " Selection:" + SettingsDialog.this.tree.getSelection()[0]); //$NON-NLS-1$
+									TreeItem tmpItem = (TreeItem) evt.item;
+									if (tmpItem.getParentItem() != null) {
+										StringBuilder sb = new StringBuilder();
+										TreeItem tmpParent = tmpItem;
+										while (null != (tmpParent = tmpParent.getParentItem())) {
+											sb.append(tmpParent.getText()).append(".");
+										}
+										sb.append(tmpItem.getText());
+										String loggerName = sb.toString();
+										SettingsDialog.this.popupmenu.setData(SettingsDialog.LOGGER_NAME, loggerName);
+									}
 								}
 							});
-							{ // begin gloabal logging settings
-								this.globalLoggingComposite = new Composite(this.loggingGroup, SWT.NONE);
-								this.globalLoggingComposite.setLayout(null);
-								this.globalLoggingComposite.setBounds(6, 19, 154, 50);
-								{
-									this.globalLogLevel = new Button(this.globalLoggingComposite, SWT.CHECK | SWT.LEFT);
-
-									this.globalLogLevel.setText(Messages.getString(MessageIds.OSDE_MSGT0341));
-									this.globalLogLevel.setBounds(4, 3, 148, 21);
-									this.globalLogLevel.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "globalLogLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
-											if (SettingsDialog.this.globalLogLevel.getSelection()) {
-												enableIndividualLogging(false);
-												SettingsDialog.this.globalLoggingCombo.setEnabled(true);
-												SettingsDialog.this.settings.setIsGlobalLogLevel("true"); //$NON-NLS-1$
-											}
-											else {
-												enableIndividualLogging(true);
-												SettingsDialog.this.globalLoggingCombo.setEnabled(false);
-												SettingsDialog.this.settings.setIsGlobalLogLevel("false"); //$NON-NLS-1$
-											}
-
-										}
-									});
-								}
-								{
-									this.globalLoggingCombo = new CCombo(this.globalLoggingComposite, SWT.BORDER);
-									this.globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
-									this.globalLoggingCombo.setBounds(4, 28, 148, 21);
-									this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "globalLoggingCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.this.globalLoggingCombo.getText());
-											SettingsDialog.this.globalLoggingCombo.setText(SettingsDialog.this.globalLoggingCombo.getText());
-										}
-									});
-								}
-							} // end gloabal logging settings
-							{ // begin individual package based logging settings
-								this.individualLoggingComosite = new Composite(this.loggingGroup, SWT.NONE);
-								this.individualLoggingComosite.setLayout(null);
-								this.individualLoggingComosite.setBounds(172, 19, 278, 178);
-								{
-									this.uiLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout uiLevelLabelLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.uiLevelLabel.setLayout(uiLevelLabelLayout);
-									this.uiLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0342));
-									this.uiLevelLabel.setBounds(3, 3, 170, 20);
-								}
-								{
-									this.uiLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.uiLevelCombo.setBounds(183, 3, 79, 21);
-									this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "uiLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.this.uiLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.deviceLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.deviceLevelLabel.setLayout(cLabel1Layout);
-									this.deviceLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0343));
-									this.deviceLevelLabel.setBounds(3, 27, 170, 20);
-								}
-								{
-									this.deviceLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.deviceLevelCombo.setBounds(183, 27, 79, 21);
-									this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "deviceLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.this.deviceLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.commonLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.commonLevelLabel.setLayout(cLabel2Layout);
-									this.commonLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0344));
-									this.commonLevelLabel.setBounds(3, 51, 170, 20);
-								}
-								{
-									this.commonLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.commonLevelCombo.setBounds(183, 51, 79, 21);
-									this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "commonLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.this.commonLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.configLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.configLevelLabel.setLayout(cLabel3Layout);
-									this.configLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0345));
-									this.configLevelLabel.setBounds(3, 75, 170, 20);
-								}
-								{
-									this.configLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.configLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.configLevelCombo.setBounds(183, 75, 79, 21);
-									this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "configLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.this.configLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.utilsLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.utilsLevelLabel.setLayout(cLabel4Layout);
-									this.utilsLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0346));
-									this.utilsLevelLabel.setBounds(3, 99, 170, 20);
-								}
-								{
-									this.utilsLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.utilsLevelCombo.setBounds(183, 99, 79, 21);
-									this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "utilsLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.this.utilsLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.fileIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-									this.fileIOLevelLabel.setLayout(cLabel4Layout);
-									this.fileIOLevelLabel.setBounds(3, 124, 170, 20);
-									this.fileIOLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0347));
-								}
-								{
-									this.fileIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.fileIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.fileIOLevelCombo.setBounds(183, 124, 79, 21);
-									this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "fileIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.this.fileIOLevelCombo.getText());
-										}
-									});
-								}
-								{
-									this.serialIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
-									RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
-									this.serialIOLevelLabel.setLayout(cLabel4Layout);
-									this.serialIOLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0348));
-									this.serialIOLevelLabel.setBounds(3, 149, 170, 20);
-								}
-								{
-									this.serialIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
-									this.serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
-									this.serialIOLevelCombo.setBounds(183, 149, 79, 21);
-									this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "serialIOLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.this.serialIOLevelCombo.getText());
-										}
-									});
-								}
-
-							} // end individual package based logging settings
-							
-							//test searcing for all classes known by LogManager
-							//if (log.isLoggable(Level.CONFIG)) {
-							//	LogManager manager = LogManager.getLogManager();
-							//	Enumeration<String> loggerNames = manager.getLoggerNames();
-							//	StringBuilder sb = new StringBuilder();
-							//	while (loggerNames.hasMoreElements()) {
-							//		String loggerName = loggerNames.nextElement();
-							//		if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >=3 ) 
-							//			sb.append(loggerName).append("\n");
-							//	}
-							//	log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, sb.toString());
-							//}
-
-						} // end logging group
-					} // end analysis composite
+						}
+					} // end logging group
+					//} // end analysis composite
 				} // end analysis tab item
 				this.cTabFolder1.setSelection(0);
+				this.cTabFolder1.addFocusListener(new FocusAdapter() {
+					@Override
+					public void focusGained(FocusEvent evt) {
+						log.log(Level.FINEST, "tree.focusGained, event=" + evt);
+						SettingsDialog.this.tree.clearAll(true);
+						LogManager manager = LogManager.getLogManager();
+						Enumeration<String> loggerNames = manager.getLoggerNames();
+						StringBuilder sb = new StringBuilder();
+						while (loggerNames.hasMoreElements()) {
+							String loggerName = loggerNames.nextElement();
+							if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) {
+								sb.append(loggerName).append(";");
+							}
+						}
+						String[] loggers = sb.toString().split(";");
+						Arrays.sort(loggers);
+						if (log.isLoggable(Level.FINER)) {
+							for (String string : loggers) {
+								log.log(Level.FINER, string);
+							}
+						}
+						SettingsDialog.this.tree.removeAll();
+						String root = "";
+						TreeItem treeItemRoot = null;
+						TreeItem treeItemNode;
+						for (String string : loggers) {
+							String[] tmp = string.replace('.', ':').split(":");
+							switch (tmp.length) {
+							case 3:
+								if (!root.equals(tmp[0] + "." + tmp[1])) {
+									root = tmp[0] + "." + tmp[1];
+									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
+									treeItemRoot.setText(root);
+								}
+								treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
+								treeItemNode.setText(tmp[2]);
+								break;
+							case 4:
+								if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) {
+									root = tmp[0] + "." + tmp[1] + "." + tmp[2];
+									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
+									treeItemRoot.setText(root);
+								}
+								treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
+								treeItemNode.setText(tmp[3]);
+								break;
+							}
+						}
+					}
+				});
 			} // end tab folder
 
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					SettingsDialog.log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					SettingsDialog.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_1.html"); //$NON-NLS-1$
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					SettingsDialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (SettingsDialog.this.settings.getActiveDevice().startsWith(Settings.EMPTY)) SettingsDialog.this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
 					SettingsDialog.this.settings.store();
 					if (SettingsDialog.this.settings.isGlobalSerialPort()) SettingsDialog.this.application.setGloabalSerialPort(SettingsDialog.this.serialPort.getText());
@@ -771,12 +857,13 @@ public class SettingsDialog extends Dialog {
 				this.okButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						SettingsDialog.log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						SettingsDialog.this.dialogShell.dispose();
 					}
 				});
 			} // end ok button
-			this.dialogShell.setLocation(this.getParent().toDisplay(100, 100));
+
+			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
 
 			updateAvailablePorts();
@@ -798,8 +885,7 @@ public class SettingsDialog extends Dialog {
 		int index = 0; // en
 		String language = this.settings.getLocale().toString();
 		for (; index < this.supportedLocals.length; index++) {
-			if(this.supportedLocals[index].equals(language)) 
-				return index;
+			if (this.supportedLocals[index].equals(language)) return index;
 		}
 		return index;
 	}
@@ -856,6 +942,7 @@ public class SettingsDialog extends Dialog {
 		this.fileIOLevelCombo.setEnabled(value);
 		this.serialIOLevelLabel.setEnabled(value);
 		this.serialIOLevelCombo.setEnabled(value);
+		this.tree.setEnabled(value);
 	}
 
 	/**
