@@ -1,12 +1,11 @@
 package osde.device.conrad;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.DeviceConfiguration;
-import osde.messages.Messages;
+import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -32,9 +31,8 @@ public class VC800SerialPort extends DeviceSerialPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public HashMap<String, Object> getData(int recordNumber, VC800Dialog dialog, String channelConfigKey) throws Exception {
-		HashMap<String, Object> dataMap = new HashMap<String, Object>();
-		byte[] answer = new byte[24];
+	public byte[] getData() throws Exception {
+		byte[] answer = new byte[14];
 
 		boolean isPortOpenedByMe = false;
 		try {
@@ -42,23 +40,15 @@ public class VC800SerialPort extends DeviceSerialPort {
 				this.open();
 				isPortOpenedByMe = true;
 			}
-			dataMap.put(channelConfigKey + recordNumber, answer);
+			this.read(answer, 5000);
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			if(!(e instanceof TimeOutException)) log.log(Level.SEVERE, e.getMessage());
 			throw e;
 		}
 		finally {
-			dialog.okButton.setText(Messages.getString(MessageIds.OSDE_MSGT1001));
 			if (isPortOpenedByMe) this.close();
 		}
-		return dataMap;
+		return answer;
 	}
-
-	/*
-	 * additional device dependent implementations
-	 */
-	//public synchronized void start(byte[] channel) throws IOException
-	//public synchronized void stop(byte[] channel) throws IOException
-	//public synchronized String[] getVersion() throws IOException
 }

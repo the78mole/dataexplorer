@@ -1,70 +1,91 @@
+/**************************************************************************************
+  	This file is part of OpenSerialDataExplorer.
+
+    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.conrad;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
- * Sample dialog implementation, used as template for new device implementations
+ * e-Station dialog implementation (902, BC6, BC610, BC8)
  * @author Winfried Brügmann
  */
 public class VC800Dialog extends DeviceDialog {
-	final static Logger						log	= Logger.getLogger(VC800Dialog.class.getName());
+	final static Logger						log									= Logger.getLogger(VC800Dialog.class.getName());
+	static final String						DEVICE_NAME					= "VC800";
 
-	Text													InfoText;
-	Button												okButton;
+	CLabel												infoText;
+	Button												closeButton;
+	Button												stopCollectDataButton;
+	Button												startCollectDataButton;
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	final VC800									device;																							// get device specific things, get serial port, ...
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	final DeviceSerialPort				serialPort;																					// open/close port execute getData()....
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	final OpenSerialDataExplorer	application;																					// interaction with application instance
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	final Channels								channels;																						// interaction with channels, source of all records
-	final Settings								settings;																						// application configuration settings
+	Composite											boundsComposite;
+	Group													configGroup;
+	Composite											composite1;
+	Composite											composite2;
+	Composite											composite3;
 
-	/**
-	* main method to test this dialog inside a shell 
-	*/
-	public static void main(String[] args) {
-		try {
-			Display display = Display.getDefault();
-			Shell shell = new Shell(display);
-			VC800 device = new VC800("c:\\Documents and Settings\\user\\Application Data\\OpenSerialDataExplorer\\Geraete\\Htronic Akkumaster C4.ini"); //$NON-NLS-1$
-			VC800Dialog inst = new VC800Dialog(shell, device);
-			inst.open();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	CLabel												inputTypeLabel;
+	CLabel												inputTypeText;
+	CLabel												inputTypeUnit;
+
+	boolean												isConnectionWarned 	= false;
+	String												inputType	= "?";				//$NON-NLS-1$
+
+	HashMap<String, String>				configData					= new HashMap<String, String>();
+	GathererThread								dataGatherThread;
+	Thread												updateConfigTread;
+
+	final VC800										device;						// get device specific things, get serial port, ...
+	final VC800SerialPort					serialPort;				// open/close port execute getData()....
+	final OpenSerialDataExplorer	application;			// interaction with application instance
+	final Channels								channels;					// interaction with channels, source of all records
+	final Settings								settings;					// application configuration settings
 
 	/**
 	 * default constructor initialize all variables required
@@ -89,7 +110,7 @@ public class VC800Dialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			VC800Dialog.log.fine("dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			VC800Dialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -99,81 +120,248 @@ public class VC800Dialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254); 
+				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
-				this.dialogShell.layout();
-				this.dialogShell.setText("Sample" + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273)); //$NON-NLS-1$
+				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(336, 393);
+				this.dialogShell.setSize(350, 365);
 				this.dialogShell.addFocusListener(new FocusAdapter() {
 					@Override
 					public void focusGained(FocusEvent evt) {
-						VC800Dialog.log.fine("dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
-						// this is only placed in the focus listener as hint, do not forget place this query 
-						if (VC800Dialog.this.serialPort != null && !VC800Dialog.this.serialPort.isConnected()) {
-							VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
+						VC800Dialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
+						// if port is already connected, do not read the data update will be done by gathere thread
+						if (!VC800Dialog.this.isConnectionWarned && !VC800Dialog.this.serialPort.isConnected()) {
+							VC800Dialog.this.updateConfigTread = new Thread() {
+								public void run() {
+									try {
+										VC800Dialog.this.configData = new HashMap<String, String>();
+										VC800Dialog.this.serialPort.open();
+										VC800Dialog.this.serialPort.wait4Bytes(2000);
+										//TODO VC800Dialog.this.device.getConfigurationValues(VC800Dialog.this.configData, VC800Dialog.this.serialPort.getData());
+										getDialogShell().getDisplay().asyncExec(new Runnable() {
+											public void run() {
+												updateGlobalConfigData(VC800Dialog.this.configData);
+											}
+										});
+									}
+									catch (Exception e) {
+										VC800Dialog.this.isConnectionWarned = true;
+										VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+									}
+									VC800Dialog.this.serialPort.close();
+								}
+							};
+							try {
+								VC800Dialog.this.updateConfigTread.start();
+							}
+							catch (RuntimeException e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 						}
-					}
-				});
-				this.dialogShell.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent evt) {
-						VC800Dialog.log.fine("dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						//TODO check if some thing to do before exiting
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						VC800Dialog.log.fine("dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						VC800Dialog.this.application.openHelpDialog("Sample", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				// enable fade in/out alpha blending (do not fade-in on top)
-				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
-					public void mouseEnter(MouseEvent evt) {
-						log.finer("dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, VC800Dialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
-					}
-					public void mouseHover(MouseEvent evt) {
-						log.finest("dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
-					}
-					public void mouseExit(MouseEvent evt) {
-						log.finer("dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, VC800Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
+						VC800Dialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						VC800Dialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				{
-					FormData InfoTextLData = new FormData();
-					InfoTextLData.width = 304;
-					InfoTextLData.height = 114;
-					InfoTextLData.left = new FormAttachment(0, 1000, 12);
-					InfoTextLData.top = new FormAttachment(0, 1000, 81);
-					this.InfoText = new Text(this.dialogShell, SWT.MULTI | SWT.CENTER | SWT.WRAP);
-					this.InfoText.setLayoutData(InfoTextLData);
-					this.InfoText.setText(Messages.getString(MessageIds.OSDE_MSGW1001));
-					this.InfoText.setFont(SWTResourceManager.getFont("Sans Serif", 12, SWT.BOLD, false, false)); //$NON-NLS-1$
-					this.InfoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-					// enable fade in for big areas inside the dialog while fast mouse move
-					this.InfoText.addMouseTrackListener(VC800Dialog.this.mouseTrackerEnterFadeOut);
-				}
-				{
-					FormData okButtonLData = new FormData();
-					okButtonLData.width = 52;
-					okButtonLData.height = 33;
-					okButtonLData.left = new FormAttachment(0, 1000, 132);
-					okButtonLData.top = new FormAttachment(0, 1000, 309);
-					this.okButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.okButton.setLayoutData(okButtonLData);
-					this.okButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
-					this.okButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							VC800Dialog.log.finest("okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							VC800Dialog.this.close();
+					this.boundsComposite = new Composite(this.dialogShell, SWT.NONE);
+					FormData boundsCompositeLData = new FormData();
+					boundsCompositeLData.left = new FormAttachment(0, 1000, 0);
+					boundsCompositeLData.right = new FormAttachment(1000, 1000, 0);
+					boundsCompositeLData.top = new FormAttachment(0, 1000, 0);
+					boundsCompositeLData.bottom = new FormAttachment(1000, 1000, 0);
+					this.boundsComposite.setLayoutData(boundsCompositeLData);
+					this.boundsComposite.setLayout(new FormLayout());
+					this.boundsComposite.addPaintListener(new PaintListener() {
+						public void paintControl(PaintEvent evt) {
+							VC800Dialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
+							if (VC800Dialog.this.dataGatherThread != null && VC800Dialog.this.dataGatherThread.isAlive()) {
+								VC800Dialog.this.startCollectDataButton.setEnabled(false);
+								VC800Dialog.this.stopCollectDataButton.setEnabled(true);
+							}
+							else {
+								VC800Dialog.this.startCollectDataButton.setEnabled(true);
+								VC800Dialog.this.stopCollectDataButton.setEnabled(false);
+							}
 						}
 					});
-				}
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-175, 100));
+					{
+						FormData infoTextLData = new FormData();
+						infoTextLData.height = 80;
+						infoTextLData.left = new FormAttachment(0, 1000, 12);
+						infoTextLData.top = new FormAttachment(0, 1000, 12);
+						infoTextLData.right = new FormAttachment(1000, 1000, -12);
+						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
+						this.infoText.setLayoutData(infoTextLData);
+						this.infoText.setText("Beim VoltCraft Multimeter können nur Daten aufgenommen werden,\n" +
+								" die der am Gerät eingestellten Messgröße entsprechen.\n" +
+								"Die Datenrate bestimmt das Gerät und variiert von Messgröße zu Messsgröße");
+						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+					}
+					{
+						FormData startCollectDataButtonLData = new FormData();
+						startCollectDataButtonLData.height = 30;
+						startCollectDataButtonLData.left = new FormAttachment(0, 1000, 12);
+						startCollectDataButtonLData.top = new FormAttachment(0, 1000, 110);
+						startCollectDataButtonLData.right = new FormAttachment(1000, 1000, -180);
+						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
+						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
+						this.startCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
+						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								VC800Dialog.log.log(Level.FINEST, "startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								if (!VC800Dialog.this.serialPort.isConnected()) {
+									try {
+										if (Channels.getInstance().getActiveChannel() != null) {
+											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
+											VC800Dialog.this.dataGatherThread = new GathererThread(VC800Dialog.this.application, VC800Dialog.this.device, VC800Dialog.this.serialPort, channelConfigKey, VC800Dialog.this);
+											try {
+												VC800Dialog.this.dataGatherThread.start();
+											}
+											catch (RuntimeException e) {
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
+											VC800Dialog.this.boundsComposite.redraw();
+										}
+									}
+									catch (Exception e) {
+										if (VC800Dialog.this.dataGatherThread != null && VC800Dialog.this.dataGatherThread.isCollectDataStopped) {
+											VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false, e);
+										}
+										VC800Dialog.this.boundsComposite.redraw();
+										VC800Dialog.this.application.updateGraphicsWindow();
+										VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+									}
+								}
+							}
+						});
+						this.startCollectDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+					}
+					{
+						FormData stopColletDataButtonLData = new FormData();
+						stopColletDataButtonLData.height = 30;
+						stopColletDataButtonLData.left = new FormAttachment(0, 1000, 170);
+						stopColletDataButtonLData.top = new FormAttachment(0, 1000, 110);
+						stopColletDataButtonLData.right = new FormAttachment(1000, 1000, -12);
+						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
+						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
+						this.stopCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
+						this.stopCollectDataButton.setEnabled(false);
+						this.stopCollectDataButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								VC800Dialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								if (VC800Dialog.this.dataGatherThread != null && VC800Dialog.this.serialPort.isConnected()) {
+									VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false, null);
+								}
+								VC800Dialog.this.boundsComposite.redraw();
+							}
+						});
+						this.stopCollectDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+					}
+					{
+						FormData configGroupLData = new FormData();
+						configGroupLData.height = 100;
+						configGroupLData.left = new FormAttachment(0, 1000, 12);
+						configGroupLData.top = new FormAttachment(0, 1000, 155);
+						configGroupLData.right = new FormAttachment(1000, 1000, -12);
+						this.configGroup = new Group(this.boundsComposite, SWT.NONE);
+						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+						this.configGroup.setLayout(configGroupLayout);
+						this.configGroup.setLayoutData(configGroupLData);
+						this.configGroup.setText("Aktuelle Dateneinheit");
+						this.configGroup.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent evt) {
+								VC800Dialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
+								VC800Dialog.this.inputTypeText.setText(VC800Dialog.this.inputType);
+							}
+						});
+						{
+							RowData composite1LData = new RowData();
+							composite1LData.width = 190;
+							composite1LData.height = 95;
+							this.composite1 = new Composite(this.configGroup, SWT.NONE);
+							FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
+							this.composite1.setLayout(composite1Layout);
+							this.composite1.setLayoutData(composite1LData);
+							{
+								this.inputTypeLabel = new CLabel(this.composite1, SWT.NONE);
+								this.inputTypeLabel.setText("input type");
+							}
+						}
+						{
+							RowData composite2LData = new RowData();
+							composite2LData.width = 45;
+							composite2LData.height = 95;
+							this.composite2 = new Composite(this.configGroup, SWT.NONE);
+							FillLayout composite2Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
+							this.composite2.setLayout(composite2Layout);
+							this.composite2.setLayoutData(composite2LData);
+							{
+								this.inputTypeText = new CLabel(this.composite2, SWT.NONE);
+								this.inputTypeText.setText(this.inputType);
+							}
+						}
+						{
+							this.composite3 = new Composite(this.configGroup, SWT.NONE);
+							FillLayout composite3Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
+							RowData composite3LData = new RowData();
+							composite3LData.width = 60;
+							composite3LData.height = 95;
+							this.composite3.setLayoutData(composite3LData);
+							this.composite3.setLayout(composite3Layout);
+							{
+								this.inputTypeUnit = new CLabel(this.composite3, SWT.NONE);
+								this.inputTypeUnit.setText("unit");
+							}
+						}
+						this.configGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+					}
+					{
+						FormData closeButtonLData = new FormData();
+						closeButtonLData.height = 30;
+						closeButtonLData.bottom = new FormAttachment(1000, 1000, -12);
+						closeButtonLData.left = new FormAttachment(0, 1000, 12);
+						closeButtonLData.right = new FormAttachment(1000, 1000, -12);
+						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
+						this.closeButton.setLayoutData(closeButtonLData);
+						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
+						this.closeButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								VC800Dialog.log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								close();
+							}
+						});
+						this.closeButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+					}
+					this.boundsComposite.addMouseTrackListener(new MouseTrackAdapter() {
+						@Override
+						public void mouseEnter(MouseEvent evt) {
+							VC800Dialog.log.log(Level.FINE, "boundsComposite.mouseEnter, event=" + evt); //$NON-NLS-1$
+							fadeOutAplhaBlending(evt, VC800Dialog.this.boundsComposite.getSize(), 10, 10, 10, 15);
+						}
+
+						@Override
+						public void mouseHover(MouseEvent evt) {
+							VC800Dialog.log.log(Level.FINEST, "boundsComposite.mouseHover, event=" + evt); //$NON-NLS-1$
+						}
+
+						@Override
+						public void mouseExit(MouseEvent evt) {
+							VC800Dialog.log.log(Level.FINE, "boundsComposite.mouseExit, event=" + evt); //$NON-NLS-1$
+							fadeInAlpaBlending(evt, VC800Dialog.this.boundsComposite.getSize(), 10, 10, -10, 15);
+						}
+					});
+				} // end boundsComposite
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.open();
 			}
 			else {
@@ -187,6 +375,34 @@ public class VC800Dialog extends DeviceDialog {
 		}
 		catch (Exception e) {
 			VC800Dialog.log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	public void resetButtons() {
+		if (!this.isDisposed()) {
+			this.startCollectDataButton.setEnabled(true);
+			this.stopCollectDataButton.setEnabled(false);
+		}
+	}
+
+	/**
+	 * update the global conguration data in dialog
+	 */
+	public void updateGlobalConfigData(HashMap<String, String> newConfigData) {
+		this.configData = newConfigData;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
+				//TODO this.inputTypeText.setText(this.inputType = this.configData.get(VC800.CONFIG_IN_VOLTAGE_CUT_OFF)); //$NON-NLS-1$
+				this.configGroup.redraw();
+			}
+			else {
+				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						//TODO VC800Dialog.this.inputTypeText.setText(VC800Dialog.this.inputType = VC800Dialog.this.configData.get(VC800.CONFIG_IN_VOLTAGE_CUT_OFF));
+						VC800Dialog.this.configGroup.redraw();
+					}
+				});
+			}
 		}
 	}
 }

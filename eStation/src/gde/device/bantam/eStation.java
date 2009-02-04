@@ -207,7 +207,6 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	boolean isCycleMode(byte[] dataBuffer) {
 		return (((dataBuffer[8] & 0xFF)-0x80) & 0x10) > 0;
 	}
-
 	
 	/**
 	 * getNumberOfCycle for NiCd and NiMh, for LiXx it  will return 0

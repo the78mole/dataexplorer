@@ -29,14 +29,17 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implemntation for sample device Sample, which can be used as start point for a new device implementation"/>
-    		<attribute name="Export-Service" value="osde.device.manufactur.Sample"/>
+    		<attribute name="Bundle-Description" value="Implemntation for VoltCraft Multimeter Series 800/900"/>
+    		<attribute name="Export-Service" value="osde.device.conrad.VC820, osde.device.conrad.VC840"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
 	    	<fileset dir="src" includes="**/*.xml"/>
 	    	<fileset dir="src" includes="**/*.jpg"/>
 	    	<fileset dir="src" includes="**/*.properties"/>
+	    	<fileset dir="src" includes="**/*.html"/>
+	    	<fileset dir="src" includes="**/*.png"/>
+	    	<fileset dir="src" includes="**/*.css"/>
 	    </jar>
 	</target>
 

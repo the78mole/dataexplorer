@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
-import osde.device.MeasurementType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -86,7 +86,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return lov2osdMap same reference as input parameter
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		// ...
+		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");
 		return lov2osdMap;
 	}
 
@@ -99,7 +99,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		// ...
+		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");
 		return ""; //$NON-NLS-1$
 	}
 
@@ -107,35 +107,36 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 16;  // sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 20;  // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
+
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * this method is more usable for real logger, where data can be stored and converted in one block
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
-	 * @throws DataInconsitsentException 
+	 * @param doUpdateProgressBar
 	 */
-	public void addAdaptedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize) throws DataInconsitsentException {
-		// prepare the hash map containing the calculation values like factor offset, reduction, ...
-		String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
-		HashMap<String, Double> calcValues = new HashMap<String, Double>();
-		calcValues.put(X_FACTOR, recordSet.get(measurements[11]).getFactor());
-		calcValues.put(X_OFFSET, recordSet.get(measurements[11]).getOffset());
-		
-		int offset = 4;
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {		
+		int offset = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		int deviceDataBufferSize = 8;
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+			
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -144,48 +145,180 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		
 		StringBuilder sb = new StringBuilder();
 		for (byte b : dataBuffer) {
 			sb.append(String.format("%02x", b)).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		log.info(sb.toString());
-		
-// LogView data section analyse 		
-//discharge   			      Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
-//                        Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
-//33 00 00 00 51 82 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 ca 00 00 07 a3 01 25 19 00 00 00 01 00 3c 0d 0a 20 20 35 38 33 30 00 00 00 00 48 02 00 00             
-//offset      51 82 00 03 00 0C 08 98 02 58 02 58                      52 00 02 00 00 0B C7 00 00 0D 00 00 00 01
-//charge  				        Ni 12 capa  dis   charge                        disc  charge      hh:mm:ss hh:mm:ss  #                                           line
-//	                      Nc    city  charge                              capac capac volt  charge   discharge                                                 counter
-//33 00 00 00 51 81 00 03 01 0c 08 98 02 56 02 56 00 3c 61 05 09 02 56 52 03 cb 07 f0 0d 02 01 25 1f 03 17 38 01 00 3c 0d 0a 20 31 38 31 30 30 00 00 00 00 13 07 00 00 
-//offset      51 81 00 03 00 0C 08 98 02 58 02 58                      52 02 85 0A 4A 0C DE 01 04 1F 04 17 1B 01
+		log.log(Level.INFO, sb.toString());
+
+		points[0] = getDigit(((dataBuffer[1] & 0x07) << 4) | (dataBuffer[2] & 0x0f));
+    points[0] += 10 * getDigit(((dataBuffer[3] & 0x07) << 4) | (dataBuffer[4] & 0x0f));
+    points[0] += 100 * getDigit(((dataBuffer[5] & 0x07) << 4) | (dataBuffer[6] & 0x0f));
+    points[0] += 1000 * getDigit(((dataBuffer[7] & 0x07) << 4) | (dataBuffer[8] & 0x0f));
+		log.log(Level.INFO, "digits = " + points[0]);
+
+    //if 		((dataBuffer[3] & 0x08) > 0) ; 									//points[0] /= 1000.0;
+    if 			((dataBuffer[5] & 0x08) > 0) points[0] *= 10 ; 	// /= 100.0;
+    else if ((dataBuffer[7] & 0x08) > 0) points[0] *= 100; 	// /= 10.0;
+    
+    if ((dataBuffer[1] & 0x08) > 0) points[0] *= -1;  
 
 		return points;
 	}
 
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param doUpdateProgressBar
+	 */
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.getRecordNames().length];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);			
+			recordSet.addPoints(this.convertDataBytes(points, dataBuffer), false);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+	}
+
+	/**
+	 * function to prepare complete data table of record set while translating avalable measurement values
+	 * @return pointer to filled data table with formated "%.3f" values
+	 */
+	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+		try {
+			String[] recordNames = recordSet.getRecordNames();	
+			int numberRecords = recordNames.length;
+			int recordEntries = recordSet.getRecordDataSize(true);
+
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				for (int i = 0; i < recordEntries; i++) {
+					dataTable[i][j+1] = record.get(i);
+				}
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTable;
+	}
+	
+	/**
+	 * get digit from display
+	 * @param a
+	 * @param b
+	 * @return digit value
+	 */
+	public int getDigit(int select) {
+		int digit = 0;
+		switch (select) {
+		case 0x7d:
+			digit = 0;
+			break;
+		case 0x05:
+			digit = 1;
+			break;
+		case 0x5b:
+			digit = 2;
+			break;
+		case 0x1f:
+			digit = 3;
+			break;
+		case 0x27:
+			digit = 4;
+			break;
+		case 0x3e:
+			digit = 5;
+			break;
+		case 0x7e:
+			digit = 6;
+			break;
+		case 0x15:
+			digit = 7;
+			break;
+		case 0x7f:
+			digit = 8;
+			break;
+		case 0x3f:
+			digit = 9;
+			break;
+		}
+
+		return digit;
+	}
+	
+	/**
+	 * query battery voltage level
+	 * @param buffer
+	 * @return true if battey voltage level detected as low
+	 */
+	public boolean isBatteryLevelLow(byte[] buffer) {
+		return (buffer[12] & 0x01) != 1;
+	}
+
+	/**
+	 * get measurement unit
+	 * @param buffer
+	 * @return measurement unit as string
+	 */
+	public String getUnit(byte[] buffer) {
+		String unit = "";
+		if ((buffer[9] & 0x02) > 0)				unit = "k";
+		else if ((buffer[9] & 0x04) > 0)	unit = "n";
+		else if ((buffer[9] & 0x08) > 0)	unit = "u";
+		else if ((buffer[10] & 0x02) > 0)	unit = "M";
+		else if ((buffer[10] & 0x08) > 0)	unit = "m";
+		else if ((buffer[10] & 0x04) > 0) unit = "%";
+
+		if ((buffer[11] & 0x04) > 0)			unit += "Ohm";
+		else if ((buffer[11] & 0x08) > 0)	unit += "F";
+		else if ((buffer[12] & 0x02) > 0)	unit += "Hz";
+		else if ((buffer[12] & 0x04) > 0)	unit += "V";
+		else if ((buffer[12] & 0x08) > 0)	unit += "A";
+		else if ((buffer[13] & 0x01) > 0) unit += "C";
+
+		return unit;
+	}
+	
+	/**
+	 * get the measurement mode
+	 * @param buffer
+	 * @return
+	 */
+	public String getMode(byte[] buffer) {
+		String mode = "DC";
+		if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x08) > 0) mode = "AC";
+		else if ((buffer[9] & 0x01) > 0)	mode = "DI";
+		else if ((buffer[11] & 0x04) > 0)	mode = "OH";
+		else if ((buffer[11] & 0x08) > 0)	mode = "CA";
+		else if ((buffer[12] & 0x02) > 0)	mode = "FR";
+		else if ((buffer[13] & 0x01) > 0) mode = "TE";
+		
+		return mode;
+	}
+	
 	/**
 	 * function to translate measured values from a device to values represented
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-		
-		String recordKey = record.getName();
-		double offset = record.getOffset(); // != 0 if curve has an defined offset
-		double factor = record.getFactor(); // != 1 if a unit translation is required
-
-		// example height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-			// do some calculation
-		}
-		
-		double newValue = value * factor + offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		// 0=Spannung oder Strom oder ..
+		double newValue = value; // no factor, offset, reduction or other supported
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -195,20 +328,9 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-		
-		String recordKey = record.getName();
-		double offset = record.getOffset(); // != 0 if curve has an defined offset
-		double factor = record.getFactor(); // != 1 if a unit translation is required
-
-		// example height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
-			// do some calculation
-		}
-		
-		double newValue = value / factor - offset;
-		log.fine("for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		// 0=Spannung oder Strom oder ..
+		double newValue = value; // no factor, offset, reduction or other supported
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -221,7 +343,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.info("no update required for " + recordSet.getName()); //$NON-NLS-1$
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -231,15 +353,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//add implementation where data point are calculated
-		//do not forget to make record displayable -> record.setDisplayable(true);
-		String[] recordNames = this.getMeasurementNames(recordSet.getChannelConfigName());
-		for (int i=0; i<recordNames.length; ++i) {
-			MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigName(), i);
-			if (measurement.isCalculation()) {
-				VC800.log.fine("do calculation for " + recordNames[i]); //$NON-NLS-1$
-			}
-		}
+		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
 	}
 
 	/**

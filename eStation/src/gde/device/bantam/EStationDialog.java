@@ -61,7 +61,7 @@ public class EStationDialog extends DeviceDialog {
 
 	CLabel												infoText;
 	Button												closeButton;
-	Button												stopColletDataButton;
+	Button												stopCollectDataButton;
 	Button												startCollectDataButton;
 
 	Composite											boundsComposite;
@@ -204,11 +204,11 @@ public class EStationDialog extends DeviceDialog {
 							EStationDialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
 							if (EStationDialog.this.dataGatherThread != null && EStationDialog.this.dataGatherThread.isAlive()) {
 								EStationDialog.this.startCollectDataButton.setEnabled(false);
-								EStationDialog.this.stopColletDataButton.setEnabled(true);
+								EStationDialog.this.stopCollectDataButton.setEnabled(true);
 							}
 							else {
 								EStationDialog.this.startCollectDataButton.setEnabled(true);
-								EStationDialog.this.stopColletDataButton.setEnabled(false);
+								EStationDialog.this.stopCollectDataButton.setEnabled(false);
 							}
 						}
 					});
@@ -270,11 +270,11 @@ public class EStationDialog extends DeviceDialog {
 						stopColletDataButtonLData.left = new FormAttachment(0, 1000, 170);
 						stopColletDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						stopColletDataButtonLData.right = new FormAttachment(1000, 1000, -12);
-						this.stopColletDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.stopColletDataButton.setLayoutData(stopColletDataButtonLData);
-						this.stopColletDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
-						this.stopColletDataButton.setEnabled(false);
-						this.stopColletDataButton.addSelectionListener(new SelectionAdapter() {
+						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
+						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
+						this.stopCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
+						this.stopCollectDataButton.setEnabled(false);
+						this.stopCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								EStationDialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -284,7 +284,7 @@ public class EStationDialog extends DeviceDialog {
 								EStationDialog.this.boundsComposite.redraw();
 							}
 						});
-						this.stopColletDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+						this.stopCollectDataButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
 					{
 						FormData configGroupLData = new FormData();
@@ -466,7 +466,7 @@ public class EStationDialog extends DeviceDialog {
 	public void resetButtons() {
 		if (!this.isDisposed()) {
 			this.startCollectDataButton.setEnabled(true);
-			this.stopColletDataButton.setEnabled(false);
+			this.stopCollectDataButton.setEnabled(false);
 		}
 	}
 
