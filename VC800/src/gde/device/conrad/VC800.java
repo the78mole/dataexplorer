@@ -25,12 +25,14 @@ import javax.xml.bind.JAXBException;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
-import osde.messages.MessageIds;
+import osde.exception.SerialPortException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
@@ -41,13 +43,14 @@ import osde.ui.OpenSerialDataExplorer;
  */
 public class VC800 extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(VC800.class.getName());
-
-	public final static String		X_FACTOR									= "x_"+IDevice.FACTOR; //$NON-NLS-1$
-	public final static String		X_OFFSET									= "x_"+IDevice.OFFSET; //$NON-NLS-1$
+	
+	public final static String		INPUT_TYPE					= "input_type"; //$NON-NLS-1$
+	public final static String		INPUT_SYMBOL				= "input_symbol"; //$NON-NLS-1$
+	public final static String		INPUT_UNIT					= "input_unit"; //$NON-NLS-1$
 
 	final OpenSerialDataExplorer	application;
-	final VC800SerialPort				serialPort;
-	final VC800Dialog						dialog;
+	final VC800SerialPort					serialPort;
+	final VC800Dialog							dialog;
 
 	/**
 	 * constructor using properties file
@@ -62,7 +65,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -72,12 +75,12 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	public VC800(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.manufactur.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("osde.device.conrad.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -86,7 +89,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return lov2osdMap same reference as input parameter
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");
+		this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));		
 		return lov2osdMap;
 	}
 
@@ -99,7 +102,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		this.application.openMessageDialog("Dieses Gerät hat LogView nicht implementiert");
+		this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
 		return ""; //$NON-NLS-1$
 	}
 
@@ -147,17 +150,18 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		
-		StringBuilder sb = new StringBuilder();
-		for (byte b : dataBuffer) {
-			sb.append(String.format("%02x", b)).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) {
+			StringBuilder sb = new StringBuilder();
+			for (byte b : dataBuffer) {
+				sb.append(String.format("%02x", b)).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			log.log(Level.FINER, sb.toString());
 		}
-		log.log(Level.INFO, sb.toString());
-
-		points[0] = getDigit(((dataBuffer[1] & 0x07) << 4) | (dataBuffer[2] & 0x0f));
-    points[0] += 10 * getDigit(((dataBuffer[3] & 0x07) << 4) | (dataBuffer[4] & 0x0f));
-    points[0] += 100 * getDigit(((dataBuffer[5] & 0x07) << 4) | (dataBuffer[6] & 0x0f));
-    points[0] += 1000 * getDigit(((dataBuffer[7] & 0x07) << 4) | (dataBuffer[8] & 0x0f));
-		log.log(Level.INFO, "digits = " + points[0]);
+		points[0] =  1000 * getDigit(((dataBuffer[1] & 0x07) << 4) | (dataBuffer[2] & 0x0f));
+    points[0] += 100 * getDigit(((dataBuffer[3] & 0x07) << 4) | (dataBuffer[4] & 0x0f));
+    points[0] += 10 * getDigit(((dataBuffer[5] & 0x07) << 4) | (dataBuffer[6] & 0x0f));
+    points[0] += 1 * getDigit(((dataBuffer[7] & 0x07) << 4) | (dataBuffer[8] & 0x0f));
+		log.log(Level.FINEST, "digits = " + points[0]); //$NON-NLS-1$
 
     //if 		((dataBuffer[3] & 0x08) > 0) ; 									//points[0] /= 1000.0;
     if 			((dataBuffer[5] & 0x08) > 0) points[0] *= 10 ; 	// /= 100.0;
@@ -186,8 +190,9 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
-			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);			
-			recordSet.addPoints(this.convertDataBytes(points, dataBuffer), false);
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			recordSet.addPoints(points, false);
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -270,27 +275,40 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get measurement unit
+	 * get measurement info (type, symbol, unit)
 	 * @param buffer
 	 * @return measurement unit as string
 	 */
-	public String getUnit(byte[] buffer) {
-		String unit = "";
-		if ((buffer[9] & 0x02) > 0)				unit = "k";
-		else if ((buffer[9] & 0x04) > 0)	unit = "n";
-		else if ((buffer[9] & 0x08) > 0)	unit = "u";
-		else if ((buffer[10] & 0x02) > 0)	unit = "M";
-		else if ((buffer[10] & 0x08) > 0)	unit = "m";
-		else if ((buffer[10] & 0x04) > 0) unit = "%";
+	public HashMap<String, String> getMeasurementInfo(byte[] buffer, HashMap<String, String> measurementInfo) {
+		String unit = ""; //$NON-NLS-1$
+		if 			((buffer[9] & 0x02) > 0)	unit = "k"; //$NON-NLS-1$
+		else if ((buffer[9] & 0x04) > 0)	unit = "n"; //$NON-NLS-1$
+		else if ((buffer[9] & 0x08) > 0)	unit = "u"; //$NON-NLS-1$
+		else if ((buffer[10] & 0x02) > 0)	unit = "M"; //$NON-NLS-1$
+		else if ((buffer[10] & 0x08) > 0)	unit = "m"; //$NON-NLS-1$
+		else if ((buffer[10] & 0x04) > 0) unit = "%"; //$NON-NLS-1$
 
-		if ((buffer[11] & 0x04) > 0)			unit += "Ohm";
-		else if ((buffer[11] & 0x08) > 0)	unit += "F";
-		else if ((buffer[12] & 0x02) > 0)	unit += "Hz";
-		else if ((buffer[12] & 0x04) > 0)	unit += "V";
-		else if ((buffer[12] & 0x08) > 0)	unit += "A";
-		else if ((buffer[13] & 0x01) > 0) unit += "C";
+		if ((buffer[11] & 0x04) > 0)			unit += "Ohm"; //$NON-NLS-1$
+		else if ((buffer[11] & 0x08) > 0)	unit += "F"; //$NON-NLS-1$
+		else if ((buffer[12] & 0x02) > 0)	unit += "Hz"; //$NON-NLS-1$
+		else if ((buffer[12] & 0x04) > 0)	unit += "V"; //$NON-NLS-1$
+		else if ((buffer[12] & 0x08) > 0)	unit += "A"; //$NON-NLS-1$
+		else if ((buffer[13] & 0x01) > 0) unit += "°C"; //$NON-NLS-1$
+		
+		measurementInfo.put(VC800.INPUT_UNIT, unit);
+		
+		String typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1500);
+		if 			(unit.endsWith("V")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1501); //$NON-NLS-1$
+		else if (unit.endsWith("A")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1503); //$NON-NLS-1$
+		else if (unit.endsWith("Ohm")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1504); //$NON-NLS-1$
+		else if (unit.endsWith("F")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1505); //$NON-NLS-1$
+		else if (unit.endsWith("Hz")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1506); //$NON-NLS-1$
+		else if (unit.endsWith("°C")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1507); //$NON-NLS-1$
+		
+		measurementInfo.put(VC800.INPUT_TYPE, typeSymbol.split(" ")[0]); //$NON-NLS-1$
+		measurementInfo.put(VC800.INPUT_SYMBOL, typeSymbol.split(" ")[1]); //$NON-NLS-1$
 
-		return unit;
+		return measurementInfo;
 	}
 	
 	/**
@@ -299,13 +317,16 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public String getMode(byte[] buffer) {
-		String mode = "DC";
-		if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x08) > 0) mode = "AC";
-		else if ((buffer[9] & 0x01) > 0)	mode = "DI";
-		else if ((buffer[11] & 0x04) > 0)	mode = "OH";
-		else if ((buffer[11] & 0x08) > 0)	mode = "CA";
-		else if ((buffer[12] & 0x02) > 0)	mode = "FR";
-		else if ((buffer[13] & 0x01) > 0) mode = "TE";
+		String mode = Messages.getString(MessageIds.OSDE_MSGT1510);
+		if ((buffer[0] & 0x02) > 0) mode = Messages.getString(MessageIds.OSDE_MSGT1511);
+		
+		if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x04) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1512);
+		else if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x08) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1513);
+		else if ((buffer[9] & 0x01) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1514);
+		else if ((buffer[11] & 0x04) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1515);
+		else if ((buffer[11] & 0x08) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1516);
+		else if ((buffer[12] & 0x02) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1517);
+		else if ((buffer[13] & 0x01) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1518);
 		
 		return mode;
 	}
@@ -386,14 +407,33 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
-					this.serialPort.open();
+					if (Channels.getInstance().getActiveChannel() != null) {
+						String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
+						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, channelConfigKey, this.getDialog());
+						try {
+							this.getDialog().dataGatherThread.start();
+						}
+						catch (RuntimeException e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+						}
+						if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
+					}
 				}
-				catch (Exception e) {
+				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(osde.messages.Messages.getString(MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+				}
+				catch (ApplicationConfigurationException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
+					this.application.getDeviceSelectionDialog().open();
 				}
 			}
 			else {
+				if (this.getDialog().dataGatherThread != null) {
+					this.getDialog().dataGatherThread.stopDataGatheringThread(false);
+				}
+				if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 				this.serialPort.close();
 			}
 		}

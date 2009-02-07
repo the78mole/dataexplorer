@@ -208,6 +208,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
+	 * @param useDevice the device
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
 	 * @param newTimeStep_ms time in msec of device measures points

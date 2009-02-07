@@ -57,7 +57,7 @@ import osde.ui.SWTResourceManager;
  */
 public class VC800Dialog extends DeviceDialog {
 	final static Logger						log									= Logger.getLogger(VC800Dialog.class.getName());
-	static final String						DEVICE_NAME					= "VC800";
+	final static String						DEVICE_NAME					= "VC800"; //$NON-NLS-1$
 
 	CLabel												infoText;
 	Button												closeButton;
@@ -71,21 +71,22 @@ public class VC800Dialog extends DeviceDialog {
 	Composite											composite3;
 
 	CLabel												inputTypeLabel;
-	CLabel												inputTypeText;
 	CLabel												inputTypeUnit;
+	CLabel												batteryLabel;
+	CLabel												batteryCondition;
+	boolean												isBatteryOK = true;
 
 	boolean												isConnectionWarned 	= false;
-	String												inputType	= "?";				//$NON-NLS-1$
 
-	HashMap<String, String>				configData					= new HashMap<String, String>();
 	GathererThread								dataGatherThread;
-	Thread												updateConfigTread;
 
 	final VC800										device;						// get device specific things, get serial port, ...
 	final VC800SerialPort					serialPort;				// open/close port execute getData()....
 	final OpenSerialDataExplorer	application;			// interaction with application instance
 	final Channels								channels;					// interaction with channels, source of all records
 	final Settings								settings;					// application configuration settings
+	final HashMap<String, String>	configData = new HashMap<String, String>();
+	final Thread									updateConfigTread;
 
 	/**
 	 * default constructor initialize all variables required
@@ -99,6 +100,43 @@ public class VC800Dialog extends DeviceDialog {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
+		this.updateConfigTread = new Thread() {
+			boolean isPortOpenedByMe = false;
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				try {
+					if (!VC800Dialog.this.serialPort.isConnected()) {
+						VC800Dialog.this.serialPort.open();
+						this.isPortOpenedByMe = true;
+					}
+					if (VC800Dialog.this.configData.size() < 3) {
+						VC800Dialog.this.serialPort.wait4Bytes(2000);
+						byte[] dataBuffer = VC800Dialog.this.serialPort.getData();
+						VC800Dialog.this.device.getMeasurementInfo(dataBuffer, VC800Dialog.this.configData);
+					}
+					if (VC800Dialog.this.dialogShell != null && !VC800Dialog.this.dialogShell.isDisposed()) {
+						if (Thread.currentThread().getId() == VC800Dialog.this.application.getThreadId()) {
+							VC800Dialog.this.configGroup.redraw();
+						}
+						else {
+							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+								public void run() {
+									VC800Dialog.this.configGroup.redraw();
+								}
+							});
+						}
+					}
+				}
+				catch (Exception e) {
+					VC800Dialog.this.isConnectionWarned = true;
+					VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+				}
+				if (this.isPortOpenedByMe) {
+					VC800Dialog.this.serialPort.close();
+				}
+			}
+		};
+
 	}
 
 	/**
@@ -131,28 +169,7 @@ public class VC800Dialog extends DeviceDialog {
 					@Override
 					public void focusGained(FocusEvent evt) {
 						VC800Dialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
-						// if port is already connected, do not read the data update will be done by gathere thread
-						if (!VC800Dialog.this.isConnectionWarned && !VC800Dialog.this.serialPort.isConnected()) {
-							VC800Dialog.this.updateConfigTread = new Thread() {
-								public void run() {
-									try {
-										VC800Dialog.this.configData = new HashMap<String, String>();
-										VC800Dialog.this.serialPort.open();
-										VC800Dialog.this.serialPort.wait4Bytes(2000);
-										//TODO VC800Dialog.this.device.getConfigurationValues(VC800Dialog.this.configData, VC800Dialog.this.serialPort.getData());
-										getDialogShell().getDisplay().asyncExec(new Runnable() {
-											public void run() {
-												updateGlobalConfigData(VC800Dialog.this.configData);
-											}
-										});
-									}
-									catch (Exception e) {
-										VC800Dialog.this.isConnectionWarned = true;
-										VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
-									}
-									VC800Dialog.this.serialPort.close();
-								}
-							};
+						if (!VC800Dialog.this.isConnectionWarned) {
 							try {
 								VC800Dialog.this.updateConfigTread.start();
 							}
@@ -198,9 +215,7 @@ public class VC800Dialog extends DeviceDialog {
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
 						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
 						this.infoText.setLayoutData(infoTextLData);
-						this.infoText.setText("Beim VoltCraft Multimeter können nur Daten aufgenommen werden,\n" +
-								" die der am Gerät eingestellten Messgröße entsprechen.\n" +
-								"Die Datenrate bestimmt das Gerät und variiert von Messgröße zu Messsgröße");
+						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1521));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
@@ -233,7 +248,7 @@ public class VC800Dialog extends DeviceDialog {
 									}
 									catch (Exception e) {
 										if (VC800Dialog.this.dataGatherThread != null && VC800Dialog.this.dataGatherThread.isCollectDataStopped) {
-											VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false, e);
+											VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false);
 										}
 										VC800Dialog.this.boundsComposite.redraw();
 										VC800Dialog.this.application.updateGraphicsWindow();
@@ -259,7 +274,7 @@ public class VC800Dialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								VC800Dialog.log.log(Level.FINEST, "stopColletDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (VC800Dialog.this.dataGatherThread != null && VC800Dialog.this.serialPort.isConnected()) {
-									VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false, null);
+									VC800Dialog.this.dataGatherThread.stopDataGatheringThread(false);
 								}
 								VC800Dialog.this.boundsComposite.redraw();
 							}
@@ -276,16 +291,21 @@ public class VC800Dialog extends DeviceDialog {
 						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.configGroup.setLayout(configGroupLayout);
 						this.configGroup.setLayoutData(configGroupLData);
-						this.configGroup.setText("Aktuelle Dateneinheit");
+						this.configGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1534));
 						this.configGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								VC800Dialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
-								VC800Dialog.this.inputTypeText.setText(VC800Dialog.this.inputType);
+								if (VC800Dialog.this.configData.size() >= 3) {
+									VC800Dialog.this.inputTypeUnit.setText(
+											VC800Dialog.this.configData.get(VC800.INPUT_TYPE) + " "	+ VC800Dialog.this.configData.get(VC800.INPUT_SYMBOL) //$NON-NLS-1$
+											+ " [" + VC800Dialog.this.configData.get(VC800.INPUT_UNIT) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+								}
+								VC800Dialog.this.batteryCondition.setText(VC800Dialog.this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						});
 						{
 							RowData composite1LData = new RowData();
-							composite1LData.width = 190;
+							composite1LData.width = 160;
 							composite1LData.height = 95;
 							this.composite1 = new Composite(this.configGroup, SWT.NONE);
 							FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
@@ -293,33 +313,28 @@ public class VC800Dialog extends DeviceDialog {
 							this.composite1.setLayoutData(composite1LData);
 							{
 								this.inputTypeLabel = new CLabel(this.composite1, SWT.NONE);
-								this.inputTypeLabel.setText("input type");
+								this.inputTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1530));
 							}
-						}
-						{
-							RowData composite2LData = new RowData();
-							composite2LData.width = 45;
-							composite2LData.height = 95;
-							this.composite2 = new Composite(this.configGroup, SWT.NONE);
-							FillLayout composite2Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-							this.composite2.setLayout(composite2Layout);
-							this.composite2.setLayoutData(composite2LData);
 							{
-								this.inputTypeText = new CLabel(this.composite2, SWT.NONE);
-								this.inputTypeText.setText(this.inputType);
+								this.batteryLabel = new CLabel(this.composite1, SWT.NONE);
+								this.batteryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1531));
 							}
 						}
 						{
 							this.composite3 = new Composite(this.configGroup, SWT.NONE);
 							FillLayout composite3Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 							RowData composite3LData = new RowData();
-							composite3LData.width = 60;
+							composite3LData.width = 100;
 							composite3LData.height = 95;
 							this.composite3.setLayoutData(composite3LData);
 							this.composite3.setLayout(composite3Layout);
 							{
 								this.inputTypeUnit = new CLabel(this.composite3, SWT.NONE);
-								this.inputTypeUnit.setText("unit");
+								this.inputTypeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1532));
+							}
+							{
+								this.batteryCondition = new CLabel(this.composite3, SWT.NONE);
+								this.batteryCondition.setText(this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						}
 						this.configGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
@@ -386,23 +401,9 @@ public class VC800Dialog extends DeviceDialog {
 	}
 
 	/**
-	 * update the global conguration data in dialog
+	 * @return the configData
 	 */
-	public void updateGlobalConfigData(HashMap<String, String> newConfigData) {
-		this.configData = newConfigData;
-		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
-			if (Thread.currentThread().getId() == this.application.getThreadId()) {
-				//TODO this.inputTypeText.setText(this.inputType = this.configData.get(VC800.CONFIG_IN_VOLTAGE_CUT_OFF)); //$NON-NLS-1$
-				this.configGroup.redraw();
-			}
-			else {
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-					public void run() {
-						//TODO VC800Dialog.this.inputTypeText.setText(VC800Dialog.this.inputType = VC800Dialog.this.configData.get(VC800.CONFIG_IN_VOLTAGE_CUT_OFF));
-						VC800Dialog.this.configGroup.redraw();
-					}
-				});
-			}
-		}
+	public HashMap<String, String> getConfigData() {
+		return this.configData;
 	}
 }

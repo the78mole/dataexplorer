@@ -39,7 +39,7 @@ import osde.ui.OpenSerialDataExplorer;
 public abstract class DeviceDialog extends Dialog {
 	final static Logger log = Logger.getLogger(DeviceDialog.class.getName());
 
-	protected Shell	dialogShell;
+	protected Shell			dialogShell;
 	
 	protected boolean 	isFailedConnectionWarned = false; // if focus adapter opens port, this flag eleminates warning loops in case of none modal dialog
 	

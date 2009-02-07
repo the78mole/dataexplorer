@@ -52,6 +52,7 @@ public class ReverseCorrectMessagesIds {
 	+ "# range 1200 to 1299 Picolario device \n"
 	+ "# range 1300 to 1399 UniLog device \n" 
 	+ "# range 1400 to 1499 eStation device \n"
+	+ "# range 1500 to 1599 VC800 device \n"
 	// add new supported device here
 	+ " \n";
 
