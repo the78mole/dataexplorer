@@ -208,7 +208,7 @@ public class StatisticsWindow {
 						Record record = activeRecordSet.get(recordName);
 						DecimalFormat df = record.getDecimalFormat();
 						IDevice device = activeRecordSet.getDevice();
-						StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.getRecordIndex(recordName));
+						StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.get(recordName).getOrdinal());
 						if (measurementStatistics != null) {
 							sb = new StringBuilder();
 							int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);

@@ -60,10 +60,10 @@ public class Record extends Vector<Integer> {
 	IDevice							device;
 
 	RecordSet						parent;
-	
-	String							name;																										// MessgrößeX Höhe
-	String							unit;																										// Einheit m
-	String							symbol;																									// Symbol h
+	final int						ordinal;													// ordinal position within record set
+	String							name;															// measurement name <Höhe>
+	String							unit;															// unit <m>
+	String							symbol;														// yymbol <h>
 	boolean							isActive;
 	boolean							isDisplayable;
 	boolean							isVisible							= true;
@@ -172,6 +172,8 @@ public class Record extends Vector<Integer> {
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
+	 * @param newDevice
+	 * @param newOrdinal
 	 * @param newName
 	 * @param newUnit
 	 * @param newSymbol
@@ -180,9 +182,10 @@ public class Record extends Vector<Integer> {
 	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
-	public Record(IDevice newDevice, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
+	public Record(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
 		this.device = newDevice;
+		this.ordinal = newOrdinal;
 		this.name = newName;
 		this.symbol = newSymbol;
 		this.unit = newUnit;
@@ -206,6 +209,7 @@ public class Record extends Vector<Integer> {
 	 */
 	private Record(Record record) {
 		super(record);
+		this.ordinal = record.ordinal;
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
@@ -260,6 +264,7 @@ public class Record extends Vector<Integer> {
 		//super(record); // vector
 		this.parent = record.parent;
 		this.parent.setZoomMode(false);
+		this.ordinal = record.ordinal;
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
@@ -349,6 +354,10 @@ public class Record extends Vector<Integer> {
 		return this.add(new Integer(point));
 	}
 
+	public int getOrdinal() {
+		return this.ordinal;
+	}
+	
 	public String getName() {
 		return this.name;
 	}
@@ -433,7 +442,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+				value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
@@ -456,7 +465,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name));
+				value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
@@ -479,7 +488,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else {
 			try {
-				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.parent.getRecordIndex(this.name), IDevice.REDUCTION);
+				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
 			}
 			catch (RuntimeException e) {

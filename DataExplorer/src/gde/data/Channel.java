@@ -251,7 +251,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, new Integer(recordSet.getHorizontalGridType()).toString());
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, recordSet.getHorizontalGridRecordName());
+				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
 			}
 			this.template.store();
 			log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
@@ -300,7 +300,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, OSDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0")); //$NON-NLS-1$
+				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "-1")).intValue()); //$NON-NLS-1$
 			}
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (this.getActiveRecordSet() != null && recordSet.equals(this.getActiveRecordSet())) 
@@ -350,7 +350,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, OSDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordKey(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "0")); //$NON-NLS-1$
+				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "-1")).intValue()); //$NON-NLS-1$
 			}
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			//if (recordSet.equals(this.getActiveRecordSet())) 
