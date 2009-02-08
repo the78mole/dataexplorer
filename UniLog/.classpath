@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
-	<classpathentry kind="lib" path="/build/lib/Windows XP x86/swt.jar"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar"/>
+	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

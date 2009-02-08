@@ -1,8 +1,7 @@
-/* Non functional contact tjarvi@qbang.org for details */
 /*-------------------------------------------------------------------------
 |   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
 |   RXTX is a native interface to serial ports in java.
-|   Copyright 1997-2007 by Trent Jarvi tjarvi@qbang.org and others who
+|   Copyright 2008 Martin Oberhuber (Wind River) and others who
 |   actually wrote it.  See individual source files for more information.
 |
 |   A copy of the LGPL v 2.1 may be found at
@@ -28,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -56,39 +55,54 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-package gnu.io;
+package gnu.io.rxtx.tests;
 
-import java.io.*;
-import java.util.*;
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
 
-/**
-* @author Trent Jarvi
-* @version %I%, %G%
-* @since JDK1.0
-*/
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
-abstract class RawPort extends CommPort {
-	public static final int  DATABITS_5             =5;
-	public static final int  DATABITS_6             =6;
-	public static final int  DATABITS_7             =7;
-	public static final int  DATABITS_8             =8;
-	public static final int  PARITY_NONE            =0;
-	public static final int  PARITY_ODD             =1;
-	public static final int  PARITY_EVEN            =2;
-	public static final int  PARITY_MARK            =3;
-	public static final int  PARITY_SPACE           =4;
-	public static final int  STOPBITS_1             =1;
-	public static final int  STOPBITS_1_5           =0; //wrong
-	public static final int  STOPBITS_2             =2;
-	public static final int  FLOWCONTROL_NONE       =0;
-	public static final int  FLOWCONTROL_RTSCTS_IN  =1;
-	public static final int  FLOWCONTROL_RTSCTS_OUT =2;
-	public static final int  FLOWCONTROL_XONXOFF_IN =4;
-	public static final int  FLOWCONTROL_XONXOFF_OUT=8;
-	public static final int  WRITE_SIZE             =8;
-	public static final int  IO_PORT                =0x378;
+import junit.framework.TestCase;
 
-	public abstract void setRawPortParams( int b, int d, int s, int p ) throws UnsupportedCommOperationException;
-	public abstract void addEventListener( RawPortEventListener lsnr ) throws TooManyListenersException;
-	public abstract void removeEventListener();
+public class CommPortIdentifierTest extends TestCase {
+
+	public CommPortIdentifierTest(String testName) {
+		super(testName);
+	}
+
+	public List getPortIdentifiers() {
+		Enumeration e = CommPortIdentifier.getPortIdentifiers();
+		List l = new ArrayList();
+		while (e.hasMoreElements()) {
+			l.add(e.nextElement());
+		}
+		return l;
+	}
+
+	public void testGetPortIdentifiers() throws Exception {
+		List l = getPortIdentifiers();
+		assertFalse("has ports", l.isEmpty());
+	}
+
+	public void testGetPortIdentifier() throws Exception {
+		List l = getPortIdentifiers();
+		CommPortIdentifier first = (CommPortIdentifier) l.get(0);
+		CommPortIdentifier last = (CommPortIdentifier) l.get(l.size() - 1);
+		// first find by name
+		CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
+		assertEquals("first found", p, first);
+		p = CommPortIdentifier.getPortIdentifier(last.getName());
+		assertEquals("last found", p, last);
+		// now the non-existent case
+		boolean exceptionThrown = false;
+		try {
+			p = CommPortIdentifier.getPortIdentifier("wuzziwuzz");
+		} catch (NoSuchPortException e) {
+			exceptionThrown = true;
+		}
+		assertTrue("invalid port", exceptionThrown);
+	}
+
 }
