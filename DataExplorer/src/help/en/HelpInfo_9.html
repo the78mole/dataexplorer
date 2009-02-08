@@ -2,13 +2,13 @@
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 <TITLE>OpenSerialDataExplorer - Information and Help</TITLE>
+<META NAME="AUTHOR" CONTENT="Winfried Brügmann">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
 
-<DIV ID="Header">
-OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
+<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
 
 <DIV ID="Menu"><A HREF="HelpInfo.html">Information and Help</A> <BR />
 <BR />
@@ -25,8 +25,7 @@ OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"File"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Edit"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Device"</A> <BR />
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics
-templates"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> <BR />
@@ -36,46 +35,41 @@ templates"</A> <BR />
 <BR />
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> <BR />
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and
-positioning</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and positioning</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Table view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Statistics view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digital view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Table view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analog view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digital view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Cell voltage view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analog view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Curve compare</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Cell voltage view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">File comment</A> <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Dataset comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Curve compare</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">File comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Dataset comment</A> <BR />
 <BR />
 <A HREF="HelpInfo_A.html">Device properties files</A> <BR />
 <BR />
 <A HREF="HelpInfo_B.html">File format</A></DIV>
 
 <DIV ID="Content" DIR="LTR">
-<H1>Curve Compare Window</H1>
-<P>As the name says the compare windows purpose is to compare curves
-with each other. The screen shot showing collected curves of an battery
-over a time period where the battery gets used. Comparison of curves
-makes only sense if the preconditions of the measurements are almost
-equal. Only the difference of the curve form regarding charge time and
-voltage level indicates a damage.</P>
-<P ALIGN=CENTER><IMG SRC="images/Compare_Window.png" NAME="graphics1" ALIGN=BOTTOM></P>
-<P><B>Hint : </B>Within the compare window is I possible to zoom and
-measure, equals to the functions in the graphics view.</P>
-<P>Sind Gridlinien im Vergleichsfenster aktiviert, werden Gridlinien
-in gleicher Form beim n&auml;chsten Start der Anwendung wieder
-hergestellt.</P>
-<P><B>Hinweis : </B>Zur Zeit m&uuml;ssen die Kurven, die man
-vergleichen m&ouml;chte, die gleiche Zeitbasis besitzen. Das bedeutet,
-sie m&uuml;ssen mit demselben Ger&auml;t aufgenommen sein. Das Programm
-verhindert Kurven unterschiedlicher Einheit miteinander zu vergleichen.
-Das Vergleichsfenster mit den darin enthaltenen Kurven wird in keiner
-Form gesichert.</P>
+<H1><A NAME="voltage_per_cell_window"></A>Cell Voltage View Window</H1>
+<P>The cell voltage view can only be used if the device enables this
+measurements. In most cases this comes true for Lithium battery cells
+charger. The voltage values are displayed as value and as bar graph.</P>
+<P ALIGN=CENTER><IMG SRC="images/CellVoltage_Window_1.png" NAME="graphics1" ALIGN=BOTTOM></P>
+<P>If the voltage values of the displayed cells has only a small
+difference the bar graph will spread to make differences more visible.
+If a cell voltage is lower than 2.60 Volt or above 4.20 Volt the bar
+color will change to red. If the cell voltage is between 2.60 and 4.20
+Volts the bar is colored yellow. The bar color changes to green if the
+cell voltage is exact 4.20 Volt.</P>
+<P ALIGN=CENTER><IMG SRC="images/CellVoltage_Window_2.png" NAME="graphics2" ALIGN=BOTTOM></P>
+<P>The pictures should make this more clear.</P>
 <P ALIGN=LEFT><A HREF="HelpInfo_8.html">&lt;&lt;== previous</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_10.html">next ==&gt;&gt;</A></P>
 </DIV>

@@ -2,13 +2,13 @@
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 <TITLE>OpenSerialDataExplorer - Information and Help</TITLE>
+<META NAME="AUTHOR" CONTENT="Winfried Brügmann">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
 
-<DIV ID="Header">
-OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
+<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
 
 <DIV ID="Menu"><A HREF="HelpInfo.html">Information and Help</A> <BR />
 <BR />
@@ -25,8 +25,7 @@ OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"File"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Edit"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Device"</A> <BR />
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics
-templates"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> <BR />
@@ -36,36 +35,44 @@ templates"</A> <BR />
 <BR />
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> <BR />
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and
-positioning</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and positioning</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Table view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Statistics view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digital view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Table view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analog view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digital view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Cell voltage view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analog view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Curve compare</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Cell voltage view</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">File comment</A> <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Dataset comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Curve compare</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">File comment</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Dataset comment</A> <BR />
 <BR />
 <A HREF="HelpInfo_A.html">Device properties files</A> <BR />
 <BR />
 <A HREF="HelpInfo_B.html">File format</A></DIV>
 
 <DIV ID="Content" DIR="LTR">
-<H1><A NAME="table_window"></A>Table View Window</H1>
-<P>The table is showing all data even if a curve is invisible.
-Depending on the amount of data the size of the table can be real big.</P>
-<P ALIGN=CENTER><IMG SRC="images/TableWindow.png" NAME="graphics1" ALIGN=BOTTOM></P>
-<P>The calculation and formating consumes time and memory. Big
-amount of data making the table unclear. This is the reason to have the
-capability to disable this calculation individual for each device.</P>
-<P ALIGN=LEFT><A HREF="HelpInfo_4.html">&lt;&lt;== previous</A></P>
-<P ALIGN=RIGHT><A HREF="HelpInfo_6.html">next ==&gt;&gt;</A></P>
+<H1><A NAME="statistics_window"></A>Statistics View Window</H1>
+	<P>
+	The statistics window shows statistic values for all measurements which can be displayed graphically.
+	The device properties file hold all configuration required to calculate statistic values.
+	Configure a trigger will enable to reference all statistic calculation to the measurement point within.
+	In addition a trigger will enable to summarize all maxima within the trigger area. 
+	This is shown in the sample screen shot below by height.
+	Declaring a comment for each line of measurement it is possible to make clear referencing trigger.
+	</P>
+	<P ALIGN=CENTER><IMG SRC="images/Statistic_Window_1.png" NAME="graphics1" ALIGN=BOTTOM BORDER=0></P>
+	<P>
+	Probably it is not required to have dialog to configure the statistic calculation for each device.
+	This is the reason to have this dialog enabled for selected devices and measurements where it seams required.
+	</P>
+	<P ALIGN=LEFT><A HREF="HelpInfo_42.html">&lt;&lt;== previous</A></P>
+	<P ALIGN=RIGHT><A HREF="HelpInfo_6.html">next ==&gt;&gt;</FONT></FONT></A></P>
 </DIV>
 </BODY>
 </HTML>

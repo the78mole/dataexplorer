@@ -34,18 +34,20 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Der Kurvenselektor</A><BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoomen und Positionieren</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Tabellarisches Anzeige</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Statistik Anzeige</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Digitale Anzeige</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Tabellarisches Anzeige</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Analoge Anzeige</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digitale Anzeige</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Zellenspannungs Anzeige</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analoge Anzeige</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Kurvenvergleichs Anzeige</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Zellenspannungs Anzeige</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Datei-Kommentar</A> <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Datensatz-Kommentar</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Kurvenvergleichs Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Datei-Kommentar</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Datensatz-Kommentar</A> <BR />
 <BR />
 <A HREF="HelpInfo_A.html">Gerätekonfigurationsdateien</A> <BR />
 <BR />
@@ -53,26 +55,21 @@
 </DIV>
 
 <DIV ID="Content" DIR="LTR">
-<H1><A NAME="compare_window"></A>Kurvenvergleichs Anzeigefenster</H1>
-<P>Wie der Name schon sagt ist das Kurvenvergleichsfenster dazu da,
-Kurven miteinander zu vergleichen. Im Bild sieht man Spannungskurven von
-einem alten Akku. Die Kurven wurden wiederholt &uuml;ber einen Zeitraum
-aufgenommen. Vergleiche machen nat&uuml;rlich nur Sinn, wenn auch die
-Voraussetzungen, wie die Kurven entstanden sind, m&ouml;glichst gleich
-sind. Allein an Hand der Unterschiede der Ladezeit und der Kurvenform,
-sieht man im Beispiel, dass mit diesem Akku etwas nicht stimmen kann.</P>
-<P ALIGN=CENTER><IMG SRC="images/Compare_Window.png" NAME="graphics1" ALIGN=BOTTOM></P>
-<P>Das Vergleichsfenster erlaubt, wie das Grafikfenster, ein Zoomen
-und Vermessen der Kurven.</P>
-<P>Sind Gridlinien im Vergleichsfenster aktiviert, werden Gridlinien
-in gleicher Form beim n&auml;chsten Start der Anwendung wieder
-hergestellt.</P>
-<P><B>Hinweis : </B>Zur Zeit m&uuml;ssen die Kurven, die man
-vergleichen m&ouml;chte, die gleiche Zeitbasis besitzen. Das bedeutet,
-sie m&uuml;ssen mit demselben Ger&auml;t aufgenommen sein. Das Programm
-verhindert Kurven unterschiedlicher Einheit miteinander zu vergleichen.
-Das Vergleichsfenster mit den darin enthaltenen Kurven wird in keiner
-Form gesichert.</P>
+<H1><A NAME="voltage_per_cell_window"></A>Zellenspannungs
+Anzeigefenster</H1>
+<P>Die Zellen-Einzelspannungsanzeige ist f&uuml;r LiPo Akkuzellen
+ausgelegt und zeigt die Spannungen jeder Zelle numerisch und als
+Balkendiagramm dar.</P>
+<P ALIGN=CENTER><IMG SRC="images/CellVoltage_Window_1.png" NAME="graphics1" ALIGN=BOTTOM></P>
+<P>Die Anzeige der Balken wird, wenn alle Zellenspannungen &uuml;ber
+4,0 Volt liegen, gespreizt, &uuml;ber den Anteil, der &uuml;ber 4 Volt
+liegt, dargestellt. Hat eine Zelle eine Spannung kleiner gleich 2,6 Volt
+oder &uuml;ber 4,20 Volt wird der Balken in rot dargestellt. Bei
+Zellenspannungen zwischen 2,6 und 4,2 Volt zeigt sich der Balken in
+gelb. Betr&auml;gt eine Zellenspannung genau 4,2 Volt f&auml;rbt sich
+der Balken gr&uuml;n.</P>
+<P ALIGN=CENTER><IMG SRC="images/CellVoltage_Window_2.png" NAME="graphics2" ALIGN=BOTTOM></P>
+<P>Die Bilder sollen das Verhalten etwas verdeutlichen.</P>
 <P ALIGN=LEFT><A HREF="HelpInfo_8.html">&lt;&lt;== zur&uuml;ck</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_10.html">weiter ==&gt;&gt;</A></P>
 </DIV>
