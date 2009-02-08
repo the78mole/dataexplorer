@@ -283,12 +283,12 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		String unit = ""; //$NON-NLS-1$
 		if 			((buffer[9] & 0x02) > 0)	unit = "k"; //$NON-NLS-1$
 		else if ((buffer[9] & 0x04) > 0)	unit = "n"; //$NON-NLS-1$
-		else if ((buffer[9] & 0x08) > 0)	unit = "u"; //$NON-NLS-1$
+		else if ((buffer[9] & 0x08) > 0)	unit = "µ"; //$NON-NLS-1$
 		else if ((buffer[10] & 0x02) > 0)	unit = "M"; //$NON-NLS-1$
 		else if ((buffer[10] & 0x08) > 0)	unit = "m"; //$NON-NLS-1$
 		else if ((buffer[10] & 0x04) > 0) unit = "%"; //$NON-NLS-1$
 
-		if ((buffer[11] & 0x04) > 0)			unit += "Ohm"; //$NON-NLS-1$
+		if ((buffer[11] & 0x04) > 0)			unit += "Ω"; //$NON-NLS-1$
 		else if ((buffer[11] & 0x08) > 0)	unit += "F"; //$NON-NLS-1$
 		else if ((buffer[12] & 0x02) > 0)	unit += "Hz"; //$NON-NLS-1$
 		else if ((buffer[12] & 0x04) > 0)	unit += "V"; //$NON-NLS-1$

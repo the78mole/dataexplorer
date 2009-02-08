@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import osde.config.Settings;
 import osde.data.Channels;
@@ -63,7 +64,7 @@ public class VC800Dialog extends DeviceDialog {
 	final static Logger						log									= Logger.getLogger(VC800Dialog.class.getName());
 	final static String						DEVICE_NAME					= "VC800"; //$NON-NLS-1$
 
-	CLabel												infoText;
+	Text													infoText;
 	Button												closeButton;
 	Button												stopCollectDataButton;
 	Button												startCollectDataButton;
@@ -172,7 +173,7 @@ public class VC800Dialog extends DeviceDialog {
 					}
 				});
 				{
-					this.boundsComposite = new Composite(this.dialogShell, SWT.NONE);
+					this.boundsComposite = new Composite(this.dialogShell, SWT.SHADOW_IN);
 					FormData boundsCompositeLData = new FormData();
 					boundsCompositeLData.left = new FormAttachment(0, 1000, 0);
 					boundsCompositeLData.right = new FormAttachment(1000, 1000, 0);
@@ -199,7 +200,7 @@ public class VC800Dialog extends DeviceDialog {
 						infoTextLData.left = new FormAttachment(0, 1000, 12);
 						infoTextLData.top = new FormAttachment(0, 1000, 12);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
-						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
+						this.infoText = new Text(this.boundsComposite, SWT.WRAP | SWT.MULTI );
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1521));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
