@@ -2,12 +2,47 @@
 
 <project name="Simulator" default="compile">
 
+	<!-- init -->
+	<target name="init">
+		<property name="build.properties" location="../build/build.properties" />
+
+		<property file="${build.properties}" />
+
+		<!-- this is to have nice message about used build.properties file -->
+		<available property="build.properties.exists" file="${build.properties}" />
+		<echo message="Building using ${build.properties}" />
+		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<condition property="isLinux">
+		    <os name="Linux"/>
+	  	</condition>
+		<property name="os.lib.path" value="Linux" />
+		<condition property="isWindows">
+		    <os name="Windows XP"/>
+	  	</condition>
+		<condition property="isWindows">
+			<os name="Windows VISTA"/>
+	  	</condition>
+		<condition property="isWindows">
+			<os name="Windows 2003"/>
+	  	</condition>
+		<property name="os.lib.path" value="Windows" />
+		<condition property="isMAC">
+		    <os name="Mac OS"/>
+	  	</condition>
+		<condition property="isMAC">
+			<os name="Mac OS X"/>
+	  	</condition>
+		<property name="os.lib.path" value="MAC" />
+	</target>
+
+
 	<property name="module.output" location="build/classes"/>
+
 
 	<path id="compile.classpath">
 		<pathelement location="../OpenSerialDataExplorer/build/classes" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
-		<pathelement location="../build/lib/${os.name} ${os.arch}/swt.jar" />
+		<pathelement location="../build/lib/${os.lib.path}/swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
@@ -48,16 +83,6 @@
 	</target>
 	
 	<target name="echo:build.properties" if="build.properties.exists">
-		<echo message="Building using ${build.properties}" />
-	</target>
-
-	<target name="init">
-		<property name="build.properties" location="../build/build.properties" />
-
-		<property file="${build.properties}" />
-
-		<!-- this is to have nice message about used build.properties file -->
-		<available property="build.properties.exists" file="${build.properties}" />
 		<echo message="Building using ${build.properties}" />
 	</target>
 
