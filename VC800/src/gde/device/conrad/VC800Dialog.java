@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.conrad;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +48,9 @@ import org.eclipse.swt.widgets.Shell;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
+import osde.exception.ApplicationConfigurationException;
+import osde.exception.SerialPortException;
+import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -66,9 +70,9 @@ public class VC800Dialog extends DeviceDialog {
 
 	Composite											boundsComposite;
 	Group													configGroup;
-	Composite											composite1;
+	Composite											labelComposite;
 	Composite											composite2;
-	Composite											composite3;
+	Composite											dataComposite;
 
 	CLabel												inputTypeLabel;
 	CLabel												inputTypeUnit;
@@ -77,6 +81,8 @@ public class VC800Dialog extends DeviceDialog {
 	boolean												isBatteryOK = true;
 
 	boolean												isConnectionWarned 	= false;
+	boolean 											isPortOpenedByMe 		= false;
+	Thread												updateConfigTread;
 
 	GathererThread								dataGatherThread;
 
@@ -86,7 +92,6 @@ public class VC800Dialog extends DeviceDialog {
 	final Channels								channels;					// interaction with channels, source of all records
 	final Settings								settings;					// application configuration settings
 	final HashMap<String, String>	configData = new HashMap<String, String>();
-	final Thread									updateConfigTread;
 
 	/**
 	 * default constructor initialize all variables required
@@ -100,43 +105,6 @@ public class VC800Dialog extends DeviceDialog {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.updateConfigTread = new Thread() {
-			boolean isPortOpenedByMe = false;
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				try {
-					if (!VC800Dialog.this.serialPort.isConnected()) {
-						VC800Dialog.this.serialPort.open();
-						this.isPortOpenedByMe = true;
-					}
-					if (VC800Dialog.this.configData.size() < 3) {
-						VC800Dialog.this.serialPort.wait4Bytes(2000);
-						byte[] dataBuffer = VC800Dialog.this.serialPort.getData();
-						VC800Dialog.this.device.getMeasurementInfo(dataBuffer, VC800Dialog.this.configData);
-					}
-					if (VC800Dialog.this.dialogShell != null && !VC800Dialog.this.dialogShell.isDisposed()) {
-						if (Thread.currentThread().getId() == VC800Dialog.this.application.getThreadId()) {
-							VC800Dialog.this.configGroup.redraw();
-						}
-						else {
-							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-								public void run() {
-									VC800Dialog.this.configGroup.redraw();
-								}
-							});
-						}
-					}
-				}
-				catch (Exception e) {
-					VC800Dialog.this.isConnectionWarned = true;
-					VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
-				}
-				if (this.isPortOpenedByMe) {
-					VC800Dialog.this.serialPort.close();
-				}
-			}
-		};
-
 	}
 
 	/**
@@ -171,6 +139,24 @@ public class VC800Dialog extends DeviceDialog {
 						VC800Dialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
 						if (!VC800Dialog.this.isConnectionWarned) {
 							try {
+								VC800Dialog.this.updateConfigTread = new Thread() {
+									public void run() {
+										try {
+											updateConfig();
+										}
+										catch (Exception e) {
+											VC800Dialog.this.isConnectionWarned = true;
+											log.log(Level.WARNING, e.getMessage(), e);
+											VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+										}
+										finally {
+											if (VC800Dialog.this.isPortOpenedByMe) {
+												VC800Dialog.this.serialPort.close();
+											}
+										}
+									}
+								};
+
 								VC800Dialog.this.updateConfigTread.start();
 							}
 							catch (RuntimeException e) {
@@ -297,43 +283,43 @@ public class VC800Dialog extends DeviceDialog {
 								VC800Dialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
 								if (VC800Dialog.this.configData.size() >= 3) {
 									VC800Dialog.this.inputTypeUnit.setText(
-											VC800Dialog.this.configData.get(VC800.INPUT_TYPE) + " "	+ VC800Dialog.this.configData.get(VC800.INPUT_SYMBOL) //$NON-NLS-1$
-											+ " [" + VC800Dialog.this.configData.get(VC800.INPUT_UNIT) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+											VC800Dialog.this.configData.get(VC800.INPUT_TYPE) + "  "	+ VC800Dialog.this.configData.get(VC800.INPUT_SYMBOL) //$NON-NLS-1$
+											+ "   [" + VC800Dialog.this.configData.get(VC800.INPUT_UNIT) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								VC800Dialog.this.batteryCondition.setText(VC800Dialog.this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						});
 						{
 							RowData composite1LData = new RowData();
-							composite1LData.width = 160;
+							composite1LData.width = 150;
 							composite1LData.height = 95;
-							this.composite1 = new Composite(this.configGroup, SWT.NONE);
+							this.labelComposite = new Composite(this.configGroup, SWT.NONE);
 							FillLayout composite1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-							this.composite1.setLayout(composite1Layout);
-							this.composite1.setLayoutData(composite1LData);
+							this.labelComposite.setLayout(composite1Layout);
+							this.labelComposite.setLayoutData(composite1LData);
 							{
-								this.inputTypeLabel = new CLabel(this.composite1, SWT.NONE);
+								this.inputTypeLabel = new CLabel(this.labelComposite, SWT.NONE);
 								this.inputTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1530));
 							}
 							{
-								this.batteryLabel = new CLabel(this.composite1, SWT.NONE);
+								this.batteryLabel = new CLabel(this.labelComposite, SWT.NONE);
 								this.batteryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1531));
 							}
 						}
 						{
-							this.composite3 = new Composite(this.configGroup, SWT.NONE);
+							this.dataComposite = new Composite(this.configGroup, SWT.NONE);
 							FillLayout composite3Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 							RowData composite3LData = new RowData();
-							composite3LData.width = 100;
+							composite3LData.width = 150;
 							composite3LData.height = 95;
-							this.composite3.setLayoutData(composite3LData);
-							this.composite3.setLayout(composite3Layout);
+							this.dataComposite.setLayoutData(composite3LData);
+							this.dataComposite.setLayout(composite3Layout);
 							{
-								this.inputTypeUnit = new CLabel(this.composite3, SWT.NONE);
+								this.inputTypeUnit = new CLabel(this.dataComposite, SWT.NONE);
 								this.inputTypeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1532));
 							}
 							{
-								this.batteryCondition = new CLabel(this.composite3, SWT.NONE);
+								this.batteryCondition = new CLabel(this.dataComposite, SWT.NONE);
 								this.batteryCondition.setText(this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						}
@@ -405,5 +391,37 @@ public class VC800Dialog extends DeviceDialog {
 	 */
 	public HashMap<String, String> getConfigData() {
 		return this.configData;
+	}
+
+	/**
+	 * @throws ApplicationConfigurationException
+	 * @throws SerialPortException
+	 * @throws InterruptedException
+	 * @throws TimeOutException
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	void updateConfig() throws ApplicationConfigurationException, SerialPortException, InterruptedException, TimeOutException, IOException, Exception {
+		if (VC800Dialog.this.configData.size() < 3 || !VC800Dialog.this.configData.get(VC800.INPUT_TYPE).equals(Messages.getString(MessageIds.OSDE_MSGT1500).split(" ")[0])) {
+			if (!VC800Dialog.this.serialPort.isConnected()) {
+				VC800Dialog.this.serialPort.open();
+				this.isPortOpenedByMe = true;
+			}
+			else {
+				this.isPortOpenedByMe = false;
+			}
+			do {
+				byte[] dataBuffer = VC800Dialog.this.serialPort.getData();
+				this.device.getMeasurementInfo(dataBuffer, VC800Dialog.this.configData);
+				this.isBatteryOK = this.device.isBatteryLevelLow(dataBuffer);
+			} while (VC800Dialog.this.configData.get(VC800.INPUT_TYPE) == null || VC800Dialog.this.configData.get(VC800.INPUT_TYPE).equals(Messages.getString(MessageIds.OSDE_MSGT1500).split(" ")[0]));
+			if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						VC800Dialog.this.configGroup.redraw();
+					}
+				});
+			}
+		}
 	}
 }
