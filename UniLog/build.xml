@@ -2,47 +2,22 @@
 
 <project name="UniLog" default="compile">
 
-	<!-- init -->
-	<target name="init">
-		<property name="build.properties" location="../build/build.properties" />
+	<property name="build.properties" location="../build/build.properties" />
 
-		<property file="${build.properties}" />
+	<property file="${build.properties}" />
 
-		<!-- this is to have nice message about used build.properties file -->
-		<available property="build.properties.exists" file="${build.properties}" />
-		<echo message="Building using ${build.properties}" />
-		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<condition property="isLinux">
-		    <os name="Linux"/>
-	  	</condition>
-		<property name="os.lib.path" value="Linux" />
-		<condition property="isWindows">
-		    <os name="Windows XP"/>
-	  	</condition>
-		<condition property="isWindows">
-			<os name="Windows VISTA"/>
-	  	</condition>
-		<condition property="isWindows">
-			<os name="Windows 2003"/>
-	  	</condition>
-		<property name="os.lib.path" value="Windows" />
-		<condition property="isMAC">
-		    <os name="Mac OS"/>
-	  	</condition>
-		<condition property="isMAC">
-			<os name="Mac OS X"/>
-	  	</condition>
-		<property name="os.lib.path" value="MAC" />
-	</target>
-
+	<!-- this is to have nice message about used build.properties file -->
+	<available property="build.properties.exists" file="${build.properties}" />
+	<echo message="Building using ${build.properties}" />
+	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+	<echo message="using build.os.shortname = ${build.os.shortname}" />
 
 	<property name="module.output" location="build/classes"/>
-
 
 	<path id="compile.classpath">
 		<pathelement location="../OpenSerialDataExplorer/build/classes" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
-		<pathelement location="../build/lib/${os.lib.path}/swt.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
@@ -53,7 +28,7 @@
 		</javac>
 	</target>
 
-	<target name="package" depends="compile, init">
+	<target name="package" depends="compile">
 		<echo message="Building using ${os.name} ${os.arch}" />
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
