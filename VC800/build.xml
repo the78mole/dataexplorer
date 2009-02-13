@@ -29,7 +29,6 @@
 	</target>
 
 	<target name="package" depends="compile">
-		<echo message="Building using ${os.name} ${os.arch}" />
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
@@ -39,7 +38,7 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implemntation for VoltCraft Multimeter Series 800/900"/>
+    		<attribute name="Bundle-Description" value="Implemntation for device UniLog SM-Modellbau"/>
     		<attribute name="Export-Service" value="osde.device.conrad.VC820, osde.device.conrad.VC840"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
@@ -56,9 +55,4 @@
 	<target name="clean">
 		<delete dir="build" />
 	</target>
-	
-	<target name="echo:build.properties" if="build.properties.exists">
-		<echo message="Building using ${build.properties}" />
-	</target>
-
 </project>

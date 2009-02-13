@@ -56,9 +56,4 @@
 	<target name="clean">
 		<delete dir="build" />
 	</target>
-	
-	<target name="echo:build.properties" if="build.properties.exists">
-		<echo message="Building using ${build.properties}" />
-	</target>
-
 </project>
