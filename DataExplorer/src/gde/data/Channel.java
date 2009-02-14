@@ -251,7 +251,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, new Integer(recordSet.getHorizontalGridType()).toString());
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
+				if (recordSet.get(recordSet.getHorizontalGridRecordName()) != null) {
+					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
+				}
 			}
 			this.template.store();
 			log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
