@@ -364,10 +364,11 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 			}
+			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			//if (recordSet.equals(this.getActiveRecordSet())) 
 			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName())) 
 				this.application.updateGraphicsWindow();
+			
 		}
 	}
 	
