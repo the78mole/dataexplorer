@@ -1612,7 +1612,7 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(
 				this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
-		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.get(this.horizontalGridRecordKey).ordinal).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.get(this.horizontalGridRecordKey)!= null ? this.get(this.horizontalGridRecordKey).ordinal : -1).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
@@ -1650,7 +1650,10 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = this.recordNames[new Integer(tmpValue.trim())];
+			if (tmpValue != null && tmpValue.length() > 0) {
+				int index = new Integer(tmpValue.trim());
+				this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : "";
+			}
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);
