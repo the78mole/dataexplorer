@@ -30,12 +30,17 @@ import osde.OSDE;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.device.ChannelTypes;
+import osde.io.LogViewReader;
+import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.RecordSetNameComparator;
 
 /**
  * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
+ * The behavior of this class depends on its type (ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG)
+ * TYPE_OUTLET means that a channel represents exact one object with one view, like a battery
+ * TPPE_CONFIG means one objects may have different views, so all channels represent one object
  * @author Winfried Brügmann
  */
 public class Channel extends HashMap<String, RecordSet> {
@@ -43,7 +48,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 	
 	String												name;							// 1: Ausgang
-	final int											type;
+	final int											type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;					// graphics template holds view configuration
 	RecordSet											activeRecordSet;
 	String 												fileName;
@@ -84,6 +89,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * overwrites the size method to return faked size in case of channel type is ChannelTypes.TYPE_CONFIG
+	 * TYPE_CONFIG means the all record sets depends to the object and the different (configuration) channels enable differnt views to it
 	 */
 	public int size() {
 		int size;
@@ -139,7 +145,10 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
-	 * method to get the record set names "1) Laden, 2) Entladen, ..."
+	 * method to get the record set names "1) Laden, 2) Entladen, ...".
+	 * the behavior of this method depends on this.type (ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG)
+	 * TYPE_OUTLET means that a channel represents exact one object, like a battery
+	 * TPPE_CONFIG measn one objects has different views, so this method returns all record set names for all channels
 	 * @return String[] containing the records names
 	 */
 	public String[] getRecordSetNames() {
@@ -164,6 +173,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	
 	/**
 	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion 
+	 * @return String[] containing the records names
 	 */
 	public String[] getUnsortedRecordSetNames() {
 		return this.keySet().toArray( new String[1]);
@@ -252,7 +262,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, new Integer(recordSet.getHorizontalGridType()).toString());
 				if (recordSet.get(recordSet.getHorizontalGridRecordName()) != null) {
-					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
+					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
 				}
 			}
 			this.template.store();
@@ -302,7 +312,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, OSDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "-1")).intValue()); //$NON-NLS-1$
+				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 			}
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (this.getActiveRecordSet() != null && recordSet.equals(this.getActiveRecordSet())) 
@@ -352,7 +362,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setHorizontalGridLineStyle(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, OSDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setHorizontalGridType(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD, "-1")).intValue()); //$NON-NLS-1$
+				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 			}
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			//if (recordSet.equals(this.getActiveRecordSet())) 
@@ -521,5 +531,38 @@ public class Channel extends HashMap<String, RecordSet> {
 		else {
 			this.isSaved = is_saved;
 		}		
+	}
+	
+	/**
+	 * check if all record sets have its data loaded, if required load data from file
+	 * this method can be used to check prior to save modified data
+	 * the behavior which recordset data is checked and loaded depends on the method this.getRecordSetNames() 
+	 */
+	public void checkAndLoadData() {
+		String fullQualifiedFileName = this.getFullQualifiedFileName();
+		for (String tmpRecordSetName : this.getRecordSetNames()) {
+			log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName);
+			Channel selectedChannel = Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
+			log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null"));
+			if (selectedChannel != null) {
+				RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
+				log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null"));
+				if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
+					log.log(Level.FINER, "tmpRecordSetName needs data to loaded");
+					try {
+						if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
+							log.log(Level.FINER, "loading data ...");
+							if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD))
+								OsdReaderWriter.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
+							else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
+						}
+					}
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+					}
+				}
+			}
+		}
 	}
 }

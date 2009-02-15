@@ -349,60 +349,73 @@ public class OsdReaderWriter {
 				// record sets with it properties
 				StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
 				String[] recordSetNames = activeChannel.getRecordSetNames();
-				// prepare all record set lines without the to be calculated data pointer
+				// prepare all record set describing data
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					// channel/configuration :|: record set name :|: recordSet description :|: recordSet properties :|: all records properties :|: record size :|: data begin pointer 
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-					sbs[i] = new StringBuilder();
-					sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER).append(OSDE.CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
-							.append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(OSDE.DATA_DELIMITER).append(
-									OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
-					// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
-					for (String recordKey : recordSet.getRecordNames()) {
-						sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
+					if (recordSetChannel != null) {
+						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+						if (recordSet != null) {
+							sbs[i] = new StringBuilder();
+							sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER).append(OSDE.CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(
+									OSDE.DATA_DELIMITER).append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription())
+									.append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
+							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
+							for (String recordKey : recordSet.getRecordNames()) {
+								sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
+							}
+							sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(OSDE.DATA_DELIMITER); //$NON-NLS-1$
+							filePointer += OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
+							filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
+							log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
+								+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								+ " filePointer = " + filePointer); //$NON-NLS-1$
+						}
 					}
-					sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(OSDE.DATA_DELIMITER); //$NON-NLS-1$
-					filePointer += OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
-					filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
-					log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
-							+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							+ " filePointer = " + filePointer); //$NON-NLS-1$
 				}
+				// prepare all record set data pointer
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					// channel/configuration :: record set name :: recordSet description :: data pointer 
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-					recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
-					sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
-					log.log(Level.FINE, sbs[i].toString());
-					//data_out.writeInt(sbs[i].length());
-					data_out.writeUTF(sbs[i].toString());
-					filePointer += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
-					log.log(Level.FINE, "filePointer = " + filePointer); //$NON-NLS-1$
+					if (recordSetChannel != null) {
+						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+						if (recordSet != null) {
+							recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
+							sbs[i].append(OSDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(OSDE.STRING_NEW_LINE); //$NON-NLS-1$
+							log.log(Level.FINE, sbs[i].toString());
+							//data_out.writeInt(sbs[i].length());
+							data_out.writeUTF(sbs[i].toString());
+							filePointer += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
+							log.log(Level.FINE, "filePointer = " + filePointer); //$NON-NLS-1$
+						}
+					}
 				}
-				// data integer 1.st raw measurement, 2.nd raw measurement, 3.rd measurement, ....
+				// check if all involved record sets have data (if loaded from file it meight be possible that some record set lack of its data)
 				long startTime = new Date().getTime();
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
-					RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
-					if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName());
-					String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
-					byte[] buffer = new byte[OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true) * noneCalculationRecordNames.length];
-					byte[] bytes = new byte[OSDE.SIZE_BYTES_INTEGER];
-					for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
-						for (int k = 0; k < noneCalculationRecordNames.length; ++k, l+=OSDE.SIZE_BYTES_INTEGER) {
-							int point = recordSet.get(noneCalculationRecordNames[k]).get(j);
-							//log.log(Level.FINE, ""+point);
-							bytes[0] = (byte)((point >>> 24) & 0xFF);
-							bytes[1] = (byte)((point >>> 16) & 0xFF);
-							bytes[2] = (byte)((point >>>  8) & 0xFF);
-							bytes[3] = (byte)((point >>>  0) & 0xFF);
-							System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+					if (recordSetChannel != null) {
+						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
+						if (recordSet != null) {
+							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName());
+							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
+							byte[] buffer = new byte[OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true) * noneCalculationRecordNames.length];
+							byte[] bytes = new byte[OSDE.SIZE_BYTES_INTEGER];
+							for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
+								for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
+									int point = recordSet.get(noneCalculationRecordNames[k]).get(j);
+									//log.log(Level.FINER, ""+point);
+									bytes[0] = (byte) ((point >>> 24) & 0xFF);
+									bytes[1] = (byte) ((point >>> 16) & 0xFF);
+									bytes[2] = (byte) ((point >>> 8) & 0xFF);
+									bytes[3] = (byte) ((point >>> 0) & 0xFF);
+									System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+								}
+							}
+							data_out.write(buffer, 0, buffer.length);
+							recordSet.setSaved(true);
 						}
 					}
-					data_out.write(buffer, 0, buffer.length);
-					recordSet.setSaved(true);
 				}
 				log.log(Level.FINE, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}

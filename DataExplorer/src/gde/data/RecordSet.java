@@ -123,7 +123,9 @@ public class RecordSet extends HashMap<String, Record> {
 	Color													timeGridColor									= OpenSerialDataExplorer.COLOR_GREY;
 	int														timeGridLineStyle							= new Integer(SWT.LINE_DOT);
 
-	public static final String		HORIZONTAL_GRID_RECORD				= "RecordSet_horizontalGridRecordOrdinal";			//$NON-NLS-1$
+	@Deprecated
+	public static final String		HORIZONTAL_GRID_RECORD				= "RecordSet_horizontalGridRecord";							//$NON-NLS-1$
+	public static final String		HORIZONTAL_GRID_RECORD_ORDINAL= "RecordSet_horizontalGridRecordOrdinal";			//$NON-NLS-1$
 	public static final String		HORIZONTAL_GRID_TYPE					= "RecordSet_horizontalGridType";								//$NON-NLS-1$
 	public static final String		HORIZONTAL_GRID_COLOR					= "RecordSet_horizontalGridColor";							//$NON-NLS-1$
 	public static final String		HORIZONTAL_GRID_LINE_STYLE		= "RecordSet_horizontalGridLineStyle";					//$NON-NLS-1$
@@ -139,7 +141,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int[] 												voltageLimits									= LithiumBatteryValues.getVoltageLimits(); 			// voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										// each main tickmark //$NON-NLS-1$		
 	
-	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
+	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
 			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
@@ -970,37 +972,23 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRecalculation = false;
 		
 		// start a low prio tread to load other record set data
-		final Channel activeChannel = this.channels.getActiveChannel();
 		Thread dataLoadThread = new Thread(new Runnable() {
       public void run() {
       	CalculationThread ct = RecordSet.this.device.getCalculationThread();
       	try {
       		while (ct != null && ct.isAlive()) {
+      			log.log(Level.FINER, "CalculationThread isAlive");
       			Thread.sleep(1000);
       		}
 				}
 				catch (InterruptedException e) {
 				}
-				String fullQualifiedFileName = activeChannel.getFullQualifiedFileName();
-				for (String tmpRecordSetName : activeChannel.getRecordSetNames()) {
-					RecordSet tmpRecordSet = activeChannel.get(tmpRecordSetName);
-					if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
-						try {
-							if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
-								if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
-								else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
-							}
-						}
-						catch (Exception e) {
-							log.log(Level.SEVERE, e.getMessage(),e);
-							RecordSet.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
-						}
-					}
-				}
+				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
+				if (activeChannel != null) activeChannel.checkAndLoadData();
 			}
 		});
 		try {
-			dataLoadThread.setPriority(Thread.MIN_PRIORITY);
+			dataLoadThread.setPriority(Thread.NORM_PRIORITY - 2);
 			dataLoadThread.start();
 		}
 		catch (RuntimeException e) {
@@ -1624,7 +1612,7 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(
 				this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
-		sb.append(HORIZONTAL_GRID_RECORD).append(OSDE.STRING_EQUAL).append(this.horizontalGridRecordKey).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.get(this.horizontalGridRecordKey).ordinal).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
@@ -1661,6 +1649,8 @@ public class RecordSet extends HashMap<String, Record> {
 
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
+			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
+			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = this.recordNames[new Integer(tmpValue.trim())];
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);

@@ -104,7 +104,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @return array with channel names
 	 */
 	public String[] getChannelNames() {
-		//return this.application.getMenuToolBar().getChannelSelectCombo().getItems();
 		return this.channelNames;
 	}
 

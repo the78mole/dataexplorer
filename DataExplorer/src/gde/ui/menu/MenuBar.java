@@ -957,12 +957,7 @@ public class MenuBar {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				for (String recordSetName : activeChannel.getRecordSetNames()) {
-					RecordSet recordSet = activeChannel.get(recordSetName);
-					if (recordSet != null && !recordSet.hasDisplayableData()) {
-						recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
-					}
-				}
+				activeChannel.checkAndLoadData();
 				FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				OsdReaderWriter.write(filePath, activeChannel, 1);
 				activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
