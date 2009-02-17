@@ -55,7 +55,6 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @param deviceProperties file
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
-	 * @throws NoSuchPortException 
 	 */
 	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -66,7 +65,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**

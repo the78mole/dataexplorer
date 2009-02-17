@@ -65,7 +65,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
 
 	/**

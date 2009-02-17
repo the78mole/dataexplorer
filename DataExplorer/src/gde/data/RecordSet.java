@@ -1651,8 +1651,13 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
 			if (tmpValue != null && tmpValue.length() > 0) {
-				int index = new Integer(tmpValue.trim());
-				this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : "";
+				try {
+					int index = new Integer(tmpValue.trim());
+					this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : "";
+				}
+				catch (Exception e) {
+					this.horizontalGridRecordKey = "";
+				}
 			}
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = new Integer(tmpValue.trim()).intValue();

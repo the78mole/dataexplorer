@@ -46,6 +46,7 @@ import osde.exception.OSDEInternalException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.menu.MenuToolBar;
 import osde.utils.StringHelper;
 
 /**
@@ -162,7 +163,7 @@ public class OsdReaderWriter {
 		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
 		
-		// record sets with it properties
+		// record sets with it properties and records
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
 		for (int i=0; i<numberRecordSets; ++i) {
 			// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
@@ -238,9 +239,12 @@ public class OsdReaderWriter {
 				
 				channel.put(recordSetName, recordSet);
 			}
-			OsdReaderWriter.application.getMenuToolBar().updateChannelSelector();
-			OsdReaderWriter.application.getMenuToolBar().updateRecordSetSelectCombo();
-
+			MenuToolBar menuToolBar = OsdReaderWriter.application.getMenuToolBar();
+			if (menuToolBar != null) {
+				menuToolBar.updateChannelSelector();
+				menuToolBar.updateRecordSetSelectCombo();
+			}
+			
 			String[] firstRecordSet = new String[2];
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
@@ -262,11 +266,11 @@ public class OsdReaderWriter {
 					int deviceDataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 					byte[] buffer = new byte[deviceDataBufferSize * recordDataSize];
 					data_in.readFully(buffer);
-					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, true);
+					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
 					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
-				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null) {
+				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
 					isFirstRecordSetDisplayed = true;
 					channels.setFileName(filePath);
 					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
