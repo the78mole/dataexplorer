@@ -189,6 +189,7 @@ public class OsdReaderWriter {
 						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
+						channels.setActiveChannelNumber(new Integer(channelConfig.substring(channelConfig.length()-1)));
 					}
 					catch (NumberFormatException e) {
 						// ignore and keep channel as null
@@ -202,12 +203,13 @@ public class OsdReaderWriter {
 						channel = channels.get(channels.getChannelNumber(channelConfig.split(" ")[0]));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
+						channels.setActiveChannelNumber(new Integer(channel.getName().split(":")[0].trim()));
 					}
 					catch (NullPointerException e) {
 						// ignore and keep channel as null
 					}
 				}
-				if (channel == null) {
+				if (channel == null) { // 3.rd try channelConfiguration not found
 					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + Messages.getString(MessageIds.OSDE_MSGI0019) + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size() + 1;
@@ -220,6 +222,7 @@ public class OsdReaderWriter {
 					}
 					newChannelNames.add(newChannelNumber + " : " + channelConfig); //$NON-NLS-1$
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
+					channels.setActiveChannelNumber(newChannelNumber);
 				}
 
 				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
@@ -314,6 +317,9 @@ public class OsdReaderWriter {
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
 			int filePointer = 0;
 			try {
+				// before do anything make sure all data is loaded, if data comes from another file 
+				activeChannel.checkAndLoadData();
+
 				// first line : header with version
 				String versionString = OSDE.OPEN_SERIAL_DATA_VERSION + useVersion + OSDE.STRING_NEW_LINE;
 				data_out.writeUTF(versionString);

@@ -466,12 +466,12 @@ public class RecordSet extends HashMap<String, Record> {
 					if (this.isSyncRequested) this.updateSyncRecordScale();	
 				}
 			}
-			if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			if (doUpdate) {
 				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -498,12 +498,12 @@ public class RecordSet extends HashMap<String, Record> {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
 			}
-			if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < points.length; i++) {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 		}
 		else
@@ -1993,8 +1993,8 @@ public class RecordSet extends HashMap<String, Record> {
 	public void loadFileData(String fullQualifiedFileName) {
 		try {
 			if (this.fileDataSize != 0 && this.fileDataPointer != 0) {
-				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, true);
-				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, true);
+				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, this.application.getStatusBar() != null);
+				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, this.application.getStatusBar() != null);
 			}
 		}
 		catch (Exception e) {

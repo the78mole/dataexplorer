@@ -280,22 +280,26 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
-				if (subtractFirst) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+				reduction = 0;
+				try {
+					if (subtractFirst) {
+						// get the record set to be used
+						RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+						if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
-				}
-				else if (subtractLast) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+						reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
+					}
+					else if (subtractLast) {
+						// get the record set to be used
+						RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+						if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+						reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+					}
 				}
-				else
-					reduction = 0;
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
 			}
 
 			// slope calculation needs height factor for calculation
@@ -335,22 +339,26 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
-			if (subtractFirst) {
-				// get the record set to be used
-				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+			reduction = 0;
+			try {
+				if (subtractFirst) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-				reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
-			}
-			else if (subtractLast) {
-				// get the record set to be used
-				RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
+					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
+				}
+				else if (subtractLast) {
+					// get the record set to be used
+					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
 
-				reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+				}
 			}
-			else
-				reduction = 0;
+			catch (Throwable e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
 		}
 
 		// slope calculation needs height factor for calculation

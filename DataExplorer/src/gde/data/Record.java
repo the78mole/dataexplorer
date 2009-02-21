@@ -131,9 +131,9 @@ public class Record extends Vector<Integer> {
 	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
-	double							maxZoomScaleValue		= this.maxScaleValue;
-	double							minZoomScaleValue		= this.minScaleValue;
-	int									numberScaleTicks		= 0;
+	double							maxZoomScaleValue			= this.maxScaleValue;
+	double							minZoomScaleValue			= this.minScaleValue;
+	int									numberScaleTicks			= 0;
 
 	double							displayScaleFactorTime;
 	double							displayScaleFactorValue;
@@ -202,6 +202,7 @@ public class Record extends Vector<Integer> {
 		// special keys for compare set record are handled with put method
 		//this.channelConfigKey;
 		//this.keyName;
+		log.log(Level.FINE, this.name + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)");
 	}
 
 	/**
@@ -239,6 +240,7 @@ public class Record extends Vector<Integer> {
 		this.keyName = record.keyName;
 		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device	
+		log.log(Level.FINE, this.name + " Record(Record)");
 	}
 
 	/**
@@ -306,6 +308,7 @@ public class Record extends Vector<Integer> {
 		this.keyName = record.keyName;
 		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device
+		log.log(Level.FINE, this.name + " Record(Record, int, boolean)");
 	}
 
 	/**
@@ -1132,7 +1135,7 @@ public class Record extends Vector<Integer> {
 	public void setMinMaxZoomScaleValues(double newMinZoomScaleValue, double newMaxZoomScaleValue) {
 		this.minZoomScaleValue				= newMinZoomScaleValue;
 		this.maxZoomScaleValue				= newMaxZoomScaleValue;
-		log.log(Level.FINE, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		log.log(Level.FINER, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**
