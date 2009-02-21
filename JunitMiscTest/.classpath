@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Sample"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Simulator"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniLog"/>
+	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
