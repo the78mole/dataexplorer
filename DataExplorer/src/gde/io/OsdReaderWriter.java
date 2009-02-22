@@ -231,9 +231,6 @@ public class OsdReaderWriter {
 				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);
-				recordSet.setDeserializedProperties(recordSetProperties);
-				recordSet.setSaved(true);
-				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 
 				//apply record sets records properties
 				if (log.isLoggable(Level.FINE)) {
@@ -249,6 +246,9 @@ public class OsdReaderWriter {
 					record.setSerializedProperties(recordsProperties[i]);
 					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
 				}
+				recordSet.setDeserializedProperties(recordSetProperties);
+				recordSet.setSaved(true);
+				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 				
 				channel.put(recordSetName, recordSet);
 			}
