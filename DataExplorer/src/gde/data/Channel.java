@@ -30,8 +30,6 @@ import osde.OSDE;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.device.ChannelTypes;
-import osde.io.LogViewReader;
-import osde.io.OsdReaderWriter;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.RecordSetNameComparator;
@@ -47,7 +45,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final long							serialVersionUID	= 26031957;
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 	
-	String												name;							// 1: Ausgang
+	String												name;							// 1 : Ausgang
+	int														ordinal;
 	final int											type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;					// graphics template holds view configuration
 	RecordSet											activeRecordSet;
@@ -64,6 +63,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	public Channel(int channelNumber, String channelName, int channelType) {
 		super(1);
 		this.name = OSDE.STRING_BLANK + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channelName;
+		this.ordinal = channelNumber;
 		this.type = channelType;
 		
 		this.application = OpenSerialDataExplorer.getInstance();
@@ -448,7 +448,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		else { // record  set exist
 			activeChannel.setActiveRecordSet(recordSetKey);
 			if (!recordSet.hasDisplayableData)
-				recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
+				recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), true);
 			recordSet.resetZoomAndMeasurement();
 			this.application.resetGraphicsWindowZoomAndMeasurement();
 			if (recordSet.isRecalculation)
@@ -550,20 +550,19 @@ public class Channel extends HashMap<String, RecordSet> {
 				log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null"));
 				if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
 					log.log(Level.FINER, "tmpRecordSetName needs data to loaded");
-					try {
-						if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
-							log.log(Level.FINER, "loading data ...");
-							if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD))
-								OsdReaderWriter.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
-							else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(tmpRecordSet, fullQualifiedFileName, false);
-						}
-					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
-					}
+					if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
+						log.log(Level.FINER, "loading data ...");
+						tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
+					}	
 				}
 			}
 		}
+	}
+
+	/**
+	 * @return the channel/config number
+	 */
+	public int getOrdinal() {
+		return this.ordinal;
 	}
 }

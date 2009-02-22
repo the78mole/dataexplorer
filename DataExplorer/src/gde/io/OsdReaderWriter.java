@@ -189,7 +189,6 @@ public class OsdReaderWriter {
 						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
-						channels.setActiveChannelNumber(new Integer(channelConfig.substring(channelConfig.length()-1)));
 					}
 					catch (NumberFormatException e) {
 						// ignore and keep channel as null
@@ -203,7 +202,6 @@ public class OsdReaderWriter {
 						channel = channels.get(channels.getChannelNumber(channelConfig.split(" ")[0]));
 						channelConfig = channel.getConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
-						channels.setActiveChannelNumber(new Integer(channel.getName().split(":")[0].trim()));
 					}
 					catch (NullPointerException e) {
 						// ignore and keep channel as null
@@ -222,9 +220,14 @@ public class OsdReaderWriter {
 					}
 					newChannelNames.add(newChannelNumber + " : " + channelConfig); //$NON-NLS-1$
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
-					channels.setActiveChannelNumber(newChannelNumber);
 				}
+				channels.setActiveChannelNumber(channel.getOrdinal());
 
+				// "3 : Motor"
+				channelConfig = channelConfig.contains(OSDE.STRING_COLON) ? channelConfig.split(OSDE.STRING_COLON)[1].trim() : channelConfig.trim();
+				// "Motor 3"
+				channelConfig = channelConfig.contains(OSDE.STRING_BLANK) ? channelConfig.split(OSDE.STRING_BLANK)[0].trim() : channelConfig.trim();
+				//"Motor"
 				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);
@@ -233,6 +236,13 @@ public class OsdReaderWriter {
 				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 
 				//apply record sets records properties
+				if (log.isLoggable(Level.FINE)) {
+					StringBuilder sb = new StringBuilder().append(recordSet.getName()).append(OSDE.STRING_MESSAGE_CONCAT);
+					for (String recordProps : recordsProperties) {
+						sb.append(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0])).append(OSDE.STRING_COMMA);
+					}
+					log.log(Level.FINE, sb.toString());
+				}
 				String [] recordKeys = recordSet.getRecordNames();
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
@@ -367,9 +377,11 @@ public class OsdReaderWriter {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
 							sbs[i] = new StringBuilder();
-							sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER).append(OSDE.CHANNEL_CONFIG_NAME).append(recordSet.getChannelConfigName()).append(
-									OSDE.DATA_DELIMITER).append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription())
-									.append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
+							sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER)
+								.append(OSDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getOrdinal()).append(OSDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
+								.append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER)
+								.append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(OSDE.DATA_DELIMITER)
+								.append(OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
 							for (String recordKey : recordSet.getRecordNames()) {
 								sbs[i].append(OSDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
@@ -380,6 +392,14 @@ public class OsdReaderWriter {
 							log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
 								+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ " filePointer = " + filePointer); //$NON-NLS-1$
+							
+							if (log.isLoggable(Level.FINE)) {
+								StringBuilder sb1 = new StringBuilder().append(recordSet.getName()).append(OSDE.STRING_MESSAGE_CONCAT);
+								for (String recordName : recordSet.getRecordNames()) {
+									sb1.append(recordName).append(OSDE.STRING_COMMA);
+								}
+								log.log(Level.FINE, sb1.toString());
+							}
 						}
 					}
 				}
@@ -407,7 +427,7 @@ public class OsdReaderWriter {
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
-							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName());
+							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), application.getStatusBar() != null);
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
 							byte[] buffer = new byte[OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true) * noneCalculationRecordNames.length];
 							byte[] bytes = new byte[OSDE.SIZE_BYTES_INTEGER];

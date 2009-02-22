@@ -70,7 +70,7 @@ public class RecordSet extends HashMap<String, Record> {
 	boolean												isFromFile										= false;																				//indicates that this record set was created by loading data from file
 	boolean												isRecalculation								= true;																					//indicates record is modified and need re-calculation
 	int														fileDataSize									= 0; 																						//number of integer values of all active/inactive records
-	long													fileDataPointer								= 0; 																						// file pointer where the data of this record begins
+	long													fileDataPointer								= 0; 																						//file pointer where the data of this record begins
 	boolean												hasDisplayableData						= false;
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
 	Rectangle											drawAreaBounds;
@@ -252,17 +252,17 @@ public class RecordSet extends HashMap<String, Record> {
 		if(log.isLoggable(Level.FINER)) {
 			StringBuilder sb = new StringBuilder();
 			for (String string : oldRecordNames) {
-				sb.append(string).append(" ");
+				sb.append(string).append(" "); //$NON-NLS-1$
 			}
-			log.log(Level.FINER, "oldRecordNames = "+ sb.toString());
+			log.log(Level.FINER, "oldRecordNames = "+ sb.toString()); //$NON-NLS-1$
 		}
 		String[] newRecordNames = this.device.getMeasurementNames(newChannelConfiguration);
 		if(log.isLoggable(Level.FINER)) {
 			StringBuilder sb = new StringBuilder();
 			for (String string : newRecordNames) {
-				sb.append(string).append(" ");
+				sb.append(string).append(" "); //$NON-NLS-1$
 			}
-			log.log(Level.FINER, "newRecordNames = "+ sb.toString());
+			log.log(Level.FINER, "newRecordNames = "+ sb.toString()); //$NON-NLS-1$
 		}
 		//copy records while exchange record name (may change to other language!)
 		for (int i = 0; i < newRecordNames.length; i++) {
@@ -448,7 +448,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
-		final String $METHOD_NAME = "addPoints";
+		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
@@ -493,7 +493,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
-		final String $METHOD_NAME = "addPoints";
+		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.noneCalculationRecords.length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
@@ -527,7 +527,7 @@ public class RecordSet extends HashMap<String, Record> {
 			System.arraycopy(this.dataTable[numRows], 0, dataTableRow, 0, numCols);
 		}
 		else {
-			log.log(Level.WARNING, "no data table row added -> numCols != dataTableRow.length");
+			log.log(Level.WARNING, "no data table row added -> numCols != dataTableRow.length"); //$NON-NLS-1$
 		}
 	}
 
@@ -758,6 +758,7 @@ public class RecordSet extends HashMap<String, Record> {
 			recordNames = device.getMeasurementNames(channelKey);
 		}
 		RecordSet newRecordSet = new RecordSet(device, channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
+		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - " , newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
@@ -827,10 +828,9 @@ public class RecordSet extends HashMap<String, Record> {
 				//				tmpRecord.setPositionNumber(x / 2);
 			}
 			newRecordSet.put(recordNames[i], tmpRecord);
-			log.log(Level.FINE, "added record for " + recordNames[i]); //$NON-NLS-1$
+			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}
 
-		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet", newRecordSet.getRecordNames()); //$NON-NLS-1$
 		return newRecordSet;
 	}
 
@@ -839,12 +839,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param recordNames
 	 */
 	static void printRecordNames(String methodName, String[] recordNames) {
-		StringBuilder sb = new StringBuilder().append(methodName + OSDE.STRING_BLANK + OSDE.STRING_NEW_LINE);
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < recordNames.length; ++i) {
 			sb.append(recordNames[i]).append(OSDE.STRING_MESSAGE_CONCAT);
 		}
 		sb.delete(sb.length() - 3, sb.length());
-		log.log(Level.FINE, sb.toString());
+		log.logp(Level.FINE, $CLASS_NAME, methodName, sb.toString());
 	}
 
 	/**
@@ -977,7 +977,7 @@ public class RecordSet extends HashMap<String, Record> {
       	CalculationThread ct = RecordSet.this.device.getCalculationThread();
       	try {
       		while (ct != null && ct.isAlive()) {
-      			log.log(Level.FINER, "CalculationThread isAlive");
+      			log.log(Level.FINER, "CalculationThread isAlive"); //$NON-NLS-1$
       			Thread.sleep(1000);
       		}
 				}
@@ -1543,7 +1543,7 @@ public class RecordSet extends HashMap<String, Record> {
 						//RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
-					log.log(Level.FINE, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
+					log.log(Level.FINE, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 					
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
@@ -1653,10 +1653,10 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 0) {
 				try {
 					int index = new Integer(tmpValue.trim());
-					this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : "";
+					this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : ""; //$NON-NLS-1$
 				}
 				catch (Exception e) {
-					this.horizontalGridRecordKey = "";
+					this.horizontalGridRecordKey = ""; //$NON-NLS-1$
 				}
 			}
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
@@ -1772,7 +1772,7 @@ public class RecordSet extends HashMap<String, Record> {
 				this.addRecordName(syncRecName);
 
 				this.isSyncableChecked = true;
-				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString());
+				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
 			}
 		}
 
@@ -1990,11 +1990,11 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * load data from file
 	 */
-	public void loadFileData(String fullQualifiedFileName) {
+	public void loadFileData(String fullQualifiedFileName, boolean doShowProgress) {
 		try {
 			if (this.fileDataSize != 0 && this.fileDataPointer != 0) {
-				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, this.application.getStatusBar() != null);
-				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, this.application.getStatusBar() != null);
+				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
+				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
 			}
 		}
 		catch (Exception e) {

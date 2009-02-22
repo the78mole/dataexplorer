@@ -89,11 +89,25 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public int getChannelNumber(String channelName) {
 		int searchedNumber = 1;
-		for (String name : this.getChannelNames()) {
-			if (name != null && name.length() > 5 && (name.split(OSDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName) || name.split(OSDE.STRING_COLON)[1].trim().equals(channelName))) {
-				break;
+		
+		if (channelName != null && channelName.length() > 5) {
+			// "2 : Outlet", use the first digit to calculate the channel number
+			if (channelName.contains(":") && channelName.split(OSDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(OSDE.STRING_COLON)[0].trim().charAt(0))) {
+				return new Integer(channelName.split(OSDE.STRING_COLON)[0].trim());
 			}
-			++searchedNumber;
+			else // old file contnet "Outlet 2" use the last digit to calculate the channel number
+				if (channelName.contains(" ") && channelName.split(" ").length > 1 && Character.isDigit(channelName.split(" ")[1].trim().charAt(0))) {
+					return new Integer(channelName.split(" ")[1].trim());
+			}
+			else {
+				for (String name : this.getChannelNames()) {
+					// try name matching "Outlet"
+					if (name.split(OSDE.STRING_COLON)[1].trim().equals(channelName) || name.split(OSDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
+						break;
+					}
+					++searchedNumber;
+				}
+			}
 		}
 		return searchedNumber;
 	}
@@ -163,7 +177,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
 				if (recordSet != null) {
 					if (!recordSet.hasDisplayableData) {
-						recordSet.loadFileData(activeChannel.getFullQualifiedFileName());
+						recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), true);
 					}
 					recordSet.resetZoomAndMeasurement();
 					recordSetKey = recordSet.getName();

@@ -166,7 +166,7 @@ public class Record extends Vector<Integer> {
 	public final static String	MIN_VALUE							= "_minValue"; 					//$NON-NLS-1$
 	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value //$NON-NLS-1$
 	
-	private final String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
+	public final static String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
 			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
 
 
@@ -184,6 +184,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
+		log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
 		this.device = newDevice;
 		this.ordinal = newOrdinal;
 		this.name = newName;
@@ -202,7 +203,6 @@ public class Record extends Vector<Integer> {
 		// special keys for compare set record are handled with put method
 		//this.channelConfigKey;
 		//this.keyName;
-		log.log(Level.FINE, this.name + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)");
 	}
 
 	/**
@@ -210,6 +210,7 @@ public class Record extends Vector<Integer> {
 	 */
 	private Record(Record record) {
 		super(record);
+		log.log(Level.FINE, record.name + " Record(Record)"); //$NON-NLS-1$
 		this.ordinal = record.ordinal;
 		this.name = record.name;
 		this.symbol = record.symbol;
@@ -240,7 +241,6 @@ public class Record extends Vector<Integer> {
 		this.keyName = record.keyName;
 		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device	
-		log.log(Level.FINE, this.name + " Record(Record)");
 	}
 
 	/**
@@ -264,6 +264,7 @@ public class Record extends Vector<Integer> {
 	 */
 	private Record(Record record, int dataIndex, boolean isFromBegin) {
 		//super(record); // vector
+		log.log(Level.FINE, record.name + " Record(Record, int, boolean)"); //$NON-NLS-1$
 		this.parent = record.parent;
 		this.parent.setZoomMode(false);
 		this.ordinal = record.ordinal;
@@ -308,7 +309,6 @@ public class Record extends Vector<Integer> {
 		this.keyName = record.keyName;
 		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device
-		log.log(Level.FINE, this.name + " Record(Record, int, boolean)");
 	}
 
 	/**
@@ -331,12 +331,13 @@ public class Record extends Vector<Integer> {
 	private void initializeProperties(Record recordRef, List<PropertyType> newProperties) {
 		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 		for (PropertyType property : newProperties) {
+			log.log(Level.FINER, recordRef.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			this.properties.add(property.clone());
 		}
 		// initialize factor, offset, reduction if not exist only
-		if (!this.properties.contains(IDevice.FACTOR)) this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, recordRef.getFactor())); 
-		if (!this.properties.contains(IDevice.OFFSET)) this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, recordRef.getOffset()));
-		if (!this.properties.contains(IDevice.REDUCTION)) this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, recordRef.getReduction()));
+		//if (!this.properties.contains(IDevice.FACTOR)) this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, recordRef.getFactor())); 
+		//if (!this.properties.contains(IDevice.OFFSET)) this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, recordRef.getOffset()));
+		//if (!this.properties.contains(IDevice.REDUCTION)) this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, recordRef.getReduction()));
 	}
 	
 	/**
@@ -344,17 +345,17 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	public boolean add(int point) {
-		final String $METHOD_NAME = "add";
+		final String $METHOD_NAME = "add"; //$NON-NLS-1$
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
 		}
 		else {
-			if (point > this.maxValue) this.maxValue = point;
+			if 			(point > this.maxValue) this.maxValue = point;
 			else if (point < this.minValue) this.minValue = point;
 		}	
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "adding point = " + point); //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-		return this.add(new Integer(point));
+		return this.add(new Integer(point)); // Vector add method
 	}
 
 	public int getOrdinal() {
@@ -1230,6 +1231,7 @@ public class Record extends Vector<Integer> {
 		sb.append(MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
 		sb.append(MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
 		for (PropertyType property : this.properties) {
+			log.log(Level.INFO, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(property.getName()).append(OSDE.STRING_UNDER_BAR).append(property.getType()).append(OSDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
 		sb.append(DEFINED_MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
@@ -1250,7 +1252,7 @@ public class Record extends Vector<Integer> {
 	 * @param serializedRecordProperties
 	 */
 	public void setSerializedProperties(String serializedRecordProperties) {
-		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, this.propertyKeys);
+		HashMap<String, String> recordProps = StringHelper.splitString(serializedRecordProperties, DELIMITER, Record.propertyKeys);
 		String tmpValue = null;
 				
 		tmpValue = recordProps.get(UNIT);
@@ -1302,10 +1304,14 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setSerializedDeviceSpecificProperties(String serializedProperties) {
 		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
+		StringBuilder sb = new StringBuilder();
+		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(OSDE.STRING_MESSAGE_CONCAT);
+		
+		// each record loaded from a file gets new properties instead of using the default initialized in constructor
+		this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
+		
 		Iterator<String> iterator = recordDeviceProps.keySet().iterator();
-	
 		if (iterator.hasNext()) {
-			this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
 			while (iterator.hasNext()) {
 				String propName = iterator.next();
 				String prop = recordDeviceProps.get(propName);
@@ -1315,9 +1321,11 @@ public class Record extends Vector<Integer> {
 				if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
 				String value = prop.split(OSDE.STRING_EQUAL)[1];
 				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
-				this.properties.add(tmpProperty.clone());
+				this.properties.add(tmpProperty);
+				if (log.isLoggable(Level.FINE)) sb.append(propName).append(" = ").append(value);
 			}
 		}
+		log.log(Level.FINE, sb.toString());
 	}
 	
 	/**
