@@ -50,6 +50,8 @@ public class TestSuperClass extends TestCase {
 	final OpenSerialDataExplorer					application	= OpenSerialDataExplorer.getInstance();
 	final Channels												channels		= Channels.getInstance();
 	final Settings												settings		= Settings.getInstance();
+	final String 													tmpDir 			= System.getProperty("java.io.tmpdir");
+
 
 	final TimeLine												timeLine		= new TimeLine();
 	Image																	curveArea;
@@ -65,7 +67,8 @@ public class TestSuperClass extends TestCase {
 	Handler																ch					= new ConsoleHandler();
 	LogFormatter													lf					= new LogFormatter();
 
-	//Logger															logger			= Logger.getLogger("osde.data.Record");
+	Logger																logger1			= Logger.getLogger("osde.data.Record");
+	Logger																logger2			= Logger.getLogger("osde.data.RecordSet");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -86,8 +89,10 @@ public class TestSuperClass extends TestCase {
 		this.ch.setFormatter(this.lf);
 		this.ch.setLevel(Level.FINE);
 
-		//this.logger.setLevel(Level.FINE);
-		//this.logger.setUseParentHandlers(true);
+		//this.logger1.setLevel(Level.FINE);
+		//this.logger1.setUseParentHandlers(true);
+		//this.logger2.setLevel(Level.FINE);
+		//this.logger2.setUseParentHandlers(true);
 
 		Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
 
@@ -96,7 +101,9 @@ public class TestSuperClass extends TestCase {
 		Canvas canvas = new Canvas(new Composite(Display.getDefault().getShells()[0], SWT.NONE), SWT.NONE);
 		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + 0); //$NON-NLS-1$
 
-		this.devicePath = new File(this.settings.getDataFilePath()); // + OSDE.FILE_SEPARATOR + "UniLog");
+		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
+		this.devicePath = new File(this.settings.getDataFilePath());
+		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "UniLog");
 	}
 
 	/**
@@ -172,7 +179,8 @@ public class TestSuperClass extends TestCase {
 	}
 
 	/**
-	 * this will setup empty channels for the device
+	 * this will setup empty channels according the device properties file
+	 * copied and modified from DeviceSelectionDialog.setupDataChannels();
 	 * @param activeDevice (IDevice is the abstract type)
 	 */
 	protected void setupDataChannels(IDevice activeDevice) {
@@ -184,7 +192,7 @@ public class TestSuperClass extends TestCase {
 			// buildup new structure  - set up the channels
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelType(i));
-				this.channels.put(new Integer(i), newChannel);
+				this.channels.put(i, newChannel);
 				channelNames[i - 1] = i + " : " + activeDevice.getChannelName(i);
 			}
 			this.channels.setChannelNames(channelNames);
@@ -193,6 +201,7 @@ public class TestSuperClass extends TestCase {
 
 	/**
 	 * method to draw the curves with it scales and defines the curve area
+	 * copied and modified from GraphicsComposite.drawCurves()
 	 * @param recordSet
 	 * @param maxX
 	 * @param maxY
@@ -320,16 +329,19 @@ public class TestSuperClass extends TestCase {
 			recordSet.updateSyncedScaleValues();
 		}
 		// draw each record using sorted record set names
-		for (String record : recordNames) {
+		for (String record : recordSet.getNoneCalculationRecordNames()) {
 			Record actualRecord = recordSet.getRecord(record);
-			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			boolean isActualRecordEnabled = true;
 			//log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
 				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, dash);
 
-			if (isActualRecordEnabled) CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+			if (isActualRecordEnabled) {
+				//System.out.println("drawing record = " + record);
+				CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+			}
 		}
 
 		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
