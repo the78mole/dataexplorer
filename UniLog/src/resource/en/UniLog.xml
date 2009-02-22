@@ -28,7 +28,7 @@
         <unit>ms</unit>
         <timeStep>250</timeStep>
     </TimeBase>
-    <Channel type="TYPE_CONFIG" name="Height 1">
+    <Channel type="TYPE_CONFIG" name="Height">
         <Measurement>
             <name>VoltageRec</name>
             <symbol>Ur</symbol>
@@ -138,7 +138,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Receiver 2">
+    <Channel type="TYPE_CONFIG" name="Receiver">
         <Measurement>
             <name>VoltageRec</name>
             <symbol>Ur</symbol>
@@ -248,7 +248,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Motor 3">
+    <Channel type="TYPE_CONFIG" name="Motor">
         <Measurement>
             <name>VoltageRec</name>
             <symbol>Ur</symbol>
@@ -360,7 +360,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Velocity 4">
+    <Channel type="TYPE_CONFIG" name="Velocity">
         <Measurement>
             <name>VoltageRec</name>
             <symbol>Ur</symbol>

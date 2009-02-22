@@ -28,7 +28,7 @@
         <unit>ms</unit>
         <timeStep>250</timeStep>
     </TimeBase>
-    <Channel type="TYPE_CONFIG" name="Höhe 1">
+    <Channel type="TYPE_CONFIG" name="Höhe">
         <Measurement>
             <name>SpannungEmpf</name>
             <symbol>Ue</symbol>
@@ -138,7 +138,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Empfänger 2">
+    <Channel type="TYPE_CONFIG" name="Empfänger">
         <Measurement>
             <name>SpannungEmpf</name>
             <symbol>Ue</symbol>
@@ -248,7 +248,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Motormessung 3">
+    <Channel type="TYPE_CONFIG" name="Motormessung">
         <Measurement>
             <name>SpannungEmpf</name>
             <symbol>Ue</symbol>
@@ -360,7 +360,7 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_CONFIG" name="Geschwindigkeit 4">
+    <Channel type="TYPE_CONFIG" name="Geschwindigkeit">
         <Measurement>
             <name>SpannungEmpf</name>
             <symbol>Ue</symbol>

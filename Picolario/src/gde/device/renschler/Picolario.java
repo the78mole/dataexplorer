@@ -44,7 +44,8 @@ import osde.utils.QuasiLinearRegression;
  * @author Winfried Brügmann
  */
 public class Picolario extends DeviceConfiguration implements IDevice {
-	final static Logger						log								= Logger.getLogger(Picolario.class.getName());
+	final static String						$CLASS_NAME				=	Picolario.class.getName();
+	final static Logger						log								= Logger.getLogger($CLASS_NAME);
 
 	public final static String		DO_NO_ADAPTION		= "do_no_adaption"; //$NON-NLS-1$
 	public final static String		DO_OFFSET_HEIGHT	= "do_offset_height"; //$NON-NLS-1$
@@ -260,6 +261,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return double with the adapted value
 	 */
 	public double translateValue(Record record, double value) {
+		final String $METHOD_NAME = "translateValue()";
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
 
 		String recordKey = "?"; //$NON-NLS-1$
@@ -280,7 +282,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
-				reduction = 0;
 				try {
 					if (subtractFirst) {
 						// get the record set to be used
@@ -298,7 +299,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					}
 				}
 				catch (Throwable e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 				}
 			}
 
@@ -323,6 +324,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public double reverseTranslateValue(Record record, double value) {
 		log.log(Level.FINEST, String.format("input value for %s - %f", record.getName(), value)); //$NON-NLS-1$
+		final String $METHOD_NAME = "reverseTranslateValue()";
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
 		String[] recordNames = record.getRecordSetNames(); 
@@ -339,7 +341,6 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
 			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 
-			reduction = 0;
 			try {
 				if (subtractFirst) {
 					// get the record set to be used
@@ -357,7 +358,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 			}
 			catch (Throwable e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage() + " " + $CLASS_NAME + "." + $METHOD_NAME);
 			}
 		}
 

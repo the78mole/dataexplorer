@@ -27,7 +27,7 @@
         <unit>ms</unit>
         <timeStep>5</timeStep>
     </TimeBase>
-    <Channel type="TYPE_CONFIG" name="Sinus 1">
+    <Channel type="TYPE_CONFIG" name="Sinus">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -43,7 +43,7 @@
 			<statistics min="true" max="true" avg="true" sigma="true"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Ramp 2">
+    <Channel type="TYPE_OUTLET" name="Ramp">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>

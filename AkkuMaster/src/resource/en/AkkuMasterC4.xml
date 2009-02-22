@@ -27,7 +27,7 @@
         <unit>ms</unit>
         <timeStep>10000</timeStep>
     </TimeBase>
-    <Channel type="TYPE_OUTLET" name="Outlet 1">
+    <Channel type="TYPE_OUTLET" name="Outlet">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -62,7 +62,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet 2">
+    <Channel type="TYPE_OUTLET" name="Outlet">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -97,7 +97,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet 3">
+    <Channel type="TYPE_OUTLET" name="Outlet">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -132,7 +132,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet 4">
+    <Channel type="TYPE_OUTLET" name="Outlet">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
