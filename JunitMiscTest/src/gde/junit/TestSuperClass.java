@@ -100,10 +100,6 @@ public class TestSuperClass extends TestCase {
 
 		Canvas canvas = new Canvas(new Composite(Display.getDefault().getShells()[0], SWT.NONE), SWT.NONE);
 		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + 0); //$NON-NLS-1$
-
-		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		this.devicePath = new File(this.settings.getDataFilePath());
-		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "UniLog");
 	}
 
 	/**
