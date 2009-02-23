@@ -366,7 +366,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName())) 
+			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName()) && this.application.getMenuBar() != null) 
 				this.application.updateGraphicsWindow();
 			
 		}
