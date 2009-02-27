@@ -400,7 +400,7 @@ public interface IDevice {
 	public double translateValue(Record record, double value);
 
 	/**
-	 * function to translate measured value from a device to values represented
+	 * function to reverse translate measured value from a device to values represented
 	 * @return double with the adapted value
 	 */
 	public double reverseTranslateValue(Record record, double value);

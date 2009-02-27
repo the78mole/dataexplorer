@@ -94,7 +94,13 @@ public class OsdReaderWriter {
 		if (!line.startsWith(OSDE.OPEN_SERIAL_DATA_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
 		
-		int version = new Integer(line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length())).intValue();
+		int version = 1;
+		try {
+			version = new Integer(line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length(), OSDE.OPEN_SERIAL_DATA_VERSION.length()+1)).intValue(); // one digit only
+		}
+		catch (NumberFormatException e) {
+			version = 1; //there is only one version
+		}
 		switch (version) {
 		case 1:
 			header.put(OSDE.OPEN_SERIAL_DATA_VERSION, OSDE.STRING_EMPTY+version);
@@ -431,15 +437,32 @@ public class OsdReaderWriter {
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
 							byte[] buffer = new byte[OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true) * noneCalculationRecordNames.length];
 							byte[] bytes = new byte[OSDE.SIZE_BYTES_INTEGER];
-							for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
-								for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
-									int point = recordSet.get(noneCalculationRecordNames[k]).get(j);
-									//log.log(Level.FINER, ""+point);
-									bytes[0] = (byte) ((point >>> 24) & 0xFF);
-									bytes[1] = (byte) ((point >>> 16) & 0xFF);
-									bytes[2] = (byte) ((point >>> 8) & 0xFF);
-									bytes[3] = (byte) ((point >>> 0) & 0xFF);
-									System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+							if (recordSet.isRaw()) {
+								for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
+									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
+										int point = recordSet.get(noneCalculationRecordNames[k]).realGet(j);
+										//log.log(Level.FINER, ""+point);
+										bytes[0] = (byte) ((point >>> 24) & 0xFF);
+										bytes[1] = (byte) ((point >>> 16) & 0xFF);
+										bytes[2] = (byte) ((point >>> 8) & 0xFF);
+										bytes[3] = (byte) ((point >>> 0) & 0xFF);
+										System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+									}
+								}
+							}
+							else {
+								IDevice device = recordSet.getDevice();
+								for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
+									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
+										Record record = recordSet.get(noneCalculationRecordNames[k]);
+										int point = new Double(device.reverseTranslateValue(record, record.realGet(j)/1000.0)*1000.0).intValue();
+										//log.log(Level.FINER, ""+point);
+										bytes[0] = (byte) ((point >>> 24) & 0xFF);
+										bytes[1] = (byte) ((point >>> 16) & 0xFF);
+										bytes[2] = (byte) ((point >>> 8) & 0xFF);
+										bytes[3] = (byte) ((point >>> 0) & 0xFF);
+										System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+									}
 								}
 							}
 							data_out.write(buffer, 0, buffer.length);

@@ -718,8 +718,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	public Integer realGet(int index) {
-		if (index > super.size()) log.log(Level.FINE, "index = " + index + " of " + super.size() + "/" + this.size()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return super.get(index);
+		return super.size() != 0 ? super.get(index) : 0;
 	}
 
 	/**
