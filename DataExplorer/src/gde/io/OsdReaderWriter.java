@@ -234,7 +234,7 @@ public class OsdReaderWriter {
 				// "Motor 3"
 				channelConfig = channelConfig.contains(OSDE.STRING_BLANK) ? channelConfig.split(OSDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
-				recordSet = RecordSet.createRecordSet(channelConfig, recordSetName, device, true, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfig, true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);
 
