@@ -335,6 +335,12 @@ public interface IDevice {
 	public void setMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey, DataTypes type, Object value);
 	
 	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName();
+	
+	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
