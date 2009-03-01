@@ -163,7 +163,7 @@ public class GathererThread extends Thread {
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(getName().trim(), this.recordSetKey, this.application.getActiveDevice(), true, false));
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), getName().trim(), true, false));
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);

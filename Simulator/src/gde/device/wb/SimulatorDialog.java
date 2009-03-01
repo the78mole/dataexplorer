@@ -373,8 +373,8 @@ public class SimulatorDialog extends DeviceDialog {
 											SimulatorDialog.this.recordNumber++;
 
 											this.recordSetKey = (SimulatorDialog.this.channel.size() + 1) + this.recordSetKeyStem;
-											SimulatorDialog.this.channel.put(this.recordSetKey, RecordSet.createRecordSet(SimulatorDialog.this.device.getChannelName(1), this.recordSetKey, SimulatorDialog.this.application
-													.getActiveDevice(), true, false));
+											SimulatorDialog.this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, 
+													SimulatorDialog.this.application.getActiveDevice(), SimulatorDialog.this.device.getChannelName(1), true, false));
 											log.log(Level.FINE, this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);

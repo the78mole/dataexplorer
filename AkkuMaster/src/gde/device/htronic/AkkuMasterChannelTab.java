@@ -516,7 +516,7 @@ public class AkkuMasterChannelTab {
 															setCollectDataStopped(false);
 															// record set does not exist or is outdated, build a new name and create
 															AkkuMasterChannelTab.this.recordSetKey = AkkuMasterChannelTab.this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
-															AkkuMasterChannelTab.this.channel.put(AkkuMasterChannelTab.this.recordSetKey, RecordSet.createRecordSet(getName().trim(), AkkuMasterChannelTab.this.recordSetKey, AkkuMasterChannelTab.this.application.getActiveDevice(), true, false));
+															AkkuMasterChannelTab.this.channel.put(AkkuMasterChannelTab.this.recordSetKey, RecordSet.createRecordSet(AkkuMasterChannelTab.this.recordSetKey, AkkuMasterChannelTab.this.application.getActiveDevice(), getName().trim(), true, false));
 															AkkuMasterChannelTab.this.channel.applyTemplateBasics(AkkuMasterChannelTab.this.recordSetKey);
 															log.log(Level.FINE, AkkuMasterChannelTab.this.recordSetKey + " created for channel " + AkkuMasterChannelTab.this.channel.getName()); //$NON-NLS-1$
 															if (AkkuMasterChannelTab.this.channel.getActiveRecordSet() == null) AkkuMasterChannelTab.this.channel.setActiveRecordSet(AkkuMasterChannelTab.this.recordSetKey);

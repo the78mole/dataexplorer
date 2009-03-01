@@ -154,7 +154,7 @@ public class GathererThread extends Thread {
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(getName().trim(), this.recordSetKey, this.application.getActiveDevice(), true, false));
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), getName().trim(), true, false));
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
