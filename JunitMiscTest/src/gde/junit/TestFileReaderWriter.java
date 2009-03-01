@@ -33,78 +33,6 @@ public class TestFileReaderWriter extends TestSuperClass {
 	public void setUp() throws Exception {
 		super.setUp();		
 	}
-	
-	/**
-	 * test reading OSD files from directories used by OSDE application and writes OSD files to %TEMP%\Write_1_OSD
-	 * all consitent files must red without failures, 
-	 * the written files might different due to code updates (add/change properties)
-	 */
-	public final void testOsdReaderOsdWriter() {
-		HashMap<String, Exception> failures = new HashMap<String, Exception>();
-
-		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		this.devicePath = new File(this.settings.getDataFilePath());
-		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "UniLog");
-
-		try {
-			List<File> files = FileUtils.getFileListing(this.devicePath);
-
-			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
-					System.out.println("working with : " + file);
-					try {
-						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
-						String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
-						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-						IDevice device = this.getInstanceOfDevice(deviceConfig);
-						this.application.setActiveDeviceWoutUI(device);
-						
-						setupDataChannels(device);
-
-						OsdReaderWriter.read(file.getAbsolutePath());
-
-						Channel activeChannel = this.channels.getActiveChannel();
-						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						this.channels.setSaved(true);
-						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
-						
-						for (String recordSetName : activeChannel.getRecordSetNames()) {
-							RecordSet recordSet = activeChannel.get(recordSetName);
-							if (recordSet != null) {
-								if (!recordSet.hasDisplayableData()) 
-									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
-								activeChannel.setActiveRecordSet(recordSet);
-								//device.makeInActiveDisplayable(recordSet);
-								drawCurves(recordSet, 1024, 768);
-							}
-						}
-
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + OSDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
-						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-						failures.put(file.getAbsolutePath(), e);
-					}
-				}
-			}
-
-		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-			fail(e.toString());
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		for (String key : failures.keySet()) {
-			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
-		}
-		if (failures.size() > 0) fail(sb.toString());
-	}
 
 	/**
 	 * test reading LOV files from LogView application directory and writes OSD files to %TEMP%\Write_1_OSD
@@ -115,7 +43,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
 		this.devicePath = new File(this.settings.getDataFilePath());
-		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "UniLog");
+		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "eStationBC6");
 
 		try {
 			List<File> files = FileUtils.getFileListing(this.devicePath);
@@ -232,6 +160,78 @@ public class TestFileReaderWriter extends TestSuperClass {
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_raw.csv";
 						System.out.println("writing as   : " + absolutFilePath);
 						CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+	
+	/**
+	 * test reading OSD files from directories used by OSDE application and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consitent files must red without failures, 
+	 * the written files might different due to code updates (add/change properties)
+	 */
+	public final void testOsdReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
+		this.devicePath = new File(this.settings.getDataFilePath());
+		//this.devicePath = new File(this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR + "UniLog");
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.devicePath);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
+					System.out.println("working with : " + file);
+					try {
+						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
+						String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+						
+						setupDataChannels(device);
+
+						OsdReaderWriter.read(file.getAbsolutePath());
+
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+						this.channels.setSaved(true);
+						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+						
+						for (String recordSetName : activeChannel.getRecordSetNames()) {
+							RecordSet recordSet = activeChannel.get(recordSetName);
+							if (recordSet != null) {
+								if (!recordSet.hasDisplayableData()) 
+									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
+								activeChannel.setActiveRecordSet(recordSet);
+								//device.makeInActiveDisplayable(recordSet);
+								drawCurves(recordSet, 1024, 768);
+							}
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + OSDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
 					}
 					catch (Exception e) {
 						e.printStackTrace();

@@ -750,19 +750,30 @@ public class MenuBar {
 			String fileName = csvFileDialog.getFileName();
 			fileName = fileName.substring(0, fileName.indexOf('.'));
 
-			final char listSeparator = deviceSetting.getListSeparator();
-			final String recordSetNameExtend = fileName;
 			try {
+				char listSeparator = deviceSetting.getListSeparator();
+				//check current device and switch if required
+				String fileDeviceName = CSVReaderWriter.getHeader(listSeparator, csvFilePath).get(OSDE.DEVICE_NAME);
+				String activeDeviceName = this.application.getActiveDevice().getName();
+				if (!activeDeviceName.equals(fileDeviceName)) { // different device in file
+					String msg = Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}); 
+					if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
+						return;			
+					this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+				}
+				
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				CSVReaderWriter.read(listSeparator, csvFilePath, recordSetNameExtend, isRaw);
+				CSVReaderWriter.read(listSeparator, csvFilePath, this.application.getActiveDevice().getRecordSetStemName(), isRaw);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
 				MenuBar.this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 			}
-			this.application.enableMenuActions(true);
-			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			finally {
+				this.application.enableMenuActions(true);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			}
 		}
 	}
 

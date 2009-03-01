@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 import osde.OSDE;
 import osde.device.DataTypes;
@@ -157,7 +156,7 @@ public class RecordSet extends HashMap<String, Record> {
 	final IDevice									device;
 
 	/**
-	 * data buffers according the size of given names array, where
+	 * record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
@@ -167,36 +166,11 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 * @param initialCapacity the initial size of the data hash map
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue, int initialCapacity) {
-		super(initialCapacity);
-		this.device = useDevice;
-		this.channelConfigName = newChannelName;
-		this.name = newName;
-		this.recordNames = measurementNames.clone();
-		this.timeStep_ms = newTimeStep_ms;
-		this.application = OpenSerialDataExplorer.getInstance();
-		this.isRaw = isRawValue;
-		this.isFromFile = isFromFileValue;
-		this.channels = Channels.getInstance();
-
-		this.check4SyncableRecords();
-	}
-
-	/**
-	 * data buffers according the size of given names array, where
-	 * the name is the key to access the data buffer
-	 * @param newChannelName the channel name or configuration name
-	 * @param newName for the records like "1) Laden" 
-	 * @param measurementNames  array of the device supported measurement names
-	 * @param newTimeStep_ms time in msec of device measures points
-	 * @param isRawValue specified if dependent values has been calculated
-	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
-	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
-		super();
+		super(measurementNames.length);
 		this.device = useDevice;
 		this.channelConfigName = newChannelName;
-		this.name = newName;
+		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
@@ -208,7 +182,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * data buffers according the size of given names array, where
+	 * record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
 	 * @param useDevice the device
 	 * @param newChannelName the channel name or configuration name
@@ -221,7 +195,7 @@ public class RecordSet extends HashMap<String, Record> {
 		super();
 		this.device = useDevice;
 		this.channelConfigName = newChannelName;
-		this.name = newName;
+		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = new String[0];
 		this.timeStep_ms = newTimeStep_ms;
 		this.application = OpenSerialDataExplorer.getInstance();
@@ -492,7 +466,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param points as int[], where the length must fit records.size()
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
+	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.noneCalculationRecords.length) {
 			for (int i = 0; i < points.length; i++) {
@@ -744,89 +718,55 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * method to create a record set with given name "1) Laden" containing records according the active device configuration
+	 * method to create a record set with given name "1) Laden" containing records according the device channle/configuration
+	 * which are loaded from device properties file
+	 * @param recordSetName the name of the record set
+	 * @param device the instance of the device 
 	 * @param channelKey (name of the outlet or configuration)
-	 * @param recordName
-	 * @param device 
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String channelKey, String recordName, IDevice device, boolean isRaw, boolean isFromFile) {
-		recordName = recordName.length() <= RecordSet.MAX_NAME_LENGTH ? recordName : recordName.substring(0, RecordSet.MAX_NAME_LENGTH);
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, String channelKey, boolean isRaw, boolean isFromFile) {
+		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 		String[] recordNames = device.getMeasurementNames(channelKey);
-		if (recordNames.length == 0) { // simple check for valid record names
+		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
 			channelKey = Channels.getInstance().getChannelNames()[0].split(OSDE.STRING_COLON)[1].trim();
 			recordNames = device.getMeasurementNames(channelKey);
 		}
-		RecordSet newRecordSet = new RecordSet(device, channelKey, recordName, recordNames, device.getTimeStep_ms(), isRaw, isFromFile, recordNames.length);
+		String [] recordSymbols = new String[recordNames.length];
+		String [] recordUnits = new String[recordNames.length];
+		for (int i = 0; i < recordNames.length; i++) {
+			MeasurementType measurement = device.getMeasurement(channelKey, i);
+			recordSymbols[i] = measurement.getSymbol();
+			recordUnits[i] = measurement.getUnit();
+		}
+		return createRecordSet(recordSetName, device, channelKey, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
+	}
+
+	/**
+	 * method to create a record set with given name "1) Laden" containing records according the given record names, symbols and units
+	 * active status as well as statistics and properties are used from device properties
+	 * @param recordSetName the name of the record set
+	 * @param device the instance of the device 
+	 * @param channelKey (name of the outlet or configuration)
+	 * @param recordNames array of namesto be used for created records
+ 	 * @param recordSymbols array of symbols to be used for created records
+	 * @param recordUnits array of units to be used for created records
+	 * @param timeStep_ms 
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @return a record set containing all records (empty) as specified
+	 */
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, String channelKey, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms, boolean isRaw, boolean isFromFile) {
+		RecordSet newRecordSet = new RecordSet(device, channelKey, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - " , newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
-			Record tmpRecord = new Record(device, i, measurement.getName(), measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
-
-			// set color defaults
-			switch (i) {
-			case 0: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 0, 255)); //(SWT.COLOR_BLUE));
-				break;
-			case 1: // zweite Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 0)); //SWT.COLOR_DARK_GREEN));
-				break;
-			case 2: // dritte Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 0)); //(SWT.COLOR_DARK_RED));
-				break;
-			case 3: // vierte Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 255, 0, 255)); //(SWT.COLOR_MAGENTA));
-				break;
-			case 4: // fünfte Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 64, 0, 64)); //(SWT.COLOR_CYAN));
-				break;
-			case 5: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 128)); //(SWT.COLOR_DARK_YELLOW));
-				break;
-			case 6: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 128, 0));
-				break;
-			case 7: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 128));
-				break;
-			case 8: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 255));
-				break;
-			case 9: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 0));
-				break;
-			case 10: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 255, 0, 128));
-				break;
-			case 11: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 64, 128));
-				break;
-			case 12: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 64, 128, 0));
-				break;
-			case 13: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 0, 64));
-				break;
-			case 14: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 64, 0));
-				break;
-			case 15: // erste Kurve
-				tmpRecord.setColor(new Color(Display.getCurrent(), 0, 128, 64));
-				break;
-			default:
-				tmpRecord.setColor(new Color(Display.getCurrent(), 128, 255, 128)); //(SWT.COLOR_GREEN));
-				break;
-			}
-			// set position defaults
-			if (i % 2 == 0) {
-				tmpRecord.setPositionLeft(true); //position left
-				//				tmpRecord.setPositionNumber(x / 2);
-			}
-			else {
-				tmpRecord.setPositionLeft(false); // position right
-				//				tmpRecord.setPositionNumber(x / 2);
-			}
+			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
+			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}

@@ -229,13 +229,19 @@ public class Channels extends HashMap<Integer, Channel> {
 		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date()); //$NON-NLS-1$
 		this.activeChannelNumber	= 1;		// default at least one channel must exist
 		this.channelNames = new String[1];
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null) {
-				String activeRecordName = activeRecordSet.getName();
-				activeChannel.get(activeRecordName).clear();
+		try {
+			Channel activeChannel = Channels.getInstance().getActiveChannel();
+			if (activeChannel != null) {
+				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+				if (activeRecordSet != null) {
+					String activeRecordName = activeRecordSet.getName();
+					activeChannel.get(activeRecordName).clear();
+				}
 			}
+		}
+		catch (RuntimeException e) {
+			// ignore since this clear operations are not really required
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
 		for (int i = 1; i <= super.size(); i++) { 
