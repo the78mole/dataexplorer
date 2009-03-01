@@ -48,5 +48,6 @@ public class MessageIds {
 	public final static String	OSDE_MSGT1534 = "OSDE_MSGT1534";
 	public final static String	OSDE_MSGT1535 = "OSDE_MSGT1535";
 	public final static String	OSDE_MSGT1536 = "OSDE_MSGT1536";
+	public final static String	OSDE_MSGT1537 = "OSDE_MSGT1537";
 
  }

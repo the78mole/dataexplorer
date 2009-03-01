@@ -76,6 +76,14 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1058);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys

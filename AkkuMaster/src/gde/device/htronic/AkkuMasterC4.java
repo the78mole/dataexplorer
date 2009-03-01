@@ -84,6 +84,14 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1186);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys

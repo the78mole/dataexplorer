@@ -89,6 +89,14 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1220);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys
@@ -180,7 +188,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
+		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -191,7 +199,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			
-			recordSet.addPoints(points);
+			recordSet.addPoints(points, false);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}

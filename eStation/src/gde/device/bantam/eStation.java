@@ -97,6 +97,14 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1411);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys
@@ -471,6 +479,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				
 				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 				recordSet.setConfiguredDisplayable(displayableCounter);		
+
+				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
+					this.application.updateGraphicsWindow();
+				}
 			}
 			catch (RuntimeException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

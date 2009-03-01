@@ -141,6 +141,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1378);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys

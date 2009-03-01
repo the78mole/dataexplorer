@@ -82,6 +82,14 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
 	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return Messages.getString(MessageIds.OSDE_MSGT1537);
+	}
 
 	/**
 	 * load the mapping exist between lov file configuration keys and OSDE keys
