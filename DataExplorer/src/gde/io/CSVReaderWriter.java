@@ -374,7 +374,7 @@ public class CSVReaderWriter {
 			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
 			
 			sb = new StringBuffer();
-			sb.append("Zeit [sec]").append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
+			sb.append(Messages.getString(MessageIds.OSDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 			// write the measurements signature
 			String[] recordNames = recordSet.getRecordNames();
 			for (int i = 0; i < recordNames.length; i++) {
