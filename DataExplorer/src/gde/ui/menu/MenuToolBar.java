@@ -27,7 +27,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
@@ -58,42 +58,35 @@ public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 
 	Point													toolSize, coolSize;
-	//Composite											recordSelectComposite;
-	//Composite											channelSelectComposite;
-	CoolItem											dataCoolItem;
-	ToolBar												portToolBar;
-	CoolItem											portCoolItem;
-	ToolBar												deviceToolBar;
-	CoolItem											deviceCoolItem;
-
 	CoolBar												coolBar;
+
 	CoolItem											fileCoolItem;
-	ToolItem											toolBoxToolItem;
-	ToolItem											nextDeviceToolItem;
-	ToolItem											prevDeviceToolItem;
-	ToolItem											deviceSelectToolItem;
-	ToolItem											saveAsToolItem;
-	ToolItem											settingsToolItem;
-	ToolItem											saveToolItem;
-	ToolItem											openToolItem;
-	ToolItem											newToolItem;
 	ToolBar												fileToolBar;
-	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, lastNumberPoints;
-	ToolBar												zoomToolBar;
-	CoolItem											zoomCoolItem;
-
-	ToolItem											portOpenCloseItem;
+	ToolItem											newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
 	
-	ToolBar												dataToolBar;
-	//Composite											dataToolBarComposite;
-	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, deleteRecord, editRecord;
-	CCombo												channelSelectCombo, recordSelectCombo;
-	//ToolBar												channelToolBar, recordToolBar;
-	ToolItem											separator;
+	CoolItem											deviceCoolItem;
+	ToolBar												deviceToolBar;
+	ToolItem											deviceSelectToolItem, prevDeviceToolItem, nextDeviceToolItem, toolBoxToolItem;
 
+	CoolItem											zoomCoolItem;
+	ToolBar												zoomToolBar;
+	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, lastPointsComboSep;
+	Composite											lastPointsComposite;
+	CCombo 												lastPointsCombo;
+	Point													lastPointsComboSize = new Point(60, 21);
+
+	CoolItem											portCoolItem;
+	ToolBar												portToolBar;
+	ToolItem											portOpenCloseItem;
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
-	Point													channelSelectSize = new Point(180, 22);
-	Point													recordSelectSize = new Point(260, 22);
+	
+	CoolItem											dataCoolItem;
+	ToolBar												dataToolBar;
+	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
+	Composite											channelSelectComposite, recordSelectComposite;
+	CCombo												channelSelectCombo, recordSelectCombo;
+	Point													channelSelectSize = new Point(180, 21);
+	Point													recordSelectSize = new Point(260, 21);
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -317,7 +310,6 @@ public class MenuToolBar {
 						}
 					});
 				}
-				//this.deviceToolBar.pack();
 				this.toolSize = this.deviceToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				this.deviceToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "deviceToolBar.size = " + this.toolSize); //$NON-NLS-1$
@@ -393,19 +385,39 @@ public class MenuToolBar {
 					});
 				}
 				{
-					ToolItem lastPointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
-					Combo lastPointsCombo = new Combo(this.zoomToolBar, SWT.READ_ONLY);
-			    //for (int i = 0; i < 4; i++) {
-			    //  lastPointsCombo.add("Item " + i);
-			    //}
-			    lastPointsCombo.setItems(new String[]{"ALL", "1000", "500", "250", "100", "50", "10"});
-			    lastPointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			    lastPointsCombo.select(0);
-			    lastPointsCombo.pack();
-			    lastPointsComboSep.setWidth(lastPointsCombo.getSize().x);
-			    lastPointsComboSep.setControl(lastPointsCombo);
+					this.lastPointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
+					{
+						this.lastPointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
+						this.lastPointsCombo = new CCombo(this.lastPointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.lastPointsCombo.setItems(new String[] { "ALL", "1000", "500", "250", "100", "50", "10" });
+						this.lastPointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+						this.lastPointsCombo.select(0);
+						this.lastPointsCombo.setToolTipText("Nur die <selektierte Anzahl> der letzten Messpunkte anzeigen");
+						this.lastPointsCombo.setSize(this.lastPointsComboSize);
+						this.lastPointsComposite.pack();
+						this.lastPointsCombo.setLocation(0, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
+						this.lastPointsCombo.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								Channel activeChannel =MenuToolBar.this.channels.getActiveChannel();
+								if (activeChannel != null) {
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									if (activeRecordSet != null) {
+										try {
+											activeRecordSet.setZoomSize(new Integer(MenuToolBar.this.lastPointsCombo.getText()));
+											//TODO set zoomMode, recordSet and graphicsWindow
+										}
+										catch (NumberFormatException e) {
+											activeRecordSet.resetZoomAndMeasurement();
+										}
+									}
+								}
+							}
+						});
+					}					
+					this.lastPointsComboSep.setWidth(this.lastPointsComposite.getSize().x);
+					this.lastPointsComboSep.setControl(this.lastPointsComposite);
 				}
-				//this.zoomToolBar.pack();
 				this.toolSize = this.zoomToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				this.zoomToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "zoomToolBar.size = " + this.toolSize); //$NON-NLS-1$
@@ -460,11 +472,12 @@ public class MenuToolBar {
 				{
 					ToolItem channelSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
-						this.channelSelectCombo = new CCombo(this.dataToolBar, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
+						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0075));
-						//this.channelSelectCombo.setEditable(false);
+						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -472,11 +485,12 @@ public class MenuToolBar {
 								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 							}
 						});
-						//this.channelSelectCombo.pack();
 						this.channelSelectCombo.setSize(this.channelSelectSize);
+						this.channelSelectComposite.pack();
+						this.channelSelectCombo.setLocation(0, (this.toolSize.y-this.channelSelectSize.y)/2);
 					}
-					channelSelectComboSep.setWidth(this.channelSelectCombo.getSize().x);
-					channelSelectComboSep.setControl(this.channelSelectCombo);
+					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
+					channelSelectComboSep.setControl(this.channelSelectComposite);
 				}
 				{
 					this.prevChannel = new ToolItem(this.dataToolBar, SWT.NONE);
@@ -523,11 +537,12 @@ public class MenuToolBar {
 				{
 					ToolItem recordSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
-						this.recordSelectCombo = new CCombo(this.dataToolBar, SWT.BORDER | SWT.LEFT);
-						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // "2) Flugaufzeichnung", "3) laden" });
+						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
+						this.recordSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
+						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(30);
-						//this.recordSelectCombo.setEditable(false);
+						this.recordSelectCombo.setEditable(false);
 						this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -563,11 +578,12 @@ public class MenuToolBar {
 								}
 							}
 						});
-						//this.recordSelectCombo.pack();
 						this.recordSelectCombo.setSize(this.recordSelectSize);
+						this.channelSelectComposite.pack();
+						this.recordSelectCombo.setLocation(0, (this.toolSize.y-this.recordSelectSize.y)/2);
 					}
-					recordSelectComboSep.setWidth(this.recordSelectCombo.getSize().x);
-					recordSelectComboSep.setControl(this.recordSelectCombo);
+					recordSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
+					recordSelectComboSep.setControl(this.channelSelectComposite);
 				}
 				{
 					this.prevRecord = new ToolItem(this.dataToolBar, SWT.NONE);
@@ -749,12 +765,12 @@ public class MenuToolBar {
 	public String[] updateRecordSetSelectCombo() {
 		final String[] recordSetNames = this.channels.getActiveChannel().getRecordSetNames();
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			//doUpdateRecordSetSelectCombo(recordSetNames);
+			doUpdateRecordSetSelectCombo(recordSetNames);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					//doUpdateRecordSetSelectCombo(recordSetNames);
+					doUpdateRecordSetSelectCombo(recordSetNames);
 				}
 			});
 		}
