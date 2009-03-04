@@ -74,6 +74,7 @@ public class MenuToolBar {
 	Composite											lastPointsComposite;
 	CCombo 												lastPointsCombo;
 	Point													lastPointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	static final int							leadFill	= 3;
 
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
@@ -393,9 +394,6 @@ public class MenuToolBar {
 						this.lastPointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						this.lastPointsCombo.select(0);
 						this.lastPointsCombo.setToolTipText("Nur die <selektierte Anzahl> der letzten Messpunkte anzeigen");
-						this.lastPointsCombo.setSize(this.lastPointsComboSize);
-						this.lastPointsComposite.pack();
-						this.lastPointsCombo.setLocation(0, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
 						this.lastPointsCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -414,6 +412,9 @@ public class MenuToolBar {
 								}
 							}
 						});
+						this.lastPointsCombo.setSize(this.lastPointsComboSize);
+						this.lastPointsComposite.setSize(this.lastPointsComboSize.x+leadFill, this.lastPointsComboSize.y);
+						this.lastPointsCombo.setLocation(leadFill, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
 					}					
 					this.lastPointsComboSep.setWidth(this.lastPointsComposite.getSize().x);
 					this.lastPointsComboSep.setControl(this.lastPointsComposite);
@@ -486,8 +487,8 @@ public class MenuToolBar {
 							}
 						});
 						this.channelSelectCombo.setSize(this.channelSelectSize);
-						this.channelSelectComposite.pack();
-						this.channelSelectCombo.setLocation(0, (this.toolSize.y-this.channelSelectSize.y)/2);
+						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill, this.channelSelectSize.y);
+						this.channelSelectCombo.setLocation(leadFill, (this.toolSize.y-this.channelSelectSize.y)/2);
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
