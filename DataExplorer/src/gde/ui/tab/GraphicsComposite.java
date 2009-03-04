@@ -1234,7 +1234,7 @@ public class GraphicsComposite extends Composite {
 					int yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
 					log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					if (xEnd - xStart > 5 && yMax - yMin > 5) {
-						recordSet.setZoomOffsetAndWidth(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+						recordSet.setZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
 						this.redrawGraphics(); //this.graphicCanvas.redraw();
 					}
 				}

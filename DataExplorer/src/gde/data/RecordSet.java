@@ -1182,7 +1182,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
 	 */
-	public void setZoomOffsetAndWidth(Rectangle zoomBounds) {
+	public void setZoomBounds(Rectangle zoomBounds) {
 		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
 		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
 		// iterate children and set min/max values
@@ -1194,6 +1194,15 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 	}
 
+	/**
+	 * set the zoom size to record set to enable to display only the last size points
+	 * @param newZoomSize number of points shown
+	 */
+	public void setZoomSize(int newZoomSize) {
+		this.recordZoomSize = newZoomSize;
+		// recordZoomOffset must be calculated each graphics refresh
+	}
+	
 	public int getRecordZoomOffset() {
 		return this.recordZoomOffset;
 	}

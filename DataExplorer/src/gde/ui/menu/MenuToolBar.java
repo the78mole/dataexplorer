@@ -85,8 +85,8 @@ public class MenuToolBar {
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite											channelSelectComposite, recordSelectComposite;
 	CCombo												channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, 21);
-	Point													recordSelectSize = new Point(260, 21);
+	Point													channelSelectSize = new Point(180, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	Point													recordSelectSize = new Point(260, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
