@@ -73,7 +73,7 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, lastPointsComboSep;
 	Composite											lastPointsComposite;
 	CCombo 												lastPointsCombo;
-	Point													lastPointsComboSize = new Point(60, 21);
+	Point													lastPointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
