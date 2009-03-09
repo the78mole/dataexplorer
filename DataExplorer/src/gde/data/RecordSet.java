@@ -89,7 +89,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int														syncMin												= 0;
 	int														syncMax												= 0;
 	boolean												syncScalePositionLeft					= false;
-
+	
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
 	int														maxSize												= 0;																						//number of data point * time step = total time
@@ -99,6 +99,7 @@ public class RecordSet extends HashMap<String, Record> {
 	//zooming
 	int														zoomLevel											= 0;																						//0 == not zoomed
 	boolean												isZoomMode										= false;
+	boolean												isScopeMode										= false;
 	int														recordZoomOffset;
 	int														recordZoomSize;
 
@@ -1153,6 +1154,7 @@ public class RecordSet extends HashMap<String, Record> {
 			this.recordZoomOffset = 0;
 		}
 		this.isZoomMode = zoomModeEnabled;
+		this.isScopeMode = false;
 	}
 
 	/**
@@ -1195,16 +1197,29 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * set the zoom size to record set to enable to display only the last size points
+	 * set the zoom size to record set to enable to display only the last size point
+	 * recordZoomOffset must be calculated each graphics refresh
 	 * @param newZoomSize number of points shown
 	 */
 	public void setZoomSize(int newZoomSize) {
 		this.recordZoomSize = newZoomSize;
-		// recordZoomOffset must be calculated each graphics refresh
+		this.isScopeMode = true;
 	}
 	
+	/**
+	 * query actual recordZoomOffset
+	 * @return recordZoomOffset
+	 */
 	public int getRecordZoomOffset() {
 		return this.recordZoomOffset;
+	}
+	
+	/**
+	 * set a new recordZoomOffset
+	 * @param newRecordZoomOffset
+	 */
+	public void setRecordZoomOffset(int newRecordZoomOffset) {
+		this.recordZoomOffset = newRecordZoomOffset;
 	}
 
 	public int getRecordZoomSize() {
@@ -1230,7 +1245,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	public double getStartTime() {
-		return this.isZoomMode ? this.recordZoomOffset * this.timeStep_ms : 0;
+		return this.isZoomMode || this.isScopeMode ? this.recordZoomOffset * this.timeStep_ms : 0;
 	}
 
 	/**
@@ -1764,9 +1779,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * and update referenced records to enable drawing of curve, set min/max
 	 */
 	void updateSyncRecordScale() {
-		Record tmpRecord = this.get(this.getSyncableName());
-		if (tmpRecord != null) {
-			tmpRecord.setMinMax(this.syncMin, this.syncMax);
+		Record syncPlaceholderRecord = this.get(this.getSyncableName());
+		if (syncPlaceholderRecord != null) {
+			syncPlaceholderRecord.setMinMax(this.syncMin, this.syncMax);
+			syncPlaceholderRecord.setScopeMinMax(this.syncMin, this.syncMax);
 
 			// update referenced record to enable drawing of curve, set min/max
 			for (String syncableRecordKey : this.syncableRecords) {
@@ -1836,12 +1852,12 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param newValue the isSyncableSynced to set
+	 * @param enable the isSyncableSynced to set
 	 */
-	public void setSyncRequested(boolean newValue) {
+	public void setSyncRequested(boolean enable) {
 		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-		this.isSyncRequested = newValue;
-		if (newValue) {
+		this.isSyncRequested = enable;
+		if (enable) {
 			this.syncScaleOfSyncableRecords();
 		}
 		else {
@@ -1979,5 +1995,41 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setVoltageLimits() {
 		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 		this.voltageLimits = LithiumBatteryValues.getVoltageLimits();
+	}
+
+	/**
+	 * @param enable the isScopeMode 
+	 */
+	public void setScopeMode(boolean enable) {
+		long startTime = System.currentTimeMillis();
+		this.isScopeMode = enable;
+		if (enable) {
+			// iterate children and set min/max values
+			for (String recordKey : this.recordNames) {
+				//StringBuilder sb = new StringBuilder();
+				Record record = this.get(recordKey);
+				if (record.isVisible && record.isDisplayable){
+					int min = 0, max = 0, value;
+					for (int i = this.recordZoomOffset; i < record.realSize(); i++) {
+						value = record.realGet(i);
+						if (i == this.recordZoomOffset) 
+							min = max = value;
+						else {
+							if 			(value > max) max = value;
+							else if (value < min) min = value;						
+						}
+						//sb.append(value).append(", ");
+					}	
+					//log.log(Level.INFO, sb.toString());
+					log.log(Level.FINE, record.getName() + ": scopeMin = " + min / 1000.0 + "; scopeMax = " + max / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+					record.setScopeMinMax(min, max);
+				}
+			}
+			if (this.isSyncRequested) {
+				this.syncMin = this.syncMax = 0;
+				this.syncScaleOfSyncableRecords();
+			}
+		}
+		log.log(Level.FINE, "evaluation time [msec] = " + (System.currentTimeMillis() - startTime));
 	}
 }

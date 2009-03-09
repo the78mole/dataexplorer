@@ -70,6 +70,7 @@ public class GraphicsComposite extends Composite {
 	public final static int				MODE_PAN								= 4;
 	public final static int				MODE_CUT_LEFT						= 6;
 	public final static int				MODE_CUT_RIGHT					= 7;
+	public final static int				MODE_SCOPE							= 8;
 
 	final	OpenSerialDataExplorer	application 						= OpenSerialDataExplorer.getInstance();
 	final Channels								channels								= Channels.getInstance();
@@ -93,6 +94,7 @@ public class GraphicsComposite extends Composite {
 	RecordSet											oldActiveRecordSet	= null;
 	int 													oldChangeCounter = 0;
 	HashMap<String, Integer>			scaleTicks = new HashMap<String, Integer>();
+	int 													oldScopeLevel = 0;
 	boolean												oldZoomLevel = false;
 
 	// mouse actions
@@ -126,6 +128,8 @@ public class GraphicsComposite extends Composite {
 	boolean												isLeftCutMode						= false;
 	boolean												isRightCutMode					= false;
 	int														xPosCut									= 0;
+	
+	boolean												isScopeMode							= false;
 
 	GraphicsComposite(final SashForm useParent, int useWindowType) {
 		super(useParent, SWT.NONE);
@@ -313,13 +317,13 @@ public class GraphicsComposite extends Composite {
 			// draw curves
 			drawCurves(recordSet, maxX, maxY);
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(GraphicsWindow.MODE_MEASURE, true);
+				drawMeasurePointer(GraphicsComposite.MODE_MEASURE, true);
 			}
 			else if (this.isLeftCutMode) {
-				drawCutPointer(GraphicsWindow.MODE_CUT_LEFT, true, false);
+				drawCutPointer(GraphicsComposite.MODE_CUT_LEFT, true, false);
 			}
 			else if (this.isRightCutMode) {
-				drawCutPointer(GraphicsWindow.MODE_CUT_RIGHT, false, true);
+				drawCutPointer(GraphicsComposite.MODE_CUT_RIGHT, false, true);
 			}
 		}
 	}
@@ -404,9 +408,24 @@ public class GraphicsComposite extends Composite {
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		log.log(Level.FINE, "curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+		if (this.isScopeMode) {
+			int offset = recordSet.get(recordSet.getFirstRecordName()).realSize() - recordSet.getRecordZoomSize();
+			log.log(Level.FINE, recordSet.get(recordSet.getFirstRecordName()).realSize() + " - " + recordSet.getRecordZoomSize() + " = " + offset);
+			if (offset < 1) {
+				recordSet.setRecordZoomOffset(0);
+				recordSet.setScopeMode(false);
+			}
+			else {
+				recordSet.setRecordZoomOffset(offset);
+				recordSet.setScopeMode(true);
+			}
+		}
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC)), OpenSerialDataExplorer.COLOR_BLACK);
+		int detaTime_ms = this.isScopeMode ? new Double(recordSet.getRecordZoomSize()*recordSet.getTimeStep_ms()).intValue() : maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC);
+		log.log(Level.FINER, "detaTime_ms = " + detaTime_ms);
+		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(width, height);
@@ -447,6 +466,7 @@ public class GraphicsComposite extends Composite {
 			}
 		}
 
+		//draw the scale for all synchronized records
 		if (recordSet.isSyncableSynced()) {
 			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), this.canvasGC, x0, y0, width, height, dataScaleWidth);
 			recordSet.updateSyncedScaleValues();
@@ -550,16 +570,22 @@ public class GraphicsComposite extends Composite {
 				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 					this.scaleTicks = new HashMap<String, Integer>();
 					isFullUpdateRequired = true;
-					log.log(Level.FINER, this.oldActiveRecordSet.getName() + " != " + activeRecordSet.getName());
+					this.oldActiveRecordSet = activeRecordSet;
+				}
+				else if (this.oldScopeLevel != this.application.getMenuToolBar().getScopeModeLevelValue()) {
+					log.log(Level.FINER, "zoom mode changed");
+					isFullUpdateRequired = true;
+					this.oldScopeLevel = this.application.getMenuToolBar().getScopeModeLevelValue();
 				}
 				else if (this.oldZoomLevel != activeRecordSet.isZoomMode()) {
 					log.log(Level.FINER, "zoom mode changed");
 					isFullUpdateRequired = true;
+					this.oldZoomLevel = activeRecordSet.isZoomMode();
 				}
 				else if (this.oldChangeCounter != activeRecordSet.getChangeCounter()) {
 					log.log(Level.FINE, "change counter = " + activeRecordSet.getChangeCounter());
-					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 					isFullUpdateRequired = true;
+					this.oldChangeCounter = activeRecordSet.getChangeCounter();
 				}
 				else {
 					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
@@ -600,8 +626,6 @@ public class GraphicsComposite extends Composite {
 						this.graphicCanvas.redraw();
 					}
 				}
-				this.oldActiveRecordSet = activeRecordSet;
-				this.oldZoomLevel = activeRecordSet.isZoomMode();
 			}
 			else { // enable clear
 				log.log(Level.FINER, "recordSet == null");
@@ -877,24 +901,28 @@ public class GraphicsComposite extends Composite {
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
+			this.isScopeMode	= false;
 			break;
 		case MODE_MEASURE:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = true;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
+			this.isScopeMode	= false;
 			break;
 		case MODE_MEASURE_DELTA:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
 			this.isPanMouse = false;
+			this.isScopeMode	= false;
 			break;
 		case MODE_PAN:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = true;
+			this.isScopeMode	= false;
 			break;
 		case MODE_CUT_LEFT:
 			this.isZoomMouse = false;
@@ -903,6 +931,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = true;
 			this.isRightCutMode = false;
+			this.isScopeMode	= false;
 			break;
 		case MODE_CUT_RIGHT:
 			this.isZoomMouse = false;
@@ -911,6 +940,16 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = false;
 			this.isRightCutMode = true;
+			this.isScopeMode	= false;
+			break;
+		case MODE_SCOPE:
+			this.isZoomMouse = false;
+			this.isLeftMouseMeasure = false;
+			this.isRightMouseMeasure = false;
+			this.isPanMouse = false;
+			this.isLeftCutMode = false;
+			this.isRightCutMode = false;
+			this.isScopeMode	= true;
 			break;
 		case MODE_RESET:
 		default:
@@ -920,6 +959,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
+			this.isScopeMode	= false;
 			this.application.setStatusMessage(OSDE.STRING_EMPTY);
 			this.xPosCut = -1;
 			this.xLast = 0;

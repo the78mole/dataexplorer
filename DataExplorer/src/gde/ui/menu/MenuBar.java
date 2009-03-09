@@ -56,7 +56,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
-import osde.ui.tab.GraphicsWindow;
+import osde.ui.tab.GraphicsComposite;
 import osde.utils.FileUtils;
 import osde.utils.StringHelper;
 
@@ -318,7 +318,7 @@ public class MenuBar {
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
+							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
 						}
 					});
 				}
@@ -329,7 +329,7 @@ public class MenuBar {
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
+							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
 						}
 					});
 				}
@@ -340,7 +340,7 @@ public class MenuBar {
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
 						}
 					});
 				}

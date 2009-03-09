@@ -47,7 +47,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
-import osde.ui.tab.GraphicsWindow;
+import osde.ui.tab.GraphicsComposite;
 
 /**
  * Graphical menu tool bar class
@@ -70,9 +70,9 @@ public class MenuToolBar {
 
 	CoolItem											zoomCoolItem;
 	ToolBar												zoomToolBar;
-	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, lastPointsComboSep;
-	Composite											lastPointsComposite;
-	CCombo 												lastPointsCombo;
+	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
+	Composite											scopePointsComposite;
+	CCombo 												scopePointsCombo;
 	Point													lastPointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
@@ -334,7 +334,7 @@ public class MenuToolBar {
 					this.zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_ZOOM, true);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
 						}
 					});
 				}
@@ -347,7 +347,7 @@ public class MenuToolBar {
 					this.panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "resizeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_PAN, true);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
 						}
 					});
 				}
@@ -382,43 +382,42 @@ public class MenuToolBar {
 					this.fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.setGraphicsMode(GraphicsWindow.MODE_RESET, false);
+							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+							MenuToolBar.this.zoomWindowItem.setEnabled(true);
+							MenuToolBar.this.scopePointsCombo.select(0);
 						}
 					});
 				}
 				{
-					this.lastPointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
+					this.scopePointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
 					{
-						this.lastPointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
-						this.lastPointsCombo = new CCombo(this.lastPointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.lastPointsCombo.setItems(new String[] { "ALL", "1000", "500", "250", "100", "50", "10" });
-						this.lastPointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-						this.lastPointsCombo.select(0);
-						this.lastPointsCombo.setToolTipText("Nur die <selektierte Anzahl> der letzten Messpunkte anzeigen");
-						this.lastPointsCombo.addSelectionListener(new SelectionAdapter() {
+						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
+						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.scopePointsCombo.setItems(new String[] { "ALL", "1000", "500", "250", "100", "50", "10" });
+						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+						this.scopePointsCombo.select(0);
+						this.scopePointsCombo.setToolTipText("Nur die <selektierte Anzahl> der letzten Messpunkte anzeigen");
+						this.scopePointsCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								Channel activeChannel =MenuToolBar.this.channels.getActiveChannel();
-								if (activeChannel != null) {
-									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-									if (activeRecordSet != null) {
-										try {
-											activeRecordSet.setZoomSize(new Integer(MenuToolBar.this.lastPointsCombo.getText()));
-											//TODO set zoomMode, recordSet and graphicsWindow
-										}
-										catch (NumberFormatException e) {
-											activeRecordSet.resetZoomAndMeasurement();
-										}
-									}
+								try {
+									new Integer(MenuToolBar.this.scopePointsCombo.getText());
+									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_SCOPE, true);
+									MenuToolBar.this.zoomWindowItem.setEnabled(false);
+								}
+								catch(Exception e) {
+									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
+									MenuToolBar.this.scopePointsCombo.select(0);
+									MenuToolBar.this.zoomWindowItem.setEnabled(true);
 								}
 							}
 						});
-						this.lastPointsCombo.setSize(this.lastPointsComboSize);
-						this.lastPointsComposite.setSize(this.lastPointsComboSize.x+leadFill+trailFill, this.lastPointsComboSize.y);
-						this.lastPointsCombo.setLocation(leadFill, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
+						this.scopePointsCombo.setSize(this.lastPointsComboSize);
+						this.scopePointsComposite.setSize(this.lastPointsComboSize.x+leadFill+trailFill, this.lastPointsComboSize.y);
+						this.scopePointsCombo.setLocation(leadFill, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
 					}					
-					this.lastPointsComboSep.setWidth(this.lastPointsComposite.getSize().x);
-					this.lastPointsComboSep.setControl(this.lastPointsComposite);
+					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
+					this.scopePointsComboSep.setControl(this.scopePointsComposite);
 				}
 				this.toolSize = this.zoomToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				this.zoomToolBar.setSize(this.toolSize);
@@ -983,5 +982,21 @@ public class MenuToolBar {
 	public void enableCutButtons(boolean enableLeft, boolean enableRight) {
 		this.cutLeftItem.setEnabled(enableLeft);
 		this.cutRightItem.setEnabled(enableRight);
+	}
+
+	/**
+	 * query the last point of measurement to be displayed
+	 * return -1 in case of inactive or all 
+	 * @return sizeLastPoints
+	 */
+	public int getScopeModeLevelValue() {
+		int sizeLastPoints = -1;
+		try {
+			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText());
+		}
+		catch (NumberFormatException e) {
+			// ignore and return -1
+		}
+		return sizeLastPoints;
 	}
 }

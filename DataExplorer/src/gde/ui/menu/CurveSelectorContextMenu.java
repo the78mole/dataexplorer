@@ -42,6 +42,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.AxisEndValuesDialog;
+import osde.ui.tab.GraphicsComposite;
 import osde.ui.tab.GraphicsWindow;
 
 /**
@@ -51,6 +52,7 @@ import osde.ui.tab.GraphicsWindow;
 public class CurveSelectorContextMenu {
 	final static Logger									 log	= Logger.getLogger(CurveSelectorContextMenu.class.getName());
 
+	Menu													menu;
 	Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
 	MenuItem											recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
@@ -66,6 +68,11 @@ public class CurveSelectorContextMenu {
 	final OpenSerialDataExplorer	application;
 	final Settings								settings = Settings.getInstance();
 	AxisEndValuesDialog						axisEndValuesDialog;
+	
+	// states of initiated sub dialogs
+	boolean												isActiveColorDialog = false;
+	boolean												isActiveEnValueDialog = false;
+
 	
 	TableItem 										selectedItem;
 	Record												actualRecord = null;
@@ -83,6 +90,7 @@ public class CurveSelectorContextMenu {
 	}
 
 	public void createMenu(final Menu popupmenu) {
+		this.menu = popupmenu;
 		try {
 			popupmenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
@@ -189,6 +197,13 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "popupmenu MenuListener.menuHidden " + evt); //$NON-NLS-1$
 				}
 			});
+			popupmenu.addListener(SWT.FocusOut, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "widgetDisposed Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.this.menu.setData(OpenSerialDataExplorer.RECORD_NAME, null);
+					CurveSelectorContextMenu.this.menu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, null);
+				}
+			});
 			this.recordName = new MenuItem(popupmenu, SWT.None);
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
@@ -218,6 +233,7 @@ public class CurveSelectorContextMenu {
 			this.lineColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event evt) {
 					log.log(Level.FINER, "lineColor performed! " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.this.isActiveColorDialog = true;
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
@@ -229,6 +245,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
 					}
+					CurveSelectorContextMenu.this.isActiveColorDialog = false;
 				}
 			});
 			this.lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
@@ -522,6 +539,7 @@ public class CurveSelectorContextMenu {
 			this.axisEndManual.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisEndManual Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.this.isActiveEnValueDialog = true;
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
 						CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
@@ -537,6 +555,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
+					CurveSelectorContextMenu.this.isActiveEnValueDialog = false;
 				}
 			});
 
@@ -1028,7 +1047,7 @@ public class CurveSelectorContextMenu {
 						}
 						if (compareSet.isEmpty() || isComparable) {
 							// while adding a new curve to compare set - reset the zoom mode
-							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsWindow.MODE_RESET ,false);
+							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET ,false);
 							
 							compareSet.setTimeStep_ms(CurveSelectorContextMenu.this.recordSet.getTimeStep_ms());
 							String newRecordkey = oldRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();
@@ -1126,4 +1145,15 @@ public class CurveSelectorContextMenu {
 		this.recordNameMeasurement = tmpRecordNameMeasurement;
 		return isChanged;
 	}
+	
+	/**
+	 * query the state of context menu and sub dialogs
+	 * @return inactive state true/false
+	 */
+	public boolean isActive() {
+		boolean isActive = (this.menu != null && this.menu.isVisible()) || this.isActiveEnValueDialog || this.isActiveColorDialog;
+		log.log(Level.FINE, "isActive = " + isActive);
+		return isActive;
+	}
+
 }

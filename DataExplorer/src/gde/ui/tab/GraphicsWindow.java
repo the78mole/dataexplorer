@@ -46,14 +46,6 @@ public class GraphicsWindow {
 	public static final int				TYPE_COMPARE						= 1;
 	public static final String		WINDOW_TYPE							= "window_type"; //$NON-NLS-1$
 
-	public final static int				MODE_RESET							= 0;
-	public final static int				MODE_ZOOM								= 1;
-	public final static int				MODE_MEASURE						= 2;
-	public final static int				MODE_MEASURE_DELTA			= 3;
-	public final static int				MODE_PAN								= 4;
-	public final static int				MODE_CUT_LEFT						= 6;
-	public final static int				MODE_CUT_RIGHT					= 7;
-
 	final CTabFolder							tabFolder;
 	CTabItem											graphic;
 	
@@ -258,5 +250,13 @@ public class GraphicsWindow {
 	 */
 	public GraphicsComposite getGraphicsComposite() {
 		return this.graphicsComposite;
+	}
+
+	/**
+	 * query the context menu activation state
+	 * @return state true/false
+	 */
+	public boolean isActiveCurveSelectorContextMenu() {
+		return this.contextMenu.isActive();
 	}
 }

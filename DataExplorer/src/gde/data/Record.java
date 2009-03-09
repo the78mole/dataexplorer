@@ -123,18 +123,25 @@ public class Record extends Vector<Integer> {
 	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
+	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
+	double							minScaleValue					= this.minValue;
+
+	// scope view 
+	int									scopeMin							= 0;													// min value of the curve within scope display area
+	int									scopeMax							= 0;													// max value of the curve within scope display area
+
+	// statistics trigger
 	int									maxValueTriggered			= Integer.MIN_VALUE;		 			// max value of the curve, according a set trigger level if any
 	int									minValueTriggered			= Integer.MAX_VALUE;					// min value of the curve, according a set trigger level if any
 	int									avgValue							= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
 	int									sigmaValue						= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
 	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
-	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
-	double							minScaleValue					= this.minValue;
 	double							maxZoomScaleValue			= this.maxScaleValue;
 	double							minZoomScaleValue			= this.minScaleValue;
 	int									numberScaleTicks			= 0;
 
+	// display the record
 	double							displayScaleFactorTime;
 	double							displayScaleFactorValue;
 	double							minDisplayValue;									// min value in device units, correspond to draw area
@@ -587,11 +594,15 @@ public class Record extends Vector<Integer> {
 	}
 
 	public int getMaxValue() {
-			return this.maxValue == this.minValue ? this.maxValue + 100 : this.maxValue;
+		return this.parent.isScopeMode ? this.scopeMax : 
+				this.maxValue == this.minValue ? this.maxValue + 100 : 
+					this.maxValue;
 	}
 
 	public int getMinValue() {
-			return this.minValue == this.maxValue ? this.minValue - 100 : this.minValue;
+		return this.parent.isScopeMode ? this.scopeMin : 
+				this.minValue == this.maxValue ? this.minValue - 100 : 
+					this.minValue;
 	}
 
 	public int getRealMaxValue() {
@@ -738,7 +749,7 @@ public class Record extends Vector<Integer> {
 	public int size() {
 		int tmpSize = super.size();
 		
-		if (this.parent.isZoomMode())
+		if (this.parent.isZoomMode || this.parent.isScopeMode )
 			tmpSize = this.parent.getRecordZoomSize();
 		else if (this.parent.isCompareSet())
 			tmpSize = this.parent.getRecordDataSize(true); // for compare set size is different, real flag has no effect
@@ -768,17 +779,16 @@ public class Record extends Vector<Integer> {
 	 */
 	public Integer get(int index) {
 		int size = super.size();
-		int currentIndex = index;
-		if(this.parent.isZoomMode()) {
-			currentIndex = currentIndex + this.parent.getRecordZoomOffset();
-			currentIndex = currentIndex > (size-1) ? (size-1) : currentIndex;
-			currentIndex = currentIndex < 0 ? 0 : currentIndex;
+		if(this.parent.isZoomMode || this.parent.isScopeMode) {
+			index = index + this.parent.getRecordZoomOffset();
+			index = index > (size-1) ? (size-1) : index;
+			index = index < 0 ? 0 : index;
 		}
 		else {
-			currentIndex = currentIndex > (size-1) ? (size-1) : currentIndex;
-			currentIndex = currentIndex < 0 ? 0 : currentIndex;
+			index = index > (size-1) ? (size-1) : index;
+			index = index < 0 ? 0 : index;
 		}
-		return size != 0 ? super.get(currentIndex) : 0;
+		return size != 0 ? super.get(index) : 0;
 	}
 
 	/**
@@ -795,7 +805,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Integer elementAt(int index) {
 		Integer value;
-		if(this.parent.isZoomMode())
+		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			value = super.elementAt(index + this.parent.getRecordZoomOffset());
 		else
 			value = super.elementAt(index);
@@ -820,7 +830,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isRoundOut() {
-		return this.parent.isZoomMode() ? false : this.isRoundOut;
+		return this.parent.isZoomMode ? false : this.isRoundOut;
 	}
 
 	public void setRoundOut(boolean enabled) {
@@ -828,7 +838,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isStartpointZero() {
-		return this.parent.isZoomMode() ? false : this.isStartpointZero;
+		return this.parent.isZoomMode ? false : this.isStartpointZero;
 	}
 
 	public void setStartpointZero(boolean enabled) {
@@ -836,7 +846,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public boolean isStartEndDefined() {
-		return this.parent.isZoomMode() ? true : this.isStartEndDefined;
+		return this.parent.isZoomMode ? true : this.isStartEndDefined;
 	}
 
 	/**
@@ -860,14 +870,14 @@ public class Record extends Vector<Integer> {
 	}
 
 	public void setMinScaleValue(double newMinScaleValue) {
-		if (this.parent.isZoomMode())
+		if (this.parent.isZoomMode)
 			this.minZoomScaleValue = newMinScaleValue;
 		else
 			this.minScaleValue = newMinScaleValue;
 	}
 
 	public void setMaxScaleValue(double newMaxScaleValue) {
-		if (this.parent.isZoomMode())
+		if (this.parent.isZoomMode)
 			this.maxZoomScaleValue = newMaxScaleValue;
 		else
 			this.maxScaleValue = newMaxScaleValue;
@@ -959,14 +969,14 @@ public class Record extends Vector<Integer> {
 	 * @return the maxScaleValue
 	 */
 	public double getMaxScaleValue() {
-		return this.parent.isZoomMode() ? this.maxZoomScaleValue : this.maxScaleValue;
+		return this.parent.isZoomMode ? this.maxZoomScaleValue : this.maxScaleValue;
 	}
 
 	/**
 	 * @return the minScaleValue
 	 */
 	public double getMinScaleValue() {
-		return this.parent.isZoomMode() ? this.minZoomScaleValue : this.minScaleValue;
+		return this.parent.isZoomMode ? this.minZoomScaleValue : this.minScaleValue;
 	}
 
 	/** 
@@ -1064,7 +1074,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getDisplayPointValueString(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		if(this.parent.isZoomMode())
+		if(this.parent.isZoomMode)
 			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		else
 			displayPointValue = this.df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
@@ -1080,7 +1090,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public double getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
 		double value;
-		if(this.parent.isZoomMode())
+		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			value = this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
 		else
 			value = this.minScaleValue + ((this.maxScaleValue - this.minScaleValue) * yPos) / drawAreaBounds.height;
@@ -1096,7 +1106,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
 		String textValue;
-		if(this.parent.isZoomMode())
+		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			textValue = this.df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
 		else
 			textValue = this.df.format(new Double((this.maxScaleValue - this.minScaleValue) * deltaPos / drawAreaBounds.height));
@@ -1113,7 +1123,7 @@ public class Record extends Vector<Integer> {
 	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
 		log.log(Level.FINE, OSDE.STRING_EMPTY + points.toString());
 		double measureDelta;
-		if(this.parent.isZoomMode())
+		if(this.parent.isZoomMode)
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
@@ -1298,7 +1308,7 @@ public class Record extends Vector<Integer> {
 		sb.append(MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
 		sb.append(MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
 		for (PropertyType property : this.properties) {
-			log.log(Level.INFO, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.FINE, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(property.getName()).append(OSDE.STRING_UNDER_BAR).append(property.getType()).append(OSDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
 		sb.append(DEFINED_MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
@@ -1683,6 +1693,16 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setSyncPlaceholder(boolean enable) {
 		this.isSyncPlaceholder = enable;
+	}
+
+	/**
+	 * set min max values for scope view (recordSet.setScopeMode())
+	 * @param newScopeMin the scopeMin to set
+	 * @param newScopeMax the scopeMin to set
+	 */
+	public void setScopeMinMax(int newScopeMin, int newScopeMax) {
+		this.scopeMin = newScopeMin;
+		this.scopeMax = newScopeMax;
 	}
 }
 
