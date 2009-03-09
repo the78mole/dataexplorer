@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -46,7 +47,7 @@ import osde.ui.SWTResourceManager;
  * Dialog class to adjust the measurement scale end values
  * @author Winfried Brügmann
  */
-public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
+public class AxisEndValuesDialog extends Dialog {
 	final static Logger log = Logger.getLogger(AxisEndValuesDialog.class.getName());
 
 	Shell			dialogShell;
@@ -230,4 +231,10 @@ public class AxisEndValuesDialog extends org.eclipse.swt.widgets.Dialog {
 		combo.select(10);
 	}
 
+	/**
+	 * query display status (isDisposed)
+	 */
+	public boolean isDisposed() {
+		return this.dialogShell.isDisposed();
+	}
 }

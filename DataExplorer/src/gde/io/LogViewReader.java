@@ -875,7 +875,7 @@ public class LogViewReader {
 			String recordSetComment = new String(buffer);
 			log.log(Level.FINE, OSDE.RECORD_SET_COMMENT + recordSetComment);
 			sb.append(OSDE.RECORD_SET_COMMENT).append(recordSetComment).append(OSDE.DATA_DELIMITER);
-			log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+			log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			
 			position += data_in.skipBytes(2);
@@ -905,19 +905,19 @@ public class LogViewReader {
 			if (tmpDataSize != dataSize) { 
 				System.out.println("data size calculation wrong");
 			}	
-				log.log(Level.INFO, OSDE.RECORD_DATA_SIZE + dataSize);
+				log.log(Level.FINE, OSDE.RECORD_DATA_SIZE + dataSize);
 				sb.append(OSDE.RECORD_DATA_SIZE).append(dataSize).append(OSDE.DATA_DELIMITER);
-				log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+				log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
 				
 				position += data_in.skipBytes(216);
-				log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+				log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
 	
 			// config block n100W, ...
 			StringBuilder config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberLines = parse2Int(buffer);
-			log.log(Level.INFO, "numberLines = " + numberLines); //$NON-NLS-1$
+			log.log(Level.FINE, "numberLines = " + numberLines); //$NON-NLS-1$
 			for (int j = 0; j < numberLines; j++) {
 				buffer = new byte[4];
 				position += data_in.read(buffer);
@@ -925,23 +925,23 @@ public class LogViewReader {
 				buffer = new byte[stringSize];
 				position += data_in.read(buffer);
 				config.append(new String(buffer)).append(OSDE.DATA_DELIMITER);
-				log.log(Level.INFO, new String(buffer));
+				log.log(Level.FINER, new String(buffer));
 			}
 			header.put(OSDE.LOV_CONFIG_DATA, config.toString());
-			log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+			log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
 			
 			//position += data_in.skipBytes(8);
 			buffer = new byte[8];
 			position += data_in.read(buffer);
 			long recordSetDataBytes = parse2Long(buffer);
-			log.log(Level.INFO, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
+			log.log(Level.FINE, OSDE.RECORD_SET_DATA_BYTES + recordSetDataBytes);
 			sb.append(OSDE.RECORD_SET_DATA_BYTES).append(recordSetDataBytes);
 
 			header.put(OSDE.DATA_POINTER_POS, OSDE.STRING_EMPTY+position);
-			log.log(Level.INFO, String.format("position = 0x%x", position)); //$NON-NLS-1$
+			log.log(Level.FINER, String.format("position = 0x%x", position)); //$NON-NLS-1$
 
 			header.put((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME, sb.toString());
-			log.log(Level.INFO, header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
+			log.log(Level.FINE, header.get((i+1)+OSDE.STRING_BLANK + OSDE.RECORD_SET_NAME));
 		}
 		return header;
 	}
