@@ -73,9 +73,10 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													lastPointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	Point													scopePointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
+	static final int							margin = System.getProperty("sun.desktop")!=null &&System.getProperty("sun.desktop").equals("gnome") ? 2 : 0;
 
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
@@ -412,9 +413,9 @@ public class MenuToolBar {
 								}
 							}
 						});
-						this.scopePointsCombo.setSize(this.lastPointsComboSize);
-						this.scopePointsComposite.setSize(this.lastPointsComboSize.x+leadFill+trailFill, this.lastPointsComboSize.y);
-						this.scopePointsCombo.setLocation(leadFill, (this.toolSize.y - this.lastPointsComboSize.y) / 2);
+						this.scopePointsCombo.setSize(this.scopePointsComboSize);
+						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolSize.y);
+						this.scopePointsCombo.setLocation(leadFill, (this.toolSize.y - this.scopePointsComboSize.y) / 2 - margin);
 					}					
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
@@ -487,8 +488,8 @@ public class MenuToolBar {
 							}
 						});
 						this.channelSelectCombo.setSize(this.channelSelectSize);
-						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.channelSelectSize.y);
-						this.channelSelectCombo.setLocation(leadFill, (this.toolSize.y-this.channelSelectSize.y)/2);
+						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.toolSize.y);
+						this.channelSelectCombo.setLocation(leadFill, (this.toolSize.y-this.channelSelectSize.y)/2 - margin);
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
@@ -580,8 +581,8 @@ public class MenuToolBar {
 							}
 						});
 						this.recordSelectCombo.setSize(this.recordSelectSize);
-						this.channelSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.recordSelectSize.y);
-						this.recordSelectCombo.setLocation(leadFill, (this.toolSize.y-this.recordSelectSize.y)/2);
+						this.channelSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolSize.y);
+						this.recordSelectCombo.setLocation(leadFill, (this.toolSize.y-this.recordSelectSize.y)/2 - margin);
 					}
 					recordSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					recordSelectComboSep.setControl(this.channelSelectComposite);
