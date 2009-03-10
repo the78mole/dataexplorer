@@ -393,7 +393,11 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetKey of the activeRecordSet to set
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
-		this.activeRecordSet = this.get(recordSetKey);
+		RecordSet newActiveRecordSet = this.get(recordSetKey);
+		if (newActiveRecordSet != null) {
+			this.activeRecordSet = newActiveRecordSet;
+			this.activeRecordSet.check4SyncableRecords();
+		}
 	}
 	
 	/**

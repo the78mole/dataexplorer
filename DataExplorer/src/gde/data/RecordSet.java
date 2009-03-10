@@ -178,8 +178,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.channels = Channels.getInstance();
-
-		this.check4SyncableRecords();
 	}
 
 	/**
@@ -203,8 +201,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = isRawValue;
 		this.isCompareSet = isCompareSetValue;
 		this.channels = null;
-
-		this.check4SyncableRecords();
 	}
 
 	/**
@@ -305,8 +301,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
-
-		this.check4SyncableRecords();
 	}
 
 	/**
@@ -374,8 +368,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
-
-		this.check4SyncableRecords();
 	}
 
 	/**
@@ -1687,19 +1679,25 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * find syncable record names, checking for equal first word "CellVoltage 1"
-	 * and check for equal unit using device measurement
+	 * find syncable record names, checking for 
+	 * <ol>
+	 * <li>equal first word in record names "CellVoltage" of CellVoltage 1"
+	 * <li>equal measurement units (from device properties)
+	 * </ol>
+	 * do not care about symbols
 	 */
 	void check4SyncableRecords() {
 		this.potentialSyncableRecords = new Vector<String>();
 
-		for (int j = 0; j < this.recordNames.length; j++) {
-			if (j > 0 && this.recordNames[j - 1].split(" ")[0].equals(this.recordNames[j].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
-					&& this.device.getMeasurement(this.channelConfigName, j - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, j).getUnit())) {
+		for (int i = 0; i < this.recordNames.length; i++) {
+			if (this.recordNames.length > 1 
+					&& i > 0 
+						&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
+						&& this.device.getMeasurement(this.channelConfigName, i - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, i).getUnit())) {
 				if (this.potentialSyncableRecords.isEmpty()) {
-					this.potentialSyncableRecords.add(this.recordNames[j - 1]);
+					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
 				}
-				this.potentialSyncableRecords.add(this.recordNames[j]);
+				this.potentialSyncableRecords.add(this.recordNames[i]);
 			}
 		}
 
