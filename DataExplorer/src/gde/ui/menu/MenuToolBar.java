@@ -76,7 +76,7 @@ public class MenuToolBar {
 	Point													scopePointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
-	static final int							margin = System.getProperty("sun.desktop")!=null &&System.getProperty("sun.desktop").equals("gnome") ? 2 : 0;
+	int										toolButtonHeight = 23;
 
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
@@ -413,9 +413,11 @@ public class MenuToolBar {
 								}
 							}
 						});
+						this.toolButtonHeight = this.panItem.getBounds().height;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
-						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolSize.y);
-						this.scopePointsCombo.setLocation(leadFill, (this.toolSize.y - this.scopePointsComboSize.y) / 2 - margin);
+						this.zoomToolBar.getBorderWidth();
+						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
+						this.scopePointsCombo.setLocation(leadFill, (this.toolButtonHeight - this.scopePointsComboSize.y) / 2);
 					}					
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
@@ -488,8 +490,8 @@ public class MenuToolBar {
 							}
 						});
 						this.channelSelectCombo.setSize(this.channelSelectSize);
-						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.toolSize.y);
-						this.channelSelectCombo.setLocation(leadFill, (this.toolSize.y-this.channelSelectSize.y)/2 - margin);
+						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
+						this.channelSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.channelSelectSize.y) / 2);
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
@@ -581,8 +583,8 @@ public class MenuToolBar {
 							}
 						});
 						this.recordSelectCombo.setSize(this.recordSelectSize);
-						this.channelSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolSize.y);
-						this.recordSelectCombo.setLocation(leadFill, (this.toolSize.y-this.recordSelectSize.y)/2 - margin);
+						this.channelSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
+						this.recordSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.recordSelectSize.y) / 2);
 					}
 					recordSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					recordSelectComboSep.setControl(this.channelSelectComposite);
@@ -697,6 +699,9 @@ public class MenuToolBar {
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+		}
+		{
+			
 		}
 	}
 
