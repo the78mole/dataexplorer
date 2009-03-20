@@ -1178,7 +1178,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setZoomBounds(Rectangle zoomBounds) {
 		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
-		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
+		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width)+1;
 		// iterate children and set min/max values
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
@@ -1999,7 +1999,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param enable the isScopeMode 
 	 */
 	public void setScopeMode(boolean enable) {
-		long startTime = System.currentTimeMillis();
 		this.isScopeMode = enable;
 		if (enable) {
 			// iterate children and set min/max values
@@ -2028,6 +2027,5 @@ public class RecordSet extends HashMap<String, Record> {
 				this.syncScaleOfSyncableRecords();
 			}
 		}
-		log.log(Level.FINE, "evaluation time [msec] = " + (System.currentTimeMillis() - startTime));
 	}
 }
