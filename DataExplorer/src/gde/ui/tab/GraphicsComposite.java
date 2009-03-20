@@ -335,11 +335,21 @@ public class GraphicsComposite extends Composite {
 	 * @param maxY
 	 */
 	private void drawCurves(RecordSet recordSet, int maxX, int maxY) {
+		if (this.isScopeMode) {
+			int offset = recordSet.get(recordSet.getFirstRecordName()).realSize() - recordSet.getRecordZoomSize();
+			if (offset < 1) {
+				recordSet.setRecordZoomOffset(0);
+				recordSet.setScopeMode(false);
+			}
+			else {
+				recordSet.setRecordZoomOffset(offset);
+				recordSet.setScopeMode(true);
+			}
+		}
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
-		int maxTime_ms = timeScale[3];
 
 		//prepare measurement scales
 		int numberCurvesRight = 0;
@@ -409,22 +419,10 @@ public class GraphicsComposite extends Composite {
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
 		log.log(Level.FINE, "curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-		if (this.isScopeMode) {
-			int offset = recordSet.get(recordSet.getFirstRecordName()).realSize() - recordSet.getRecordZoomSize();
-			log.log(Level.FINE, recordSet.get(recordSet.getFirstRecordName()).realSize() + " - " + recordSet.getRecordZoomSize() + " = " + offset);
-			if (offset < 1) {
-				recordSet.setRecordZoomOffset(0);
-				recordSet.setScopeMode(false);
-			}
-			else {
-				recordSet.setRecordZoomOffset(offset);
-				recordSet.setScopeMode(true);
-			}
-		}
+		int detaTime_ms = new Double(recordSet.getTimeStep_ms() * (recordSet.getRecordDataSize(false) - 1)).intValue();		
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		int detaTime_ms = this.isScopeMode ? new Double(recordSet.getRecordZoomSize()*recordSet.getTimeStep_ms()).intValue() : maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), TimeLine.TIME_LINE_MSEC);
-		log.log(Level.FINER, "detaTime_ms = " + detaTime_ms);
+		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + detaTime_ms + " endTime = " + endTimeFormated);
 		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// get the image and prepare GC
@@ -493,6 +491,7 @@ public class GraphicsComposite extends Composite {
 			Point point = this.canvasGC.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y / 2);
+			log.log(Level.FINER, strStartTime);
 		}
 	}
 
@@ -573,7 +572,7 @@ public class GraphicsComposite extends Composite {
 					this.oldActiveRecordSet = activeRecordSet;
 				}
 				else if (this.oldScopeLevel != this.application.getMenuToolBar().getScopeModeLevelValue()) {
-					log.log(Level.FINER, "zoom mode changed");
+					log.log(Level.FINER, "scope level changed to " + this.application.getMenuToolBar().getScopeModeLevelValue());
 					isFullUpdateRequired = true;
 					this.oldScopeLevel = this.application.getMenuToolBar().getScopeModeLevelValue();
 				}
@@ -970,6 +969,7 @@ public class GraphicsComposite extends Composite {
 			this.bottomLast = 0;
 			updatePanMenueButton();
 			updateCutModeButtons();
+			this.application.getMenuToolBar().resetZoomToolBar();
 			//this.redrawGraphics();
 			break;
 		}

@@ -73,7 +73,7 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													scopePointsComboSize = new Point(60, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	Point													scopePointsComboSize = new Point(70, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	int										toolButtonHeight = 23;
@@ -336,6 +336,7 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
+							MenuToolBar.this.scopePointsCombo.setEnabled(false);
 						}
 					});
 				}
@@ -384,8 +385,7 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
-							MenuToolBar.this.zoomWindowItem.setEnabled(true);
-							MenuToolBar.this.scopePointsCombo.select(0);
+							resetZoomToolBar();
 						}
 					});
 				}
@@ -415,9 +415,8 @@ public class MenuToolBar {
 						});
 						this.toolButtonHeight = this.panItem.getBounds().height;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
-						this.zoomToolBar.getBorderWidth();
 						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.scopePointsCombo.setLocation(leadFill, (this.toolButtonHeight - this.scopePointsComboSize.y) / 2);
+						this.scopePointsCombo.setLocation(leadFill, (this.toolButtonHeight - this.scopePointsComboSize.y + 1) / 2);
 					}					
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
@@ -998,11 +997,23 @@ public class MenuToolBar {
 	public int getScopeModeLevelValue() {
 		int sizeLastPoints = -1;
 		try {
-			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText());
+			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText()) + 1;
 		}
 		catch (NumberFormatException e) {
 			// ignore and return -1
 		}
 		return sizeLastPoints;
+	}
+
+	/**
+	 * reset the zoom tool bar to default state
+	 */
+	public void resetZoomToolBar() {
+		this.zoomWindowItem.setEnabled(true);
+		this.panItem.setEnabled(false);
+		this.cutLeftItem.setEnabled(false);
+		this.cutRightItem.setEnabled(false);
+		this.scopePointsCombo.setEnabled(true);
+		this.scopePointsCombo.select(0);
 	}
 }
