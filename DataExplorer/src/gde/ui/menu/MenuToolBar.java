@@ -56,6 +56,8 @@ import osde.ui.tab.GraphicsComposite;
  */
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
+	
+	public static final String 		INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
 
 	Point													toolSize, coolSize;
 	CoolBar												coolBar;
