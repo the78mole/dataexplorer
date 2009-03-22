@@ -713,7 +713,7 @@ public class Record extends Vector<Integer> {
 	 * @return maximum value according trigger specification of referenced measurement
 	 */
 	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.tmpTriggerRange == null)  {
+		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
 		if (this.maxValueTriggered == Integer.MIN_VALUE )this.setMinMaxValueTriggered();
@@ -726,7 +726,7 @@ public class Record extends Vector<Integer> {
 	 * @return minimum value according trigger specification of referenced measurement
 	 */
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.tmpTriggerRange == null)  {
+		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
 		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();

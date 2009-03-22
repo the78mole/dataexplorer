@@ -970,7 +970,6 @@ public class GraphicsComposite extends Composite {
 			updatePanMenueButton();
 			updateCutModeButtons();
 			this.application.getMenuToolBar().resetZoomToolBar();
-			//this.redrawGraphics();
 			break;
 		}
 	}
