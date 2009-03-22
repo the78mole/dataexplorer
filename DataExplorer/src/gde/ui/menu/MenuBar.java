@@ -81,7 +81,7 @@ public class MenuBar {
 	Menu													viewMenu;
 	MenuItem											viewMenuItem;
 	Menu													graphicsMenu;
-	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem											graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
 	MenuItem											csvExportMenuItem1, csvExportMenuItem2;
 	MenuItem											nextDeviceMenuItem;
 	MenuItem											prevDeviceMenuItem;
@@ -520,6 +520,24 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.channels.getActiveChannel().saveTemplate();
+						}
+					});
+				}
+				{
+					this.restoreDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
+					this.restoreDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.OSDE_MSGT0195));
+					this.restoreDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+							GraphicsTemplate template = activeChannel.getTemplate();
+							template.setNewFileName(template.getDefaultFileName());
+							MenuBar.log.log(Level.FINE, "templateFilePath = " + template.getDefaultFileName()); //$NON-NLS-1$
+							template.load();
+							if (activeChannel.getActiveRecordSet() != null) {
+								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName());
+								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							}
 						}
 					});
 				}

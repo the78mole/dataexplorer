@@ -387,7 +387,6 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
-							resetZoomToolBar();
 						}
 					});
 				}
@@ -410,8 +409,6 @@ public class MenuToolBar {
 								}
 								catch(Exception e) {
 									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
-									MenuToolBar.this.scopePointsCombo.select(0);
-									MenuToolBar.this.zoomWindowItem.setEnabled(true);
 								}
 							}
 						});
@@ -687,7 +684,7 @@ public class MenuToolBar {
 					this.editRecord.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
-							//MenuToolBar.this.recordSelectCombo.setEditable(true);
+							MenuToolBar.this.recordSelectCombo.setEditable(true);
 							MenuToolBar.this.recordSelectCombo.setFocus();
 							// begin here text can be edited
 						}
@@ -1017,5 +1014,12 @@ public class MenuToolBar {
 		this.cutRightItem.setEnabled(false);
 		this.scopePointsCombo.setEnabled(true);
 		this.scopePointsCombo.select(0);
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && activeRecordSet.isSyncRequested()) {
+				activeRecordSet.setSyncRequested(true);
+			}
+		}
 	}
 }
