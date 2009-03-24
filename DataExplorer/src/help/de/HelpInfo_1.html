@@ -56,8 +56,7 @@
 
 <DIV ID="Content" DIR="LTR">
 <H1><A NAME="settings"></A>Der Einstellungsdialog</H1>
-<P>Der Einstellungsdialog dient zum Einstellen:</P>
-<IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=RIGHT>
+<P>Der Einstellungsdialog dient zum Einstellen:
 <UL>
 	<LI>Des Datenpfades, das Verzeichnis unter dem die
 	ger&auml;tespezifischen Logdatendateien abgelegt werden sollen, hier
@@ -93,6 +92,9 @@
 	Diese Einstellung wirkt sich auch auf den Ger&auml;teauswahldialog aus,
 	der dann die Portauswahl sperrt.
 </UL>
+</P>
+<P align=center><IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=CENTER>
+</P>
 <P>Über den Analyse Tabulator erreicht man Einstellmöglichkeiten für
 eine Fehleranalyse. Nach einem Programmabsturz sollte in einer trace.log
 Datei eine m&ouml;gliche Erkl&auml;rung zu finden sein. Achtung, alle
@@ -100,8 +102,6 @@ Verstellungen der Loglevel haben einen Einfluss auf die Laufzeit und das
 kann zu nicht absehbaren Nebeneffekten f&uuml;hren. Alle Einstellungen
 sollten mit diesem Wissen vorgenommen werden. Die Werte sind
 entsprechend der Informationsf&uuml;lle gestaffelt, 
-<IMG SRC="images/Settingsdialog_2.png" NAME="graphics 2" ALIGN=RIGHT>
-</P>
 <UL>
 	<LI>SEVERE schreibt nur Programmfehler,
 	<LI>WARNING schreibt Fehler und Warnungen,
@@ -112,6 +112,7 @@ entsprechend der Informationsf&uuml;lle gestaffelt,
 	<LI>FINER schreibt noch mehr als FINE
 	<LI>FINEST schreibt noch mehr als FINER
 </UL>
+</P>
 <P>Ohne besonderen Grund sollte man nicht unbedingt &uuml;ber den
 Level FINE einstellen.</P>
 <UL>
@@ -135,6 +136,13 @@ Level FINE einstellen.</P>
 	Speicherverbrauch der Java Virtual Machine auf 512 Megabyte begrenzt
 	ist.
 </UL>
+<P align=center><IMG SRC="images/Settingsdialog_2.png" NAME="graphics 2" ALIGN=CENTER>
+</P>
+<P>Der Klassenbasierte Loglevel erlaubt den logging level auf ausgew&auml;hlte Klassen zu reduzieren. 
+Hierdurch wir die Ausgabe &uuml;bersichtlicher und erlaubt die Analyse weiter einzuschr&auml;nken.
+Die Selektion des Loglevels wir über ein Kontextmen&uuml; erreicht.
+Erst durch schliessen des Dialogs wird die Einstellung wirksam.
+</P>
 <P>In jedem Fall werden immer nur drei Tracelogdateien mit einigen
 Megabyte Gr&ouml;&szlig;e geschrieben. Die Dateien &uuml;berschreiben
 sich dann immer wieder selbst.</P>

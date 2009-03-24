@@ -61,7 +61,6 @@
 <H2>General Tab</H2>
 
 <P>The settings dialog is used to configure:
-<IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=RIGHT ></P>
 <UL>
 	<LI>The language to be used
 	<LI>The data path, where the application is locking for and
@@ -88,16 +87,17 @@
 	possible to configure global serial port usage, but in most cases the
 	single available port will be found automatically.
 </UL>
-
+</P>
+<P ALIGN=CENTER><IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=CENTER >
+</P>
 <H2>Analysis Tab</H2>
-<P><img src="images/Settingsdialog_2.png" name="graphics 2" align="RIGHT" >
+<P>
 Using the analyse tab only adjustments for problem analysis can
 be found. After a program failure function a trace log entry should
 appear which may help to find the reason for it appearance. Pay
 attention, modifying trace log level away from INFO will result in
 slowed down execution an may lead in unknown side effects. So adust this
 values using this knowledge. The adjustments are scaled in detail level,
-</P>
 <UL>
 	<LI>SEVERE writes only program execution errors,
 	<LI>WARNING writing errors and warnings,
@@ -108,7 +108,8 @@ values using this knowledge. The adjustments are scaled in detail level,
 	<LI>FINER writing more than FINE
 	<li>FINEST writing more than FINER
 </UL>
-<P>Without a good reason do not adjust above level FINE.</P>
+</P>
+<P>Without a good reason do not adjust above level FINE.
 <UL>
 	<LI>the global setting of the &quot;trace log&quot; level, is in
 	normal the level INFO
@@ -127,6 +128,13 @@ values using this knowledge. The adjustments are scaled in detail level,
 	OpenSerialDataExplorer.jar&quot; where the maximal memory usage is
 	limited to 512 Mbyte.
 </UL>
+</P>
+<P ALIGN=CENTER><img src="images/Settingsdialog_2.png" name="graphics 2" ALIGN=CENTER >
+</P>
+<P>The class based log level allows to set a logging level for selected class(es) which reduce the amount of trace statements and helps analysing class centric.
+A context menu enables the log level selection.
+Closing the settings dialog will activate the adjusted trace level.
+</P>
 <P>In every case only three level of trace log files are written
 with a limited size. The files in this rolled approach will over write
 after a certain amount of statements.</P>
