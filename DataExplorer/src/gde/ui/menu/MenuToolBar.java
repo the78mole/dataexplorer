@@ -57,7 +57,8 @@ import osde.ui.tab.GraphicsComposite;
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
-	public static final String 		INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
+	public static String 					INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
+	StringBuffer									toolBarSizes 					= new StringBuffer();
 
 	Point													toolSize, coolSize;
 	CoolBar												coolBar;
@@ -75,7 +76,7 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													scopePointsComboSize = new Point(70, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	Point													scopePointsComboSize = new Point(70, 21);
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	int										toolButtonHeight = 23;
@@ -90,8 +91,8 @@ public class MenuToolBar {
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite											channelSelectComposite, recordSelectComposite;
 	CCombo												channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
-	Point													recordSelectSize = new Point(260, 21+(OSDE.IS_WINDOWS == true ? 0 : 2));
+	Point													channelSelectSize = new Point(180, 21);
+	Point													recordSelectSize = new Point(260, 21);
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -203,6 +204,7 @@ public class MenuToolBar {
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.fileCoolItem.setPreferredSize(this.size);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end file cool item
 
 		{ // begin device cool item
@@ -322,6 +324,7 @@ public class MenuToolBar {
 			this.deviceCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.deviceCoolItem.setPreferredSize(this.size);
 			this.deviceCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end device cool item
 		
 		{ // begin zoom cool item
@@ -427,6 +430,7 @@ public class MenuToolBar {
 			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.zoomCoolItem.setPreferredSize(this.size);
 			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -464,6 +468,7 @@ public class MenuToolBar {
 			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
@@ -697,9 +702,10 @@ public class MenuToolBar {
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		}
 		{
-			
+			INITIAL_COOLBAR_SIZES = this.toolBarSizes.toString();
 		}
 	}
 
