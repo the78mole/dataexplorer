@@ -1689,7 +1689,7 @@ public class RecordSet extends HashMap<String, Record> {
 	void check4SyncableRecords() {
 		this.potentialSyncableRecords = new Vector<String>();
 
-		for (int i = 0; i < this.recordNames.length; i++) {
+		for (int i = 0; i < (this.syncableRecords.size() > 0 ? this.recordNames.length-1 : this.recordNames.length); i++) {
 			if (this.recordNames.length > 1 
 					&& i > 0 
 						&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
