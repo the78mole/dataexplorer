@@ -57,6 +57,7 @@ import osde.ui.tab.GraphicsComposite;
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
+	private static final String[]	SCOPE_VALUES					= new String[] { "ALL", "10", "25", "50", "100", "250", "500", "750", "1000" };
 	public static String 					INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
 	StringBuffer									toolBarSizes 					= new StringBuffer();
 
@@ -398,10 +399,10 @@ public class MenuToolBar {
 					{
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setItems(new String[] { "ALL", "1000", "500", "250", "100", "50", "10" });
+						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						this.scopePointsCombo.select(0);
-						this.scopePointsCombo.setToolTipText("Nur die <selektierte Anzahl> der letzten Messpunkte anzeigen");
+						this.scopePointsCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0072));
 						this.scopePointsCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
