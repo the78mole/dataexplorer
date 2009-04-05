@@ -37,15 +37,15 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> <BR />
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoom- and positioning</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Statistics view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_5.html">Statistics Window</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Table view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Table Window</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digital view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digital Window</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analog view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analog Window</A> <BR />
 <BR />
-&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Cell voltage view</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Cell Voltage Window</A> <BR />
 <BR />
 &nbsp;&nbsp;<A HREF="HelpInfo_10.html">Curve compare</A> <BR />
 <BR />
@@ -118,7 +118,8 @@ status bar.</P>
 <P ALIGN=CENTER>
 <IMG SRC="images/CurveSelector_ContextMenue_Measure.png" NAME="graphics7" ALIGN=MIDDLE>
 <IMG SRC="images/CurveSelector_ContextMenue_Measure_Pointer.png" NAME="graphics8" ALIGN=MIDDLE>
-<IMG SRC="images/CurveSelector_ContextMenue_Measure_Value.png" NAME="graphics9" ALIGN=MIDDLE></P>
+<IMG SRC="images/CurveSelector_ContextMenue_Measure_Value.png" NAME="graphics9" ALIGN=MIDDLE>
+</P>
 <P>To <B>measure point difference</B> the difference between
 two point are measured using two different crossed hairlines. The delta
 value and unit gets displayed in the status bar.</P>
@@ -131,9 +132,25 @@ the starting point of the zoomed area is displayed.</P>
 The last sections in the context menu are used to copy selected curves into
 the compare window <B>Copy to curve compare</B>. The last entry allowes
 to clean the curve compare view by selecting <B>Clean curve compare</B>.
-This entry gets active when at least one curve is within this area.</P>
-<P>The actual release allows comparing curves of same type and same
-time raster. It is ssenseless to compare voltage with height as example.
+This entry gets active when at least one curve is within this area.
+</P>
+<P><B>Hint : </B>The actual release allows comparing curves of same type and same
+time base. It is senseless to compare voltage with height as example.
+In case of none matching curves the application will display a warning message.
+</P>
+<H3><A NAME="curve_sync"></A>Curve scale synchronisation</H3>
+<P>
+If there are curves of similar type an extra selectable entry within the curveselector will be displayed.
+Selecting this entry the scales of the curves will be merged while synchronising the end values. 
+As sample voltage curves of Lithium cells are named.
+The comparison of the two following screen shots should make this more clear.
+</P>
+<P ALIGN=CENTER><IMG SRC="images/SynchroniseRecords_1.png" NAME="graphics10" ALIGN=MIDDLE>
+</P>
+<P>This will make more room for the curve display itself and the minimun and maximum values are the same.
+Through this the curves are easy compareable and a manual adjustment using the context menu is obsolete.
+</P>
+<P ALIGN=CENTER><IMG SRC="images/SynchroniseRecords_2.png" NAME="graphics11" ALIGN=MIDDLE>
 </P>
 <P ALIGN=LEFT><A HREF="HelpInfo_4.html">&lt;&lt;== previous</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_42.html">next ==&gt;&gt;</A></P>
