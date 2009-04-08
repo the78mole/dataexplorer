@@ -78,7 +78,7 @@ public class QuasiLinearRegression extends CalculationThread {
 				avgX = avgX / timeStepsPerInterval;
 				// (xi - avgX)*(xi - avgX)
 				double ssXX = 0.0; // 10 sec = 0.053025;
-				for (int i = 0; i < timeStepsPerInterval; i++) {
+				for (int i = 1; i <= timeStepsPerInterval; i++) {
 					ssXX = ssXX + (((1 / timeStep_sec * i) - avgX) * ((1 / timeStep_sec * i) - avgX));
 				}
 				ssXX = ssXX / timeStepsPerInterval;
@@ -106,10 +106,9 @@ public class QuasiLinearRegression extends CalculationThread {
 					}
 					ssXY = ssXY / timeStepsPerInterval;
 
-					int slope = 0;
+					int slope = new Double(ssXY / ssXX / timeStep_sec / timeStep_sec).intValue();
 					// add point over pointInterval only
 					for (int i = 0; i < pointInterval; i++) {
-						slope = new Double(ssXY / ssXX / timeStep_sec * 1 / timeStep_sec).intValue();
 						record.add(slope);
 					}
 					startPosition = startPosition + pointInterval;

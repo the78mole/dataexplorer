@@ -83,7 +83,7 @@ public class LinearRegression extends CalculationThread {
 				}
 				ssXX = ssXX / timeStepsPerInterval;
 				log.log(Level.FINE, "avgX = " + avgX + " ssXX = " + ssXX); //$NON-NLS-1$ //$NON-NLS-2$
-				modCounter = modCounter - 1;
+				--modCounter;
 				while (modCounter > 0 && !this.threadStop) {
 					// calculate avg y
 					double avgY = 0.0;
