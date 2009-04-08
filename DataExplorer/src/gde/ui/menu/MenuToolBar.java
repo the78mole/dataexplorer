@@ -58,7 +58,6 @@ public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
 	private static final String[]	SCOPE_VALUES					= new String[] { "ALL", "10", "25", "50", "100", "250", "500", "750", "1000" };
-	public static String 					INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
 	StringBuffer									toolBarSizes 					= new StringBuffer();
 
 	Point													toolSize, coolSize;
@@ -705,9 +704,6 @@ public class MenuToolBar {
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		}
-		{
-			INITIAL_COOLBAR_SIZES = this.toolBarSizes.toString();
-		}
 	}
 
 	/**
@@ -1028,5 +1024,13 @@ public class MenuToolBar {
 				activeRecordSet.setSyncRequested(true);
 			}
 		}
+	}
+	
+	/**
+	 * get the coolbar sizes as string
+	 * INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
+	 */
+	public String getCoolBarSizes() {
+			return this.toolBarSizes.toString();		
 	}
 }
