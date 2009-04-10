@@ -168,6 +168,30 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
+		
+		//switch off single cell voltage lines if not battery type of lithium where cell voltages are available
+		int accuIndex = getAccuCellType(dataBuffer);//Lithium=1, NiMH=2, NiCd=3, Pb=4
+		if (accuIndex > 1) { // only Lithium types has individual voltages
+			String[] recordKeys = recordSet.getRecordNames();
+			for (int i = 6; i < points.length; i++) {
+				Record tmpRecord = recordSet.get(recordKeys[i]);
+				tmpRecord.setActive(false);
+				tmpRecord.setDisplayable(false);
+				tmpRecord.setVisible(false);
+			}
+		}
+		else {
+			String[] recordKeys = recordSet.getRecordNames();
+			for (int i = 6; i < points.length; i++) {
+				Record tmpRecord = recordSet.get(recordKeys[i]);
+				if (tmpRecord.getRealMinValue() == tmpRecord.getRealMaxValue()) {
+					tmpRecord.setActive(false);
+					tmpRecord.setDisplayable(false);
+					tmpRecord.setVisible(false);
+				}
+			}
+		}
+
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
