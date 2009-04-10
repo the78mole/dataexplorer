@@ -108,7 +108,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.OSDE_MSGT0129);
 
-	public static final int				MAX_NAME_LENGTH								= 30;
+	public static final int				MAX_NAME_LENGTH								= 40;
 
 	public static final String		TIME_STEP_MS									= "timeStep_ms";																//$NON-NLS-1$
 	public static final String		TIME													= "time";																				//$NON-NLS-1$
@@ -934,19 +934,27 @@ public class RecordSet extends HashMap<String, Record> {
 	 * set all records from this record to displayable
 	 */
 	public void setAllDisplayable() {
+		String syncableRecordKey = this.getSyncableName();
 		for (String recordKey : this.recordNames) {
-			this.get(recordKey).setDisplayable(true);
+			if (!recordKey.equals(syncableRecordKey)) {
+				this.get(recordKey).setDisplayable(true);
+			}
 		}
 	}
 
 	/**
-	 * force enable all records to be displayed and active if none calculation, this is used for unknown data import or unknown configurations
+	 * force enable all records to be displayed if active and none calculation, this is used for unknown data import or unknown configurations
 	 */
 	public void setAllVisibleAndDisplayable() {
+		String syncableRecordKey = this.getSyncableName();
 		for (String recordKey : this.recordNames) {
-			Record record = this.get(recordKey);
-			record.setVisible(record.isActive());
-			record.setDisplayable(!this.device.getMeasurement(this.channelConfigName, record.ordinal).isCalculation());
+			if (!recordKey.equals(syncableRecordKey)) {
+				Record record = this.get(recordKey);
+				if (record.isActive()) {
+					record.setVisible(true);
+					record.setDisplayable(!this.device.getMeasurement(this.channelConfigName, record.ordinal).isCalculation());
+				}
+			}
 		}
 		for (String recordKey : this.getNoneCalculationRecordNames()) {
 			this.get(recordKey).setActive(true);
