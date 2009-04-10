@@ -399,7 +399,7 @@ public class LogViewReader {
 		getBaseHeaderData(header, data_in);
 		String streamVersion = header.get(OSDE.LOV_STREAM_VERSION);
 		String[] aVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK);
-		String useVersion = header.get(OSDE.LOV_FORMAT_VERSION).split(OSDE.STRING_BLANK)[1];
+		String useVersion = aVersion.length > 1 ? aVersion[1] : "";
 		if (aVersion.length >= 3) useVersion = useVersion + OSDE.STRING_BLANK + aVersion[2];
 		log.log(Level.FINE, "using format version " + useVersion); //$NON-NLS-1$
 		
