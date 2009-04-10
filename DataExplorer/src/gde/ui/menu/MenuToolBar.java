@@ -416,6 +416,7 @@ public class MenuToolBar {
 							}
 						});
 						this.toolButtonHeight = this.panItem.getBounds().height;
+						//this.scopePointsComboSize.x = SWTResourceManager.getGC(this.scopePointsCombo.getDisplay()).stringExtent("00000000").x;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
 						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
 						this.scopePointsCombo.setLocation(leadFill, (this.toolButtonHeight - this.scopePointsComboSize.y + 1) / 2);
@@ -549,6 +550,7 @@ public class MenuToolBar {
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
+						//this.recordSelectSize.x = SWTResourceManager.getGC(this.recordSelectCombo.getDisplay()).stringExtent("012345678901234567890123456789012345678901234567890".substring(0, RecordSet.MAX_NAME_LENGTH)).x;
 						this.recordSelectCombo.setEditable(false);
 						this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
