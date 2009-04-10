@@ -548,7 +548,7 @@ public class MenuToolBar {
 						this.recordSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
-						this.recordSelectCombo.setTextLimit(30);
+						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
 						this.recordSelectCombo.setEditable(false);
 						this.recordSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
