@@ -72,17 +72,16 @@
 	together with the used spread sheet program (used for import/export of
 	CSV files) .
 	<LI>Behavior of the device dialogs. A primary modal behavior is
-	some times unhandy, if some adjustments are tke place in parallel while
+	some times unhandy, if some adjustments are the place in parallel while
 	gathering data. Some times this cost more effort while programming
 	this.
 	<LI>While opening this dialog it scans for available serial ports
 	and updates the results delayed. The delay can be reduced on slow
 	systems by switching off the availability check. If this is the case
-	used ports are displayed too which might not be used in future. Dann
-	werden belegte Ports halt auch angezeigt und k&ouml;nnen eventuell
-	sp&auml;ter nicht benutzt werden. At UNIX based systems this is not
-	relevant. This adjustment reflect also to the device selection dialog
-	which also scans for available pserial ports.
+	used ports are displayed too which might not be used in future. 
+	At UNIX based systems this is not relevant. 
+	This adjustment reflect also to the device selection dialog
+	which also scans for available serial ports.
 	<LI>If system wide only one serial port is available it is
 	possible to configure global serial port usage, but in most cases the
 	single available port will be found automatically.
@@ -92,11 +91,11 @@
 </P>
 <H2>Analysis Tab</H2>
 <P>
-Using the analyse tab only adjustments for problem analysis can
+Using the analyze tab only adjustments for problem analysis can
 be found. After a program failure function a trace log entry should
 appear which may help to find the reason for it appearance. Pay
 attention, modifying trace log level away from INFO will result in
-slowed down execution an may lead in unknown side effects. So adust this
+slowed down execution an may lead in unknown side effects. So adjust this
 values using this knowledge. The adjustments are scaled in detail level,
 <UL>
 	<LI>SEVERE writes only program execution errors,
@@ -122,7 +121,7 @@ values using this knowledge. The adjustments are scaled in detail level,
 	calculate checksum, etc.
 	<LI>File I/O, function calls involved in file input/output
 	<LI>Serial I/O, will used a memory logger above the level INFO to
-	archieve a low performance impact. As logical consequence the memory
+	archive a low performance impact. As logical consequence the memory
 	usage of the application is higher as before. It might be required to
 	start the application using &quot;java -jar -Xmx512m
 	OpenSerialDataExplorer.jar&quot; where the maximal memory usage is
@@ -131,7 +130,7 @@ values using this knowledge. The adjustments are scaled in detail level,
 </P>
 <P ALIGN=CENTER><img src="images/Settingsdialog_2.png" name="graphics 2" ALIGN=CENTER >
 </P>
-<P>The class based log level allows to set a logging level for selected class(es) which reduce the amount of trace statements and helps analysing class centric.
+<P>The class based log level allows to set a logging level for selected class(es) which reduce the amount of trace statements and helps analyzing class centric.
 A context menu enables the log level selection.
 Closing the settings dialog will activate the adjusted trace level.
 </P>
