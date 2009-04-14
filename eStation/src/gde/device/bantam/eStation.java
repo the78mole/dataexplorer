@@ -455,22 +455,26 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		String syncableRecordKey = recordSet.getSyncableName();
 		String[] recordKeys = recordSet.getRecordNames();
 
 		//recordSet.setAllVisibleAndDisplayable();
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
 		}
-
-		for (int i = 0; i < recordKeys.length; i++) {
-			if (!recordKeys[i].equals(syncableRecordKey)) {
-				Record record = recordSet.get(recordKeys[i]);
+		for (String recordKey : recordKeys) {
+				Record record = recordSet.get(recordKey);
 				record.setVisible(record.isActive());
-				record.setDisplayable(record.getRealMinValue() != record.getRealMaxValue());
-			}
+				record.setDisplayable(record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue());
+				log.log(Level.FINER, recordKey + " setDisplayable=" + (record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue()));
 		}
 		recordSet.isSyncableDisplayableRecords(true);
+		
+		if (log.isLoggable(Level.FINE)) {
+			for (String recordKey : recordKeys) {
+				Record record = recordSet.get(recordKey);
+				log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
+			}
+		}
 	}
 
 	/**
@@ -493,7 +497,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				for (String measurementKey : recordNames) {
 					Record record = recordSet.get(measurementKey);
 					
-					if (record.isActive() && (record.getRealMinValue() != record.getRealMaxValue())) {
+					if (record.isActive() && (record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue())) {
 						++displayableCounter;
 					}
 				}
