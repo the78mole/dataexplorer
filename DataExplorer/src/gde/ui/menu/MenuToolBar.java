@@ -259,7 +259,7 @@ public class MenuToolBar {
 								}
 							}
 							else {
-								MenuToolBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0017));
 							}
 						}
 					});
