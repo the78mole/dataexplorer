@@ -605,7 +605,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordNames.length; ++i) {
-			// since actual record names can differ from device configuration measurement names, match by sequence
+			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(recordNames[i]);		
 			measurement = this.getMeasurement(channelConfigKey, i);
 			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$

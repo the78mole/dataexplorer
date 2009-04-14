@@ -356,7 +356,7 @@ public class GraphicsComposite extends Composite {
 		int numberCurvesLeft = 0;
 		for (String recordKey : recordSet.getRecordNames()) {
 			Record tmpRecord = recordSet.getRecord(recordKey);
-			if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 				log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
@@ -368,7 +368,7 @@ public class GraphicsComposite extends Composite {
 		if (recordSet.isSyncableSynced()) {
 			for (String recordKey : recordSet.getSyncableRecords()) {
 				Record tmpRecord = recordSet.getRecord(recordKey);
-				if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+				if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 					log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					if (tmpRecord.isPositionLeft())
 						numberCurvesLeft--;

@@ -33,6 +33,7 @@ import osde.device.IDevice;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
+import osde.io.LogViewReader;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
@@ -147,51 +148,58 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		// prepare the hash map containing the calculation values like factor offset, reduction, ...
-		//String[] measurements = this.getMeasurementNames(recordSet.getChannelConfigName()); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
-		//HashMap<String, Double> calcValues = new HashMap<String, Double>();
-		//calcValues.put(X_FACTOR, recordSet.get(measurements[11]).getFactor());
-		//calcValues.put(X_OFFSET, recordSet.get(measurements[11]).getOffset());
-		
-		int offset = 0;
-		int lovDataSize = this.getLovDataByteSize();
-		int deviceDataBufferSize = 72;
-		byte[] convertBuffer = new byte[deviceDataBufferSize];
-		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int deviceDataBufferSize = 76; // const.
+		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		int offset = 0;
 		int progressCycle = 0;
-		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		int lovDataSize = this.getLovDataByteSize();
+		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
 		
-		for (int i = 0; i < recordDataSize; i++) { 
-			System.arraycopy(dataBuffer, offset + i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
-			
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
-		}
-		
-		//switch off single cell voltage lines if not battery type of lithium where cell voltages are available
-		int accuIndex = getAccuCellType(dataBuffer);//Lithium=1, NiMH=2, NiCd=3, Pb=4
-		if (accuIndex > 1) { // only Lithium types has individual voltages
-			String[] recordKeys = recordSet.getRecordNames();
-			for (int i = 6; i < points.length; i++) {
-				Record tmpRecord = recordSet.get(recordKeys[i]);
-				tmpRecord.setActive(false);
-				tmpRecord.setDisplayable(false);
-				tmpRecord.setVisible(false);
+		if (dataBuffer[0] == 0x7B) {
+			byte[] convertBuffer = new byte[deviceDataBufferSize];
+			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
 		}
 		else {
-			String[] recordKeys = recordSet.getRecordNames();
-			for (int i = 6; i < points.length; i++) {
-				Record tmpRecord = recordSet.get(recordKeys[i]);
-				if (tmpRecord.getRealMinValue() == tmpRecord.getRealMaxValue()) {
-					tmpRecord.setActive(false);
-					tmpRecord.setDisplayable(false);
-					tmpRecord.setVisible(false);
-				}
-			}
-		}
+			byte[] sizeBuffer = new byte[4];
+			byte[] convertBuffer = new byte[deviceDataBufferSize];
+			
+			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+			for (int i = 0; i < recordDataSize; i++) {
+				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
+				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
+				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+				offset += lovDataSize;
+				
+				StringBuilder sb = new StringBuilder();
+				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
+				//sb.append(timeBuffer.length).append(" - ");
+				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
+				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length-8)+"0000000000";
+				long dateTime = new Long(timeStamp.substring(6,17));
+				log.log(Level.FINEST, timeStamp + " " + timeStamp.substring(6,17) + " " + dateTime);
+				sb.append(dateTime);
+				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
+				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
+				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/1000 - 217; // value 217 is a compromis manual selected
+				sb.append(" - ").append(deltaTime);
+				sb.append(" - ").append(sumTimeDelta += deltaTime);
+				log.log(Level.FINER, sb.toString());
+				lastDateTime = dateTime;
 
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+			}
+			recordSet.setTimeStep_ms(sumTimeDelta/recordDataSize);
+			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
+		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
@@ -447,7 +455,22 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
+		String syncableRecordKey = recordSet.getSyncableName();
+		String[] recordKeys = recordSet.getRecordNames();
+
+		//recordSet.setAllVisibleAndDisplayable();
+		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
+			recordSet.get(recordKey).setActive(true);
+		}
+
+		for (int i = 0; i < recordKeys.length; i++) {
+			if (!recordKeys[i].equals(syncableRecordKey)) {
+				Record record = recordSet.get(recordKeys[i]);
+				record.setVisible(record.isActive());
+				record.setDisplayable(record.getRealMinValue() != record.getRealMaxValue());
+			}
+		}
+		recordSet.isSyncableDisplayableRecords(true);
 	}
 
 	/**
@@ -470,7 +493,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				for (String measurementKey : recordNames) {
 					Record record = recordSet.get(measurementKey);
 					
-					if (record.isActive()) {
+					if (record.isActive() && (record.getRealMinValue() != record.getRealMaxValue())) {
 						++displayableCounter;
 					}
 				}

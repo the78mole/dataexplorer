@@ -372,7 +372,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		log.log(Level.FINE, "no update required for " + recordSet.getName()); //$NON-NLS-1$
+		recordSet.setAllVisibleAndDisplayable();
 	}
 
 	/**

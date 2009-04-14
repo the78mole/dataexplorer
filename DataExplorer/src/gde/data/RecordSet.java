@@ -68,7 +68,8 @@ public class RecordSet extends HashMap<String, Record> {
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
 	boolean												isFromFile										= false;																				//indicates that this record set was created by loading data from file
 	boolean												isRecalculation								= true;																					//indicates record is modified and need re-calculation
-	int														fileDataSize									= 0; 																						//number of integer values of all active/inactive records
+	int														fileDataSize									= 0; 																						//number of integer values per record
+	int														fileDataBytes									= 0; 																						//number of bytes containing all records data 
 	long													fileDataPointer								= 0; 																						//file pointer where the data of this record begins
 	boolean												hasDisplayableData						= false;
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
@@ -549,7 +550,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getRecordNames() {
-		return this.recordNames.clone();
+		Vector<String> recordNamesVector = new Vector<String>();
+		String syncPlaceholdername = this.getSyncableName();
+		for (String recordName : this.recordNames) {
+			if (!recordName.equals(syncPlaceholdername)) recordNamesVector.add(recordName);
+		}
+		return recordNamesVector.toArray(new String[0]).clone();
 	}
 
 	/**
@@ -786,14 +792,14 @@ public class RecordSet extends HashMap<String, Record> {
 	public int getAxisPosition(String recordKey, boolean isLeft) {
 		int value = -1;
 		if (isLeft) {
-			for (String recordName : getRecordNames()) {
+			for (String recordName : this.recordNames) {
 				Record tmpRecord = this.get(recordName);
 				if (tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
 		else {
-			for (String recordName : getRecordNames()) {
+			for (String recordName : this.recordNames) {
 				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
 				Record tmpRecord = this.get(recordName);
 				if (!tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
@@ -808,7 +814,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public int getNumberVisibleWithAxisPosLeft() {
 		int value = 0;
-		for (String recordKey : this.getRecordNames()) {
+		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
 			if (record.isVisible && record.isDisplayable && record.isPositionLeft) ++value;
 		}
@@ -909,6 +915,7 @@ public class RecordSet extends HashMap<String, Record> {
       public void run() {
       	CalculationThread ct = RecordSet.this.device.getCalculationThread();
       	try {
+    			Thread.sleep(1000);
       		while (ct != null && ct.isAlive()) {
       			log.log(Level.FINER, "CalculationThread isAlive"); //$NON-NLS-1$
       			Thread.sleep(1000);
@@ -917,7 +924,8 @@ public class RecordSet extends HashMap<String, Record> {
 				catch (InterruptedException e) {
 				}
 				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
-				if (activeChannel != null) activeChannel.checkAndLoadData();
+				if (activeChannel != null) 
+					activeChannel.checkAndLoadData();
 			}
 		});
 		try {
@@ -943,17 +951,15 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * force enable all records to be displayed if active and none calculation, this is used for unknown data import or unknown configurations
+	 * force enable all records to be displayed and active if none calculation, this is used for unknown data import or unknown configurations
 	 */
 	public void setAllVisibleAndDisplayable() {
 		String syncableRecordKey = this.getSyncableName();
 		for (String recordKey : this.recordNames) {
 			if (!recordKey.equals(syncableRecordKey)) {
 				Record record = this.get(recordKey);
-				if (record.isActive()) {
-					record.setVisible(true);
-					record.setDisplayable(!this.device.getMeasurement(this.channelConfigName, record.ordinal).isCalculation());
-				}
+				record.setVisible(true);
+				record.setDisplayable(true);
 			}
 		}
 		for (String recordKey : this.getNoneCalculationRecordNames()) {
@@ -1476,7 +1482,7 @@ public class RecordSet extends HashMap<String, Record> {
 				log.log(Level.FINE, "entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
 				//RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
 
-				int numberRecords = getRecordNamesLength();
+				int numberRecords = this.recordKeys.length; //getRecordNamesLength();
 				int recordEntries = getRecordDataSize(true);
 
 				int maxWaitCounter = 10;
@@ -1534,8 +1540,9 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.isRecalculation;
 	}
 
+	@Deprecated
 	public int getRecordNamesLength() {
-		return this.recordNames.length;
+		return (this.getSyncableName().equals("") ? this.recordNames.length : this.recordNames.length-1);
 	}
 
 	public String getFirstRecordName() {
@@ -1718,6 +1725,11 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isSyncableDisplayableRecords(boolean forceRenew) {
 		if (forceRenew || !this.isSyncableChecked) {
+			String oldSyncName = this.getSyncableName();
+			if (this.containsKey(oldSyncName)) {
+				this.removeRecordName(oldSyncName);
+				this.remove(oldSyncName);
+			}
 			this.syncableRecords = new Vector<String>();
 			for (String syncableRecordKey : this.potentialSyncableRecords) {
 				Record record = this.get(syncableRecordKey);
@@ -1908,40 +1920,36 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the fileDataSize
+	 * @return the fileDataSize, number of integer values per record
 	 */
 	public int getFileDataSize() {
 		return this.fileDataSize;
 	}
 
 	/**
-	 * @param newFileDataSize the fileDataSize to set
-	 */
-	public void setFileDataSize(int newFileDataSize) {
-		this.fileDataSize = newFileDataSize;
-	}
-
-	/**
-	 * @return the fileDataPointer
+	 * @return the fileDataPointer, file pointer where the data of this record begins
 	 */
 	public long getFileDataPointer() {
 		return this.fileDataPointer;
 	}
 
 	/**
-	 * @param newFileDataPointer the fileDataPointer to set
+	 * @return the fileDataBytes, number of bytes containing all records data 
 	 */
-	public void setFileDataPointer(long newFileDataPointer) {
-		this.fileDataPointer = newFileDataPointer;
+	public int getFileDataBytesSize() {
+		return this.fileDataBytes;
 	}
 
+
 	/**
-	 * @param newFileDataPointer the fileDataPointer to set
-	 * @param newFileDataSize the fileDataSize to set
+	 * @param newFileDataPointer the file data pointer to set, seek point to read data
+	 * @param newFileRecordDataSize the file record size to set
+	 * @param newFileRecordSetDataBytes the file data bytes to set
 	 */
-	public void setFileDataPointerAndSize(long newFileDataPointer, int newFileDataSize) {
+	public void setFileDataPointerAndSize(long newFileDataPointer, int newFileRecordDataSize, int newFileRecordSetDataBytes) {
 		this.fileDataPointer = newFileDataPointer;
-		this.fileDataSize = newFileDataSize;
+		this.fileDataSize = newFileRecordDataSize;
+		this.fileDataBytes = newFileRecordSetDataBytes;
 	}
 
 	/**

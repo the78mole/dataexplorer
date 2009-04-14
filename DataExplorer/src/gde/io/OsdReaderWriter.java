@@ -279,11 +279,10 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
-				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize);
+				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length  * recordDataSize);
 				if (recordSetName.equals(firstRecordSet[1])) {
 					long startTime = new Date().getTime();
-					int deviceDataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-					byte[] buffer = new byte[deviceDataBufferSize * recordDataSize];
+					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
 					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
