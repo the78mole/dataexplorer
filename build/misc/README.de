@@ -1,4 +1,4 @@
-******** OpenSerialDataExplorer README ***********  08 Aug 2008 WB
+******** OpenSerialDataExplorer README ***********  18 Apr 2009 WB
 
 Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
 Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
@@ -10,6 +10,7 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - Picolario (Renschler)
 											 - UniLog (SM-Modellbau)
 											 - eStation BC6, BC610, BC8, 902 (Bantam)
+											 - VC820, VC840 (Conrad/VoltCraft)
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
 
@@ -21,31 +22,26 @@ Für den ersten Start des Programms über ein Kommando-Fenster(Windows) Shell(Linu
 wechseln und das launch Script ausführen (Windows lauch.bat, Linux launch.sh). 
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
-OpenSerialDataExplorer\launch.bat (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.ico (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.lnk (Windows)
-OpenSerialDataExplorer\launch.sh (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
+OpenSerialDataExplorer\OpenSerialDataExplorer (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux, Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.jar
 OpenSerialDataExplorer\Devices\*.jar
-OpenSerialDataExplorer\help\*
-OpenSerialDataExplorer\init\Devices\*.jpg
-OpenSerialDataExplorer\init\Devices\language\*.xml
-OpenSerialDataExplorer\init\Devices\*.xsd
-OpenSerialDataExplorer\init\GraphicsTemplates\*.xsd
 
 Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
 OpenSerialDataExplorer\java\ext\*.jar
 
-Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter 
-%APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows), bzw. /home/<Benutzer>/.OpenSerialDataExplorer
-angelegt. Hier werden auch evtl. die Tracelogdaten abgelegt.
-Für das Verzeichnis der Nutzerdaten ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
+Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
+%APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows)
+/home/<Benutzer>/.OpenSerialDataExplorer (Linux, Mac OS)
+angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
+
+Für das Verzeichnis der Nutzerdaten (logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterlegt.
 
-Hinweis: Erscheint nach der Ausführung von launch.bat folgende oder ähnliche Fehlermeldung 
+Hinweis: Erscheint nach der Ausführung von OpenSerialDataExplorer.exe/OpenSerialDataExplorer folgende oder ähnliche Fehlermeldung 
 "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6"
-ist die installierte Java version (java -version) zu alt und muß gegen eine Version 1.6 ausgetauscht werden.
+ist die installierte Java version (java -version) zu alt und muß gegen eine aktuelle Version > 1.6 ausgetauscht werden.
 
-Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite schicken.
+Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.

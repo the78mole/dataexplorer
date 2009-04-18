@@ -1,9 +1,9 @@
-﻿******** OpenSerialDataExplorer README ***********  08 Aug 2008 WB
+﻿******** OpenSerialDataExplorer README ***********  18 Aug 2009 WB
 
 The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
 on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
 operating systems like Windows, Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
-Since I have no access to a Mac OS it is only tested under Windows and Linux.
+Since I have no access to a Mac OS it is only tested under Windows and several Linux distributions.
 
 The OSDE gathers data from serial connected devices and display this data for further analysis.
 At the moment the following devices are enabled: 
@@ -11,6 +11,7 @@ At the moment the following devices are enabled:
 											 - Picolario (Renschler) variometer
 											 - UniLog (SM-Modellbau) multi measurement
 											 - eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger (LiPo)
+											 - VC820, VC840 (Conrad/VoltCraft)
 
 More device are under construction. Help doing this is very welcome.											 
 
@@ -22,30 +23,25 @@ For the first execution use a command window (Windows), shell (Linux) and change
 directory and execute the launch script (launch.bat Windows, launch.sh Linux).
 
 As overview the following files are under the OpenSerialDataExplorer program directory:
-OpenSerialDataExplorer\launch.bat (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.ico (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.lnk (Windows)
-OpenSerialDataExplorer\launch.sh (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
+OpenSerialDataExplorer\lOpenSerialDataExplorer (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux, Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.jar
 OpenSerialDataExplorer\devices\*.jar
-OpenSerialDataExplorer\help\*
-OpenSerialDataExplorer\init\Devices\*.jpg
-OpenSerialDataExplorer\init\Devices\language\*.xml
-OpenSerialDataExplorer\init\Devices\*.xsd
-OpenSerialDataExplorer\init\GraphicsTemplates\*.xsd
 
 Extensions for the Java runtime RXTXcomm and SWT:
 OpenSerialDataExplorer\java\ext\*.jar
 
 During the first execution of the program the application configuration directories are created 
-%APPDATA%\<user>\OpenSerialDataExplorer (Windows), /home/<user>/.OpenSerialDataExplorer.
-At this place also trace log files might be created.
-The directory for the user data the user takes responsibility, it will be stored within the application configuration file
+%APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
+/home/<user>/.OpenSerialDataExplorer (Linux, Mac OS)
+At this place also application configuration and trace log files are located.
+
+The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file
 (OpenSerialDataExplorer.properties) and queried just after starting the application.
 
 Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6" 
 is received after executing launch.bat/lauchn.sh the Java version (java -version) is to old to execute this program and must be renewed.
 
-For questions or suggestions for improvement feel free to contact me using the e-mail address on the download page.
+For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page.
