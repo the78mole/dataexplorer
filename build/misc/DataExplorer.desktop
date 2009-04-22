@@ -12,4 +12,5 @@ Name[en_US]=OpenSerialDataExplorer
 Path=@OSDE_DIR@
 StartupNotify=true
 Terminal=false
-Type=application
+Type=Application
+Categories=Application;
