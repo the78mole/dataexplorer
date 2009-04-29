@@ -2,14 +2,14 @@
 Comment=OpenSerialDataExplorer - explore your serial data
 Comment[en_US]=OpenSerialDataExplorer - explore your serial data
 Encoding=UTF-8
-Exec=java -jar -Xms40m -Xmx256m @OSDE_DIR@OpenSerialDataExplorer.jar %f
+Exec=java -jar -Xms40m -Xmx256m /opt/OpenSerialDataExplorer/OpenSerialDataExplorer.jar %f
 GenericName=OpenSerialDataExplorer
 GenericName[en_US]=OpenSerialDataExplorer
-Icon=@OSDE_DIR@OpenSerialDataExplorer.xpm
+Icon=/opt/OpenSerialDataExplorer/OpenSerialDataExplorer.xpm
 MimeType=application/x-OpenSerialData
 Name=OpenSerialDataExplorer
 Name[en_US]=OpenSerialDataExplorer
-Path=@OSDE_DIR@
+Path=/opt/OpenSerialDataExplorer
 StartupNotify=true
 Terminal=false
 Type=Application
