@@ -1,6 +1,0 @@
-#!/bin/bash
-# ***** script to launch OpenSerialDataExplorer ** 27 Apr 2009 WB *****
-
-echo java -jar -Xms40m -Xmx256m ./OpenSerialDataExplorer.jar
-java -jar -Xms16m -Xmx256m ./OpenSerialDataExplorer.jar %f
-
