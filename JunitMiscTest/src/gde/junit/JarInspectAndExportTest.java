@@ -105,7 +105,7 @@ public class JarInspectAndExportTest extends TestCase {
 				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 				for (String plugin : plugins) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					FileUtils.extract(jarFile, "resource/" + plugin + ".jpg", targetDirectory, "555");
+					FileUtils.extract(jarFile, plugin + ".jpg", "resource/", targetDirectory, "555");
 				}
 			}
 		}
@@ -133,7 +133,7 @@ public class JarInspectAndExportTest extends TestCase {
 				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 				for (String plugin : plugins) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					FileUtils.extract(jarFile, "resource/en/" + plugin + ".xml", targetDirectory, "555");
+					FileUtils.extract(jarFile, plugin + ".xml", "resource/en/", targetDirectory, "555");
 				}
 			}
 		}
