@@ -209,11 +209,10 @@ public class CSVReaderWriter {
 	 * @throws NotSupportedFileFormatException 
 	 * @throws MissMatchDeviceException 
 	 * @throws IOException 
-	 * @throws UnitCompareException 
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 */
-	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, UnitCompareException, DataInconsitsentException, DataTypeException {
+	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		String line = OSDE.STRING_STAR;
 		RecordSet recordSet = null;
