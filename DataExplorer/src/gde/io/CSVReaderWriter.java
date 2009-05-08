@@ -126,9 +126,8 @@ public class CSVReaderWriter {
 	 * <li>if units of absolute data will not match a warning dialog will show all red measurements kesy with expected units 
 	 * </ul>
 	 * @param header
-	 * @throws UnitCompareException 
 	 */
-	public static HashMap<String, String> evaluateType(char separator, HashMap<String, String> header, DeviceConfiguration deviceConfig) throws UnitCompareException {
+	public static HashMap<String, String> evaluateType(char separator, HashMap<String, String> header, DeviceConfiguration deviceConfig) {
 		int index = 0, innerIndex = 0;
 		int countRaw = 0, countAbs = 0;
 		StringBuilder sb_measurements = new StringBuilder();
