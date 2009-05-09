@@ -889,10 +889,10 @@ public class MenuBar {
 			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				String msg = Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}); 
-				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
+				if (!OSDE.isForceDeviceSwitch() && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}))) 
 					return;			
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+				OSDE.setForceDeviceSwitch(false);
 			}
 			
 			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
@@ -1017,10 +1017,10 @@ public class MenuBar {
 			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				String msg = Messages.getString(MessageIds.OSDE_MSGI0014, new Object[]{fileDeviceName});
-				if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
+				if (!OSDE.isForceDeviceSwitch() && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0014, new Object[]{fileDeviceName}))) 
 					return;			
-				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
+				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);		
+				OSDE.setForceDeviceSwitch(false);
 			}
 			
 			int channelNumber = new Integer(lovHeader.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
