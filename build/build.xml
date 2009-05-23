@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="OpenSerialDataExplorer" default="dist" basedir="..">
+	
+	<!-- Check that ant-contrib-0.6.jar is in $ANT_HOME/lib -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	<!-- Check that antelopetasks-3.2.10.jar is in $ANT_HOME/lib 
+	<taskdef name="stringutil" classname="ise.antelope.tasks.StringUtilTask"/>
+	<taskdef name="grep" classname="ise.antelope.tasks.Find"/>
+	<taskdef name="switch" classname="ise.antelope.tasks.SwitchTask"/>
+	<taskdef name="case" classname="ise.antelope.tasks.Case"/>
+	<typedef name="startswith" classname="ise.antelope.tasks.condition.StartsWith"/>
+	-->
+	
+	<target name="echo:build.properties" if="build.properties.exists">
+		<echo message="Building using ${build.properties}" />
+	</target>
+
+	<!-- Main target -->
+	<target name="dist" depends="zip_package">
+		<echo message="Building on system ${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<echo message="Building using Java ${java.version}" />
+	</target>
+	
+	<!-- init -->
+	<target name="init">
+		<property name="build.properties" location="build/build.properties" />
+
+		<property file="${build.properties}" />
+
+		<!-- this is to have nice message about used build.properties file -->
+		<available property="build.properties.exists" file="${build.properties}" />
+		<antcall target="echo:build.properties" />
+
+		<!-- output directories -->
+		<property name="output.dir" location="build/target" />
+		<property name="build.target.dir" location="build/target/install" />
+
+		<property name="output.windows32" location="${output.dir}/Windows_32" />
+		<property name="output.windows32.program" location="${output.windows32}/OpenSerialDataExplorer" />
+		<property name="output.windows32.program.devices" location="${output.windows32}/OpenSerialDataExplorer/devices" />
+		<property name="output.windows32.java.ext" location="${output.windows32}/OpenSerialDataExplorer/java/ext" />
+
+		<property name="output.windows64" location="${output.dir}/Windows_64" />
+		<property name="output.windows64.program" location="${output.windows64}/OpenSerialDataExplorer" />
+		<property name="output.windows64.program.devices" location="${output.windows64}/OpenSerialDataExplorer/devices" />
+		<property name="output.windows64.java.ext" location="${output.windows64}/OpenSerialDataExplorer/java/ext" />
+
+		<property name="output.linux32" location="${output.dir}/Linux_32" />
+		<property name="output.linux32.program" location="${output.linux32}/OpenSerialDataExplorer" />
+		<property name="output.linux32.program.devices" location="${output.linux32}/OpenSerialDataExplorer/devices" />
+		<property name="output.linux32.java.ext" location="${output.linux32}/OpenSerialDataExplorer/java/ext" />
+
+		<property name="output.linux64" location="${output.dir}/Linux_64" />
+		<property name="output.linux64.program" location="${output.linux64}/OpenSerialDataExplorer" />
+		<property name="output.linux64.program.devices" location="${output.linux64}/OpenSerialDataExplorer/devices" />
+		<property name="output.linux64.java.ext" location="${output.linux64}/OpenSerialDataExplorer/java/ext" />
+
+		<property name="output.mac" location="${output.dir}/Mac" />
+		<property name="output.mac.program" location="${output.mac}/OpenSerialDataExplorer" />
+		<property name="output.mac.program.devices" location="${output.mac}/OpenSerialDataExplorer/devices" />
+		<property name="output.mac.java.ext" location="${output.mac}/OpenSerialDataExplorer/java/ext" />
+
+		<!-- create output directory structure -->
+		<mkdir dir="${output.dir}" />
+		<mkdir dir="${build.target.dir}" />
+
+		<mkdir dir="${output.windows32}" />
+		<mkdir dir="${output.windows32.program}" />
+		<mkdir dir="${output.windows32.program.devices}" />
+		<mkdir dir="${output.windows32.java.ext}" />
+
+		<mkdir dir="${output.windows64}" />
+		<mkdir dir="${output.windows64.program}" />
+		<mkdir dir="${output.windows64.program.devices}" />
+		<mkdir dir="${output.windows64.java.ext}" />
+
+		<mkdir dir="${output.linux32}" />
+		<mkdir dir="${output.linux32.program}" />
+		<mkdir dir="${output.linux32.program.devices}" />
+		<mkdir dir="${output.linux32.java.ext}" />
+
+		<mkdir dir="${output.linux64}" />
+		<mkdir dir="${output.linux64.program}" />
+		<mkdir dir="${output.linux64.program.devices}" />
+		<mkdir dir="${output.linux64.java.ext}" />
+
+		<mkdir dir="${output.mac}" />
+		<mkdir dir="${output.mac.program}" />
+		<mkdir dir="${output.mac.program.devices}" />
+		<mkdir dir="${output.mac.java.ext}" />
+
+		<!-- create src directory varaible -->
+		<property name="source.dir" location="${basedir}" />
+	</target>
+
+	<!-- cleanup -->
+	<target name="clean" depends="init">
+		<delete dir="${output.dir}" />
+
+		<ant antfile="build.xml" target="clean" dir="OpenSerialDataExplorer" />
+		<ant antfile="build.xml" target="clean" dir="Picolario" />
+		<ant antfile="build.xml" target="clean" dir="AkkuMaster" />
+		<ant antfile="build.xml" target="clean" dir="Simulator" />
+		<ant antfile="build.xml" target="clean" dir="UniLog" />
+		<ant antfile="build.xml" target="clean" dir="eStation" />
+		<ant antfile="build.xml" target="clean" dir="VC800" />
+		<!-- add new device here -->
+	</target>
+
+	<!-- install target -->
+	<target name="install" depends="dist">
+		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+		
+		<condition property="isLinux">
+		    <os name="Linux"/>
+	  	</condition>
+	    <antcall target="Linux"/>
+		<condition property="isWindows">
+		    <os name="Windows XP"/>
+	  	</condition>
+		<condition property="isWindows">
+			<os name="Windows VISTA"/>
+	  	</condition>
+		<condition property="isWindows">
+			<os name="Windows 2003"/>
+	  	</condition>
+	    <antcall target="Windows"/>
+		<condition property="isMAC">
+		    <os name="Mac OS"/>
+	  	</condition>
+		<condition property="isMAC">
+			<os name="Mac OS X"/>
+	  	</condition>
+	    <antcall target="MAC"/>
+	</target>
+	
+	<target name="Windows" if="isWindows" >
+	 	<property name="install.dir" location="C:/Program Files/OpenSerialDataExplorer" />
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<if>
+			<equals arg1="${sun.arch.data.model}" arg2="32" />
+			<then>
+				<copy todir="${install.dir}" flatten="no">
+					<fileset dir="${output.windows32}/OpenSerialDataExplorer" />
+				</copy>
+			</then>
+			<else>
+				<copy todir="${install.dir}" flatten="no">
+					<fileset dir="${output.windows64}/OpenSerialDataExplorer" />
+				</copy>
+			</else>
+		</if>
+	</target>
+
+	<target name="Linux" if="isLinux" >
+	 	<property name="install.dir" location="/opt/OpenSerialDataExplorer" />
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<copy todir="${install.dir}" flatten="no">
+			<fileset dir="${output.linux}/OpenSerialDataExplorer" />
+		</copy>
+	</target>
+	
+	<target name="MAC" if="isMAC" >
+	 	<property name="install.dir" location="/opt/OpenSerialDataExplorer" />
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<if>
+			<equals arg1="${sun.arch.data.model}" arg2="32" />
+			<then>
+				<copy todir="${install.dir}" flatten="no">
+					<fileset dir="${output.linux32}/OpenSerialDataExplorer" />
+				</copy>
+			</then>
+			<else>
+				<copy todir="${install.dir}" flatten="no">
+					<fileset dir="${output.linux64}/OpenSerialDataExplorer" />
+				</copy>
+			</else>
+		</if>
+	</target>
+
+	<!-- Package -->
+	<target name="package" depends="init">
+		<ant antfile="build.xml" target="package" dir="OpenSerialDataExplorer" />
+		<ant antfile="build.xml" target="package" dir="Picolario" />
+		<ant antfile="build.xml" target="package" dir="AkkuMaster" />
+		<ant antfile="build.xml" target="package" dir="Simulator" />
+		<ant antfile="build.xml" target="package" dir="UniLog" />
+		<ant antfile="build.xml" target="package" dir="eStation" />
+		<ant antfile="build.xml" target="package" dir="VC800" />
+		<!-- add new device here -->
+	</target>
+	
+	<!-- build the windows exe file -->
+	<target name="windowsexe" depends="package">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="launch4j/launch4j.jar:launch4j/lib/xstream.jar" />
+		<launch4j configFile="build/misc/OpenSerialDataExplorer.xml" />
+	</target>
+
+	<!-- create internal temporay file structure -->
+	<target name="copy-files" depends="package">
+
+		<!-- programm directory -->
+		<copy todir="${output.windows32.program}" flatten="yes">
+			<fileset file="OpenSerialDataExplorer/build/*.jar" />
+			<fileset file="build/misc/OpenSerialDataExplorer.exe" />
+			<fileset file="build/misc/OpenSerialDataExplorer.ini" />
+			<!--
+			<fileset file="build/misc/OpenSerialDataExplorer.ico" />
+			<fileset file="build/misc/launch.bat" />
+			-->
+		</copy>
+		<copy todir="${output.windows32.program.devices}" flatten="yes">
+			<fileset file="Picolario/build/*.jar" />
+			<fileset file="AkkuMaster/build/*.jar" />
+			<fileset file="Simulator/build/*.jar" />
+			<fileset file="UniLog/build/*.jar" />
+			<fileset file="eStation/build/*.jar" />
+			<fileset file="VC800/build/*.jar" />
+			<!-- add new device here -->
+		</copy>
+		
+		<copy todir="${output.windows64.program}" flatten="yes">
+			<fileset file="OpenSerialDataExplorer/build/*.jar" />
+			<fileset file="build/misc/OpenSerialDataExplorer.exe" />
+			<fileset file="build/misc/OpenSerialDataExplorer.ini" />
+			<!--
+			<fileset file="build/misc/OpenSerialDataExplorer.ico" />
+			<fileset file="build/misc/launch.bat" />
+			-->
+		</copy>
+		<copy todir="${output.windows64.program.devices}" flatten="yes">
+			<fileset file="Picolario/build/*.jar" />
+			<fileset file="AkkuMaster/build/*.jar" />
+			<fileset file="Simulator/build/*.jar" />
+			<fileset file="UniLog/build/*.jar" />
+			<fileset file="eStation/build/*.jar" />
+			<fileset file="VC800/build/*.jar" />
+			<!-- add new device here -->
+		</copy>
+		
+		<copy todir="${output.linux32.program}" flatten="yes">
+			<fileset file="OpenSerialDataExplorer/build/*.jar" />
+			<fileset file="build/misc/OpenSerialData-mime.xml" />
+			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<fileset file="build/misc/OpenSerialDataExplorer" />
+			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+		</copy>
+		<copy todir="${output.linux32.program.devices}" flatten="yes">
+			<fileset file="Picolario/build/*.jar" />
+			<fileset file="AkkuMaster/build/*.jar" />
+			<fileset file="Simulator/build/*.jar" />
+			<fileset file="UniLog/build/*.jar" />
+			<fileset file="eStation/build/*.jar" />
+			<fileset file="VC800/build/*.jar" />
+			<!-- add new device here -->
+		</copy>
+		
+		<copy todir="${output.linux64.program}" flatten="yes">
+			<fileset file="OpenSerialDataExplorer/build/*.jar" />
+			<fileset file="build/misc/OpenSerialData-mime.xml" />
+			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<fileset file="build/misc/OpenSerialDataExplorer" />
+			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+		</copy>
+		<copy todir="${output.linux64.program.devices}" flatten="yes">
+			<fileset file="Picolario/build/*.jar" />
+			<fileset file="AkkuMaster/build/*.jar" />
+			<fileset file="Simulator/build/*.jar" />
+			<fileset file="UniLog/build/*.jar" />
+			<fileset file="eStation/build/*.jar" />
+			<fileset file="VC800/build/*.jar" />
+			<!-- add new device here -->
+		</copy>
+		
+		<copy todir="${output.mac.program}" flatten="yes">
+			<fileset file="OpenSerialDataExplorer/build/*.jar" />
+			<fileset file="build/misc/OpenSerialData-mime.xml" />
+			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<fileset file="build/misc/OpenSerialDataExplorer" />
+			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+		</copy>
+		<copy todir="${output.mac.program.devices}" flatten="yes">
+			<fileset file="Picolario/build/*.jar" />
+			<fileset file="AkkuMaster/build/*.jar" />
+			<fileset file="Simulator/build/*.jar" />
+			<fileset file="UniLog/build/*.jar" />
+			<fileset file="eStation/build/*.jar" />
+			<fileset file="VC800/build/*.jar" />
+			<!-- add new device here -->
+		</copy>
+
+		<!-- java extenssions -->
+		<copy todir="${output.windows32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Windows/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.windows64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Windows/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.linux32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Linux/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.linux64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Linux/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.mac.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/MAC/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+
+		<!-- launcher scripts, README -->
+		<copy todir="${output.windows32}/OpenSerialDataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.windows64}/OpenSerialDataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.linux32}/OpenSerialDataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.linux64}/OpenSerialDataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.mac}/OpenSerialDataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+
+	</target>
+
+	<!-- zip for Windows, tar for Linux/Mac OS -->
+	<target name="zip_package" depends="copy-files">
+
+		<echo message="zip Windows 32 bit files" />
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_windows_x86_32.zip">
+			<zipfileset dir="${output.windows32}" casesensitive="true" />
+		</zip>
+
+		<echo message="zip Windows 64 bit files" />
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_windows_x86_64.zip">
+			<zipfileset dir="${output.windows64}" casesensitive="true" />
+		</zip>
+
+		<echo message="tar Linux 32 bit files" />
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_32.tar.gz" compression="gzip">
+			<tarfileset dir="${output.linux32}" casesensitive="true" mode="755" >
+				<include name="*/OpenSerialDataExplorer"/>
+			</tarfileset>
+			<tarfileset dir="${output.linux32}" casesensitive="true" mode="766" >
+				<include name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+			<tarfileset dir="${output.linux32}" casesensitive="true" >
+				<include name="**"/>
+				<exclude name="*/OpenSerialDataExplorer"/>
+				<exclude name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+		</tar>
+
+		<echo message="tar Linux 64 bit files" />
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_64.tar.gz" compression="gzip">
+			<tarfileset dir="${output.linux64}" casesensitive="true" mode="755" >
+				<include name="*/OpenSerialDataExplorer"/>
+			</tarfileset>
+			<tarfileset dir="${output.linux64}" casesensitive="true" mode="766" >
+				<include name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+			<tarfileset dir="${output.linux64}" casesensitive="true" >
+				<include name="**"/>
+				<exclude name="*/OpenSerialDataExplorer"/>
+				<exclude name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+		</tar>
+
+		<echo message="tar Mac files" />
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac.tar.gz" compression="gzip">
+			<tarfileset dir="${output.mac}" casesensitive="true" mode="755" >
+				<include name="*/OpenSerialDataExplorer"/>
+			</tarfileset>
+			<tarfileset dir="${output.mac}" casesensitive="true" mode="766" >
+				<include name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+			<tarfileset dir="${output.mac}" casesensitive="true" >
+				<include name="**"/>
+				<exclude name="*/OpenSerialDataExplorer"/>
+				<exclude name="*/OpenSerialDataExplorer.desktop"/>
+			</tarfileset>
+		</tar>
+	</target>
+</project>
