@@ -159,15 +159,13 @@ public class OperatingSystemHelper {
 				isRemoved = true;
 			}
 			else if (OSDE.IS_LINUX) {
-				String sourceBasePath = FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-				sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1);
-				log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
-				
 				String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
-				String deletionTargetFilePath = sourceBasePath+desktopFileName;
-				log.log(Level.INFO, "deletionTargetFilePath = " + deletionTargetFilePath); //$NON-NLS-1$
-
-				Process process = Runtime.getRuntime().exec("del " + deletionTargetFilePath); //$NON-NLS-1$
+				targetBasePath = System.getenv("HOME") + OSDE.FILE_SEPARATOR_UNIX + "Desktop" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
+				log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				
+				Process process = Runtime.getRuntime().exec("rm -f " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 				process.waitFor();
 				if (process.exitValue() != 0) {
 					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
@@ -352,7 +350,7 @@ public class OperatingSystemHelper {
 				//installation directory must contain OpenSerialDataExplorer.desktop with write permission
 				if (targetFile.exists() && targetFile.canWrite()) {
 					FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
-					FileUtils.extract(jarFile, "register.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					FileUtils.extract(jarFile, "unregister.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					FileUtils.extract(jarFile, "OpenSerialDataExplorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 					command = "chmod +x " + targetDir + "/unregister.sh"; //$NON-NLS-1$ //$NON-NLS-2$
