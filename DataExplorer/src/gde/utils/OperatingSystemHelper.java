@@ -57,7 +57,7 @@ public class OperatingSystemHelper {
 		else {
 			log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 
-			if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
+			if (OSDE.IS_WINDOWS) {
 				try {
 					String launchFilename = "OpenSerialDataExplorer.exe"; //$NON-NLS-1$
 					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
@@ -137,6 +137,52 @@ public class OperatingSystemHelper {
 		log.log(Level.INFO, "OpenSerialDataExplorer desktop created = " + isCreated); //$NON-NLS-1$
 		return isCreated;
 	}
+	
+	/**
+	 * remove destop shortcut to launch the main jar
+	 */
+	public static boolean removeDesktopLink() {
+		boolean isRemoved = false;
+		String targetBasePath, targetDesktopLaucherFilePath;
+
+		try {
+			if (OSDE.IS_WINDOWS) {
+				targetBasePath = System.getenv("USERPROFILE") + OSDE.FILE_SEPARATOR_WINDOWS + "Desktop" + OSDE.FILE_SEPARATOR_WINDOWS; //$NON-NLS-1$ //$NON-NLS-2$
+				targetDesktopLaucherFilePath = targetBasePath + "OpenSerialData Explorer.lnk"; //$NON-NLS-1$
+				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+
+				Process process = Runtime.getRuntime().exec("cmd /C erase /F \"" + targetDesktopLaucherFilePath + "\""); //$NON-NLS-1$
+				process.waitFor();
+				if (process.exitValue() != 0) {
+					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
+				}
+				isRemoved = true;
+			}
+			else if (OSDE.IS_LINUX) {
+				String sourceBasePath = FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+				sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1);
+				log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+				
+				String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
+				String deletionTargetFilePath = sourceBasePath+desktopFileName;
+				log.log(Level.INFO, "deletionTargetFilePath = " + deletionTargetFilePath); //$NON-NLS-1$
+
+				Process process = Runtime.getRuntime().exec("del " + deletionTargetFilePath); //$NON-NLS-1$
+				process.waitFor();
+				if (process.exitValue() != 0) {
+					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
+				}
+				isRemoved = true;
+			}
+			else {
+				OpenSerialDataExplorer.getInstance().openMessageDialog("Remove desktopLink for Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+			}
+		}
+		catch (Throwable e) {
+			log.log(Level.WARNING, e.getMessage());
+		}
+		return isRemoved;
+	}
 
 	/**
 	 * register the application to the running OS
@@ -188,8 +234,8 @@ public class OperatingSystemHelper {
 					while ((line = besr.readLine()) != null) {
 						System.err.println(line);
 					}
-					if (process.exitValue() != 0) {
-						log.log(Level.WARNING, "failed to register OpenSerialData MIME type to OS"); //$NON-NLS-1$
+					if (process.exitValue() == 0) {
+						log.log(Level.WARNING, "failed to deregister OpenSerialData MIME type"); //$NON-NLS-1$
 					}
 					rc = 0;
 				}
@@ -249,5 +295,99 @@ public class OperatingSystemHelper {
 		return rc == 0;
 	}
 
+	/**
+	 * register the application to the running OS
+	 * associate file ending .osd as shell support
+	 * @return true for successful registration
+	 */
+	public static boolean deregisterApplication() {
+		int rc = -1;
+		String targetDir = OSDE.JAVA_IO_TMPDIR;
+		String command = OSDE.STRING_BLANK;
+		
 
+		String jarBasePath = FileUtils.getOsdeJarBasePath();
+		String jarFilePath = jarBasePath + "/OpenSerialDataExplorer.jar"; //$NON-NLS-1$
+
+		try {
+			JarFile jarFile = new JarFile(jarFilePath);
+
+			if (OSDE.IS_WINDOWS) {
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0400));
+				String regExe = "Register" + OSDE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$ 
+				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$	
+
+				FileUtils.extract(jarFile, regExe, OSDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
+				if (new Float(System.getProperty("os.version").trim()) < 6.0) //$NON-NLS-1$
+					command = targetDir + regExe; 
+				else // < Vista has UAC
+					command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
+				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
+				Runtime.getRuntime().exec(command).waitFor();
+
+				//check if registration was successful
+				Process process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$
+				process.waitFor();
+				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String line;
+
+				while ((line = bisr.readLine()) != null) {
+					System.out.println(line);
+				}
+				while ((line = besr.readLine()) != null) {
+					System.err.println(line);
+				}
+				if (process.exitValue() != 0) {
+					log.log(Level.WARNING, "failed to register OpenSerialData MIME type to OS"); //$NON-NLS-1$
+				}
+				rc = 0;
+			}
+			else if (OSDE.IS_LINUX) {
+				String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
+				String extractTargetFilePath = jarBasePath + desktopFileName;
+				log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+				File targetFile = new File(extractTargetFilePath);
+
+				//installation directory must contain OpenSerialDataExplorer.desktop with write permission
+				if (targetFile.exists() && targetFile.canWrite()) {
+					FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
+					FileUtils.extract(jarFile, "register.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					FileUtils.extract(jarFile, "OpenSerialDataExplorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+					command = "chmod +x " + targetDir + "/unregister.sh"; //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					Runtime.getRuntime().exec(command).waitFor();
+					command = targetDir + "/unregister.sh"; //$NON-NLS-1$
+					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					rc = Runtime.getRuntime().exec(command).waitFor();
+				}
+				else {
+					// package error, must not occur in a deliverd driver
+					log.log(Level.WARNING, extractTargetFilePath + " does not exist or does not have write (755) pernission, the OpenSerialDataExplorer MIME-type can not registered"); //$NON-NLS-1$
+				}
+
+				//check if xdg-utls are installed, this is the prerequisite for the registration process				
+				if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
+					log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0402));
+					rc = 0;
+				}
+			}
+			else {
+				OpenSerialDataExplorer.getInstance().openMessageDialog("Remove desktopLink for Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+			}
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			if (e.getMessage().contains("error=740") || e instanceof IOException) { //permission access exception //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0405, new Object[] {command}));
+				rc = 0; 
+			}
+			else {
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0404));
+			}
+		}
+		return rc == 0;
+	}
 }
