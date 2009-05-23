@@ -539,7 +539,7 @@ public class SettingsDialog extends Dialog {
 				} // end general tab item
 				{
 					this.osMiscTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
-					this.osMiscTabItem.setText("Miscelanious");
+					this.osMiscTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0303)); 
 					{
 						this.osMiscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.osMiscTabItem.setControl(this.osMiscComposite);
@@ -548,27 +548,27 @@ public class SettingsDialog extends Dialog {
 						{
 							this.desktopLauncher = new Group(this.osMiscComposite, SWT.NONE);
 							this.desktopLauncher.setLayout(null);
-							this.desktopLauncher.setText("Desktop Launcher");
+							this.desktopLauncher.setText(Messages.getString(MessageIds.OSDE_MSGT0362));
 							{
 								this.createLauncerButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
-								this.createLauncerButton.setText("Create Desktop Launcher");
+								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
 								this.createLauncerButton.setBounds(28, 43, 423, 57);
 								this.createLauncerButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "createLauncerButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "createLauncerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										OperatingSystemHelper.createDesktopLink();
 									}
 								});
 							}
 							{
 								this.removeLauncherButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
-								this.removeLauncherButton.setText("Remove Desktop Launcher");
+								this.removeLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0364));
 								this.removeLauncherButton.setBounds(28, 122, 423, 56);
 								this.removeLauncherButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "removeLauncherButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "removeLauncherButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										OperatingSystemHelper.removeDesktopLink();
 									}
 								});
@@ -577,27 +577,27 @@ public class SettingsDialog extends Dialog {
 						{
 							this.shellMimeType = new Group(this.osMiscComposite, SWT.NONE);
 							this.shellMimeType.setLayout(null);
-							this.shellMimeType.setText("Shell MIME Type");
+							this.shellMimeType.setText(Messages.getString(MessageIds.OSDE_MSGT0365));
 							{
 								this.assocMimeTypeButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
-								this.assocMimeTypeButton.setText("Create MIME type association");
+								this.assocMimeTypeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0366));
 								this.assocMimeTypeButton.setBounds(28, 40, 423, 50);
 								this.assocMimeTypeButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "assocMimeTypeButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "assocMimeTypeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										OperatingSystemHelper.registerApplication();
 									}
 								});
 							}
 							{
 								this.removeMimeAssocButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
-								this.removeMimeAssocButton.setText("Remove MIME type association");
+								this.removeMimeAssocButton.setText(Messages.getString(MessageIds.OSDE_MSGT0367));
 								this.removeMimeAssocButton.setBounds(28, 121, 423, 52);
 								this.removeMimeAssocButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "removeMimeAssocButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "removeMimeAssocButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										OperatingSystemHelper.deregisterApplication();
 									}
 								});
@@ -831,13 +831,13 @@ public class SettingsDialog extends Dialog {
 							this.tree.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt + " Selection:" + SettingsDialog.this.tree.getSelection()[0]); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt + " Selection:" + SettingsDialog.this.tree.getSelection()[0]); //$NON-NLS-1$ //$NON-NLS-2$
 									TreeItem tmpItem = (TreeItem) evt.item;
 									if (tmpItem.getParentItem() != null) {
 										StringBuilder sb = new StringBuilder();
 										TreeItem tmpParent = tmpItem;
 										while (null != (tmpParent = tmpParent.getParentItem())) {
-											sb.append(tmpParent.getText()).append(".");
+											sb.append(tmpParent.getText()).append("."); //$NON-NLS-1$
 										}
 										sb.append(tmpItem.getText());
 										String loggerName = sb.toString();
@@ -852,18 +852,18 @@ public class SettingsDialog extends Dialog {
 				this.settingsTabFolder.addFocusListener(new FocusAdapter() {
 					@Override
 					public void focusGained(FocusEvent evt) {
-						SettingsDialog.log.log(Level.FINEST, "tree.focusGained, event=" + evt);
+						SettingsDialog.log.log(Level.FINEST, "tree.focusGained, event=" + evt); //$NON-NLS-1$
 						SettingsDialog.this.tree.clearAll(true);
 						LogManager manager = LogManager.getLogManager();
 						Enumeration<String> loggerNames = manager.getLoggerNames();
 						StringBuilder sb = new StringBuilder();
 						while (loggerNames.hasMoreElements()) {
 							String loggerName = loggerNames.nextElement();
-							if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) {
-								sb.append(loggerName).append(";");
+							if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) { //$NON-NLS-1$ //$NON-NLS-2$
+								sb.append(loggerName).append(";"); //$NON-NLS-1$
 							}
 						}
-						String[] loggers = sb.toString().split(";");
+						String[] loggers = sb.toString().split(";"); //$NON-NLS-1$
 						Arrays.sort(loggers);
 						if (SettingsDialog.log.isLoggable(Level.FINER)) {
 							for (String string : loggers) {
@@ -871,15 +871,15 @@ public class SettingsDialog extends Dialog {
 							}
 						}
 						SettingsDialog.this.tree.removeAll();
-						String root = "";
+						String root = ""; //$NON-NLS-1$
 						TreeItem treeItemRoot = null;
 						TreeItem treeItemNode;
 						for (String string : loggers) {
-							String[] tmp = string.replace('.', ':').split(":");
+							String[] tmp = string.replace('.', ':').split(":"); //$NON-NLS-1$
 							switch (tmp.length) {
 							case 3:
-								if (!root.equals(tmp[0] + "." + tmp[1])) {
-									root = tmp[0] + "." + tmp[1];
+								if (!root.equals(tmp[0] + "." + tmp[1])) { //$NON-NLS-1$
+									root = tmp[0] + "." + tmp[1]; //$NON-NLS-1$
 									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
 									treeItemRoot.setText(root);
 								}
@@ -887,8 +887,8 @@ public class SettingsDialog extends Dialog {
 								treeItemNode.setText(tmp[2]);
 								break;
 							case 4:
-								if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) {
-									root = tmp[0] + "." + tmp[1] + "." + tmp[2];
+								if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) { //$NON-NLS-1$ //$NON-NLS-2$
+									root = tmp[0] + "." + tmp[1] + "." + tmp[2]; //$NON-NLS-1$ //$NON-NLS-2$
 									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
 									treeItemRoot.setText(root);
 								}
