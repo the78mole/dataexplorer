@@ -215,10 +215,7 @@ public class OperatingSystemHelper {
 					String targetBasePath = jarBasePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 					targetBasePath = targetBasePath.startsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
 					targetBasePath = targetBasePath.endsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length()-1) : targetBasePath;
-					if (new Float(System.getProperty("os.version").trim()) < 6.0) 
-						command = targetDir + regExe + OSDE.STRING_BLANK + targetBasePath;
-					else // < Vista has UAC
-						command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + targetBasePath;
+					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + targetBasePath;
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
 					Runtime.getRuntime().exec(command).waitFor();
 
