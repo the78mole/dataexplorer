@@ -261,7 +261,7 @@
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
-			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+			<fileset file="build/misc/OpenSerialData Explorer.desktop" />
 		</copy>
 		<copy todir="${output.linux64.program.devices}" flatten="yes">
 			<fileset file="Picolario/build/*.jar" />
@@ -278,7 +278,7 @@
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
-			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+			<fileset file="build/misc/OpenSerialData Explorer.desktop" />
 		</copy>
 		<copy todir="${output.mac.program.devices}" flatten="yes">
 			<fileset file="Picolario/build/*.jar" />
