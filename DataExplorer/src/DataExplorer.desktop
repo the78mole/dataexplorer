@@ -1,0 +1,15 @@
+[Desktop Entry]
+Comment=OpenSerialDataExplorer - explore your serial data
+Comment[en_US]=OpenSerialDataExplorer - explore your serial data
+Comment[de_DE]=OpenSerialDataExplorer - erforsche deine seriellen Daten
+Encoding=UTF-8
+Exec=java -jar -Xms40m -Xmx256m @OSDE_DIR@OpenSerialDataExplorer.jar %f
+GenericName=OpenSerialDataExplorer
+Icon=@OSDE_DIR@OpenSerialDataExplorer.xpm
+MimeType=application/x-OpenSerialData
+Name=OpenSerialDataExplorer
+Path=@OSDE_DIR@
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GTK;Utility;Application;

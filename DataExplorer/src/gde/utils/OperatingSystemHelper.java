@@ -92,12 +92,12 @@ public class OperatingSystemHelper {
 					sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1);
 					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					
-					String desktopFileName = "OpenSerialData Explorer.desktop"; //$NON-NLS-1$
+					String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
 					String extractTargetFilePath = sourceBasePath+desktopFileName;
 					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					File targetFile = new File(extractTargetFilePath);
 					
-					//installation directory must contain OpenSerialData Explorer.desktop with write permission
+					//installation directory must contain OpenSerialDataExplorer.desktop with write permission
 					if (targetFile.exists()  && targetFile.canWrite()) {
 						String jarFilePath = sourceBasePath + "OpenSerialDataExplorer.jar"; //$NON-NLS-1$
 						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
@@ -239,16 +239,16 @@ public class OperatingSystemHelper {
 					rc = 0;
 				}
 				else if (OSDE.IS_LINUX) { 
-					String desktopFileName = "OpenSerialData Explorer.desktop"; //$NON-NLS-1$
+					String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
 					String extractTargetFilePath = jarBasePath + desktopFileName;
 					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					File targetFile = new File(extractTargetFilePath);
 
-					//installation directory must contain OpenSerialData Explorer.desktop with write permission
+					//installation directory must contain OpenSerialDataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
 						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 						FileUtils.extract(jarFile, "register.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						FileUtils.extract(jarFile, "OpenSerialData Explorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, "OpenSerialDataExplorerdirectory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						command = "chmod +x " + targetDir + "/register.sh"; //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
@@ -344,7 +344,7 @@ public class OperatingSystemHelper {
 				rc = 0;
 			}
 			else if (OSDE.IS_LINUX) {
-				String desktopFileName = "OpenSerialData Explorer.desktop"; //$NON-NLS-1$
+				String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
 				String extractTargetFilePath = jarBasePath + desktopFileName;
 				log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 				File targetFile = new File(extractTargetFilePath);
@@ -353,7 +353,7 @@ public class OperatingSystemHelper {
 				if (targetFile.exists() && targetFile.canWrite()) {
 					FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 					FileUtils.extract(jarFile, "unregister.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					FileUtils.extract(jarFile, "OpenSerialData Explorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					FileUtils.extract(jarFile, "OpenSerialDataExplorerdirectory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 					command = "chmod +x " + targetDir + "/unregister.sh"; //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
