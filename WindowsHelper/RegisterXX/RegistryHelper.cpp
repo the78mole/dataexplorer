@@ -79,10 +79,10 @@ void registerOpenSerialData(String ^ osdeBasePath)
 	#--------------------------------------------------------------------------- 
 */
 	RegistryKey ^ lm_sw_cl = Registry::LocalMachine->OpenSubKey("Software")->OpenSubKey("Classes", true);
- 	//RegistryKey ^ lm_cl_osd = lm_sw_cl->OpenSubKey(".osd", true);
-	//if(!lm_cl_osd) 
-	//	lm_cl_osd = lm_sw_cl->CreateSubKey(".osd");
-	//lm_cl_osd->SetValue("", "OpenSerialDataExplorer.OpenSerialData", RegistryValueKind::String);
+ 	RegistryKey ^ lm_cl_osd = lm_sw_cl->OpenSubKey(".osd", true);
+	if(!lm_cl_osd) 
+		lm_cl_osd = lm_sw_cl->CreateSubKey(".osd");
+	lm_cl_osd->SetValue("", "OpenSerialDataExplorer.OpenSerialData", RegistryValueKind::String);
 
 	RegistryKey ^ lm_cl_osde = lm_sw_cl->OpenSubKey("OpenSerialDataExplorer.OpenSerialData", true);
 	if(lm_cl_osde) 
@@ -338,6 +338,9 @@ int main(array<System::String ^> ^args)
 		rc = 740;
 	}
 	catch(System::ArgumentException ^ pEx) { 
+		Console::WriteLine( pEx->Message );
+	}
+	catch(System::NullReferenceException ^ pEx) { 
 		Console::WriteLine( pEx->Message );
 	}
 
