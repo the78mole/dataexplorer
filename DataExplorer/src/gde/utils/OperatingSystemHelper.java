@@ -159,7 +159,7 @@ public class OperatingSystemHelper {
 				isRemoved = true;
 			}
 			else if (OSDE.IS_LINUX) {
-				String desktopFileName = "OpenSerialData*.desktop"; //$NON-NLS-1$
+				String desktopFileName = "OpenSerialDataExplorer.desktop"; //$NON-NLS-1$
 				targetBasePath = System.getenv("HOME") + OSDE.FILE_SEPARATOR_UNIX + "Desktop" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
@@ -215,7 +215,7 @@ public class OperatingSystemHelper {
 					String targetBasePath = jarBasePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 					targetBasePath = targetBasePath.startsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
 					targetBasePath = targetBasePath.endsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length()-1) : targetBasePath;
-					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + targetBasePath;
+					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + "\"" + targetBasePath + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$  
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
 					Runtime.getRuntime().exec(command).waitFor();
 
@@ -226,12 +226,17 @@ public class OperatingSystemHelper {
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 					String line;
 
+					StringBuilder sb = new StringBuilder();
 					while ((line = bisr.readLine()) != null) {
-						System.out.println(line);
+						sb.append(line);
 					}
+					log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+					sb = new StringBuilder();
 					while ((line = besr.readLine()) != null) {
-						System.err.println(line);
+						sb.append(line);
 					}
+					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+					log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
 					if (process.exitValue() != 0) {
 						log.log(Level.WARNING, "failed to register OpenSerialData MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740");
@@ -248,7 +253,7 @@ public class OperatingSystemHelper {
 					if (targetFile.exists() && targetFile.canWrite()) {
 						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 						FileUtils.extract(jarFile, "register.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						FileUtils.extract(jarFile, "OpenSerialDataExplorerdirectory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, "OpenSerialDataExplorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						command = "chmod +x " + targetDir + "/register.sh"; //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
@@ -317,27 +322,29 @@ public class OperatingSystemHelper {
 				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$	
 
 				FileUtils.extract(jarFile, regExe, OSDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
-				if (new Float(System.getProperty("os.version").trim()) < 6.0) //$NON-NLS-1$
-					command = targetDir + regExe; 
-				else // < Vista has UAC
-					command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
+				command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
 				Runtime.getRuntime().exec(command).waitFor();
 
-				//check if registration was successful
+				//check if deregistration was successful
 				Process process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				String line;
 
+				StringBuilder sb = new StringBuilder();
 				while ((line = bisr.readLine()) != null) {
-					System.out.println(line);
+					sb.append(line);
 				}
+				log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+				sb = new StringBuilder();
 				while ((line = besr.readLine()) != null) {
-					System.err.println(line);
+					sb.append(line);
 				}
-				if (process.exitValue() != 0) {
+				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+				log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
+				if (process.exitValue() == 0) {
 					log.log(Level.WARNING, "failed to deregister OpenSerialData MIME type to OS rc = " + process.exitValue()); //$NON-NLS-1$
 					throw new IOException("error=740");
 				}
