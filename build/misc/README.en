@@ -2,7 +2,7 @@
 
 The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
 on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
-operating systems like Windows, Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
+operating systems like 32/64 Bit Windows and Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
 Since I have no access to a Mac OS it is only tested under Windows and several Linux distributions.
 
 The OSDE gathers data from serial connected devices and display this data for further analysis.
@@ -12,6 +12,7 @@ At the moment the following devices are enabled:
 											 - UniLog (SM-Modellbau) multi measurement
 											 - eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger (LiPo)
 											 - VC820, VC840 (Conrad/VoltCraft)
+											 - Simulator
 
 More device are under construction. Help doing this is very welcome.											 
 
@@ -24,6 +25,7 @@ directory and execute the launch script (launch.bat Windows, launch.sh Linux).
 
 As overview the following files are under the OpenSerialDataExplorer program directory:
 OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
+OpenSerialDataExplorer\OpenSerialDataExplorer.ini (Windows)
 OpenSerialDataExplorer\lOpenSerialDataExplorer (Linux, Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux, Mac OS)
@@ -32,6 +34,7 @@ OpenSerialDataExplorer\devices\*.jar
 
 Extensions for the Java runtime RXTXcomm and SWT:
 OpenSerialDataExplorer\java\ext\*.jar
+OpenSerialDataExplorer\java\ext\*.LICENSE
 
 During the first execution of the program the application configuration directories are created 
 %APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
