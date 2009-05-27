@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,7 +76,7 @@ public class WindowsHelper {
 	 * @param iconPosition
 	 * @param description
 	 */
-	public static native String createDesktopLink(
+	public static native void createDesktopLink(
 			String fqShellLinkPath,
 			String fqExecutablePath,
 			String executableArguments,
@@ -91,10 +90,10 @@ public class WindowsHelper {
 	 * native method called via load library to enable use of native windows functions to register OpenSerialData MIME type to associate .osd
 	 * @param applicationInstallationDirectory
 	 */
-	public static native String registerMimeType(	String applicationInstallationDirectory	) throws SecurityException, IOException;
+	//public static native String registerMimeType(	String applicationInstallationDirectory	) throws SecurityException, IOException;
 
 	/**
 	 * native method called via load library to enable use of native windows functions to remove file type association
 	 */
-	public static native String deregisterMimeType() throws SecurityException, IOException;
+	//public static native String deregisterMimeType() throws SecurityException, IOException;
 }

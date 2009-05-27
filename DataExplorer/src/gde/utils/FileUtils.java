@@ -153,6 +153,27 @@ public class FileUtils {
 	}
 
 	/**
+	 * delete a file if exist
+	 */
+	public static void cleanFile(String fullQualifiedFilePath) {
+		if (FileUtils.checkFileExist(fullQualifiedFilePath)) {
+			(new File(fullQualifiedFilePath)).delete();
+		}
+	}
+
+	/**
+	 * delete a file list, if exist
+	 */
+	public static void cleanFiles(String fileBasePath, String[] fileNames) {
+		fileBasePath = fileBasePath.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + OSDE.FILE_SEPARATOR_UNIX;
+		for (String fileName : fileNames) {
+			FileUtils.cleanFile(fileBasePath + fileName);
+		}
+	}
+
+	
+	
+	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
 	 * supported Charset encoding :
 	 * US-ASCII 	Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set

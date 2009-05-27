@@ -53,7 +53,7 @@ mt -manifest SRV2003_X64_RETAIL\WinHelper.dll.manifest -outputresource:SRV2003_X
 /*****************************************************************************************************************
 Methoid to create a windows shell link (extension lnk) using ole32 and uuid libs (hot-key specification and window type not enabled)
 *****************************************************************************************************************/
-JNIEXPORT void JNICALL Java_osde_io_WindowsCreateShellLink_create
+JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
   (JNIEnv *env, jclass cl, jstring jfqShellLinkPath, jstring jfqExecutablePath, jstring jexecutableArguments, jstring jworkingDirectory, jstring jfqIconPath, jint iconPosition, jstring jdescription)
 {	
 	const char *fqShellLinkPath = env->GetStringUTFChars(jfqShellLinkPath, 0);

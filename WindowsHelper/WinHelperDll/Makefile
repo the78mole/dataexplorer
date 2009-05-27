@@ -17,7 +17,7 @@ $(OUTDIR) :
 # Update the object files if necessary
 
 $(OUTDIR)\WinHelper.obj: WinHelper.cpp WinHelper.h
-    $(cc) $(cflags) $(cvarsdll) $(cdebug) /D "NDEBUG" /D "_WINDLL" /D "_AFXDLL" /D "_UNICODE" /D "UNICODE" /I. /I"$(JDK)\include" /I"$(JDK)\include\win32" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\" WinHelper.cpp
+    $(cc) $(cflags) $(cvarsdll) /D "NDEBUG" /D "_WINDLL" /D "_AFXDLL" /D "_UNICODE" /D "UNICODE" /I. /I"$(JDK)\include" /I"$(JDK)\include\win32" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\" WinHelper.cpp
 
 # Update the dynamic link library
 

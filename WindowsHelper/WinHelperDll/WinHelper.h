@@ -28,7 +28,7 @@ extern "C" {
  * Method:    create
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_osde_io_WindowsCreateShellLink_create
+JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
   (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jint, jstring);
 
 #ifdef __cplusplus
