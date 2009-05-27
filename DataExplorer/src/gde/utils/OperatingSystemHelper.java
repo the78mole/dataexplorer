@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
-import osde.io.WindowsCreateShellLink;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -75,12 +74,12 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					String fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
-					String description = Messages.getString(MessageIds.OSDE_MSGT0401);
+					String description = Messages.getString(MessageIds.OSDE_MSGT0400);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					String[] shellLinkArgs = { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
 
-					WindowsCreateShellLink.create(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
 					isCreated = true;
 				}
 				catch (Throwable e) {
@@ -207,7 +206,8 @@ public class OperatingSystemHelper {
 				JarFile jarFile = new JarFile(jarFilePath);
 
 				if (OSDE.IS_WINDOWS) { 
-					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0400));
+					// warn user for UAC or fail due to required admin rights accessing registry
+					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0029));
 					String regExe = "Register" + OSDE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$ 
 					log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$	
 
@@ -217,10 +217,7 @@ public class OperatingSystemHelper {
 					targetBasePath = targetBasePath.endsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length()-1) : targetBasePath;
 					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + "\"" + targetBasePath + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$  
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
-					Runtime.getRuntime().exec(command).waitFor();
-
-					//check if registration was successful
-					Process process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$
+					Process process = Runtime.getRuntime().exec(command);
 					process.waitFor();
 					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -236,7 +233,34 @@ public class OperatingSystemHelper {
 						sb.append(line);
 					}
 					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
-					log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
+					if (process.exitValue() != 0) {
+						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+						log.log(Level.SEVERE, msg);
+						if (msg.contains("740"))
+							throw new IOException("error=740");
+
+						throw new UnsatisfiedLinkError(msg);
+					}
+
+					//check if registration was successful
+					command = "cmd /C assoc .osd"; //$NON-NLS-1$
+					log.log(Level.INFO, "executing \"" + command + "\" to check association"); //$NON-NLS-1$ //$NON-NLS-2$
+					process = Runtime.getRuntime().exec(command);
+					process.waitFor();
+					bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+					sb = new StringBuilder();
+					while ((line = bisr.readLine()) != null) {
+						sb.append(line);
+					}
+					log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+					sb = new StringBuilder();
+					while ((line = besr.readLine()) != null) {
+						sb.append(line);
+					}
+					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+					log.log(Level.INFO, "\"" + command + "\" rc = " + process.exitValue()); //$NON-NLS-1$ //$NON-NLS-2$
 					if (process.exitValue() != 0) {
 						log.log(Level.WARNING, "failed to register OpenSerialData MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740");
@@ -270,17 +294,17 @@ public class OperatingSystemHelper {
 					//check if xdg-utls are installed, this is the prerequisite for the registration process				
 					if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
 						log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0402));
+						OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
 						rc = 0;
 					}
 				}
 				else if (OSDE.IS_MAC) { //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openMessageDialog("OpenSerialDataExplorer MIME type to association .osd file ending to Operating system is currently not implemented." );
+					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0031));
 					rc = 0;
 				}
 				else {
 					log.log(Level.INFO, "Unsupported OS, shell integration, MIME registration NOT IMPLEMENTED"); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openMessageDialog("OpenSerialDataExplorer MIME type to association .osd file ending to Operating system is currently not implemented." );
+					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0024, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 					rc = 0;
 				}
 			}
@@ -288,11 +312,15 @@ public class OperatingSystemHelper {
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (e.getMessage().contains("error=740") || e instanceof IOException) { //permission access exception //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0405, new Object[] {command}));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0023, new Object[] {command}));
 				rc = 0; 
 			}
+			else if (e instanceof UnsatisfiedLinkError) {
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
+						+ Messages.getString(MessageIds.OSDE_MSGI0033));
+			}
 			else {
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0404));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0039));
 			}
 		}
 		log.log(Level.INFO, "OpenSerialDataExplorer MIME registered = " + (rc == 0)); //$NON-NLS-1$
@@ -307,8 +335,7 @@ public class OperatingSystemHelper {
 	public static boolean deregisterApplication() {
 		int rc = -1;
 		String targetDir = OSDE.JAVA_IO_TMPDIR;
-		String command = OSDE.STRING_BLANK;
-		
+		String command = OSDE.STRING_BLANK;	
 
 		String jarBasePath = FileUtils.getOsdeJarBasePath();
 		String jarFilePath = jarBasePath + "/OpenSerialDataExplorer.jar"; //$NON-NLS-1$
@@ -317,23 +344,46 @@ public class OperatingSystemHelper {
 			JarFile jarFile = new JarFile(jarFilePath);
 
 			if (OSDE.IS_WINDOWS) {
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0400));
+				// warn user for UAC or fail due to required admin rights accessing registry
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0029));
 				String regExe = "Register" + OSDE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$ 
 				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$	
 
 				FileUtils.extract(jarFile, regExe, OSDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
 				command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
-				Runtime.getRuntime().exec(command).waitFor();
-
-				//check if deregistration was successful
-				Process process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$
+				Process process = Runtime.getRuntime().exec(command);
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				String line;
 
 				StringBuilder sb = new StringBuilder();
+				while ((line = bisr.readLine()) != null) {
+					sb.append(line);
+				}
+				log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+				sb = new StringBuilder();
+				while ((line = besr.readLine()) != null) {
+					sb.append(line);
+				}
+				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+				if (process.exitValue() != 0) {
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+					log.log(Level.SEVERE, msg);
+					if (msg.contains("740"))
+						throw new IOException("error=740");
+
+					throw new UnsatisfiedLinkError(msg);
+				}
+
+				//check if deregistration was successful
+				process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$
+				process.waitFor();
+				bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+				sb = new StringBuilder();
 				while ((line = bisr.readLine()) != null) {
 					sb.append(line);
 				}
@@ -377,22 +427,26 @@ public class OperatingSystemHelper {
 				//check if xdg-utls are installed, this is the prerequisite for the registration process				
 				if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
 					log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0402));
+					OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
 					rc = 0;
 				}
 			}
 			else {
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Remove desktopLink for Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0032, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (e.getMessage().contains("error=740") || e instanceof IOException) { //permission access exception //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0405, new Object[] {command}));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0023, new Object[] {command}));
 				rc = 0; 
 			}
+			else if ( e instanceof UnsatisfiedLinkError) {
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
+						+ Messages.getString(MessageIds.OSDE_MSGI0033));
+			}
 			else {
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0404));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0039));
 			}
 		}
 		return rc == 0;

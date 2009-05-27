@@ -429,7 +429,6 @@ public class FileUtils {
 	 * @return operating depending path where the device plug-in jar are located
 	 */
 	public static String getOsdeJarBasePath() {
-		String	osname = System.getProperty("os.name", "").toLowerCase();	//$NON-NLS-1$ //$NON-NLS-2$
 		String basePath;
 		URL url = OpenSerialDataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
@@ -443,8 +442,7 @@ public class FileUtils {
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
-			osname = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
-			if (osname.startsWith("windows")) { //$NON-NLS-1$
+			if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
 				basePath = basePath.replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);  //$NON-NLS-1$//$NON-NLS-2$
 			}
 		}
