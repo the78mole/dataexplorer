@@ -87,7 +87,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						String absolutFilePath = tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -231,7 +231,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						new File(tmpDir1).mkdirs();
 						String absolutFilePath = tmpDir1 + file.getName();
 						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -304,7 +304,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						String absolutFilePath = tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_lov.osd";
 						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -370,7 +370,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						new File(tmpDir2).mkdirs();
 						String absolutFilePath = tmpDir2 + file.getName();
 						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), 1);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
