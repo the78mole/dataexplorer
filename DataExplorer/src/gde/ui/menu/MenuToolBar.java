@@ -48,6 +48,7 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsComposite;
+import osde.utils.FileUtils;
 
 /**
  * Graphical menu tool bar class
@@ -67,9 +68,17 @@ public class MenuToolBar {
 	ToolBar												fileToolBar;
 	ToolItem											newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
 	
-	CoolItem											deviceCoolItem;
-	ToolBar												deviceToolBar;
-	ToolItem											deviceSelectToolItem, prevDeviceToolItem, nextDeviceToolItem, toolBoxToolItem;
+	CoolItem											deviceObjectCoolItem;
+	ToolBar												deviceObjectToolBar;
+	ToolItem											deviceSelectToolItem, toolBoxToolItem;
+	ToolItem											prevDeviceToolItem, nextDeviceToolItem;
+	Composite											objectSelectComposite;
+	CCombo												objectSelectCombo;
+	Point													objectSelectSize = new Point(180, 21);
+	ToolItem											newObject, deleteObject, editObject;
+	String												oldObjectKey = null;
+	boolean												isObjectoriented = false;
+	String												activeObjectKey = OSDE.STRING_EMPTY;
 
 	CoolItem											zoomCoolItem;
 	ToolBar												zoomToolBar;
@@ -79,7 +88,7 @@ public class MenuToolBar {
 	Point													scopePointsComboSize = new Point(70, 21);
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
-	int										toolButtonHeight = 23;
+	int														toolButtonHeight = 23;
 
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
@@ -96,13 +105,17 @@ public class MenuToolBar {
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
+	final Settings								settings;
 	final String									language;
+	final String									osdeDataPath;
 
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
 		this.application = parent;
 		this.coolBar = menuCoolBar;
 		this.channels = Channels.getInstance();
-		this.language = Settings.getInstance().getLocale().getLanguage();
+		this.settings = Settings.getInstance();
+		this.language = this.settings.getLocale().getLanguage();
+		this.osdeDataPath = MenuToolBar.this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX;
 	}
 
 	public void init() {
@@ -194,26 +207,26 @@ public class MenuToolBar {
 						}
 					});
 				}
-				//this.fileToolBar.pack();
 				this.toolSize = this.fileToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				this.fileToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "fileToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end file tool bar
-			//this.coolSize = this.fileCoolItem.computeSize(this.toolSize.x, SWT.DEFAULT);
-			//log.log(Level.FINE, "fileCoolItem.size = " + this.coolSize); //$NON-NLS-1$
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.fileCoolItem.setPreferredSize(this.size);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			
+			// set height used for selection combos
+			this.toolButtonHeight = this.settingsToolItem.getBounds().height;
 		} // end file cool item
 
 		{ // begin device cool item
-			this.deviceCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin device tool bar
-				this.deviceToolBar = new ToolBar(this.coolBar, SWT.NONE);
-				this.deviceCoolItem.setControl(this.deviceToolBar);
+				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 				{
-					this.deviceSelectToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.deviceSelectToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.deviceSelectToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0057));
 					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif")); //$NON-NLS-1$
 					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
@@ -228,7 +241,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.prevDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.prevDeviceToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
 					this.prevDeviceToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0058));
 					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
@@ -265,7 +278,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.nextDeviceToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.nextDeviceToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
 					this.nextDeviceToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0059));
 					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
@@ -301,7 +314,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.toolBoxToolItem = new ToolItem(this.deviceToolBar, SWT.NONE);
+					this.toolBoxToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif")); //$NON-NLS-1$
 					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 					this.toolBoxToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0060));
@@ -317,13 +330,168 @@ public class MenuToolBar {
 						}
 					});
 				}
-				this.toolSize = this.deviceToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.deviceToolBar.setSize(this.toolSize);
+				{
+					ToolItem objectSelectComboSep = new ToolItem(this.deviceObjectToolBar, SWT.SEPARATOR);
+					{
+						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
+						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "None", "ASW-27", "AkkuSubC_1"" });
+						this.objectSelectCombo.select(this.settings.getActiveObject());
+						this.isObjectoriented = this.settings.getActiveObject() >= 1;
+						this.objectSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0201));
+						this.objectSelectCombo.setEditable(false);
+						this.objectSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+						this.objectSelectCombo.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST, "objectSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								int selectionIndex = MenuToolBar.this.objectSelectCombo.getSelectionIndex();
+								if (selectionIndex != 0) {
+									MenuToolBar.this.editObject.setEnabled(true);
+									MenuToolBar.this.deleteObject.setEnabled(true);
+									selectionIndex = checkChannelForObjectKeyMissmatch(selectionIndex, MenuToolBar.this.objectSelectCombo.getText());
+									MenuToolBar.this.isObjectoriented = true;
+									MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+								}
+								else {
+									MenuToolBar.this.editObject.setEnabled(false);
+									MenuToolBar.this.deleteObject.setEnabled(false);
+									MenuToolBar.this.isObjectoriented = false;
+								}
+								MenuToolBar.this.settings.setActiveObject(selectionIndex);
+							}
+						});
+						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
+							public void keyPressed(KeyEvent evt) {
+								log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
+								if (evt.character == SWT.CR) {
+									MenuToolBar.this.objectSelectCombo.setEditable(false);
+									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
+									log.log(Level.INFO, "newObjKey = " + newObjKey); //$NON-NLS-1$
+									String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
+									int selectionIndex = 0;
+									
+									if (MenuToolBar.this.oldObjectKey == null) { // new object key
+										for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+											if (tmpObjects[selectionIndex].equals(OSDE.STRING_EMPTY)) {
+												tmpObjects[selectionIndex] = newObjKey;
+												break;
+											}
+										}									
+										checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+										FileUtils.checkDirectoryAndCreate(MenuToolBar.this.osdeDataPath + newObjKey);
+									}
+									else {
+										log.log(Level.INFO, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
+										FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
+										for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+											if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
+												tmpObjects[selectionIndex] = newObjKey;
+												break;
+											}
+										}									
+										checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+										FileUtils.checkDirectoryAndCreate(MenuToolBar.this.osdeDataPath + newObjKey);
+										MenuToolBar.this.oldObjectKey = null;
+									}
+									MenuToolBar.this.objectSelectCombo.setItems(tmpObjects);
+									MenuToolBar.this.settings.setObjectList(tmpObjects);
+									MenuToolBar.this.objectSelectCombo.select(selectionIndex);
+									MenuToolBar.this.settings.setActiveObject(selectionIndex);
+									if (selectionIndex >= 1) {
+										MenuToolBar.this.deleteObject.setEnabled(true);
+										MenuToolBar.this.editObject.setEnabled(true);
+										MenuToolBar.this.isObjectoriented = true;
+										MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+									}
+									//TODO start scan files 
+								}
+							}
+						});		
+						this.objectSelectCombo.setSize(this.objectSelectSize);
+						this.objectSelectComposite.setSize(this.objectSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
+						this.objectSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.objectSelectSize.y) / 2);
+					}
+					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
+					objectSelectComboSep.setControl(this.objectSelectComposite);
+				}
+				{
+					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.newObject.setImage(SWTResourceManager.getImage("osde/resource/NewObj.gif")); //$NON-NLS-1$
+					this.newObject.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0202));
+					this.newObject.setHotImage(SWTResourceManager.getImage("osde/resource/NewObjHot.gif")); //$NON-NLS-1$
+					this.newObject.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "newObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Vector<String> tmpObjects = new Vector<String>();
+							for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
+								tmpObjects.add(tmpObject);
+							}
+							tmpObjects.add("");
+							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
+							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
+							MenuToolBar.this.objectSelectCombo.setEditable(true);
+							MenuToolBar.this.objectSelectCombo.setFocus();
+							// begin here text can be edited -> key listener
+						}
+					});
+				}
+				{
+					this.deleteObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.deleteObject.setImage(SWTResourceManager.getImage("osde/resource/RemObj.gif")); //$NON-NLS-1$
+					this.deleteObject.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0203));
+					this.deleteObject.setHotImage(SWTResourceManager.getImage("osde/resource/RemObjHot.gif")); //$NON-NLS-1$
+					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.deleteObject.setEnabled(false);
+					this.deleteObject.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "deleteObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
+								Vector<String> tmpObjects = new Vector<String>();
+								for (String tmpObject : MenuToolBar.this.objectSelectCombo.getItems()) {
+									tmpObjects.add(tmpObject);
+								}
+								int currentIndex = MenuToolBar.this.objectSelectCombo.getSelectionIndex();
+								String delObjectKey = tmpObjects.elementAt(currentIndex);
+								tmpObjects.remove(currentIndex);
+								MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
+								currentIndex = currentIndex >= 2 ? currentIndex - 1 : tmpObjects.size() > 1 ? 1 : 0;
+								MenuToolBar.this.objectSelectCombo.select(currentIndex);
+								FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + delObjectKey);
+								if (currentIndex == 0) {
+									MenuToolBar.this.deleteObject.setEnabled(false);
+									MenuToolBar.this.editObject.setEnabled(false);
+									MenuToolBar.this.isObjectoriented = false;
+								}
+								MenuToolBar.this.settings.setObjectList(tmpObjects.toArray(new String[1]));
+								MenuToolBar.this.settings.setActiveObject(currentIndex);
+							}
+						}
+					});
+				}
+				{
+					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.editObject.setImage(SWTResourceManager.getImage("osde/resource/EditObj.gif")); //$NON-NLS-1$
+					this.editObject.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0204));
+					this.editObject.setHotImage(SWTResourceManager.getImage("osde/resource/EditObjHot.gif")); //$NON-NLS-1$
+					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.editObject.setEnabled(false);
+					this.editObject.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "editObject.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
+								MenuToolBar.this.oldObjectKey = MenuToolBar.this.objectSelectCombo.getItems()[MenuToolBar.this.objectSelectCombo.getSelectionIndex()];
+								MenuToolBar.this.objectSelectCombo.setEditable(true);
+								MenuToolBar.this.objectSelectCombo.setFocus();
+								// begin here text can be edited -> key listener
+							}
+						}
+					});
+				}
+				this.toolSize = this.deviceObjectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				this.deviceObjectToolBar.setSize(this.toolSize);
 				log.log(Level.FINE, "deviceToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end device tool bar
-			this.deviceCoolItem.setSize(this.toolSize.x, this.toolSize.y);
+			this.deviceObjectCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.deviceCoolItem.setPreferredSize(this.size);
-			this.deviceCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.deviceObjectCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end device cool item
 		
@@ -415,7 +583,6 @@ public class MenuToolBar {
 								}
 							}
 						});
-						this.toolButtonHeight = this.panItem.getBounds().height;
 						//this.scopePointsComboSize.x = SWTResourceManager.getGC(this.scopePointsCombo.getDisplay()).stringExtent("00000000").x;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
 						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
@@ -471,7 +638,7 @@ public class MenuToolBar {
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
 		} // end port cool item
-
+		
 		{ // begin data cool item (channel select, record select)
 			this.dataCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{
@@ -640,7 +807,7 @@ public class MenuToolBar {
 				}
 				{
 					this.deleteRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
+					this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/Delete.gif")); //$NON-NLS-1$
 					this.deleteRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0081));
 					this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
 					this.deleteRecord.addSelectionListener(new SelectionAdapter() {
@@ -685,7 +852,7 @@ public class MenuToolBar {
 				}
 				{
 					this.editRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
+					this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/Edit.gif")); //$NON-NLS-1$
 					this.editRecord.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0082));
 					this.editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
 					this.editRecord.addSelectionListener(new SelectionAdapter() {
@@ -1034,5 +1201,79 @@ public class MenuToolBar {
 	 */
 	public String getCoolBarSizes() {
 			return this.toolBarSizes.toString();		
+	}
+
+	/**
+	 * check the object key selected against an eventually existing and ask for replacement
+	 * @param actualSelectionIndex
+	 * @return
+	 */
+	public int checkChannelForObjectKeyMissmatch(int actualSelectionIndex, String newObjectKey) {
+		Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			String existingObjKey = activeChannel.getObjectKey();
+			String selectedObjKey = MenuToolBar.this.objectSelectCombo.getItem(actualSelectionIndex);
+			
+			// check if selected key matches the existing object key or is new for this channel
+			if (actualSelectionIndex != 0 && existingObjKey.equals(OSDE.STRING_EMPTY)) { // channel has no key
+				activeChannel.setObjectKey(newObjectKey);
+			}
+			else if (!selectedObjKey.equals(existingObjKey)) { // channel has a key
+				int answer = MenuToolBar.this.application.openOkCancelMessageDialog("Ein Objektschlüssel " + existingObjKey + " ist bereits gesetzt, Soll er durch die Auswhal ersetzt werden?");
+				if (answer == SWT.OK) { //replace existing objectkey in channel
+					activeChannel.setObjectKey(newObjectKey);
+				}
+				else { // do not exchange, select the existing key
+					selectObjectKey(actualSelectionIndex, existingObjKey);
+				}
+			}
+		}
+		return actualSelectionIndex;
+	}
+
+	/**
+	 * @param actualSelectionIndex
+	 * @param newObjectKey
+	 */
+	public void selectObjectKey(int actualSelectionIndex, String newObjectKey) {
+		boolean isContained = false;
+		int searchSelectionIndex = 0;
+		String[] objectKeys = MenuToolBar.this.objectSelectCombo.getItems();
+		for(; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
+			if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
+					MenuToolBar.this.objectSelectCombo.select(searchSelectionIndex);
+					isContained = true;
+					break;
+			}
+		}
+		if (!isContained && searchSelectionIndex > actualSelectionIndex) { // channel contains a key which does not exist in the list
+			Vector<String> tmpObjects = new Vector<String>();
+			for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
+				tmpObjects.add(tmpObject);
+			}
+			tmpObjects.add(newObjectKey);
+			MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1]));
+			MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
+		}
+		//TODO switch to object oriented
+	}
+
+	public void selectObjectKeyDeviceOriented() {
+		this.objectSelectCombo.select(0);
+		//TODO switch to device oriented
+	}
+
+	/**
+	 * @return the isObjectoriented
+	 */
+	public boolean isObjectoriented() {
+		return this.isObjectoriented;
+	}
+
+	/**
+	 * @return the activeObjectKey
+	 */
+	public String getActiveObjectKey() {
+		return this.activeObjectKey;
 	}
 }

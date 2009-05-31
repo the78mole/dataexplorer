@@ -40,7 +40,6 @@ import osde.ui.OpenSerialDataExplorer;
 public class OperatingSystemHelper {
 	private static final Logger	log			= Logger.getLogger(OperatingSystemHelper.class.getName());
 	
-	
 	/**
 	 * create destop shortcut to launch the main jar
 	 */
@@ -451,4 +450,42 @@ public class OperatingSystemHelper {
 		}
 		return rc == 0;
 	}
+	
+	/**
+	 * create a file link
+	 */
+	public static void createFileLink(String fullQualifiedSourceFilePath, String fullQualifiedTargetFilePath) {
+		
+		if (OSDE.IS_WINDOWS) {
+			try {
+				String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_WINDOWS) + 1);
+				log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+				
+				String targetFileLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; //$NON-NLS-1$
+				log.log(Level.INFO, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
+
+				String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, "", sourceBasePath, fullQualifiedSourceFilePath, "" };
+
+				WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+			}
+			catch (Throwable e) {
+				log.log(Level.WARNING, e.getMessage());
+			}
+		}
+		else if (OSDE.IS_LINUX) { //$NON-NLS-1$
+			try {
+				String command = "ln -s " + fullQualifiedSourceFilePath + OSDE.STRING_BLANK + fullQualifiedTargetFilePath; 
+				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+				Runtime.getRuntime().exec(command).waitFor();
+			}
+			catch (Throwable e) {
+				log.log(Level.WARNING, e.getMessage());
+			}
+		}
+		else {
+			log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
+			OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+		}
+	}
+
 }

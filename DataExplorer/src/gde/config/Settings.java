@@ -110,6 +110,8 @@ public class Settings extends Properties {
 	public final static String[]	LOGGING_LEVEL									= new String[] { "SEVERE", "WARNING", "INFO", "FINE", "FINER", "FINEST" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	public final static String		ACTIVE_DEVICE									= "active_device"; //$NON-NLS-1$
+	public final static String		OBJECT_LIST										= "object_list"; //$NON-NLS-1$
+	public final static String		ACTIVE_OBJECT									= "active_object"; //$NON-NLS-1$
 	public final static String		DATA_FILE_PATH								= "data_file_path"; //$NON-NLS-1$
 	public final static String		LIST_SEPARATOR								= "list_separator"; //$NON-NLS-1$
 	public final static String		DECIMAL_SEPARATOR							= "decimal_separator"; //$NON-NLS-1$
@@ -387,6 +389,8 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%s\n", DEVICE_BLOCK)); // [Gerät] //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_DEVICE, this.getProperty(ACTIVE_DEVICE))); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", OBJECT_LIST, this.getProperty(OBJECT_LIST))); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_OBJECT, this.getProperty(ACTIVE_OBJECT))); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", WINDOW_BLOCK)); // [Fenster Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", WINDOW_LEFT, this.window.x)); //$NON-NLS-1$
@@ -454,6 +458,16 @@ public class Settings extends Properties {
 		}
 
 	}
+	
+	/*
+	 * overload Properties method due to loading properties from file returns "null" instead of null
+	 * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
+	 */
+  public String getProperty(String key, String defaultValue) {
+  	String val = getProperty(key);
+		if (val == null || val.equals("") || val.equals("null")) val = defaultValue;
+  	return val;
+  }
 
 	public Rectangle getWindow() {
 		return this.window;
@@ -470,15 +484,20 @@ public class Settings extends Properties {
 	}
 	
 	public int[] getCoolBarOrder() {
-		String order = this.getProperty(COOLBAR_ORDER, "0;1;2;3;4").trim(); //$NON-NLS-1$
-		if (order == null || order.equals("") || order.equals("null")) order = "0;1;2;3;4"; //$NON-NLS-1$
-		return StringHelper.stringToIntArray(order);
+		int[] intOrder = StringHelper.stringToIntArray(this.getProperty(COOLBAR_ORDER, "0;1;2;3;4").trim());
+		int coolBarSize = this.getCoolBarSizes().length;
+		if (intOrder.length != coolBarSize) {
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < coolBarSize; i++) {
+				sb.append(i).append(";");
+			}
+			intOrder = StringHelper.stringToIntArray(sb.toString());
+		}
+		return intOrder;	
 	}
 
 	public int[] getCoolBarWraps() {
-		String wraps = this.getProperty(COOLBAR_WRAPS, "0;3").trim(); //$NON-NLS-1$
-		if (wraps == null || wraps.equals("") || wraps.equals("null")) wraps = "0;3"; //$NON-NLS-1$
-		return StringHelper.stringToIntArray(wraps);
+		return StringHelper.stringToIntArray(this.getProperty(COOLBAR_WRAPS, "0;3").trim()); //$NON-NLS-1$
 	}
 
 	public Point[] getCoolBarSizes() {
@@ -495,6 +514,26 @@ public class Settings extends Properties {
 
 	public void setActiveDevice(String activeDeviceString) {
 		this.setProperty(ACTIVE_DEVICE, activeDeviceString.trim());
+	}
+
+	public String[] getObjectList() {
+		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(";"); //$NON-NLS-1$
+	}
+
+	public void setObjectList(String[] activeDeviceString) {
+		StringBuffer sb = new StringBuffer();
+		for (String objectString : activeDeviceString) {
+			sb.append(objectString).append(";"); //$NON-NLS-1$
+		}
+		this.setProperty(OBJECT_LIST, sb.toString());
+	}
+
+	public int getActiveObject() {
+		return new Integer(this.getProperty(ACTIVE_OBJECT, "0").trim()); //$NON-NLS-1$
+	}
+
+	public void setActiveObject(int newActiveObject) {
+		this.setProperty(ACTIVE_OBJECT, ""+newActiveObject);
 	}
 
 	/**

@@ -847,7 +847,7 @@ public class MenuBar {
 			fileName = StringHelper.getDate() + OSDE.STRING_UNDER_BAR;
 		}
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
-			fileName = fileName + Channels.getInstance().getActiveChannel().getActiveRecordSet().getObjectKey() + OSDE.STRING_UNDER_BAR;
+			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey() + OSDE.STRING_UNDER_BAR;
 		}
 		return fileName;
 	}
@@ -859,8 +859,15 @@ public class MenuBar {
 	public void openFileDialog(final String dialogName) {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
 			Settings deviceSetting = Settings.getInstance();
-			String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
-			String path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+			String path;
+			if (this.application.getMenuToolBar().isObjectoriented){
+				String objectPath = this.application.getMenuToolBar() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getMenuToolBar().getActiveObjectKey() : OSDE.STRING_EMPTY;
+				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + objectPath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+			}
+			else {
+				String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
+				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+			}
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_OSD, OSDE.FILE_ENDING_STAR_LOV }, path); 
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
@@ -883,10 +890,12 @@ public class MenuBar {
 	 * @throws NotSupportedFileFormatException
 	 * @throws DeclinedException
 	 */
-	public void openOsdFile(final String openFilePath) {
+	public void openOsdFile(String openFilePath) {
 		try {
+			openFilePath = OsdReaderWriter.isLink(openFilePath); // check if windows link
 			//check current device and switch if required
-			String fileDeviceName = OsdReaderWriter.getHeader(openFilePath).get(OSDE.DEVICE_NAME);
+			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
+			String fileDeviceName = osdHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				if (!OSDE.isForceDeviceSwitch() && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}))) 
@@ -894,8 +903,15 @@ public class MenuBar {
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
 				OSDE.setForceDeviceSwitch(false);
 			}
+			String objectkey = osdHeader.get(OSDE.OBJECT_KEY);
+			if (objectkey != null && !objectkey.equals(OSDE.STRING_EMPTY)) {
+				this.application.getMenuToolBar().selectObjectKey(0, objectkey);
+			}
+			else {
+				this.application.getMenuToolBar().selectObjectKeyDeviceOriented();
+			}
 			
-			String recordSetPropertys = OsdReaderWriter.getHeader(openFilePath).get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
+			String recordSetPropertys = osdHeader.get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
 			// channel/configuration type is outlet
 			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal();
@@ -987,7 +1003,7 @@ public class MenuBar {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				FileUtils.renameFile(filePath, OSDE.FILE_ENDING_BAK); // rename existing file to *.bak
-				OsdReaderWriter.write(filePath, activeChannel, 1);
+				OsdReaderWriter.write(filePath, activeChannel, OSDE.OPEN_SERIAL_DATA_VERSION_INT);
 				activeChannel.setFileName(filePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
 				activeChannel.setSaved(true);
 			}

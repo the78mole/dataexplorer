@@ -92,7 +92,7 @@ public class FileUtils {
 	/**
 	 * check existens of a directory and create if not exist
 	 * @param directory
-	 * @return true false if directory needs to be created
+	 * @return false if directory needs to be created
 	 */
 	public static boolean checkDirectoryAndCreate(String directory) {
 		boolean exist = true;
@@ -132,6 +132,32 @@ public class FileUtils {
 		return exist;
 	}
 
+	/**
+	 * check existent of a directory and delete underlaying files as well as the directory
+	 * @param fullQualifiedDirectoryPath
+	 * @param versionFileName string qualifier "_V01" checks for file *_V01.* 
+	 * @return true false if directory needs to be created
+	 */
+	public static boolean deleteDirectory(String fullQualifiedDirectoryPath) {
+		boolean exist = false;
+		File dir = new File(fullQualifiedDirectoryPath);
+		if (dir.exists() && dir.isDirectory()) {
+			exist = true;
+			
+			try {
+				List<File> files = FileUtils.getFileListing(dir);
+				for (File file : files) {
+					file.delete();
+				}
+				dir.delete();
+			}
+			catch (FileNotFoundException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+		}
+		return exist;
+	}	
+	
 	/**
 	 * check if a file exist, the file path given must fully qualified
 	 * @param fullQualifiedFileName

@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.io;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -23,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.MenuToolBar;
 import osde.utils.StringHelper;
+import osde.utils.WindowsHelper;
 
 /**
  * @author Winfried Brügmann
@@ -94,18 +97,22 @@ public class OsdReaderWriter {
 		if (!line.startsWith(OSDE.OPEN_SERIAL_DATA_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
 		
-		int version = 1;
+		String sVersion = line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length(), OSDE.OPEN_SERIAL_DATA_VERSION.length()+1).trim();
+		int version;
 		try {
-			version = new Integer(line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length(), OSDE.OPEN_SERIAL_DATA_VERSION.length()+1)).intValue(); // one digit only
+			version = new Integer(sVersion).intValue(); // one digit only
 		}
 		catch (NumberFormatException e) {
-			version = 1; //there is only one version
+			log.log(Level.SEVERE, "can not interprete red version information " + sVersion);
+			throw new NotSupportedFileFormatException(filePath);
 		}
+		
 		switch (version) {
 		case 1:
+		case 2: // added OBJECT_KEY to header
 			header.put(OSDE.OPEN_SERIAL_DATA_VERSION, OSDE.STRING_EMPTY+version);
-			
-			while (headerCounter-- > 0) {
+			boolean isHeaderComplete = false;
+			while (!isHeaderComplete && headerCounter-- > 0) {
 				line = data_in.readUTF();
 				line = line.substring(0, line.length() - 1);
 				log.log(Level.FINE, line);
@@ -125,6 +132,7 @@ public class OsdReaderWriter {
 									header.put((lastReordNumber-headerCounter)+OSDE.STRING_BLANK+OSDE.RECORD_SET_NAME, line.substring(OSDE.RECORD_SET_NAME.length()));
 								}
 							}
+							isHeaderComplete = true;
 						}
 						break;
 					}
@@ -254,7 +262,6 @@ public class OsdReaderWriter {
 				}
 				recordSet.setDeserializedProperties(recordSetProperties);
 				recordSet.setSaved(true);
-				recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 				
 				channel.put(recordSetName, recordSet);
 			}
@@ -365,6 +372,12 @@ public class OsdReaderWriter {
 				data_out.writeUTF(sb.toString());
 				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
 				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				// fifth line : object key
+				sb = new StringBuilder();
+				sb.append(OSDE.OBJECT_KEY).append(activeChannel.getObjectKey()).append(OSDE.STRING_NEW_LINE);
+				data_out.writeUTF(sb.toString());
+				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
+				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// number of record sets
 				sb = new StringBuilder();
 				sb.append(OSDE.RECORD_SET_SIZE).append(activeChannel.size()).append(OSDE.STRING_NEW_LINE);
@@ -384,7 +397,6 @@ public class OsdReaderWriter {
 							sbs[i] = new StringBuilder();
 							sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER)
 								.append(OSDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getOrdinal()).append(OSDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
-								.append(OSDE.OBJECT_KEY).append(recordSet.getObjectKey()).append(OSDE.DATA_DELIMITER)
 								.append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(OSDE.DATA_DELIMITER)
 								.append(OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
@@ -518,5 +530,28 @@ public class OsdReaderWriter {
 		finally {
 			random_in.close();
 		}
+	}
+	
+	/**
+	 * check if the given file is a windows shell link, if so it returns the contained file path
+	 * @param filePath
+	 * @return if shell link file the contained file path is returned, else the given file path
+	 * @throws IOException 
+	 */
+	public static String isLink(String filePath) throws IOException {
+		String ret = filePath;
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
+		String line = reader.readLine();
+		reader.close();
+		log.log(Level.INFO, "line = " + line);
+		if (!line.contains("OpenSerialData")) {
+			ret = WindowsHelper.getFilePathFromLink(filePath);
+			if (ret.startsWith("OSDE_MSGE")) {
+				String msgKey = ret.split(";")[0];
+				String msgValue = ret.split("; ")[1];
+				throw new UnsatisfiedLinkError(Messages.getString(msgKey, new Object[] { msgValue }));
+			}
+		}
+		return ret;
 	}
 }

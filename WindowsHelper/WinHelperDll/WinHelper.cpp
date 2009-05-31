@@ -23,7 +23,6 @@
 #include <initguid.h>
 #include <stdlib.h>
 #include <io.h>
-//#include <string.h>
 
 /*****************************************************************************************************************
 WinHelper is a collection of windows native functions which are not accessible from Java 
@@ -53,7 +52,7 @@ mt -manifest SRV2003_X64_RETAIL\WinHelper.dll.manifest -outputresource:SRV2003_X
 /*****************************************************************************************************************
 Methoid to create a windows shell link (extension lnk) using ole32 and uuid libs (hot-key specification and window type not enabled)
 *****************************************************************************************************************/
-JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
+JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
   (JNIEnv *env, jclass cl, jstring jfqShellLinkPath, jstring jfqExecutablePath, jstring jexecutableArguments, jstring jworkingDirectory, jstring jfqIconPath, jint iconPosition, jstring jdescription)
 {	
 	const char *fqShellLinkPath = env->GetStringUTFChars(jfqShellLinkPath, 0);
@@ -62,24 +61,31 @@ JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
 	const char *workingDirectory = env->GetStringUTFChars(jworkingDirectory, 0);
 	const char *fqIconPath = env->GetStringUTFChars(jfqIconPath, 0);
 	const char *description = env->GetStringUTFChars(jdescription, 0);
-	
+/*	
 	printf("fqShellLinkPath = %s\n", fqShellLinkPath); 
 	printf("fqExecutablePath = %s\n", fqExecutablePath); 
 	printf("executableArguments = %s\n", executableArguments); 
 	printf("workingDirectory = %s\n", workingDirectory); 
 	printf("fqIconPath = %s\n", fqIconPath); 
 	printf("description = %s\n", description); 
-
+*/
     IShellLink *pShellLink;                            // pointer to IShellLink i/f
     HRESULT hres;
     WIN32_FIND_DATA wfd;
     char szGotPath[MAX_PATH];
+	char szReturn[MAX_PATH];
 
     hres = CoInitialize(NULL);
     if (!SUCCEEDED(hres))
     {
-        printf("Could not open the COM library\n");
-        return;
+        //printf("Could not open the COM library\n");
+		env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
+		env->ReleaseStringUTFChars(jfqExecutablePath, fqExecutablePath);
+		env->ReleaseStringUTFChars(jexecutableArguments, executableArguments);
+		env->ReleaseStringUTFChars(jworkingDirectory, workingDirectory);
+		env->ReleaseStringUTFChars(jfqIconPath, fqIconPath);
+		env->ReleaseStringUTFChars(jdescription, description);
+        return env->NewStringUTF("OSDE_MSGE0045; Could not open the COM library");
     }
 
 
@@ -87,7 +93,7 @@ JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
     hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)&pShellLink);
     if (SUCCEEDED(hres))
     {
-        // Get pointer to the IPersistFile interface.if exist
+        // Get pointer to the IPersistFile interface, if exist
         IPersistFile *pPersistFile;
         hres = pShellLink->QueryInterface(IID_IPersistFile, (LPVOID *)&pPersistFile);
 
@@ -96,16 +102,16 @@ JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
             WCHAR wszLinkPath[MAX_PATH];
 
             // Ensure string is Unicode.
-            MultiByteToWideChar(CP_ACP, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
+            MultiByteToWideChar(CP_UTF8, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
             //int MultiByteToWideChar(UINT, DWORD, const CHAR*, int, WCHAR*, int)
 
             // Load the shell link if exist
             //virtual HRESULT IPersistFile::Load(const WCHAR*, DWORD)
+            //wprintf(L"pPersistFile->Load(%s, STGM_READ)\n", wszLinkPath);
             hres = pPersistFile->Load(wszLinkPath, STGM_READ);
             if (SUCCEEDED(hres))
             {
                 // Resolve the link.
-
                 hres = pShellLink->Resolve(0, SLR_ANY_MATCH);
                 //                  ^
                 // Using 0 instead -| of hWnd, as hWnd is only used if
@@ -117,51 +123,58 @@ JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
                     strcpy_s(szGotPath, fqShellLinkPath);
 
                     hres = pShellLink->GetPath((LPWSTR)szGotPath, MAX_PATH,
-                                               (WIN32_FIND_DATA *)&wfd, SLGP_SHORTPATH );
-                    if (!SUCCEEDED(hres))
-                        printf("GetPath failed!\n");
-
-                    printf("This points to %s\n", wfd.cFileName);
-                    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                        printf("This is a directory\n");
+                                               (WIN32_FIND_DATA *)&wfd, SLGP_UNCPRIORITY );
+                                               
+                    if (!SUCCEEDED(hres)) {
+                        sprintf_s(&szReturn[0], MAX_PATH,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
+                        //printf(szReturn);
+                    }
+                    else if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
+                        //printf(szReturn);
+                    } 
                 }
             }
-            else // file does not exist
+            else  // file does not exist, it can be created
             {
-                //printf("IPersistFile Load Error\n");
-
 				WCHAR wszExecutablePath[MAX_PATH];
-				MultiByteToWideChar(CP_ACP, 0, fqExecutablePath, -1, wszExecutablePath, MAX_PATH);
+				MultiByteToWideChar(CP_UTF8, 0, fqExecutablePath, -1, wszExecutablePath, MAX_PATH);
                 pShellLink->SetPath((LPCWSTR)wszExecutablePath);  // Path to the object we are referring to
 
-
 				WCHAR wszEcutableArguments[MAX_PATH];
-				MultiByteToWideChar(CP_ACP, 0, executableArguments, -1, wszEcutableArguments, MAX_PATH);
+				MultiByteToWideChar(CP_UTF8, 0, executableArguments, -1, wszEcutableArguments, MAX_PATH);
                 pShellLink->SetArguments((LPCWSTR)wszEcutableArguments);
  
 				WCHAR wszWorkingDirectory[MAX_PATH];
-				MultiByteToWideChar(CP_ACP, 0, workingDirectory, -1, wszWorkingDirectory, MAX_PATH);
+				MultiByteToWideChar(CP_UTF8, 0, workingDirectory, -1, wszWorkingDirectory, MAX_PATH);
 				pShellLink->SetWorkingDirectory((LPCWSTR)wszWorkingDirectory);
 
 				WCHAR wszIconPath[MAX_PATH];
-				MultiByteToWideChar(CP_ACP, 0, fqIconPath, -1, wszIconPath, MAX_PATH);
+				MultiByteToWideChar(CP_UTF8, 0, fqIconPath, -1, wszIconPath, MAX_PATH);
                 pShellLink->SetIconLocation((LPCWSTR)wszIconPath, iconPosition); //   The address of a buffer to contain the path of the file containing the icon.
 
 				WCHAR wszDescription[MAX_PATH];
-				MultiByteToWideChar(CP_ACP, 0, description, -1, wszDescription, MAX_PATH);
+				MultiByteToWideChar(CP_UTF8, 0, description, -1, wszDescription, MAX_PATH);
                 pShellLink->SetDescription((LPCWSTR)wszDescription);
 
-                MultiByteToWideChar(CP_ACP, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
+                MultiByteToWideChar(CP_UTF8, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
                 pPersistFile->Save(wszLinkPath, TRUE);
+                //wprintf(L"wszLinkPath = %s\n", wszLinkPath);
             }
             pPersistFile->Release();
         }
-        else
-            printf("QueryInterface Error\n");
+        else 
+        {
+            sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0041; QueryInterface Error\n");
+            //printf(szReturn);
+        }
         pShellLink->Release();
     }
-    else
-        printf("CoCreateInstance Error - hres = %08x\n", hres);
+    else 
+    {
+        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
+        //printf(szReturn);
+    }
 
 	env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
 	env->ReleaseStringUTFChars(jfqExecutablePath, fqExecutablePath);
@@ -169,6 +182,106 @@ JNIEXPORT void JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
 	env->ReleaseStringUTFChars(jworkingDirectory, workingDirectory);
 	env->ReleaseStringUTFChars(jfqIconPath, fqIconPath);
 	env->ReleaseStringUTFChars(jdescription, description);
+	return env->NewStringUTF(szReturn);
+}
+
+/*****************************************************************************************************************
+Methoid to return the contained full qualified file path from a windows shell link (extension lnk) using ole32 and uuid libs
+*****************************************************************************************************************/
+JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
+  (JNIEnv *env, jclass cl, jstring jfqShellLinkPath)
+{	
+	const char *fqShellLinkPath = env->GetStringUTFChars(jfqShellLinkPath, 0);
+	char szReturn[MAX_PATH];
+    IShellLink *pShellLink;                            // pointer to IShellLink i/f
+    HRESULT hres;
+    WIN32_FIND_DATA wfd;
+    char szGotPath[MAX_PATH];
 	
-	return;
+	//printf("fqShellLinkPath = %s\n", fqShellLinkPath); 
+
+    hres = CoInitialize(NULL);
+    if (!SUCCEEDED(hres))
+    {
+        //printf("OSDE_MSGE000x; Could not open the COM library\n");
+        env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
+        return env->NewStringUTF("OSDE_MSGE0045; Could not open the COM library");
+    }
+
+
+    // Get pointer to the IShellLink interface.
+    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)&pShellLink);
+    if (SUCCEEDED(hres))
+    {
+        // Get pointer to the IPersistFile interface, if exist
+        IPersistFile *pPersistFile;
+        hres = pShellLink->QueryInterface(IID_IPersistFile, (LPVOID *)&pPersistFile);
+
+        if (SUCCEEDED(hres))
+        {
+            WCHAR wszLinkPath[MAX_PATH];
+
+            // Ensure string is Unicode.
+            MultiByteToWideChar(CP_UTF8, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
+            //int MultiByteToWideChar(UINT, DWORD, const CHAR*, int, WCHAR*, int)
+
+            // Load the shell link if exist
+            //virtual HRESULT IPersistFile::Load(const WCHAR*, DWORD)
+            //wprintf(L"pPersistFile->Load(%s, STGM_READ)\n", wszLinkPath);
+            hres = pPersistFile->Load(wszLinkPath, STGM_READ);
+            if (SUCCEEDED(hres))
+            {
+                // Resolve the link.
+                hres = pShellLink->Resolve(0, SLR_ANY_MATCH);
+                //                  ^
+                // Using 0 instead -| of hWnd, as hWnd is only used if
+                // interface needs to prompt for more information. Should use
+                // hWnd from current console in the long run.
+
+                if (SUCCEEDED(hres))
+                {
+                    strcpy_s(szGotPath, fqShellLinkPath);
+
+                    hres = pShellLink->GetPath((LPWSTR)szGotPath, MAX_PATH,
+                                               (WIN32_FIND_DATA *)&wfd, SLGP_UNCPRIORITY );
+                    if (!SUCCEEDED(hres)) {
+                        sprintf_s(&szReturn[0], MAX_PATH,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
+                        //printf(szReturn);
+                    }
+                    else if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
+                        //printf(szReturn);
+                    } 
+
+                    //wprintf(L"link contained file path = %s\n", szGotPath);
+                    int utf8_length = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)szGotPath, -1, szReturn, (sizeof(szReturn) - sizeof(char)), NULL, NULL);
+                    //printf("link contained file path = %s\n", szReturn);
+ 
+					if (utf8_length == 0) {
+                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0046; WideCharToMultiByte failed!\n");
+                        //printf(szReturn);
+					}
+                    
+                }
+            }
+            else // file does not exist
+            {
+                sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0042; IPersistFile Load Error\n");
+                //printf(szReturn);
+            }
+            pPersistFile->Release();
+        }
+        else {
+            sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0041; QueryInterface Error\n");
+            //printf(szReturn);
+        }
+        pShellLink->Release();
+    }
+    else {
+        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
+        //printf(szReturn);
+    }
+
+	env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
+	return env->NewStringUTF(szReturn);
 }

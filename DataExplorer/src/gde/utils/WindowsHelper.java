@@ -87,6 +87,13 @@ public class WindowsHelper {
 		);
 
 	/**
+	 * native method called via load library to enable use of native windows ole32 functions
+	 * @param fqShellLinkPath
+	 * @return contained full qualified file path
+	 */
+	public static native String getFilePathFromLink(String fqShellLinkPath);
+
+	/**
 	 * native method called via load library to enable use of native windows functions to register OpenSerialData MIME type to associate .osd
 	 * @param applicationInstallationDirectory
 	 */

@@ -50,6 +50,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	final int											type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;					// graphics template holds view configuration
 	RecordSet											activeRecordSet;
+	String												objectKey	= OSDE.STRING_EMPTY;
 	String 												fileName;
 	boolean												isSaved = false;
 	final OpenSerialDataExplorer	application;
@@ -569,4 +570,14 @@ public class Channel extends HashMap<String, RecordSet> {
 	public int getOrdinal() {
 		return this.ordinal;
 	}
+
+	public String getObjectKey() {
+		return this.objectKey;
+	}
+
+	public void setObjectKey(String newObjectkey) {
+		this.objectKey = newObjectkey;
+	}
+
 }
+

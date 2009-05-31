@@ -58,7 +58,6 @@ public class RecordSet extends HashMap<String, Record> {
 
 	String												name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final String									channelConfigName;
-	String												objectKey											= OSDE.STRING_EMPTY;
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																// records/measurements which are active or inactive
@@ -706,14 +705,6 @@ public class RecordSet extends HashMap<String, Record> {
 
 	public void setName(String newName) {
 		this.name = newName;
-	}
-
-	public String getObjectKey() {
-		return this.objectKey;
-	}
-
-	public void setObjectKey(String newObjectkey) {
-		this.objectKey = newObjectkey;
 	}
 
 	/**
