@@ -146,7 +146,7 @@ public class TimeLine {
 		drawTickMarks(recordSet, gc, x0, y0, width, startTimeValue, endTimeValue, scaleFactor, timeFormat, deltaTime_ms, ticklength, miniTicks, gap);
 
 		// draw the scale description centered
-		GraphicsUtils.drawText(TimeLine.timeLineText, (x0 + width / 2), y0 + ticklength + pt.y * 2, gc, SWT.HORIZONTAL);
+		GraphicsUtils.drawTimeLineText(TimeLine.timeLineText, (x0 + width / 2), y0 + ticklength + pt.y * 2, gc, SWT.HORIZONTAL);
 	}
 
 	/**
