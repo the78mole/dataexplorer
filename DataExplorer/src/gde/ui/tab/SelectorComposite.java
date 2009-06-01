@@ -197,6 +197,7 @@ public class SelectorComposite extends Composite {
 		RecordSet activeRecordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
 		RecordSet recordSet = this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : this.application.getCompareSet();
 		if (recordSet != null && recordSet.size() > 0) {
+				log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();
 				//this.curveSelectorHeader.pack(true);
 				//itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
