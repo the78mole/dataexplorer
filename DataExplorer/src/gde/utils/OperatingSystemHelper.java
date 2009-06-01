@@ -458,6 +458,8 @@ public class OperatingSystemHelper {
 		
 		if (OSDE.IS_WINDOWS) {
 			try {
+				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
+				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 				String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_WINDOWS) + 1);
 				log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 				

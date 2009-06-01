@@ -308,7 +308,6 @@ public class SettingsDialog extends Dialog {
 							{
 								this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestObjectKey.setText(Messages.getString(MessageIds.OSDE_MSGT0317));
-								this.suggestObjectKey.setEnabled(false);
 								this.suggestObjectKey.setBounds(239, 28, 194, 16);
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override

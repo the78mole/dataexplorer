@@ -30,6 +30,8 @@ import osde.OSDE;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.device.ChannelTypes;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.RecordSetNameComparator;
@@ -55,6 +57,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	boolean												isSaved = false;
 	final OpenSerialDataExplorer	application;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
+	
+	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0210);
+	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0211);
 
 
 	/**
@@ -577,7 +582,22 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	public void setObjectKey(String newObjectkey) {
 		this.objectKey = newObjectkey;
+		if (this.activeRecordSet != null) {
+			if (newObjectkey.equals(OSDE.STRING_EMPTY))	this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_REMOVE_OBJECT_KEY);
+			else 																				this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
+		}
 	}
 
+	/**
+	 * overloaded clear method to enable implementation specific clear actions
+	 */
+	public void clear() {
+		for (String recordSetKey : this.getRecordSetNames()) {
+			if (recordSetKey != null && recordSetKey.length() > 3) this.remove(recordSetKey);
+		}
+
+		super.clear();
+		this.objectKey = OSDE.STRING_EMPTY;
+	}
 }
 

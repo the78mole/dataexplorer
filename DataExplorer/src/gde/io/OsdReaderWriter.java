@@ -49,6 +49,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.MenuToolBar;
+import osde.utils.OperatingSystemHelper;
 import osde.utils.StringHelper;
 import osde.utils.WindowsHelper;
 
@@ -173,6 +174,7 @@ public class OsdReaderWriter {
 		
 		HashMap<String, String> header = getHeader(filePath);
 		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
+		String objectKey = header.get(OSDE.OBJECT_KEY) != null ? header.get(OSDE.OBJECT_KEY) : OSDE.STRING_EMPTY;
 		int numberRecordSets = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
@@ -236,7 +238,7 @@ public class OsdReaderWriter {
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
 				channels.setActiveChannelNumber(channel.getOrdinal());
-
+				channel.setObjectKey(objectKey);
 				// "3 : Motor"
 				channelConfig = channelConfig.contains(OSDE.STRING_COLON) ? channelConfig.split(OSDE.STRING_COLON)[1].trim() : channelConfig.trim();
 				// "Motor 3"
@@ -326,17 +328,18 @@ public class OsdReaderWriter {
 	 * write channel data to osd file format
 	 * - if channel type is TYPE_OUTLET only this channel record sets are part of the written file
 	 * - if channel type is TYPE_CONFIG all records sets of all channel configurations are written to the file
-	 * @param filePath
+	 * @param fullQualifiedFilePath
 	 * @param activeChannel
 	 * @param useVersion
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static void write(String filePath, Channel activeChannel, int useVersion) throws FileNotFoundException, IOException {
-		if (activeChannel != null && filePath != null && useVersion != 0) {
-			FileOutputStream file_out = new FileOutputStream(new File(filePath));
+	public static void write(String fullQualifiedFilePath, Channel activeChannel, int useVersion) throws FileNotFoundException, IOException {
+		if (activeChannel != null && fullQualifiedFilePath != null && useVersion != 0) {
+			FileOutputStream file_out = new FileOutputStream(new File(fullQualifiedFilePath));
 			DataOutputStream data_out = new DataOutputStream(file_out);
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
+			boolean isObjectOriented = OsdReaderWriter.application.isObjectoriented();
 			int filePointer = 0;
 			try {
 				// before do anything make sure all data is loaded, if data comes from another file 
@@ -482,6 +485,12 @@ public class OsdReaderWriter {
 					}
 				}
 				log.log(Level.FINE, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				
+				//update/write link if object oriented
+				if (isObjectOriented) {
+					OperatingSystemHelper.createFileLink(fullQualifiedFilePath, 
+							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1));
+				}
 			}
 			finally {
 				data_out.flush();
@@ -491,7 +500,7 @@ public class OsdReaderWriter {
 			}
 		}
 		else {
-			OSDEInternalException e = new OSDEInternalException(Messages.getString(MessageIds.OSDE_MSGE0009) + activeChannel + ", " + filePath + ", " + useVersion); //$NON-NLS-1$
+			OSDEInternalException e = new OSDEInternalException(Messages.getString(MessageIds.OSDE_MSGE0009) + activeChannel + ", " + fullQualifiedFilePath + ", " + useVersion); //$NON-NLS-1$
 			OpenSerialDataExplorer.getInstance().openMessageDialogAsync(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
@@ -543,7 +552,7 @@ public class OsdReaderWriter {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 		String line = reader.readLine();
 		reader.close();
-		log.log(Level.INFO, "line = " + line);
+		log.log(Level.FINER, "line = " + line);
 		if (!line.contains("OpenSerialData")) {
 			ret = WindowsHelper.getFilePathFromLink(filePath);
 			if (ret.startsWith("OSDE_MSGE")) {

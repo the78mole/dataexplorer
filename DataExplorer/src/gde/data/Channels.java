@@ -186,6 +186,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
+				this.application.getMenuToolBar().updateObjectSelector();
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateGraphicsWindow();
@@ -232,6 +233,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		try {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
 			if (activeChannel != null) {
+				activeChannel.objectKey = OSDE.STRING_EMPTY;
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
 					String activeRecordName = activeRecordSet.getName();

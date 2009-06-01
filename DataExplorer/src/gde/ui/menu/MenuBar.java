@@ -847,7 +847,7 @@ public class MenuBar {
 			fileName = StringHelper.getDate() + OSDE.STRING_UNDER_BAR;
 		}
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
-			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey() + OSDE.STRING_UNDER_BAR;
+			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
 		return fileName;
 	}
@@ -860,9 +860,8 @@ public class MenuBar {
 		if (this.application.getDeviceSelectionDialog().checkDataSaved()) {
 			Settings deviceSetting = Settings.getInstance();
 			String path;
-			if (this.application.getMenuToolBar().isObjectoriented){
-				String objectPath = this.application.getMenuToolBar() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getMenuToolBar().getActiveObjectKey() : OSDE.STRING_EMPTY;
-				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + objectPath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+			if (this.application.isObjectoriented()){
+				path = this.application.getObjectFilePath();
 			}
 			else {
 				String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
@@ -916,7 +915,7 @@ public class MenuBar {
 			// channel/configuration type is outlet
 			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal();
 			if(isChannelTypeOutlet && this.channels.size() > 1) {
-				String[] splitChannel = channelConfigName.split(" ");
+				String[] splitChannel = channelConfigName.split(OSDE.STRING_BLANK);
 				int channelNumber = 1;
 				try {
 					channelNumber = splitChannel.length == 2 ? new Integer(splitChannel[1]) : (
@@ -927,14 +926,12 @@ public class MenuBar {
 				// at this point we have a channel/config ordinal
 				Channel channel = this.channels.get(channelNumber);
 				if (channel.size() > 0) { // check for records to be exchanged
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channel.getConfigKey()})); 
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channel.getConfigKey()})); 
 					if (answer != SWT.OK) 
 						return;				
 				}
 				// clean existing channel record sets for new data
-				for (String recordSetKey : channel.getRecordSetNames()) {
-					if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
-				}
+				channel.clear();
 			}
 			else
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
@@ -1057,9 +1054,7 @@ public class MenuBar {
 					
 					// clean existing channel for new data, if channel does not exist ignore, 
 					// this will be covered by the reader by creating a new channel
-					for (String recordSetKey : channel.getRecordSetNames()) {
-						if (recordSetKey != null && recordSetKey.length() > 3) channel.remove(recordSetKey);
-					}
+					channel.clear();
 				}
 			}
 			else

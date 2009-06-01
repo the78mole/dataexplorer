@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -59,6 +61,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.FileUtils;
+import osde.utils.RecordSetNameComparator;
 import osde.utils.StringHelper;
 
 /**
@@ -166,6 +169,8 @@ public class Settings extends Properties {
 	private String							cbSizes;
 	private String							settingsFilePath;				// full qualified path to settings file
 	private String							applHomePath;						// default path to application home directory
+	Comparator<String> 					comparator = new RecordSetNameComparator(); //used to sort object key list
+
 
 	//	/**
 	//	 * for unit test only
@@ -520,20 +525,25 @@ public class Settings extends Properties {
 		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(";"); //$NON-NLS-1$
 	}
 
-	public void setObjectList(String[] activeDeviceString) {
+	public void setObjectList(String[] activeObjectList, int newActiveObjectIndex) {
+		String activeObjectKey = activeObjectList[newActiveObjectIndex];
+		Arrays.sort(activeObjectList, this.comparator);
 		StringBuffer sb = new StringBuffer();
-		for (String objectString : activeDeviceString) {
-			sb.append(objectString).append(";"); //$NON-NLS-1$
+		int newIndex = 0;
+		for (int i = 0; i < activeObjectList.length; ++i) {
+			sb.append(activeObjectList[i]).append(";"); //$NON-NLS-1$
+			if (activeObjectKey.equals(activeObjectList[i])) newIndex = i;
 		}
 		this.setProperty(OBJECT_LIST, sb.toString());
+		this.setProperty(ACTIVE_OBJECT, ""+newIndex);
 	}
 
-	public int getActiveObject() {
+	public int getActiveObjectIndex() {
 		return new Integer(this.getProperty(ACTIVE_OBJECT, "0").trim()); //$NON-NLS-1$
 	}
 
-	public void setActiveObject(int newActiveObject) {
-		this.setProperty(ACTIVE_OBJECT, ""+newActiveObject);
+	public String getActiveObject() {
+		return getObjectList()[getActiveObjectIndex()];
 	}
 
 	/**
