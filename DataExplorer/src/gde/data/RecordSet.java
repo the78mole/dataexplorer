@@ -325,6 +325,15 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.channelConfigName = recordSet.channelConfigName;
+
+		if (recordSet.isSyncableChecked) {
+			String syncRecordName = recordSet.getSyncableName();
+			if (syncRecordName.length() > 5) { // " 1..2"
+				recordSet.removeRecordName(syncRecordName);
+				this.remove(syncRecordName);
+			}
+		}
+
 		this.recordNames = recordSet.recordNames.clone();
 
 		// update child records
@@ -368,6 +377,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
+		
+		this.device.updateVisibilityStatus(this);
 	}
 
 	/**
@@ -1698,8 +1709,9 @@ public class RecordSet extends HashMap<String, Record> {
 		for (int i = 0; i < (this.syncableRecords.size() > 0 ? this.recordNames.length-1 : this.recordNames.length); i++) {
 			if (this.recordNames.length > 1 
 					&& i > 0 
-						&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
-						&& this.device.getMeasurement(this.channelConfigName, i - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, i).getUnit())) {
+					&& !this.recordNames[i].contains("..") //$NON-NLS-1$ CellVoltage 1..2
+					&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
+					&& this.device.getMeasurement(this.channelConfigName, i - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, i).getUnit())) {
 				if (this.potentialSyncableRecords.isEmpty()) {
 					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
 				}
