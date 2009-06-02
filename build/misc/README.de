@@ -47,5 +47,7 @@ in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterle
 Hinweis: Erscheint nach der Ausführung von OpenSerialDataExplorer.exe/OpenSerialDataExplorer folgende oder ähnliche Fehlermeldung 
 "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6"
 ist die installierte Java version (java -version) zu alt und muß gegen eine aktuelle Version > 1.6 ausgetauscht werden.
+Für Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
+"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.

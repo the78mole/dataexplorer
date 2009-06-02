@@ -394,4 +394,25 @@
 			</tarfileset>
 		</tar>
 	</target>
+	
+	<target name="backupDataFiles">
+		<tar destfile="F:/OpenSerialData.tar.gz" compression="gzip">
+			<tarfileset dir="D:/Documents" casesensitive="true" >
+				<include name="OpenSerialDataExplorer/**"/>
+				<exclude name="OpenSerialDataExplorer/OSDE_*"/>
+				<exclude name="OpenSerialDataExplorer/**/*.zip"/>
+				<exclude name="OpenSerialDataExplorer/**/*.pdf"/>
+				<exclude name="OpenSerialDataExplorer/**/*.gz"/>
+				<exclude name="OpenSerialDataExplorer/**/*.bak"/>
+				<include name="LogView/**"/>
+				<exclude name="LogView/**/*.bak"/>
+				<exclude name="LogView/**/*.BAK"/>
+				<exclude name="LogView/**.zip"/>
+				<exclude name="LogView/**.pdf"/>
+				<include name="LogViewOBJ/**"/>
+				<exclude name="LogViewOBJ/**/*.bak"/>
+				<exclude name="LogViewOBJ/**/*.BAK"/>
+			</tarfileset>
+		</tar>
+	</target>
 </project>
