@@ -476,9 +476,25 @@ public class OperatingSystemHelper {
 		}
 		else if (OSDE.IS_LINUX) { //$NON-NLS-1$
 			try {
-				String command = "ln -s " + fullQualifiedSourceFilePath + OSDE.STRING_BLANK + fullQualifiedTargetFilePath; 
+				String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+				String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+				String command = "ln -s  -T \"" + fullQualifiedLinkTargetPath + "\"" + OSDE.STRING_BLANK + "\"" + fullQualifiedLinkPath + "\""; 
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
-				Runtime.getRuntime().exec(command).waitFor();
+				Process process = Runtime.getRuntime().exec(command);
+				process.waitFor();
+				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String line;
+				while ((line = bisr.readLine()) != null) {
+					log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
+				}
+				while ((line = besr.readLine()) != null) {
+					log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
+				}
+				if (process.exitValue() != 0) {
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+					log.log(Level.SEVERE, msg);
+				}
 			}
 			catch (Throwable e) {
 				log.log(Level.WARNING, e.getMessage());

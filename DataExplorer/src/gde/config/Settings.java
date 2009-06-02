@@ -527,7 +527,13 @@ public class Settings extends Properties {
 
 	public void setObjectList(String[] activeObjectList, int newActiveObjectIndex) {
 		String activeObjectKey = activeObjectList[newActiveObjectIndex];
-		Arrays.sort(activeObjectList, this.comparator);
+		// keep object oriented out of the sorting game
+		String[] tmpObjectKeys = new String[activeObjectList.length - 1];
+		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
+		Arrays.sort(tmpObjectKeys, this.comparator);
+		System.arraycopy(tmpObjectKeys, 1, activeObjectList, 0, activeObjectList.length - 1);
+		
+		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
 		int newIndex = 0;
 		for (int i = 0; i < activeObjectList.length; ++i) {
