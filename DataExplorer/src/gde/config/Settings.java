@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.FileHandler;
@@ -532,6 +533,13 @@ public class Settings extends Properties {
 		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
 		Arrays.sort(tmpObjectKeys, this.comparator);
 		System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
+		
+		//check for invalid object key
+		Vector<String> tmpObjectVector = new Vector<String>();
+		for (String objectKey : activeObjectList) {
+			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
+		}
+		activeObjectList = tmpObjectVector.toArray(new String[1]);
 		
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
