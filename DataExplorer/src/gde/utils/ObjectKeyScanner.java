@@ -87,8 +87,6 @@ public class ObjectKeyScanner extends Thread {
 							String newLinkFilePath = objectKeyDirPath + OSDE.FILE_SEPARATOR_UNIX + file.getName();
 							if (!new File(newLinkFilePath).exists()) {
 								OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
-								OsdReaderWriter.isLink(file.getCanonicalPath());
-								log.log(Level.INFO, OsdReaderWriter.isLink(newLinkFilePath));
 							}
 						}
 					}

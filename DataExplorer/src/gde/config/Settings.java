@@ -531,7 +531,7 @@ public class Settings extends Properties {
 		String[] tmpObjectKeys = new String[activeObjectList.length - 1];
 		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
 		Arrays.sort(tmpObjectKeys, this.comparator);
-		System.arraycopy(tmpObjectKeys, 1, activeObjectList, 0, activeObjectList.length - 1);
+		System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
 		
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();

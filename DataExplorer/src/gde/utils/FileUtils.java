@@ -151,8 +151,13 @@ public class FileUtils {
 				}
 				dir.delete();
 			}
-			catch (FileNotFoundException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+			catch (Exception e) {
+				if (e instanceof FileNotFoundException) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+				else {
+					log.log(Level.SEVERE, dir.getAbsolutePath(), e);
+				}
 			}
 		}
 		return exist;

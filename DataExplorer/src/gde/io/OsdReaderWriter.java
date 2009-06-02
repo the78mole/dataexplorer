@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.io;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -24,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +49,6 @@ import osde.ui.OpenSerialDataExplorer;
 import osde.ui.menu.MenuToolBar;
 import osde.utils.OperatingSystemHelper;
 import osde.utils.StringHelper;
-import osde.utils.WindowsHelper;
 
 /**
  * @author Winfried Brügmann
@@ -539,28 +536,5 @@ public class OsdReaderWriter {
 		finally {
 			random_in.close();
 		}
-	}
-	
-	/**
-	 * check if the given file is a windows shell link, if so it returns the contained file path
-	 * @param filePath
-	 * @return if shell link file the contained file path is returned, else the given file path
-	 * @throws IOException 
-	 */
-	public static String isLink(String filePath) throws IOException {
-		String ret = filePath;
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
-		String line = reader.readLine();
-		reader.close();
-		log.log(Level.FINER, "line = " + line);
-		if (!line.contains("OpenSerialData")) {
-			ret = WindowsHelper.getFilePathFromLink(filePath);
-			if (ret.startsWith("OSDE_MSGE")) {
-				String msgKey = ret.split(";")[0];
-				String msgValue = ret.split("; ")[1];
-				throw new UnsatisfiedLinkError(Messages.getString(msgKey, new Object[] { msgValue }));
-			}
-		}
-		return ret;
 	}
 }

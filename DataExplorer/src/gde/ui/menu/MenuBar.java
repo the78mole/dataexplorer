@@ -58,6 +58,7 @@ import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.tab.GraphicsComposite;
 import osde.utils.FileUtils;
+import osde.utils.OperatingSystemHelper;
 import osde.utils.StringHelper;
 
 /**
@@ -891,7 +892,7 @@ public class MenuBar {
 	 */
 	public void openOsdFile(String openFilePath) {
 		try {
-			openFilePath = OsdReaderWriter.isLink(openFilePath); // check if windows link
+			openFilePath = OperatingSystemHelper.getLinkContainedFilePath(openFilePath); // check if windows link
 			//check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(OSDE.DEVICE_NAME);

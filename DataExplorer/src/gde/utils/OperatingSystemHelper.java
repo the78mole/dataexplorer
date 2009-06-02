@@ -19,6 +19,7 @@ package osde.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -477,8 +478,15 @@ public class OperatingSystemHelper {
 		else if (OSDE.IS_LINUX) { //$NON-NLS-1$
 			try {
 				String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-				String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-				String command = "ln -s  -T \"" + fullQualifiedLinkTargetPath + "\"" + OSDE.STRING_BLANK + "\"" + fullQualifiedLinkPath + "\""; 
+				if (fullQualifiedLinkTargetPath.contains(" ")) { // creating links with filenames containing blanks failed
+					if (FileUtils.checkFileExist(fullQualifiedLinkTargetPath)) {
+						File file = new File(fullQualifiedLinkTargetPath);
+						fullQualifiedLinkTargetPath = fullQualifiedLinkTargetPath.replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
+						file.renameTo(new File(fullQualifiedLinkTargetPath));
+					}
+				}
+				String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
+				String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath; 
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 				Process process = Runtime.getRuntime().exec(command);
 				process.waitFor();
@@ -504,6 +512,63 @@ public class OperatingSystemHelper {
 			log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
 			OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
 		}
+	}
+	
+	/**
+	 * check if the given file is a file link, if so it returns the contained file path
+	 * @param filePath
+	 * @return if shell link file the contained file path is returned, else the given file path is returned
+	 * @throws IOException 
+	 */
+	public static String getLinkContainedFilePath(String filePath) throws IOException {
+		String ret = filePath;
+		if (OSDE.IS_WINDOWS) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
+			String line = reader.readLine();
+			log.log(Level.INFO, "line = " + line);
+			reader.close();
+			if (!line.contains("OpenSerialData")) {
+				ret = WindowsHelper.getFilePathFromLink(filePath);
+				if (ret.startsWith("OSDE_MSGE")) {
+					String msgKey = ret.split(";")[0];
+					String msgValue = ret.split("; ")[1];
+					throw new UnsatisfiedLinkError(Messages.getString(msgKey,
+							new Object[] { msgValue }));
+				}
+			}
+		}
+		else if (OSDE.IS_LINUX) {
+			try {
+				String command = "ls -al " + filePath; 
+				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+				Process process = Runtime.getRuntime().exec(command);
+				process.waitFor();
+				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String line;
+				while ((line = bisr.readLine()) != null) {
+					log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
+					if (line.contains(" -> ")) {
+						ret = line.split(" -> ")[1].trim();
+					}
+				}
+				while ((line = besr.readLine()) != null) {
+					log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
+				}
+				if (process.exitValue() != 0) {
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+					log.log(Level.SEVERE, msg);
+				}
+			} catch (Exception e) {
+				log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
+
+		}
+		else {
+			log.log(Level.WARNING, "Operating System implementation not available");
+		}
+		return ret;
 	}
 
 }
