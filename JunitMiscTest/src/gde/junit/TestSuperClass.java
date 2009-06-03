@@ -87,7 +87,7 @@ public class TestSuperClass extends TestCase {
 		this.rootLogger.setLevel(Level.WARNING);
 		this.rootLogger.addHandler(this.ch);
 		this.ch.setFormatter(this.lf);
-		this.ch.setLevel(Level.FINE);
+		this.ch.setLevel(Level.FINER);
 
 		//this.logger1.setLevel(Level.FINE);
 		//this.logger1.setUseParentHandlers(true);
