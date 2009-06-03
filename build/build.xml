@@ -395,7 +395,7 @@
 		</tar>
 	</target>
 	
-	<target name="backupDataFiles">
+	<target name="backupDataFilesWindows">
 		<tar destfile="F:/OpenSerialData.tar.gz" compression="gzip">
 			<tarfileset dir="D:/Documents" casesensitive="true" >
 				<include name="OpenSerialDataExplorer/**"/>
