@@ -526,7 +526,7 @@ public class OperatingSystemHelper {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			String line = reader.readLine();
-			log.log(Level.INFO, "line = " + line);
+			log.log(Level.FINER, "line = " + line);
 			reader.close();
 			if (!line.contains("OpenSerialData")) {
 				ret = WindowsHelper.getFilePathFromLink(filePath);
@@ -541,20 +541,20 @@ public class OperatingSystemHelper {
 		else if (OSDE.IS_LINUX) {
 			try {
 				String command = "ls -al " + filePath; 
-				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
 				Process process = Runtime.getRuntime().exec(command);
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				String line;
 				while ((line = bisr.readLine()) != null) {
-					log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
+					log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
 					if (line.contains(" -> ")) {
 						ret = line.split(" -> ")[1].trim();
 					}
 				}
 				while ((line = besr.readLine()) != null) {
-					log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
+					log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 				}
 				if (process.exitValue() != 0) {
 					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$

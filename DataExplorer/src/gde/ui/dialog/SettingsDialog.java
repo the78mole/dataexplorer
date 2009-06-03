@@ -42,6 +42,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -64,6 +65,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.LogLevelSelectionContextMenu;
+import osde.utils.ObjectKeyScanner;
 import osde.utils.OperatingSystemHelper;
 
 /**
@@ -124,6 +126,8 @@ public class SettingsDialog extends Dialog {
 	Slider															alphaSlider;
 	Button															suggestDate;
 	Group																fileOpenSaveDialogGroup;
+	private Button											scanObjectKeysButton;
+	private Group												objectKeyGroup;
 	private Button											removeMimeAssocButton;
 	private Button											assocMimeTypeButton;
 	private Button											removeLauncherButton;
@@ -538,7 +542,7 @@ public class SettingsDialog extends Dialog {
 				} // end general tab item
 				{
 					this.osMiscTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
-					this.osMiscTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0303)); 
+					this.osMiscTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0303));
 					{
 						this.osMiscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.osMiscTabItem.setControl(this.osMiscComposite);
@@ -546,12 +550,23 @@ public class SettingsDialog extends Dialog {
 						this.osMiscComposite.setLayout(composite1Layout);
 						{
 							this.desktopLauncher = new Group(this.osMiscComposite, SWT.NONE);
-							this.desktopLauncher.setLayout(null);
+							RowLayout desktopLauncherLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							desktopLauncherLayout.center = true;
+							desktopLauncherLayout.type = SWT.VERTICAL;
+							desktopLauncherLayout.pack = false;
+							desktopLauncherLayout.fill = true;
+							desktopLauncherLayout.marginLeft = 30;
+							desktopLauncherLayout.marginRight = 30;
+							desktopLauncherLayout.justify = true;
+							this.desktopLauncher.setLayout(desktopLauncherLayout);
 							this.desktopLauncher.setText(Messages.getString(MessageIds.OSDE_MSGT0362));
 							{
 								this.createLauncerButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
 								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
-								this.createLauncerButton.setBounds(28, 43, 423, 57);
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 417;
+								createLauncerButtonLData.height = 44;
+								this.createLauncerButton.setLayoutData(createLauncerButtonLData);
 								this.createLauncerButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -563,7 +578,10 @@ public class SettingsDialog extends Dialog {
 							{
 								this.removeLauncherButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
 								this.removeLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0364));
-								this.removeLauncherButton.setBounds(28, 122, 423, 56);
+								RowData removeLauncherButtonLData = new RowData();
+								removeLauncherButtonLData.width = 417;
+								removeLauncherButtonLData.height = 44;
+								this.removeLauncherButton.setLayoutData(removeLauncherButtonLData);
 								this.removeLauncherButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -575,12 +593,24 @@ public class SettingsDialog extends Dialog {
 						}
 						{
 							this.shellMimeType = new Group(this.osMiscComposite, SWT.NONE);
-							this.shellMimeType.setLayout(null);
+							RowLayout shellMimeTypeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							shellMimeTypeLayout.center = true;
+							shellMimeTypeLayout.marginHeight = 3;
+							shellMimeTypeLayout.marginWidth = 3;
+							shellMimeTypeLayout.pack = false;
+							shellMimeTypeLayout.marginLeft = 30;
+							shellMimeTypeLayout.fill = true;
+							shellMimeTypeLayout.type = SWT.VERTICAL;
+							shellMimeTypeLayout.justify = true;
+							this.shellMimeType.setLayout(shellMimeTypeLayout);
 							this.shellMimeType.setText(Messages.getString(MessageIds.OSDE_MSGT0365));
 							{
 								this.assocMimeTypeButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
 								this.assocMimeTypeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0366));
-								this.assocMimeTypeButton.setBounds(28, 40, 423, 50);
+								RowData assocMimeTypeButtonLData = new RowData();
+								assocMimeTypeButtonLData.width = 417;
+								assocMimeTypeButtonLData.height = 44;
+								this.assocMimeTypeButton.setLayoutData(assocMimeTypeButtonLData);
 								this.assocMimeTypeButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -592,12 +622,61 @@ public class SettingsDialog extends Dialog {
 							{
 								this.removeMimeAssocButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
 								this.removeMimeAssocButton.setText(Messages.getString(MessageIds.OSDE_MSGT0367));
-								this.removeMimeAssocButton.setBounds(28, 121, 423, 52);
+								RowData removeMimeAssocButtonLData = new RowData();
+								removeMimeAssocButtonLData.width = 417;
+								removeMimeAssocButtonLData.height = 44;
+								this.removeMimeAssocButton.setLayoutData(removeMimeAssocButtonLData);
 								this.removeMimeAssocButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "removeMimeAssocButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										OperatingSystemHelper.deregisterApplication();
+									}
+								});
+							}
+						}
+						{
+							this.objectKeyGroup = new Group(this.osMiscComposite, SWT.NONE);
+							RowLayout objectKeyGroupLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							objectKeyGroupLayout.type = SWT.VERTICAL;
+							objectKeyGroupLayout.center = true;
+							objectKeyGroupLayout.fill = true;
+							objectKeyGroupLayout.justify = true;
+							objectKeyGroupLayout.marginBottom = 10;
+							objectKeyGroupLayout.marginLeft = 30;
+							objectKeyGroupLayout.marginRight = 10;
+							objectKeyGroupLayout.marginTop = 10;
+							objectKeyGroupLayout.pack = false;
+							this.objectKeyGroup.setLayout(objectKeyGroupLayout);
+							this.objectKeyGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0206));
+							{
+								this.scanObjectKeysButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
+								this.scanObjectKeysButton.setText(Messages.getString(MessageIds.OSDE_MSGT0207));
+								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] {this.settings.getDataFilePath()}));
+								RowData scanObjectKeysButtonLData = new RowData();
+								scanObjectKeysButtonLData.width = 417;
+								scanObjectKeysButtonLData.height = 44;
+								this.scanObjectKeysButton.setLayoutData(scanObjectKeysButtonLData);
+								this.scanObjectKeysButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "scanObjectKeysButton.widgetSelected, event=" + evt);
+										final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
+										objLnkSearch.setSearchForKeys(true);
+										objLnkSearch.start();
+										new Thread(){ 
+											public void run() {
+												while(objLnkSearch.isAlive()) {
+													try {
+														Thread.sleep(1000);
+													}
+													catch (InterruptedException e) {
+														// ignore
+													}
+												}
+												SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
+										}
+										}.start();
 									}
 								});
 							}
