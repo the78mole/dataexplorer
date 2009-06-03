@@ -19,7 +19,9 @@ package osde.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,8 +38,22 @@ public class ObjectKeyScanner extends Thread {
 	final private static Logger											log					= Logger.getLogger(ObjectKeyScanner.class.getName());
 
 	final private Settings settings;
-	final private String objectKey;
+	private String objectKey = OSDE.STRING_EMPTY;
+	private boolean searchForKeys = false;
 	
+	/**
+	 * constructor to create a object key scanner, 
+	 * starting this as thread all the sub files of the given data path are scanned for object key references 
+	 * using this constructor the object key must be set before starting the scan thread
+	 * and a file link will be created in a dircetory named with the object key
+	 * @param newObjectKey the object key to be used for scanning existing files
+	 */
+	public ObjectKeyScanner() {
+		super();
+		this.settings = Settings.getInstance();
+		this.setPriority(Thread.MIN_PRIORITY);
+	}
+
 	/**
 	 * constructor to create a object key scanner, 
 	 * starting this as thread all the sub files of the given data path are scanned for object key references 
@@ -68,36 +84,76 @@ public class ObjectKeyScanner extends Thread {
 	public void run() {
 		try {
 			String objectKeyDirPath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + this.objectKey;
-			
-			//check directory and cleanup if already exist 
-			//TODO enable update
-			if (FileUtils.checkDirectoryAndCreate(objectKeyDirPath)) {
-				FileUtils.deleteDirectory(objectKeyDirPath);
+
+			if (this.objectKey.length() > 1) {
+				//check directory and cleanup if already exist 
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
-			}
-			
-			//scan all data files for object key
-			List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
-			for (File file : files) {
-				if (file.getName().endsWith(OSDE.FILE_ENDING_OSD) && !containsKnownObjectKey(file.getPath())) {
-					log.log(Level.INFO, "working with " + file.getName());
+				//scan all data files for object key
+				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
+				for (File file : files) {
 					try {
-						if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY))) {
-							log.log(Level.INFO, "found file with given object key " + file.getName());
-							String newLinkFilePath = objectKeyDirPath + OSDE.FILE_SEPARATOR_UNIX + file.getName();
-							if (!new File(newLinkFilePath).exists()) {
-								OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
+						String actualFilePath = file.getAbsolutePath();
+						if (actualFilePath.endsWith(OSDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
+							log.log(Level.FINER, "working with " + file.getName());
+							if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY))) {
+								log.log(Level.FINER, "found file with given object key " + file.getName());
+								String newLinkFilePath = objectKeyDirPath + OSDE.FILE_SEPARATOR_UNIX + file.getName();
+								if (!new File(newLinkFilePath).exists()) {
+									OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
+								}
 							}
 						}
 					}
 					catch (IOException e) {
-						log.log(Level.WARNING, e.getLocalizedMessage(), e);
+						log.log(Level.WARNING, file.getAbsolutePath(), e);
 					}
 					catch (NotSupportedFileFormatException e) {
 						log.log(Level.WARNING, e.getLocalizedMessage(), e);
 					}
 					catch (Throwable t) {
 						log.log(Level.WARNING, t.getLocalizedMessage(), t);
+					}
+				}
+			}
+			else {
+				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !");
+
+				Vector<String> foundObjectKeys = new Vector<String>();
+				int fileCounter = 0;
+				if (this.searchForKeys) {
+					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
+					for (File file : files) {
+						try {
+							String actualFilePath = file.getAbsolutePath();
+							if (actualFilePath.endsWith(OSDE.FILE_ENDING_OSD)) {
+								fileCounter++;
+								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
+									log.log(Level.FINER, "working with " + file.getName());
+									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY);
+									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
+										log.log(Level.FINER, "found object key " + foundObjectKey);
+										if (!foundObjectKeys.contains(foundObjectKey)) foundObjectKeys.add(foundObjectKey);
+									}
+								}
+							}
+						}
+						catch (IOException e) {
+							log.log(Level.WARNING, e.getLocalizedMessage(), e);
+						}
+						catch (NotSupportedFileFormatException e) {
+							log.log(Level.WARNING, e.getLocalizedMessage(), e);
+						}
+						catch (Throwable t) {
+							log.log(Level.WARNING, t.getLocalizedMessage(), t);
+						}
+					}
+					Iterator<String> iterator = foundObjectKeys.iterator();
+					log.log(Level.FINER, "\nscanned " + fileCounter + " files for object key , found following keys");
+					while (iterator.hasNext()) {
+						String tmpObjKey = iterator.next();
+						log.log(Level.FINER, "found object key in vector = " + tmpObjKey);
+						this.setObjectKey(tmpObjKey);
+						this.run();
 					}
 				}
 			}
@@ -108,30 +164,17 @@ public class ObjectKeyScanner extends Thread {
 	}
 
 	/**
-	 * check if the actual object key list is part of the file path 
-	 * @param fulleQualifiedFilePath
-	 * @return
+	 * @param newObjectKey the objectKey to set
 	 */
-	private boolean containsKnownObjectKey(String fulleQualifiedFilePath) {
-		boolean contains = false;
-		for (String tmpObjKey : this.settings.getObjectList()) {
-			if (fulleQualifiedFilePath.contains(tmpObjKey)) {
-				contains = true;
-				break;
-			}
-		}
-		return contains;
+	public void setObjectKey(String newObjectKey) {
+		this.objectKey = newObjectKey;
 	}
 
 	/**
-	 * @param args
+	 * @param enable the searchForKeys to set
 	 */
-	public static void main(String[] args) {
-		ObjectKeyScanner objLnkCrt = new ObjectKeyScanner("ASW-27");
-		objLnkCrt.start();
-		
-		ObjectKeyScanner objLnkCrt_ = new ObjectKeyScanner("FlugAkkuA_3200");
-		objLnkCrt_.start();
+	public void setSearchForKeys(boolean enable) {
+		this.searchForKeys = enable;
 	}
 
 }
