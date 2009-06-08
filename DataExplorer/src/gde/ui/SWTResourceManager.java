@@ -298,6 +298,23 @@ public class SWTResourceManager {
 			return null;
 		}
 	}
+	
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	public static Image getImage(ImageData imageData, String imgKey) {
+		//sd.height, sd.width, sd.depth, sd.palette
+		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
+		try {
+			if (resources.containsKey(key))
+				return (Image) resources.get(key);
+			Image img = new Image(Display.getDefault(), imageData);
+			log.log(Level.FINE, "new image created = " + key); //$NON-NLS-1$
+			resources.put(key, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(String url) {

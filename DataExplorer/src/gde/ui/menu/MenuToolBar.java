@@ -122,7 +122,6 @@ public class MenuToolBar {
 	public void init() {
 		this.coolBar = new CoolBar(this.application, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.coolBar);
-		//this.coolBar.setSize(800, 100);
 		create();
 	}
 
@@ -352,15 +351,18 @@ public class MenuToolBar {
 									MenuToolBar.this.deleteObject.setEnabled(true);
 									checkChannelForObjectKeyMissmatch(selectionIndex, MenuToolBar.this.objectSelectCombo.getText());
 									MenuToolBar.this.isObjectoriented = true;
-									//MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+									
+									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
 								}
 								else {
 									MenuToolBar.this.editObject.setEnabled(false);
 									MenuToolBar.this.deleteObject.setEnabled(false);
 									checkChannelForObjectKeyMissmatch(selectionIndex, MenuToolBar.this.objectSelectCombo.getText());
 									MenuToolBar.this.isObjectoriented = false;
+									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(false);
 								}
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
+								MenuToolBar.this.application.updateObjectDescriptionWindow();
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
