@@ -15,6 +15,7 @@
     along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
+
 import java.io.File;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -75,63 +76,63 @@ import osde.ui.menu.ImageContextMenu;
  */
 public class ObjectDescriptionWindow {
 
-	final static Logger									 log	= Logger.getLogger(ObjectDescriptionWindow.class.getName());
+	final static Logger						log									= Logger.getLogger(ObjectDescriptionWindow.class.getName());
 
-	private CTabItem							objectTabItem;
-	private StyledText						styledText;
-	private Canvas								imageCanvas;
-	private CLabel							objectName;
-	private CLabel								objectNameLabel;
-	
-	private CoolBar								editCoolBar;
-	private ToolBar								fontSelectToolBar;
-	private ToolBar								editToolBar;
-//	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
-//	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
-	int														toolButtonHeight = 23;
-	private CoolItem editCoolItem;
+	CTabItem							objectTabItem;
+	StyledText						styledText;
+	Canvas								imageCanvas;
+	CLabel								objectName;
+	CLabel								objectNameLabel;
 
-	private ToolItem fontSelect;
-	Composite fontSizeSelectComposite;
-	CCombo fontSizeSelectCombo;
-	Point fontSizeSelectSize = new Point(40, 21);
-	private ToolItem strikeoutButton;
-	private ToolItem underlineButton;
-	private ToolItem italicButton;
-	private ToolItem boldButton;
-	Vector<StyleRange>			cachedStyles	= new Vector<StyleRange>();
+	CoolBar								editCoolBar;
+	ToolBar								fontSelectToolBar;
+	ToolBar								editToolBar;
+	//	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
+	//	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
+	int														toolButtonHeight		= 23;
+	CoolItem							editCoolItem;
 
-	
-	private Composite							tabComposite;
+	ToolItem							fontSelect;
+	Composite											fontSizeSelectComposite;
+	CCombo												fontSizeSelectCombo;
+	Point													fontSizeSelectSize	= new Point(40, 21);
+	ToolItem							strikeoutButton;
+	ToolItem							underlineButton;
+	ToolItem							italicButton;
+	ToolItem							boldButton;
+	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
+
+	Composite							tabComposite;
 
 	final OpenSerialDataExplorer	application;
-	String objectFilePath;
-	String activeObjectKey;
-	boolean	isObjectDataSaved = true;
-	private Composite styledTextComposite;
+	String												objectFilePath;
+	String												activeObjectKey;
+	boolean												isObjectDataSaved		= true;
+	Composite							styledTextComposite;
 
-	private Composite statusComposite;
-	private Text objectTypeText;
-	private CLabel objectTypeLable;
-	private Composite typeComposite;
-	private Group mainObjectCharacterisitcsGroup;
-	private CLabel dateLabel;
-	private Composite dateComposite;
-	private Group editGroup;
-	private ToolItem fColorButton, bColorButton;
-	private Text dateText;
-	private CCombo statusText;
-	private CLabel statusLabel; 
-		
+	Composite							statusComposite;
+	Text									objectTypeText;
+	CLabel								objectTypeLable;
+	Composite							typeComposite;
+	Group									mainObjectCharacterisitcsGroup;
+	CLabel								dateLabel;
+	Composite							dateComposite;
+	Group									editGroup;
+	ToolItem							fColorButton, bColorButton;
+	ToolItem							cutButton, copyButton, pasteButton;
+	Text									dateText;
+	CCombo								statusText;
+	CLabel								statusLabel;
+
 	Menu													popupmenu;
-	ImageContextMenu contextMenu;
-	ObjectData	object;
-	Image image;
+	ImageContextMenu							contextMenu;
+	ObjectData										object;
+	Image													image;
 
 	final Settings								settings;
 	final CTabFolder							tabFolder;
-	//static private CTabFolder cTabFolder1;
-	private Composite headerComposite;
+	//static CTabFolder cTabFolder1;
+	private Composite							headerComposite;
 
 	public ObjectDescriptionWindow(OpenSerialDataExplorer currenApplication, CTabFolder objectDescriptionTab) {
 		this.application = currenApplication;
@@ -149,16 +150,16 @@ public class ObjectDescriptionWindow {
 
 	public void setVisible(boolean isVisible) {
 		if (isVisible) {
-			if (objectTabItem.isDisposed()) {
+			if (this.objectTabItem.isDisposed()) {
 				create();
 			}
 		}
 		else {
-			objectTabItem.getControl().dispose();
-			objectTabItem.dispose();
+			this.objectTabItem.getControl().dispose();
+			this.objectTabItem.dispose();
 		}
 	}
-	
+
 	/**
 	 * loads the object relevant data from file if exist, or defaults
 	 */
@@ -202,7 +203,7 @@ public class ObjectDescriptionWindow {
 			this.styledText.setStyleRanges(this.object.getStyleRanges().clone());
 			int index = 0;
 			for (String fontSize : this.fontSizeSelectCombo.getItems()) {
-				if (fontSize.equals(OSDE.STRING_EMPTY+fd.getHeight())) {
+				if (fontSize.equals(OSDE.STRING_EMPTY + fd.getHeight())) {
 					this.fontSizeSelectCombo.select(index);
 					break;
 				}
@@ -210,206 +211,211 @@ public class ObjectDescriptionWindow {
 			}
 		}
 	}
-	
+
 	/**
 	 * creates the window content
 	 */
 	public void create() {
-		objectTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		objectTabItem.setText("Object Characteristics");
+		this.objectTabItem = new CTabItem(this.tabFolder, SWT.NONE);
+		this.objectTabItem.setText("Object Characteristics");
 		{
-			tabComposite = new Composite(this.tabFolder, SWT.NONE);
-			objectTabItem.setControl(tabComposite);
+			this.tabComposite = new Composite(this.tabFolder, SWT.NONE);
+			this.objectTabItem.setControl(this.tabComposite);
 			FormLayout composite1Layout = new FormLayout();
-			tabComposite.setLayout(composite1Layout);
-			tabComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.tabComposite.setLayout(composite1Layout);
+			this.tabComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			{
-				headerComposite = new Composite(tabComposite, SWT.NONE);
+				this.headerComposite = new Composite(this.tabComposite, SWT.NONE);
 				RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				headerComposite.setLayout(composite2Layout);
+				this.headerComposite.setLayout(composite2Layout);
 				FormData composite2LData = new FormData();
 				composite2LData.width = 419;
 				composite2LData.height = 36;
-				composite2LData.left =  new FormAttachment(0, 1000, 15);
-				composite2LData.top =  new FormAttachment(0, 1000, 17);
-				headerComposite.setLayoutData(composite2LData);
-				headerComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				composite2LData.left = new FormAttachment(0, 1000, 15);
+				composite2LData.top = new FormAttachment(0, 1000, 17);
+				this.headerComposite.setLayoutData(composite2LData);
+				this.headerComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				{
-					objectNameLabel = new CLabel(headerComposite, SWT.NONE);
-					objectNameLabel.setText("Object Name :");
-					objectNameLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif",12,0,false,false));
-					objectNameLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
+					this.objectNameLabel.setText("Object Name :");
+					this.objectNameLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 0, false, false));
+					this.objectNameLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				}
 				{
-					objectName = new CLabel(headerComposite, SWT.NONE);
-					objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif",12,1,false,false));			
+					this.objectName = new CLabel(this.headerComposite, SWT.NONE);
+					this.objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
 					RowData cLabel1LData = new RowData();
 					cLabel1LData.width = 299;
 					cLabel1LData.height = 26;
-					objectName.setLayoutData(cLabel1LData);
-					objectName.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.objectName.setLayoutData(cLabel1LData);
+					this.objectName.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				}
 			}
 			{
-				mainObjectCharacterisitcsGroup = new Group(tabComposite, SWT.NONE);
+				this.mainObjectCharacterisitcsGroup = new Group(this.tabComposite, SWT.NONE);
 				GridLayout group2Layout = new GridLayout();
 				group2Layout.makeColumnsEqualWidth = true;
-				mainObjectCharacterisitcsGroup.setLayout(group2Layout);
+				this.mainObjectCharacterisitcsGroup.setLayout(group2Layout);
 				FormData group2LData = new FormData();
 				group2LData.width = 414;
 				group2LData.height = 411;
-				group2LData.left =  new FormAttachment(0, 1000, 15);
-				group2LData.top =  new FormAttachment(0, 1000, 60);
-				mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
-				mainObjectCharacterisitcsGroup.setText("Main Characteristics ");
-				mainObjectCharacterisitcsGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				mainObjectCharacterisitcsGroup.setToolTipText("Describes the main characteristics of the object");
+				group2LData.left = new FormAttachment(0, 1000, 15);
+				group2LData.top = new FormAttachment(0, 1000, 60);
+				this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
+				this.mainObjectCharacterisitcsGroup.setText("Main Characteristics ");
+				this.mainObjectCharacterisitcsGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.mainObjectCharacterisitcsGroup.setToolTipText("Describes the main characteristics of the object");
 				{
-					typeComposite = new Composite(mainObjectCharacterisitcsGroup, SWT.NONE);
+					this.typeComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
 					RowLayout composite1Layout3 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					typeComposite.setLayout(composite1Layout3);
+					this.typeComposite.setLayout(composite1Layout3);
 					GridData typeCompositeLData = new GridData();
 					typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 					typeCompositeLData.grabExcessHorizontalSpace = true;
 					typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					typeCompositeLData.heightHint = 28;
-					typeComposite.setLayoutData(typeCompositeLData);
-					typeComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.typeComposite.setLayoutData(typeCompositeLData);
+					this.typeComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
-						objectTypeLable = new CLabel(typeComposite, SWT.NONE);
-						objectTypeLable.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						objectTypeLable.setText("Object Type :");
+						this.objectTypeLable = new CLabel(this.typeComposite, SWT.NONE);
+						this.objectTypeLable.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.objectTypeLable.setText("Object Type :");
 						RowData cLabel1LData1 = new RowData();
 						cLabel1LData1.width = 120;
 						cLabel1LData1.height = 22;
-						objectTypeLable.setLayoutData(cLabel1LData1);
-						objectTypeLable.setToolTipText("give a type name, sample:battery, Soaring model, motor flyer, trainer, solar collector, ....");
+						this.objectTypeLable.setLayoutData(cLabel1LData1);
+						this.objectTypeLable.setToolTipText("give a type name, sample:battery, Soaring model, motor flyer, trainer, solar collector, ....");
 					}
 					{
-						objectTypeText = new Text(typeComposite, SWT.NONE);
-						objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
-						objectTypeText.setEditable(true);
+						this.objectTypeText = new Text(this.typeComposite, SWT.NONE);
+						this.objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.objectTypeText.setEditable(true);
 						RowData cLabel2LData = new RowData();
 						cLabel2LData.width = 267;
 						cLabel2LData.height = 23;
-						objectTypeText.setLayoutData(cLabel2LData);
-						objectTypeText.setToolTipText("give a type name, sample: NiMh battery, soaring model, motor flyer, trainer, solar collector, ....");
-						objectTypeText.addKeyListener(new KeyAdapter() {
+						this.objectTypeText.setLayoutData(cLabel2LData);
+						this.objectTypeText.setToolTipText("give a type name, sample: NiMh battery, soaring model, motor flyer, trainer, solar collector, ....");
+						this.objectTypeText.addKeyListener(new KeyAdapter() {
+							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "objectTypeText.keyReleased, event="+evt);
-								isObjectDataSaved = false;
+								log.log(Level.FINEST, "objectTypeText.keyReleased, event=" + evt);
+								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
 					}
 				}
 				{
-					dateComposite = new Composite(mainObjectCharacterisitcsGroup, SWT.NONE);
+					this.dateComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
 					RowLayout composite1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					dateComposite.setLayout(composite1Layout1);
+					this.dateComposite.setLayout(composite1Layout1);
 					GridData dateCompositeLData = new GridData();
 					dateCompositeLData.grabExcessHorizontalSpace = true;
 					dateCompositeLData.verticalAlignment = GridData.BEGINNING;
 					dateCompositeLData.widthHint = 246;
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					dateCompositeLData.heightHint = 28;
-					dateComposite.setLayoutData(dateCompositeLData);
-					dateComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.dateComposite.setLayoutData(dateCompositeLData);
+					this.dateComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
-						dateLabel = new CLabel(dateComposite, SWT.NONE);
-						dateLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
+						this.dateLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 						RowData dateLabelLData = new RowData();
 						dateLabelLData.width = 120;
 						dateLabelLData.height = 22;
-						dateLabel.setLayoutData(dateLabelLData);
-						dateLabel.setText("Date of first usage :");
-						dateLabel.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
+						this.dateLabel.setLayoutData(dateLabelLData);
+						this.dateLabel.setText("Date of first usage :");
+						this.dateLabel.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
 					}
 					{
-						dateText = new Text(dateComposite, SWT.NONE);
+						this.dateText = new Text(this.dateComposite, SWT.NONE);
 						RowData dateTextLData = new RowData();
 						dateTextLData.width = 114;
 						dateTextLData.height = 21;
-						dateText.setLayoutData(dateTextLData);
-						dateText.setBackground(SWTResourceManager.getColor(255, 255, 255));
-						dateText.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
-						dateText.setEditable(true);
-						dateText.addKeyListener(new KeyAdapter() {
+						this.dateText.setLayoutData(dateTextLData);
+						this.dateText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.dateText.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
+						this.dateText.setEditable(true);
+						this.dateText.addKeyListener(new KeyAdapter() {
+							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "dateText.keyReleased, event="+evt);
-								isObjectDataSaved = false;
+								log.log(Level.FINEST, "dateText.keyReleased, event=" + evt);
+								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
 					}
 				}
 				{
-					statusComposite = new Composite(mainObjectCharacterisitcsGroup, SWT.NONE);
+					this.statusComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
 					RowLayout composite1Layout2 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					statusComposite.setLayout(composite1Layout2);
+					this.statusComposite.setLayout(composite1Layout2);
 					GridData statusCompositeLData = new GridData();
 					statusCompositeLData.grabExcessHorizontalSpace = true;
 					statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					statusCompositeLData.widthHint = 246;
 					statusCompositeLData.heightHint = 28;
-					statusComposite.setLayoutData(statusCompositeLData);
-					statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.statusComposite.setLayoutData(statusCompositeLData);
+					this.statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
-						statusLabel = new CLabel(statusComposite, SWT.NONE);
-						statusLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
+						this.statusLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 						RowData statusLabelLData = new RowData();
 						statusLabelLData.width = 120;
 						statusLabelLData.height = 22;
-						statusLabel.setLayoutData(statusLabelLData);
-						statusLabel.setText("Status information :");
-						statusLabel.setToolTipText("selct most fitting usage state of the object, active, in use, damaged, outdated, lost, sold ");
+						this.statusLabel.setLayoutData(statusLabelLData);
+						this.statusLabel.setText("Status information :");
+						this.statusLabel.setToolTipText("selct most fitting usage state of the object, active, in use, damaged, outdated, lost, sold ");
 					}
 					{
-						statusText = new CCombo(statusComposite, SWT.NONE);
-						statusText.setItems(new String[] {"unknown", "active", "in use", "damaged", "outdated", "lost", "sold", "under repair" });
-						statusText.select(0);
+						this.statusText = new CCombo(this.statusComposite, SWT.NONE);
+						this.statusText.setItems(new String[] { "unknown", "active", "in use", "damaged", "outdated", "lost", "sold", "under repair" });
+						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 117;
 						group1LData.height = 22;
-						statusText.setLayoutData(group1LData);
-						statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
-						statusText.addSelectionListener(new SelectionAdapter() {
+						this.statusText.setLayoutData(group1LData);
+						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.statusText.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "statusText.widgetSelected, event="+evt);
-								isObjectDataSaved = false;
+								log.log(Level.FINEST, "statusText.widgetSelected, event=" + evt);
+								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
 					}
 				}
 				{
-					imageCanvas = new Canvas(mainObjectCharacterisitcsGroup, SWT.BORDER);
+					this.imageCanvas = new Canvas(this.mainObjectCharacterisitcsGroup, SWT.BORDER);
 					GridData imageCanvasLData = new GridData();
 					imageCanvasLData.minimumWidth = 400;
 					imageCanvasLData.minimumHeight = 300;
 					imageCanvasLData.verticalAlignment = GridData.FILL;
 					imageCanvasLData.grabExcessHorizontalSpace = true;
 					imageCanvasLData.widthHint = 400;
-					imageCanvas.setLayoutData(imageCanvasLData);
-					imageCanvas.setToolTipText("drag image here, 400x300 is the recommended  size");
-					imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/"+ settings.getLocale() +"/ObjectImage.gif"));
-					imageCanvas.setSize(400, 300);
-					popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-					contextMenu = new ImageContextMenu();
-					contextMenu.createMenu(this.popupmenu);
-					imageCanvas.setMenu(popupmenu);
-					imageCanvas.addPaintListener(new PaintListener() {
+					this.imageCanvas.setLayoutData(imageCanvasLData);
+					this.imageCanvas.setToolTipText("drag image here, 400x300 is the recommended  size");
+					this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/" + this.settings.getLocale() + "/ObjectImage.gif"));
+					this.imageCanvas.setSize(400, 300);
+					this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+					this.contextMenu = new ImageContextMenu();
+					this.contextMenu.createMenu(this.popupmenu);
+					this.imageCanvas.setMenu(this.popupmenu);
+					this.imageCanvas.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							log.log(Level.FINEST, "imageCanvas.paintControl, event="+evt);
-							if (popupmenu.getData(ImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean)popupmenu.getData("OBJECT_IMAGE_CHANGED")) {
-								image = SWTResourceManager.getImage(new Image(imageCanvas.getDisplay(), (String)popupmenu.getData(ImageContextMenu.OBJECT_IMAGE_PATH)).getImageData(), object.getKey(), object.getImageWidth(), object.getImageHeight(), true);
-								object.setImage(image);
-								popupmenu.setData("OBJECT_IMAGE_CHANGED", false);
-								isObjectDataSaved = false;
+							log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt);
+							if (ObjectDescriptionWindow.this.popupmenu.getData(ImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean) ObjectDescriptionWindow.this.popupmenu.getData("OBJECT_IMAGE_CHANGED")) {
+								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(ObjectDescriptionWindow.this.imageCanvas.getDisplay(), (String) ObjectDescriptionWindow.this.popupmenu
+										.getData(ImageContextMenu.OBJECT_IMAGE_PATH)).getImageData(), ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(),
+										ObjectDescriptionWindow.this.object.getImageHeight(), true);
+								ObjectDescriptionWindow.this.object.setImage(ObjectDescriptionWindow.this.image);
+								ObjectDescriptionWindow.this.popupmenu.setData("OBJECT_IMAGE_CHANGED", false);
+								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 								//imageCanvas.redraw(0,0,400,300,true);
 							}
-							imageCanvas.setSize(400, 300);
-							if (image != null) {
-								Rectangle imgBounds = image.getBounds();
-								evt.gc.drawImage(image, 0, 0, imgBounds.width, imgBounds.height, 0, 0, 400, 300);
+							ObjectDescriptionWindow.this.imageCanvas.setSize(400, 300);
+							if (ObjectDescriptionWindow.this.image != null) {
+								Rectangle imgBounds = ObjectDescriptionWindow.this.image.getBounds();
+								evt.gc.drawImage(ObjectDescriptionWindow.this.image, 0, 0, imgBounds.width, imgBounds.height, 0, 0, 400, 300);
 							}
 						}
 					});
@@ -417,17 +423,17 @@ public class ObjectDescriptionWindow {
 			}
 			{
 				FormData composite1LData = new FormData();
-				composite1LData.right =  new FormAttachment(1000, 1000, -15);
-				composite1LData.top =  new FormAttachment(0, 1000, 60);
-				composite1LData.bottom =  new FormAttachment(1000, 1000, -15);
-				composite1LData.left =  new FormAttachment(440, 1000, 0);
-				editGroup = new Group(tabComposite, SWT.NONE);
+				composite1LData.right = new FormAttachment(1000, 1000, -15);
+				composite1LData.top = new FormAttachment(0, 1000, 60);
+				composite1LData.bottom = new FormAttachment(1000, 1000, -15);
+				composite1LData.left = new FormAttachment(440, 1000, 0);
+				this.editGroup = new Group(this.tabComposite, SWT.NONE);
 				FormLayout editGroupLayout = new FormLayout();
-				editGroup.setLayout(editGroupLayout);
-				editGroup.setLayoutData(composite1LData);
-				editGroup.setText("Additional Characteristics");
-				editGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				editGroup.setToolTipText("describe additionla characteristics here ");
+				this.editGroup.setLayout(editGroupLayout);
+				this.editGroup.setLayoutData(composite1LData);
+				this.editGroup.setText("Additional Characteristics");
+				this.editGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.editGroup.setToolTipText("describe additionla characteristics here ");
 				{
 					FormData composite1LData1 = new FormData();
 					composite1LData1.height = 40;
@@ -435,33 +441,35 @@ public class ObjectDescriptionWindow {
 					composite1LData1.right = new FormAttachment(1000, 1000, -5);
 					composite1LData1.top = new FormAttachment(0, 1000, 5);
 					composite1LData1.width = 500;
-					editCoolBar = new CoolBar(editGroup, SWT.FLAT);
-					editCoolBar.setLayoutData(composite1LData1);
-					editCoolBar.setLayout(new RowLayout(SWT.HORIZONTAL));
-					editCoolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.editCoolBar = new CoolBar(this.editGroup, SWT.FLAT);
+					this.editCoolBar.setLayoutData(composite1LData1);
+					this.editCoolBar.setLayout(new RowLayout(SWT.HORIZONTAL));
+					this.editCoolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
-						editCoolItem = new CoolItem(editCoolBar, SWT.FLAT);
+						this.editCoolItem = new CoolItem(this.editCoolBar, SWT.FLAT);
 						{
-							fontSelectToolBar = new ToolBar(editCoolBar, SWT.FLAT);
-							editCoolItem.setControl(fontSelectToolBar);
-							
+							this.fontSelectToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
+							this.editCoolItem.setControl(this.fontSelectToolBar);
+
 							new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 							{
-								fontSelect = new ToolItem(this.fontSelectToolBar, SWT.BORDER);
-								fontSelect.setImage(SWTResourceManager.getImage("osde/resource/Font.gif"));
-								fontSelect.setToolTipText("Select the font to used or set");
-								fontSelect.addSelectionListener(new SelectionAdapter() {
+								this.fontSelect = new ToolItem(this.fontSelectToolBar, SWT.BORDER);
+								this.fontSelect.setImage(SWTResourceManager.getImage("osde/resource/Font.gif"));
+								this.fontSelect.setToolTipText("Select the font to used or set");
+								this.fontSelect.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "fontSelect.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setFont();
 									}
 								});
 							}
-							Point size = fontSelectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-							fontSelectToolBar.setSize(size);
+							Point size = this.fontSelectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+							this.fontSelectToolBar.setSize(size);
 
-							editToolBar = new ToolBar(editCoolBar, SWT.FLAT);
-							editCoolItem.setControl(editToolBar);
-							
+							this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
+							this.editCoolItem.setControl(this.editToolBar);
+
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								ToolItem fontSizeSelectComboSep = new ToolItem(this.editToolBar, SWT.SEPARATOR);
@@ -476,9 +484,10 @@ public class ObjectDescriptionWindow {
 									this.fontSizeSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.fontSizeSelectCombo.setVisibleItemCount(5);
 									this.fontSizeSelectCombo.addSelectionListener(new SelectionAdapter() {
+										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											log.log(Level.FINEST, "fontSizeSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											setFontSize(Float.parseFloat(fontSizeSelectCombo.getText()));
+											setFontSize(Float.parseFloat(ObjectDescriptionWindow.this.fontSizeSelectCombo.getText()));
 										}
 									});
 									this.toolButtonHeight = this.fontSelect.getBounds().height;
@@ -491,129 +500,183 @@ public class ObjectDescriptionWindow {
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								boldButton = new ToolItem(editToolBar, SWT.PUSH);
-								boldButton.setImage(SWTResourceManager.getImage("osde/resource/Bold.gif"));
-								boldButton.setToolTipText("toggle bold text");
-								boldButton.addSelectionListener(new SelectionAdapter() {
+								this.boldButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.boldButton.setImage(SWTResourceManager.getImage("osde/resource/Bold.gif"));
+								this.boldButton.setToolTipText("toggle bold text");
+								this.boldButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "boldButton.widgetSelected, event=" + evt);
-										setStyle(boldButton);
+										setStyle(ObjectDescriptionWindow.this.boldButton);
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								italicButton = new ToolItem(editToolBar, SWT.PUSH);
-								italicButton.setImage(SWTResourceManager.getImage("osde/resource/Italic.gif"));
-								italicButton.setToolTipText("toggle italic font style");
-								italicButton.addSelectionListener(new SelectionAdapter() {
+								this.italicButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.italicButton.setImage(SWTResourceManager.getImage("osde/resource/Italic.gif"));
+								this.italicButton.setToolTipText("toggle italic font style");
+								this.italicButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "italicButton.widgetSelected, event=" + evt);
-										setStyle(italicButton);
+										setStyle(ObjectDescriptionWindow.this.italicButton);
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								underlineButton = new ToolItem(editToolBar, SWT.PUSH);
-								underlineButton.setImage(SWTResourceManager.getImage("osde/resource/Underline.gif"));
-								underlineButton.setToolTipText("underline selected text");
-								underlineButton.addSelectionListener(new SelectionAdapter() {
+								this.underlineButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.underlineButton.setImage(SWTResourceManager.getImage("osde/resource/Underline.gif"));
+								this.underlineButton.setToolTipText("underline selected text");
+								this.underlineButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "underlineButton.widgetSelected, event=" + evt);
-										setStyle(underlineButton);
+										setStyle(ObjectDescriptionWindow.this.underlineButton);
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								strikeoutButton = new ToolItem(editToolBar, SWT.PUSH);
-								strikeoutButton.setImage(SWTResourceManager.getImage("osde/resource/Strikeout.gif"));
-								strikeoutButton.setToolTipText("strike trough selected text");
-								strikeoutButton.addSelectionListener(new SelectionAdapter() {
+								this.strikeoutButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.strikeoutButton.setImage(SWTResourceManager.getImage("osde/resource/Strikeout.gif"));
+								this.strikeoutButton.setToolTipText("strike trough selected text");
+								this.strikeoutButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "strikeoutButton.widgetSelected, event=" + evt);
-										setStyle(strikeoutButton);
+										setStyle(ObjectDescriptionWindow.this.strikeoutButton);
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								fColorButton = new ToolItem(editToolBar, SWT.PUSH);
-								fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif"));
-								fColorButton.addSelectionListener(new SelectionAdapter() {
+								this.fColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif"));
+								this.fColorButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt);
-										RGB rgb = new ColorDialog(editToolBar.getShell()).open();
-										fColorButton.setData(rgb);
-										setStyle(fColorButton);
+										RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
+										ObjectDescriptionWindow.this.fColorButton.setData(rgb);
+										setStyle(ObjectDescriptionWindow.this.fColorButton);
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
-								bColorButton = new ToolItem(editToolBar, SWT.PUSH);
-								bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif"));
-								bColorButton.addSelectionListener(new SelectionAdapter() {
+								this.bColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif"));
+								this.bColorButton.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt);
-										RGB rgb = new ColorDialog(editToolBar.getShell()).open();
-										bColorButton.setData(rgb);
-										setStyle(bColorButton);
+										RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
+										ObjectDescriptionWindow.this.bColorButton.setData(rgb);
+										setStyle(ObjectDescriptionWindow.this.bColorButton);
+									}
+								});
+							}
+							new ToolItem(this.editToolBar, SWT.SEPARATOR);
+							{
+								this.copyButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.copyButton.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif"));
+								this.copyButton.setToolTipText("copy selected text");
+								this.copyButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "copyButton.widgetSelected, event=" + evt);
+										handleCutCopy();
+										ObjectDescriptionWindow.this.styledText.copy();
+									}
+								});
+							}
+							new ToolItem(this.editToolBar, SWT.SEPARATOR);
+							{
+								this.cutButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.cutButton.setImage(SWTResourceManager.getImage("osde/resource/Cut.gif"));
+								this.cutButton.setToolTipText("cut selected text");
+								this.cutButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "cutButton.widgetSelected, event=" + evt);
+										handleCutCopy();
+										ObjectDescriptionWindow.this.styledText.cut();
+									}
+								});
+							}
+							new ToolItem(this.editToolBar, SWT.SEPARATOR);
+							{
+								this.pasteButton = new ToolItem(this.editToolBar, SWT.PUSH);
+								this.pasteButton.setImage(SWTResourceManager.getImage("osde/resource/Paste.gif"));
+								this.pasteButton.setToolTipText("paste selected text");
+								this.pasteButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt);
+										ObjectDescriptionWindow.this.styledText.paste();
+										//								    Clipboard clipboard = new Clipboard(tabComposite.getDisplay());
+										//						        String data = (String) clipboard.getContents(RTFTransfer.getInstance());
+										//						        System.out.println(data);
+										//						        FileInputStream stream = new FileInputStream("sample.rtf");
+										//						        RTFEditorKit kit = new RTFEditorKit();
+										//						        Document doc = kit.createDefaultDocument();
+										//						        kit.read(stream, doc, 0);
+										//					        	String plainText = doc.getText(0, doc.getLength());
 									}
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 
-							size = editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-							editToolBar.setSize(size);
+							size = this.editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+							this.editToolBar.setSize(size);
 						}
-						Point size = editCoolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-						editToolBar.setSize(size);
+						Point size = this.editCoolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+						this.editToolBar.setSize(size);
 					}
 				}
 				{
-					styledTextComposite = new Composite(editGroup, SWT.BORDER);
+					this.styledTextComposite = new Composite(this.editGroup, SWT.BORDER);
 					FormLayout styledTextCompositeLayout = new FormLayout();
-					styledTextComposite.setLayout(styledTextCompositeLayout);
-					styledTextComposite.setBackground(SWTResourceManager.getColor(255, 255, 255));
+					this.styledTextComposite.setLayout(styledTextCompositeLayout);
+					this.styledTextComposite.setBackground(SWTResourceManager.getColor(255, 255, 255));
 					FormData styledTextCompositeLData = new FormData();
 					styledTextCompositeLData.width = 540;
 					styledTextCompositeLData.height = 383;
-					styledTextCompositeLData.top =  new FormAttachment(0, 1000, 49);
-					styledTextCompositeLData.left =  new FormAttachment(0, 1000, 5);
-					styledTextCompositeLData.bottom =  new FormAttachment(1000, 1000, -3);
-					styledTextCompositeLData.right =  new FormAttachment(1000, 1000, -4);
-					styledTextComposite.setLayoutData(styledTextCompositeLData);
+					styledTextCompositeLData.top = new FormAttachment(0, 1000, 49);
+					styledTextCompositeLData.left = new FormAttachment(0, 1000, 5);
+					styledTextCompositeLData.bottom = new FormAttachment(1000, 1000, -3);
+					styledTextCompositeLData.right = new FormAttachment(1000, 1000, -4);
+					this.styledTextComposite.setLayoutData(styledTextCompositeLData);
 					{
-						styledText = new StyledText(styledTextComposite, SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
+						this.styledText = new StyledText(this.styledTextComposite, SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
 						FormLayout styledTextLayout = new FormLayout();
-						styledText.setLayout(styledTextLayout);
-						styledText.setText(" Hersteller\t\t:\n Händler\t\t\t:\n Preis\t\t\t\t:\n Bauzeit\t\t\t:\n .....\t\t\t\t\t:\n");
-						styledText.setEditable(true);
-						styledText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif",10,1,false,false));
-						styledText.setHorizontalIndex(2);
-						styledText.setTopIndex(1);
+						this.styledText.setLayout(styledTextLayout);
+						this.styledText.setEditable(true);
+						this.styledText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+						this.styledText.setHorizontalIndex(2);
+						this.styledText.setTopIndex(1);
 						FormData styledTextLData = new FormData();
 						styledTextLData.width = 400;
 						styledTextLData.height = 300;
-						styledTextLData.top =  new FormAttachment(0, 1000, 5);
-						styledTextLData.left =  new FormAttachment(0, 1000, 8);
-						styledTextLData.bottom =  new FormAttachment(1000, 1000, 0);
-						styledTextLData.right =  new FormAttachment(1000, 1000, 0);
-						styledText.setLayoutData(styledTextLData);
-						styledText.addExtendedModifyListener(new ExtendedModifyListener() {
+						styledTextLData.top = new FormAttachment(0, 1000, 5);
+						styledTextLData.left = new FormAttachment(0, 1000, 8);
+						styledTextLData.bottom = new FormAttachment(1000, 1000, 0);
+						styledTextLData.right = new FormAttachment(1000, 1000, 0);
+						this.styledText.setLayoutData(styledTextLData);
+						this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 							public void modifyText(ExtendedModifyEvent evt) {
-								log.log(Level.INFO, "styledText.modifyText, event="+evt);
+								log.log(Level.INFO, "styledText.modifyText, event=" + evt);
 								if (evt.length == 0) return;
 								StyleRange style;
-								if (evt.length == 1 || styledText.getTextRange(evt.start, evt.length).equals(styledText.getLineDelimiter())) {
+								if (evt.length == 1 || ObjectDescriptionWindow.this.styledText.getTextRange(evt.start, evt.length).equals(ObjectDescriptionWindow.this.styledText.getLineDelimiter())) {
 									// Have the new text take on the style of the text to its right
 									// (during
 									// typing) if no style information is active.
-									int caretOffset = styledText.getCaretOffset();
+									int caretOffset = ObjectDescriptionWindow.this.styledText.getCaretOffset();
 									style = null;
-									if (caretOffset < styledText.getCharCount()) style = styledText.getStyleRangeAtOffset(caretOffset);
+									if (caretOffset < ObjectDescriptionWindow.this.styledText.getCharCount()) style = ObjectDescriptionWindow.this.styledText.getStyleRangeAtOffset(caretOffset);
 									if (style != null) {
 										style = (StyleRange) style.clone();
 										style.start = evt.start;
@@ -622,57 +685,51 @@ public class ObjectDescriptionWindow {
 									else {
 										style = new StyleRange(evt.start, evt.length, null, null, SWT.NORMAL);
 									}
-									if (boldButton.getSelection()) style.fontStyle |= SWT.BOLD;
-									if (italicButton.getSelection()) style.fontStyle |= SWT.ITALIC;
-									style.underline = underlineButton.getSelection();
-									style.strikeout = strikeoutButton.getSelection();
-									if (!style.isUnstyled()) styledText.setStyleRange(style);
+									if (ObjectDescriptionWindow.this.boldButton.getSelection()) style.fontStyle |= SWT.BOLD;
+									if (ObjectDescriptionWindow.this.italicButton.getSelection()) style.fontStyle |= SWT.ITALIC;
+									style.underline = ObjectDescriptionWindow.this.underlineButton.getSelection();
+									style.strikeout = ObjectDescriptionWindow.this.strikeoutButton.getSelection();
+									if (!style.isUnstyled()) ObjectDescriptionWindow.this.styledText.setStyleRange(style);
 								}
 								else {
 									// paste occurring, have text take on the styles it had when it was
 									// cut/copied
-									for (int i = 0; i < cachedStyles.size(); i++) {
-										style = (StyleRange) cachedStyles.elementAt(i);
+									for (int i = 0; i < ObjectDescriptionWindow.this.cachedStyles.size(); i++) {
+										style = ObjectDescriptionWindow.this.cachedStyles.elementAt(i);
 										StyleRange newStyle = (StyleRange) style.clone();
 										newStyle.start = style.start + evt.start;
-										styledText.setStyleRange(newStyle);
+										ObjectDescriptionWindow.this.styledText.setStyleRange(newStyle);
 									}
 								}
 							}
 						});
-//						styledText.addMenuDetectListener(new MenuDetectListener() {
-//							public void menuDetected(MenuDetectEvent evt) {
-//								log.log(Level.FINEST, "styledText.menuDetected, event="+evt);
-//								//TODO add your code for styledText.menuDetected
-//							}
-//						});
-//						styledText.addSelectionListener(new SelectionAdapter() {
-//							public void widgetSelected(SelectionEvent evt) {
-//								log.log(Level.FINEST, "styledText.widgetSelected, event="+evt);
-//								//TODO add your code for styledText.widgetSelected
-//							}
-//						});
-//						styledText.addVerifyKeyListener(new VerifyKeyListener() {
-//							public void verifyKey(VerifyEvent evt) {
-//								log.log(Level.FINEST, "styledText.verifyKey, event="+evt);
-//								//TODO add your code for styledText.verifyKey
-//							}
-//						});
-//						styledText.addModifyListener(new ModifyListener() {
-//							public void modifyText(ModifyEvent evt) {
-//								log.log(Level.FINEST, "styledText.modifyText, event="+evt);
-//								//TODO add your code for styledText.modifyText
-//							}
-//						});
-						styledText.addKeyListener(new KeyAdapter() {
+						this.styledText.addKeyListener(new KeyAdapter() {
+							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.INFO, "styledText.keyReleased, event="+evt);
-								isObjectDataSaved = false;
+								log.log(Level.INFO, "styledText.keyReleased, event=" + evt);
+								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
-//							public void keyPressed(KeyEvent evt) {
-//								log.log(Level.FINEST, "styledText.keyPressed, event="+evt);
-//								//TODO add your code for styledText.keyPressed
-//							}
+
+							@Override
+							public void keyPressed(KeyEvent evt) {
+								log.log(Level.FINEST, "styledText.keyPressed, event=" + evt);
+								if ((evt.stateMask & SWT.CTRL) != 0) {
+									if (evt.keyCode == 'x') { //cut
+										System.out.println("SWT.CTRL + 'x'");
+										handleCutCopy();
+										ObjectDescriptionWindow.this.styledText.cut();
+									}
+									else if (evt.keyCode == 'c') { //copy
+										System.out.println("SWT.CTRL + 'c'");
+										handleCutCopy();
+										ObjectDescriptionWindow.this.styledText.copy();
+									}
+									else if (evt.keyCode == 'v') { //paste
+										System.out.println("SWT.CTRL + 'v'");
+										ObjectDescriptionWindow.this.styledText.paste();
+									}
+								}
+							}
 						});
 					}
 				}
@@ -681,51 +738,51 @@ public class ObjectDescriptionWindow {
 		this.update();
 	}
 
-//	/**
-//	 * dummy main to enable form edit
-//	 * @param args
-//	 */
-//	public static void main(String[] args) {
-//		Display display = Display.getDefault();
-//		Shell shell = new Shell(display);
-//		Composite inst = new Composite(shell, SWT.NULL);
-//
-//		FillLayout instLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
-//		inst.setLayout(instLayout);
-//			{
-//				cTabFolder1 = new CTabFolder(inst, SWT.NONE);
-//				
-//				ObjectDescriptionWindow objectDescriptionWindow = new ObjectDescriptionWindow(cTabFolder1);
-//				objectDescriptionWindow.create();
-//				
-//				cTabFolder1.setSelection(0);
-//			}
-//			inst.layout();
-//
-//		Point size = inst.getSize();
-//		shell.setLayout(new FillLayout());
-//		shell.layout();
-//		if (size.x == 0 && size.y == 0) {
-//			inst.pack();
-//			shell.pack();
-//		}
-//		else {
-//			Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
-//			shell.setSize(shellBounds.width, shellBounds.height);
-//		}
-//		shell.open();
-//		while (!shell.isDisposed()) {
-//			if (!display.readAndDispatch()) display.sleep();
-//		}
-//	}
-	
+	//	/**
+	//	 * dummy main to enable form edit
+	//	 * @param args
+	//	 */
+	//	public static void main(String[] args) {
+	//		Display display = Display.getDefault();
+	//		Shell shell = new Shell(display);
+	//		Composite inst = new Composite(shell, SWT.NULL);
+	//
+	//		FillLayout instLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
+	//		inst.setLayout(instLayout);
+	//			{
+	//				cTabFolder1 = new CTabFolder(inst, SWT.NONE);
+	//				
+	//				ObjectDescriptionWindow objectDescriptionWindow = new ObjectDescriptionWindow(cTabFolder1);
+	//				objectDescriptionWindow.create();
+	//				
+	//				cTabFolder1.setSelection(0);
+	//			}
+	//			inst.layout();
+	//
+	//		Point size = inst.getSize();
+	//		shell.setLayout(new FillLayout());
+	//		shell.layout();
+	//		if (size.x == 0 && size.y == 0) {
+	//			inst.pack();
+	//			shell.pack();
+	//		}
+	//		else {
+	//			Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
+	//			shell.setSize(shellBounds.width, shellBounds.height);
+	//		}
+	//		shell.open();
+	//		while (!shell.isDisposed()) {
+	//			if (!display.readAndDispatch()) display.sleep();
+	//		}
+	//	}
+
 	/**
 	 * @return the imageCanvas to enable redraw
 	 */
 	public void redrawImageCanvas() {
 		this.imageCanvas.redraw();
 	}
-	
+
 	/**
 	 * Set a style
 	 */
@@ -756,11 +813,11 @@ public class ObjectDescriptionWindow {
 				style.strikeout = !style.strikeout;
 			}
 			else if (widget == this.fColorButton) {
-				RGB rgb = (RGB)this.fColorButton.getData();
+				RGB rgb = (RGB) this.fColorButton.getData();
 				style.foreground = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
 			}
 			else if (widget == this.bColorButton) {
-				RGB rgb = (RGB)this.bColorButton.getData();
+				RGB rgb = (RGB) this.bColorButton.getData();
 				style.background = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
 			}
 			this.styledText.setStyleRange(style);
@@ -768,12 +825,12 @@ public class ObjectDescriptionWindow {
 		this.styledText.setSelectionRange(sel.x + sel.y, 0);
 		this.isObjectDataSaved = false;
 	}
-	
+
 	/**
 	 * Set a font for the wole text
 	 */
 	void setFont() {
-		FontDialog fontDialog = new FontDialog(editToolBar.getShell());
+		FontDialog fontDialog = new FontDialog(this.editToolBar.getShell());
 		fontDialog.setFontList((this.styledText.getFont()).getFontData());
 		FontData fontData = fontDialog.open();
 		if (fontData != null) {
@@ -781,16 +838,42 @@ public class ObjectDescriptionWindow {
 		}
 		this.isObjectDataSaved = false;
 	}
-	
+
 	/**
 	 * Set a font for the wole text
 	 */
 	void setFontSize(float height) {
 		FontData fontData = this.styledText.getFont().getFontData()[0];
 		fontData.height = height;
-		if (fontData != null) {
-			this.styledText.setFont(SWTResourceManager.getFont(fontData));
-		}
+		this.styledText.setFont(SWTResourceManager.getFont(fontData));
 		this.isObjectDataSaved = false;
+	}
+
+	/**
+	 * Cache the style information for styled text that has been cut or copied
+	 * Save the cut/copied style info so that during paste we will maintain the style information
+	 */
+	void handleCutCopy() {
+		this.cachedStyles = new Vector<StyleRange>();
+		Point sel = this.styledText.getSelectionRange();
+		int startX = sel.x;
+		for (int i = sel.x; i <= sel.x + sel.y - 1; i++) {
+			StyleRange style = this.styledText.getStyleRangeAtOffset(i);
+			if (style != null) {
+				style.start = style.start - startX;
+				if (!this.cachedStyles.isEmpty()) {
+					StyleRange lastStyle = this.cachedStyles.lastElement();
+					if (lastStyle.similarTo(style) && lastStyle.start + lastStyle.length == style.start) {
+						lastStyle.length++;
+					}
+					else {
+						this.cachedStyles.addElement(style);
+					}
+				}
+				else {
+					this.cachedStyles.addElement(style);
+				}
+			}
+		}
 	}
 }
