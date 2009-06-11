@@ -24,11 +24,12 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.StyledTextPrintOptions;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
 import osde.OSDE;
-import osde.config.Settings;
 import osde.io.ObjectDataReaderWriter;
 import osde.ui.SWTResourceManager;
 
@@ -37,15 +38,26 @@ import osde.ui.SWTResourceManager;
  * Class to handle object relevant data, like object key, object description, object type, object image, ....
  */
 public class ObjectData {
+	/**
+	 * 
+	 */
+	public static final String	STRING_STYLED_TEXT_DEFAULT	= "Hersteller\t\t:\nHändler\t\t\t:\nPreis\t\t\t\t:\nBauzeit\t\t\t:\n .....\t\t\t\t\t:\n";
+
 	final static Logger	log	= Logger.getLogger(ObjectData.class.getName());
+
+	public static final String	STRING_UNKNOWN	= "unknown";
 
 	String							key;
 	String							type;
 	String							activationDate;
 	String							status;
 	Image								image;
+	static int					imageWidth = 400;
+	static int					imageHeight = 300;
 	String							styledText;
 	StyleRange[]				styleRanges;
+	Font								font;
+	String							fullQualifiedObjectFilePath;
 
 	/**
 	 * Constructor for basic initialisation
@@ -57,14 +69,15 @@ public class ObjectData {
 	 * @param newStyledText
 	 * @param newStyleRanges
 	 */
-	public ObjectData(String newKey, String newType, String newActivationDate, String newStatus, Image newImage, String newStyledText, StyleRange[] newStyleRanges) {
+	public ObjectData(String newKey, String newType, String newActivationDate, String newStatus, Image newImage, String newStyledText, StyleRange[] newStyleRanges, FontData fd) {
 		this.key = newKey;
 		this.type = newType;
 		this.activationDate = newActivationDate;
 		this.status = newStatus;
 		this.image = newImage;
 		this.styledText = newStyledText;
-		this.styleRanges = newStyleRanges;
+		this.styleRanges = newStyleRanges.clone();
+		this.font = SWTResourceManager.getFont(fd.getName(), fd.getHeight(), fd.getStyle(), false, false);
 	}
 
 	/**
@@ -72,25 +85,27 @@ public class ObjectData {
 	 * @param objectFilePath
 	 */
 	public ObjectData(String objectFilePath) {
-		this.key = objectFilePath.substring(objectFilePath.lastIndexOf("/") + 1);
+		this.fullQualifiedObjectFilePath = objectFilePath;
+		this.key = objectFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(OSDE.STRING_DOT));
 		this.key = this.key.contains(OSDE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(OSDE.STRING_DOT)) : this.key;
-		this.type = "";
-		this.activationDate = "";
-		this.status = "unknown";
-		this.image = SWTResourceManager.getImage("osde/resource/" + Settings.getInstance().getLocale() + "/ObjectImage.gif");
-		this.styledText = "Hersteller\t\t:\nHändler\t\t\t:\nPreis\t\t\t\t:\nBauzeit\t\t\t:\n .....\t\t\t\t\t:\n";
+		this.type = ObjectData.STRING_UNKNOWN;
+		this.activationDate = ObjectData.STRING_UNKNOWN;
+		this.status = ObjectData.STRING_UNKNOWN;
+		this.image = null;
+		this.styledText = ObjectData.STRING_STYLED_TEXT_DEFAULT;
 		this.styleRanges = new StyleRange[] { new StyleRange(0, this.styledText.length(), null, null, SWT.BOLD) };
+		this.font = OSDE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false);
 	}
 
 	/**
 	 * copy constructor
 	 */
-	private ObjectData(ObjectData objectData) {
+	public ObjectData(ObjectData objectData) {
 		this.key = objectData.key;
 		this.type = objectData.type;
 		this.activationDate = objectData.activationDate;
 		this.status = objectData.status;
-		this.image = SWTResourceManager.getImage(objectData.image.getImageData(), this.key);
+		this.image = SWTResourceManager.getImage(objectData.image.getImageData(), this.key, imageWidth, imageHeight, false);
 		this.styledText = objectData.styledText;
 		Vector<StyleRange> tmpRanges = new Vector<StyleRange>();
 		for (StyleRange range : objectData.styleRanges) {
@@ -199,14 +214,14 @@ public class ObjectData {
 		this.styleRanges = newStyleRanges;
 	}
 
-	public void save(String objectFilePath) {
-		ObjectDataReaderWriter objWriter = new ObjectDataReaderWriter(objectFilePath, this);
+	public void save() {
+		ObjectDataReaderWriter objWriter = new ObjectDataReaderWriter(this);
 		objWriter.write();
 	}
 
-	public static ObjectData load(String objectFilePath) {
-		ObjectDataReaderWriter objReader = new ObjectDataReaderWriter(objectFilePath, new ObjectData(objectFilePath));
-		return new ObjectData(objReader.read());
+	public void load() {
+		ObjectDataReaderWriter objReader = new ObjectDataReaderWriter(this);
+		objReader.read();
 	}
 
 	public void print(String objectFilePath, StyledText prtStyledText) {
@@ -219,5 +234,54 @@ public class ObjectData {
 		options.printTextForeground = true;
 
 		prtStyledText.print(new Printer()).run();
+	}
+
+	/**
+	 * @return the imageWidth
+	 */
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	/**
+	 * @param newWidth the imageWidth to set
+	 */
+	public void setImageWidth(int newWidth) {
+		imageWidth = newWidth;
+	}
+
+	/**
+	 * @return the imageHeight
+	 */
+	public int getImageHeight() {
+		return imageHeight;
+	}
+
+	/**
+	 * @param newHeight the imageHeight to set
+	 */
+	public void setImageHeight(int newHeight) {
+		imageHeight = newHeight;
+	}
+
+	/**
+	 * @return the fontData
+	 */
+	public FontData getFontData() {
+		return this.font != null ? this.font.getFontData()[0] : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false).getFontData()[0];
+	}
+
+	/**
+	 * @param newFont the fontData to set
+	 */
+	public void setFont(Font newFont) {
+		this.font = newFont;
+	}
+
+	/**
+	 * @return the fullQualifiedObjectFilePath
+	 */
+	public String getFullQualifiedObjectFilePath() {
+		return this.fullQualifiedObjectFilePath;
 	}
 }

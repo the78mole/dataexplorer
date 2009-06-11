@@ -317,6 +317,25 @@ public class SWTResourceManager {
 	}
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	public static Image getImage(ImageData imageData, String imgKey, int newWidth, int newHeight, boolean forceRefresh) {
+		//sd.height, sd.width, sd.depth, sd.palette
+		String key = "IMAGE_DATA:" + newWidth + OSDE.STRING_UNDER_BAR + newHeight + OSDE.STRING_UNDER_BAR + imgKey;
+		try {
+			if (resources.containsKey(key) && !forceRefresh)
+				return (Image) resources.get(key);
+			if (forceRefresh)
+				resources.remove(key);
+			Image img = new Image(Display.getDefault(), imageData.scaledTo(newWidth, newHeight));
+			log.log(Level.FINE, "new image created = " + key); //$NON-NLS-1$
+			resources.put(key, img);
+			return img;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(String url) {
 		String tmpUrl = null;
 		try {

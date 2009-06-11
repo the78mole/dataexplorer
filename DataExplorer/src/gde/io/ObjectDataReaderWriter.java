@@ -27,18 +27,21 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
 import osde.OSDE;
 import osde.data.ObjectData;
+import osde.exception.ApplicationConfigurationException;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -57,30 +60,27 @@ public class ObjectDataReaderWriter {
 	private static final String	BEGIN_HEADER					= "{BeginHeader}";
 	private static final String	BEGIN_CHARACTERISTICS	= "{BeginCharacteristics}";
 	private static final String	BEGIN_STYLED_TEXT			= "{BeginStyledText}";
+	private static final String	BEGIN_FONT						= "{BeginFont}";
 
 	private ObjectData					objectData;
 	private String							filePath;
 
-	public ObjectDataReaderWriter(String newFilePath, ObjectData newObjectData) {
+	public ObjectDataReaderWriter(ObjectData newObjectData) {
 		this.objectData = newObjectData;
-		this.filePath = newFilePath;
+		this.filePath = newObjectData.getFullQualifiedObjectFilePath();
 	}
 
 	@SuppressWarnings("unchecked")
-	public ObjectData read() {
+	public void read() {
 
-		String key = "unknown";
-		String type = "unknown";
-		String activationDate = "unknown";
-		String status = "unknown";
-		Image image = null;
-		String styledText = "unknown";
-		StyleRange[] styleRanges = null;
+		String redObjectkey = ObjectData.STRING_UNKNOWN;
 
 		File file = new File(this.filePath);
 		if (file.exists()) {
 			try {
 				ZipFile zipFile = new ZipFile(file);
+				//this.consolePrinter = new PrintStream(System.out, false, Constants.writeCodePage); 
+				//-Dfile.encoding=UTF-8
 
 				Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zipFile.entries();
 
@@ -90,49 +90,57 @@ public class ObjectDataReaderWriter {
 					if (entry.getName().endsWith(OSDE.FILE_ENDING_DOT_RTF)) {
 						String[] content = StringHelper.splitString(extract(zipFile.getInputStream(entry)), ObjectDataReaderWriter.LINE_DELIMITER, OSDE.STRING_EMPTY);
 
-						key = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
+						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
+						if (!this.objectData.getKey().equals(redObjectkey)) {
+							throw new ApplicationConfigurationException("Missmatch object key versus file content detected !");
+						}
 
-						int i = 1;
 						// main characteristics
-						for (; i < content.length; i++) {
+						for (int i = 1; i < content.length; i++) {
 							if (content[i].contains(ObjectDataReaderWriter.BEGIN_CHARACTERISTICS)) {
 								String[] tmpCharacteristics = StringHelper.splitString(content[i], ObjectDataReaderWriter.DELIMITER, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS);
-								type = tmpCharacteristics[0];
-								activationDate = tmpCharacteristics[1];
-								status = tmpCharacteristics[2];
-								++i;
+								this.objectData.setType(tmpCharacteristics[0]);
+								this.objectData.setActivationDate(tmpCharacteristics[1]);
+								this.objectData.setStatus(tmpCharacteristics[2]);
 								break;
 							}
 						}
+						// font
+						for (int i = 1; i < content.length; i++) {
+							if (content[i].contains(ObjectDataReaderWriter.BEGIN_FONT)) {
+								String[] tmpFontData = StringHelper.splitString(content[i], ObjectDataReaderWriter.DELIMITER, ObjectDataReaderWriter.BEGIN_FONT);
+								this.objectData.setFont(SWTResourceManager.getFont(tmpFontData[0], Integer.parseInt(tmpFontData[1]), Integer.parseInt(tmpFontData[2]), false, false));
+								break;
+							}
+						}					
 						// styled text
-						for (; i < content.length; i++) {
+						for (int i = 1; i < content.length; i++) {
 							if (content[i].contains(ObjectDataReaderWriter.BEGIN_STYLED_TEXT)) {
-								styledText = content[i].substring(ObjectDataReaderWriter.BEGIN_STYLED_TEXT.length());
-								++i;
+								this.objectData.setStyledText(content[i].substring(ObjectDataReaderWriter.BEGIN_STYLED_TEXT.length()));
 								break;
 							}
 						}
-
 						//style ranges
 						Vector<StyleRange> tmpRanges = new Vector<StyleRange>();
-						for (; i < content.length; i++) {
+						for (int i = 1; i < content.length; i++) {
 							String line = content[i];
 							if (line.contains(ObjectDataReaderWriter.BEGIN_STYLES)) {
-								String[] ranges = StringHelper.splitString(line, ObjectDataReaderWriter.LINE_DELIMITER, ObjectDataReaderWriter.BEGIN_STYLES);
+								String[] ranges = StringHelper.splitString(line, ObjectDataReaderWriter.DELIMITER, ObjectDataReaderWriter.BEGIN_STYLES);
 								for (String styleRangeText : ranges) {
+									if (styleRangeText.contains(ObjectDataReaderWriter.END_STYLES)) break;
 									tmpRanges.add(buildOneStyle(styleRangeText));
 								}
 							}
 							if (line.contains(ObjectDataReaderWriter.END_STYLES)) break;
 						}
-						styleRanges = tmpRanges.toArray(new StyleRange[0]);
+						this.objectData.setStyleRanges(tmpRanges.toArray(new StyleRange[0]));
 					}
 					else if (entry.getName().endsWith(OSDE.FILE_ENDING_DOT_JPG)) {
 						//image
 						String imageKey = entry.getName().substring(0, entry.getName().length() - OSDE.FILE_ENDING_DOT_JPG.length());
 						InputStream inZip = zipFile.getInputStream(entry);
 						ImageLoader imageLoader = new ImageLoader();
-						image = SWTResourceManager.getImage(imageLoader.load(inZip)[0], imageKey);
+						this.objectData.setImage(SWTResourceManager.getImage(imageLoader.load(inZip)[0], imageKey, 400, 300, true));
 						inZip.close();
 					}
 					else {
@@ -143,12 +151,25 @@ public class ObjectDataReaderWriter {
 			catch (IOException e) {
 				ObjectDataReaderWriter.log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
-			catch (Exception e) {
-				ObjectDataReaderWriter.log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			catch (Throwable t) {
+				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
+				if (t instanceof ZipException) {
+					int answer = OpenSerialDataExplorer.getInstance().openYesNoMessageDialog("Object file " + file.getAbsolutePath() + " seams invalid, should it be deleted ?");
+					if(answer == SWT.YES) file.delete();	
+				}
+				else if (t instanceof ApplicationConfigurationException) {
+					if (OpenSerialDataExplorer.getInstance().isVisible()) {
+						String msg = "Object file " + file.getAbsolutePath() + " contains invalid object key \"" + redObjectkey + "\", should it be deleted ?";
+						int answer = OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(msg);
+						if (answer == SWT.YES) file.delete();
+					}	
+					else {
+						String msg = "Object file " + file.getAbsolutePath() + " contains invalid object key \"" + redObjectkey + "\", please check ?";
+						OSDE.setInitError(msg);
+					}
+				}
 			}
 		}
-		//ObjectData(String newKey, String newType, String newActivationDate, String newStatus, ImageData newImageData, String newStyledText, StyleRange[] newStyleRanges) {
-		return new ObjectData(key, type, activationDate, status, image, styledText, styleRanges);
 	}
 
 	/**
@@ -238,10 +259,15 @@ public class ObjectDataReaderWriter {
 			String text = this.objectData.getKey();
 			write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
 			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
-
+			
 			text = this.objectData.getType() + ObjectDataReaderWriter.DELIMITER + this.objectData.getActivationDate() + ObjectDataReaderWriter.DELIMITER + this.objectData.getStatus();
 			write(outZip, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
 			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+
+			FontData fd = this.objectData.getFontData();
+			text = fd.getName() + DELIMITER + fd.getHeight() + DELIMITER + fd.getStyle();
+			write(outZip, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
 
 			text = this.objectData.getStyledText();
 			write(outZip, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
@@ -251,16 +277,16 @@ public class ObjectDataReaderWriter {
 			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_STYLES);
 			StyleRange[] styles = this.objectData.getStyleRanges();
 			for (StyleRange style : styles) {
-				ObjectDataReaderWriter.log.log(Level.INFO, text);
 				text = style.start + OSDE.STRING_BLANK + style.length + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getRed()) + OSDE.STRING_BLANK
 						+ (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getGreen()) + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getBlue())
 						+ OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getRed()) + OSDE.STRING_BLANK
 						+ (style.background == null ? OSDE.STRING_DASH : style.background.getGreen()) + OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getBlue())
-						+ OSDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.LINE_DELIMITER;
-				write(outZip, text + ObjectDataReaderWriter.LINE_DELIMITER);
+						+ OSDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
+				write(outZip, text);
+				ObjectDataReaderWriter.log.log(Level.INFO, text);
 			}
 			write(outZip, ObjectDataReaderWriter.END_STYLES + OSDE.STRING_NEW_LINE);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_STYLES);
+			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.END_STYLES);
 
 			outZip.flush();
 			outZip.close();
