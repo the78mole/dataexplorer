@@ -147,7 +147,7 @@ public class ObjectDescriptionWindow {
 
 	public void setVisible(boolean isVisible) {
 		if (isVisible) {
-			if (this.objectTabItem.isDisposed()) {
+			if (this.objectTabItem == null || this.objectTabItem.isDisposed()) {
 				create();
 			}
 		}
@@ -226,7 +226,7 @@ public class ObjectDescriptionWindow {
 				RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.headerComposite.setLayout(composite2Layout);
 				FormData composite2LData = new FormData();
-				composite2LData.width = 419;
+				composite2LData.width = 420;
 				composite2LData.height = 36;
 				composite2LData.left = new FormAttachment(0, 1000, 15);
 				composite2LData.top = new FormAttachment(0, 1000, 17);
@@ -242,7 +242,7 @@ public class ObjectDescriptionWindow {
 					this.objectName = new CLabel(this.headerComposite, SWT.NONE);
 					this.objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
 					RowData cLabel1LData = new RowData();
-					cLabel1LData.width = 299;
+					cLabel1LData.width = 300;
 					cLabel1LData.height = 26;
 					this.objectName.setLayoutData(cLabel1LData);
 					this.objectName.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -254,8 +254,8 @@ public class ObjectDescriptionWindow {
 				group2Layout.makeColumnsEqualWidth = true;
 				this.mainObjectCharacterisitcsGroup.setLayout(group2Layout);
 				FormData group2LData = new FormData();
-				group2LData.width = 414;
-				group2LData.height = 411;
+				group2LData.width = 410;
+				group2LData.height = 410;
 				group2LData.left = new FormAttachment(0, 1000, 15);
 				group2LData.top = new FormAttachment(0, 1000, 60);
 				this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
@@ -284,12 +284,12 @@ public class ObjectDescriptionWindow {
 						this.objectTypeLable.setToolTipText("give a type name, sample:battery, Soaring model, motor flyer, trainer, solar collector, ....");
 					}
 					{
-						this.objectTypeText = new Text(this.typeComposite, SWT.NONE);
+						this.objectTypeText = new Text(this.typeComposite, SWT.BORDER);
 						this.objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
 						this.objectTypeText.setEditable(true);
 						RowData cLabel2LData = new RowData();
-						cLabel2LData.width = 267;
-						cLabel2LData.height = 23;
+						cLabel2LData.width = 265;
+						cLabel2LData.height = 18;
 						this.objectTypeText.setLayoutData(cLabel2LData);
 						this.objectTypeText.setToolTipText("give a type name, sample: NiMh battery, soaring model, motor flyer, trainer, solar collector, ....");
 						this.objectTypeText.addKeyListener(new KeyAdapter() {
@@ -308,7 +308,7 @@ public class ObjectDescriptionWindow {
 					GridData dateCompositeLData = new GridData();
 					dateCompositeLData.grabExcessHorizontalSpace = true;
 					dateCompositeLData.verticalAlignment = GridData.BEGINNING;
-					dateCompositeLData.widthHint = 246;
+					dateCompositeLData.widthHint = 250;
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					dateCompositeLData.heightHint = 28;
 					this.dateComposite.setLayoutData(dateCompositeLData);
@@ -324,10 +324,10 @@ public class ObjectDescriptionWindow {
 						this.dateLabel.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
 					}
 					{
-						this.dateText = new Text(this.dateComposite, SWT.NONE);
+						this.dateText = new Text(this.dateComposite, SWT.BORDER);
 						RowData dateTextLData = new RowData();
-						dateTextLData.width = 114;
-						dateTextLData.height = 21;
+						dateTextLData.width = 118;
+						dateTextLData.height = 18;
 						this.dateText.setLayoutData(dateTextLData);
 						this.dateText.setBackground(SWTResourceManager.getColor(255, 255, 255));
 						this.dateText.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
@@ -349,7 +349,7 @@ public class ObjectDescriptionWindow {
 					statusCompositeLData.grabExcessHorizontalSpace = true;
 					statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					statusCompositeLData.widthHint = 246;
+					statusCompositeLData.widthHint = 250;
 					statusCompositeLData.heightHint = 28;
 					this.statusComposite.setLayoutData(statusCompositeLData);
 					this.statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -364,12 +364,12 @@ public class ObjectDescriptionWindow {
 						this.statusLabel.setToolTipText("selct most fitting usage state of the object, active, in use, damaged, outdated, lost, sold ");
 					}
 					{
-						this.statusText = new CCombo(this.statusComposite, SWT.NONE);
+						this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
 						this.statusText.setItems(new String[] { "unknown", "active", "in use", "damaged", "outdated", "lost", "sold", "under repair" });
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
-						group1LData.width = 117;
-						group1LData.height = 22;
+						group1LData.width = 120;
+						group1LData.height = 18;
 						this.statusText.setLayoutData(group1LData);
 						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
 						this.statusText.addSelectionListener(new SelectionAdapter() {
@@ -423,7 +423,7 @@ public class ObjectDescriptionWindow {
 				composite1LData.right = new FormAttachment(1000, 1000, -15);
 				composite1LData.top = new FormAttachment(0, 1000, 60);
 				composite1LData.bottom = new FormAttachment(1000, 1000, -15);
-				composite1LData.left = new FormAttachment(440, 1000, 0);
+				composite1LData.left = new FormAttachment(0, 1000, 440);
 				this.editGroup = new Group(this.tabComposite, SWT.NONE);
 				FormLayout editGroupLayout = new FormLayout();
 				this.editGroup.setLayout(editGroupLayout);
