@@ -372,41 +372,53 @@ public class MenuToolBar {
 									MenuToolBar.this.objectSelectCombo.setEditable(false);
 									MenuToolBar.this.deviceObjectToolBar.setFocus();
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
-									log.log(Level.INFO, "newObjKey = " + newObjKey); //$NON-NLS-1$
-									String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
-									int selectionIndex = 0;
-									
-									if (MenuToolBar.this.oldObjectKey == null) { // new object key
-										for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-											if (tmpObjects[selectionIndex].equals(OSDE.STRING_EMPTY)) {
-												tmpObjects[selectionIndex] = newObjKey;
-												break;
+									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
+									if (newObjKey.length() >= 1) {
+										String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
+										int selectionIndex = 0;
+										if (MenuToolBar.this.oldObjectKey == null) { // new object key
+											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+												if (tmpObjects[selectionIndex].equals(OSDE.STRING_EMPTY)) {
+													tmpObjects[selectionIndex] = newObjKey;
+													break;
+												}
 											}
-										}									
-										checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
-									}
-									else {
-										log.log(Level.INFO, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
-										FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
-										for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-											if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
-												tmpObjects[selectionIndex] = newObjKey;
-												break;
+											checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+										}
+										else {
+											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
+											FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
+											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+												if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
+													tmpObjects[selectionIndex] = newObjKey;
+													break;
+												}
 											}
-										}									
-										checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
-										MenuToolBar.this.oldObjectKey = null;
+											checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+											MenuToolBar.this.oldObjectKey = null;
+										}
+										MenuToolBar.this.objectSelectCombo.setItems(tmpObjects);
+										MenuToolBar.this.objectSelectCombo.select(selectionIndex);
+										MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
+										if (selectionIndex >= 1) {
+											MenuToolBar.this.deleteObject.setEnabled(true);
+											MenuToolBar.this.editObject.setEnabled(true);
+											MenuToolBar.this.isObjectoriented = true;
+											//MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+										}
+										MenuToolBar.this.application.updateObjectDescriptionWindow();
+										new ObjectKeyScanner(newObjKey).start();
 									}
-									MenuToolBar.this.objectSelectCombo.setItems(tmpObjects);
-									MenuToolBar.this.objectSelectCombo.select(selectionIndex);
-									MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
-									if (selectionIndex >= 1) {
-										MenuToolBar.this.deleteObject.setEnabled(true);
-										MenuToolBar.this.editObject.setEnabled(true);
-										MenuToolBar.this.isObjectoriented = true;
-										//MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getItem(selectionIndex);
+									else { // undefined newObjectKey
+										Vector<String> tmpObjectKeys = new Vector<String>();
+										for (String objectKey : MenuToolBar.this.objectSelectCombo.getItems()) {
+											if (objectKey.length() >=1 ) tmpObjectKeys.add(objectKey);
+										}
+										MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
+										MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+										MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
+										MenuToolBar.this.application.updateObjectDescriptionWindow();
 									}
-									new ObjectKeyScanner(newObjKey).start();
 								}
 							}
 						});		
@@ -430,6 +442,7 @@ public class MenuToolBar {
 								tmpObjects.add(tmpObject);
 							}
 							tmpObjects.add("");
+							MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
 							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
 							MenuToolBar.this.objectSelectCombo.setEditable(true);
@@ -465,6 +478,9 @@ public class MenuToolBar {
 									MenuToolBar.this.isObjectoriented = false;
 								}
 								MenuToolBar.this.settings.setObjectList(tmpObjects.toArray(new String[1]), currentIndex);
+								
+								MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
+								MenuToolBar.this.application.updateObjectDescriptionWindow();
 							}
 						}
 					});

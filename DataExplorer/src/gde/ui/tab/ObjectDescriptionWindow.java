@@ -419,27 +419,28 @@ public class ObjectDescriptionWindow {
 				}
 			}
 			{
+				this.editGroup = new Group(this.tabComposite, SWT.NONE);
 				FormData composite1LData = new FormData();
+				composite1LData.width = 540;
 				composite1LData.right = new FormAttachment(1000, 1000, -15);
 				composite1LData.top = new FormAttachment(0, 1000, 60);
 				composite1LData.bottom = new FormAttachment(1000, 1000, -15);
 				composite1LData.left = new FormAttachment(0, 1000, 440);
-				this.editGroup = new Group(this.tabComposite, SWT.NONE);
-				FormLayout editGroupLayout = new FormLayout();
-				this.editGroup.setLayout(editGroupLayout);
-				this.editGroup.setLayoutData(composite1LData);
+				this.editGroup.setLayoutData(composite1LData);				
+				this.editGroup.setLayout(new GridLayout());
 				this.editGroup.setText("Additional Characteristics");
 				this.editGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				this.editGroup.setToolTipText("describe additionla characteristics here ");
 				{
-					FormData composite1LData1 = new FormData();
-					composite1LData1.height = 40;
-					composite1LData1.left = new FormAttachment(0, 1000, 5);
-					composite1LData1.right = new FormAttachment(1000, 1000, -5);
-					composite1LData1.top = new FormAttachment(0, 1000, 5);
-					composite1LData1.width = 500;
 					this.editCoolBar = new CoolBar(this.editGroup, SWT.FLAT);
-					this.editCoolBar.setLayoutData(composite1LData1);
+					GridData editCoolBarLData = new GridData();
+					editCoolBarLData.grabExcessHorizontalSpace = true;
+					editCoolBarLData.horizontalAlignment = GridData.FILL;
+					editCoolBarLData.verticalAlignment = GridData.BEGINNING;
+					editCoolBarLData.minimumWidth = 505;
+					editCoolBarLData.heightHint = 40;		
+					editCoolBarLData.minimumHeight = 40;				
+					this.editCoolBar.setLayoutData(editCoolBarLData);		
 					this.editCoolBar.setLayout(new RowLayout(SWT.HORIZONTAL));
 					this.editCoolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
@@ -461,17 +462,11 @@ public class ObjectDescriptionWindow {
 									}
 								});
 							}
-							Point size = this.fontSelectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-							this.fontSelectToolBar.setSize(size);
-
-							this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
-							this.editCoolItem.setControl(this.editToolBar);
-
-							new ToolItem(this.editToolBar, SWT.SEPARATOR);
+							new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 							{
-								ToolItem fontSizeSelectComboSep = new ToolItem(this.editToolBar, SWT.SEPARATOR);
+								ToolItem fontSizeSelectComboSep = new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 								{
-									this.fontSizeSelectComposite = new Composite(this.editToolBar, SWT.FLAT);
+									this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 									this.fontSizeSelectComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 									this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 									this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" });
@@ -495,6 +490,12 @@ public class ObjectDescriptionWindow {
 								fontSizeSelectComboSep.setWidth(this.fontSizeSelectComposite.getSize().x);
 								fontSizeSelectComboSep.setControl(this.fontSizeSelectComposite);
 							}
+							Point size = this.fontSelectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+							this.fontSelectToolBar.setSize(size);
+
+							this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
+							this.editCoolItem.setControl(this.editToolBar);
+
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.boldButton = new ToolItem(this.editToolBar, SWT.PUSH);
@@ -644,8 +645,9 @@ public class ObjectDescriptionWindow {
 							size = this.editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 							this.editToolBar.setSize(size);
 						}
-						Point size = this.editCoolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-						this.editToolBar.setSize(size);
+//						System.out.println(this.editToolBar.getSize() + " " + this.fontSelectToolBar.getSize());
+//						System.out.println(this.editCoolItem.getSize());
+//						this.editCoolItem.setMinimumSize(500, this.fontSelectToolBar.getSize().y);
 					}
 				}
 				{
@@ -653,14 +655,14 @@ public class ObjectDescriptionWindow {
 					FormLayout styledTextCompositeLayout = new FormLayout();
 					this.styledTextComposite.setLayout(styledTextCompositeLayout);
 					this.styledTextComposite.setBackground(SWTResourceManager.getColor(255, 255, 255));
-					FormData styledTextCompositeLData = new FormData();
-					styledTextCompositeLData.width = 540;
-					styledTextCompositeLData.height = 383;
-					styledTextCompositeLData.top = new FormAttachment(0, 1000, 49);
-					styledTextCompositeLData.left = new FormAttachment(0, 1000, 5);
-					styledTextCompositeLData.bottom = new FormAttachment(1000, 1000, -3);
-					styledTextCompositeLData.right = new FormAttachment(1000, 1000, -4);
-					this.styledTextComposite.setLayoutData(styledTextCompositeLData);
+					GridData styledTextGData = new GridData();
+					styledTextGData.grabExcessHorizontalSpace = true;
+					styledTextGData.horizontalAlignment = GridData.FILL;
+					styledTextGData.grabExcessVerticalSpace = true;
+					styledTextGData.verticalAlignment = GridData.FILL;
+					//styledTextGData.widthHint = 200;
+					//styledTextGData.heightHint = 200;					
+					this.styledTextComposite.setLayoutData(styledTextGData);
 					{
 						this.styledText = new StyledText(this.styledTextComposite, SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
 						FormLayout styledTextLayout = new FormLayout();
@@ -884,5 +886,12 @@ public class ObjectDescriptionWindow {
 				}
 			}
 		}
+	}
+
+	/**
+	 * enable save object data from outside the object
+	 */
+	public void saveObjectData() {
+		if (!this.isObjectDataSaved) this.object.save();
 	}
 }
