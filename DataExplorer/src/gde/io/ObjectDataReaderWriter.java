@@ -87,7 +87,7 @@ public class ObjectDataReaderWriter {
 				while (entries.hasMoreElements()) {
 					ZipEntry entry = entries.nextElement();
 
-					if (entry.getName().endsWith(OSDE.FILE_ENDING_DOT_RTF)) {
+					if (entry.getName().endsWith(OSDE.FILE_ENDING_DOT_STF)) {
 						String[] content = StringHelper.splitString(extract(zipFile.getInputStream(entry)), ObjectDataReaderWriter.LINE_DELIMITER, OSDE.STRING_EMPTY);
 
 						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
@@ -254,7 +254,7 @@ public class ObjectDataReaderWriter {
 			outZip.closeEntry();
 
 			//save the text document
-			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_RTF));
+			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_STF));
 
 			String text = this.objectData.getKey();
 			write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);

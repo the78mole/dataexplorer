@@ -31,6 +31,7 @@ import org.eclipse.swt.printing.Printer;
 
 import osde.OSDE;
 import osde.io.ObjectDataReaderWriter;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -224,16 +225,21 @@ public class ObjectData {
 		objReader.read();
 	}
 
-	public void print(String objectFilePath, StyledText prtStyledText) {
+	public void print() {
 		StyledTextPrintOptions options = new StyledTextPrintOptions();
-		options.header = StyledTextPrintOptions.SEPARATOR + objectFilePath + StyledTextPrintOptions.SEPARATOR;
+		options.header = StyledTextPrintOptions.SEPARATOR + this.fullQualifiedObjectFilePath + StyledTextPrintOptions.SEPARATOR;
 		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + OSDE.OSDE_NAME_LONG;
 		options.printLineBackground = true;
 		options.printTextBackground = true;
 		options.printTextFontStyle = true;
 		options.printTextForeground = true;
+		options.lineLabels = new String[] {this.key, this.type, this.activationDate, this.status};
 
-		prtStyledText.print(new Printer()).run();
+		StyledText tmpStyledText = new StyledText(OpenSerialDataExplorer.getInstance().getParent(), SWT.NONE);
+		tmpStyledText.setFont(this.font);
+		tmpStyledText.setText(this.styledText);
+		tmpStyledText.setStyleRanges(this.styleRanges);
+		tmpStyledText.print(new Printer()).run();
 	}
 
 	/**

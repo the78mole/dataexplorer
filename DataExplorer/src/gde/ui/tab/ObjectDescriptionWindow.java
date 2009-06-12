@@ -75,54 +75,51 @@ import osde.ui.menu.ImageContextMenu;
  * This class defines the layout for the object description, this window(tab) will only shown, if not device oriented
  */
 public class ObjectDescriptionWindow {
-
 	final static Logger						log									= Logger.getLogger(ObjectDescriptionWindow.class.getName());
 
-	CTabItem							objectTabItem;
-	StyledText						styledText;
-	Canvas								imageCanvas;
-	CLabel								objectName;
-	CLabel								objectNameLabel;
+	CTabItem											objectTabItem;
+	StyledText										styledText;
+	Canvas												imageCanvas;
+	CLabel												objectName;
+	CLabel												objectNameLabel;
 
-	CoolBar								editCoolBar;
-	ToolBar								fontSelectToolBar;
-	ToolBar								editToolBar;
-	//	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
-	//	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
+	CoolBar												editCoolBar;
+	ToolBar												fontSelectToolBar;
+	ToolBar												editToolBar;
 	int														toolButtonHeight		= 23;
-	CoolItem							editCoolItem;
+	CoolItem											editCoolItem;
 
-	ToolItem							fontSelect;
+	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
 	Point													fontSizeSelectSize	= new Point(40, 21);
-	ToolItem							strikeoutButton;
-	ToolItem							underlineButton;
-	ToolItem							italicButton;
-	ToolItem							boldButton;
+	ToolItem											strikeoutButton;
+	ToolItem											underlineButton;
+	ToolItem											italicButton;
+	ToolItem											boldButton;
 	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
 
-	Composite							tabComposite;
+	Composite											tabComposite;
 
 	final OpenSerialDataExplorer	application;
 	String												objectFilePath;
 	String												activeObjectKey;
 	boolean												isObjectDataSaved		= true;
-	Composite							styledTextComposite;
+	Composite											styledTextComposite;
 
-	Composite							statusComposite;
-	Text									objectTypeText;
-	CLabel								objectTypeLable;
-	Composite							typeComposite;
-	Group									mainObjectCharacterisitcsGroup;
-	CLabel								dateLabel;
-	Composite							dateComposite;
-	Group									editGroup;
-	ToolItem							fColorButton, bColorButton;
-	ToolItem							cutButton, copyButton, pasteButton;
-	Text									dateText;
-	CCombo								statusText;
-	CLabel								statusLabel;
+	Composite											statusComposite;
+	Text													objectTypeText;
+	CLabel												objectTypeLable;
+	Composite											typeComposite;
+	Group													mainObjectCharacterisitcsGroup;
+	CLabel												dateLabel;
+	Composite											dateComposite;
+	Group													editGroup;
+	ToolItem											fColorButton, bColorButton;
+	ToolItem											cutButton, copyButton, pasteButton, printButton;
+	Text													dateText;
+	CCombo												statusText;
+	CLabel												statusLabel;
 
 	Menu													popupmenu;
 	ImageContextMenu							contextMenu;
@@ -554,6 +551,7 @@ public class ObjectDescriptionWindow {
 							{
 								this.fColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
 								this.fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif"));
+								this.fColorButton.setToolTipText("apply forground color to selected text");
 								this.fColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -568,6 +566,7 @@ public class ObjectDescriptionWindow {
 							{
 								this.bColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
 								this.bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif"));
+								this.bColorButton.setToolTipText("apply background color to selected text");
 								this.bColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -616,14 +615,27 @@ public class ObjectDescriptionWindow {
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt);
 										ObjectDescriptionWindow.this.styledText.paste();
-										//								    Clipboard clipboard = new Clipboard(tabComposite.getDisplay());
-										//						        String data = (String) clipboard.getContents(RTFTransfer.getInstance());
-										//						        System.out.println(data);
-										//						        FileInputStream stream = new FileInputStream("sample.rtf");
-										//						        RTFEditorKit kit = new RTFEditorKit();
-										//						        Document doc = kit.createDefaultDocument();
-										//						        kit.read(stream, doc, 0);
-										//					        	String plainText = doc.getText(0, doc.getLength());
+										//Clipboard clipboard = new Clipboard(tabComposite.getDisplay());
+										//String data = (String) clipboard.getContents(RTFTransfer.getInstance());
+										//log.log(Level.FINEST, data);
+										//FileInputStream stream = new FileInputStream("sample.rtf");
+										//RTFEditorKit kit = new RTFEditorKit();
+										//Document doc = kit.createDefaultDocument();
+										//kit.read(stream, doc, 0);
+										//String plainText = doc.getText(0, doc.getLength());
+									}
+								});
+							}
+							new ToolItem(this.editToolBar, SWT.SEPARATOR);
+							{
+								this.printButton = new ToolItem(this.editToolBar, SWT.PUSH | SWT.BORDER);
+								this.printButton.setImage(SWTResourceManager.getImage("osde/resource/Print.gif"));
+								this.printButton.setToolTipText("print");
+								this.printButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(Level.FINEST, "printButton.widgetSelected, event=" + evt);
+										ObjectDescriptionWindow.this.object.print();
 									}
 								});
 							}
@@ -667,7 +679,7 @@ public class ObjectDescriptionWindow {
 						this.styledText.setLayoutData(styledTextLData);
 						this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 							public void modifyText(ExtendedModifyEvent evt) {
-								log.log(Level.INFO, "styledText.modifyText, event=" + evt);
+								log.log(Level.FINEST, "styledText.modifyText, event=" + evt);
 								if (evt.length == 0) return;
 								StyleRange style;
 								if (evt.length == 1 || ObjectDescriptionWindow.this.styledText.getTextRange(evt.start, evt.length).equals(ObjectDescriptionWindow.this.styledText.getLineDelimiter())) {
@@ -706,7 +718,7 @@ public class ObjectDescriptionWindow {
 						this.styledText.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.INFO, "styledText.keyReleased, event=" + evt);
+								log.log(Level.FINEST, "styledText.keyReleased, event=" + evt);
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 
@@ -715,18 +727,15 @@ public class ObjectDescriptionWindow {
 								log.log(Level.FINEST, "styledText.keyPressed, event=" + evt);
 								if ((evt.stateMask & SWT.CTRL) != 0) {
 									if (evt.keyCode == 'x') { //cut
-										System.out.println("SWT.CTRL + 'x'");
+										log.log(Level.INFO, "SWT.CTRL + 'x'");
 										handleCutCopy();
-										ObjectDescriptionWindow.this.styledText.cut();
 									}
 									else if (evt.keyCode == 'c') { //copy
-										System.out.println("SWT.CTRL + 'c'");
+										log.log(Level.INFO, "SWT.CTRL + 'c'");
 										handleCutCopy();
-										ObjectDescriptionWindow.this.styledText.copy();
 									}
 									else if (evt.keyCode == 'v') { //paste
-										System.out.println("SWT.CTRL + 'v'");
-										ObjectDescriptionWindow.this.styledText.paste();
+										log.log(Level.INFO, "SWT.CTRL + 'v'");
 									}
 								}
 							}
