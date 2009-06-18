@@ -94,9 +94,9 @@ public class ObjectKeyScanner extends Thread {
 					try {
 						String actualFilePath = file.getAbsolutePath();
 						if (actualFilePath.endsWith(OSDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
-							log.log(Level.FINER, "working with " + file.getName());
+							log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
 							if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY))) {
-								log.log(Level.FINER, "found file with given object key " + file.getName());
+								log.log(Level.FINER, "found file with given object key " + file.getName()); //$NON-NLS-1$
 								String newLinkFilePath = objectKeyDirPath + OSDE.FILE_SEPARATOR_UNIX + file.getName();
 								if (!new File(newLinkFilePath).exists()) {
 									OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
@@ -116,7 +116,7 @@ public class ObjectKeyScanner extends Thread {
 				}
 			}
 			else {
-				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !");
+				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				Vector<String> foundObjectKeys = new Vector<String>();
 				int fileCounter = 0;
@@ -128,10 +128,10 @@ public class ObjectKeyScanner extends Thread {
 							if (actualFilePath.endsWith(OSDE.FILE_ENDING_OSD)) {
 								fileCounter++;
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
-									log.log(Level.FINER, "working with " + file.getName());
+									log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
-										log.log(Level.FINER, "found object key " + foundObjectKey);
+										log.log(Level.FINER, "found object key " + foundObjectKey); //$NON-NLS-1$
 										if (!foundObjectKeys.contains(foundObjectKey)) foundObjectKeys.add(foundObjectKey);
 									}
 								}
@@ -148,10 +148,10 @@ public class ObjectKeyScanner extends Thread {
 						}
 					}
 					Iterator<String> iterator = foundObjectKeys.iterator();
-					log.log(Level.FINER, "\nscanned " + fileCounter + " files for object key , found following keys");
+					log.log(Level.FINER, "\nscanned " + fileCounter + " files for object key , found following keys"); //$NON-NLS-1$ //$NON-NLS-2$
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();
-						log.log(Level.FINER, "found object key in vector = " + tmpObjKey);
+						log.log(Level.FINER, "found object key in vector = " + tmpObjKey); //$NON-NLS-1$
 						this.setObjectKey(tmpObjKey);
 						this.run();
 					}

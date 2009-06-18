@@ -58,8 +58,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	final OpenSerialDataExplorer	application;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 	
-	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0210);
-	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0211);
+	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0400);
+	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0401);
+	public final static String		UNSAVED_REASON_CHANGED_OBJECT_DATA	= Messages.getString(MessageIds.OSDE_MSGT0402);
 
 
 	/**
@@ -130,7 +131,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			String[] sortedRecordSetNames = this.getRecordSetNames();
 			for (int i = sortedRecordSetNames.length - 1; i >= 0; --i) {
 				try {
-					recordNumber = new Integer(sortedRecordSetNames[i].split("[)]")[0]) + 1;
+					recordNumber = new Integer(sortedRecordSetNames[i].split("[)]")[0]) + 1; //$NON-NLS-1$
 					break;
 				}
 				catch (NumberFormatException e) {
@@ -545,6 +546,19 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 	
 	/**
+	 * set a unsaved reason marker to enable unsaved data warning
+	 * valid arguments are UNSAVED_REASON_ADD_OBJECT_KEY, UNSAVED_REASON_REMOVE_OBJECT_KEY, UNSAVED_REASON_CHANGED_OBJECT_DATA
+	 * @param unsavedReason
+	 */
+	public void setUnsaved(String unsavedReason) {
+		this.activeRecordSet = this.getActiveRecordSet();
+		if (this.activeRecordSet != null) {
+			this.activeRecordSet.setUnsaved(unsavedReason);
+		}
+	}
+
+	
+	/**
 	 * check if all record sets have its data loaded, if required load data from file
 	 * this method can be used to check prior to save modified data
 	 * the behavior which recordset data is checked and loaded depends on the method this.getRecordSetNames() 
@@ -552,16 +566,16 @@ public class Channel extends HashMap<String, RecordSet> {
 	public void checkAndLoadData() {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
 		for (String tmpRecordSetName : this.getRecordSetNames()) {
-			log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName);
+			log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$
 			Channel selectedChannel = Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
-			log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null"));
+			log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
 			if (selectedChannel != null) {
 				RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
-				log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null"));
+				log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
-					log.log(Level.FINER, "tmpRecordSetName needs data to loaded");
+					log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
 					if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
-						log.log(Level.FINER, "loading data ...");
+						log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
 						tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
 					}	
 				}

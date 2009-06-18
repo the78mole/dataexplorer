@@ -31,6 +31,8 @@ import org.eclipse.swt.printing.Printer;
 
 import osde.OSDE;
 import osde.io.ObjectDataReaderWriter;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
@@ -42,11 +44,10 @@ public class ObjectData {
 	/**
 	 * 
 	 */
-	public static final String	STRING_STYLED_TEXT_DEFAULT	= "Hersteller\t\t:\nHändler\t\t\t:\nPreis\t\t\t\t:\nBauzeit\t\t\t:\n .....\t\t\t\t\t:\n";
+	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.OSDE_MSGT0433);
 
 	final static Logger	log	= Logger.getLogger(ObjectData.class.getName());
 
-	public static final String	STRING_UNKNOWN	= "unknown";
 
 	String							key;
 	String							type;
@@ -89,13 +90,13 @@ public class ObjectData {
 		this.fullQualifiedObjectFilePath = objectFilePath;
 		this.key = objectFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(OSDE.STRING_DOT));
 		this.key = this.key.contains(OSDE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(OSDE.STRING_DOT)) : this.key;
-		this.type = ObjectData.STRING_UNKNOWN;
-		this.activationDate = ObjectData.STRING_UNKNOWN;
-		this.status = ObjectData.STRING_UNKNOWN;
+		this.type = Messages.getString(MessageIds.OSDE_MSGT0279);
+		this.activationDate = Messages.getString(MessageIds.OSDE_MSGT0279);
+		this.status = Messages.getString(MessageIds.OSDE_MSGT0279);
 		this.image = null;
 		this.styledText = ObjectData.STRING_STYLED_TEXT_DEFAULT;
 		this.styleRanges = new StyleRange[] { new StyleRange(0, this.styledText.length(), null, null, SWT.BOLD) };
-		this.font = OSDE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false);
+		this.font = OSDE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -274,7 +275,7 @@ public class ObjectData {
 	 * @return the fontData
 	 */
 	public FontData getFontData() {
-		return this.font != null ? this.font.getFontData()[0] : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false).getFontData()[0];
+		return this.font != null ? this.font.getFontData()[0] : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false).getFontData()[0]; //$NON-NLS-1$
 	}
 
 	/**

@@ -39,7 +39,8 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class OperatingSystemHelper {
-	private static final Logger	log			= Logger.getLogger(OperatingSystemHelper.class.getName());
+	private static final Logger	log									= Logger.getLogger(OperatingSystemHelper.class.getName());
+	private static final String	STRING_LINK_POINTER	= " -> ";  //$NON-NLS-1$
 	
 	/**
 	 * create destop shortcut to launch the main jar
@@ -68,13 +69,13 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					String fqExecutablePath = sourceLaunchFilePath.replace("/", OSDE.FILE_SEPARATOR); //$NON-NLS-1$
 					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
-					String executableArguments = ""; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
+					String executableArguments = OSDE.STRING_EMPTY; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
 					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
 					String workingDirectory = sourceBasePath.replace("/", OSDE.FILE_SEPARATOR); //$NON-NLS-1$
 					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					String fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
-					String description = Messages.getString(MessageIds.OSDE_MSGT0400);
+					String description = Messages.getString(MessageIds.OSDE_MSGT0000);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					String[] shellLinkArgs = { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
@@ -130,7 +131,7 @@ public class OperatingSystemHelper {
 			}
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW00320, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		log.log(Level.INFO, "OpenSerialDataExplorer desktop created = " + isCreated); //$NON-NLS-1$
@@ -150,7 +151,7 @@ public class OperatingSystemHelper {
 				targetDesktopLaucherFilePath = targetBasePath + "OpenSerialData*.lnk"; //$NON-NLS-1$
 				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
-				Process process = Runtime.getRuntime().exec("cmd /C erase /F \"" + targetDesktopLaucherFilePath + "\""); //$NON-NLS-1$
+				Process process = Runtime.getRuntime().exec("cmd /C erase /F \"" + targetDesktopLaucherFilePath + "\""); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				if (process.exitValue() != 0) {
 					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
@@ -172,7 +173,7 @@ public class OperatingSystemHelper {
 				isRemoved = true;
 			}
 			else {
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Remove desktopLink for Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW00323, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		catch (Throwable e) {
@@ -234,10 +235,10 @@ public class OperatingSystemHelper {
 					}
 					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 					if (process.exitValue() != 0) {
-						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.SEVERE, msg);
-						if (msg.contains("740"))
-							throw new IOException("error=740");
+						if (msg.contains("740")) //$NON-NLS-1$
+							throw new IOException("error=740"); //$NON-NLS-1$
 
 						throw new UnsatisfiedLinkError(msg);
 					}
@@ -263,7 +264,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "\"" + command + "\" rc = " + process.exitValue()); //$NON-NLS-1$ //$NON-NLS-2$
 					if (process.exitValue() != 0) {
 						log.log(Level.WARNING, "failed to register OpenSerialData MIME type rc = " + process.exitValue()); //$NON-NLS-1$
-						throw new IOException("error=740");
+						throw new IOException("error=740"); //$NON-NLS-1$
 					}
 					rc = 0;
 				}
@@ -276,8 +277,8 @@ public class OperatingSystemHelper {
 					//installation directory must contain OpenSerialDataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
 						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
-						FileUtils.extract(jarFile, "register.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						FileUtils.extract(jarFile, "OpenSerialDataExplorer.directory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, "register.sh", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, "OpenSerialDataExplorer.directory", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						command = "chmod +x " + targetDir + "/register.sh"; //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
@@ -369,10 +370,10 @@ public class OperatingSystemHelper {
 				}
 				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 				if (process.exitValue() != 0) {
-					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.SEVERE, msg);
-					if (msg.contains("740"))
-						throw new IOException("error=740");
+					if (msg.contains("740")) //$NON-NLS-1$
+						throw new IOException("error=740"); //$NON-NLS-1$
 
 					throw new UnsatisfiedLinkError(msg);
 				}
@@ -396,7 +397,7 @@ public class OperatingSystemHelper {
 				log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
 				if (process.exitValue() == 0) {
 					log.log(Level.WARNING, "failed to deregister OpenSerialData MIME type to OS rc = " + process.exitValue()); //$NON-NLS-1$
-					throw new IOException("error=740");
+					throw new IOException("error=740"); //$NON-NLS-1$
 				}
 				rc = 0;
 			}
@@ -409,8 +410,8 @@ public class OperatingSystemHelper {
 				//installation directory must contain OpenSerialDataExplorer.desktop with write permission
 				if (targetFile.exists() && targetFile.canWrite()) {
 					FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
-					FileUtils.extract(jarFile, "unregister.sh", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					FileUtils.extract(jarFile, "OpenSerialDataExplorerdirectory", "", targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					FileUtils.extract(jarFile, "unregister.sh", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					FileUtils.extract(jarFile, "OpenSerialDataExplorerdirectory", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 					command = "chmod +x " + targetDir + "/unregister.sh"; //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
@@ -457,60 +458,74 @@ public class OperatingSystemHelper {
 	 */
 	public static void createFileLink(String fullQualifiedSourceFilePath, String fullQualifiedTargetFilePath) {
 		
-		if (OSDE.IS_WINDOWS) {
-			try {
-				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
-				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
-				String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_WINDOWS) + 1);
-				log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
-				
-				String targetFileLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; //$NON-NLS-1$
-				log.log(Level.INFO, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
-
-				String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, "", sourceBasePath, fullQualifiedSourceFilePath, "" };
-
-				WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+		try {
+			if (FileUtils.checkFileExist(fullQualifiedTargetFilePath)) {
+				// check if the target file contained is the same
+				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath);
+				if(!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
+					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length()-4) + OSDE.STRING_UNDER_BAR + OSDE.FILE_ENDING_DOT_OSD;
+					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW003213, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
+				}
 			}
-			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage());
+			
+			if (OSDE.IS_WINDOWS) {
+				try {
+					fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
+					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
+					String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_WINDOWS) + 1);
+					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					
+					String targetFileLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; //$NON-NLS-1$
+					log.log(Level.INFO, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
+
+					String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, OSDE.STRING_EMPTY, sourceBasePath, fullQualifiedSourceFilePath, OSDE.STRING_EMPTY };
+
+					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+				}
+				catch (Throwable e) {
+					log.log(Level.WARNING, e.getMessage());
+				}
 			}
-		}
-		else if (OSDE.IS_LINUX) { //$NON-NLS-1$
-			try {
-				String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-				if (fullQualifiedLinkTargetPath.contains(" ")) { // creating links with filenames containing blanks failed
-					if (FileUtils.checkFileExist(fullQualifiedLinkTargetPath)) {
-						File file = new File(fullQualifiedLinkTargetPath);
-						fullQualifiedLinkTargetPath = fullQualifiedLinkTargetPath.replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
-						file.renameTo(new File(fullQualifiedLinkTargetPath));
+			else if (OSDE.IS_LINUX) { //$NON-NLS-1$
+				try {
+					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+					if (fullQualifiedLinkTargetPath.contains(OSDE.STRING_BLANK)) { // creating links with filenames containing blanks failed
+						if (FileUtils.checkFileExist(fullQualifiedLinkTargetPath)) {
+							File file = new File(fullQualifiedLinkTargetPath);
+							fullQualifiedLinkTargetPath = fullQualifiedLinkTargetPath.replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
+							file.renameTo(new File(fullQualifiedLinkTargetPath));
+						}
+					}
+					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
+					String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath;  //$NON-NLS-1$
+					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					Process process = Runtime.getRuntime().exec(command);
+					process.waitFor();
+					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					String line;
+					while ((line = bisr.readLine()) != null) {
+						log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
+					}
+					while ((line = besr.readLine()) != null) {
+						log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
+					}
+					if (process.exitValue() != 0) {
+						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+						log.log(Level.SEVERE, msg);
 					}
 				}
-				String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
-				String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath; 
-				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
-				Process process = Runtime.getRuntime().exec(command);
-				process.waitFor();
-				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				String line;
-				while ((line = bisr.readLine()) != null) {
-					log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
-				}
-				while ((line = besr.readLine()) != null) {
-					log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
-				}
-				if (process.exitValue() != 0) {
-					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
-					log.log(Level.SEVERE, msg);
+				catch (Throwable e) {
+					log.log(Level.WARNING, e.getMessage());
 				}
 			}
-			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage());
+			else {
+				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
 			}
 		}
-		else {
-			log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
-			OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+		catch (IOException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 	}
 	
@@ -526,12 +541,12 @@ public class OperatingSystemHelper {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			String line = reader.readLine();
-			log.log(Level.FINER, "line = " + line);
+			log.log(Level.FINER, "line = " + line); //$NON-NLS-1$
 			reader.close();
-			if (!line.contains("OpenSerialData")) {
+			if (!line.contains(OSDE.OPEN_SERIAL_DATA)) {
 				ret = WindowsHelper.getFilePathFromLink(filePath);
-				if (ret.startsWith("OSDE_MSGE")) {
-					String msgKey = ret.split(";")[0];
+				if (ret.startsWith("OSDE_MSGE")) { //$NON-NLS-1$
+					String msgKey = ret.split(OSDE.STRING_SEMICOLON)[0];
 					String msgValue = ret.split("; ")[1];
 					throw new UnsatisfiedLinkError(Messages.getString(msgKey,
 							new Object[] { msgValue }));
@@ -540,7 +555,7 @@ public class OperatingSystemHelper {
 		}
 		else if (OSDE.IS_LINUX) {
 			try {
-				String command = "ls -al " + filePath; 
+				String command = "ls -al " + filePath;  //$NON-NLS-1$
 				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
 				Process process = Runtime.getRuntime().exec(command);
 				process.waitFor();
@@ -549,15 +564,15 @@ public class OperatingSystemHelper {
 				String line;
 				while ((line = bisr.readLine()) != null) {
 					log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
-					if (line.contains(" -> ")) {
-						ret = line.split(" -> ")[1].trim();
+					if (line.contains(OperatingSystemHelper.STRING_LINK_POINTER)) {
+						ret = line.split(OperatingSystemHelper.STRING_LINK_POINTER)[1].trim();
 					}
 				}
 				while ((line = besr.readLine()) != null) {
 					log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 				}
 				if (process.exitValue() != 0) {
-					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.SEVERE, msg);
 				}
 			} catch (Exception e) {
@@ -566,7 +581,7 @@ public class OperatingSystemHelper {
 
 		}
 		else {
-			log.log(Level.WARNING, "Operating System implementation not available");
+			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
 		}
 		return ret;
 	}

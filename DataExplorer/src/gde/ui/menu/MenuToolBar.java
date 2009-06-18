@@ -59,7 +59,7 @@ import osde.utils.ObjectKeyScanner;
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
-	private static final String[]	SCOPE_VALUES					= new String[] { "ALL", "10", "25", "50", "100", "250", "500", "750", "1000" };
+	private static final String[]	SCOPE_VALUES					= new String(Messages.getString(MessageIds.OSDE_MSGT0196)).split(OSDE.STRING_SEMICOLON);
 	StringBuffer									toolBarSizes 					= new StringBuffer();
 
 	Point													toolSize, coolSize;
@@ -214,7 +214,7 @@ public class MenuToolBar {
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.fileCoolItem.setPreferredSize(this.size);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			this.toolBarSizes.append(this.toolSize.x).append(OSDE.STRING_COLON).append(this.toolSize.y).append(OSDE.STRING_SEMICOLON);
 			
 			// set height used for selection combos
 			this.toolButtonHeight = this.settingsToolItem.getBounds().height;
@@ -308,7 +308,7 @@ public class MenuToolBar {
 								}
 							}
 							else {
-								MenuToolBar.this.application.openMessageDialog("Das Gerät kann nicht gewechselt werden, solange der serielle Port geöffnet ist!");
+								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0030));
 							}
 						}
 					});
@@ -345,6 +345,7 @@ public class MenuToolBar {
 						this.objectSelectCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "objectSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								MenuToolBar.this.application.checkSaveObjectData();
 								int selectionIndex = MenuToolBar.this.objectSelectCombo.getSelectionIndex();
 								if (selectionIndex != 0) {
 									MenuToolBar.this.editObject.setEnabled(true);
@@ -354,10 +355,10 @@ public class MenuToolBar {
 									
 									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
 								}
-								else {
+								else { // device oriented
 									MenuToolBar.this.editObject.setEnabled(false);
 									MenuToolBar.this.deleteObject.setEnabled(false);
-									checkChannelForObjectKeyMissmatch(selectionIndex, MenuToolBar.this.objectSelectCombo.getText());
+									checkChannelForObjectKeyMissmatch(selectionIndex, OSDE.STRING_EMPTY);
 									MenuToolBar.this.isObjectoriented = false;
 									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(false);
 								}
@@ -387,7 +388,11 @@ public class MenuToolBar {
 										}
 										else {
 											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
-											FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
+											if (MenuToolBar.this.oldObjectKey.length() >= 1) {
+												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0031));
+												if (answer == SWT.YES) 
+													FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
+											}
 											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
 												if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
 													tmpObjects[selectionIndex] = newObjKey;
@@ -441,7 +446,7 @@ public class MenuToolBar {
 							for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
 								tmpObjects.add(tmpObject);
 							}
-							tmpObjects.add("");
+							tmpObjects.add(OSDE.STRING_EMPTY);
 							MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
 							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
@@ -510,7 +515,7 @@ public class MenuToolBar {
 			this.deviceObjectCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.deviceCoolItem.setPreferredSize(this.size);
 			this.deviceObjectCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			this.toolBarSizes.append(this.toolSize.x).append(OSDE.STRING_COLON).append(this.toolSize.y).append(OSDE.STRING_SEMICOLON);
 		} // end device cool item
 		
 		{ // begin zoom cool item
@@ -616,7 +621,7 @@ public class MenuToolBar {
 			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.zoomCoolItem.setPreferredSize(this.size);
 			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			this.toolBarSizes.append(this.toolSize.x).append(OSDE.STRING_COLON).append(this.toolSize.y).append(OSDE.STRING_SEMICOLON);
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -627,9 +632,9 @@ public class MenuToolBar {
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -654,7 +659,7 @@ public class MenuToolBar {
 			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			this.toolBarSizes.append(this.toolSize.x).append(OSDE.STRING_COLON).append(this.toolSize.y).append(OSDE.STRING_SEMICOLON);
 		} // end port cool item
 		
 		{ // begin data cool item (channel select, record select)
@@ -857,7 +862,7 @@ public class MenuToolBar {
 										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 										MenuToolBar.this.application.updateGraphicsWindow();
 										MenuToolBar.this.application.updateStatisticsData();
-										MenuToolBar.this.application.updateDataTable("");
+										MenuToolBar.this.application.updateDataTable(OSDE.STRING_EMPTY);
 										MenuToolBar.this.application.updateDigitalWindow();
 										MenuToolBar.this.application.updateAnalogWindow();
 										MenuToolBar.this.application.updateCellVoltageWindow();
@@ -889,7 +894,7 @@ public class MenuToolBar {
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(":").append(this.toolSize.y).append(";");
+			this.toolBarSizes.append(this.toolSize.x).append(OSDE.STRING_COLON).append(this.toolSize.y).append(OSDE.STRING_SEMICOLON);
 		}
 		
 		// set the focus controlled to an item which has no slection capability
@@ -1093,30 +1098,30 @@ public class MenuToolBar {
 			switch (this.iconSet) {
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0069));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
 				}
 				break;
 			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
 			default:
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
 				}
 				break;
@@ -1231,15 +1236,11 @@ public class MenuToolBar {
 	 */
 	public int checkChannelForObjectKeyMissmatch(int actualSelectionIndex, String newObjectKey) {
 		Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
-		if (activeChannel != null) {
+		if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
 			String channelObjKey = activeChannel.getObjectKey();
-			String selectedObjKey = MenuToolBar.this.objectSelectCombo.getText();
 			
 			// check if selected key matches the existing object key or is new for this channel
-			if (actualSelectionIndex != 0 && activeChannel.size() == 0) { // channel has no key
-				activeChannel.setObjectKey(newObjectKey);
-			}
-			else if (!selectedObjKey.equals(channelObjKey)) { // channel has a key
+			if (!newObjectKey.equals(channelObjKey)) { // channel has a key
 				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0205, new Object[] {channelObjKey, newObjectKey}));
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);

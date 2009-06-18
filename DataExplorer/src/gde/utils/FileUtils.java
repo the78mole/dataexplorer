@@ -170,7 +170,7 @@ public class FileUtils {
 	 */
 	public static boolean checkFileExist(final String fullQualifiedFileName) {
 		File file = new File(fullQualifiedFileName);
-		return file.exists();
+		return file.exists() && !file.isDirectory();
 	}
 	
 	/**
@@ -187,8 +187,13 @@ public class FileUtils {
 	 * delete a file if exist
 	 */
 	public static void cleanFile(String fullQualifiedFilePath) {
+	    
 		if (FileUtils.checkFileExist(fullQualifiedFilePath)) {
-			(new File(fullQualifiedFilePath)).delete();
+		    File fileToBeDeleted = new File(fullQualifiedFilePath);
+			if (!fileToBeDeleted.isDirectory()) 
+				fileToBeDeleted.delete();
+			else
+				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory, use different method !" );
 		}
 	}
 
@@ -198,7 +203,8 @@ public class FileUtils {
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
 		fileBasePath = fileBasePath.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + OSDE.FILE_SEPARATOR_UNIX;
 		for (String fileName : fileNames) {
-			FileUtils.cleanFile(fileBasePath + fileName);
+			if (fileName.length() > 4 ) // "a.csv"
+				FileUtils.cleanFile(fileBasePath + fileName);
 		}
 	}
 

@@ -41,6 +41,8 @@ import org.eclipse.swt.graphics.ImageLoader;
 import osde.OSDE;
 import osde.data.ObjectData;
 import osde.exception.ApplicationConfigurationException;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
@@ -50,17 +52,17 @@ import osde.utils.StringHelper;
  * This class provides functionality to save and load object describing data
  */
 public class ObjectDataReaderWriter {
-	private static final String	LINE_DELIMITER				= "{$}";
-	private static final String	DELIMITER							= "{%}";
+	private static final String	LINE_DELIMITER				= "{$}"; //$NON-NLS-1$
+	private static final String	DELIMITER							= "{%}"; //$NON-NLS-1$
 
 	final static Logger					log										= Logger.getLogger(ObjectDataReaderWriter.class.getName());
 
-	private static final String	BEGIN_STYLES					= "{BeginStyles}";
-	private static final String	END_STYLES						= "{EndStyles}";
-	private static final String	BEGIN_HEADER					= "{BeginHeader}";
-	private static final String	BEGIN_CHARACTERISTICS	= "{BeginCharacteristics}";
-	private static final String	BEGIN_STYLED_TEXT			= "{BeginStyledText}";
-	private static final String	BEGIN_FONT						= "{BeginFont}";
+	private static final String	BEGIN_STYLES					= "{BeginStyles}"; //$NON-NLS-1$
+	private static final String	END_STYLES						= "{EndStyles}"; //$NON-NLS-1$
+	private static final String	BEGIN_HEADER					= "{BeginHeader}"; //$NON-NLS-1$
+	private static final String	BEGIN_CHARACTERISTICS	= "{BeginCharacteristics}"; //$NON-NLS-1$
+	private static final String	BEGIN_STYLED_TEXT			= "{BeginStyledText}"; //$NON-NLS-1$
+	private static final String	BEGIN_FONT						= "{BeginFont}"; //$NON-NLS-1$
 
 	private ObjectData					objectData;
 	private String							filePath;
@@ -73,7 +75,7 @@ public class ObjectDataReaderWriter {
 	@SuppressWarnings("unchecked")
 	public void read() {
 
-		String redObjectkey = ObjectData.STRING_UNKNOWN;
+		String redObjectkey = Messages.getString(MessageIds.OSDE_MSGT0279);
 
 		File file = new File(this.filePath);
 		if (file.exists()) {
@@ -92,7 +94,7 @@ public class ObjectDataReaderWriter {
 
 						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
 						if (!this.objectData.getKey().equals(redObjectkey)) {
-							throw new ApplicationConfigurationException("Missmatch object key versus file content detected !");
+							throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGW0029));
 						}
 
 						// main characteristics
@@ -148,23 +150,26 @@ public class ObjectDataReaderWriter {
 					}
 				}
 			}
-			catch (IOException e) {
-				ObjectDataReaderWriter.log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			}
 			catch (Throwable t) {
 				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				if (t instanceof ZipException) {
-					int answer = OpenSerialDataExplorer.getInstance().openYesNoMessageDialog("Object file " + file.getAbsolutePath() + " seams invalid, should it be deleted ?");
-					if(answer == SWT.YES) file.delete();	
+					if (OpenSerialDataExplorer.getInstance().isVisible()) {
+						int answer = OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0025, new Object[] {file.getAbsolutePath()}));
+						if (answer == SWT.YES) file.delete();
+					}
+					else {
+						String msg = Messages.getString(MessageIds.OSDE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
+						OSDE.setInitError(msg);
+					}
 				}
 				else if (t instanceof ApplicationConfigurationException) {
 					if (OpenSerialDataExplorer.getInstance().isVisible()) {
-						String msg = "Object file " + file.getAbsolutePath() + " contains invalid object key \"" + redObjectkey + "\", should it be deleted ?";
+						String msg = Messages.getString(MessageIds.OSDE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
 						int answer = OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(msg);
 						if (answer == SWT.YES) file.delete();
 					}	
 					else {
-						String msg = "Object file " + file.getAbsolutePath() + " contains invalid object key \"" + redObjectkey + "\", please check ?";
+						String msg = Messages.getString(MessageIds.OSDE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
 						OSDE.setInitError(msg);
 					}
 				}
@@ -246,35 +251,36 @@ public class ObjectDataReaderWriter {
 
 			ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
 
-			// save the image
-			ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
-			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_JPG));
-			imageLoader.save(outZip, SWT.IMAGE_JPEG);
-			outZip.closeEntry();
-
+			if (this.objectData.getImage() != null) { // image not set in object window
+				// save the image
+				ImageLoader imageLoader = new ImageLoader();
+				imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
+				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_JPG));
+				imageLoader.save(outZip, SWT.IMAGE_JPEG);
+				outZip.closeEntry();
+			}
 			//save the text document
 			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_STF));
 
 			String text = this.objectData.getKey();
 			write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
 			
 			text = this.objectData.getType() + ObjectDataReaderWriter.DELIMITER + this.objectData.getActivationDate() + ObjectDataReaderWriter.DELIMITER + this.objectData.getStatus();
 			write(outZip, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
 
 			FontData fd = this.objectData.getFontData();
 			text = fd.getName() + DELIMITER + fd.getHeight() + DELIMITER + fd.getStyle();
 			write(outZip, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
 
 			text = this.objectData.getStyledText();
 			write(outZip, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
 
 			write(outZip, ObjectDataReaderWriter.BEGIN_STYLES);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.BEGIN_STYLES);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLES);
 			StyleRange[] styles = this.objectData.getStyleRanges();
 			for (StyleRange style : styles) {
 				text = style.start + OSDE.STRING_BLANK + style.length + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getRed()) + OSDE.STRING_BLANK
@@ -283,10 +289,10 @@ public class ObjectDataReaderWriter {
 						+ (style.background == null ? OSDE.STRING_DASH : style.background.getGreen()) + OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getBlue())
 						+ OSDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
 				write(outZip, text);
-				ObjectDataReaderWriter.log.log(Level.INFO, text);
+				ObjectDataReaderWriter.log.log(Level.FINE, text);
 			}
 			write(outZip, ObjectDataReaderWriter.END_STYLES + OSDE.STRING_NEW_LINE);
-			ObjectDataReaderWriter.log.log(Level.INFO, ObjectDataReaderWriter.END_STYLES);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
 
 			outZip.flush();
 			outZip.close();

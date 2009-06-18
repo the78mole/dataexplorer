@@ -63,12 +63,14 @@ import org.eclipse.swt.widgets.Widget;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.data.Channel;
+import osde.data.Channels;
 import osde.data.ObjectData;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.ui.menu.ImageContextMenu;
+import osde.ui.menu.ObjectImageContextMenu;
 
 /**
  * @author Winfried Brügmann
@@ -78,63 +80,62 @@ public class ObjectDescriptionWindow {
 	final static Logger						log									= Logger.getLogger(ObjectDescriptionWindow.class.getName());
 
 	CTabItem											objectTabItem;
-	StyledText										styledText;
-	Canvas												imageCanvas;
-	CLabel												objectName;
-	CLabel												objectNameLabel;
+	Composite											tabComposite;
 
+	Group													editGroup;
 	CoolBar												editCoolBar;
 	ToolBar												fontSelectToolBar;
 	ToolBar												editToolBar;
 	int														toolButtonHeight		= 23;
 	CoolItem											editCoolItem;
-
 	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
-	Point													fontSizeSelectSize	= new Point(40, 21);
+	Point													fontSizeSelectSize	= new Point((OSDE.IS_WINDOWS ? 40 : 60), (OSDE.IS_WINDOWS ? 21 : 23));
 	ToolItem											strikeoutButton;
 	ToolItem											underlineButton;
 	ToolItem											italicButton;
 	ToolItem											boldButton;
-	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
-
-	Composite											tabComposite;
-
-	final OpenSerialDataExplorer	application;
-	String												objectFilePath;
-	String												activeObjectKey;
-	boolean												isObjectDataSaved		= true;
-	Composite											styledTextComposite;
-
-	Composite											statusComposite;
-	Text													objectTypeText;
-	CLabel												objectTypeLable;
-	Composite											typeComposite;
-	Group													mainObjectCharacterisitcsGroup;
-	CLabel												dateLabel;
-	Composite											dateComposite;
-	Group													editGroup;
 	ToolItem											fColorButton, bColorButton;
 	ToolItem											cutButton, copyButton, pasteButton, printButton;
+	Composite											styledTextComposite;
+	StyledText										styledText;
+
+	Group													mainObjectCharacterisitcsGroup;
+	Composite											headerComposite;	
+	CLabel												objectNameLabel;
+	CLabel												objectName;
+	Composite											typeComposite;
+	CLabel												objectTypeLable;
+	Text													objectTypeText;
+	Composite											dateComposite;
+	CLabel												dateLabel;
 	Text													dateText;
+	Composite											statusComposite;
 	CCombo												statusText;
 	CLabel												statusLabel;
 
+	Canvas												imageCanvas;
 	Menu													popupmenu;
-	ImageContextMenu							contextMenu;
-	ObjectData										object;
-	Image													image;
+	ObjectImageContextMenu				contextMenu;
 
-	final Settings								settings;
 	final CTabFolder							tabFolder;
 	//static CTabFolder cTabFolder1;
-	private Composite							headerComposite;
+	final OpenSerialDataExplorer	application;
+	final Settings								settings;
+	final Channels								channels;
+	String												objectFilePath;
+	String												activeObjectKey;
+	boolean												isObjectDataSaved		= true;
+	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
+	ObjectData										object;
+	Image													image;
 
 	public ObjectDescriptionWindow(OpenSerialDataExplorer currenApplication, CTabFolder objectDescriptionTab) {
 		this.application = currenApplication;
 		this.tabFolder = objectDescriptionTab;
 		this.settings = Settings.getInstance();
+		this.channels = Channels.getInstance();
 		this.activeObjectKey = this.settings.getActiveObject();
 	}
 
@@ -142,7 +143,12 @@ public class ObjectDescriptionWindow {
 		this.application = null;
 		this.tabFolder = objectDescriptionTab;
 		this.settings = null;
+		this.channels = null;
 		this.tabFolder.setSize(1020, 554);
+	}
+	
+	public boolean isVisible() {
+		return !this.objectTabItem.isDisposed() && this.objectTabItem.getControl().isVisible();
 	}
 
 	public void setVisible(boolean isVisible) {
@@ -163,17 +169,7 @@ public class ObjectDescriptionWindow {
 	public void update() {
 		if (!this.objectTabItem.isDisposed()) {
 
-			if (this.object != null && !this.isObjectDataSaved) {
-				this.object.setType(this.objectTypeText.getText());
-				this.object.setActivationDate(this.dateText.getText());
-				this.object.setStatus(this.statusText.getText());
-				this.object.setImage(SWTResourceManager.getImage(this.image.getImageData(), this.activeObjectKey, this.object.getImageWidth(), this.object.getImageHeight(), false));
-				this.object.setStyledText(this.styledText.getText());
-				this.object.setFont(this.styledText.getFont());
-				this.object.setStyleRanges(this.styledText.getStyleRanges().clone());
-				this.object.save();
-				this.isObjectDataSaved = true;
-			}
+			checkSaveObjectData();
 
 			this.activeObjectKey = this.application.getMenuToolBar().getActiveObjectKey();
 			this.objectFilePath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + OSDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + OSDE.FILE_ENDING_DOT_ZIP;
@@ -182,12 +178,13 @@ public class ObjectDescriptionWindow {
 			// check if object data can be load from file
 			if (new File(this.objectFilePath).exists()) {
 				this.object.load();
-				this.image = SWTResourceManager.getImage(this.object.getImage().getImageData(), this.object.getKey(), this.object.getImageWidth(), this.object.getImageHeight(), true);
-				this.imageCanvas.redraw();
+				if (this.object.getImage() != null) 
+					this.image = SWTResourceManager.getImage(this.object.getImage().getImageData(), this.object.getKey(), this.object.getImageWidth(), this.object.getImageHeight(), true);
 			}
 			else {
 				this.image = null;
 			}
+			this.imageCanvas.redraw();
 
 			this.objectName.setText(this.object.getKey().equals(this.settings.getActiveObject()) ? this.object.getKey() : this.settings.getActiveObject());
 			this.objectTypeText.setText(this.object.getType());
@@ -210,11 +207,36 @@ public class ObjectDescriptionWindow {
 	}
 
 	/**
+	 * method to check isf the object data are changed and needs to be saved
+	 */
+	public void checkSaveObjectData() {
+		if (this.object != null && !this.isObjectDataSaved) {
+			this.object.setType(this.objectTypeText.getText());
+			this.object.setActivationDate(this.dateText.getText());
+			this.object.setStatus(this.statusText.getText());
+			if (this.image != null)
+				this.object.setImage(SWTResourceManager.getImage(this.image.getImageData(), this.activeObjectKey, this.object.getImageWidth(), this.object.getImageHeight(), false));
+			else
+				this.object.setImage(null);
+			this.object.setStyledText(this.styledText.getText());
+			this.object.setFont(this.styledText.getFont());
+			this.object.setStyleRanges(this.styledText.getStyleRanges().clone());
+			this.object.save();
+			this.isObjectDataSaved = true;
+			Channel activeChannel = this.channels.getActiveChannel();
+			if (activeChannel != null) {
+				activeChannel.setUnsaved(Channel.UNSAVED_REASON_CHANGED_OBJECT_DATA);
+			}
+				
+		}
+	}
+
+	/**
 	 * creates the window content
 	 */
 	public void create() {
 		this.objectTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		this.objectTabItem.setText("Object Characteristics");
+		this.objectTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0403));
 		{
 			this.tabComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.objectTabItem.setControl(this.tabComposite);
@@ -226,7 +248,7 @@ public class ObjectDescriptionWindow {
 				RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.headerComposite.setLayout(composite2Layout);
 				FormData composite2LData = new FormData();
-				composite2LData.width = 420;
+				composite2LData.width = 600;
 				composite2LData.height = 36;
 				composite2LData.left = new FormAttachment(0, 1000, 15);
 				composite2LData.top = new FormAttachment(0, 1000, 17);
@@ -234,13 +256,17 @@ public class ObjectDescriptionWindow {
 				this.headerComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				{
 					this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
-					this.objectNameLabel.setText("Object Name :");
-					this.objectNameLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 0, false, false));
+					this.objectNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0404));
+					this.objectNameLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 0, false, false)); //$NON-NLS-1$
+					RowData cLabel1LData = new RowData();
+					cLabel1LData.width = 130;
+					cLabel1LData.height = 26;
+					this.objectNameLabel.setLayoutData(cLabel1LData);
 					this.objectNameLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 				}
 				{
 					this.objectName = new CLabel(this.headerComposite, SWT.NONE);
-					this.objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false));
+					this.objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
 					RowData cLabel1LData = new RowData();
 					cLabel1LData.width = 300;
 					cLabel1LData.height = 26;
@@ -259,9 +285,8 @@ public class ObjectDescriptionWindow {
 				group2LData.left = new FormAttachment(0, 1000, 15);
 				group2LData.top = new FormAttachment(0, 1000, 60);
 				this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
-				this.mainObjectCharacterisitcsGroup.setText("Main Characteristics ");
+				this.mainObjectCharacterisitcsGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0416));
 				this.mainObjectCharacterisitcsGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.mainObjectCharacterisitcsGroup.setToolTipText("Describes the main characteristics of the object");
 				{
 					this.typeComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
 					RowLayout composite1Layout3 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -276,26 +301,28 @@ public class ObjectDescriptionWindow {
 					{
 						this.objectTypeLable = new CLabel(this.typeComposite, SWT.NONE);
 						this.objectTypeLable.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						this.objectTypeLable.setText("Object Type :");
+						this.objectTypeLable.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.objectTypeLable.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
 						RowData cLabel1LData1 = new RowData();
-						cLabel1LData1.width = 120;
+						cLabel1LData1.width = 140;
 						cLabel1LData1.height = 22;
 						this.objectTypeLable.setLayoutData(cLabel1LData1);
-						this.objectTypeLable.setToolTipText("give a type name, sample:battery, Soaring model, motor flyer, trainer, solar collector, ....");
+						this.objectTypeLable.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0405));
 					}
 					{
 						this.objectTypeText = new Text(this.typeComposite, SWT.BORDER);
 						this.objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.objectTypeText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
 						this.objectTypeText.setEditable(true);
 						RowData cLabel2LData = new RowData();
-						cLabel2LData.width = 265;
+						cLabel2LData.width = 240;
 						cLabel2LData.height = 18;
 						this.objectTypeText.setLayoutData(cLabel2LData);
-						this.objectTypeText.setToolTipText("give a type name, sample: NiMh battery, soaring model, motor flyer, trainer, solar collector, ....");
+						this.objectTypeText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0405));
 						this.objectTypeText.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "objectTypeText.keyReleased, event=" + evt);
+								log.log(Level.FINEST, "objectTypeText.keyReleased, event=" + evt); //$NON-NLS-1$
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
@@ -308,7 +335,6 @@ public class ObjectDescriptionWindow {
 					GridData dateCompositeLData = new GridData();
 					dateCompositeLData.grabExcessHorizontalSpace = true;
 					dateCompositeLData.verticalAlignment = GridData.BEGINNING;
-					dateCompositeLData.widthHint = 250;
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					dateCompositeLData.heightHint = 28;
 					this.dateComposite.setLayoutData(dateCompositeLData);
@@ -316,26 +342,28 @@ public class ObjectDescriptionWindow {
 					{
 						this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
 						this.dateLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.dateLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
 						RowData dateLabelLData = new RowData();
-						dateLabelLData.width = 120;
+						dateLabelLData.width = 140;
 						dateLabelLData.height = 22;
 						this.dateLabel.setLayoutData(dateLabelLData);
-						this.dateLabel.setText("Date of first usage :");
-						this.dateLabel.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
+						this.dateLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0406));
+						this.dateLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0407));
 					}
 					{
 						this.dateText = new Text(this.dateComposite, SWT.BORDER);
+						this.dateText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
 						RowData dateTextLData = new RowData();
-						dateTextLData.width = 118;
+						dateTextLData.width = OSDE.IS_WINDOWS ? 118: 116;
 						dateTextLData.height = 18;
 						this.dateText.setLayoutData(dateTextLData);
 						this.dateText.setBackground(SWTResourceManager.getColor(255, 255, 255));
-						this.dateText.setToolTipText("Kaufdatum, Datum der Fertigstellung ");
+						this.dateText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0407));
 						this.dateText.setEditable(true);
 						this.dateText.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "dateText.keyReleased, event=" + evt);
+								log.log(Level.FINEST, "dateText.keyReleased, event=" + evt); //$NON-NLS-1$
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
@@ -349,33 +377,35 @@ public class ObjectDescriptionWindow {
 					statusCompositeLData.grabExcessHorizontalSpace = true;
 					statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					statusCompositeLData.widthHint = 250;
 					statusCompositeLData.heightHint = 28;
 					this.statusComposite.setLayoutData(statusCompositeLData);
 					this.statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
 						this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
 						this.statusLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.statusLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
 						RowData statusLabelLData = new RowData();
-						statusLabelLData.width = 120;
+						statusLabelLData.width = 140;
 						statusLabelLData.height = 22;
 						this.statusLabel.setLayoutData(statusLabelLData);
-						this.statusLabel.setText("Status information :");
-						this.statusLabel.setToolTipText("selct most fitting usage state of the object, active, in use, damaged, outdated, lost, sold ");
+						this.statusLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0410));
+						this.statusLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));
 					}
 					{
 						this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
-						this.statusText.setItems(new String[] { "unknown", "active", "in use", "damaged", "outdated", "lost", "sold", "under repair" });
+						this.statusText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(OSDE.STRING_SEMICOLON));
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 120;
 						group1LData.height = 18;
 						this.statusText.setLayoutData(group1LData);
 						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));
 						this.statusText.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "statusText.widgetSelected, event=" + evt);
+								log.log(Level.FINEST, "statusText.widgetSelected, event=" + evt); //$NON-NLS-1$
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 						});
@@ -390,20 +420,28 @@ public class ObjectDescriptionWindow {
 					imageCanvasLData.grabExcessHorizontalSpace = true;
 					imageCanvasLData.widthHint = 400;
 					this.imageCanvas.setLayoutData(imageCanvasLData);
-					this.imageCanvas.setToolTipText("drag image here, 400x300 is the recommended  size");
-					this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/" + this.settings.getLocale() + "/ObjectImage.gif"));
+					this.imageCanvas.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0413));
+					this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.imageCanvas.setSize(400, 300);
 					this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-					this.contextMenu = new ImageContextMenu();
+					this.contextMenu = new ObjectImageContextMenu();
 					this.contextMenu.createMenu(this.popupmenu);
 					this.imageCanvas.setMenu(this.popupmenu);
 					this.imageCanvas.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
-							log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt);
-							if (ObjectDescriptionWindow.this.popupmenu.getData(ImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean) ObjectDescriptionWindow.this.popupmenu.getData("OBJECT_IMAGE_CHANGED")) {
-								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(ObjectDescriptionWindow.this.imageCanvas.getDisplay(), (String) ObjectDescriptionWindow.this.popupmenu
-										.getData(ImageContextMenu.OBJECT_IMAGE_PATH)).getImageData(), ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(),
+							log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
+							if (ObjectDescriptionWindow.this.popupmenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean) ObjectDescriptionWindow.this.popupmenu.getData("OBJECT_IMAGE_CHANGED")) {
+								String imagePath = (String) ObjectDescriptionWindow.this.popupmenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
+								if (imagePath != null) {
+								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(ObjectDescriptionWindow.this.imageCanvas.getDisplay(), 
+										imagePath).getImageData(), 
+										ObjectDescriptionWindow.this.object.getKey(), 
+										ObjectDescriptionWindow.this.object.getImageWidth(),
 										ObjectDescriptionWindow.this.object.getImageHeight(), true);
+								}
+								else {
+									ObjectDescriptionWindow.this.image = null;
+								}
 								ObjectDescriptionWindow.this.object.setImage(ObjectDescriptionWindow.this.image);
 								ObjectDescriptionWindow.this.popupmenu.setData("OBJECT_IMAGE_CHANGED", false);
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
@@ -428,9 +466,8 @@ public class ObjectDescriptionWindow {
 				composite1LData.left = new FormAttachment(0, 1000, 440);
 				this.editGroup.setLayoutData(composite1LData);				
 				this.editGroup.setLayout(new GridLayout());
-				this.editGroup.setText("Additional Characteristics");
+				this.editGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0414));
 				this.editGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.editGroup.setToolTipText("describe additionla characteristics here ");
 				{
 					this.editCoolBar = new CoolBar(this.editGroup, SWT.FLAT);
 					GridData editCoolBarLData = new GridData();
@@ -448,12 +485,13 @@ public class ObjectDescriptionWindow {
 						{
 							this.fontSelectToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 							this.editCoolItem.setControl(this.fontSelectToolBar);
+							this.fontSelectToolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
 							new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 							{
 								this.fontSelect = new ToolItem(this.fontSelectToolBar, SWT.BORDER);
-								this.fontSelect.setImage(SWTResourceManager.getImage("osde/resource/Font.gif"));
-								this.fontSelect.setToolTipText("Select the font to used or set");
+								this.fontSelect.setImage(SWTResourceManager.getImage("osde/resource/Font.gif")); //$NON-NLS-1$
+								this.fontSelect.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0417));
 								this.fontSelect.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -469,7 +507,8 @@ public class ObjectDescriptionWindow {
 									this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 									this.fontSizeSelectComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 									this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-									this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" });
+									this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+									this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 									this.fontSizeSelectCombo.select(3);
 									this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0201));
 									this.fontSizeSelectCombo.setEditable(false);
@@ -495,16 +534,17 @@ public class ObjectDescriptionWindow {
 
 							this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 							this.editCoolItem.setControl(this.editToolBar);
+							this.editToolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.boldButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.boldButton.setImage(SWTResourceManager.getImage("osde/resource/Bold.gif"));
-								this.boldButton.setToolTipText("toggle bold text");
+								this.boldButton.setImage(SWTResourceManager.getImage("osde/resource/Bold.gif")); //$NON-NLS-1$
+								this.boldButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0419));
 								this.boldButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "boldButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "boldButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setStyle(ObjectDescriptionWindow.this.boldButton);
 									}
 								});
@@ -512,12 +552,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.italicButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.italicButton.setImage(SWTResourceManager.getImage("osde/resource/Italic.gif"));
-								this.italicButton.setToolTipText("toggle italic font style");
+								this.italicButton.setImage(SWTResourceManager.getImage("osde/resource/Italic.gif")); //$NON-NLS-1$
+								this.italicButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0420));
 								this.italicButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "italicButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "italicButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setStyle(ObjectDescriptionWindow.this.italicButton);
 									}
 								});
@@ -525,12 +565,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.underlineButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.underlineButton.setImage(SWTResourceManager.getImage("osde/resource/Underline.gif"));
-								this.underlineButton.setToolTipText("underline selected text");
+								this.underlineButton.setImage(SWTResourceManager.getImage("osde/resource/Underline.gif")); //$NON-NLS-1$
+								this.underlineButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0421));
 								this.underlineButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "underlineButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "underlineButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setStyle(ObjectDescriptionWindow.this.underlineButton);
 									}
 								});
@@ -538,12 +578,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.strikeoutButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.strikeoutButton.setImage(SWTResourceManager.getImage("osde/resource/Strikeout.gif"));
-								this.strikeoutButton.setToolTipText("strike trough selected text");
+								this.strikeoutButton.setImage(SWTResourceManager.getImage("osde/resource/Strikeout.gif")); //$NON-NLS-1$
+								this.strikeoutButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0422));
 								this.strikeoutButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "strikeoutButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "strikeoutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setStyle(ObjectDescriptionWindow.this.strikeoutButton);
 									}
 								});
@@ -551,12 +591,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.fColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif"));
-								this.fColorButton.setToolTipText("apply forground color to selected text");
+								this.fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif")); //$NON-NLS-1$
+								this.fColorButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0423));
 								this.fColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 										RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
 										ObjectDescriptionWindow.this.fColorButton.setData(rgb);
 										setStyle(ObjectDescriptionWindow.this.fColorButton);
@@ -566,12 +606,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.bColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif"));
-								this.bColorButton.setToolTipText("apply background color to selected text");
+								this.bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif")); //$NON-NLS-1$
+								this.bColorButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0424));
 								this.bColorButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 										RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
 										ObjectDescriptionWindow.this.bColorButton.setData(rgb);
 										setStyle(ObjectDescriptionWindow.this.bColorButton);
@@ -581,12 +621,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.copyButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.copyButton.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif"));
-								this.copyButton.setToolTipText("copy selected text");
+								this.copyButton.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif")); //$NON-NLS-1$
+								this.copyButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0426));
 								this.copyButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "copyButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "copyButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										handleCutCopy();
 										ObjectDescriptionWindow.this.styledText.copy();
 									}
@@ -595,12 +635,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.cutButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.cutButton.setImage(SWTResourceManager.getImage("osde/resource/Cut.gif"));
-								this.cutButton.setToolTipText("cut selected text");
+								this.cutButton.setImage(SWTResourceManager.getImage("osde/resource/Cut.gif")); //$NON-NLS-1$
+								this.cutButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0427));
 								this.cutButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "cutButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "cutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										handleCutCopy();
 										ObjectDescriptionWindow.this.styledText.cut();
 									}
@@ -609,12 +649,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.pasteButton = new ToolItem(this.editToolBar, SWT.PUSH);
-								this.pasteButton.setImage(SWTResourceManager.getImage("osde/resource/Paste.gif"));
-								this.pasteButton.setToolTipText("paste selected text");
+								this.pasteButton.setImage(SWTResourceManager.getImage("osde/resource/Paste.gif")); //$NON-NLS-1$
+								this.pasteButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0428));
 								this.pasteButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										ObjectDescriptionWindow.this.styledText.paste();
 										//Clipboard clipboard = new Clipboard(tabComposite.getDisplay());
 										//String data = (String) clipboard.getContents(RTFTransfer.getInstance());
@@ -630,12 +670,12 @@ public class ObjectDescriptionWindow {
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.printButton = new ToolItem(this.editToolBar, SWT.PUSH | SWT.BORDER);
-								this.printButton.setImage(SWTResourceManager.getImage("osde/resource/Print.gif"));
-								this.printButton.setToolTipText("print");
+								this.printButton.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
+								this.printButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0429));
 								this.printButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "printButton.widgetSelected, event=" + evt);
+										log.log(Level.FINEST, "printButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										ObjectDescriptionWindow.this.object.print();
 									}
 								});
@@ -668,7 +708,7 @@ public class ObjectDescriptionWindow {
 						FormLayout styledTextLayout = new FormLayout();
 						this.styledText.setLayout(styledTextLayout);
 						this.styledText.setEditable(true);
-						this.styledText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+						this.styledText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
 						this.styledText.setHorizontalIndex(2);
 						this.styledText.setTopIndex(1);
 						FormData styledTextLData = new FormData();
@@ -681,7 +721,7 @@ public class ObjectDescriptionWindow {
 						this.styledText.setLayoutData(styledTextLData);
 						this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 							public void modifyText(ExtendedModifyEvent evt) {
-								log.log(Level.FINEST, "styledText.modifyText, event=" + evt);
+								log.log(Level.FINEST, "styledText.modifyText, event=" + evt); //$NON-NLS-1$
 								if (evt.length == 0) return;
 								StyleRange style;
 								if (evt.length == 1 || ObjectDescriptionWindow.this.styledText.getTextRange(evt.start, evt.length).equals(ObjectDescriptionWindow.this.styledText.getLineDelimiter())) {
@@ -720,24 +760,24 @@ public class ObjectDescriptionWindow {
 						this.styledText.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "styledText.keyReleased, event=" + evt);
+								log.log(Level.FINEST, "styledText.keyReleased, event=" + evt); //$NON-NLS-1$
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 							}
 
 							@Override
 							public void keyPressed(KeyEvent evt) {
-								log.log(Level.FINEST, "styledText.keyPressed, event=" + evt);
+								log.log(Level.FINEST, "styledText.keyPressed, event=" + evt); //$NON-NLS-1$
 								if ((evt.stateMask & SWT.CTRL) != 0) {
 									if (evt.keyCode == 'x') { //cut
-										log.log(Level.INFO, "SWT.CTRL + 'x'");
+										log.log(Level.FINE, "SWT.CTRL + 'x'"); //$NON-NLS-1$
 										handleCutCopy();
 									}
 									else if (evt.keyCode == 'c') { //copy
-										log.log(Level.INFO, "SWT.CTRL + 'c'");
+										log.log(Level.FINE, "SWT.CTRL + 'c'"); //$NON-NLS-1$
 										handleCutCopy();
 									}
 									else if (evt.keyCode == 'v') { //paste
-										log.log(Level.INFO, "SWT.CTRL + 'v'");
+										log.log(Level.FINE, "SWT.CTRL + 'v'"); //$NON-NLS-1$
 									}
 								}
 							}
