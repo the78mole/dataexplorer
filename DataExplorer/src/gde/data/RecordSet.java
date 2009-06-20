@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
 import osde.OSDE;
+import osde.config.Settings;
 import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
@@ -776,8 +777,8 @@ public class RecordSet extends HashMap<String, Record> {
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 		if (application != null && application.isObjectoriented()) {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
-			if (activeChannel != null && !activeChannel.getObjectKey().equals(application.getMenuToolBar().getActiveObjectKey())) {
-				activeChannel.setObjectKey(application.getMenuToolBar().getActiveObjectKey());
+			if (activeChannel != null && !activeChannel.getObjectKey().equals(Settings.getInstance().getActiveObject())) {
+				activeChannel.setObjectKey(Settings.getInstance().getActiveObject());
 			}
 		}
 
