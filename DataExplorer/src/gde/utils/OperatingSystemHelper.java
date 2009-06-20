@@ -43,7 +43,7 @@ public class OperatingSystemHelper {
 	private static final String	STRING_LINK_POINTER	= " -> ";  //$NON-NLS-1$
 	
 	/**
-	 * create destop shortcut to launch the main jar
+	 * create desktop shortcut to launch the main jar
 	 */
 	public static boolean createDesktopLink() {
 		boolean isCreated = false;
@@ -151,7 +151,7 @@ public class OperatingSystemHelper {
 				targetDesktopLaucherFilePath = targetBasePath + "OpenSerialData*.lnk"; //$NON-NLS-1$
 				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
-				Process process = Runtime.getRuntime().exec("cmd /C erase /F \"" + targetDesktopLaucherFilePath + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+				Process process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				process.waitFor();
 				if (process.exitValue() != 0) {
 					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
@@ -165,7 +165,7 @@ public class OperatingSystemHelper {
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 				log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 				
-				Process process = Runtime.getRuntime().exec("rm -f " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				Process process = new ProcessBuilder("rm", "-f", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				if (process.exitValue() != 0) {
 					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
@@ -216,9 +216,9 @@ public class OperatingSystemHelper {
 					String targetBasePath = jarBasePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 					targetBasePath = targetBasePath.startsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
 					targetBasePath = targetBasePath.endsWith(OSDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length()-1) : targetBasePath;
-					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + "\"" + targetBasePath + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$  
+					command = "cmd /C " + targetDir + regExe + OSDE.STRING_BLANK + targetBasePath; //$NON-NLS-1$
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
-					Process process = Runtime.getRuntime().exec(command);
+					Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe, targetBasePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
 					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -353,7 +353,7 @@ public class OperatingSystemHelper {
 				FileUtils.extract(jarFile, regExe, OSDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
 				command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
-				Process process = Runtime.getRuntime().exec(command);
+				Process process = new ProcessBuilder("cmd", "/C", targetDir+targetDir).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -499,7 +499,8 @@ public class OperatingSystemHelper {
 					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
 					String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath;  //$NON-NLS-1$
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
-					Process process = Runtime.getRuntime().exec(command);
+					
+					Process process = new ProcessBuilder("ln", "-s", fullQualifiedLinkTargetPath, fullQualifiedLinkPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
 					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -521,7 +522,7 @@ public class OperatingSystemHelper {
 			}
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openMessageDialog("Operating System " + System.getProperty(OSDE.STRING_OS_NAME) + " is not supported!");
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0035, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		catch (IOException e) {
@@ -557,7 +558,7 @@ public class OperatingSystemHelper {
 			try {
 				String command = "ls -al " + filePath;  //$NON-NLS-1$
 				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
-				Process process = Runtime.getRuntime().exec(command);
+				Process process = new ProcessBuilder("ls", "-al", filePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));

@@ -247,55 +247,55 @@ public class ObjectDataReaderWriter {
 	public void write() {
 		try {
 			File targetFile = new File(this.filePath);
-			if (targetFile.exists()) targetFile.delete();
-
-			ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
-
-			if (this.objectData.getImage() != null) { // image not set in object window
-				// save the image
-				ImageLoader imageLoader = new ImageLoader();
-				imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
-				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_JPG));
-				imageLoader.save(outZip, SWT.IMAGE_JPEG);
-				outZip.closeEntry();
-			}
-			//save the text document
-			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_STF));
-
-			String text = this.objectData.getKey();
-			write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
 			
-			text = this.objectData.getType() + ObjectDataReaderWriter.DELIMITER + this.objectData.getActivationDate() + ObjectDataReaderWriter.DELIMITER + this.objectData.getStatus();
-			write(outZip, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
-
-			FontData fd = this.objectData.getFontData();
-			text = fd.getName() + DELIMITER + fd.getHeight() + DELIMITER + fd.getStyle();
-			write(outZip, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-
-			text = this.objectData.getStyledText();
-			write(outZip, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
-
-			write(outZip, ObjectDataReaderWriter.BEGIN_STYLES);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLES);
-			StyleRange[] styles = this.objectData.getStyleRanges();
-			for (StyleRange style : styles) {
-				text = style.start + OSDE.STRING_BLANK + style.length + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getRed()) + OSDE.STRING_BLANK
-						+ (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getGreen()) + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getBlue())
-						+ OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getRed()) + OSDE.STRING_BLANK
-						+ (style.background == null ? OSDE.STRING_DASH : style.background.getGreen()) + OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getBlue())
-						+ OSDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
-				write(outZip, text);
-				ObjectDataReaderWriter.log.log(Level.FINE, text);
+			// check if target directory exist, it must be created and removed by creatingor removing object key
+			File targetFileDir = new File(targetFile.getPath());
+			if (targetFileDir.exists()) {
+				if (targetFile.exists()) targetFile.delete();
+				ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
+				if (this.objectData.getImage() != null) { // image not set in object window
+					// save the image
+					ImageLoader imageLoader = new ImageLoader();
+					imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
+					outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_JPG));
+					imageLoader.save(outZip, SWT.IMAGE_JPEG);
+					outZip.closeEntry();
+				}
+				//save the text document
+				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + OSDE.FILE_ENDING_DOT_STF));
+				String text = this.objectData.getKey();
+				write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				text = this.objectData.getType() + ObjectDataReaderWriter.DELIMITER + this.objectData.getActivationDate() + ObjectDataReaderWriter.DELIMITER + this.objectData.getStatus();
+				write(outZip, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				FontData fd = this.objectData.getFontData();
+				text = fd.getName() + DELIMITER + fd.getHeight() + DELIMITER + fd.getStyle();
+				write(outZip, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				text = this.objectData.getStyledText();
+				write(outZip, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+				write(outZip, ObjectDataReaderWriter.BEGIN_STYLES);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLES);
+				StyleRange[] styles = this.objectData.getStyleRanges();
+				for (StyleRange style : styles) {
+					text = style.start + OSDE.STRING_BLANK + style.length + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getRed()) + OSDE.STRING_BLANK
+							+ (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getGreen()) + OSDE.STRING_BLANK + (style.foreground == null ? OSDE.STRING_DASH : style.foreground.getBlue())
+							+ OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getRed()) + OSDE.STRING_BLANK
+							+ (style.background == null ? OSDE.STRING_DASH : style.background.getGreen()) + OSDE.STRING_BLANK + (style.background == null ? OSDE.STRING_DASH : style.background.getBlue())
+							+ OSDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
+					write(outZip, text);
+					ObjectDataReaderWriter.log.log(Level.FINE, text);
+				}
+				write(outZip, ObjectDataReaderWriter.END_STYLES + OSDE.STRING_NEW_LINE);
+				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
+				outZip.flush();
+				outZip.close();
 			}
-			write(outZip, ObjectDataReaderWriter.END_STYLES + OSDE.STRING_NEW_LINE);
-			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
-
-			outZip.flush();
-			outZip.close();
+			else {
+				log.log(Level.WARNING, "could not save object data, since object key removed");
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();

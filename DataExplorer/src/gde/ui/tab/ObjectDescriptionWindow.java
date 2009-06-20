@@ -927,11 +927,4 @@ public class ObjectDescriptionWindow {
 			}
 		}
 	}
-
-	/**
-	 * enable save object data from outside the object
-	 */
-	public void saveObjectData() {
-		if (!this.isObjectDataSaved) this.object.save();
-	}
 }
