@@ -44,28 +44,31 @@ import osde.ui.SWTResourceManager;
 public class AnalogWindow {
 	final static Logger											log	= Logger.getLogger(AnalogWindow.class.getName());
 
-	private CTabItem												analogTab;
-	private Composite												analogMainComposite;
-	private HashMap<String, AnalogDisplay>	displays;
-	private CLabel													infoText;
-	private GridLayout 											analogMainCompositeLayout;
-	private String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
+	CTabItem												analogTab;
+	Composite												analogMainComposite;
+	HashMap<String, AnalogDisplay>	displays;
+	CLabel													infoText;
+	GridLayout 											analogMainCompositeLayout;
+	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
-	private final Channels									channels;
-	private final CTabFolder								displayTab;
-	private RecordSet												oldRecordSet;
-	private Channel													oldChannel;
-	private String[] 												oldRecordsToDisplay;
+	final OpenSerialDataExplorer		application;
+	final Channels									channels;
+	final CTabFolder								displayTab;
+	RecordSet												oldRecordSet;
+	Channel													oldChannel;
+	String[] 												oldRecordsToDisplay;
 
 	public AnalogWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
 		this.analogTab = new CTabItem(this.displayTab, SWT.NONE);
-		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		SWTResourceManager.registerResourceUser(this.analogTab);
+		this.analogTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		
 		this.displays = new HashMap<String, AnalogDisplay>(3);
 		{

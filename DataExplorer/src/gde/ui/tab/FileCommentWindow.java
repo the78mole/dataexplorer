@@ -62,8 +62,9 @@ public class FileCommentWindow {
 	TableColumn			recordCommentTableHeader;
 	TableColumn			recordCommentTableHeader2;
 
-	final Channels		channels;
-	final CTabFolder	displayTab;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
+	final CTabFolder							displayTab;
 
 	/**
 	 * constructor with CTabFolder parent
@@ -71,6 +72,7 @@ public class FileCommentWindow {
 	 */
 	public FileCommentWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 	}
 
@@ -79,8 +81,9 @@ public class FileCommentWindow {
 	 */
 	public void create() {
 		this.commentTab = new CTabItem(this.displayTab, SWT.NONE);
-		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 		SWTResourceManager.registerResourceUser(this.commentTab);
+		this.commentTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 
 		{
 			this.commentMainComposite = new Composite(this.displayTab, SWT.NONE);
@@ -95,11 +98,12 @@ public class FileCommentWindow {
 			{
 				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
 				this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
-				this.infoLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+				this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 				this.infoLabel.setBounds(50, 10, 500, 26);
 			}
 			{
 				this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER  | SWT.V_SCROLL);
+				this.fileCommentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
 				this.fileCommentText.setBounds(50, 40, 500, 100);
 				this.fileCommentText.setText(this.channels.getFileDescription());
@@ -120,6 +124,7 @@ public class FileCommentWindow {
 			}
 			{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
+			this.recordCommentTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 			this.recordCommentTable.setBounds(50, 200, 500, 100);
 			//this.table.setControl(this.dataTable);
 			this.recordCommentTable.setLinesVisible(true);

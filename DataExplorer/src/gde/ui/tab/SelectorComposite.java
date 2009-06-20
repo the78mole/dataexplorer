@@ -101,7 +101,7 @@ public class SelectorComposite extends Composite {
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
 			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
-			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(this.curveSelectorHeader, SWT.BOLD));
+			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
@@ -114,6 +114,7 @@ public class SelectorComposite extends Composite {
 		}
 		{
 			this.curveSelectorTable = new Table(this, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
+			this.curveSelectorTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
 			curveTableLData.width = 82;

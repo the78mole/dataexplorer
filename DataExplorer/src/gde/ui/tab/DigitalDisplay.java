@@ -48,23 +48,25 @@ public class DigitalDisplay extends Composite {
 	CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
 	Composite				minMaxComposite;
 
-	final Channels	channels;
-	final String		recordKey;
-	final IDevice		device;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
+	final String									recordKey;
+	final IDevice									device;
 
-	public DigitalDisplay(Composite digitalWindow, String currentRecordKey, IDevice currentDevice) {
+	public DigitalDisplay(OpenSerialDataExplorer currentApplication, Composite digitalWindow, String currentRecordKey, IDevice currentDevice) {
 		super(digitalWindow, SWT.BORDER);
 		FillLayout digitalComposite1Layout = new FillLayout(SWT.VERTICAL);
 		this.setLayout(digitalComposite1Layout);
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
+		this.application = currentApplication;
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
 		{
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.textDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 14, 1, false, false)); //$NON-NLS-1$
+			this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD));
 			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
@@ -84,7 +86,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.actualDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.actualDigitalLabel.setText("00,00"); //$NON-NLS-1$
-			this.actualDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 72, 0, false, false)); //$NON-NLS-1$
+			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 72, SWT.NORMAL));
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
 				public void paintControl(final PaintEvent evt) {
 					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
@@ -113,12 +115,12 @@ public class DigitalDisplay extends Composite {
 
 			this.minDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.minDigitalLabel.setText("MIN : 00,00"); //$NON-NLS-1$
-			this.minDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.minDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD)); 
 			this.minDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
 			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.maxDigitalLabel.setText("MAX : 00,00"); //$NON-NLS-1$
-			this.maxDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.maxDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.maxDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		}
 	}

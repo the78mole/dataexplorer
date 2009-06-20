@@ -126,16 +126,16 @@ public class SettingsDialog extends Dialog {
 	Slider															alphaSlider;
 	Button															suggestDate;
 	Group																fileOpenSaveDialogGroup;
-	private Button											scanObjectKeysButton;
-	private Group												objectKeyGroup;
-	private Button											removeMimeAssocButton;
-	private Button											assocMimeTypeButton;
-	private Button											removeLauncherButton;
-	private Button											createLauncerButton;
-	private Composite										osMiscComposite;
-	private Group												shellMimeType;
-	private Group												desktopLauncher;
-	private CTabItem										osMiscTabItem;
+	Button															scanObjectKeysButton;
+	Group																objectKeyGroup;
+	Button															removeMimeAssocButton;
+	Button															assocMimeTypeButton;
+	Button															removeLauncherButton;
+	Button															createLauncerButton;
+	Composite														osMiscComposite;
+	Group																shellMimeType;
+	Group																desktopLauncher;
+	CTabItem														osMiscTabItem;
 	CLabel															fileIOLevelLabel;
 	CCombo															fileIOLevelCombo;
 	Button															deviceDialogModalButton;
@@ -184,16 +184,19 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setText(OSDE.OSDE_NAME_LONG + Messages.getString(MessageIds.OSDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.gif")); //$NON-NLS-1$
 			{ // begin tab folder
-				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
+				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT|SWT.BORDER);
+				this.settingsTabFolder.setSimple(false);
 				FormData cTabFolder1LData = new FormData();
 				cTabFolder1LData.width = 484;
 				cTabFolder1LData.height = 419;
 				cTabFolder1LData.left = new FormAttachment(0, 1000, 0);
 				cTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
-				cTabFolder1LData.top = new FormAttachment(0, 1000, 1);
+				cTabFolder1LData.top = new FormAttachment(0, 1000, 0);
+				this.settingsTabFolder.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.settingsTabFolder.setLayoutData(cTabFolder1LData);
 				{ // begin general tab item
 					this.generalTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
+					this.generalTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.generalTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0301));
 					{
 						FormData tabComposite1LData = new FormData();
@@ -212,10 +215,12 @@ public class SettingsDialog extends Dialog {
 							groupLocaleLData.top = new FormAttachment(0, 1000, 7);
 							this.groupLocale = new Group(this.tabComposite1, SWT.NONE);
 							this.groupLocale.setLayout(null);
+							this.groupLocale.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.groupLocale.setLayoutData(groupLocaleLData);
 							this.groupLocale.setText(Messages.getString(MessageIds.OSDE_MSGT0305));
 							{
 								this.localCombo = new CCombo(this.groupLocale, SWT.BORDER);
+								this.localCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
 								this.localCombo.setBounds(354, 22, 54, 20);
@@ -234,7 +239,8 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.localLabel = new CLabel(this.groupLocale, SWT.LEFT);
-								this.localLabel.setBounds(37, 22, 292, 20);
+								this.localLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.localLabel.setBounds(15, 22, 292, 20);
 								this.localLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0307));
 								this.localLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0308));
 							}
@@ -248,6 +254,7 @@ public class SettingsDialog extends Dialog {
 							classSelectionGroupLData.left = new FormAttachment(0, 1000, 12);
 							classSelectionGroupLData.top = new FormAttachment(0, 1000, 66);
 							this.defaultDataPathGroup.setLayoutData(classSelectionGroupLData);
+							this.defaultDataPathGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0310));
 							this.defaultDataPathGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
@@ -257,15 +264,18 @@ public class SettingsDialog extends Dialog {
 							});
 							{
 								this.defaultDataPathLabel = new CLabel(this.defaultDataPathGroup, SWT.NONE);
+								this.defaultDataPathLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.defaultDataPathLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0311));
-								this.defaultDataPathLabel.setBounds(14, 24, 90, 20);
+								this.defaultDataPathLabel.setBounds(15, 24, 90, 20);
 							}
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
+								this.defaultDataPath.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.defaultDataPath.setBounds(107, 24, 295, 20);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
+								this.defaultDataPathAdjustButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.defaultDataPathAdjustButton.setText(". . . "); //$NON-NLS-1$
 								this.defaultDataPathAdjustButton.setBounds(405, 24, 30, 20);
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
@@ -287,6 +297,7 @@ public class SettingsDialog extends Dialog {
 							fileOpenSaveDialogGroupLData.left = new FormAttachment(0, 1000, 12);
 							fileOpenSaveDialogGroupLData.top = new FormAttachment(0, 1000, 129);
 							this.fileOpenSaveDialogGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.fileOpenSaveDialogGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.fileOpenSaveDialogGroup.setLayout(null);
 							this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0315));
@@ -298,7 +309,8 @@ public class SettingsDialog extends Dialog {
 								}
 							});
 							{
-								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.RIGHT);
+								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.suggestDate.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.suggestDate.setText(Messages.getString(MessageIds.OSDE_MSGT0316));
 								this.suggestDate.setBounds(15, 28, 194, 16);
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
@@ -311,6 +323,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.suggestObjectKey.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.suggestObjectKey.setText(Messages.getString(MessageIds.OSDE_MSGT0317));
 								this.suggestObjectKey.setBounds(239, 28, 194, 16);
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
@@ -331,6 +344,7 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup = new Group(this.tabComposite1, SWT.NONE);
 							this.deviceDialogGroup.setLayout(null);
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
+							this.deviceDialogGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0318));
 							this.deviceDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
@@ -345,6 +359,7 @@ public class SettingsDialog extends Dialog {
 							});
 							{
 								this.deviceDialogModalButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceDialogModalButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceDialogModalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0319));
 								this.deviceDialogModalButton.setBounds(16, 24, 254, 18);
 								this.deviceDialogModalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
@@ -359,6 +374,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.deviceDialogOnTopButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceDialogOnTopButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
 								this.deviceDialogOnTopButton.setBounds(282, 24, 165, 18);
 								this.deviceDialogOnTopButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
@@ -372,6 +388,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.deviceDialogAlphaButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceDialogAlphaButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceDialogAlphaButton.setText(Messages.getString(MessageIds.OSDE_MSGT0321));
 								this.deviceDialogAlphaButton.setBounds(16, 47, 254, 18);
 								this.deviceDialogAlphaButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0322));
@@ -412,6 +429,7 @@ public class SettingsDialog extends Dialog {
 						{ // begin CSV separator group
 							this.separatorGroup = new Group(this.tabComposite1, SWT.NONE);
 							this.separatorGroup.setLayout(null);
+							this.separatorGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							FormData separatorGroupLData = new FormData();
 							separatorGroupLData.width = 451;
 							separatorGroupLData.height = 44;
@@ -428,13 +446,14 @@ public class SettingsDialog extends Dialog {
 							});
 							{
 								this.decimalSeparatorLabel = new CLabel(this.separatorGroup, SWT.RIGHT);
+								this.decimalSeparatorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.decimalSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0326));
 								this.decimalSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0327));
 								this.decimalSeparatorLabel.setBounds(10, 24, 140, 22);
 							}
 							{
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
-								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
+								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 								this.decimalSeparator.setItems(new String[] { " . ", " , " }); //$NON-NLS-1$ //$NON-NLS-2$
 								this.decimalSeparator.setBounds(153, 24, 43, 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
@@ -448,13 +467,14 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.listSeparatorLabel = new CLabel(this.separatorGroup, SWT.RIGHT);
+								this.listSeparatorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.listSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0328));
 								this.listSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0329));
 								this.listSeparatorLabel.setBounds(228, 24, 140, 20);
 							}
 							{
 								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
-								this.listSeparator.setFont(SWTResourceManager.getFont(this.decimalSeparator, SWT.BOLD));
+								this.listSeparator.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 								this.listSeparator.setItems(new String[] { " , ", " ; ", " : " }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								this.listSeparator.setBounds(370, 24, 47, 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
@@ -476,6 +496,7 @@ public class SettingsDialog extends Dialog {
 							serialPortGroupLData.width = 451;
 							serialPortGroupLData.height = 55;
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
+							this.serialPortGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0330));
 							this.serialPortGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
@@ -491,6 +512,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.doPortAvailabilityCheck.setBounds(15, 19, 243, 22);
+								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.OSDE_MSGT0331));
 								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0332));
 								this.doPortAvailabilityCheck.addSelectionListener(new SelectionAdapter() {
@@ -503,6 +525,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
+								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0334));
 								this.useGlobalSerialPort.setBounds(15, 43, 243, 22);
@@ -521,6 +544,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
+								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPort.setBounds(260, 45, 181, 20);
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -534,6 +558,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.Port = new CLabel(this.serialPortGroup, SWT.LEFT);
+								this.Port.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.Port.setText(Messages.getString(MessageIds.OSDE_MSGT0335));
 								this.Port.setBounds(264, 19, 174, 20);
 							}
@@ -542,6 +567,7 @@ public class SettingsDialog extends Dialog {
 				} // end general tab item
 				{
 					this.osMiscTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
+					this.osMiscTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.osMiscTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0303));
 					{
 						this.osMiscComposite = new Composite(this.settingsTabFolder, SWT.NONE);
@@ -559,9 +585,11 @@ public class SettingsDialog extends Dialog {
 							desktopLauncherLayout.marginRight = 30;
 							desktopLauncherLayout.justify = true;
 							this.desktopLauncher.setLayout(desktopLauncherLayout);
+							this.desktopLauncher.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.desktopLauncher.setText(Messages.getString(MessageIds.OSDE_MSGT0362));
 							{
 								this.createLauncerButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
+								this.createLauncerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 417;
@@ -577,6 +605,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.removeLauncherButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
+								this.removeLauncherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.removeLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0364));
 								RowData removeLauncherButtonLData = new RowData();
 								removeLauncherButtonLData.width = 417;
@@ -603,9 +632,11 @@ public class SettingsDialog extends Dialog {
 							shellMimeTypeLayout.type = SWT.VERTICAL;
 							shellMimeTypeLayout.justify = true;
 							this.shellMimeType.setLayout(shellMimeTypeLayout);
+							this.shellMimeType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.shellMimeType.setText(Messages.getString(MessageIds.OSDE_MSGT0365));
 							{
 								this.assocMimeTypeButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
+								this.assocMimeTypeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.assocMimeTypeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0366));
 								RowData assocMimeTypeButtonLData = new RowData();
 								assocMimeTypeButtonLData.width = 417;
@@ -621,6 +652,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.removeMimeAssocButton = new Button(this.shellMimeType, SWT.PUSH | SWT.CENTER);
+								this.removeMimeAssocButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.removeMimeAssocButton.setText(Messages.getString(MessageIds.OSDE_MSGT0367));
 								RowData removeMimeAssocButtonLData = new RowData();
 								removeMimeAssocButtonLData.width = 417;
@@ -648,9 +680,11 @@ public class SettingsDialog extends Dialog {
 							objectKeyGroupLayout.marginTop = 10;
 							objectKeyGroupLayout.pack = false;
 							this.objectKeyGroup.setLayout(objectKeyGroupLayout);
+							this.objectKeyGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.objectKeyGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0206));
 							{
 								this.scanObjectKeysButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
+								this.scanObjectKeysButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.scanObjectKeysButton.setText(Messages.getString(MessageIds.OSDE_MSGT0207));
 								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] {this.settings.getDataFilePath()}));
 								RowData scanObjectKeysButtonLData = new RowData();
@@ -685,11 +719,13 @@ public class SettingsDialog extends Dialog {
 				}
 				{ // begin analysis tab item
 					this.analysisTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
+					this.analysisTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.analysisTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0302));
 					{ // begin logging group
 						this.loggingGroup = new Group(this.settingsTabFolder, SWT.NONE);
 						this.loggingGroup.setLayout(null);
 						this.loggingGroup.setBounds(13, 8, 456, 399);
+						this.loggingGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0340));
 						this.analysisTabItem.setControl(this.loggingGroup);
 						this.loggingGroup.addPaintListener(new PaintListener() {
@@ -715,7 +751,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.globalLogLevel = new Button(this.globalLoggingComposite, SWT.CHECK | SWT.LEFT);
 								this.globalLogLevel.setBounds(12, 12, 190, 22);
-
+								this.globalLogLevel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.globalLogLevel.setText(Messages.getString(MessageIds.OSDE_MSGT0341));
 								this.globalLogLevel.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -737,6 +773,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.globalLoggingCombo = new CCombo(this.globalLoggingComposite, SWT.BORDER);
+								this.globalLoggingCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.globalLoggingCombo.setBounds(214, 12, 212, 22);
 								this.globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
 								this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
@@ -756,13 +793,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.uiLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
 								RowLayout uiLevelLabelLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
+								this.uiLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.uiLevelLabel.setLayout(uiLevelLabelLayout);
 								this.uiLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0342));
 								this.uiLevelLabel.setBounds(3, 3, 170, 20);
 							}
 							{
 								this.uiLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.uiLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.uiLevelCombo.setBounds(183, 3, 79, 21);
 								this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -776,13 +814,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.deviceLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
 								RowLayout cLabel1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
+								this.deviceLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceLevelLabel.setLayout(cLabel1Layout);
 								this.deviceLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0343));
 								this.deviceLevelLabel.setBounds(3, 27, 170, 20);
 							}
 							{
 								this.deviceLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.deviceLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.deviceLevelCombo.setBounds(183, 27, 79, 21);
 								this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -796,13 +835,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.commonLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
 								RowLayout cLabel2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
+								this.commonLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.commonLevelLabel.setLayout(cLabel2Layout);
 								this.commonLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0344));
 								this.commonLevelLabel.setBounds(3, 51, 170, 20);
 							}
 							{
 								this.commonLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.commonLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.commonLevelCombo.setBounds(183, 51, 79, 21);
 								this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -816,13 +856,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.configLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
 								RowLayout cLabel3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
+								this.configLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.configLevelLabel.setLayout(cLabel3Layout);
 								this.configLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0345));
 								this.configLevelLabel.setBounds(3, 75, 170, 20);
 							}
 							{
 								this.configLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.configLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.configLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.configLevelCombo.setBounds(183, 75, 79, 21);
 								this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -836,13 +877,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.utilsLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
 								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
+								this.utilsLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.utilsLevelLabel.setLayout(cLabel4Layout);
 								this.utilsLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0346));
 								this.utilsLevelLabel.setBounds(3, 99, 170, 20);
 							}
 							{
 								this.utilsLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.utilsLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.utilsLevelCombo.setBounds(183, 99, 79, 21);
 								this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -855,6 +897,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.fileIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								this.fileIOLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 								this.fileIOLevelLabel.setLayout(cLabel4Layout);
 								this.fileIOLevelLabel.setBounds(3, 124, 170, 20);
@@ -862,6 +905,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.fileIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.fileIOLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.fileIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.fileIOLevelCombo.setBounds(183, 124, 79, 21);
 								this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -874,14 +918,15 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.serialIOLevelLabel = new CLabel(this.individualLoggingComosite, SWT.NONE);
+								this.serialIOLevelLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								RowLayout cLabel4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-
 								this.serialIOLevelLabel.setLayout(cLabel4Layout);
 								this.serialIOLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0348));
 								this.serialIOLevelLabel.setBounds(3, 149, 170, 20);
 							}
 							{
 								this.serialIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
+								this.serialIOLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
 								this.serialIOLevelCombo.setBounds(183, 149, 79, 21);
 								this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -896,6 +941,7 @@ public class SettingsDialog extends Dialog {
 						} // end individual package based logging settings
 						{
 							this.classBasedLabel = new Label(this.loggingGroup, SWT.CENTER);
+							this.classBasedLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.classBasedLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0349));
 							this.classBasedLabel.setBounds(286, 95, 192, 18);
 
@@ -904,6 +950,7 @@ public class SettingsDialog extends Dialog {
 
 							this.tree = new Tree(this.loggingGroup, SWT.NONE);
 							this.tree.setLayout(null);
+							this.tree.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.tree.setBounds(286, 120, 192, 290);
 							this.tree.setMenu(this.popupmenu);
 							this.tree.addSelectionListener(new SelectionAdapter() {
@@ -1008,6 +1055,7 @@ public class SettingsDialog extends Dialog {
 				okButtonLData.bottom = new FormAttachment(1000, 1000, -9);
 				okButtonLData.right = new FormAttachment(1000, 1000, -122);
 				this.okButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.okButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.okButton.setLayoutData(okButtonLData);
 				this.okButton.setText(Messages.getString(MessageIds.OSDE_MSGT0188));
 				this.okButton.addSelectionListener(new SelectionAdapter() {

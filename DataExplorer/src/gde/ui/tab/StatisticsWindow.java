@@ -81,8 +81,9 @@ public class StatisticsWindow {
 
 	public void create() {
 		this.statistics = new CTabItem(this.tabFolder, SWT.NONE);
-		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 		SWTResourceManager.registerResourceUser(this.statistics);
+		this.statistics.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 		initGUI();
 	}
 
@@ -107,6 +108,7 @@ public class StatisticsWindow {
 				this.descriptionGroup = new Group(this.composite, SWT.NONE);
 				this.descriptionGroup.setLayout(null);
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
+				this.descriptionGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
 				this.descriptionGroup.setBackground(SWTResourceManager.getColor(255, 255, 255));
 				this.descriptionGroup.addPaintListener(new PaintListener() {
@@ -117,6 +119,7 @@ public class StatisticsWindow {
 				});
 				{
 					this.textLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
+					this.textLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.textLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.textLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 					this.textLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
@@ -127,7 +130,7 @@ public class StatisticsWindow {
 				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
 				this.dataTable.setLinesVisible(!this.isWindows);
 				this.dataTable.setHeaderVisible(true);
-				this.dataTable.setFont(SWTResourceManager.getFont(this.dataTable.getFont().getFontData()[0].getName(), 10, SWT.NORMAL));
+				this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				{
 					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.LEFT);

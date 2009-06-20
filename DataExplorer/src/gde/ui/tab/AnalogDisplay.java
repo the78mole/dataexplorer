@@ -70,11 +70,12 @@ public class AnalogDisplay extends Composite {
 	double					minValue					= 0.0;
 	double					maxValue					= 1.0;
 
-	final Channel		channel;
-	final RecordSet	recordSet;
-	final Record 		record;
-	final String		recordKey;
-	final IDevice		device;
+	final OpenSerialDataExplorer	application;
+	final Channel									channel;
+	final RecordSet								recordSet;
+	final Record									record;
+	final String									recordKey;
+	final IDevice									device;
 
 	/**
 	 * 
@@ -92,6 +93,7 @@ public class AnalogDisplay extends Composite {
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
 		this.channel = Channels.getInstance().getActiveChannel();
+		this.application = OpenSerialDataExplorer.getInstance();
 		if (this.channel != null) {
 			this.recordSet = this.channel.getActiveRecordSet();
 			if (this.recordSet != null) {
@@ -115,7 +117,7 @@ public class AnalogDisplay extends Composite {
 			}
 		});
 		this.textDigitalLabel = new CLabel(this.tacho, SWT.CENTER);
-		this.textDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 14, 1, false, false)); //$NON-NLS-1$
+		this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD)); //$NON-NLS-1$
 		this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		this.textDigitalLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 		this.textDigitalLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);

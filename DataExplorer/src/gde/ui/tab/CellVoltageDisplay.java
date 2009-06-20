@@ -57,8 +57,9 @@ public class CellVoltageDisplay extends Composite {
 	Composite						fillLeft;
 	Composite						cellComposite;
 	
-	final CellVoltageWindow		parent;
-	final String							displayHeaderText;
+	final CellVoltageWindow				parent;
+	final OpenSerialDataExplorer	application;
+	final String									displayHeaderText;
 
 	int									voltage;
 	int 								lastTop = 0;
@@ -74,10 +75,11 @@ public class CellVoltageDisplay extends Composite {
 	final int lowerLimitVoltage;
 
 
-	public CellVoltageDisplay(Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
+	public CellVoltageDisplay(OpenSerialDataExplorer currentApplication, Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
 		super(cellVoltageMainComposite, SWT.BORDER);
 		this.voltage = measurementValue;
 		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit); //$NON-NLS-1$
+		this.application = currentApplication;
 		this.parent = useParent;
 		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 		GridLayout mainCompositeLayout = new GridLayout();
@@ -97,7 +99,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellTextLabel.setText(this.displayHeaderText);
 			GridData text1LData = new GridData();
@@ -109,7 +111,7 @@ public class CellVoltageDisplay extends Composite {
 			this.cellVoltageDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellVoltageDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
-			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont("Sans Serif", 32, 0, false, false)); //$NON-NLS-1$
+			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 32, SWT.NORMAL));
 			GridData actualDigitalLabelLData = new GridData();
 			actualDigitalLabelLData.horizontalAlignment = GridData.FILL;
 			actualDigitalLabelLData.grabExcessHorizontalSpace = true;

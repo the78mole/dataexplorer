@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -60,6 +61,7 @@ public class AxisEndValuesDialog extends Dialog {
 	boolean 	isInit = false;
 	double[]	newValues	= new double[2];
 	String[]	initialValues = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "10", "25", "50", "100" };//$NON-NLS-$
+	final OpenSerialDataExplorer application;
 
 	/**
 	* Auto-generated main method to display this 
@@ -80,6 +82,7 @@ public class AxisEndValuesDialog extends Dialog {
 
 	public AxisEndValuesDialog(Shell parent, int style) {
 		super(parent, style);
+		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	public double[] open(final double[] oldMinMax) {
@@ -119,6 +122,7 @@ public class AxisEndValuesDialog extends Dialog {
 				okBbuttonLData.left = new FormAttachment(0, 1000, 17);
 				okBbuttonLData.top = new FormAttachment(0, 1000, 99);
 				this.okBbutton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.okBbutton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 				this.okBbutton.setLayoutData(okBbuttonLData);
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
@@ -148,6 +152,7 @@ public class AxisEndValuesDialog extends Dialog {
 				maxValueLabelLData.left = new FormAttachment(0, 1000, 12);
 				maxValueLabelLData.top = new FormAttachment(0, 1000, 12);
 				this.maxValueLabel.setLayoutData(maxValueLabelLData);
+				this.maxValueLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.maxValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0152));
 			}
 			{
@@ -157,6 +162,7 @@ public class AxisEndValuesDialog extends Dialog {
 				maxValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
+				this.maxValueSelect.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.maxValueSelect.setLayoutData(maxValueSelectLData);
 				this.maxValueSelect.setItems(this.initialValues);
 				this.maxValueSelect.select(7);
@@ -176,6 +182,7 @@ public class AxisEndValuesDialog extends Dialog {
 				cLabel1LData.height = 22;
 				cLabel1LData.left = new FormAttachment(0, 1000, 12);
 				cLabel1LData.top = new FormAttachment(0, 1000, 169);
+				this.minValueLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.minValueLabel.setLayoutData(cLabel1LData);
 				this.minValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0153));
 			}
@@ -186,6 +193,7 @@ public class AxisEndValuesDialog extends Dialog {
 				minValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
+				this.minValueSelect.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.minValueSelect.setLayoutData(minValueSelectLData);
 				this.minValueSelect.setItems(this.initialValues);
 				this.minValueSelect.select(5);

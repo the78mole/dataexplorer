@@ -75,9 +75,10 @@ public class CellVoltageWindow {
 
 	String											info									= Messages.getString(MessageIds.OSDE_MSGT0230);
 
-	final Channels							channels;
-	final CTabFolder						displayTab;
-	final LithiumValuesDialog		lithiumValuesDialog;
+	final OpenSerialDataExplorer	application;
+	final Channels								channels;
+	final CTabFolder							displayTab;
+	final LithiumValuesDialog			lithiumValuesDialog;
 
 	RecordSet										oldRecordSet					= null;
 	Channel											oldChannel						= null;
@@ -125,8 +126,9 @@ public class CellVoltageWindow {
 
 	public CellVoltageWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.lithiumValuesDialog = new LithiumValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+		this.lithiumValuesDialog = new LithiumValuesDialog(this.application, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 
 	}
 
@@ -134,8 +136,9 @@ public class CellVoltageWindow {
 		final String $METHOD_NAME = "create"; //$NON-NLS-1$
 
 		this.cellVoltageTab = new CTabItem(this.displayTab, SWT.NONE);
-		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		SWTResourceManager.registerResourceUser(this.displayTab);
+		this.cellVoltageTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		{
 			this.cellVoltageMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.cellVoltageTab.setControl(this.cellVoltageMainComposite);
@@ -268,7 +271,7 @@ public class CellVoltageWindow {
 						CellVoltageWindow.this.liPoButton.setSelection(false);
 						CellVoltageWindow.this.liIoButton.setSelection(false);
 						CellVoltageWindow.this.liFeButton.setSelection(false);
-						LithiumBatteryValues.setVoltageLimits(new LithiumValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open());
+						LithiumBatteryValues.setVoltageLimits(new LithiumValuesDialog(OpenSerialDataExplorer.getInstance(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open());
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -301,25 +304,25 @@ public class CellVoltageWindow {
 				this.voltageValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageValue.setText("00.00"); //$NON-NLS-1$
 				this.voltageValue.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.voltageValue.setFont(SWTResourceManager.getFont("Sans Serif", 25, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, 25, SWT.NORMAL)); //$NON-NLS-1$
 			}
 			{
 				this.voltageUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageUnit.setText("[V]"); //$NON-NLS-1$
 				this.voltageUnit.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.voltageUnit.setFont(SWTResourceManager.getFont("Sans Serif", 18, SWT.NORMAL)); //$NON-NLS-1$
+				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, 18, SWT.NORMAL)); //$NON-NLS-1$
 			}
 			{
 				this.capacitiyValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacitiyValue.setText("0000"); //$NON-NLS-1$
 				this.capacitiyValue.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.capacitiyValue.setFont(SWTResourceManager.getFont("Sans Serif", 25, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, 25, SWT.NORMAL)); //$NON-NLS-1$
 			}
 			{
 				this.capacityUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacityUnit.setText("[mAh]"); //$NON-NLS-1$
 				this.capacityUnit.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-				this.capacityUnit.setFont(SWTResourceManager.getFont("Sans Serif", 18, SWT.NORMAL)); //$NON-NLS-1$
+				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, 18, SWT.NORMAL)); //$NON-NLS-1$
 			}
 		}
 	}
@@ -390,7 +393,7 @@ public class CellVoltageWindow {
 					this.displays.removeAllElements();
 					// add new
 					for (int i = 0; this.voltageVector != null && i < this.voltageVector.size(); ++i) {
-						CellVoltageDisplay display = new CellVoltageDisplay(this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);
+						CellVoltageDisplay display = new CellVoltageDisplay(this.application, this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);
 						display.create();
 						log.log(Level.FINER, "created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);

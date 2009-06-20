@@ -179,7 +179,7 @@ public class GraphicsComposite extends Composite {
 
 		{
 			this.recordSetHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
-			this.recordSetHeader.setFont(SWTResourceManager.getFont("Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+			this.recordSetHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.recordSetHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 			this.recordSetHeader.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
@@ -240,6 +240,7 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
+			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {

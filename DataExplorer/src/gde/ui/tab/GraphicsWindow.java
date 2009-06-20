@@ -77,8 +77,9 @@ public class GraphicsWindow {
 
 	public void create() {
 		this.graphic = new CTabItem(this.tabFolder, SWT.NONE);
-		this.graphic.setText(this.tabName);
 		SWTResourceManager.registerResourceUser(this.graphic);
+		this.graphic.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.graphic.setText(this.tabName);
 		this.graphic.addListener(SWT.RESIZE, new Listener() {
 			public void handleEvent(Event evt) {
 				log.log(Level.FINE, "controlRezized " + evt);

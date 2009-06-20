@@ -51,6 +51,7 @@ public class DigitalWindow {
 	FillLayout 											digitalMainCompositeLayout;
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
+	final OpenSerialDataExplorer		application;
 	final Channels									channels;
 	final CTabFolder								displayTab;
 	RecordSet												oldRecordSet;
@@ -59,13 +60,15 @@ public class DigitalWindow {
 
 	public DigitalWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 	}
 
 	public void create() {
 		this.digitalTab = new CTabItem(this.displayTab, SWT.NONE);
-		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		SWTResourceManager.registerResourceUser(this.digitalTab);
+		this.digitalTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		
 		this.displays = new HashMap<String, DigitalDisplay>(3);
 		{
@@ -151,7 +154,7 @@ public class DigitalWindow {
 					}
 					// add new
 					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
-						DigitalDisplay display = new DigitalDisplay(this.digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
+						DigitalDisplay display = new DigitalDisplay(this.application, this.digitalMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.log(Level.FINE, "created digital display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);

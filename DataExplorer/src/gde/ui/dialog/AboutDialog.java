@@ -44,10 +44,12 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	final static Logger log = Logger.getLogger(AboutDialog.class.getName());
 
 	Shell dialogShell;
-	private Label aboutText;
-	private Button ok;
-	private Label infoText;
-	private Label version;
+	Label aboutText;
+	Button ok;
+	Label infoText;
+	Label version;
+	
+	final OpenSerialDataExplorer application;
 
 	/**
 	* Auto-generated main method to display this 
@@ -66,6 +68,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public AboutDialog(Shell parent, int style) {
 		super(parent, style);
+		this.application = OpenSerialDataExplorer.getInstance();
 	}
 
 	public void open() {
@@ -87,6 +90,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				infoTextLData.top =  new FormAttachment(0, 1000, 90);
 				infoTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.infoText = new Label(this.dialogShell, SWT.LEFT | SWT.WRAP);
+				this.infoText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
 				this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT0147)
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0148)  //$NON-NLS-1$ 
@@ -104,6 +108,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				versionLData.top =  new FormAttachment(0, 1000, 50);
 				versionLData.right =  new FormAttachment(1000, 1000, -20);
 				this.version = new Label(this.dialogShell, SWT.CENTER);
+				this.version.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
 				this.version.setText(OSDE.OSDE_VERSION);
 				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
@@ -134,7 +139,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				aboutTextLData.right =  new FormAttachment(1000, 1000, -20);
 				this.aboutText = new Label(this.dialogShell, SWT.CENTER);
 				this.aboutText.setLayoutData(aboutTextLData);
-				this.aboutText.setFont(SWTResourceManager.getFont("Sans Serif", 18, 2, false, false)); //$NON-NLS-1$
+				this.aboutText.setFont(SWTResourceManager.getFont(this.application, 18, 2));
 				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());

@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Display;
 
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 
@@ -38,6 +39,8 @@ import osde.ui.SWTResourceManager;
  */
 public class GraphicsUtils {
 	private static Logger log = Logger.getLogger(GraphicsUtils.class.getName());
+	
+	static OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
 
 	/**
 	 * draws tick marks to a scale in vertical direction (plus 90 degrees)
@@ -199,7 +202,10 @@ public class GraphicsUtils {
 		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
-		stringGc.setFont(gc.getFont());
+		if (GraphicsUtils.application != null)
+			stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
+		else
+			stringGc.setFont(gc.getFont());
 
 		// clear the image
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
@@ -243,7 +249,10 @@ public class GraphicsUtils {
 		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
-		stringGc.setFont(gc.getFont());
+		if (GraphicsUtils.application != null)
+			stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
+		else
+			stringGc.setFont(gc.getFont());
 
 		// clear the image with background color
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
@@ -251,7 +260,11 @@ public class GraphicsUtils {
 		stringGc.drawText(string, 0, 0);
 		
 		if (string.contains(", ")) { // string [min, hrs]
-			stringGc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
+			if (GraphicsUtils.application != null)
+				stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.BOLD));
+			else
+				stringGc.setFont(gc.getFont());
+			
 			stringGc.drawText(string.split(", |]")[1], gc.textExtent(string.split(", ")[0]+",").x, 0);
 		}
 

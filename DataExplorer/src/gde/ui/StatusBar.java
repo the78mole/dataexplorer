@@ -94,7 +94,7 @@ public class StatusBar {
 				{
 					this.conText = new Label(this.comComposite, SWT.LEFT);
 					this.conText.setText("CON"); //$NON-NLS-1$
-					this.conText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
+					this.conText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
 					this.conText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
@@ -106,7 +106,7 @@ public class StatusBar {
 				{
 					this.rxText = new Label(this.comComposite, SWT.LEFT);
 					this.rxText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.rxText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
+					this.rxText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
 					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
@@ -118,7 +118,7 @@ public class StatusBar {
 				{
 					this.txText = new Label(this.comComposite, SWT.LEFT);
 					this.txText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.txText.setFont(SWTResourceManager.getFont("Sans Serif", 8, SWT.NORMAL, false, false)); //$NON-NLS-1$
+					this.txText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
 					this.txText.setText("TX"); //$NON-NLS-1$
 				}
 				this.comComposite.pack();
@@ -135,6 +135,7 @@ public class StatusBar {
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
+				this.msgLabel.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), ((OpenSerialDataExplorer)this.statusComposite.getParent()).getWidgetFontSize(), SWT.NORMAL));
 			}
 		}
 	}
