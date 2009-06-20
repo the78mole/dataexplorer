@@ -742,7 +742,7 @@ public class RecordSet extends HashMap<String, Record> {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
 			recordSymbols[i] = measurement.getSymbol();
 			recordUnits[i] = measurement.getUnit();
-		}
+		}			
 		return createRecordSet(recordSetName, device, channelKey, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
 	}
 
@@ -770,6 +770,15 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpRecord.setColorDefaultsAndPosition(i);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
+		}
+		
+		// check and update object key
+		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
+		if (application != null && application.isObjectoriented()) {
+			Channel activeChannel = Channels.getInstance().getActiveChannel();
+			if (activeChannel != null && !activeChannel.getObjectKey().equals(application.getMenuToolBar().getActiveObjectKey())) {
+				activeChannel.setObjectKey(application.getMenuToolBar().getActiveObjectKey());
+			}
 		}
 
 		return newRecordSet;

@@ -69,7 +69,7 @@ public class ObjectDataReaderWriter {
 
 	public ObjectDataReaderWriter(ObjectData newObjectData) {
 		this.objectData = newObjectData;
-		this.filePath = newObjectData.getFullQualifiedObjectFilePath();
+		this.filePath = newObjectData.getFullQualifiedObjectFilePath().replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -249,7 +249,7 @@ public class ObjectDataReaderWriter {
 			File targetFile = new File(this.filePath);
 			
 			// check if target directory exist, it must be created and removed by creatingor removing object key
-			File targetFileDir = new File(targetFile.getPath());
+			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
 				if (targetFile.exists()) targetFile.delete();
 				ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));

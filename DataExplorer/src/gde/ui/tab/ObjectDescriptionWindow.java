@@ -726,8 +726,7 @@ public class ObjectDescriptionWindow {
 								StyleRange style;
 								if (evt.length == 1 || ObjectDescriptionWindow.this.styledText.getTextRange(evt.start, evt.length).equals(ObjectDescriptionWindow.this.styledText.getLineDelimiter())) {
 									// Have the new text take on the style of the text to its right
-									// (during
-									// typing) if no style information is active.
+									// (during typing) if no style information is active.
 									int caretOffset = ObjectDescriptionWindow.this.styledText.getCaretOffset();
 									style = null;
 									if (caretOffset < ObjectDescriptionWindow.this.styledText.getCharCount()) style = ObjectDescriptionWindow.this.styledText.getStyleRangeAtOffset(caretOffset);
@@ -746,13 +745,17 @@ public class ObjectDescriptionWindow {
 									if (!style.isUnstyled()) ObjectDescriptionWindow.this.styledText.setStyleRange(style);
 								}
 								else {
-									// paste occurring, have text take on the styles it had when it was
-									// cut/copied
-									for (int i = 0; i < ObjectDescriptionWindow.this.cachedStyles.size(); i++) {
-										style = ObjectDescriptionWindow.this.cachedStyles.elementAt(i);
-										StyleRange newStyle = (StyleRange) style.clone();
-										newStyle.start = style.start + evt.start;
-										ObjectDescriptionWindow.this.styledText.setStyleRange(newStyle);
+									try {
+										// paste occurring, have text take on the styles it had when it was cut/copied
+										for (int i = 0; i < ObjectDescriptionWindow.this.cachedStyles.size(); i++) {
+											style = ObjectDescriptionWindow.this.cachedStyles.elementAt(i);
+											StyleRange newStyle = (StyleRange) style.clone();
+											newStyle.start = style.start + evt.start;
+											ObjectDescriptionWindow.this.styledText.setStyleRange(newStyle);
+										}
+									}
+									catch (Exception e) {
+										// switch object occurs while there is cached style
 									}
 								}
 							}
