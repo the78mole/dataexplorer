@@ -124,6 +124,7 @@ public class ObjectDescriptionWindow {
 	final OpenSerialDataExplorer	application;
 	final Settings								settings;
 	final Channels								channels;
+	final int											fontSize = OSDE.IS_WINDOWS ? 10 : 9;
 	String												objectFilePath;
 	String												activeObjectKey;
 	boolean												isObjectDataSaved		= true;
@@ -192,7 +193,7 @@ public class ObjectDescriptionWindow {
 			this.statusText.setText(this.object.getStatus());
 
 			FontData fd = this.object.getFontData();
-			this.styledText.setFont(SWTResourceManager.getFont(fd.getName(), fd.getHeight(), fd.getStyle(), false, false));
+			this.styledText.setFont(SWTResourceManager.getFont(this.application, fd.getHeight(), fd.getStyle()));
 			this.styledText.setText(this.object.getStyledText());
 			this.styledText.setStyleRanges(this.object.getStyleRanges().clone());
 			int index = 0;
@@ -257,7 +258,7 @@ public class ObjectDescriptionWindow {
 				{
 					this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
 					this.objectNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0404));
-					this.objectNameLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 0, false, false)); //$NON-NLS-1$
+					this.objectNameLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
 					RowData cLabel1LData = new RowData();
 					cLabel1LData.width = 130;
 					cLabel1LData.height = 26;
@@ -266,7 +267,7 @@ public class ObjectDescriptionWindow {
 				}
 				{
 					this.objectName = new CLabel(this.headerComposite, SWT.NONE);
-					this.objectName.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 12, 1, false, false)); //$NON-NLS-1$
+					this.objectName.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 					RowData cLabel1LData = new RowData();
 					cLabel1LData.width = 300;
 					cLabel1LData.height = 26;
@@ -301,7 +302,7 @@ public class ObjectDescriptionWindow {
 					{
 						this.objectTypeLable = new CLabel(this.typeComposite, SWT.NONE);
 						this.objectTypeLable.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						this.objectTypeLable.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.objectTypeLable.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 						this.objectTypeLable.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
 						RowData cLabel1LData1 = new RowData();
 						cLabel1LData1.width = 140;
@@ -312,7 +313,7 @@ public class ObjectDescriptionWindow {
 					{
 						this.objectTypeText = new Text(this.typeComposite, SWT.BORDER);
 						this.objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
-						this.objectTypeText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.objectTypeText.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 						this.objectTypeText.setEditable(true);
 						RowData cLabel2LData = new RowData();
 						cLabel2LData.width = 240;
@@ -342,7 +343,7 @@ public class ObjectDescriptionWindow {
 					{
 						this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
 						this.dateLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						this.dateLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.dateLabel.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 						RowData dateLabelLData = new RowData();
 						dateLabelLData.width = 140;
 						dateLabelLData.height = 22;
@@ -352,7 +353,7 @@ public class ObjectDescriptionWindow {
 					}
 					{
 						this.dateText = new Text(this.dateComposite, SWT.BORDER);
-						this.dateText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.dateText.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 						RowData dateTextLData = new RowData();
 						dateTextLData.width = OSDE.IS_WINDOWS ? 118: 116;
 						dateTextLData.height = 18;
@@ -383,7 +384,7 @@ public class ObjectDescriptionWindow {
 					{
 						this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
 						this.statusLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						this.statusLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.statusLabel.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 						RowData statusLabelLData = new RowData();
 						statusLabelLData.width = 140;
 						statusLabelLData.height = 22;
@@ -393,7 +394,7 @@ public class ObjectDescriptionWindow {
 					}
 					{
 						this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
-						this.statusText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+						this.statusText.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL)); 
 						this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(OSDE.STRING_SEMICOLON));
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
@@ -507,7 +508,7 @@ public class ObjectDescriptionWindow {
 									this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 									this.fontSizeSelectComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 									this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-									this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 0, false, false)); //$NON-NLS-1$
+									this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.NORMAL));
 									this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 									this.fontSizeSelectCombo.select(3);
 									this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0201));
@@ -708,7 +709,7 @@ public class ObjectDescriptionWindow {
 						FormLayout styledTextLayout = new FormLayout();
 						this.styledText.setLayout(styledTextLayout);
 						this.styledText.setEditable(true);
-						this.styledText.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false)); //$NON-NLS-1$
+						this.styledText.setFont(SWTResourceManager.getFont(this.application, this.fontSize, SWT.BOLD));
 						this.styledText.setHorizontalIndex(2);
 						this.styledText.setTopIndex(1);
 						FormData styledTextLData = new FormData();

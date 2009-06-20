@@ -131,7 +131,7 @@ public class OperatingSystemHelper {
 			}
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW00320, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0032, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		log.log(Level.INFO, "OpenSerialDataExplorer desktop created = " + isCreated); //$NON-NLS-1$
@@ -173,7 +173,7 @@ public class OperatingSystemHelper {
 				isRemoved = true;
 			}
 			else {
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW00323, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
+				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0034, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
 			}
 		}
 		catch (Throwable e) {
@@ -464,7 +464,7 @@ public class OperatingSystemHelper {
 				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath);
 				if(!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length()-4) + OSDE.STRING_UNDER_BAR + OSDE.FILE_ENDING_DOT_OSD;
-					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW003213, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
+					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW0033, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
 				}
 			}
 			

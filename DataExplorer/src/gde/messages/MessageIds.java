@@ -98,9 +98,9 @@ public class MessageIds {
 	public final static String	OSDE_MSGW0029 = "OSDE_MSGW0029";
 	public final static String	OSDE_MSGW0030 = "OSDE_MSGW0030";
 	public final static String	OSDE_MSGW0031 = "OSDE_MSGW0031";
-	public final static String	OSDE_MSGW00320 = "OSDE_MSGW00320";
-	public final static String	OSDE_MSGW003213 = "OSDE_MSGW003213";
-	public final static String	OSDE_MSGW00323 = "OSDE_MSGW00323";
+	public final static String	OSDE_MSGW0032 = "OSDE_MSGW0032";
+	public final static String	OSDE_MSGW0033 = "OSDE_MSGW003213";
+	public final static String	OSDE_MSGW0034 = "OSDE_MSGW00323";
 	public final static String	OSDE_MSGI0001 = "OSDE_MSGI0001";
 	public final static String	OSDE_MSGI0002 = "OSDE_MSGI0002";
 	public final static String	OSDE_MSGI0003 = "OSDE_MSGI0003";
