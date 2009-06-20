@@ -91,7 +91,7 @@ public class ObjectDescriptionWindow {
 	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
-	Point													fontSizeSelectSize	= new Point((OSDE.IS_WINDOWS ? 40 : 60), (OSDE.IS_WINDOWS ? 21 : 23));
+	Point													fontSizeSelectSize	= new Point((OSDE.IS_WINDOWS ? 40 : 60), (OSDE.IS_WINDOWS ? 21 : 25));
 	ToolItem											strikeoutButton;
 	ToolItem											underlineButton;
 	ToolItem											italicButton;
@@ -296,7 +296,7 @@ public class ObjectDescriptionWindow {
 					typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 					typeCompositeLData.grabExcessHorizontalSpace = true;
 					typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					typeCompositeLData.heightHint = 28;
+					typeCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
 					this.typeComposite.setLayoutData(typeCompositeLData);
 					this.typeComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
@@ -337,7 +337,7 @@ public class ObjectDescriptionWindow {
 					dateCompositeLData.grabExcessHorizontalSpace = true;
 					dateCompositeLData.verticalAlignment = GridData.BEGINNING;
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					dateCompositeLData.heightHint = 28;
+					dateCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
 					this.dateComposite.setLayoutData(dateCompositeLData);
 					this.dateComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
@@ -378,7 +378,7 @@ public class ObjectDescriptionWindow {
 					statusCompositeLData.grabExcessHorizontalSpace = true;
 					statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					statusCompositeLData.heightHint = 28;
+					statusCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
 					this.statusComposite.setLayoutData(statusCompositeLData);
 					this.statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 					{
@@ -399,7 +399,7 @@ public class ObjectDescriptionWindow {
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 120;
-						group1LData.height = 18;
+						group1LData.height = OSDE.IS_WINDOWS ? 21 : 25;
 						this.statusText.setLayoutData(group1LData);
 						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
 						this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));

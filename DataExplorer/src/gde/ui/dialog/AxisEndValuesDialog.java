@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import osde.OSDE;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -158,7 +159,7 @@ public class AxisEndValuesDialog extends Dialog {
 			{
 				FormData maxValueSelectLData = new FormData();
 				maxValueSelectLData.width = 84;
-				maxValueSelectLData.height = 17;
+				maxValueSelectLData.height = OSDE.IS_WINDOWS ? 17 : 21;
 				maxValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
@@ -189,7 +190,7 @@ public class AxisEndValuesDialog extends Dialog {
 			{
 				FormData minValueSelectLData = new FormData();
 				minValueSelectLData.width = 84;
-				minValueSelectLData.height = 17;
+				minValueSelectLData.height = OSDE.IS_WINDOWS ? 17 : 21;
 				minValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);

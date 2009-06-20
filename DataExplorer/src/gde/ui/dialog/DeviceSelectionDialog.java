@@ -299,7 +299,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.deviceSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.deviceSelectCombo.setItems(new String[] {Messages.getString(MessageIds.OSDE_MSGT0156)});
 									this.deviceSelectCombo.select(0);
-									this.deviceSelectCombo.setBounds(12, 20, 375, 22);
+									this.deviceSelectCombo.setBounds(12, 20, 375, OSDE.IS_WINDOWS ? 21 : 25);
 									this.deviceSelectCombo.setEditable(false);
 									this.deviceSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.deviceSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -490,7 +490,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.portSelectCombo = new CCombo(this.portGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.portSelectCombo.setBounds(249, 27, 205, 22);
+									this.portSelectCombo.setBounds(249, 27, 205, OSDE.IS_WINDOWS ? 21 : 25);
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
 									this.portSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
