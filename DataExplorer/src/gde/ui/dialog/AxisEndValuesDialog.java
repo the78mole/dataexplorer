@@ -123,7 +123,7 @@ public class AxisEndValuesDialog extends Dialog {
 				okBbuttonLData.left = new FormAttachment(0, 1000, 17);
 				okBbuttonLData.top = new FormAttachment(0, 1000, 99);
 				this.okBbutton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.okBbutton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+				this.okBbutton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.okBbutton.setLayoutData(okBbuttonLData);
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {

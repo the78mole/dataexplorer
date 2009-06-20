@@ -325,7 +325,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.deviceSlider = new Slider(this.group1, SWT.HORIZONTAL);
-									this.deviceSlider.setBounds(393, 18, 119, 25);
+									this.deviceSlider.setBounds(393, 18, 119, OSDE.IS_WINDOWS ? 25 : 32);
 									this.deviceSlider.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.deviceSlider.setMinimum(0);
 									this.deviceSlider.setMaximum(1);

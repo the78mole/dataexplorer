@@ -271,7 +271,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
 								this.defaultDataPath.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.defaultDataPath.setBounds(107, 24, 295, 20);
+								this.defaultDataPath.setBounds(107, 24, 295, OSDE.IS_WINDOWS ? 21 : 25);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
