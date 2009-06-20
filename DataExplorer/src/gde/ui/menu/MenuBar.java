@@ -896,12 +896,11 @@ public class MenuBar {
 			//check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(OSDE.DEVICE_NAME);
+			this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
+			// check and switch device, if required
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				if (!OSDE.isForceDeviceSwitch() && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}))) 
-					return;			
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
-				OSDE.setForceDeviceSwitch(false);
 			}
 			String objectkey = osdHeader.get(OSDE.OBJECT_KEY);
 			if (objectkey != null && !objectkey.equals(OSDE.STRING_EMPTY)) {
@@ -1030,11 +1029,9 @@ public class MenuBar {
 			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
 			String fileDeviceName = lovHeader.get(OSDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();
+			// check and switch device if required
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
-				if (!OSDE.isForceDeviceSwitch() && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0014, new Object[]{fileDeviceName}))) 
-					return;			
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);		
-				OSDE.setForceDeviceSwitch(false);
 			}
 			
 			int channelNumber = new Integer(lovHeader.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
