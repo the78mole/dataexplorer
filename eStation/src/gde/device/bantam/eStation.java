@@ -463,9 +463,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		for (String recordKey : recordKeys) {
 				Record record = recordSet.get(recordKey);
-				record.setVisible(record.isActive());
-				record.setDisplayable(record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue());
-				log.log(Level.FINER, recordKey + " setDisplayable=" + (record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue()));
+				boolean hasReasonableData = record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue();
+				record.setVisible(record.isActive() && hasReasonableData);
+				log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
+				record.setDisplayable(record.getOrdinal() <= 5 || hasReasonableData);
+				log.log(Level.FINER, recordKey + " setDisplayable=" + (record.getOrdinal() <= 5 || hasReasonableData));
 		}
 		recordSet.isSyncableDisplayableRecords(true);
 		

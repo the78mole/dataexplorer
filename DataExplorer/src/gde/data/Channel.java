@@ -322,8 +322,12 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setHorizontalGridRecordKey(new Integer(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 			}
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.getActiveRecordSet() != null && recordSet.equals(this.getActiveRecordSet())) 
+			if (this.activeRecordSet != null) {
+				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet);
+			}
+			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
 				this.application.updateGraphicsWindow();
+			}	
 		}
 	}	
 
@@ -373,9 +377,12 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.getActiveRecordSet() != null && recordSet.getName().equals(this.getActiveRecordSet().getName()) && this.application.getMenuBar() != null) 
+			if (this.activeRecordSet != null) {
+				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet);
+			}
+			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
 				this.application.updateGraphicsWindow();
-			
+			}		
 		}
 	}
 	
