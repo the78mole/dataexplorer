@@ -461,7 +461,7 @@ public class OperatingSystemHelper {
 		try {
 			if (FileUtils.checkFileExist(fullQualifiedTargetFilePath)) {
 				// check if the target file contained is the same
-				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath);
+				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 				if(!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length()-4) + OSDE.STRING_UNDER_BAR + OSDE.FILE_ENDING_DOT_OSD;
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW0033, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
@@ -473,10 +473,10 @@ public class OperatingSystemHelper {
 					fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS);
 					String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_WINDOWS) + 1);
-					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					log.log(Level.FINE, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					
 					String targetFileLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_UNIX, OSDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; //$NON-NLS-1$
-					log.log(Level.INFO, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
+					log.log(Level.FINE, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
 
 					String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, OSDE.STRING_EMPTY, sourceBasePath, fullQualifiedSourceFilePath, OSDE.STRING_EMPTY };
 
@@ -498,7 +498,7 @@ public class OperatingSystemHelper {
 					}
 					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
 					String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath;  //$NON-NLS-1$
-					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 					
 					Process process = new ProcessBuilder("ln", "-s", fullQualifiedLinkTargetPath, fullQualifiedLinkPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
@@ -506,10 +506,10 @@ public class OperatingSystemHelper {
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 					String line;
 					while ((line = bisr.readLine()) != null) {
-						log.log(Level.INFO, "std.out = " + line); //$NON-NLS-1$
+						log.log(Level.FINE, "std.out = " + line); //$NON-NLS-1$
 					}
 					while ((line = besr.readLine()) != null) {
-						log.log(Level.INFO, "std.err = " + line); //$NON-NLS-1$
+						log.log(Level.FINE, "std.err = " + line); //$NON-NLS-1$
 					}
 					if (process.exitValue() != 0) {
 						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
