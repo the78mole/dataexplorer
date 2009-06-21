@@ -191,6 +191,8 @@ public class GraphicsUtils {
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
 		// Determine string's dimensions
+		if (GraphicsUtils.application != null)
+			gc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
@@ -238,6 +240,8 @@ public class GraphicsUtils {
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
 		// Determine string's dimensions
+		if (GraphicsUtils.application != null)
+			gc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
 		Point pt = gc.textExtent(string);
 		
 		// Create an image the same size as the string
