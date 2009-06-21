@@ -165,10 +165,14 @@ public class CellVoltageWindow {
 			this.voltageLimitsSelection.setBounds(0, 0, 350, 50);
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
 					CellVoltageWindow.this.liPoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
+					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
 					CellVoltageWindow.this.liIoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
+					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
 					CellVoltageWindow.this.liFeButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
+					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 					CellVoltageWindow.this.individualButton.setSelection(!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 				}
 			});
@@ -589,5 +593,12 @@ public class CellVoltageWindow {
 		CellVoltageWindow.this.voltageUnit.setText(""); //$NON-NLS-1$
 		CellVoltageWindow.this.capacitiyValue.setText(""); //$NON-NLS-1$
 		CellVoltageWindow.this.capacityUnit.setText(""); //$NON-NLS-1$
+	}
+
+	/**
+	 * update the voltage limits selection
+	 */
+	public void updateVoltageLimitsSelection() {
+		this.voltageLimitsSelection.redraw();
 	}
 }
