@@ -17,6 +17,7 @@
 package osde.utils;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,13 +69,13 @@ public class WebBrowser {
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public static void openBrowser(String stringUrl) {
-		String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
 		try {
-			if (osName.startsWith("windows")) { //$NON-NLS-1$
+			if (OSDE.IS_WINDOWS) {
 				Runtime.getRuntime().exec("rundll32.exe url.dll,FileProtocolHandler " + stringUrl); //$NON-NLS-1$
 			}
-			else if (osName.startsWith("linux")){ //$NON-NLS-1$
+			else if (OSDE.IS_LINUX){
 				String[] browsers = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 				String browser = null;
 				for (int count = 0; count < browsers.length && browser == null; count++)
@@ -86,22 +87,14 @@ public class WebBrowser {
 				
 				Runtime.getRuntime().exec(browser + OSDE.STRING_BLANK + stringUrl);
 			}
-			else {
-				throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0020, new Object[] {osName} )); 
+			else if (OSDE.IS_MAC) {
+				Class fileMgr = Class.forName("com.apple.eio.FileManager");
+				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] { String.class });
+				openURL.invoke(null, new Object[] { stringUrl });
 			}
-				//if (osName.startsWith("mac")) {
-				//Class<FileManager> fileMgr = Class.forName("com.apple.eio.FileManager");
-				//Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] { String.class });
-				//openURL.invoke(null, new Object[] { stringUrl });
-				
-//	    ProcessBuilder pb = new ProcessBuilder("ping", "192.168.0.112");
-//	    Process p = pb.start();
-//	    p.waitFor(); // waits until termination of ping call
-//	    if (p.exitValue() == 0)
-//	    System.out.println("success");
-//	    else
-//	    System.out.println("no success");
-
+			else {
+				throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0020, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)} )); 
+			}
 
 		}
 		catch (Exception e) {
