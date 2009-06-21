@@ -717,28 +717,28 @@ public class UniLogDialog extends DeviceDialog {
 							this.configTabItem1 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 							this.configTabItem1.setText(this.device.getChannelName(1));
 							this.configTab1 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(1));
-							this.configTab1.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.configTabItem1.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.configTabItem1.setControl(this.configTab1);
 						}
 						if (this.device.getChannelCount() > 1) {
 							this.configTabItem2 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 							this.configTabItem2.setText(this.device.getChannelName(2));
 							this.configTab2 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(2));
-							this.configTab2.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.configTabItem2.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.configTabItem2.setControl(this.configTab2);
 						}
 						if (this.device.getChannelCount() > 2) {
 							this.configTabItem3 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 							this.configTabItem3.setText(this.device.getChannelName(3));
 							this.configTab3 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(3));
-							this.configTab3.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.configTabItem3.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.configTabItem3.setControl(this.configTab3);
 						}
 						if (this.device.getChannelCount() > 3) {
 							this.configTabItem4 = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 							this.configTabItem4.setText(this.device.getChannelName(4));
 							this.configTab4 = new UniLogConfigTab(this.deviceConfigTabFolder, this.device, this.device.getChannelName(4));
-							this.configTab4.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.configTabItem4.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.configTabItem4.setControl(this.configTab4);
 						}
 					} // end measurement configuration tabs

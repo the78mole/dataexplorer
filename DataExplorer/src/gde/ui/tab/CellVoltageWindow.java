@@ -137,7 +137,7 @@ public class CellVoltageWindow {
 
 		this.cellVoltageTab = new CTabItem(this.displayTab, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.displayTab);
-		this.cellVoltageTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.cellVoltageTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
 		{
 			this.cellVoltageMainComposite = new Composite(this.displayTab, SWT.NONE);

@@ -236,7 +236,7 @@ public class ObjectDescriptionWindow {
 	 */
 	public void create() {
 		this.objectTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		this.objectTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.objectTabItem.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.objectTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0403));
 		{
 			this.tabComposite = new Composite(this.tabFolder, SWT.NONE);

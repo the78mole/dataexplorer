@@ -82,7 +82,7 @@ public class StatisticsWindow {
 	public void create() {
 		this.statistics = new CTabItem(this.tabFolder, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.statistics);
-		this.statistics.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.statistics.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 		initGUI();
 	}

@@ -82,7 +82,7 @@ public class FileCommentWindow {
 	public void create() {
 		this.commentTab = new CTabItem(this.displayTab, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.commentTab);
-		this.commentTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.commentTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 
 		{

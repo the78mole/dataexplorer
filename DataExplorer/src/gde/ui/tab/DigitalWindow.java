@@ -67,7 +67,7 @@ public class DigitalWindow {
 	public void create() {
 		this.digitalTab = new CTabItem(this.displayTab, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.digitalTab);
-		this.digitalTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.digitalTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		
 		this.displays = new HashMap<String, DigitalDisplay>(3);

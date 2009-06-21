@@ -63,7 +63,7 @@ public class DataTableWindow {
 	public void create() {
 		this.table = new CTabItem(this.tabFolder, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.table);
-		this.table.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.table.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.table.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
 		{
 			this.dataTable = new Table(this.tabFolder, SWT.BORDER);

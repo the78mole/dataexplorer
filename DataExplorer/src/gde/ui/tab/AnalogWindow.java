@@ -67,7 +67,7 @@ public class AnalogWindow {
 	public void create() {
 		this.analogTab = new CTabItem(this.displayTab, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this.analogTab);
-		this.analogTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.analogTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		
 		this.displays = new HashMap<String, AnalogDisplay>(3);
