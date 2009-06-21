@@ -587,7 +587,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.gearRatioSlider = new Slider(this.motorPropGroup, SWT.VERTICAL);
 									this.gearRatioSlider.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.gearRatioSlider.setBounds(263, 39, 21, 30);
+									this.gearRatioSlider.setBounds(263, 39, 21, OSDE.IS_WINDOWS ? 30 : 34);
 									this.gearRatioSlider.setMinimum(0);
 									this.gearRatioSlider.setMaximum(100);
 									this.gearRatioSlider.setSelection(this.sliderPosition);
@@ -654,7 +654,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.timeIntervalCombo.setItems(UniLogDialog.TIME_INTERVAL);
-									this.timeIntervalCombo.setBounds(70, 17, 136, OSDE.IS_WINDOWS ? 20 : 24);
+									this.timeIntervalCombo.setBounds(50, 17, 156, OSDE.IS_WINDOWS ? 20 : 24);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
 									this.timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);

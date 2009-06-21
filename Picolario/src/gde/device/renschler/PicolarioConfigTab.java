@@ -318,7 +318,7 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.calculationTypeLabel = new CLabel(this.heightAdaptionGroup, SWT.NONE);
 						this.calculationTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.calculationTypeLabel.setBounds(22, 151, 115, 20);
+						this.calculationTypeLabel.setBounds(15, 151, 115, 20);
 						this.calculationTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1215));
 					}
 					{
@@ -330,7 +330,7 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.slopeCalculationTypeCombo = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.slopeCalculationTypeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.slopeCalculationTypeCombo.setBounds(140, 151, 97, OSDE.IS_WINDOWS ? 21 : 25);
+						this.slopeCalculationTypeCombo.setBounds(130, 150, 100, OSDE.IS_WINDOWS ? 21 : 25);
 						this.slopeCalculationTypeCombo.setItems(new String[] { " " + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0262), " " + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0263) }); //$NON-NLS-1$ //$NON-NLS-2$
 						this.slopeCalculationTypeCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1217));
 						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -365,7 +365,7 @@ public class PicolarioConfigTab extends Composite {
 					{
 						this.regressionTime = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.regressionTime.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.regressionTime.setBounds(239, 151, 61, OSDE.IS_WINDOWS ? 21 : 25);
+						this.regressionTime.setBounds(232, 150, 70, OSDE.IS_WINDOWS ? 21 : 25);
 						this.regressionTime.setItems(new String[] { " 1 s", " 2 s", " 3 s", " 4 s", " 5 s", " 6 s", " 7 s", " 8 s", " 9 s", "10 s", "11 s", "12 s", "13 s", "14 s", "15 s", "16 s", "17 s", "18 s", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
 								"19 s", "20 s", "21 s", "22 s", "23 s", "24 s", "25 s", "26 s", "27 s", "28 s", "29 s", "30 s" }); //$NON-NLS-1$ //$NON-NLS-2$
 						this.regressionTime.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1218));
