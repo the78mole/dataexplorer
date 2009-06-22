@@ -29,6 +29,8 @@ import osde.OSDE;
 import osde.config.Settings;
 import osde.exception.NotSupportedFileFormatException;
 import osde.io.OsdReaderWriter;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 
 /**
  * This thread implementation goes through all sub folders of the data location and creates links to object related files
@@ -38,8 +40,10 @@ public class ObjectKeyScanner extends Thread {
 	final private static Logger											log					= Logger.getLogger(ObjectKeyScanner.class.getName());
 
 	final private Settings settings;
-	private String objectKey = OSDE.STRING_EMPTY;
-	private boolean searchForKeys = false;
+	final String deviceOriented;
+	String objectKey = OSDE.STRING_EMPTY;
+	boolean searchForKeys = false;
+	final Vector<String> objectKeys;
 	
 	/**
 	 * constructor to create a object key scanner, 
@@ -51,19 +55,25 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner() {
 		super();
 		this.settings = Settings.getInstance();
+		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+		this.objectKeys = new Vector<String>();
+		this.objectKeys.add(this.deviceOriented);
 		this.setPriority(Thread.MIN_PRIORITY);
 	}
 
 	/**
 	 * constructor to create a object key scanner, 
 	 * starting this as thread all the sub files of the given data path are scanned for object key references 
-	 * and a file link will be created in a dircetory named with the object key
+	 * and a file link will be created in a directory named with the object key
 	 * @param newObjectKey the object key to be used for scanning existing files
 	 */
 	public ObjectKeyScanner(String newObjectKey) {
 		super();
 		this.objectKey = newObjectKey;
 		this.settings = Settings.getInstance();
+		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+		this.objectKeys = new Vector<String>();
+		this.objectKeys.add(this.deviceOriented);
 		this.setPriority(Thread.MIN_PRIORITY);
 	}
 
@@ -78,6 +88,9 @@ public class ObjectKeyScanner extends Thread {
 		super(name);
 		this.objectKey = newObjectKey;
 		this.settings = Settings.getInstance();
+		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+		this.objectKeys = new Vector<String>();
+		this.objectKeys.add(this.deviceOriented);
 		this.setPriority(Thread.MIN_PRIORITY);
 	}
 	
@@ -88,6 +101,20 @@ public class ObjectKeyScanner extends Thread {
 			if (this.objectKey.length() > 1) {
 				//check directory and cleanup if already exist 
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
+				
+				// check if object key known (settings)
+				String[] objectList = this.settings.getObjectList();
+				boolean isKnown = true;
+				for (String objectName : objectList) {
+					if (!objectName.equals(this.objectKey)) {
+						isKnown = false;
+						break;
+					}
+				}
+				if (!isKnown && this.objectKey != null && !this.objectKeys.contains(this.objectKey)) {
+					this.objectKeys.add(this.objectKey);
+				}
+				
 				//scan all data files for object key
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
 				for (File file : files) {
@@ -177,4 +204,11 @@ public class ObjectKeyScanner extends Thread {
 		this.searchForKeys = enable;
 	}
 
+	/**
+	 * 
+	 * @return object key list found during scan
+	 */
+	public String[] getObjectList() {
+		return this.objectKeys.toArray(new String[1]);
+	}
 }

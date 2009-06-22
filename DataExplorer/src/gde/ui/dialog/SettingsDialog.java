@@ -708,6 +708,7 @@ public class SettingsDialog extends Dialog {
 														// ignore
 													}
 												}
+												SettingsDialog.this.application.setObjectList(objLnkSearch.getObjectList());
 												SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
 										}
 										}.start();

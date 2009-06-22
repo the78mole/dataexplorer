@@ -1317,4 +1317,13 @@ public class MenuToolBar {
 		}
 		this.isObjectoriented = this.objectSelectCombo.getSelectionIndex() > 0;
 	}
+	
+	/**
+	 * set a new object key list from outside (object key scanner)
+	 */
+	public void setObjectList(String[] newObjectKeyList) {
+		this.settings.setObjectList(newObjectKeyList, this.objectSelectCombo.getSelectionIndex());
+		this.objectSelectCombo.setItems(this.settings.getObjectList());
+		this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
+	}
 }
