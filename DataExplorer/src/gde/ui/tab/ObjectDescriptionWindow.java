@@ -158,8 +158,10 @@ public class ObjectDescriptionWindow {
 			}
 		}
 		else {
-			if (this.objectTabItem.getControl() != null) this.objectTabItem.getControl().dispose();
-			this.objectTabItem.dispose();
+			if (this.objectTabItem != null) {
+				this.objectTabItem.getControl().dispose();
+				this.objectTabItem.dispose();
+			}
 		}
 	}
 

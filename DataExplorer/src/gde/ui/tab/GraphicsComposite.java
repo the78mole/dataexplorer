@@ -397,7 +397,7 @@ public class GraphicsComposite extends Composite {
 		// draw x coordinate	- time scale
 		int startTimeFormated, endTimeFormated;
 		// Calculate the horizontal area to used for plotting graphs
-		this.canvasGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+		this.canvasGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
 		int horizontalGap = pt.x/5;
 		int horizontalNumberExtend = pt.x;

@@ -312,11 +312,15 @@ public class TimeLine {
 					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
 					if (isMod60 && timeValue != 0) {
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
-						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) timeGrid.add(intXTickPosition);
-					}
-					GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
-					if (isMod60 && timeValue != 0) { // reset font style
+						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
+							timeGrid.add(intXTickPosition);
+						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						log.info(numberStr+ " BOLD");
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
+					}
+					else {
+						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						log.info(numberStr+ " NORMAL");
 					}
 				}
 				else

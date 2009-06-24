@@ -179,6 +179,7 @@ public class GraphicsUtils {
 
 	/**
 	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees). Uses the current
+	 * attention: prerequisite is to have gc.setFont called before calling this method !
 	 * @param string the text to draw
 	 * @param x the x coordinate of the top left corner of the drawing rectangle
 	 * @param y the y coordinate of the top left corner of the drawing rectangle
@@ -191,8 +192,6 @@ public class GraphicsUtils {
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
 		// Determine string's dimensions
-		//if (GraphicsUtils.application != null) // gc already primed with font GraphicsComposite.drawCurves(); 
-		//	gc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
 		Point pt = gc.textExtent(string);
 
 		// Create an image the same size as the string
@@ -204,10 +203,7 @@ public class GraphicsUtils {
 		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
-		if (GraphicsUtils.application != null)
-			stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
-		else
-			stringGc.setFont(gc.getFont());
+		stringGc.setFont(SWTResourceManager.getFont(gc.getFont().getFontData()[0]));
 
 		// clear the image
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
@@ -227,7 +223,8 @@ public class GraphicsUtils {
 
 
 	/**
-	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees). Uses the current
+	 * Draws time line text horizontal [min, hrs], where hrs is bold 
+	 * attention: prerequisite is to have gc.setFont called before calling this method !
 	 * @param string the text to draw
 	 * @param x the x coordinate of the top left corner of the drawing rectangle
 	 * @param y the y coordinate of the top left corner of the drawing rectangle
@@ -253,10 +250,7 @@ public class GraphicsUtils {
 		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
-		if (GraphicsUtils.application != null)
-			stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
-		else
-			stringGc.setFont(gc.getFont());
+		stringGc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
 
 		// clear the image with background color
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
@@ -264,12 +258,9 @@ public class GraphicsUtils {
 		stringGc.drawText(string, 0, 0);
 		
 		if (string.contains(", ")) { // string [min, hrs]
-			if (GraphicsUtils.application != null)
-				stringGc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.BOLD));
-			else
-				stringGc.setFont(gc.getFont());
-			
-			stringGc.drawText(string.split(", |]")[1], gc.textExtent(string.split(", ")[0]+",").x, 0);
+			int boldTextOffset = gc.textExtent(string.split(", ")[0]+", ").x;
+			stringGc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
+			stringGc.drawText(string.split(", |]")[1].trim(), boldTextOffset, 0);
 		}
 
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
