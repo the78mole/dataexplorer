@@ -240,7 +240,7 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_WINDOWS ? 10 : 9, SWT.NORMAL));
+			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize()+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
