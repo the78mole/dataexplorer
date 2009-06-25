@@ -315,12 +315,10 @@ public class TimeLine {
 						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
 							timeGrid.add(intXTickPosition);
 						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
-						log.info(numberStr+ " BOLD");
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
 					}
 					else {
 						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
-						log.info(numberStr+ " NORMAL");
 					}
 				}
 				else

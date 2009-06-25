@@ -169,7 +169,7 @@ public class ObjectDescriptionWindow {
 	 * loads the object relevant data from file if exist, or defaults
 	 */
 	public void update() {
-		if (!this.objectTabItem.isDisposed()) {
+		if (this.objectTabItem != null && !this.objectTabItem.isDisposed()) {
 
 			checkSaveObjectData();
 
@@ -238,6 +238,7 @@ public class ObjectDescriptionWindow {
 	 */
 	public void create() {
 		this.objectTabItem = new CTabItem(this.tabFolder, SWT.NONE);
+		SWTResourceManager.registerResourceUser(this.objectTabItem);
 		this.objectTabItem.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.objectTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0403));
 		{

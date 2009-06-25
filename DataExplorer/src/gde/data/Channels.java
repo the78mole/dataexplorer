@@ -186,7 +186,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				}
 				this.application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
-				this.application.getMenuToolBar().updateObjectSelector();
+				//this.application.getMenuToolBar().updateObjectSelector();
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateGraphicsWindow();

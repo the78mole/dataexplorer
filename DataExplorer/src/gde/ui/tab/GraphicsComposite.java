@@ -1403,7 +1403,7 @@ public class GraphicsComposite extends Composite {
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
 		this.graphicCanvas.setBounds(x, y, width, height);
 		
-		y =  this.headerGap + this.headerHeight + height;
+		y =  this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width-20, height);
 	}

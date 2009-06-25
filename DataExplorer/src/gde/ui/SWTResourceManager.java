@@ -49,7 +49,7 @@ import osde.device.IDevice;
  * You may change this code and your changes will not be overwritten,
  * but if you change the version number below then this class will be
  * completely overwritten by Jigloo.
- * #SWTResourceManager:version4.0.0#
+ * #SWTResourceManager:version1.70#
  */
 
 /**
@@ -58,11 +58,11 @@ import osde.device.IDevice;
  */
 public class SWTResourceManager {
 	private static Logger log = Logger.getLogger(SWTResourceManager.class.getName());
+	
+	static int accessCounter = 0;
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	private static HashMap resources = new HashMap();
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	static Vector users = new Vector();
+	private static HashMap<String, Object> resources = new HashMap<String, Object>();
+	static Vector<Widget> users = new Vector<Widget>();
 	private static SWTResourceManager instance = new SWTResourceManager();
 
 	private static DisposeListener disposeListener = new DisposeListener() {
@@ -83,17 +83,44 @@ public class SWTResourceManager {
 	 * at all, and the "dispose" method should be explicitly called after all
 	 * resources are no longer being used.
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static void registerResourceUser(Widget widget) {
 		if (users.contains(widget))
 			return;
 		users.add(widget);
 		widget.addDisposeListener(disposeListener);
 	}
+	
+	private static void checkAccess() {
+		if (accessCounter++ % 10 == 0) {
+			listStatus();
+		}
+	}
+	
+	public static void listStatus() {
+		Iterator<String> it = resources.keySet().iterator();
+		log.log(Level.INFO, "number collected resources = " + resources.size());
+		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0;
+		while (it.hasNext()) {
+			Object resource = resources.get(it.next());
+			if (resource instanceof Font) {
+				 ++numFonts;
+			}
+			else if (resource instanceof Color) {
+				 ++numColors;
+			}
+			else if (resource instanceof Image) {
+				 ++numImage;
+			}
+			else if (resource instanceof Cursor) {
+				 ++numCursor;
+			}
+		}
+		log.log(Level.INFO, numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors");
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	}
+
 	public static void dispose() {
-		Iterator it = resources.keySet().iterator();
+		Iterator<String> it = resources.keySet().iterator();
 		while (it.hasNext()) {
 			Object resource = resources.get(it.next());
 			if (resource instanceof Font)
@@ -157,9 +184,11 @@ public class SWTResourceManager {
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
-		String fontName = name + OSDE.STRING_OR + size + OSDE.STRING_OR + style + OSDE.STRING_OR + strikeout + OSDE.STRING_OR + underline;
-		if (resources.containsKey(fontName))
+		checkAccess();
+		String fontName = name + OSDE.STRING_DASH + size + OSDE.STRING_DASH + style + OSDE.STRING_DASH + strikeout + OSDE.STRING_DASH + underline;
+		if (resources.containsKey(fontName)) {
 			return (Font) resources.get(fontName);
+		}
 		FontData fd = new FontData(name, size, style);
 		if (strikeout || underline) {
 			try {
@@ -182,14 +211,15 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(String url, Control widget) {
+		checkAccess();
 		Image img = getImage(url);
 		if(img != null && widget != null)
 			img.setBackground(widget.getBackground());
 		return img;
 	}
 	
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(int x, int y) {
+		checkAccess();
 		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -204,8 +234,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(int x, int y, String imgKey) {
+		checkAccess();
 		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y + OSDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -227,8 +257,8 @@ public class SWTResourceManager {
 	 * @param text to be placed centered in the remaining space
 	 * @return specified image
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(Point pt, String imageURL, String text) {
+		checkAccess();
 		String key = "IMAGE:" + pt.x + OSDE.STRING_UNDER_BAR + pt.y + OSDE.STRING_UNDER_BAR + imageURL + OSDE.STRING_UNDER_BAR + text; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -254,8 +284,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getRotatedImage(Image image, int style, String imgKey) {	
+		checkAccess();
 		Image resultImg = null;
 		
 		// Use the image's data to create a rotated image's data
@@ -295,9 +325,8 @@ public class SWTResourceManager {
 		return resultImg;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(ImageData imageData) {
-		//sd.height, sd.width, sd.depth, sd.palette
+		checkAccess();
 		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imageData.depth; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -312,9 +341,8 @@ public class SWTResourceManager {
 		}
 	}
 	
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(ImageData imageData, String imgKey) {
-		//sd.height, sd.width, sd.depth, sd.palette
+		checkAccess();
 		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -329,9 +357,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(ImageData imageData, String imgKey, int newWidth, int newHeight, boolean forceRefresh) {
-		//sd.height, sd.width, sd.depth, sd.palette
+		checkAccess();
 		String key = "IMAGE_DATA:" + newWidth + OSDE.STRING_UNDER_BAR + newHeight + OSDE.STRING_UNDER_BAR + imgKey;
 		try {
 			if (resources.containsKey(key) && !forceRefresh)
@@ -348,8 +375,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(String url) {
+		checkAccess();
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
@@ -368,8 +395,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Image getImage(IDevice activeDeviceInstance, String url) {
+		checkAccess();
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
@@ -388,8 +415,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Color getColor(int swtColor) {
+		checkAccess();
 		String name = "COLOR:" + swtColor; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
@@ -399,8 +426,8 @@ public class SWTResourceManager {
 		return color;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Color getColor(int red, int green, int blue) {
+		checkAccess();
 		String name = "COLOR:" + red + OSDE.STRING_COMMA + green + OSDE.STRING_COMMA + blue; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
@@ -410,8 +437,8 @@ public class SWTResourceManager {
 		return color;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
+		checkAccess();
 		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + alpha1 + OSDE.STRING_COMMA + swtColor2 + OSDE.STRING_COMMA + alpha2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
@@ -421,8 +448,8 @@ public class SWTResourceManager {
 		return pattern;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int swtColor2) {
+		checkAccess();
 		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + swtColor2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
@@ -432,8 +459,8 @@ public class SWTResourceManager {
 		return pattern;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Cursor getCursor(int type) {
+		checkAccess();
 		String name = "CURSOR:" + type; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Cursor) resources.get(name);
@@ -443,8 +470,8 @@ public class SWTResourceManager {
 		return cursor;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Cursor getCursor(String url) {
+		checkAccess();
 		try {
 			String tmpUrl = url.replace('\\', '/');
 			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
@@ -461,8 +488,8 @@ public class SWTResourceManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Image img) {
+		checkAccess();
 		String name = "GC_IMAGE:" + img.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
@@ -472,8 +499,8 @@ public class SWTResourceManager {
 		return gc;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Display display) {
+		checkAccess();
 		String name = "GC_IMAGE:" + display.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
@@ -483,8 +510,8 @@ public class SWTResourceManager {
 		return gc;
 	}
 	
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static GC getGC(Canvas canvas, String descriptorKey) {
+		checkAccess();
 		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
@@ -493,5 +520,4 @@ public class SWTResourceManager {
 		resources.put(name, gc);
 		return gc;
 	}
-
 }

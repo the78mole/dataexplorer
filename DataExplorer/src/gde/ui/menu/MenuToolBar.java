@@ -1280,6 +1280,8 @@ public class MenuToolBar {
 			MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
 		}
 		this.isObjectoriented = this.objectSelectCombo.getSelectionIndex() > 0;
+		this.application.getObjectDescriptionWindow().setVisible(this.isObjectoriented);
+		this.application.updateObjectDescriptionWindow();
 	}
 
 	public void selectObjectKeyDeviceOriented() {
