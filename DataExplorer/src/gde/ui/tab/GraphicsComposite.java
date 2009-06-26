@@ -144,12 +144,12 @@ public class GraphicsComposite extends Composite {
 		this.setLayout(null);
 		this.setDragDetect(false);
 		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-//		this.addPaintListener(new PaintListener() {
-//			public void paintControl(PaintEvent evt) {
-//				log.log(Level.FINE, "GraphicsComposite.paintControl() = " + evt);
-//				doRedrawGraphics();
-//			}
-//		});
+		this.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent evt) {
+				log.log(Level.FINE, "GraphicsComposite.paintControl() = " + evt);
+				doRedrawGraphics();
+			}
+		});
 		this.addControlListener(new ControlListener() {
 			public void controlResized(ControlEvent evt) {
 				log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt);
@@ -616,7 +616,7 @@ public class GraphicsComposite extends Composite {
 						int timeCaptionY = curveBounds.y + curveBounds.height + timeCaptionHeight;
 						int timeCaptionX = curveBounds.x + ((curveBounds.width - timeCaptionWidth)/2);
 						//curve area
-						//this.graphicCanvas.redraw(curveBounds.x+5, curveBounds.y+5, 1, 1, true); // damage a small area of image only -> redraw complete image ??
+						//this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height, true); // damage a small area of image only -> redraw complete image ??
 						// time scale
 						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin+7, timeCaptionHeight, true);
 						// time caption
