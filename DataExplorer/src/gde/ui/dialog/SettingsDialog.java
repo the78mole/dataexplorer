@@ -126,9 +126,11 @@ public class SettingsDialog extends Dialog {
 	Slider															alphaSlider;
 	Button															suggestDate;
 	Group																fileOpenSaveDialogGroup;
-	Button															scanObjectKeysButton;
 	Group																objectKeyGroup;
+	Button															scanObjectKeysButton;
 	Button															removeMimeAssocButton;
+	Group																miscDiagGroup;
+	Button															resourceConsumptionButton;
 	Button															assocMimeTypeButton;
 	Button															removeLauncherButton;
 	Button															createLauncerButton;
@@ -593,7 +595,7 @@ public class SettingsDialog extends Dialog {
 								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 417;
-								createLauncerButtonLData.height = 44;
+								createLauncerButtonLData.height = 25;
 								this.createLauncerButton.setLayoutData(createLauncerButtonLData);
 								this.createLauncerButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -609,7 +611,7 @@ public class SettingsDialog extends Dialog {
 								this.removeLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0364));
 								RowData removeLauncherButtonLData = new RowData();
 								removeLauncherButtonLData.width = 417;
-								removeLauncherButtonLData.height = 44;
+								removeLauncherButtonLData.height = 25;
 								this.removeLauncherButton.setLayoutData(removeLauncherButtonLData);
 								this.removeLauncherButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -640,7 +642,7 @@ public class SettingsDialog extends Dialog {
 								this.assocMimeTypeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0366));
 								RowData assocMimeTypeButtonLData = new RowData();
 								assocMimeTypeButtonLData.width = 417;
-								assocMimeTypeButtonLData.height = 44;
+								assocMimeTypeButtonLData.height = 25;
 								this.assocMimeTypeButton.setLayoutData(assocMimeTypeButtonLData);
 								this.assocMimeTypeButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -656,7 +658,7 @@ public class SettingsDialog extends Dialog {
 								this.removeMimeAssocButton.setText(Messages.getString(MessageIds.OSDE_MSGT0367));
 								RowData removeMimeAssocButtonLData = new RowData();
 								removeMimeAssocButtonLData.width = 417;
-								removeMimeAssocButtonLData.height = 44;
+								removeMimeAssocButtonLData.height = 25;
 								this.removeMimeAssocButton.setLayoutData(removeMimeAssocButtonLData);
 								this.removeMimeAssocButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -689,7 +691,7 @@ public class SettingsDialog extends Dialog {
 								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] {this.settings.getDataFilePath()}));
 								RowData scanObjectKeysButtonLData = new RowData();
 								scanObjectKeysButtonLData.width = 417;
-								scanObjectKeysButtonLData.height = 44;
+								scanObjectKeysButtonLData.height = 25;
 								this.scanObjectKeysButton.setLayoutData(scanObjectKeysButtonLData);
 								this.scanObjectKeysButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -712,6 +714,39 @@ public class SettingsDialog extends Dialog {
 												SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
 										}
 										}.start();
+									}
+								});
+							}
+						}
+						{
+							this.miscDiagGroup = new Group(this.osMiscComposite, SWT.NONE);
+							RowLayout miscDiagGroupLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							miscDiagGroupLayout.type = SWT.VERTICAL;
+							miscDiagGroupLayout.center = true;
+							miscDiagGroupLayout.fill = true;
+							miscDiagGroupLayout.justify = true;
+							miscDiagGroupLayout.marginBottom = 10;
+							miscDiagGroupLayout.marginLeft = 30;
+							miscDiagGroupLayout.marginRight = 10;
+							miscDiagGroupLayout.marginTop = 10;
+							miscDiagGroupLayout.pack = false;
+							this.miscDiagGroup.setLayout(miscDiagGroupLayout);
+							this.miscDiagGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.miscDiagGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0209));
+							{
+								this.resourceConsumptionButton = new Button(this.miscDiagGroup, SWT.PUSH | SWT.CENTER);
+								this.resourceConsumptionButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.resourceConsumptionButton.setText(Messages.getString(MessageIds.OSDE_MSGT0210));
+								this.resourceConsumptionButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0211));
+								RowData resourceConsumptionButtonLData = new RowData();
+								resourceConsumptionButtonLData.width = 417;
+								resourceConsumptionButtonLData.height = 25;
+								this.resourceConsumptionButton.setLayoutData(resourceConsumptionButtonLData);
+								this.resourceConsumptionButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt);
+										SWTResourceManager.listResourceStatus();
 									}
 								});
 							}

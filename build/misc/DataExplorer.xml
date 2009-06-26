@@ -9,8 +9,8 @@
   <priority>normal</priority>
   <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
   <supportUrl>http://bruegmaenner.de/de/winfried/osde/README.html</supportUrl>
-  <customProcName>true</customProcName>
-  <stayAlive>true</stayAlive>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
   <manifest></manifest>
   <icon>D:\workspaces\osde\build\misc\OpenSerialDataExplorer.ico</icon>
   <classPath>

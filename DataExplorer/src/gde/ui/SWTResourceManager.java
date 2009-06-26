@@ -90,13 +90,13 @@ public class SWTResourceManager {
 		widget.addDisposeListener(disposeListener);
 	}
 	
-	private static void checkAccess() {
-		if (accessCounter++ % 10 == 0) {
-			listStatus();
-		}
-	}
+//	private static void checkAccess() {
+//		if (accessCounter++ % 10 == 0) {
+//			listStatus();
+//		}
+//	}
 	
-	public static void listStatus() {
+	public static void listResourceStatus() {
 		Iterator<String> it = resources.keySet().iterator();
 		log.log(Level.INFO, "number collected resources = " + resources.size());
 		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0;
@@ -184,7 +184,6 @@ public class SWTResourceManager {
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
-		checkAccess();
 		String fontName = name + OSDE.STRING_DASH + size + OSDE.STRING_DASH + style + OSDE.STRING_DASH + strikeout + OSDE.STRING_DASH + underline;
 		if (resources.containsKey(fontName)) {
 			return (Font) resources.get(fontName);
@@ -211,7 +210,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(String url, Control widget) {
-		checkAccess();
 		Image img = getImage(url);
 		if(img != null && widget != null)
 			img.setBackground(widget.getBackground());
@@ -219,7 +217,6 @@ public class SWTResourceManager {
 	}
 	
 	public static Image getImage(int x, int y) {
-		checkAccess();
 		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -235,7 +232,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(int x, int y, String imgKey) {
-		checkAccess();
 		String key = "IMAGE:" + x + OSDE.STRING_UNDER_BAR + y + OSDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -258,7 +254,6 @@ public class SWTResourceManager {
 	 * @return specified image
 	 */
 	public static Image getImage(Point pt, String imageURL, String text) {
-		checkAccess();
 		String key = "IMAGE:" + pt.x + OSDE.STRING_UNDER_BAR + pt.y + OSDE.STRING_UNDER_BAR + imageURL + OSDE.STRING_UNDER_BAR + text; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -285,7 +280,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getRotatedImage(Image image, int style, String imgKey) {	
-		checkAccess();
 		Image resultImg = null;
 		
 		// Use the image's data to create a rotated image's data
@@ -326,7 +320,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(ImageData imageData) {
-		checkAccess();
 		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imageData.depth; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -342,7 +335,6 @@ public class SWTResourceManager {
 	}
 	
 	public static Image getImage(ImageData imageData, String imgKey) {
-		checkAccess();
 		String key = "IMAGE_DATA:" + imageData.height + OSDE.STRING_UNDER_BAR + imageData.width + OSDE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
@@ -358,7 +350,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(ImageData imageData, String imgKey, int newWidth, int newHeight, boolean forceRefresh) {
-		checkAccess();
 		String key = "IMAGE_DATA:" + newWidth + OSDE.STRING_UNDER_BAR + newHeight + OSDE.STRING_UNDER_BAR + imgKey;
 		try {
 			if (resources.containsKey(key) && !forceRefresh)
@@ -376,7 +367,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(String url) {
-		checkAccess();
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
@@ -396,7 +386,6 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(IDevice activeDeviceInstance, String url) {
-		checkAccess();
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
@@ -416,7 +405,6 @@ public class SWTResourceManager {
 	}
 
 	public static Color getColor(int swtColor) {
-		checkAccess();
 		String name = "COLOR:" + swtColor; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
@@ -427,7 +415,6 @@ public class SWTResourceManager {
 	}
 
 	public static Color getColor(int red, int green, int blue) {
-		checkAccess();
 		String name = "COLOR:" + red + OSDE.STRING_COMMA + green + OSDE.STRING_COMMA + blue; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
@@ -438,7 +425,6 @@ public class SWTResourceManager {
 	}
 
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
-		checkAccess();
 		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + alpha1 + OSDE.STRING_COMMA + swtColor2 + OSDE.STRING_COMMA + alpha2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
@@ -449,7 +435,6 @@ public class SWTResourceManager {
 	}
 
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int swtColor2) {
-		checkAccess();
 		String name = "PATTERN:" + x1 + OSDE.STRING_COMMA + y1 + OSDE.STRING_COMMA + x2 + OSDE.STRING_COMMA + y2 + swtColor1 + OSDE.STRING_COMMA + swtColor2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
@@ -460,7 +445,6 @@ public class SWTResourceManager {
 	}
 
 	public static Cursor getCursor(int type) {
-		checkAccess();
 		String name = "CURSOR:" + type; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Cursor) resources.get(name);
@@ -471,7 +455,6 @@ public class SWTResourceManager {
 	}
 
 	public static Cursor getCursor(String url) {
-		checkAccess();
 		try {
 			String tmpUrl = url.replace('\\', '/');
 			if (tmpUrl.startsWith(OSDE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
@@ -489,7 +472,6 @@ public class SWTResourceManager {
 	}
 
 	public static GC getGC(Image img) {
-		checkAccess();
 		String name = "GC_IMAGE:" + img.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
@@ -500,7 +482,6 @@ public class SWTResourceManager {
 	}
 
 	public static GC getGC(Display display) {
-		checkAccess();
 		String name = "GC_IMAGE:" + display.hashCode(); //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
@@ -511,7 +492,6 @@ public class SWTResourceManager {
 	}
 	
 	public static GC getGC(Canvas canvas, String descriptorKey) {
-		checkAccess();
 		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (GC) resources.get(name);
