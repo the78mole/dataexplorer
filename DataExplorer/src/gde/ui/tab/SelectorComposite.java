@@ -217,35 +217,28 @@ public class SelectorComposite extends Composite {
 						record = recordSet.getRecord(recordKeys[i]);
 						break;
 					}
-					log.log(Level.FINER, record.getName());
-
-					textSize = record.getName().length() * 8;
-					//this.curveSelectorTable.pack();
-					//log.log(Level.FINE, item.getText() + " " + item.getBounds().width);
-					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
-					//log.log(Level.FINE, item.getText() + " " + itemWidth);
-					//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
-					if (record.isDisplayable()) {
-						TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-						item.setForeground(record.getColor());
-						item.setText(record.getName());
-						if (record.isVisible()) {
-							item.setChecked(true);
-							item.setData(OpenSerialDataExplorer.OLD_STATE, true);
-							item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-						}
-						else {
-							item.setChecked(false);
-							item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-							item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+					if (record != null) {
+						log.log(Level.FINER, record.getName());
+						textSize = record.getName().length() * 8;
+						if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
+						//log.log(Level.FINE, item.getText() + " " + itemWidth);
+						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
+						if (record.isDisplayable()) {
+							TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
+							item.setForeground(record.getColor());
+							item.setText(record.getName());
+							if (record.isVisible()) {
+								item.setChecked(true);
+								item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+							}
+							else {
+								item.setChecked(false);
+								item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+							}
 						}
 					}
-//					else {
-//						item.setChecked(false);
-//						item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-//						item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-//						item.dispose();
-//					}
 				}
 				if (recordSet.isSyncableDisplayableRecords(false) && recordSet.isOneSyncableVisible() && this.windowType == GraphicsWindow.TYPE_NORMAL) {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);

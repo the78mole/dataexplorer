@@ -1759,12 +1759,13 @@ public class RecordSet extends HashMap<String, Record> {
 				addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
 				addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
 				Record tmpRecord = new Record(this.device, this.realSize()+1, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
-				this.put(syncRecName, tmpRecord);
 				tmpRecord.isSyncPlaceholder = true;
 				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
 				tmpRecord.isVisible = false;
 				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
+				this.put(syncRecName, tmpRecord);
 				this.addRecordName(syncRecName);
+				this.setSyncRequested(false);
 
 				this.isSyncableChecked = true;
 				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
@@ -1860,7 +1861,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return true onlx if both isSyncableSynced && isOneSyncableVisible are true
+	 * @return true only if both isSyncableSynced && isOneSyncableVisible are true
 	 */
 	public boolean isSyncableSynced() {
 		return this.isSyncRequested && isOneSyncableVisible();
