@@ -88,7 +88,7 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 
-		final int FILTER_TIME_DELTA_MS = 200; // definition of the time delta in msec
+		final int FILTER_TIME_DELTA_MS = 400; // definition of the time delta in msec
 
 		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.configKey).length];
@@ -170,7 +170,7 @@ public class GathererThread extends Thread {
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setTableDisplayable(false); // suppress table calc + display 
 						recordSet.setAllDisplayable();
-						this.channel.applyTemplate(this.recordSetKey);
+						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {

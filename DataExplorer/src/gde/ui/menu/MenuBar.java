@@ -536,7 +536,7 @@ public class MenuBar {
 							MenuBar.log.log(Level.FINE, "templateFilePath = " + template.getDefaultFileName()); //$NON-NLS-1$
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
-								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName());
+								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
 								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							}
 						}
@@ -575,7 +575,7 @@ public class MenuBar {
 							MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 							template.load();
 							if (activeChannel.getActiveRecordSet() != null) {
-								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName());
+								activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
 								activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							}
 						}

@@ -114,7 +114,7 @@ public class DataGathererThread extends Thread {
 
 				// update the progress bar reading one after the other only
 				channel.get(recordSetKey).setAllDisplayable();
-				channel.applyTemplate(recordSetKey);
+				channel.applyTemplate(recordSetKey, true);
 			}// end for
 			this.dialog.enableReadButtons();
 			DataGathererThread.log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$

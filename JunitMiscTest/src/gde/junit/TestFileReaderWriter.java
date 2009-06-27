@@ -77,7 +77,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
-							activeChannel.applyTemplate(recordSet.getName());
+							activeChannel.applyTemplate(recordSet.getName(), true);
 							//device.makeInActiveDisplayable(recordSet);
 							drawCurves(recordSet, 1024, 768);
 						}
@@ -293,7 +293,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 								if (!recordSet.hasDisplayableData()) 
 									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
 								activeChannel.setActiveRecordSet(recordSet);
-								activeChannel.applyTemplate(recordSetName);
+								activeChannel.applyTemplate(recordSetName, true);
 								//device.makeInActiveDisplayable(recordSet);
 								drawCurves(recordSet, 1024, 768);
 							}

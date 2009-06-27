@@ -1779,7 +1779,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return syncable record name stem or empty sting
 	 */
 	public String getSyncableName() {
-		return this.syncableRecords.isEmpty() ? "" : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return this.syncableRecords.isEmpty() ? OSDE.STRING_EMPTY : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(OSDE.STRING_BLANK)[1]; //$NON-NLS-1$
 	}
 
 	public void syncScaleOfSyncableRecords() {

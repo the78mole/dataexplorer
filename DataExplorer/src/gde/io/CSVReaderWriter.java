@@ -315,7 +315,7 @@ public class CSVReaderWriter {
 
 				activeChannel.put(recordSetName, recordSet);
 				activeChannel.setActiveRecordSet(recordSetName);
-				activeChannel.applyTemplate(recordSetName);
+				activeChannel.applyTemplate(recordSetName, true);
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 				//				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 

@@ -165,14 +165,14 @@ public class CellVoltageWindow {
 			this.voltageLimitsSelection.setBounds(0, 0, 350, 50);
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
-					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
 					CellVoltageWindow.this.liPoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liPoLimits));
-					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
 					CellVoltageWindow.this.liIoButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liIoLimits));
-					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
 					CellVoltageWindow.this.liFeButton.setSelection(LithiumBatteryValues.compareVoltageLimits(LithiumBatteryValues.liFeLimits));
-					log.logp(Level.INFO, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 					CellVoltageWindow.this.individualButton.setSelection(!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 				}
 			});

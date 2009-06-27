@@ -165,7 +165,7 @@ public class GathererThread extends Thread {
 						record.setUnit(m_unit);
 						record.setSymbol(configData.get(VC800.INPUT_SYMBOL));
 						record.setName(configData.get(VC800.INPUT_TYPE));
-						this.channel.applyTemplate(this.recordSetKey);
+						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {

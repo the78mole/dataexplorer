@@ -288,6 +288,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		if (this.template.isAvailable()&& recordSet != null) {
 			for (int i=0; i<recordSet.getRecordNames().length; ++i) {
 				Record record = recordSet.get(recordSet.getRecordNames()[i]);
+				if(recordSet.getRecordNames()[i].equals(recordSet.getSyncableName())) continue; // don't do for sync record placeholder
 				//record.setVisible(new Boolean(this.template.getProperty(recordName + Record.IS_VISIBLE, "true")).booleanValue());
 				//record.setPositionLeft(new Boolean(this.template.getProperty(recordName + Record.IS_POSITION_LEFT, "true")).booleanValue());
 				int r, g, b;
@@ -330,8 +331,10 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * method to apply the graphics template definition to an record set
+	 * @param recordSetKey
+	 * @param doUpdateVisibilityStatus
 	 */
-	public void applyTemplate(String recordSetKey) {
+	public void applyTemplate(String recordSetKey, boolean doUpdateVisibilityStatus) {
 		RecordSet recordSet = this.get(recordSetKey);
 
 		if (this.template != null) this.template.load();
@@ -339,6 +342,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		if (this.template.isAvailable()&& recordSet != null) {
 			for (int i=0; i<recordSet.getRecordNames().length; ++i) {
 				Record record = recordSet.get(recordSet.getRecordNames()[i]);
+				if(recordSet.getRecordNames()[i].equals(recordSet.getSyncableName())) continue; // don't do for sync record placeholder
 				record.setVisible(new Boolean(this.template.getProperty(i + Record.IS_VISIBLE, "true")).booleanValue()); //$NON-NLS-1$
 				record.setPositionLeft(new Boolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true")).booleanValue()); //$NON-NLS-1$
 				int r, g, b;
@@ -374,10 +378,11 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.activeRecordSet != null) {
+			if (this.activeRecordSet != null && doUpdateVisibilityStatus) {
 				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet);
 			}
 			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
+				this.application.updateCurveSelectorTable();
 				this.application.updateGraphicsWindow();
 			}		
 		}

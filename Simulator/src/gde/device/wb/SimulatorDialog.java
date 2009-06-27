@@ -394,7 +394,7 @@ public class SimulatorDialog extends DeviceDialog {
 											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
 											recordSet.setTimeStep_ms(new Double(SimulatorDialog.this.device.getTimeStep_ms()));
 											recordSet.setAllDisplayable();
-											SimulatorDialog.this.channel.applyTemplate(this.recordSetKey);
+											SimulatorDialog.this.channel.applyTemplate(this.recordSetKey, false);
 
 											// switch the active record set if the current record set is child of active channel
 											if (SimulatorDialog.this.channel.getName().equals(SimulatorDialog.this.channels.getActiveChannel().getName())) {

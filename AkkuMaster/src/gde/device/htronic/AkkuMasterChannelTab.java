@@ -542,7 +542,7 @@ public class AkkuMasterChannelTab {
 															AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channel.get(AkkuMasterChannelTab.this.recordSetKey);
 															AkkuMasterChannelTab.this.recordSet.setTableDisplayable(false); // suppress table calc + display 
 															AkkuMasterChannelTab.this.recordSet.setAllDisplayable();
-															AkkuMasterChannelTab.this.channel.applyTemplate(AkkuMasterChannelTab.this.recordSetKey);
+															AkkuMasterChannelTab.this.channel.applyTemplate(AkkuMasterChannelTab.this.recordSetKey, false);
 															// switch the active record set if the current record set is child of active channel
 															if (AkkuMasterChannelTab.this.channel.getName().equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getName())) {
 																AkkuMasterChannelTab.this.application.getMenuToolBar().addRecordSetName(AkkuMasterChannelTab.this.recordSetKey);

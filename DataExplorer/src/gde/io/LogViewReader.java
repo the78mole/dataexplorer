@@ -223,7 +223,7 @@ public class LogViewReader {
 					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 					device.updateVisibilityStatus(recordSet);
 					if (application.getMenuToolBar() != null) {
-						channel.applyTemplate(recordSet.getName());
+						channel.applyTemplate(recordSet.getName(), true);
 					}
 				}
 				
@@ -279,7 +279,7 @@ public class LogViewReader {
 			
 			device.updateVisibilityStatus(recordSet);
 			if (application.getMenuToolBar() != null) {
-				channels.getActiveChannel().applyTemplate(recordSet.getName());
+				channels.getActiveChannel().applyTemplate(recordSet.getName(), true);
 			}
 		}
 		catch (FileNotFoundException e) {

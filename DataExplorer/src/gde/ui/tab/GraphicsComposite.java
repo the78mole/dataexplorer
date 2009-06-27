@@ -1294,7 +1294,7 @@ public class GraphicsComposite extends Composite {
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						this.channels.getActiveChannel().applyTemplate(recordSet.getName());
+						this.channels.getActiveChannel().applyTemplate(recordSet.getName(), false);
 						setModeState(GraphicsComposite.MODE_RESET);
 					}
 				}
@@ -1305,7 +1305,7 @@ public class GraphicsComposite extends Composite {
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						this.channels.getActiveChannel().applyTemplate(recordSet.getName());
+						this.channels.getActiveChannel().applyTemplate(recordSet.getName(), false);
 						setModeState(GraphicsComposite.MODE_RESET);
 					}
 				}
