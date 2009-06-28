@@ -578,14 +578,11 @@ public class SettingsDialog extends Dialog {
 						this.osMiscComposite.setLayout(composite1Layout);
 						{
 							this.desktopLauncher = new Group(this.osMiscComposite, SWT.NONE);
-							RowLayout desktopLauncherLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							RowLayout desktopLauncherLayout = new RowLayout(SWT.HORIZONTAL);
 							desktopLauncherLayout.center = true;
-							desktopLauncherLayout.type = SWT.VERTICAL;
-							desktopLauncherLayout.pack = false;
-							desktopLauncherLayout.fill = true;
-							desktopLauncherLayout.marginLeft = 30;
-							desktopLauncherLayout.marginRight = 30;
-							desktopLauncherLayout.justify = true;
+							desktopLauncherLayout.marginTop = 30;
+							desktopLauncherLayout.marginWidth = 40;
+							desktopLauncherLayout.spacing = 40;
 							this.desktopLauncher.setLayout(desktopLauncherLayout);
 							this.desktopLauncher.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.desktopLauncher.setText(Messages.getString(MessageIds.OSDE_MSGT0362));
@@ -594,8 +591,8 @@ public class SettingsDialog extends Dialog {
 								this.createLauncerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
 								RowData createLauncerButtonLData = new RowData();
-								createLauncerButtonLData.width = 417;
-								createLauncerButtonLData.height = 25;
+								createLauncerButtonLData.width = 180;
+								createLauncerButtonLData.height = 30;
 								this.createLauncerButton.setLayoutData(createLauncerButtonLData);
 								this.createLauncerButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -610,8 +607,8 @@ public class SettingsDialog extends Dialog {
 								this.removeLauncherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.removeLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0364));
 								RowData removeLauncherButtonLData = new RowData();
-								removeLauncherButtonLData.width = 417;
-								removeLauncherButtonLData.height = 25;
+								removeLauncherButtonLData.width = 180;
+								removeLauncherButtonLData.height = 30;
 								this.removeLauncherButton.setLayoutData(removeLauncherButtonLData);
 								this.removeLauncherButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -624,15 +621,11 @@ public class SettingsDialog extends Dialog {
 						}
 						{
 							this.shellMimeType = new Group(this.osMiscComposite, SWT.NONE);
-							RowLayout shellMimeTypeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+							RowLayout shellMimeTypeLayout = new RowLayout(SWT.HORIZONTAL);
 							shellMimeTypeLayout.center = true;
-							shellMimeTypeLayout.marginHeight = 3;
-							shellMimeTypeLayout.marginWidth = 3;
-							shellMimeTypeLayout.pack = false;
-							shellMimeTypeLayout.marginLeft = 30;
-							shellMimeTypeLayout.fill = true;
-							shellMimeTypeLayout.type = SWT.VERTICAL;
-							shellMimeTypeLayout.justify = true;
+							shellMimeTypeLayout.marginTop = 30;
+							shellMimeTypeLayout.marginWidth = 40;
+							shellMimeTypeLayout.spacing = 40;
 							this.shellMimeType.setLayout(shellMimeTypeLayout);
 							this.shellMimeType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.shellMimeType.setText(Messages.getString(MessageIds.OSDE_MSGT0365));
@@ -641,8 +634,8 @@ public class SettingsDialog extends Dialog {
 								this.assocMimeTypeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.assocMimeTypeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0366));
 								RowData assocMimeTypeButtonLData = new RowData();
-								assocMimeTypeButtonLData.width = 417;
-								assocMimeTypeButtonLData.height = 25;
+								assocMimeTypeButtonLData.width = 180;
+								assocMimeTypeButtonLData.height = 30;
 								this.assocMimeTypeButton.setLayoutData(assocMimeTypeButtonLData);
 								this.assocMimeTypeButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -657,8 +650,8 @@ public class SettingsDialog extends Dialog {
 								this.removeMimeAssocButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.removeMimeAssocButton.setText(Messages.getString(MessageIds.OSDE_MSGT0367));
 								RowData removeMimeAssocButtonLData = new RowData();
-								removeMimeAssocButtonLData.width = 417;
-								removeMimeAssocButtonLData.height = 25;
+								removeMimeAssocButtonLData.width = 180;
+								removeMimeAssocButtonLData.height = 30;
 								this.removeMimeAssocButton.setLayoutData(removeMimeAssocButtonLData);
 								this.removeMimeAssocButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -671,16 +664,11 @@ public class SettingsDialog extends Dialog {
 						}
 						{
 							this.objectKeyGroup = new Group(this.osMiscComposite, SWT.NONE);
-							RowLayout objectKeyGroupLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
-							objectKeyGroupLayout.type = SWT.VERTICAL;
+							RowLayout objectKeyGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							objectKeyGroupLayout.center = true;
-							objectKeyGroupLayout.fill = true;
-							objectKeyGroupLayout.justify = true;
-							objectKeyGroupLayout.marginBottom = 10;
-							objectKeyGroupLayout.marginLeft = 30;
-							objectKeyGroupLayout.marginRight = 10;
-							objectKeyGroupLayout.marginTop = 10;
-							objectKeyGroupLayout.pack = false;
+							objectKeyGroupLayout.marginTop = 30;
+							objectKeyGroupLayout.marginWidth = 90;
+							objectKeyGroupLayout.spacing = 40;
 							this.objectKeyGroup.setLayout(objectKeyGroupLayout);
 							this.objectKeyGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.objectKeyGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0206));
@@ -690,8 +678,8 @@ public class SettingsDialog extends Dialog {
 								this.scanObjectKeysButton.setText(Messages.getString(MessageIds.OSDE_MSGT0207));
 								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] {this.settings.getDataFilePath()}));
 								RowData scanObjectKeysButtonLData = new RowData();
-								scanObjectKeysButtonLData.width = 417;
-								scanObjectKeysButtonLData.height = 25;
+								scanObjectKeysButtonLData.width = 300;
+								scanObjectKeysButtonLData.height = 30;
 								this.scanObjectKeysButton.setLayoutData(scanObjectKeysButtonLData);
 								this.scanObjectKeysButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -720,16 +708,11 @@ public class SettingsDialog extends Dialog {
 						}
 						{
 							this.miscDiagGroup = new Group(this.osMiscComposite, SWT.NONE);
-							RowLayout miscDiagGroupLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
-							miscDiagGroupLayout.type = SWT.VERTICAL;
+							RowLayout miscDiagGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							miscDiagGroupLayout.center = true;
-							miscDiagGroupLayout.fill = true;
-							miscDiagGroupLayout.justify = true;
-							miscDiagGroupLayout.marginBottom = 10;
-							miscDiagGroupLayout.marginLeft = 30;
-							miscDiagGroupLayout.marginRight = 10;
-							miscDiagGroupLayout.marginTop = 10;
-							miscDiagGroupLayout.pack = false;
+							miscDiagGroupLayout.marginTop = 30;
+							miscDiagGroupLayout.marginWidth = 90;
+							miscDiagGroupLayout.spacing = 40;
 							this.miscDiagGroup.setLayout(miscDiagGroupLayout);
 							this.miscDiagGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.miscDiagGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0209));
@@ -739,8 +722,8 @@ public class SettingsDialog extends Dialog {
 								this.resourceConsumptionButton.setText(Messages.getString(MessageIds.OSDE_MSGT0210));
 								this.resourceConsumptionButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0211));
 								RowData resourceConsumptionButtonLData = new RowData();
-								resourceConsumptionButtonLData.width = 417;
-								resourceConsumptionButtonLData.height = 25;
+								resourceConsumptionButtonLData.width = 300;
+								resourceConsumptionButtonLData.height = 30;
 								this.resourceConsumptionButton.setLayoutData(resourceConsumptionButtonLData);
 								this.resourceConsumptionButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1138,30 +1121,30 @@ public class SettingsDialog extends Dialog {
 		this.listPortsThread = new Thread() {
 			@Override
 			public void run() {
-				while (!SettingsDialog.this.dialogShell.isDisposed()) {
-					SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
-					if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-							public void run() {
-								if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) SettingsDialog.this.serialPortGroup.redraw();
+				try {
+					while (!SettingsDialog.this.dialogShell.isDisposed()) {
+						SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+						if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
+							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+								public void run() {
+									if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) SettingsDialog.this.serialPortGroup.redraw();
+								}
+							});
+							try {
+								Thread.sleep(2500);
 							}
-						});
-						try {
-							Thread.sleep(2500);
-						}
-						catch (InterruptedException e) {
-							// ignore
+							catch (InterruptedException e) {
+								// ignore
+							}
 						}
 					}
 				}
+				catch (Throwable t) {
+					SettingsDialog.log.log(Level.WARNING, t.getMessage(), t);
+				}
 			}
 		};
-		try {
-			this.listPortsThread.start();
-		}
-		catch (RuntimeException e) {
-			SettingsDialog.log.log(Level.WARNING, e.getMessage(), e);
-		}
+		this.listPortsThread.start();
 	}
 
 	/**

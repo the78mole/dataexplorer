@@ -88,7 +88,7 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 
-		final int FILTER_TIME_DELTA_MS = 400; // definition of the time delta in msec
+		final int FILTER_TIME_DELTA_MS = 500; // definition of the time delta in msec
 
 		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.configKey).length];
