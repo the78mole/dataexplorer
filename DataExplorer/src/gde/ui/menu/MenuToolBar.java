@@ -597,9 +597,9 @@ public class MenuToolBar {
 						this.scopePointsCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0072));
 						this.scopePointsCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(Level.FINEST, "scopePointsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
-									new Integer(MenuToolBar.this.scopePointsCombo.getText());
+									new Integer(MenuToolBar.this.scopePointsCombo.getText().trim());
 									MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_SCOPE, true);
 									MenuToolBar.this.zoomWindowItem.setEnabled(false);
 								}
@@ -1198,7 +1198,7 @@ public class MenuToolBar {
 	public int getScopeModeLevelValue() {
 		int sizeLastPoints = -1;
 		try {
-			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText()) + 1;
+			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText().trim()) + 1;
 		}
 		catch (NumberFormatException e) {
 			// ignore and return -1
