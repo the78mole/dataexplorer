@@ -1765,7 +1765,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
 				this.put(syncRecName, tmpRecord);
 				this.addRecordName(syncRecName);
-				this.setSyncRequested(false);
+				this.setSyncRequested(false, false);
 
 				this.isSyncableChecked = true;
 				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
@@ -1885,10 +1885,14 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * @param enable the isSyncableSynced to set
+	 * @param countAsChange 
 	 */
-	public void setSyncRequested(boolean enable) {
-		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+	public void setSyncRequested(boolean enable, boolean countAsChange) {
 		this.isSyncRequested = enable;
+ 
+		if (countAsChange)
+			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+		
 		if (enable) {
 			this.syncScaleOfSyncableRecords();
 		}

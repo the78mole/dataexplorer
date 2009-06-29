@@ -1220,7 +1220,7 @@ public class MenuToolBar {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && activeRecordSet.isSyncRequested()) {
-				activeRecordSet.setSyncRequested(true);
+				activeRecordSet.setSyncRequested(true, true);
 			}
 		}
 	}

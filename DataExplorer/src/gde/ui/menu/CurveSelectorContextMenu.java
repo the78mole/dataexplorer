@@ -216,7 +216,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
 						if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-							CurveSelectorContextMenu.this.recordSet.setSyncRequested(checked);
+							CurveSelectorContextMenu.this.recordSet.setSyncRequested(checked, true);
 						}
 						else {
 							CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
