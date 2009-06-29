@@ -1327,5 +1327,11 @@ public class MenuToolBar {
 		this.settings.setObjectList(newObjectKeyList, this.objectSelectCombo.getSelectionIndex());
 		this.objectSelectCombo.setItems(this.settings.getObjectList());
 		this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
+		this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
+		this.updateObjectSelector();
+	}
+	
+	public String[] getObjectKeyList() {
+		return this.objectSelectCombo.getItems();
 	}
 }

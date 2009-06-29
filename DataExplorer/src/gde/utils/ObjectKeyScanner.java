@@ -31,6 +31,7 @@ import osde.exception.NotSupportedFileFormatException;
 import osde.io.OsdReaderWriter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 
 /**
  * This thread implementation goes through all sub folders of the data location and creates links to object related files
@@ -49,7 +50,7 @@ public class ObjectKeyScanner extends Thread {
 	 * constructor to create a object key scanner, 
 	 * starting this as thread all the sub files of the given data path are scanned for object key references 
 	 * using this constructor the object key must be set before starting the scan thread
-	 * and a file link will be created in a dircetory named with the object key
+	 * and a file link will be created in a directory named with the object key
 	 * @param newObjectKey the object key to be used for scanning existing files
 	 */
 	public ObjectKeyScanner() {
@@ -57,7 +58,9 @@ public class ObjectKeyScanner extends Thread {
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
-		this.objectKeys.add(this.deviceOriented);
+		for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
+			this.objectKeys.add(tmpObjKey);
+		}
 		this.setPriority(Thread.MIN_PRIORITY);
 	}
 
@@ -73,27 +76,12 @@ public class ObjectKeyScanner extends Thread {
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
-		this.objectKeys.add(this.deviceOriented);
+		for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
+			this.objectKeys.add(tmpObjKey);
+		}
 		this.setPriority(Thread.MIN_PRIORITY);
 	}
 
-	/**
-	 * constructor to create a object key scanner, 
-	 * starting this as thread all the sub files of the given data path are scanned for object key references 
-	 * and a file link will be created in a dircetory named with the object key
-	 * @param name name of the thread
-	 * @param newObjectKey the object key to be used for scanning existing files
-	 */
-	public ObjectKeyScanner(String name, String newObjectKey) {
-		super(name);
-		this.objectKey = newObjectKey;
-		this.settings = Settings.getInstance();
-		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
-		this.objectKeys = new Vector<String>();
-		this.objectKeys.add(this.deviceOriented);
-		this.setPriority(Thread.MIN_PRIORITY);
-	}
-	
 	public void run() {
 		try {
 			String objectKeyDirPath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + this.objectKey;

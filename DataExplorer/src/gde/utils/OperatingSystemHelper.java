@@ -584,6 +584,7 @@ public class OperatingSystemHelper {
 		else {
 			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
 		}
+		log.log(Level.INFO, ret);
 		return ret;
 	}
 
