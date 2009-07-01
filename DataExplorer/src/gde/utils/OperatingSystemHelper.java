@@ -541,8 +541,10 @@ public class OperatingSystemHelper {
 		if (OSDE.IS_WINDOWS) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
-			String line = reader.readLine();
-			log.log(Level.FINER, "line = " + line); //$NON-NLS-1$
+			char[] tmpChars = new char[25];
+			reader.read(tmpChars);
+			String line = new String(tmpChars);
+			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			reader.close();
 			if (!line.contains(OSDE.OPEN_SERIAL_DATA)) {
 				ret = WindowsHelper.getFilePathFromLink(filePath);
@@ -584,7 +586,7 @@ public class OperatingSystemHelper {
 		else {
 			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
 		}
-		log.log(Level.INFO, ret);
+		log.log(Level.FINE, ret);
 		return ret;
 	}
 
