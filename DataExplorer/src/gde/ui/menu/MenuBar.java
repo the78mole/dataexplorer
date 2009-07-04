@@ -902,8 +902,9 @@ public class MenuBar {
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
 			}
+			//only switch object key, if application is object oriented
 			String objectkey = osdHeader.get(OSDE.OBJECT_KEY);
-			if (objectkey != null && !objectkey.equals(OSDE.STRING_EMPTY)) {
+			if (this.application.isObjectoriented() && objectkey != null && !objectkey.equals(OSDE.STRING_EMPTY)) {
 				this.application.getMenuToolBar().selectObjectKey(0, objectkey);
 			}
 			else {

@@ -1266,6 +1266,7 @@ public class MenuToolBar {
 		for(; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
 			if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
 					MenuToolBar.this.objectSelectCombo.select(searchSelectionIndex);
+					MenuToolBar.this.settings.setObjectList(MenuToolBar.this.settings.getObjectList(), searchSelectionIndex);
 					isContained = true;
 					break;
 			}
