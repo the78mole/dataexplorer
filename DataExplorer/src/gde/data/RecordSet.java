@@ -43,7 +43,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CalculationThread;
-import osde.utils.LithiumBatteryValues;
+import osde.utils.CellVoltageValues;
 import osde.utils.StringHelper;
 import osde.utils.TimeLine;
 
@@ -139,7 +139,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
 	String												horizontalGridRecordKey				= OSDE.STRING_DASH;															// recordNames[horizontalGridRecord]
 
-	int[] 												voltageLimits									= LithiumBatteryValues.getVoltageLimits(); 			// voltage limits for LiXx cells, initial LiPo
+	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			// voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										// each main tickmark //$NON-NLS-1$		
 	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
@@ -2026,7 +2026,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setVoltageLimits() {
 		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-		this.voltageLimits = LithiumBatteryValues.getVoltageLimits();
+		this.voltageLimits = CellVoltageValues.getVoltageLimits();
 	}
 
 	/**

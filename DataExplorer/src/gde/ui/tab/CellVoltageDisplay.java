@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.utils.LithiumBatteryValues;
+import osde.utils.CellVoltageValues;
 
 /**
  * Child display class displaying cell voltage display
@@ -87,7 +87,7 @@ public class CellVoltageDisplay extends Composite {
 		mainCompositeLayout.marginHeight = 0;
 		mainCompositeLayout.marginWidth = 0;
 		this.setLayout(mainCompositeLayout);
-		int[] voltageLimits = LithiumBatteryValues.getVoltageLimits();
+		int[] voltageLimits = CellVoltageValues.getVoltageLimits();
 		this.upperLimitVoltage = voltageLimits[0];
 		this.upperLimitColorRed = voltageLimits[1];
 		this.lowerLimitColorGreen = voltageLimits[2];
