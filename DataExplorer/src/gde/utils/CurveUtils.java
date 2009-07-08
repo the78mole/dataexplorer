@@ -92,9 +92,9 @@ public class CurveUtils {
 			}
 
 			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling alogorithm
-				double[] roundValues = round(yMinValueDisplay, yMaxValueDisplay);
-				yMinValueDisplay = roundValues[0]; // min
-				yMaxValueDisplay = roundValues[1]; // max
+				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
+				yMaxValueDisplay = yMaxValueDisplay > 0 ? MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay) : MathUtils.roundDown(yMaxValueDisplay, deltaValueDisplay); // max
+				yMinValueDisplay = yMinValueDisplay > 0 ? MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay) : MathUtils.roundUp(yMinValueDisplay, deltaValueDisplay); // min
 				if (isRaw) {
 					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 					yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
@@ -128,7 +128,7 @@ public class CurveUtils {
 		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int ticklength = 5;
 		int gap = 10;
-		int miniticks = 3;
+		int miniticks = 4;
 
 		// prepare axis position
 		gc.setLineWidth(1);
@@ -240,132 +240,5 @@ public class CurveUtils {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
 		}
 		log.log(Level.FINEST, sb.toString());
-	}
-
-	/**
-	 * adapted rounding  
-	 * - a small number needs different rounding compared to a big number 0.05 -> 0.1, 529 -> 550
-	 * - a small value delta needs different rounding compared to a big delta 10 -> +-1, 200 +-10 
-	 * @param minValue
-	 * @param maxValue 
-	 * @return double array roundMinValue, roundMaxValue 
-	 */
-	public static double[] round(double minValue, double maxValue) {
-		double[] outValues = { 0.0, 0.0 };
-
-		if (minValue != 0) {
-			if (minValue < 0) {
-				if (minValue > -1)
-					outValues[0] = minValue - (0.1 + (minValue - 0.1) % 0.1);
-				else if (minValue > -2.5)
-					outValues[0] = minValue - (0.25 + (minValue - 0.25) % 0.25);
-				else if (minValue > -5)
-					outValues[0] = minValue - (0.5 + (minValue - 0.5) % 0.5);
-				else if (minValue > -10)
-					outValues[0] = (int) (minValue - 1);
-				else if (minValue < -50)
-					outValues[0] = minValue - (10 + (minValue % 10));
-				else
-					outValues[0] = minValue - (5 + (minValue % 5));
-			}
-			else {// minValue > 0 
-				if (minValue < 1)
-					outValues[0] = minValue - (0.1 + (minValue - 0.1) % 0.1);
-				else if (minValue < 2.5)
-					outValues[0] = minValue - (0.25 + (minValue - 0.25) % 0.25);
-				else if (minValue < 5)
-					outValues[0] = minValue - (0.5 + (minValue - 0.5) % 0.5);
-				else if (minValue < 10)
-					outValues[0] = (int) (minValue - 1);
-				else if (minValue < 50)
-					outValues[0] = minValue - (minValue % 10);
-				else
-					outValues[0] = minValue - (minValue % 5);
-			}
-		}
-
-		if (maxValue != 0) {
-			if (maxValue < 0) {
-				if (maxValue > -1)
-					outValues[1] = maxValue + (0.1 - (maxValue - 0.1) % 0.1);
-				else if (maxValue > -2.5)
-					outValues[1] = maxValue + (0.25 - (maxValue - 0.25) % 0.25);
-				else if (maxValue > -5)
-					outValues[1] = maxValue + (0.5 - (maxValue - 0.5) % 0.5);
-				else if (maxValue > -10)
-					outValues[1] = (int) (maxValue + 1);
-				else if (maxValue > -50)
-					outValues[1] = maxValue + 5 - (maxValue % 5);
-				else
-					outValues[1] = maxValue + 10 - (maxValue % 10);
-			}
-			else {
-				if (maxValue < 1)
-					outValues[1] = maxValue + (0.1 - (((maxValue + 0.1) * 10) % 1) / 10);
-				else if (maxValue < 2.5)
-					outValues[1] = maxValue + (0.25 - (maxValue + 0.25) % 0.25);
-				else if (maxValue < 5)
-					outValues[1] = maxValue + (0.5 - (maxValue + 0.5) % 0.5);
-				else if (maxValue < 10)
-					outValues[1] = (int) (maxValue + 1);
-				else if (maxValue > 50)
-					outValues[1] = maxValue + 10 - (maxValue % 10);
-				else
-					outValues[1] = maxValue + 5 - (maxValue % 5);
-			}
-		}
-
-		// enable scale value 0.0  -- algorithm must fit scale tick mark calculation DrawUtile.drawVerticalTickMarks
-		if (minValue < 0 && maxValue > 0) {
-			double deltaScale = outValues[1] - outValues[0];
-			if (deltaScale <= 1) {
-				//numberTicks = new Double(deltaScale * 20 / 1).intValue();
-				outValues[0] = outValues[0] - (outValues[0] % 0.1 == 0 ? 0 : (0.1 + outValues[0] % 0.1));
-				outValues[1] = outValues[1] + (outValues[1] % 0.1 == 0 ? 0 : (0.1 - outValues[1] % 0.1));
-			}
-			else if (deltaScale <= 2) {
-				//numberTicks = (int)(deltaScale) * 10 / 1;
-				outValues[0] = outValues[0] - (outValues[0] % 0.25 == 0 ? 0 : (0.25 + outValues[0] % 0.25));
-				outValues[1] = outValues[1] + (outValues[1] % 0.25 == 0 ? 0 : (0.25 - outValues[1] % 0.25));
-			}
-			else if (deltaScale <= 5) {
-				//numberTicks = (int)(deltaScale) * 5 / 1;
-				outValues[0] = outValues[0] - (outValues[0] % 0.5 == 0 ? 0 : (0.5 + outValues[0] % 0.5));
-				outValues[1] = outValues[1] + (outValues[1] % 0.5 == 0 ? 0 : (0.5 - outValues[1] % 0.5));
-			}
-			else if (deltaScale <= 10) {
-				//numberTicks = (int)deltaScale;
-				outValues[0] = outValues[0] - (outValues[0] % 1 == 0 ? 0 : (1 + outValues[0] % 1));
-				outValues[1] = outValues[1] + (outValues[1] % 1 == 0 ? 0 : (1 - outValues[1] % 1));
-			}
-			else if (deltaScale <= 25) {
-				//numberTicks = (int)deltaScale;
-				outValues[0] = outValues[0] - (outValues[0] % 1.5 == 0 ? 0 : (1.5 + outValues[0] % 1.5));
-				outValues[1] = outValues[1] + (outValues[1] % 1.5 == 0 ? 0 : (1.5 - outValues[1] % 1.5));
-			}
-			else if (deltaScale <= 50) {
-				//numberTicks = (int)deltaScale;
-				outValues[0] = outValues[0] - (outValues[0] % 2.5 == 0 ? 0 : (2.5 + outValues[0] % 2.5));
-				outValues[1] = outValues[1] + (outValues[1] % 2.5 == 0 ? 0 : (2.5 - outValues[1] % 2.5));
-			}
-			else if (deltaScale <= 100) {
-				//numberTicks = (int)(deltaScale / 5);
-				outValues[0] = outValues[0] - (outValues[0] % 5 == 0 ? 0 : (5 + outValues[0] % 5));
-				outValues[1] = outValues[1] + (outValues[1] % 5 == 0 ? 0 : (5 - outValues[1] % 5));
-			}
-			else if (deltaScale <= 300) {
-				//numberTicks = (int)(deltaScale / 20);
-				outValues[0] = outValues[0] - (outValues[0] % 10 == 0 ? 0 : (10 + outValues[0] % 10));
-				outValues[1] = outValues[1] + (outValues[1] % 10 == 0 ? 0 : (10 - outValues[1] % 10));
-			}
-			else { // > 300
-				outValues[0] = outValues[0] - (outValues[0] % 20 == 0 ? 0 : (20 + outValues[0] % 20));
-				outValues[1] = outValues[1] + (outValues[1] % 20 == 0 ? 0 : (20 - outValues[1] % 20));
-			}
-			log.log(Level.FINER, "reminder = " +  (outValues[1] - outValues[0]) % 20);
-		}
-
-		log.log(Level.FINE, minValue + " --> " + outValues[0] + " " + maxValue + " --> " + outValues[1]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return outValues;
 	}
 }

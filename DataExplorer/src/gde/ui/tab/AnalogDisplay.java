@@ -39,8 +39,8 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.utils.CurveUtils;
 import osde.utils.GraphicsUtils;
+import osde.utils.MathUtils;
 
 /**
  * Child display class displaying analog active measurements
@@ -134,9 +134,9 @@ public class AnalogDisplay extends Composite {
 			// get min max values and check if this has been changed
 			double tmpMinValue = this.device.translateValue(this.record, this.record.getMinValue() / 1000.0);
 			double tmpMaxValue = this.device.translateValue(this.record, this.record.getMaxValue() / 1000.0);
-			double[] roundValues = CurveUtils.round(tmpMinValue, tmpMaxValue);
-			tmpMinValue = roundValues[0]; // min
-			tmpMaxValue = roundValues[1]; // max
+			double deltaScale = tmpMaxValue - tmpMinValue;
+			tmpMinValue = this.minValue > 0 ? MathUtils.roundUp(this.minValue, deltaScale) : MathUtils.roundDown(this.minValue, deltaScale);
+			tmpMaxValue = this.maxValue > 0 ? MathUtils.roundDown(this.maxValue, deltaScale) : MathUtils.roundUp(this.maxValue, deltaScale);
 			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
 				this.minValue = tmpMinValue;
 				this.maxValue = tmpMaxValue;

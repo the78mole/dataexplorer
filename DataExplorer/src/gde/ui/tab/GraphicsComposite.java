@@ -392,7 +392,7 @@ public class GraphicsComposite extends Composite {
 		int x0; // enable a small gap if no axis is shown
 		int width; // make the time width  the width for the curves
 		int y0;
-		int height; // make modulo 20
+		int height; // make modulo 10
 		// draw x coordinate	- time scale
 		int startTimeFormated, endTimeFormated;
 		// Calculate the horizontal area to used for plotting graphs
@@ -518,9 +518,15 @@ public class GraphicsComposite extends Composite {
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
-		//curveAreaGC.setLineStyle(recordSet.getHorizontalGridLineStyle());
+		
+		boolean isStartValueDefined = true, isEnValueDefined = true;
+		Record gridRecord = recordSet.get(recordSet.getHorizontalGridRecordName());
+		if (gridRecord != null) {
+			isStartValueDefined = gridRecord.isRoundOut() || gridRecord.isStartEndDefined() || gridRecord.isStartpointZero();
+			isEnValueDefined = gridRecord.isRoundOut() || gridRecord.isStartEndDefined();
+		}
 		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i = 0; i < horizontalGridVector.size() - 1; i += recordSet.getHorizontalGridType()) {
+		for (int i=(isStartValueDefined?1:0); i<(isEnValueDefined?horizontalGridVector.size()-1:horizontalGridVector.size()); i+=recordSet.getHorizontalGridType()) {
 			int y = horizontalGridVector.get(i);
 			gc.drawLine(0, y - useOffSetY, width - 1, y - useOffSetY);
 		}

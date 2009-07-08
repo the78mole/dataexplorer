@@ -49,132 +49,193 @@ public class GraphicsUtils {
 	 * @param y0 start point in y horizontal direction
 	 * @param x0 start point in x vertical direction
 	 * @param height in points where the ticks should be drawn
-	 * @param startNumber the number where the scale should start to count
-	 * @param endNumber the number where the scale should start to count, endNumber - startNumber -> number of ticks drawn
+	 * @param minValue the number where the scale should start to count
+	 * @param maxValue the number where the scale should start to count, endNumber - startNumber -> number of ticks drawn
 	 * @param ticklength of the main ticks
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 * @param isPositionLeft position of to be drawn scale
 	 * @param df - decimal format
 	 */
-	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double startNumber, double endNumber, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
+	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
-		// enable scale value 0.0  -- algorithm must round algorithm
-		double heightAdaptation = height / 350.0;
-		int numberTicks = new Double(10 * heightAdaptation).intValue();
+		int yTop = y0-height;
+		double heightAdaptation = height / 60.0;
+		int numberTicks = new Double(heightAdaptation).intValue(); 
+		int maxNumberTicks = height / 20;
+		double deltaScale = (maxValue - minValue);
+		double minScaleValue, maxScaleValue;
+		if (record.isRoundOut() || record.isStartEndDefined()) {
+			minScaleValue = minValue;
+			maxScaleValue = maxValue;
+		}
+		else {
+			minScaleValue = minValue > 0 ? MathUtils.roundUp(minValue, deltaScale) : MathUtils.roundDown(minValue, deltaScale);
+			maxScaleValue = maxValue > 0 ? MathUtils.roundDown(maxValue, deltaScale) : MathUtils.roundUp(maxValue, deltaScale);
+		}
+		double deltaScaleValue = (maxScaleValue - minScaleValue);
+		double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
+		log.log(Level.INFO, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
 		
-		// check for zero scale value
-		double deltaScale = (endNumber - startNumber);
-		if (startNumber < 0 && endNumber > 0) {
-			if (deltaScale <= 0.1) {
-				numberTicks = new Double(deltaScale * 100 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.01, height);
-			}
-			else if (deltaScale <= 0.5) {
-				numberTicks = new Double(deltaScale * 50 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.05, height);
-			}
-			else if (deltaScale <= 1) {
-				numberTicks = new Double(deltaScale * 20 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.1, height);
-			}
-			else if (deltaScale <= 2) {
-				numberTicks = new Double(deltaScale * 10 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.25, height);
-			}
-			else if (deltaScale <= 5) {
-				numberTicks = new Double(deltaScale * 5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 0.5, height);
-			}
-			else if (deltaScale <= 10) {
-				numberTicks = new Double(deltaScale * 2 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1, height);
-			}
-			else if (deltaScale <= 25) {
-				numberTicks = new Double(deltaScale * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 1.5, height);
-			}
-			else if (deltaScale <= 50) {
-				numberTicks = new Double(deltaScale/2.5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 2.5, height);
-			}
-			else if (deltaScale <= 100) {
-				numberTicks = new Double(deltaScale / 5 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 5, height);
-			}
-			else if (deltaScale <= 300) {
-				numberTicks = new Double(deltaScale / 10 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 10, height);
-			}
-			else {
-				numberTicks = new Double(deltaScale / 20 * heightAdaptation).intValue();
-				numberTicks = fineTuneScaleToMeetZero(numberTicks, deltaScale, 20, height);
+//		log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+		
+		if (deltaScale <= 0.01) {
+			while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.005 > 0.01) {
+				deltaMainTickValue = deltaScaleValue / numberTicks;
+				log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+				++numberTicks;
 			}
 		}
-		log.log(Level.FINE, record.getName() + " numberTicks = " + numberTicks); //$NON-NLS-1$
+		else if (deltaScale <= 0.1) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.025 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 0.5) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.05 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 1) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.05 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 2) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.1 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 5) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.1 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 10) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.5 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 25) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 1 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 50) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.5 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 100) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 300) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01 ) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else if (deltaScale <= 600) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+			else {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
+					deltaMainTickValue = deltaScaleValue / numberTicks;
+					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					++numberTicks;
+				}
+			}
+//		log.log(Level.FINE, record.getName() + " numberTicks = " + numberTicks); //$NON-NLS-1$
 		
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
 		RecordSet recordSet = record.getParent();
 		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordName().equals(record.getName());
 		
-		int dist = 10;
-		double deltaValue = deltaScale / numberTicks;
-		double deltaTick = 1.0 * height / numberTicks;
-		miniticks++;
-
 		if (record.getNumberScaleTicks() != numberTicks) {
 			record.setNumberScaleTicks(numberTicks);
 			int cleanwidth = 35; //ticklength + gap + dist;
 			if (isPositionLeft) 
-				gc.fillRectangle(x0 - cleanwidth, y0-height, cleanwidth, height);
+				gc.fillRectangle(x0 - cleanwidth, yTop, cleanwidth, height);
 			else
-				gc.fillRectangle(x0+1, y0-height, cleanwidth, height);
+				gc.fillRectangle(x0+1, yTop, cleanwidth, height);
 		}
 
+		int dist = 10;
 		if (!isPositionLeft) {
 			ticklength = ticklength * -1; // mirror drawing direction 
 			gap = gap * -1;
 			dist = dist * -1;
 		}
-		for (int i = 0; i <= numberTicks; i++) {
+		
+		deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
+		log.log(Level.INFO, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
+		double deltaMainTickPixel = deltaScaleValue * height / deltaScale / numberTicks; //1.0 * height / numberTicks;
+		miniticks = 5;
+//		while (miniticks >= 3 && (((deltaValue/miniticks) * Math.pow(10, df.getMaximumFractionDigits()+1)+0.01) % 1) > 0.1) {
+//			--miniticks;
+//		}
+		double deltaPosMini = deltaMainTickPixel / miniticks;
+
+		//draw mini ticks below first main tick
+		int yTickPositionMin = new Double(y0 - (Math.abs(minScaleValue - minValue) * height / deltaScale)).intValue(); //new Double(y0 - i * deltaMainTickPixel).intValue();
+		for (int j = 1; j < miniticks; j++) {
+			int yPosMini = yTickPositionMin + (int)(j * deltaPosMini);
+			if (yPosMini > y0) break;
+			log.log(Level.FINEST, "yTickPosition=" + yTickPositionMin + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+			gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
+		}
+		// draw main ticks and mini ticks
+		for (int i=0; i <= numberTicks; i++) {
 			//draw the main scale, length = 5 and gap to scale = 2
-			int yPosition = new Double(y0 - i * deltaTick).intValue();
-			gc.drawLine(x0, yPosition, x0 - ticklength, yPosition);
-			if (i != 0 && isBuildGridVector) horizontalGrid.add(yPosition);
+			int yTickPosition = new Double(yTickPositionMin - i * deltaMainTickPixel).intValue();
+			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
+			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 			//draw the sub scale according number of miniTicks
-			double deltaPosMini = deltaTick / miniticks;
 			for (int j = 1; j < miniticks && i < numberTicks; j++) {
-				int yPosMini = yPosition - (int)(j * deltaPosMini);
-				log.log(Level.FINEST, "yPosition=" + yPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+				int yPosMini = yTickPosition - (int)(j * deltaPosMini);
+				log.log(Level.FINEST, "yTickPosition=" + yTickPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	
-			drawText(df.format(startNumber + i * deltaValue), x0 - ticklength - gap - dist, yPosition, gc, SWT.HORIZONTAL);
+			drawText(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+		}
+		//draw mini ticks above first main tick
+		int yTickPositionMax = new Double(yTickPositionMin - numberTicks * deltaMainTickPixel).intValue();
+		for (int j = 1; j < miniticks; j++) {
+			int yPosMini = yTickPositionMax - (int)(j * deltaPosMini);
+			if (yPosMini < yTop) break;
+			log.log(Level.FINEST, "yTickPosition=" + yTickPositionMax + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+			gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 		}
 		if (isBuildGridVector) {
 			recordSet.setHorizontalGrid(horizontalGrid);
 		}
-	}
-
-	/**
-	 * adjust the number of tick marks to enable the mark at 0.0 
-	 * @param numberTicks
-	 * @param deltaScale
-	 * @return
-	 */
-	private static int fineTuneScaleToMeetZero(int numberTicks, double deltaScale, double modValue, int height) {
-		/* 700 / 32 = 20 pixel minumum between main tick marks */
-		int modTicks = new Double(deltaScale / modValue).intValue();
-		
-		if (height / modTicks > 30)
-			numberTicks = modTicks * 2;
-		else if (height / modTicks < 15)
-			numberTicks = modTicks / 2;
-		else 
-			numberTicks = modTicks;
-
-		return numberTicks>2 ? numberTicks : 2;
 	}
 
 	/**
