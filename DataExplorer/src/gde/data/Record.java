@@ -734,11 +734,13 @@ public class Record extends Vector<Integer> {
 	}
 	
 	void setMinMaxValueTriggered() {
-		for (TriggerRange range : this.triggerRanges) {
-			for (int i = range.in; i < range.out; i++) {
-				int point = this.realGet(i);
-				if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-				if (point < this.minValueTriggered) this.minValueTriggered = point;
+		if (this.triggerRanges != null) {
+			for (TriggerRange range : this.triggerRanges) {
+				for (int i = range.in; i < range.out; i++) {
+					int point = this.realGet(i);
+					if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+					if (point < this.minValueTriggered) this.minValueTriggered = point;
+				}
 			}
 		}
 	}

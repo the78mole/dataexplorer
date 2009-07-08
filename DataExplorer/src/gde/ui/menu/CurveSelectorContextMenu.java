@@ -892,7 +892,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -912,7 +912,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordNameKey);
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -1064,7 +1064,7 @@ public class CurveSelectorContextMenu {
 								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
 								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
 								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-								compareSet.setHorizontalGridRecordKey(newRecordkey);
+								compareSet.setHorizontalGridRecordKey(compareSet.getRecord(newRecordkey).getOrdinal());
 							}
 							int maxRecordSize = compareSet.getMaxSize();
 							for (String recordKey : compareSet.keySet()) {

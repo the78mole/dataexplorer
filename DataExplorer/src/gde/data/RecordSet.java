@@ -137,7 +137,7 @@ public class RecordSet extends HashMap<String, Record> {
 	Vector<Integer>								horizontalGrid								= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
 	Color													horizontalGridColor						= OpenSerialDataExplorer.COLOR_GREY;
 	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
-	String												horizontalGridRecordKey				= OSDE.STRING_DASH;															// recordNames[horizontalGridRecord]
+	int														horizontalGridRecordOrdinal		= -1;																						// recordNames[horizontalGridRecord]
 
 	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			// voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										// each main tickmark //$NON-NLS-1$		
@@ -299,7 +299,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
 		this.horizontalGridColor = recordSet.horizontalGridColor;
 		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
-		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
+		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 	}
@@ -375,7 +375,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
 		this.horizontalGridColor = recordSet.horizontalGridColor;
 		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
-		this.horizontalGridRecordKey = recordSet.horizontalGridRecordKey;
+		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 		
@@ -1459,26 +1459,21 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the horizontalGridRecord
 	 */
 	public String getHorizontalGridRecordName() {
-		return this.horizontalGridRecordKey;
+		return this.horizontalGridRecordOrdinal == -1 ? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+	}
+
+	/**
+	 * @return the horizontalGridRecord ordinal
+	 */
+	public int getHorizontalGridRecordOrdinal() {
+		return this.horizontalGridRecordOrdinal;
 	}
 
 	/**
 	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
 	 */
 	public void setHorizontalGridRecordKey(int newHorizontalGridRecordOrdinal) {
-		for (String recordKey : this.recordNames) {
-			if (this.get(recordKey).ordinal == newHorizontalGridRecordOrdinal) {
-				this.horizontalGridRecordKey = recordKey;
-				break;
-			}
-		}
-	}
-
-	/**
-	 * @param newHorizontalGridRecordName of the horizontal grid record name to set
-	 */
-	public void setHorizontalGridRecordKey(String newHorizontalGridRecordName) {
-		this.horizontalGridRecordKey = newHorizontalGridRecordName;
+		this.horizontalGridRecordOrdinal = newHorizontalGridRecordOrdinal;
 	}
 
 	/**
@@ -1595,7 +1590,7 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(
 				this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
-		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.get(this.horizontalGridRecordKey)!= null ? this.get(this.horizontalGridRecordKey).ordinal : -1).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.horizontalGridRecordOrdinal).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
@@ -1630,16 +1625,24 @@ public class RecordSet extends HashMap<String, Record> {
 				this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(OSDE.STRING_COMMA)[2]));
 
+			// begin depreciated
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridRecordKey = tmpValue.trim();
+			if (tmpValue != null && tmpValue.length() > 0) {
+				for (String recordKey : this.recordNames) {
+					if (recordKey.equals(tmpValue)) {
+						this.horizontalGridRecordOrdinal = this.getRecord(recordKey).ordinal;
+						break;
+					}
+				}
+			}
+			// end depreciated
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				try {
-					int index = new Integer(tmpValue.trim());
-					this.horizontalGridRecordKey = (index >= 0 && index < this.recordNames.length) ? this.recordNames[new Integer(tmpValue.trim())] : ""; //$NON-NLS-1$
+					this.horizontalGridRecordOrdinal = new Integer(tmpValue.trim());
 				}
 				catch (Exception e) {
-					this.horizontalGridRecordKey = ""; //$NON-NLS-1$
+					this.horizontalGridRecordOrdinal = -1; 
 				}
 			}
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
