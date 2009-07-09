@@ -437,28 +437,11 @@ public class CurveSelectorContextMenu {
 						boolean isRounded = CurveSelectorContextMenu.this.actualRecord.isRoundOut();
 						boolean isStart0 = CurveSelectorContextMenu.this.actualRecord.isStartpointZero();
 						boolean isManual = CurveSelectorContextMenu.this.actualRecord.isStartEndDefined();
-						CurveSelectorContextMenu.this.axisEndAuto.setSelection(true);
-						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
-						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
-						CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
-						if (isManual) {
-							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
-							CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
-							CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
-							CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
-						}
-						if (isStart0) {
-							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
-							//axisEndRound.setSelection(false);
-							CurveSelectorContextMenu.this.axisStarts0.setSelection(true);
-							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
-						}
-						if (isRounded) {
-							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
-							CurveSelectorContextMenu.this.axisEndRound.setSelection(true);
-							//axisStarts0.setSelection(false);
-							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
-						}
+						boolean isAuto = !isRounded && !isManual;
+						CurveSelectorContextMenu.this.axisEndAuto.setSelection(isAuto);
+						CurveSelectorContextMenu.this.axisEndRound.setSelection(isRounded);
+						CurveSelectorContextMenu.this.axisStarts0.setSelection(isStart0);
+						CurveSelectorContextMenu.this.axisEndManual.setSelection(isManual);
 					}
 				}
 
@@ -474,7 +457,6 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisEndAuto.SelectionListener = " + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
-						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
 						CurveSelectorContextMenu.this.actualRecord.setStartpointZero(false);
 						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
 						CurveSelectorContextMenu.this.actualRecord.setRoundOut(false);
@@ -517,13 +499,11 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisStarts0 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						if (CurveSelectorContextMenu.this.axisStarts0.getSelection()) { // true
-							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartpointZero(true);
 							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartEndDefined(false, 0, 0);
 						}
 						else { // false
-							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartpointZero(false);
 							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartEndDefined(false, 0, 0);
