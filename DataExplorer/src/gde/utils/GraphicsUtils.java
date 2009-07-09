@@ -60,10 +60,10 @@ public class GraphicsUtils {
 	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
 		int yTop = y0-height;
-		double heightAdaptation = height / 60.0;
-		int numberTicks = new Double(heightAdaptation).intValue(); 
+		int numberTicks = height / 60; // initial start value 
 		int maxNumberTicks = height / 20;
 		double deltaScale = (maxValue - minValue);
+		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
 		if (record.isRoundOut() || record.isStartEndDefined()) {
 			minScaleValue = minValue;
@@ -72,105 +72,108 @@ public class GraphicsUtils {
 		else {
 			minScaleValue = minValue > 0 ? MathUtils.roundUp(minValue, deltaScale) : MathUtils.roundDown(minValue, deltaScale);
 			maxScaleValue = maxValue > 0 ? MathUtils.roundDown(maxValue, deltaScale) : MathUtils.roundUp(maxValue, deltaScale);
+			deltaScaleValue = (maxScaleValue - minScaleValue);
+			int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
+			int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
+			int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale-deltaScaleValue));
+			if (maxTickRound < maxNumberTicks) 
+				maxNumberTicks = maxTickRound; 
 		}
-		double deltaScaleValue = (maxScaleValue - minScaleValue);
-		double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
+		double deltaMainTickValue = deltaScaleValue / numberTicks; 
 		log.log(Level.INFO, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
 		
-//		log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-		
-		if (deltaScale <= 0.01) {
+		if (deltaScaleValue <= 0.01) {
 			while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.005 > 0.01) {
 				deltaMainTickValue = deltaScaleValue / numberTicks;
-				log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+				log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 				++numberTicks;
 			}
 		}
-		else if (deltaScale <= 0.1) {
+		else if (deltaScaleValue <= 0.1) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.025 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 0.5) {
+			else if (deltaScaleValue <= 0.5) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.05 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 1) {
+			else if (deltaScaleValue <= 1) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.05 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 2) {
+			else if (deltaScaleValue <= 2) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.1 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 5) {
+			else if (deltaScaleValue <= 5) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.1 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 10) {
+			else if (deltaScaleValue <= 10) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.5 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 25) {
+			else if (deltaScaleValue <= 25) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 1 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 50) {
+			else if (deltaScaleValue <= 50) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 0.5 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 100) {
+			else if (deltaScaleValue <= 100) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 300) {
+			else if (deltaScaleValue <= 300) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01 ) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-			else if (deltaScale <= 600) {
+			else if (deltaScaleValue <= 600) {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
 			else {
 				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks) % 5 > 0.01) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
+					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
 			}
-//		log.log(Level.FINE, record.getName() + " numberTicks = " + numberTicks); //$NON-NLS-1$
+			log.log(Level.INFO, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 		
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
