@@ -482,8 +482,8 @@ public class CellVoltageWindow {
 					int index = record.getName().length();
 					//log.log(Level.FINER, "record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
-					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a propperty to flag as single cell voltage
-						if (record.getLast() > 0) { // last value is current value
+					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a property to flag as single cell voltage
+						if (record.getLast() >= 0) { // last value is current value
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
 							cellCount++;
