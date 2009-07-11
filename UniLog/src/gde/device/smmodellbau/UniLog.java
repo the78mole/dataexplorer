@@ -301,7 +301,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				}
 			}
-			recordSet.addPoints(convertDataBytes(points, readBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, readBuffer));
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
@@ -451,7 +451,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			points[12] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
 			points[13] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
 			
-			recordSet.addPoints(points, false);
+			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}

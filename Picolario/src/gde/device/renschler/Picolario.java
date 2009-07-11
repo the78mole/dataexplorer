@@ -150,7 +150,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	
 		for (int i = 0; i < recordDataSize; i++) { 
 			System.arraycopy(dataBuffer, offset + i*size, convertBuffer, 0, deviceDataBufferSize);
-			recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -199,7 +199,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			
-			recordSet.addPoints(points, false);
+			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}

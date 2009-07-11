@@ -39,7 +39,7 @@ public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 
-	OpenSerialDataExplorer		application;
+	final OpenSerialDataExplorer		application;
 	final EStationSerialPort	serialPort;
 	final eStation						device;
 	final EStationDialog			dialog;
@@ -50,8 +50,8 @@ public class GathererThread extends Thread {
 	final String							configKey;
 	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
-	boolean										isSwitchedRecordSet					= false;
 	boolean										isGatheredRecordSetVisible	= true;
+	int 											numberBatteryCells 					= 0; 
 
 	final static int					WAIT_TIME_RETRYS						= 36;
 	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;														// 36 * 5 sec timeout = 180 sec
@@ -92,7 +92,6 @@ public class GathererThread extends Thread {
 
 		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.configKey).length];
-		int numberBatteryCells = 0; // only if battery type is Lithium* single cell voltages will be available
 		int waitTime_ms = 0; // dry time
 		boolean isProgrammExecuting = false;
 		boolean isConfigUpdated = false;
@@ -179,32 +178,38 @@ public class GathererThread extends Thread {
 					}
 
 					// prepare the data for adding to record set
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), false);
+					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+					
 					int posCells = this.device.getName().endsWith("BC6") ? 6 : 8; //$NON-NLS-1$
-					numberBatteryCells = 0; //this.device.getNumberOfLithiumXCells(dataBuffer);
+					this.numberBatteryCells = 0; //this.device.getNumberOfLithiumXCells(dataBuffer);
 					String[] recordKeys = recordSet.getRecordNames();
 					for (int i = posCells; i < recordSet.size(); i++) {
 						Record record = recordSet.get(recordKeys[i]);
 						if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
-							numberBatteryCells++;
+							this.numberBatteryCells++;
 							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
-					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
-					if (this.isGatheredRecordSetVisible) {
-						this.application.updateGraphicsWindow();
-						this.application.updateStatisticsData();
-						//this.application.updateDataTable(this.recordSetKey);
-						this.application.updateDigitalWindowChilds();
-						this.application.updateAnalogWindowChilds();
 
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "numberBatteryCells = " + numberBatteryCells); //$NON-NLS-1$
-						if (numberBatteryCells > 0) {
-							this.application.updateCellVoltageChilds();
-						}
+					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								GathererThread.this.application.updateGraphicsWindow();
+								GathererThread.this.application.updateStatisticsData();
+								//GathererThread.this.application.updateDataTable(this.recordSetKey);
+								GathererThread.this.application.updateDigitalWindowChilds();
+								GathererThread.this.application.updateAnalogWindowChilds();
+								log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
+								if (GathererThread.this.numberBatteryCells > 0) {
+									GathererThread.this.application.updateCellVoltageChilds();
+								}
+							}
+						});
 					}
-					//switch off single cell voltage lines if not battery type of lithium where cell voltages are available
-					for (int i = posCells + numberBatteryCells; !isConfigUpdated && i < points.length; i++) {
+					
+					//switch off single cell voltage lines if no cell voltages is available
+					for (int i = posCells + this.numberBatteryCells; !isConfigUpdated && i < points.length; i++) {
 						recordSet.get(recordKeys[i]).setActive(false);
 						recordSet.get(recordKeys[i]).setDisplayable(false);
 						recordSet.get(recordKeys[i]).setVisible(false);
@@ -316,7 +321,6 @@ public class GathererThread extends Thread {
 			tmpRecordSet.setTableDisplayable(true); // enable table display after calculation
 			this.device.updateVisibilityStatus(tmpRecordSet);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
-			//this.channel.applyTemplate(newRecordSetKey);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey);
 		}

@@ -175,14 +175,19 @@ public class GathererThread extends Thread {
 						old_unit = m_unit;
 					}
 					// prepare the data for adding to record set
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), false);
-					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
-					if (this.isGatheredRecordSetVisible) {
-						this.application.updateGraphicsWindow();
-						this.application.updateStatisticsData();
-						//this.application.updateDataTable(this.recordSetKey);
-						this.application.updateDigitalWindowChilds();
-						this.application.updateAnalogWindowChilds();
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+
+					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+							public void run() {
+								GathererThread.this.application.updateGraphicsWindow();
+								GathererThread.this.application.updateStatisticsData();
+								GathererThread.this.application.updateDataTable(GathererThread.this.recordSetKey);
+								GathererThread.this.application.updateDigitalWindowChilds();
+								GathererThread.this.application.updateAnalogWindowChilds();
+								//GathererThread.this.application.updateCellVoltageChilds();
+							}
+						});
 					}
 					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}

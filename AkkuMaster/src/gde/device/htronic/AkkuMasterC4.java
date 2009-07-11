@@ -158,7 +158,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 
 			System.arraycopy(dataBuffer,  4 + i*lovDataSize, convertDataBuffer,  0, 14); //configurationBuffer.length
 			System.arraycopy(dataBuffer, 23 + i*lovDataSize, convertDataBuffer, 14, 16); //measurementsBuffer.length
-			recordSet.addPoints(convertDataBytes(points, convertDataBuffer), false);
+			recordSet.addPoints(convertDataBytes(points, convertDataBuffer));
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
@@ -224,7 +224,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			points[4] = new Double((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
 			log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			
-			recordSet.addPoints(points, false);
+			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}

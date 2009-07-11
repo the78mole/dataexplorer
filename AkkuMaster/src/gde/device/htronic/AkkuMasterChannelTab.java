@@ -582,14 +582,19 @@ public class AkkuMasterChannelTab {
 														points[4] = new Integer((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
 														log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-														AkkuMasterChannelTab.this.isGatheredRecordSetVisible = AkkuMasterChannelTab.this.recordSetKey.equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getActiveRecordSet().getName());						
-														if (AkkuMasterChannelTab.this.isGatheredRecordSetVisible) {
-															AkkuMasterChannelTab.this.recordSet.addPoints(points, false); // updates data table and digital windows
-															AkkuMasterChannelTab.this.application.updateGraphicsWindow();
-															AkkuMasterChannelTab.this.application.updateStatisticsData();
-															AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey);
-															AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
-															AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
+														AkkuMasterChannelTab.this.recordSet.addPoints(points); 
+														
+														if (AkkuMasterChannelTab.this.recordSet.isChildOfActiveChannel() && AkkuMasterChannelTab.this.recordSet.equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getActiveRecordSet())) {
+															OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+																public void run() {
+																	AkkuMasterChannelTab.this.application.updateGraphicsWindow();
+																	AkkuMasterChannelTab.this.application.updateStatisticsData();
+																	AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey);
+																	AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
+																	AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
+																	//AkkuMasterChannelTab.this.application.updateCellVoltageChilds();
+																}
+															});
 														}
 													}
 													else {

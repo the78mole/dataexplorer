@@ -162,7 +162,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 			for (int i = 0; i < recordDataSize; i++) {
 				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
@@ -176,7 +176,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
 				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
 				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer), false);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 				offset += lovDataSize;
 				
 				StringBuilder sb = new StringBuilder();
@@ -380,7 +380,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				points[j+8] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
 			}
 			
-			recordSet.addPoints(points, false);
+			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}

@@ -305,7 +305,7 @@ public class CSVReaderWriter {
 						points[i] = new Double(new Double(data)*1000).intValue();
 					}
 					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points);
-					else 				recordSet.addPoints(points, false);
+					else 				recordSet.addPoints(points);
 				}
 
 				// set time base in msec

@@ -94,7 +94,7 @@ public class DataGathererThread extends Thread {
 				for (byte[] reveivedBuffer : data) { // 31 or x*3 + 1
 					for (int i = 0; i < reveivedBuffer.length/3; ++i) {  // three bytes per datapoint
 						System.arraycopy(reveivedBuffer, i*3, dataBuffer, 0, 3);
-						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), false);
+						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 					}
 				}
 				

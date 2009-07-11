@@ -423,7 +423,7 @@ public class SimulatorDialog extends DeviceDialog {
 											points[0] = iterV.next().intValue();//Spannung 
 											points[1] = iterA.next().intValue();//Strom 
 											log.log(Level.FINE, String.format("Spannung = %d mV, Strom = %d mA", points[0], points[1])); //$NON-NLS-1$
-											recordSet.addPoints(points, false);
+											recordSet.addPoints(points);
 										}
 
 										SimulatorDialog.this.application.updateGraphicsWindow();

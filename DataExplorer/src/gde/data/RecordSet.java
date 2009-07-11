@@ -426,7 +426,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param doUpdate to manage display update
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addPoints(int[] points, boolean doUpdate) throws DataInconsitsentException {
+	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
@@ -451,20 +451,6 @@ public class RecordSet extends HashMap<String, Record> {
 					sb.append(points[i]).append(OSDE.STRING_BLANK);
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
-			}
-			if (doUpdate) {
-				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-					OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-						public void run() {
-							RecordSet.this.application.updateGraphicsWindow();
-							RecordSet.this.application.updateStatisticsData();
-							//RecordSet.this.application.updateDataTable(this.recordSetKey);
-							RecordSet.this.application.updateDigitalWindowChilds();
-							RecordSet.this.application.updateAnalogWindowChilds();
-							RecordSet.this.application.updateCellVoltageChilds();
-						}
-					});
-				}
 			}
 		}
 		else
@@ -843,7 +829,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * check if this record set is one of the just active channel in UI
 	 */
-	private boolean isChildOfActiveChannel() {
+	public boolean isChildOfActiveChannel() {
 		boolean isChild = false;
 		//Channels channels = Channels.getInstance();
 		RecordSet uiRecordSet = this.channels.getActiveChannel().get(this.name);
