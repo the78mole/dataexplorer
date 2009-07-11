@@ -582,8 +582,12 @@ public class GraphicsComposite extends Composite {
 	 */
 	synchronized void doRedrawGraphics() {
 		this.recordSetHeader.redraw();
-		this.graphicCanvas.redraw(10,10,10,10,true); // image based - let OS handle the update
-		//this.graphicCanvas.redraw(); // do full update
+		
+		if (OSDE.IS_WINDOWS)
+			this.graphicCanvas.redraw(10,10,10,10,true); // image based - let OS handle the update
+		else
+			this.graphicCanvas.redraw(); // do full update
+		
 		this.recordSetComment.redraw();
 	}
 
