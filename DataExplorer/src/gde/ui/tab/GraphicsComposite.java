@@ -178,31 +178,6 @@ public class GraphicsComposite extends Composite {
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_9.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
-//		this.addPaintListener(new PaintListener() {
-//			public void paintControl(PaintEvent evt) {
-//				log.log(Level.FINER, "graphicComposite.paintControl, event=" + evt); //$NON-NLS-1$
-//				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-//					if (recordSet != null && (GraphicsComposite.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsComposite.this.oldRecordSetHeader))) {
-//						GraphicsComposite.this.recordSetHeader.setText(recordSet.getHeader());
-//						GraphicsComposite.this.oldRecordSetHeader = recordSet.getHeader();
-//					}
-//				}
-//
-//				drawAreaPaintControl(evt);
-//
-//				GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-//
-//				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-//					if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
-//						GraphicsComposite.this.recordSetComment.setText(recordSet.getRecordSetDescription());
-//						GraphicsComposite.this.oldRecordSetComment = recordSet.getRecordSetDescription();
-//					}
-//				}
-//			}
-//		});
-
 		{
 			this.recordSetHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
 			this.recordSetHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
@@ -509,8 +484,12 @@ public class GraphicsComposite extends Composite {
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
-			if (isActualRecordEnabled) 
+			if (isActualRecordEnabled) {
+				//gc.drawRectangle(x0, y0-height, width, height);
+				gc.setClipping(x0, y0-height, width, height);
 				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				gc.setClipping(this.canvasBounds);
+			}
 		}
 
 		// draw start time for zoom mode or scope mode
@@ -518,6 +497,7 @@ public class GraphicsComposite extends Composite {
 			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
+			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 			log.log(Level.FINER, strStartTime);
 		}
