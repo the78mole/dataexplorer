@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
+import osde.OSDE;
 import osde.data.Record;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
@@ -33,8 +34,7 @@ import osde.ui.OpenSerialDataExplorer;
  * @author Winfried Brügmann
  */
 public class CurveUtils {
-	private static Logger				log			= Logger.getLogger(CurveUtils.class.getName());
-	private static final String	lineSep	= System.getProperty("line.separator"); //$NON-NLS-1$
+	private static Logger			log								= Logger.getLogger(CurveUtils.class.getName());
 
 	/**
 	 * draws the data graph scale using gives rectangle for display
@@ -217,7 +217,7 @@ public class CurveUtils {
 		try {
 			// calculate start point of the curve, which is the first oldPoint
 			oldPoint = record.getDisplayPoint(0, 0, x0, y0);
-			if (log.isLoggable(Level.FINEST)) sb.append(CurveUtils.lineSep).append(oldPoint.toString());
+			if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
@@ -228,7 +228,7 @@ public class CurveUtils {
 			for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j+xScale) {
 				// get the point to be drawn
 				newPoint = record.getDisplayPoint(i, j, x0, y0);
-				if (log.isLoggable(Level.FINEST)) sb.append(CurveUtils.lineSep).append(newPoint.toString());
+				if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
 
 				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 

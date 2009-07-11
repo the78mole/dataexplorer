@@ -92,7 +92,8 @@ public class GraphicsComposite extends Composite {
 	// update graphics only area required
 	RecordSet											oldActiveRecordSet	= null;
 	int 													oldChangeCounter = 0;
-	HashMap<String, Integer>			scaleTicks = new HashMap<String, Integer>();
+	HashMap<String, Integer>			leftSideScales = new HashMap<String, Integer>();
+	HashMap<String, Integer>			rightSideScales = new HashMap<String, Integer>();
 	int 													oldScopeLevel = 0;
 	boolean												oldZoomLevel = false;
 
@@ -173,6 +174,30 @@ public class GraphicsComposite extends Composite {
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 				else
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_9.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
+		this.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent evt) {
+				log.log(Level.FINER, "graphicComposite.paintControl, event=" + evt); //$NON-NLS-1$
+				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
+					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordSet != null && (GraphicsComposite.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsComposite.this.oldRecordSetHeader))) {
+						GraphicsComposite.this.recordSetHeader.setText(recordSet.getHeader());
+						GraphicsComposite.this.oldRecordSetHeader = recordSet.getHeader();
+					}
+				}
+
+				drawAreaPaintControl(evt);
+
+				GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+
+				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
+					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
+						GraphicsComposite.this.recordSetComment.setText(recordSet.getRecordSetDescription());
+						GraphicsComposite.this.oldRecordSetComment = recordSet.getRecordSetDescription();
+					}
+				}
 			}
 		});
 
@@ -291,10 +316,10 @@ public class GraphicsComposite extends Composite {
 	synchronized void drawAreaPaintControl(PaintEvent evt) {
 		log.log(Level.FINER, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		// Get the canvas and its dimensions
-		Canvas canvas = (Canvas) evt.widget;
-		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+		//Canvas canvas = (Canvas) evt.widget;
+		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 
-		Point canvasSize = canvas.getSize();
+		Point canvasSize = this.graphicCanvas.getSize();
 		int maxX = canvasSize.x - 5; // enable a small gap if no axis is shown 
 		int maxY = canvasSize.y;
 		log.log(Level.FINER, "canvas size = " + maxX + " x " + maxY); //$NON-NLS-1$ //$NON-NLS-2$
@@ -436,7 +461,7 @@ public class GraphicsComposite extends Composite {
 		this.curveAreaGC.fillRectangle(this.curveArea.getBounds());
 
 		// draw draw area bounding 
-		if(System.getProperty("os.name").toLowerCase().startsWith("windows"))  //$NON-NLS-1$ //$NON-NLS-2$
+		if(OSDE.IS_WINDOWS)  
 			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 		else
 			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_GREY);
@@ -569,83 +594,9 @@ public class GraphicsComposite extends Composite {
 	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
-		if (Channels.getInstance().getActiveChannel() != null && this.windowType == GraphicsWindow.TYPE_NORMAL && !OSDE.IS_LINUX) { // Linux GTK has different update algorithm use always full update
-			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-			if (activeRecordSet != null) {
-				boolean isFullUpdateRequired = false;
-				if (this.oldActiveRecordSet != null && !this.oldActiveRecordSet.getName().equals(activeRecordSet.getName())) {
-					this.scaleTicks = new HashMap<String, Integer>();
-					isFullUpdateRequired = true;
-					this.oldActiveRecordSet = activeRecordSet;
-				}
-				else if (this.oldScopeLevel != this.application.getMenuToolBar().getScopeModeLevelValue()) {
-					log.log(Level.FINER, "scope level changed to " + this.application.getMenuToolBar().getScopeModeLevelValue());
-					isFullUpdateRequired = true;
-					this.oldScopeLevel = this.application.getMenuToolBar().getScopeModeLevelValue();
-				}
-				else if (this.oldZoomLevel != activeRecordSet.isZoomMode()) {
-					log.log(Level.FINER, "zoom mode changed");
-					isFullUpdateRequired = true;
-					this.oldZoomLevel = activeRecordSet.isZoomMode();
-				}
-				else if (this.oldChangeCounter != activeRecordSet.getChangeCounter()) {
-					log.log(Level.FINE, "change counter = " + activeRecordSet.getChangeCounter());
-					isFullUpdateRequired = true;
-					this.oldChangeCounter = activeRecordSet.getChangeCounter();
-				}
-				else {
-					for (String recordKey : activeRecordSet.getVisibleRecordNames()) {
-						Record record = activeRecordSet.get(recordKey);
-						int numberScaleTicks = record.getNumberScaleTicks();
-						int oldNumberScaleTicks = this.scaleTicks.get(recordKey) == null ? 0 : this.scaleTicks.get(recordKey);
-						if (oldNumberScaleTicks == 0 || oldNumberScaleTicks != numberScaleTicks) {
-							this.scaleTicks.remove(recordKey);
-							this.scaleTicks.put(recordKey, numberScaleTicks);
-							isFullUpdateRequired = true;
-							log.log(Level.FINER, "scale ticks changed " + oldNumberScaleTicks + " != " + numberScaleTicks);
-						}
-					}
-				}
-				if (isFullUpdateRequired) {
-					log.log(Level.FINE, "redrawing full " + this.graphicCanvas.getClientArea());
-					this.recordSetHeader.redraw();
-					this.graphicCanvas.redraw();
-					this.recordSetComment.redraw();
-				}
-				else {
-					Rectangle curveBounds = activeRecordSet.getDrawAreaBounds();
-					if (curveBounds != null) {
-						int margin = 10;
-						int timeCaptionHeight = 25;
-						int timeCaptionWidth = 200;
-						int timeCaptionY = curveBounds.y + curveBounds.height + timeCaptionHeight;
-						int timeCaptionX = curveBounds.x + ((curveBounds.width - timeCaptionWidth)/2);
-						//curve area
-						//this.graphicCanvas.redraw(curveBounds.x, curveBounds.y, curveBounds.width, curveBounds.height, true); // damage a small area of image only -> redraw complete image ??
-						// time scale
-						this.graphicCanvas.redraw(curveBounds.x-margin, curveBounds.y+curveBounds.height+1, curveBounds.x+curveBounds.width+margin+7, timeCaptionHeight, true);
-						// time caption
-						this.graphicCanvas.redraw(timeCaptionX, timeCaptionY, timeCaptionWidth, timeCaptionHeight, true);
-					}
-					else {
-						log.log(Level.FINER, "redrawing full curveBounds == null");
-						this.graphicCanvas.redraw();
-					}
-				}
-			}
-			else { // enable clear
-				log.log(Level.FINER, "recordSet == null");
-				this.recordSetHeader.redraw();
-				this.graphicCanvas.redraw();
-				this.recordSetComment.redraw();
-			}
-		}
-		else { // enable clear
-			log.log(Level.FINER, "channel == null");
-			this.recordSetHeader.redraw();
-			this.graphicCanvas.redraw();
-			this.recordSetComment.redraw();
-		}
+		this.recordSetHeader.redraw();
+		this.graphicCanvas.redraw();
+		this.recordSetComment.redraw();
 	}
 
 	/**

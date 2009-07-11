@@ -454,9 +454,16 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 			if (doUpdate) {
 				if (isChildOfActiveChannel() && this.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-					this.application.updateGraphicsWindow();
-					this.application.updateDigitalWindowChilds();
-					this.application.updateAnalogWindowChilds();
+					OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+						public void run() {
+							RecordSet.this.application.updateGraphicsWindow();
+							RecordSet.this.application.updateStatisticsData();
+							//RecordSet.this.application.updateDataTable(this.recordSetKey);
+							RecordSet.this.application.updateDigitalWindowChilds();
+							RecordSet.this.application.updateAnalogWindowChilds();
+							RecordSet.this.application.updateCellVoltageChilds();
+						}
+					});
 				}
 			}
 		}
