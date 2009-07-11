@@ -73,6 +73,7 @@ public class GraphicsComposite extends Composite {
 	public final static int				MODE_SCOPE							= 8;
 
 	final	OpenSerialDataExplorer	application 						= OpenSerialDataExplorer.getInstance();
+	final Settings								settings								= Settings.getInstance();
 	final Channels								channels								= Channels.getInstance();
 	final TimeLine								timeLine								= new TimeLine();
 	final SashForm								graphicSashForm;
@@ -109,11 +110,12 @@ public class GraphicsComposite extends Composite {
 	int														rightLast								= 0;
 	int														bottomLast							= 0;
 	int														offSetX, offSetY;
-	Image													curveArea;
-	GC														curveAreaGC;
-	Rectangle											curveAreaBounds;
+	Rectangle 										canvasBounds;
+	Image													canvasImage;
+	GC														canvasImageGC;
 	GC														canvasGC;
-
+	Rectangle											curveAreaBounds					= new Rectangle(0,0,1,1);
+	
 	boolean												isLeftMouseMeasure			= false;
 	boolean												isRightMouseMeasure			= false;
 	int														xPosMeasure							= 0, yPosMeasure = 0;
@@ -176,30 +178,30 @@ public class GraphicsComposite extends Composite {
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_9.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
-		this.addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent evt) {
-				log.log(Level.FINER, "graphicComposite.paintControl, event=" + evt); //$NON-NLS-1$
-				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordSet != null && (GraphicsComposite.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsComposite.this.oldRecordSetHeader))) {
-						GraphicsComposite.this.recordSetHeader.setText(recordSet.getHeader());
-						GraphicsComposite.this.oldRecordSetHeader = recordSet.getHeader();
-					}
-				}
-
-				drawAreaPaintControl(evt);
-
-				GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-
-				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
-						GraphicsComposite.this.recordSetComment.setText(recordSet.getRecordSetDescription());
-						GraphicsComposite.this.oldRecordSetComment = recordSet.getRecordSetDescription();
-					}
-				}
-			}
-		});
+//		this.addPaintListener(new PaintListener() {
+//			public void paintControl(PaintEvent evt) {
+//				log.log(Level.FINER, "graphicComposite.paintControl, event=" + evt); //$NON-NLS-1$
+//				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
+//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+//					if (recordSet != null && (GraphicsComposite.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsComposite.this.oldRecordSetHeader))) {
+//						GraphicsComposite.this.recordSetHeader.setText(recordSet.getHeader());
+//						GraphicsComposite.this.oldRecordSetHeader = recordSet.getHeader();
+//					}
+//				}
+//
+//				drawAreaPaintControl(evt);
+//
+//				GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+//
+//				if (GraphicsComposite.this.channels.getActiveChannel() != null) {
+//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+//					if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
+//						GraphicsComposite.this.recordSetComment.setText(recordSet.getRecordSetDescription());
+//						GraphicsComposite.this.oldRecordSetComment = recordSet.getRecordSetDescription();
+//					}
+//				}
+//			}
+//		});
 
 		{
 			this.recordSetHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
@@ -268,7 +270,7 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINEST, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 
@@ -316,31 +318,36 @@ public class GraphicsComposite extends Composite {
 	synchronized void drawAreaPaintControl(PaintEvent evt) {
 		log.log(Level.FINER, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		// Get the canvas and its dimensions
-		//Canvas canvas = (Canvas) evt.widget;
+		this.canvasBounds = this.graphicCanvas.getClientArea();
+		log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
+		
+		this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
+		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
+		this.canvasImageGC.setBackground(this.graphicCanvas.getBackground());
+		this.canvasImageGC.fillRectangle(this.canvasBounds);
+		this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		//get gc for other drawing operations
 		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
-
-		Point canvasSize = this.graphicCanvas.getSize();
-		int maxX = canvasSize.x - 5; // enable a small gap if no axis is shown 
-		int maxY = canvasSize.y;
-		log.log(Level.FINER, "canvas size = " + maxX + " x " + maxY); //$NON-NLS-1$ //$NON-NLS-2$
 
 		RecordSet recordSet = null;
 		switch (this.windowType) {
-		case GraphicsWindow.TYPE_COMPARE:
-			if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
-				recordSet = this.application.getCompareSet();
-			}
-			break;
-
-		default: // TYPE_NORMAL
-			if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
-				recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-			}
-			break;
+			case GraphicsWindow.TYPE_COMPARE:
+				if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
+					recordSet = this.application.getCompareSet();
+				}
+				break;
+	
+			default: // TYPE_NORMAL
+				if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
+					recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+				}
+				break;
 		}
 		if (recordSet != null) {
 			// draw curves
-			drawCurves(recordSet, maxX, maxY);
+			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
+			this.canvasGC.drawImage(this.canvasImage, 0,0);
+			
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(GraphicsComposite.MODE_MEASURE, true);
 			}
@@ -355,11 +362,12 @@ public class GraphicsComposite extends Composite {
 
 	/**
 	 * method to draw the curves with it scales and defines the curve area
-	 * @param recordSet
-	 * @param maxX
-	 * @param maxY
+	 * @param recordSet the record set to be drawn
+	 * @param bounds the bounds where the curves and scales are drawn
+	 * @param gc the graphics context to be used for the graphics operations
 	 */
-	private void drawCurves(RecordSet recordSet, int maxX, int maxY) {
+	private void drawCurves(RecordSet recordSet, Rectangle bounds, GC gc) {
+		// prime the record set regarding scope mode and/or zoom mode
 		if (this.isScopeMode) {
 			int offset = recordSet.get(recordSet.getFirstRecordName()).realSize() - recordSet.getRecordZoomSize();
 			if (offset < 1) {
@@ -371,12 +379,14 @@ public class GraphicsComposite extends Composite {
 				recordSet.setScopeMode(true);
 			}
 		}
+		
+		//prepare time scale
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
 
-		//prepare measurement scales
+		//calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
 		for (String recordKey : recordSet.getRecordNames()) {
@@ -389,7 +399,7 @@ public class GraphicsComposite extends Composite {
 					numberCurvesRight++;
 			}
 		}
-		// correct scales and scale position according synced scales requirements
+		//correct scales and scale position according synced scales requirements
 		if (recordSet.isSyncableSynced()) {
 			for (String recordKey : recordSet.getSyncableRecords()) {
 				Record tmpRecord = recordSet.getRecord(recordKey);
@@ -406,76 +416,68 @@ public class GraphicsComposite extends Composite {
 			else
 				numberCurvesRight++;
 		}
-		// correct scales and scale position according compare set requirements
+		//correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
 			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
 			numberCurvesRight = numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
 		log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
-		int dataScaleWidth; // space used for text and scales with description or legend
-		int x0; // enable a small gap if no axis is shown
-		int width; // make the time width  the width for the curves
-		int y0;
-		int height; // make modulo 10
-		// draw x coordinate	- time scale
+		//calculate the bounds left for the curves
+		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
+		int x0, y0; // the lower left corner of the curve area
+		int xMax, yMax; // the upper right corner of the curve area
+		int width; // x coordinate width	- time scale
+		int height; // y coordinate - make modulo 10 ??
 		int startTimeFormated, endTimeFormated;
-		// Calculate the horizontal area to used for plotting graphs
-		this.canvasGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
+		
+		// calculate the horizontal space width to be used for the scales
+		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int horizontalGap = pt.x/5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
+		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
-		x0 = maxX - (maxX - spaceLeft) + 5;
-		int xMax = maxX - spaceRight;
+		
+		// calculate the horizontal area available for plotting graphs
+		x0 = spaceLeft + 5;// enable a small gap if no axis is shown
+		xMax = bounds.width - spaceRight - 5;
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
-		xMax = x0 + width;
-		int verticalSpace = 3 * pt.y;// space used for time scale text and scales with description or legend
-		int spaceTop = 20;
-		int spaceBot = verticalSpace;
-		y0 = maxY - spaceBot;
-		int yMax = maxY - (maxY - spaceTop);
-		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
-		yMax = y0 - height;		
-		log.log(Level.FINE, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		// draw curves for each active record
-		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
-		log.log(Level.FINE, "curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		
+		// calculate the vertical area available for plotting graphs
+		int gapTop = 20; // free gap on top of the curves
+		int gapBot = 3 * pt.y; // space used for time scale text and scales with description or legend;
+		y0 = bounds.height - gapBot;
+		yMax = gapTop;
+		height = y0 - yMax <= 11 ? 11 : y0 - yMax;
+		//yMax = y0 - height;	// recalculate due to modulo 10
+		log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
+		// draw curves for each active record
+		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
+		recordSet.setDrawAreaBounds(this.curveAreaBounds);
+		log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+
+		//draw the time scale
 		int detaTime_ms = new Double(recordSet.getTimeStep_ms() * (recordSet.getRecordDataSize(false) - 1)).intValue();		
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + detaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
-
-		// get the image and prepare GC
-		this.curveArea = SWTResourceManager.getImage(width, height);
-		this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
-		this.curveAreaBounds = getCurveAreaBounds();
-
-		// clear the image
-		this.curveAreaGC.setBackground(this.canvasGC.getBackground());
-		this.curveAreaGC.fillRectangle(this.curveArea.getBounds());
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		if(OSDE.IS_WINDOWS)  
-			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+			gc.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 		else
-			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_GREY);
-		this.curveAreaGC.drawLine(0, 0, width, 0);
-		this.curveAreaGC.drawLine(0, 0, 0, height - 1);
-		this.curveAreaGC.drawLine(width - 1, 0, width - 1, height - 1);
-
-		// prepare grid lines
-		this.offSetX = x0;
-		this.offSetY = y0 - height;
-		int[] dash = Settings.getInstance().getGridDashStyle();
+			gc.setForeground(OpenSerialDataExplorer.COLOR_GREY);
+		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
+		gc.drawLine(x0-1, yMax-1, x0-1, y0-1); 
+		gc.drawLine(xMax+1, yMax-1, xMax+1, y0-1);
 
 		// check for activated time grid
-		if (recordSet.getTimeGridType() > 0) drawTimeGrid(recordSet, this.curveAreaGC, this.offSetX, height, dash);
+		if (recordSet.getTimeGridType() > 0) 
+			drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
@@ -492,68 +494,53 @@ public class GraphicsComposite extends Composite {
 
 		//draw the scale for all synchronized records
 		if (recordSet.isSyncableSynced()) {
-			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), this.canvasGC, x0, y0, width, height, dataScaleWidth);
+			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), gc, x0, y0, width, height, dataScaleWidth);
 			recordSet.updateSyncedScaleValues();
 		}
+		
 		// draw each record using sorted record set names
 		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
-				CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);
+				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
-				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, dash);
+				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) 
-				CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
 		}
 
-		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
-
-		if (startTimeFormated != 0) { // scaled window 
+		// draw start time for zoom mode or scope mode
+		if (startTimeFormated != 0) { 
 			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
-			Point point = this.canvasGC.textExtent(strStartTime);
+			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
-			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y / 2);
+			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 			log.log(Level.FINER, strStartTime);
 		}
-	}
-
-	/**
-	 * get the bound rectangle of the curve area
-	 */
-	public Rectangle getCurveAreaBounds() {
-		Rectangle rect = this.curveArea.getBounds();
-		log.log(Level.FINER, "curveAreaBounds = " + rect);
-		return rect;
 	}
 
 	/**
 	 * draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale 
 	 * @param recordSet
 	 * @param gc the graphics context to be used
-	 * @param useOffsetY the offset in vertical direction
-	 * @param width
-	 * @param dash to be used for the custom line style
+	 * @param bounds
+	 * @param dashLineStyle to be used for the custom line style
 	 */
-	private void drawCurveGrid(RecordSet recordSet, GC gc, int useOffSetY, int width, int[] dash) {
+	private void drawCurveGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dashLineStyle) {
 		gc.setLineWidth(1);
-		gc.setLineDash(dash);
+		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
 		
-		boolean isStartValueDefined = true, isEnValueDefined = true;
-		Record gridRecord = recordSet.get(recordSet.getHorizontalGridRecordName());
-		if (gridRecord != null) {
-			isStartValueDefined = gridRecord.isRoundOut() || gridRecord.isStartEndDefined() || gridRecord.isStartpointZero();
-			isEnValueDefined = gridRecord.isRoundOut() || gridRecord.isStartEndDefined();
-		}
 		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i=(isStartValueDefined?1:0); i<(isEnValueDefined?horizontalGridVector.size()-1:horizontalGridVector.size()); i+=recordSet.getHorizontalGridType()) {
+		for (int i=0; i<horizontalGridVector.size(); i+=recordSet.getHorizontalGridType()) {
 			int y = horizontalGridVector.get(i);
-			gc.drawLine(0, y - useOffSetY, width - 1, y - useOffSetY);
+			if (y > bounds.y && y < (bounds.y+bounds.height))
+				gc.drawLine(bounds.x, y, bounds.x+bounds.width, y);
 		}
 	}
 
@@ -561,16 +548,16 @@ public class GraphicsComposite extends Composite {
 	 * draw vertical (time) grid lines according the vector defined during drawing of time scale
 	 * @param recordSet
 	 * @param gc the graphics context to be used
-	 * @param height
-	 * @param dash to be used for the custom line style
+	 * @param bounds
+	 * @param dashLineStyle to be used for the custom line style
 	 */
-	public void drawTimeGrid(RecordSet recordSet, GC gc, int useOffSetX, int height, int[] dash) {
+	public void drawTimeGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dashLineStyle) {
 		gc.setLineWidth(1);
-		gc.setLineDash(dash);
+		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getColorTimeGrid());
 		for (Integer x : recordSet.getTimeGrid()) {
-			gc.drawLine(x - useOffSetX, 0, x - useOffSetX, height - 1);
+			gc.drawLine(x, bounds.y, x, bounds.y+bounds.height);
 		}
 	}
 
@@ -595,7 +582,8 @@ public class GraphicsComposite extends Composite {
 	 */
 	synchronized void doRedrawGraphics() {
 		this.recordSetHeader.redraw();
-		this.graphicCanvas.redraw();
+		this.graphicCanvas.redraw(10,10,10,10,true); // image based - let OS handle the update
+		//this.graphicCanvas.redraw(); // do full update
 		this.recordSetComment.redraw();
 	}
 
@@ -703,7 +691,7 @@ public class GraphicsComposite extends Composite {
 	 * @param lineWidth
 	 */
 	void eraseVerticalLine(int posFromLeft, int posFromTop, int length, int lineWidth) {
-		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
+		this.canvasGC.drawImage(this.canvasImage, posFromLeft, posFromTop, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
 	}
 
 	/**
@@ -714,7 +702,7 @@ public class GraphicsComposite extends Composite {
 	 * @param lineWidth
 	 */
 	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
-		this.canvasGC.drawImage(this.curveArea, posFromLeft, posFromTop, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+		this.canvasGC.drawImage(this.canvasImage, posFromLeft, posFromTop, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 	}
 
 	/**
@@ -745,7 +733,7 @@ public class GraphicsComposite extends Composite {
 		
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
 			log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			this.canvasGC.drawImage(this.curveArea, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
 		}
 		
 		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
@@ -764,7 +752,7 @@ public class GraphicsComposite extends Composite {
 	 */
 	void eraseConnectingLine(int left, int top, int width, int height) {
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
-			this.canvasGC.drawImage(this.curveArea, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
 		}
 	}
 
@@ -968,7 +956,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
-			if (recordSet != null && this.curveArea != null) {
+			if (recordSet != null && this.canvasImage != null) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
@@ -1115,11 +1103,11 @@ public class GraphicsComposite extends Composite {
 						else if (this.isLeftCutMode) { 
 							// clear old cut area
 							if (evt.x < this.xPosCut) {
-								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
+								this.canvasGC.drawImage(this.canvasImage, evt.x, 0, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
 										this.curveAreaBounds.height);
 							}
 							else { // evt.x > this.xPosCut
-								this.canvasGC.drawImage(this.curveArea, this.xPosCut, 0, evt.x - this.xPosCut, this.curveAreaBounds.height, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut,
+								this.canvasGC.drawImage(this.canvasImage, this.xPosCut, 0, evt.x - this.xPosCut, this.curveAreaBounds.height, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut,
 										this.curveAreaBounds.height);
 								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 								this.canvasGC.fillRectangle(this.xPosCut + this.offSetX, 0 + this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height);
@@ -1132,11 +1120,11 @@ public class GraphicsComposite extends Composite {
 						else if (this.isRightCutMode) {
 							// clear old cut lines
 							if (evt.x > this.xPosCut) {
-								this.canvasGC.drawImage(this.curveArea, this.xPosCut, 0, evt.x - this.xPosCut, this.curveAreaBounds.height, this.offSetX + this.xPosCut, this.offSetY, evt.x - this.xPosCut,
+								this.canvasGC.drawImage(this.canvasImage, this.xPosCut, 0, evt.x - this.xPosCut, this.curveAreaBounds.height, this.offSetX + this.xPosCut, this.offSetY, evt.x - this.xPosCut,
 										this.curveAreaBounds.height);
 							}
 							else { // evt.x < this.xPosCut
-								this.canvasGC.drawImage(this.curveArea, evt.x, 0, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
+								this.canvasGC.drawImage(this.canvasImage, evt.x, 0, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
 										this.curveAreaBounds.height);
 								this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 								this.canvasGC.fillRectangle(evt.x + this.offSetX, 0 + this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
@@ -1187,7 +1175,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
-			if (this.curveArea != null && recordSet != null) {
+			if (this.canvasImage != null && recordSet != null) {
 				String measureRecordKey = recordSet.getRecordKeyMeasurement();
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xDown = point.x;
@@ -1218,7 +1206,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
-			if (this.curveArea != null && recordSet != null) {
+			if (this.canvasImage != null && recordSet != null) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xUp = point.x;
 				this.yUp = point.y;
@@ -1280,7 +1268,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
-			if (this.curveArea != null && recordSet != null) {
+			if (this.canvasImage != null && recordSet != null) {
 				// 
 				if (recordSet.isCutLeftEdgeEnabled()) {
 					this.application.getMenuToolBar().enableCutButtons(true, false);
@@ -1344,24 +1332,27 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * 
+	 * resize the three areas: header, curve, comment
 	 */
 	void setComponentBounds() {
 		Rectangle graphicsBounds = this.getClientArea();
 		//this.application.setGraphicsSashFormWeights(this.graphicSashForm.getSize().x - graphicsBounds.width);
 		int x = 0;
 		int y = this.headerGap;
-		int width = graphicsBounds.width-1;
+		int width = graphicsBounds.width;
 		int height = this.headerHeight;
 		this.recordSetHeader.setBounds(x, y, width, height);
+		log.log(Level.FINER, "recordSetHeader.setBounds " + this.recordSetHeader.getBounds());
 		
 		y = this.headerGap + this.headerHeight;
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
 		this.graphicCanvas.setBounds(x, y, width, height);
+		log.log(Level.FINER, "graphicCanvas.setBounds " + this.graphicCanvas.getBounds());
 		
 		y =  this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width-20, height);
+		log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
 	}
 
 }

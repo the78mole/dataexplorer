@@ -125,7 +125,7 @@ public class TimeLine {
 	 * @param deltaTime_ms the difference in ms between start and end time
 	 * @param color
 	 */
-	public synchronized void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int deltaTime_ms, Color color) {
+	public void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int deltaTime_ms, Color color) {
 		if (this.isTimeLinePrepared == false) {
 			log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first"); //$NON-NLS-1$
 			return;
@@ -135,7 +135,7 @@ public class TimeLine {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
-		gc.drawLine(x0, y0, x0 + width, y0);
+		gc.drawLine(x0, y0, x0+width+1, y0);
 		log.log(Level.FINER, String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, timeFormat)); //$NON-NLS-1$
 
 		Point pt = gc.textExtent(TimeLine.timeLineText);
@@ -287,7 +287,8 @@ public class TimeLine {
 				//draw the main scale ticks, length = 5 and gap to scale = 2
 				double xTickPosition = x0 + i * deltaTick;
 				int intXTickPosition = new Double(xTickPosition).intValue();
-				if (i != 0 && isBuildGridVector) timeGrid.add(intXTickPosition);
+				if (i > 0 && isBuildGridVector) 
+					timeGrid.add(intXTickPosition);
 				gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
 
 				//draw the sub ticks to the scale according number of miniTicks
@@ -310,7 +311,7 @@ public class TimeLine {
 					double timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
 					log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue60 = " + timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
 					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
-					if (isMod60 && timeValue != 0) {
+					if (isMod60 && timeValue > 0.0) {
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
 						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
 							timeGrid.add(intXTickPosition);

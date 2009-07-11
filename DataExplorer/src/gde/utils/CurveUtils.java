@@ -140,7 +140,7 @@ public class CurveUtils {
 		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
-			gc.drawLine(xPos, y0, xPos, y0 - height); //xPos = x0
+			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
 			log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
@@ -148,8 +148,8 @@ public class CurveUtils {
 			GraphicsUtils.drawText(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 		else {
-			int xPos = x0 + width + positionNumber * scaleWidthSpace;
-			gc.drawLine(xPos, y0, xPos, y0 - height); //yMax
+			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
+			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //yMax
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
