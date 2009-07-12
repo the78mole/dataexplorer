@@ -291,7 +291,7 @@ public class GraphicsComposite extends Composite {
 	 * @param evt
 	 */
 	synchronized void drawAreaPaintControl(PaintEvent evt) {
-		log.log(Level.FINER, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		log.log(Level.FINEST, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
 		log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
@@ -319,7 +319,6 @@ public class GraphicsComposite extends Composite {
 				break;
 		}
 		if (recordSet != null) {
-			// draw curves
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0,0);
 			
@@ -333,6 +332,8 @@ public class GraphicsComposite extends Composite {
 				drawCutPointer(GraphicsComposite.MODE_CUT_RIGHT, false, true);
 			}
 		}
+		else
+			this.canvasGC.drawImage(this.canvasImage, 0,0);			
 	}
 
 	/**
@@ -422,12 +423,15 @@ public class GraphicsComposite extends Composite {
 		
 		// calculate the vertical area available for plotting graphs
 		int gapTop = 20; // free gap on top of the curves
-		int gapBot = 3 * pt.y; // space used for time scale text and scales with description or legend;
-		y0 = bounds.height - gapBot;
+		int gapBot = 3 * pt.y + 3; // space used for time scale text and scales with description or legend;
+		y0 = bounds.height - gapBot + 1;
 		yMax = gapTop;
 		height = y0 - yMax <= 11 ? 11 : y0 - yMax;
 		//yMax = y0 - height;	// recalculate due to modulo 10
 		log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		// set offset values used for mouse measurement pointers
+		this.offSetX = x0;
+		this.offSetY = y0 - height;
 
 		// draw curves for each active record
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
@@ -439,7 +443,7 @@ public class GraphicsComposite extends Composite {
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + detaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		if(OSDE.IS_WINDOWS)  
@@ -447,8 +451,8 @@ public class GraphicsComposite extends Composite {
 		else
 			gc.setForeground(OpenSerialDataExplorer.COLOR_GREY);
 		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
-		gc.drawLine(x0-1, yMax-1, x0-1, y0-1); 
-		gc.drawLine(xMax+1, yMax-1, xMax+1, y0-1);
+		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
+		gc.drawLine(xMax+1, yMax-1, xMax+1, y0);
 
 		// check for activated time grid
 		if (recordSet.getTimeGridType() > 0) 
@@ -485,8 +489,9 @@ public class GraphicsComposite extends Composite {
 				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
+				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				//gc.drawRectangle(x0, y0-height, width, height);
-				gc.setClipping(x0, y0-height, width, height);
+				gc.setClipping(x0-1, y0-height-1, width+2, height+2);
 				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
 				gc.setClipping(this.canvasBounds);
 			}
@@ -563,8 +568,13 @@ public class GraphicsComposite extends Composite {
 	synchronized void doRedrawGraphics() {
 		this.recordSetHeader.redraw();
 		
-		if (OSDE.IS_WINDOWS)
-			this.graphicCanvas.redraw(10,10,10,10,true); // image based - let OS handle the update
+		if (OSDE.IS_WINDOWS) {
+			Point size = this.graphicCanvas.getSize();
+			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
+			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
+			this.graphicCanvas.redraw(5,size.y-5,5,5,true);
+			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
+		}
 		else
 			this.graphicCanvas.redraw(); // do full update
 		
@@ -675,7 +685,7 @@ public class GraphicsComposite extends Composite {
 	 * @param lineWidth
 	 */
 	void eraseVerticalLine(int posFromLeft, int posFromTop, int length, int lineWidth) {
-		this.canvasGC.drawImage(this.canvasImage, posFromLeft, posFromTop, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
+		this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
 	}
 
 	/**
@@ -686,7 +696,7 @@ public class GraphicsComposite extends Composite {
 	 * @param lineWidth
 	 */
 	void eraseHorizontalLine(int posFromTop, int posFromLeft, int length, int lineWidth) {
-		this.canvasGC.drawImage(this.canvasImage, posFromLeft, posFromTop, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+		this.canvasGC.drawImage(this.canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 	}
 
 	/**
@@ -717,7 +727,7 @@ public class GraphicsComposite extends Composite {
 		
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
 			log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+			this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY,  width, height);
 		}
 		
 		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
@@ -920,9 +930,9 @@ public class GraphicsComposite extends Composite {
 		int tmpxPos = xPos - this.offSetX;
 		int tmpyPos = yPos - this.offSetY;
 		int minX = 0;
-		int maxX = this.curveAreaBounds.width - 1;
+		int maxX = this.curveAreaBounds.width;
 		int minY = 0;
-		int maxY = this.curveAreaBounds.height - 1;
+		int maxY = this.curveAreaBounds.height;
 		if (tmpxPos < minX || tmpxPos > maxX) {
 			tmpxPos = tmpxPos < minX ? minX : maxX;
 		}

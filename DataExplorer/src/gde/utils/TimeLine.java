@@ -135,7 +135,7 @@ public class TimeLine {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
-		gc.drawLine(x0, y0, x0+width+1, y0);
+		gc.drawLine(x0-1, y0, x0+width+1, y0);
 		log.log(Level.FINER, String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, timeFormat)); //$NON-NLS-1$
 
 		Point pt = gc.textExtent(TimeLine.timeLineText);
@@ -166,9 +166,6 @@ public class TimeLine {
 	 * @param gap distance between ticks and the number scale
 	 */
 	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, double scaleFactor, int timeFormat, int deltaTime_ms, int ticklength, int miniticks, int gap) {
-		// adapt x0 and width, measurement scales are outside the curve draw area
-		x0 = x0 - 1;
-		width = width + 1;
 		double numberTicks, timeDelta;
 		//int offset = (startTimeValue != 0) ? 10 - startTimeValue % 10 : 0;
 		int timeDeltaValue = endTimeValue - startTimeValue;

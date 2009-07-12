@@ -1047,7 +1047,7 @@ public class Record extends Vector<Integer> {
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
 		returnPoint.x = new Double((xDisplayOffset + (this.getTimeStep_ms() * index) * this.displayScaleFactorTime)).intValue();
-		returnPoint.y = new Double(yDisplayOffset - 1 - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		returnPoint.y = new Double(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}
 
@@ -1063,7 +1063,7 @@ public class Record extends Vector<Integer> {
 		log.log(Level.FINER, "scaledIndex = " + scaledIndex); //$NON-NLS-1$
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
-		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height-1 : pointY;
+		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height : pointY;
 		log.log(Level.FINER, "pointY = " + pointY); //$NON-NLS-1$
 		return pointY;
 	}

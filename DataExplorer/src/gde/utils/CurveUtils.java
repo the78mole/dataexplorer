@@ -206,7 +206,7 @@ public class CurveUtils {
 			factorX = factorX * xScale;
 		}
 		record.setDisplayScaleFactorTime(factorX);
-		record.setDisplayScaleFactorValue(height - 1);
+		record.setDisplayScaleFactorValue(height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		Point newPoint, oldPoint = new Point(0, 0);
