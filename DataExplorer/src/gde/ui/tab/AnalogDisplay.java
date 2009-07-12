@@ -135,8 +135,8 @@ public class AnalogDisplay extends Composite {
 			double tmpMinValue = this.device.translateValue(this.record, this.record.getMinValue() / 1000.0);
 			double tmpMaxValue = this.device.translateValue(this.record, this.record.getMaxValue() / 1000.0);
 			double deltaScale = tmpMaxValue - tmpMinValue;
-			tmpMinValue = this.minValue > 0 ? MathUtils.roundUp(this.minValue, deltaScale) : MathUtils.roundDown(this.minValue, deltaScale);
-			tmpMaxValue = this.maxValue > 0 ? MathUtils.roundDown(this.maxValue, deltaScale) : MathUtils.roundUp(this.maxValue, deltaScale);
+			tmpMinValue = tmpMinValue > 0 ? MathUtils.roundDown(tmpMinValue, deltaScale) : MathUtils.roundUp(tmpMinValue, deltaScale);
+			tmpMaxValue = tmpMaxValue > 0 ? MathUtils.roundUp(tmpMaxValue, deltaScale) : MathUtils.roundDown(tmpMaxValue, deltaScale);
 			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
 				this.minValue = tmpMinValue;
 				this.maxValue = tmpMaxValue;
@@ -159,12 +159,13 @@ public class AnalogDisplay extends Composite {
 			this.textDigitalLabel.setText(recordText);
 			this.centerX = this.width / 2;
 			this.centerY = (int) (this.height * 0.75);
-			int radiusW = (int) (this.width / 2 * 0.80);
+			double radiusW = this.width / 2 * 0.80;
 			//int radiusH = (int) (this.height / 2 * 0.90);
-			int radiusH = this.centerY - this.textHeight - 40;
+			double radiusH = this.height * 0.75 - this.textHeight - 40;
 			//log.log(Level.FINE, "radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
 			//radiusH = radiusH < radiusLimitH ? radiusH : radiusLimitH;
-			this.radius = radiusW < radiusH ? radiusW : radiusH;
+			this.radius = (int)(radiusW < radiusH ? radiusW : radiusH);
+			log.log(Level.FINER, "radius = " + this.radius + " height = " + this.height + " width = " + this.width);
 			this.angleStart = -20;
 			this.angleDelta = 220;
 			this.tachoImageGC.setForeground(this.record.getColor());
@@ -196,7 +197,7 @@ public class AnalogDisplay extends Composite {
 			int knobRradius = (int) (this.radius * 0.1);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
-			knobRradius = (int) (this.radius / 10 * 0.1);
+			knobRradius = (int) (this.radius / 10 * 0.2);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);

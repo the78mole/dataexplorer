@@ -896,7 +896,6 @@ public class MenuBar {
 			//check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(OSDE.DEVICE_NAME);
-			this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 			// check and switch device, if required
 			String activeDeviceName = this.application.getActiveDevice().getName();
 			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
