@@ -60,9 +60,9 @@ public class GraphicsUtils {
 	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
 		int yTop = y0-height;
-		int numberTicks = height / 70 >= 2 ? 5 : 1; // initial start value 
-		int maxNumberTicks = height / 30 >= 2 ? height / 30 : 1;
 		double deltaScale = (maxValue - minValue);
+		int numberTicks = height / 70 >= 2 ? height / 70 : 1; // initial start value 
+		int maxNumberTicks = height / 30 >= 2 ? height / 30 : 1;
 		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
 		if (record.isRoundOut() || record.isStartEndDefined()) {
@@ -97,9 +97,7 @@ public class GraphicsUtils {
 				}
 			}
 			else if (deltaScaleValue <= 1) {
-				while (numberTicks < maxNumberTicks) {
-					double roundDelta = deltaScaleValue / numberTicks * 20;
-					if (roundDelta%1 > 0.25  || roundDelta%1 > 0.1) break;
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 20)%1 > 0.1) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
 					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue + " " + (deltaScaleValue / numberTicks * 20) % 1);
 					++numberTicks;
@@ -129,7 +127,7 @@ public class GraphicsUtils {
 			else if (deltaScaleValue <= 50) {
 				while (numberTicks < maxNumberTicks) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					if (deltaMainTickValue%1 > 0.5 || deltaMainTickValue%1 > 0.2 || deltaMainTickValue%1 > 0.1) break;
+					if (deltaMainTickValue%1 < 0.5 || deltaMainTickValue%1 < 0.2 || deltaMainTickValue%1 < 0.1) break;
 					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
@@ -137,7 +135,7 @@ public class GraphicsUtils {
 			else {
 				while (numberTicks < maxNumberTicks) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
-					if (deltaMainTickValue%5 > 0.5 || deltaMainTickValue%5 > 0.2 || deltaMainTickValue%5 > 0.1) break;
+					if (deltaMainTickValue%5 < 0.5 || deltaMainTickValue%5 < 0.2 || deltaMainTickValue%5 < 0.1) break;
 					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;
 				}
