@@ -70,14 +70,16 @@ public class GraphicsUtils {
 			maxScaleValue = maxValue;
 		}
 		else {
-			minScaleValue = minValue > 0 ? MathUtils.roundUp(minValue, deltaScale) : MathUtils.roundDown(minValue, deltaScale);
-			maxScaleValue = maxValue > 0 ? MathUtils.roundDown(maxValue, deltaScale) : MathUtils.roundUp(maxValue, deltaScale);
+			minScaleValue = minValue > 0 ? MathUtils.roundUpAuto(minValue, deltaScale) : MathUtils.roundDownAuto(minValue, deltaScale);
+			maxScaleValue = maxValue > 0 ? MathUtils.roundDownAuto(maxValue, deltaScale) : MathUtils.roundUpAuto(maxValue, deltaScale);
 			deltaScaleValue = (maxScaleValue - minScaleValue);
 			int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
 			int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
 			int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale-deltaScaleValue));
 			if (maxTickRound < maxNumberTicks) 
-				maxNumberTicks = maxTickRound; 
+				maxNumberTicks = maxTickRound-1; 
+			if (numberTicks > maxNumberTicks)
+				numberTicks = maxNumberTicks;
 		}
 		double deltaMainTickValue = deltaScaleValue / numberTicks; 
 		log.log(Level.FINE, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);

@@ -308,6 +308,142 @@ public class MathUtils {
 		}
 		return roundValue;
 	}
+	
+	/**
+	 * round up given value according value delta value level for auto scale
+	 * round up for a positive value results in a higher value
+	 * round up for a negative value results in a lower value
+	 * @param value
+	 * @param delta
+	 * @return
+	 */
+	public static double roundUpAuto(double value, double delta) {
+		double roundValue = checkRoundReq(value);
+
+		if (value != roundValue) {
+			if (value > 0) {
+				if (delta < 0.25)
+					roundValue = value + (0.01 - value % 0.01);
+				else if (delta < 0.5)
+					roundValue = value + (0.025 - value % 0.025);
+				else if (delta < 1.0)
+					roundValue = value + (0.05 - value % 0.05);
+				else if (delta < 2.5)
+					roundValue = value + (0.1 - value % 0.1);
+				else if (delta < 5)
+					roundValue = value + (0.25 - value % 0.25);
+				else if (delta < 10)
+					roundValue = value + (0.5 - value % 0.5);
+				else if (delta < 25)
+					roundValue = (int) (value + 1);
+				else if (delta < 50)
+					roundValue = value + (2.5 - (value % 2.5));
+				else if (delta < 100)
+					roundValue = value + (5 - value % 5);
+				else if (delta < 500)
+					roundValue = value + (10 - value % 10);
+				else if (delta < 1000)
+					roundValue = value + (50 - value % 50);
+				else  
+					roundValue = value + (100 - value % 100);
+			}
+			else {// value < 0 
+				if (delta < 0.25)
+					roundValue = value - (0.01 + value % 0.01);
+				else if (delta < 0.5)
+					roundValue = value - (0.025 + value % 0.025);
+				else if (delta < 1)
+					roundValue = value - (0.05 + value % 0.05);
+				else if (delta < 2.5)
+					roundValue = value - (0.1 + value % 0.1);
+				else if (delta < 5)
+					roundValue = value - (0.25 + value % 0.25);
+				else if (delta < 10)
+					roundValue = value - (0.5 + value % 0.5);
+				else if (delta < 25)
+					roundValue = (int) (value - 1);
+				else if (delta < 50)
+					roundValue = value - (2.5 + (value % 2.5));
+				else if (delta < 100)
+					roundValue = value - (5 + (value % 5));
+				else if (delta < 500)
+					roundValue = value - (10 + (value % 10));
+				else if (delta < 1000)
+					roundValue = value - (50 + (value % 50));
+				else
+					roundValue = value - (100 + (value % 100));
+			}
+		}
+		return roundValue;
+	}
+	
+	/**
+	 * round down given value according value delta value level for auto scale
+	 * round down for a positive value results in a lower value
+	 * round down for a negative value results in a higher value
+	 * @param value
+	 * @param delta
+	 * @return
+	 */
+	public static double roundDownAuto(double value, double delta) {
+		double roundValue = checkRoundReq(value);
+
+		if (value != roundValue) {
+			if (value > 0) {
+				if (delta < 0.25)
+					roundValue = value - (value % 0.01);
+				else if (delta < 0.5)
+					roundValue = value - (value % 0.025);
+				else if (delta < 1.0)
+					roundValue = value - (value % 0.05);
+				else if (delta < 2.5)
+					roundValue = value - (value % 0.1);
+				else if (delta < 5)
+					roundValue = value - (value % 0.25);
+				else if (delta < 10)
+					roundValue = value - (value % 0.5);
+				else if (delta < 25)
+					roundValue = value - (value % 1);
+				else if (delta < 50)
+					roundValue = value - (value % 2.5);
+				else if (delta < 100)
+					roundValue = value - (value % 5);
+				else if (delta < 500)
+					roundValue = value - (value % 10);
+				else if (delta < 1000)
+					roundValue = value - (value % 50);
+				else  
+					roundValue = value - (value % 100);
+			}
+			else {// value < 0 
+				if (delta < 0.25)
+					roundValue = value - (0.005 + value % 0.01);
+				else if (delta < 0.5)
+					roundValue = value - (0.0125 + value % 0.025);
+				else if (delta < 1.0)
+					roundValue = value - (0.025 + value % 0.05);
+				else if (delta < 2.5)
+					roundValue = value - (0.05 + value % 0.1);
+				else if (delta < 5)
+					roundValue = value - (value % 0.25);
+				else if (delta < 10)
+					roundValue = value - (value % 0.5);
+				else if (delta < 25)
+					roundValue = value - (value % 1);
+				else if (delta < 50)
+					roundValue = value - (value % 2.5);
+				else if (delta < 100)
+					roundValue = value - (value % 5);
+				else if (delta < 500)
+					roundValue = value - (value % 10);
+				else if (delta < 1000)
+					roundValue = value - (value % 50);
+				else
+					roundValue = value - (value % 100);
+			}
+		}
+		return roundValue;
+	}
 
 
 	/**

@@ -408,7 +408,7 @@ public class GraphicsComposite extends Composite {
 		int startTimeFormated, endTimeFormated;
 		
 		// calculate the horizontal space width to be used for the scales
-		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
+		Point pt = gc.textExtent("-000,00"); //$NON-NLS-1$
 		int horizontalGap = pt.x/5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
