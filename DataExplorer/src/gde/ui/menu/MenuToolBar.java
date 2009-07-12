@@ -169,9 +169,9 @@ public class MenuToolBar {
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.STRING_EMPTY);
+									MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
 								else
-									MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0007, activeChannel.getFileName());
+									MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName());
 							}
 						}
 					});
@@ -184,7 +184,7 @@ public class MenuToolBar {
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.getMenuBar().saveOsdFile(MessageIds.OSDE_MSGT0006, OSDE.STRING_EMPTY);
+							MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
 						}
 					});
 				}
