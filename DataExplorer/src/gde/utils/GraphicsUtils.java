@@ -99,7 +99,7 @@ public class GraphicsUtils {
 			else if (deltaScaleValue <= 1) {
 				while (numberTicks < maxNumberTicks) {
 					double roundDelta = deltaScaleValue / numberTicks * 20;
-					if (roundDelta%1 > 0.5 || roundDelta%1 > 0.25  || roundDelta%1 > 0.1) break;
+					if (roundDelta%1 > 0.25  || roundDelta%1 > 0.1) break;
 					deltaMainTickValue = deltaScaleValue / numberTicks;
 					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue + " " + (deltaScaleValue / numberTicks * 20) % 1);
 					++numberTicks;
