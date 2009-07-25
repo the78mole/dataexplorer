@@ -36,6 +36,9 @@ Extensions for the Java runtime RXTXcomm and SWT:
 OpenSerialDataExplorer\java\ext\*.jar
 OpenSerialDataExplorer\java\ext\*.LICENSE
 
+Hint for Linux user: RxTxcomm is using the uucp locking mechanism, to enable this the user must be part of the "uucp" group. Without being part 
+of this group open an serial port might be impossible. This depends on the used distribution.
+
 During the first execution of the program the application configuration directories are created 
 %APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
 /home/<user>/.OpenSerialDataExplorer (Linux, Mac OS)

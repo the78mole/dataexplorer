@@ -36,6 +36,9 @@ Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
 OpenSerialDataExplorer\java\ext\*.jar
 OpenSerialDataExplorer\java\ext\*.LICENSE
 
+Hinweis für Linux-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angehören. In Abhängigkeit
+der verwendeten Distribution kann evtl. kein serieller Port geöffnet werden.
+
 Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
 %APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows)
 /home/<Benutzer>/.OpenSerialDataExplorer (Linux, Mac OS)
