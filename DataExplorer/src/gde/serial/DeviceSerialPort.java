@@ -183,7 +183,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		// Initialize serial port
 		try {
 			Settings settings = Settings.getInstance();
-			this.serialPortStr = settings.isGlobalSerialPort() ? settings.getSerialPort() : this.deviceConfig.getPort();
+			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
 			if(availablePorts.size() == 0 ) availablePorts = listConfiguredSerialPorts();
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
