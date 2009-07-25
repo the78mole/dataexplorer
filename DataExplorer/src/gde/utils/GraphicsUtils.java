@@ -73,13 +73,16 @@ public class GraphicsUtils {
 			minScaleValue = minValue > 0 ? MathUtils.roundUpAuto(minValue, deltaScale) : MathUtils.roundDownAuto(minValue, deltaScale);
 			maxScaleValue = maxValue > 0 ? MathUtils.roundDownAuto(maxValue, deltaScale) : MathUtils.roundUpAuto(maxValue, deltaScale);
 			deltaScaleValue = (maxScaleValue - minScaleValue);
-			int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
-			int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
-			int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale-deltaScaleValue));
-			if (maxTickRound < maxNumberTicks) 
-				maxNumberTicks = maxTickRound-1; 
-			if (numberTicks > maxNumberTicks)
-				numberTicks = maxNumberTicks;
+			if (minScaleValue != minValue || maxScaleValue != maxValue) {
+				int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
+				int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
+				int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale - deltaScaleValue));
+				if (maxTickRound < maxNumberTicks) maxNumberTicks = maxTickRound - 1;
+				if (numberTicks > maxNumberTicks) numberTicks = maxNumberTicks;
+			}
+			else { // normally this should be used if the graph contains only zero and the axis end values are set to +/- 0.1
+				numberTicks = 2;
+			}
 		}
 		double deltaMainTickValue = deltaScaleValue / numberTicks; 
 		log.log(Level.FINE, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
