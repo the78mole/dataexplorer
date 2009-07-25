@@ -170,7 +170,7 @@ public class EStationDialog extends DeviceDialog {
 									}
 									catch (Exception e) {
 										EStationDialog.this.isConnectionWarned = true;
-										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
 									}
 									EStationDialog.this.serialPort.close();
 								}
@@ -258,7 +258,7 @@ public class EStationDialog extends DeviceDialog {
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
-										EStationDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}

@@ -227,11 +227,11 @@ public class GathererThread extends Thread {
 						sumCycleTime = measurementCount = 0;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGT1408));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1408));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -261,7 +261,7 @@ public class GathererThread extends Thread {
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -296,7 +296,7 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT1409));
+			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1409));
 		}
 		else {
 			if (throwable != null) {
@@ -340,7 +340,7 @@ public class GathererThread extends Thread {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
 				this.application.updateDataTable(this.recordSetKey);
-				this.application.openMessageDialog(message);
+				this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
 				this.device.getDialog().resetButtons();
 			}
 			else {
@@ -350,14 +350,14 @@ public class GathererThread extends Thread {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
 						GathererThread.this.application.updateDataTable(useRecordSetKey);
-						GathererThread.this.application.openMessageDialog(message);
+						GathererThread.this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
 						GathererThread.this.device.getDialog().resetButtons();
 					}
 				});
 			}
 		}
 		else
-			this.application.openMessageDialog(message);
+			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 	}
 
 	/**

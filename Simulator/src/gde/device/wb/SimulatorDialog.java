@@ -434,7 +434,7 @@ public class SimulatorDialog extends DeviceDialog {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
 										if (SimulatorDialog.this.timer != null) SimulatorDialog.this.timer.cancel();
 										SimulatorDialog.log.log(Level.SEVERE, e.getMessage(), e);
-										SimulatorDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										SimulatorDialog.this.application.openMessageDialog(SimulatorDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);

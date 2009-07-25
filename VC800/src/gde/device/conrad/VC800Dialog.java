@@ -148,7 +148,7 @@ public class VC800Dialog extends DeviceDialog {
 										catch (Exception e) {
 											VC800Dialog.this.isConnectionWarned = true;
 											log.log(Level.WARNING, e.getMessage(), e);
-											VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
+											VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getMessage() } ));
 										}
 										finally {
 											if (VC800Dialog.this.isPortOpenedByMe) {
@@ -241,7 +241,7 @@ public class VC800Dialog extends DeviceDialog {
 										}
 										VC800Dialog.this.boundsComposite.redraw();
 										VC800Dialog.this.application.updateGraphicsWindow();
-										VC800Dialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}

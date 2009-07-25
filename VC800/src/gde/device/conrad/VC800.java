@@ -97,7 +97,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return lov2osdMap same reference as input parameter
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));		
+		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));		
 		return lov2osdMap;
 	}
 
@@ -110,7 +110,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
+		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
 		return ""; //$NON-NLS-1$
 	}
 
@@ -429,11 +429,11 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 			}

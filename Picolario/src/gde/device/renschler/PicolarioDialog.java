@@ -187,7 +187,7 @@ public class PicolarioDialog extends DeviceDialog {
 							catch (Exception e) {
 								PicolarioDialog.this.setClosePossible(true);
 								PicolarioDialog.this.serialPort.close();
-								PicolarioDialog.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+								PicolarioDialog.this.application.openMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
 							}
 						}
@@ -233,7 +233,7 @@ public class PicolarioDialog extends DeviceDialog {
 							log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
-								int answer = PicolarioDialog.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGT1202));
+								int answer = PicolarioDialog.this.application.openYesNoMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1202));
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
 									log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$

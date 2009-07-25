@@ -289,7 +289,7 @@ public class PicolarioConfigTab extends Composite {
 									}
 									catch (NumberFormatException e) {
 										log.log(Level.WARNING, e.getMessage(), e);
-										PicolarioConfigTab.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE1200, new Object[] { e.getMessage() } ));
+										PicolarioConfigTab.this.application.openMessageDialog(PicolarioConfigTab.this.getShell(), Messages.getString(MessageIds.OSDE_MSGE1200, new Object[] { e.getMessage() } ));
 									}
 									PicolarioConfigTab.this.isConfigChanged = true;
 									PicolarioConfigTab.this.makePersitentButton.setEnabled(PicolarioConfigTab.this.isConfigChanged);

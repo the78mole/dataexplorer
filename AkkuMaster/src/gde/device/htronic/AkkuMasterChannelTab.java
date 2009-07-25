@@ -203,7 +203,7 @@ public class AkkuMasterChannelTab {
 										updateAdjustedValues();
 									}
 									catch (Exception e) {
-										OpenSerialDataExplorer.getInstance().openMessageDialog(
+										OpenSerialDataExplorer.getInstance().openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), 
 												Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] {e.getClass().getSimpleName(), e.getMessage() } )); 
 									}
 									updateCaptureOnlyButton();
@@ -243,7 +243,7 @@ public class AkkuMasterChannelTab {
 										updateAdjustedValues();
 									}
 									catch (Exception e) {
-										OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
+										OpenSerialDataExplorer.getInstance().openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
 									}
 									updateCaptureOnlyButton();
 									updateProgramButton();
@@ -487,7 +487,7 @@ public class AkkuMasterChannelTab {
 										}
 
 										if (AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + dischargeCurrent_mA || AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + chargeCurrent_mA) {
-											AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
+											AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
 											setCollectData(false);
 											setStartDataGatheringSelection(true);
 											return;
@@ -616,7 +616,7 @@ public class AkkuMasterChannelTab {
 													}
 													setCollectData(false);
 													stopTimer();
-													AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0027));
+													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0027));
 												}
 											}
 											catch (DataInconsitsentException e) {
@@ -624,14 +624,14 @@ public class AkkuMasterChannelTab {
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 											catch (Exception e) {
 												// exception is logged where it is thrown first 
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 										}
 									});
@@ -641,7 +641,7 @@ public class AkkuMasterChannelTab {
 								catch (Exception e1) {
 									setStopButtonEnabled(false);
 									setStartDataGatheringSelection(true);
-									AkkuMasterChannelTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
+									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
 								}
 							}
 						}
