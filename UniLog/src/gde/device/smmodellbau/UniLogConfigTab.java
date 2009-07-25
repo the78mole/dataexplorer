@@ -43,47 +43,35 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 	final static Logger						log									= Logger.getLogger(UniLogConfigTab.class.getName());
 
+	Button												reveiverVoltageButton;
 	CLabel												receiverVoltageSymbol, receiverVoltageUnit;
-	CLabel												voltageUnit;
-	CLabel												currentUnit;
+	
+	Button												voltageButton;
+	CLabel												voltageSymbol, voltageUnit;
+	
+	Button												currentButton;
+	CLabel												currentSymbol, currentUnit;
+	Button												currentInvertButton;
+	
 	CLabel												revolutionSymbol, revolutionUnit;
 	CLabel												heightSymbol, heightUnit;
-	Button												a23ExternModus;
-	CLabel												axName, axUnit, axOffset, axFactor;
-	Button												a1UniLogModus;
-	Button												a23InternModus;
 	CLabel												prop100WUnit, numCellLabel;
-	Group													axModusGroup;
 	Group													powerGroup;
 	Text													prop100WInput, numCellInput;
-	Text													a1Unit;
 	CLabel												etaUnit;
 	CLabel												etaSymbol;
 	CLabel												slopeUnit;
 	CLabel												slopeSymbol;
 	CLabel												etaButton;
 	CLabel												slopeLabel;
-	Button												a3Button;
-	Button												a1Button;
-	Button												a2Button;
-	Button												reveiverVoltageButton;
 	Button												revolutionButton;
 	Button												heightButton;
 	CLabel												capacityLabel;
-	Button												currentButton;
-	Button												currentInvertButton;
 	CLabel												currentOffsetLabel;
 	Text													currentOffset;
-	Button												voltageButton;
-	Text													a1Factor, a2Factor, a3Factor;
-	Text													a1Offset, a2Offset, a3Offset;
-	Text													a3Unit;
-	Text													a2Unit;
 	CLabel												voltagePerCellUnit;
 	CLabel												voltagePerCellSymbol;
-	CLabel												voltageSymbol;
 	CLabel												energyUnit;
-	CLabel												currentSymbol;
 	CLabel												energySymbol;
 	CLabel												powerUnit;
 	CLabel												powerSymbol;
@@ -92,11 +80,16 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	CLabel												voltagePerCellLabel;
 	CLabel												energyLabel;
 	CLabel												powerLabel;
-	Text													a3Text;
-	Text													a2Text;
-	Text													a1Text;
 	CLabel												prop100WLabel;
 	Button												setConfigButton;
+	
+	Group													axModusGroup;
+	CLabel												axName, axUnit, axOffset, axFactor;
+	Button												a1Button, a2Button, a3Button;
+	Text													a1Text, a2Text, a3Text;
+	Text													a1Unit, a2Unit, a3Unit;
+	Text													a1Factor, a2Factor, a3Factor;
+	Text													a1Offset, a2Offset, a3Offset;
 
 	// values manipulated by editing
 	boolean												isActiveUe					= false;
@@ -395,7 +388,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -514,7 +507,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -605,7 +598,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -753,12 +746,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.axModusGroup = new Group(this, SWT.NONE);
 					this.axModusGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.axModusGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1350));
-					this.axModusGroup.setBounds(313, 2, 310, 193);
+					this.axModusGroup.setBounds(313, 2, 310, 135);
 					this.axModusGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1351));
 					this.axModusGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					this.axModusGroup.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.log(Level.FINEST, "axModusGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							
 							UniLogConfigTab.this.a1Button.setSelection(UniLogConfigTab.this.isActiveA1);
 							UniLogConfigTab.this.a1Text.setText(UniLogConfigTab.this.nameA1);
 							UniLogConfigTab.this.a1Unit.setText("[" + UniLogConfigTab.this.unitA1 + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -779,54 +773,33 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						}
 					});
 					{
-						this.a1UniLogModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
-						this.a1UniLogModus.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1UniLogModus.setBounds(7, 20, 290, 25);
-						this.a1UniLogModus.setText(Messages.getString(MessageIds.OSDE_MSGT1352));
-						this.a1UniLogModus.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "a1UniLogModus.widgetSelected, event=" + evt); //$NON-NLS-1$
-								try {
-									if (!UniLogConfigTab.this.isA1ModusAvailable) {
-										UniLogConfigTab.this.dialog.updateConfigurationValues(UniLogConfigTab.this.device.getSerialPort().readConfiguration());
-									}
-									UniLogConfigTab.this.a1Text.setText(UniLogDialog.A1_MODUS[UniLogConfigTab.this.dialog.getSelectionIndexA1ModusCombo()]);
-									checkUpdateAnalog();
-								}
-								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(e.getMessage());
-								}
-							}
-						});
-					}
-					{
 						this.axName = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axName.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.axName.setBounds(40, 50, 116, 18);
+						this.axName.setBounds(40, 20, 116, 18);
 						this.axName.setText(Messages.getString(MessageIds.OSDE_MSGT1353));
 					}
 					{
 						this.axUnit = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.axUnit.setBounds(158, 50, 50, 18);
+						this.axUnit.setBounds(158, 20, 50, 18);
 						this.axUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1354));
 					}
 					{
 						this.axOffset = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axOffset.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.axOffset.setBounds(209, 50, 46, 20);
+						this.axOffset.setBounds(209, 20, 46, 20);
 						this.axOffset.setText(Messages.getString(MessageIds.OSDE_MSGT1355));
 					}
 					{
 						this.axFactor = new CLabel(this.axModusGroup, SWT.LEFT);
 						this.axFactor.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.axFactor.setBounds(257, 50, 48, 20);
+						this.axFactor.setBounds(257, 20, 48, 20);
 						this.axFactor.setText(Messages.getString(MessageIds.OSDE_MSGT1356));
 					}
 					{
 						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a1Button.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1Button.setBounds(4, 72, 36, 20);
+						this.a1Button.setBounds(4, 45, 36, 20);
 						this.a1Button.setText(Messages.getString(MessageIds.OSDE_MSGT1357));
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -839,7 +812,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Text.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1Text.setBounds(42, 72, 116, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a1Text.setBounds(42, 45, 116, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a1Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1358));
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -852,7 +825,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a1Unit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1Unit.setBounds(160, 72, 45, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a1Unit.setBounds(160, 45, 45, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -864,7 +837,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Offset.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1Offset.setBounds(207, 72, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a1Offset.setBounds(207, 45, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -873,7 +846,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -881,7 +854,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Factor.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a1Factor.setBounds(257, 72, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a1Factor.setBounds(257, 45, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Factor.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -890,7 +863,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -898,7 +871,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a2Button.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a2Button.setBounds(4, 93, 36, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a2Button.setBounds(4, 70, 36, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a2Button.setText(Messages.getString(MessageIds.OSDE_MSGT1359));
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -911,7 +884,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Text.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a2Text.setBounds(42, 93, 116, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a2Text.setBounds(42, 70, 116, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a2Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1360));
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -924,7 +897,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a2Unit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a2Unit.setBounds(160, 93, 45, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a2Unit.setBounds(160, 70, 45, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -936,7 +909,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Offset.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a2Offset.setBounds(207, 93, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a2Offset.setBounds(207, 70, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -945,7 +918,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -953,7 +926,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Factor.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a2Factor.setBounds(257, 93, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a2Factor.setBounds(257, 70, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Factor.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -962,7 +935,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -970,7 +943,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a3Button.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a3Button.setBounds(4, 115, 36, 20);
+						this.a3Button.setBounds(4, 95, 36, 20);
 						this.a3Button.setText(Messages.getString(MessageIds.OSDE_MSGT1361));
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -983,7 +956,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Text.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a3Text.setBounds(42, 115, 116, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a3Text.setBounds(42, 95, 116, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a3Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1362));
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -996,7 +969,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a3Unit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a3Unit.setBounds(160, 115, 45, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a3Unit.setBounds(160, 95, 45, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -1008,7 +981,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Offset.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a3Offset.setBounds(207, 115, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a3Offset.setBounds(207, 95, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -1017,7 +990,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -1025,7 +998,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Factor.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a3Factor.setBounds(257, 115, 48, OSDE.IS_WINDOWS ? 20 : 22);
+						this.a3Factor.setBounds(257, 95, 48, OSDE.IS_WINDOWS ? 20 : 22);
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Factor.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -1034,34 +1007,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
-							}
-						});
-					}
-					{
-						this.a23InternModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
-						this.a23InternModus.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a23InternModus.setBounds(7, 153, 146, 25);
-						this.a23InternModus.setText(Messages.getString(MessageIds.OSDE_MSGT1363));
-						this.a23InternModus.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "a23InternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
-								setA23Defaults('I');
-								checkUpdateAnalog();
-							}
-						});
-					}
-					{
-						this.a23ExternModus = new Button(this.axModusGroup, SWT.PUSH | SWT.CENTER);
-						this.a23ExternModus.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.a23ExternModus.setBounds(159, 153, 139, 26);
-						this.a23ExternModus.setText(Messages.getString(MessageIds.OSDE_MSGT1364));
-						this.a23ExternModus.addSelectionListener(new SelectionAdapter() {
-							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "a23ExternModus.widgetSelected, event=" + evt); //$NON-NLS-1$
-								setA23Defaults('E');
-								checkUpdateAnalog();
 							}
 						});
 					}
@@ -1069,8 +1016,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
 					this.setConfigButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-					this.setConfigButton.setBounds(320, 250, 295, 30);
-					this.setConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1365));
+					this.setConfigButton.setBounds(320, 200, 295, 50);
+					this.setConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1364));
+					this.setConfigButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1365));
 					this.setConfigButton.setEnabled(false);
 					this.setConfigButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -1157,35 +1105,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.slopeCalculationTypeCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			this.regressionTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		}
-	}
-
-	/**
-	 * load default values for A2 and A3 fields
-	 * @param internExtern 'I' intern / 'E' external sensor
-	 */
-	void setA23Defaults(int internExtern) {
-		String[] a2Values;
-		String[] a3Values;
-		switch (internExtern) {
-		case 'E': // extern
-			a2Values = new String[] { Messages.getString(MessageIds.OSDE_MSGT1366), Messages.getString(MessageIds.OSDE_MSGT1367), Messages.getString(MessageIds.OSDE_MSGT1368), "0.0", "1.0" }; //$NON-NLS-1$ //$NON-NLS-2$
-			a3Values = new String[] { Messages.getString(MessageIds.OSDE_MSGT1369), Messages.getString(MessageIds.OSDE_MSGT1370), Messages.getString(MessageIds.OSDE_MSGT1371), "0.0", "1.0" }; //$NON-NLS-1$ //$NON-NLS-2$
-			break;
-		case 'I': // intern
-		default:
-			a2Values = new String[] { Messages.getString(MessageIds.OSDE_MSGT1372), Messages.getString(MessageIds.OSDE_MSGT1373), Messages.getString(MessageIds.OSDE_MSGT1374), "0.0", "1.0" }; //$NON-NLS-1$ //$NON-NLS-2$
-			a3Values = new String[] { Messages.getString(MessageIds.OSDE_MSGT1375), Messages.getString(MessageIds.OSDE_MSGT1376), Messages.getString(MessageIds.OSDE_MSGT1377), "0.0", "1.0" }; //$NON-NLS-1$ //$NON-NLS-2$
-			break;
-		}
-		this.a2Text.setText(this.nameA2 = a2Values[0]);
-		this.a2Unit.setText(this.unitA2 = a2Values[2]);
-		this.a2Offset.setText(""+(this.offsetA2 = new Double(a2Values[3]))); //$NON-NLS-1$
-		this.a2Factor.setText(""+(this.factorA2 = new Double(a2Values[4]))); //$NON-NLS-1$
-
-		this.a3Text.setText(this.nameA3 = a3Values[0]);
-		this.a3Unit.setText(this.unitA3 = a3Values[2]);
-		this.a3Offset.setText(""+(this.offsetA3 = new Double(a3Values[3]))); //$NON-NLS-1$
-		this.a3Factor.setText(""+(this.factorA3 = new Double(a3Values[4]))); //$NON-NLS-1$
 	}
 
 	/**
@@ -1362,19 +1281,19 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetCurrent = recordSet.get(recordKeys[2]).getOffset();
 			
 			property = recordSet.get(recordKeys[6]).getProperty(UniLog.NUMBER_CELLS);
-			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
+			this.numCellValue = property != null ? new Integer(property.getValue().trim()) : 4;
 			
 			this.isActiveRPM = recordSet.get(recordKeys[7]).isActive();
 			
 			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_WATT);
-			this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
 			
 			this.isActiveHeight = recordSet.get(recordKeys[9]).isActive();
 
 			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
 			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
+			this.slopeTimeSelection = property != null ? new Integer(property.getValue().trim()) : 10;
 
 			record = recordSet.get(recordKeys[11]);
 			this.isActiveA1 = record.isActive();
@@ -1409,13 +1328,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetCurrent = measurement.getOffset();
 
 			property = this.device.getMeasruementProperty(this.configName, 6, UniLog.NUMBER_CELLS);
-			this.numCellValue = property != null ? new Integer(property.getValue()) : 4;
+			this.numCellValue = property != null ? new Integer(property.getValue().trim()) : 4;
 
 			measurement = this.device.getMeasurement(this.configName, 7);
 			this.isActiveRPM = measurement.isActive();
 
 			property = this.device.getMeasruementProperty(this.configName, 8, UniLog.PROP_N_100_WATT);
-			this.prop100WValue = property != null ? new Integer(property.getValue()) : 10000;
+			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
 
 			measurement = this.device.getMeasurement(this.configName, 9);
 			this.isActiveHeight = measurement.isActive();
@@ -1423,7 +1342,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			property = this.device.getMeasruementProperty(this.configName, 10, CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
 			property = this.device.getMeasruementProperty(this.configName, 10, CalculationThread.REGRESSION_INTERVAL_SEC);
-			this.slopeTimeSelection = property != null ? new Integer(property.getValue()) : 10;
+			this.slopeTimeSelection = property != null ? new Integer(property.getValue().trim()) : 10;
 
 			if (this.nameA1.equals(OSDE.STRING_DASH)) {
 				measurement = this.device.getMeasurement(this.configName, 11);

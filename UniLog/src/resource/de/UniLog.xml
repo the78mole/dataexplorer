@@ -344,7 +344,7 @@
         <Measurement>
             <name>ServoImpuls</name>
             <symbol>A2</symbol>
-            <unit>Âµs</unit>
+            <unit>µs</unit>
             <active>false</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -353,7 +353,7 @@
         <Measurement>
             <name>TempIntern</name>
             <symbol>A3</symbol>
-            <unit>Â°C</unit>
+            <unit>°C</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>

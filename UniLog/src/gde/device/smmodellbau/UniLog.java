@@ -316,7 +316,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
-		String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
+		String lineSep = OSDE.LINE_SEPARATOR;
 		int tmpValue = 0;
 		
 		// voltageReceiver *** power/drive *** group
@@ -374,40 +374,64 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a1Modus = " + a1Modus + " (0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("a1Value = " + points[11]).append(lineSep); //$NON-NLS-1$
+			sb.append("a1Modus = " + a1Modus).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
+			if (a1Modus == 0)
+				sb.append("temperatur [°C] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a1Modus == 1)  
+				sb.append("voltage [mV] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a1Modus == 2)  
+				sb.append("speed 250 [km/h] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a1Modus == 3)
+				sb.append("speed 400 [km/h] = " + points[12]).append(lineSep); //$NON-NLS-1$
 		}
 
-		// A2 Modus == 0 -> external sensor; A2 Modus != 0 -> impulse time length
-		int a2Modus = (dataBuffer[4] & 0x30); // 00110000
-		if (a2Modus == 0) {
+		// A2 Modus == 0 -> temperature; A2 Modus == 1 -> impulse time length
+		// A2 Modus == 2 -> mills voltage; A2 Modus == 3 -> capacity mAh
+		int a2Modus = (dataBuffer[4] & 0x30) >> 4; // 00110000
+		if (a2Modus == 0 || a2Modus == 2) {
 			tmpValue = (((dataBuffer[19] & 0xEF) << 8) + (dataBuffer[18] & 0xFF));
 			tmpValue = tmpValue > 32768 ? (tmpValue - 65536) : tmpValue;
 			points[12] = new Integer(tmpValue * 100).intValue(); //12=a2Value
 		}
-		else {
+		else if (a2Modus == 1 || a2Modus == 3) {
 			tmpValue = (((dataBuffer[19] & 0xFF) << 8) + (dataBuffer[18] & 0xFF));
 			points[12] = new Integer(tmpValue * 1000).intValue(); //12=a2Value
 		}
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a2Modus = " + a2Modus + " (0 -> external temperature sensor; !0 -> impulse time length)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a2Modus = " + a2Modus).append(lineSep); //$NON-NLS-1$
 			if (a2Modus == 0)
-				sb.append("a2Value = " + points[12]).append(lineSep); //$NON-NLS-1$
-			else
-				sb.append("impulseTime [us]= " + points[12]).append(lineSep); //$NON-NLS-1$
+				sb.append("tempreature [°C] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a2Modus == 1)  
+				sb.append("impulseTime [us] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a2Modus == 2)  
+				sb.append("voltage [mV] = " + points[12]).append(lineSep); //$NON-NLS-1$
+			else if (a2Modus == 3)
+				sb.append("capacity [mAh] = " + points[12]).append(lineSep); //$NON-NLS-1$
 		}
 
-		// A3 Modus == 0 -> external sensor; A3 Modus != 0 -> internal temperature
-		int a3Modus = (dataBuffer[4] & 0xC0); // 11000000
+		// A3 Modus == 0 -> external temperature sensor; A3 Modus == 1 -> internal temperature
+		// A3 Modus == 2 -> external temperature sensor; A3 Modus == 3 -> internal temperature
+		int a3Modus = (dataBuffer[4] & 0xC0) >> 6; // 11000000
 		tmpValue = (((dataBuffer[21] & 0xEF) << 8) + (dataBuffer[20] & 0xFF));
-		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-		points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
+		if (a3Modus == 0 || a3Modus == 1 || a3Modus == 3) {
+			if (tmpValue > 32768) tmpValue = tmpValue - 65536;
+			points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
+		}
+		else if (a3Modus == 2) {
+			points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
+		}
 		if (log.isLoggable(Level.FINE)) {
-			sb.append("a3Modus = " + a3Modus + " (0 -> external temperature sensor; !0 -> internal temperature)").append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a3Modus = " + a3Modus).append(lineSep); //$NON-NLS-1$
 			if (a3Modus == 0)
-				sb.append("a3Value = " + points[13]).append(lineSep); //$NON-NLS-1$
+				sb.append("external Temperature [°C] = " + points[13]).append(lineSep); //$NON-NLS-1$
+			else if (a3Modus == 1)
+				sb.append("internal Temperature [°C] = " + points[13]).append(lineSep); //$NON-NLS-1$
+			else if (a3Modus == 2)
+				sb.append("energy [Wmin] = " + points[13]).append(lineSep); //$NON-NLS-1$
+			else if (a3Modus == 3)
+				sb.append("voltage [mV] = " + points[13]).append(lineSep); //$NON-NLS-1$
 			else
-				sb.append("tempIntern = " + points[13]).append(lineSep); //$NON-NLS-1$
+				sb.append("a3Value = " + points[13]).append(lineSep); //$NON-NLS-1$
 		}
 		
 		log.log(Level.FINE, sb.toString());
@@ -861,12 +885,51 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {
 				this.serialPort.close();
 			}
 		}
+	}
+	
+	/**
+	 * get the analog modus of A1, A2 and A3 to update the analog measurements of the given channel configuration
+	 * @param dataBuffer
+	 * @param configKey
+	 * @return
+	 */
+	public void updateMeasurementByAnalogModi(byte[] dataBuffer, String configKey) {
+		// a1Modus -> 0==Temperature, 1==Millivolt, 2=Speed 250, 3=Speed 400
+		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
+
+		// A2 Modus == 0 -> temperature; A2 Modus == 1 -> impulse time length
+		// A2 Modus == 2 -> mills voltage; A2 Modus == 3 -> capacity mAh
+		int a2Modus = (dataBuffer[4] & 0x30) >> 4; // 00110000
+
+		// A3 Modus == 0 -> external temperature sensor; A3 Modus == 1 -> internal temperature
+		// A3 Modus == 2 -> energy in Wmin; A3 Modus == 3 -> mills voltage
+		int a3Modus = (dataBuffer[4] & 0xC0) >> 6; // 11000000
+
+		if (log.isLoggable(Level.INFO)) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("a1Modus = " + a1Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a2Modus = " + a2Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
+			sb.append("a3Modus = " + a3Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
+			log.log(Level.FINE, sb.toString());
+		}
+		
+		MeasurementType measurement = this.getMeasurement(configKey, 11); // 11=A1
+		measurement.setName(UniLogDialog.A1_MODUS_NAMES[a1Modus].trim());
+		measurement.setUnit(UniLogDialog.A1_MODUS_UNITS[a1Modus].trim());
+
+		measurement = this.getMeasurement(configKey, 12); // 12=A1
+		measurement.setName(UniLogDialog.A2_MODUS_NAMES[a2Modus].trim());
+		measurement.setUnit(UniLogDialog.A2_MODUS_UNITS[a2Modus].trim());
+		
+		measurement = this.getMeasurement(configKey, 13); // 13=A1
+		measurement.setName(UniLogDialog.A3_MODUS_NAMES[a3Modus].trim());
+		measurement.setUnit(UniLogDialog.A3_MODUS_UNITS[a3Modus].trim());
 	}
 }
