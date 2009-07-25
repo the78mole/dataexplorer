@@ -253,7 +253,7 @@ public class DeviceConfiguration {
 	}
 
 	public String getPort() {
-		return this.serialPort.getPort();
+		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort.getPort();
 	}
 
 	public void setPort(String newPort) {

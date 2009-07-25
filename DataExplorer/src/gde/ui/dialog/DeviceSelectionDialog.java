@@ -818,7 +818,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * update entries according configuration, this is called whenever a new device is selected
 	 */
 	void updateDialogEntries() {
-		//updateAvailablePorts();
 		// device selection
 		log.log(Level.FINE, "active devices " + this.activeDevices.toString()); //$NON-NLS-1$
 		String[] list = this.activeDevices.toArray(new String[this.activeDevices.size()]);
@@ -1096,25 +1095,29 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private void updateAvailablePorts() {
 		// execute independent from dialog UI
 		this.listPortsThread = new Thread() {
+			@Override
 			public void run() {
-				while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-					log.log(Level.FINE, "updateAvailablePorts() - entry"); //$NON-NLS-1$
-					DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
-					if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-							public void run() {
-								if (!DeviceSelectionDialog.this.dialogShell.isDisposed()) 
+				try {
+					while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+						DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
+						if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
+							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+								public void run() {
+									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) 
 									DeviceSelectionDialog.this.portGroup.redraw();
+								}
+							});
+							try {
+								Thread.sleep(2500);
 							}
-						});
+							catch (InterruptedException e) {
+								// ignore
+							}
+						}
 					}
-					log.log(Level.FINE, "updateAvailablePorts() - exit"); //$NON-NLS-1$
-					try {
-						Thread.sleep(2500);
-					}
-					catch (InterruptedException e) {
-						// ignore
-					}
+				}
+				catch (Throwable t) {
+					SettingsDialog.log.log(Level.WARNING, t.getMessage(), t);
 				}
 			}
 		};
