@@ -519,8 +519,8 @@ public class CurveSelectorContextMenu {
 			this.axisEndManual.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisEndManual Action performed! " + e); //$NON-NLS-1$
-					CurveSelectorContextMenu.this.isActiveEnValueDialog = true;
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.isActiveEnValueDialog = true;
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
 						CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
@@ -533,9 +533,9 @@ public class CurveSelectorContextMenu {
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.isActiveEnValueDialog = false;
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
-					CurveSelectorContextMenu.this.isActiveEnValueDialog = false;
 				}
 			});
 

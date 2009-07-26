@@ -322,7 +322,9 @@ public class MathUtils {
 
 		if (value != roundValue) {
 			if (value > 0) {
-				if (delta < 0.25)
+				if (delta < 0.05)
+					roundValue = value + (0.001 - value % 0.001);
+				else if (delta < 0.25)
 					roundValue = value + (0.01 - value % 0.01);
 				else if (delta < 0.5)
 					roundValue = value + (0.025 - value % 0.025);
@@ -348,7 +350,9 @@ public class MathUtils {
 					roundValue = value + (100 - value % 100);
 			}
 			else {// value < 0 
-				if (delta < 0.25)
+				if (delta < 0.05)
+					roundValue = value - (0.001 + value % 0.001);
+				else if (delta < 0.25)
 					roundValue = value - (0.01 + value % 0.01);
 				else if (delta < 0.5)
 					roundValue = value - (0.025 + value % 0.025);
@@ -390,7 +394,9 @@ public class MathUtils {
 
 		if (value != roundValue) {
 			if (value > 0) {
-				if (delta < 0.25)
+				if (delta < 0.05)
+					roundValue = value - (value % 0.001);
+				else if (delta < 0.25)
 					roundValue = value - (value % 0.01);
 				else if (delta < 0.5)
 					roundValue = value - (value % 0.025);
@@ -416,7 +422,9 @@ public class MathUtils {
 					roundValue = value - (value % 100);
 			}
 			else {// value < 0 
-				if (delta < 0.25)
+				if (delta < 0.05)
+					roundValue = value - (0.00125 + value % 0.001);
+				else if (delta < 0.25)
 					roundValue = value - (0.005 + value % 0.01);
 				else if (delta < 0.5)
 					roundValue = value - (0.0125 + value % 0.025);

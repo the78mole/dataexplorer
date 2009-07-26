@@ -104,7 +104,6 @@ public class AxisEndValuesDialog extends Dialog {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
 					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
-					AxisEndValuesDialog.this.application.updateGraphicsWindow();
 				}
 			});
 			this.dialogShell.addPaintListener(new PaintListener() {

@@ -72,13 +72,22 @@ public class GraphicsUtils {
 		else {
 			minScaleValue = minValue > 0 ? MathUtils.roundUpAuto(minValue, deltaScale) : MathUtils.roundDownAuto(minValue, deltaScale);
 			maxScaleValue = maxValue > 0 ? MathUtils.roundDownAuto(maxValue, deltaScale) : MathUtils.roundUpAuto(maxValue, deltaScale);
+			if (minScaleValue > maxScaleValue) {
+				double tmpDeltaScaleValue = minScaleValue - maxScaleValue;
+				minScaleValue = minScaleValue - tmpDeltaScaleValue;
+				maxScaleValue = maxScaleValue + tmpDeltaScaleValue;
+			}
 			deltaScaleValue = (maxScaleValue - minScaleValue);
-			if (minScaleValue != minValue || maxScaleValue != maxValue) {
+			if ((minScaleValue != minValue || maxScaleValue != maxValue) && (deltaScale - deltaScaleValue) > 0) {
 				int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
 				int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
 				int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale - deltaScaleValue));
-				if (maxTickRound < maxNumberTicks) maxNumberTicks = maxTickRound - 1;
-				if (numberTicks > maxNumberTicks) numberTicks = maxNumberTicks;
+				if (maxTickRound >= 3 && maxTickRound < maxNumberTicks) 
+					maxNumberTicks = maxTickRound - 1;
+				else 
+					maxNumberTicks = maxTickRound;
+				if (numberTicks > maxNumberTicks) 
+					numberTicks = maxNumberTicks;
 			}
 			else { // normally this should be used if the graph contains only zero and the axis end values are set to +/- 0.1
 				numberTicks = 2;
@@ -87,8 +96,8 @@ public class GraphicsUtils {
 		double deltaMainTickValue = deltaScaleValue / numberTicks; 
 		log.log(Level.FINE, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
 		
-		if (deltaScaleValue <= 0.01) {
-			while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 100) % 1 > 0.01) {
+		if (deltaScaleValue <= 0.05) {
+			while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 100) % 1 > 0.1) {
 				deltaMainTickValue = deltaScaleValue / numberTicks;
 				log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 				++numberTicks;
