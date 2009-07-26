@@ -286,6 +286,10 @@ public class GathererThread extends Thread {
 	void stopDataGatheringThread(boolean enableEndMessage, Throwable throwable) {
 		final String $METHOD_NAME = "stopGatheringWhileCheckRecordSet"; //$NON-NLS-1$
 
+		if (throwable != null) {
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+		}
+		
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
@@ -302,7 +306,6 @@ public class GathererThread extends Thread {
 		}
 		else {
 			if (throwable != null) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 				cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
 						+ Messages.getString(MessageIds.OSDE_MSGT1408));
 			}
