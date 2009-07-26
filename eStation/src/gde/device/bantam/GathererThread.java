@@ -108,7 +108,7 @@ public class GathererThread extends Thread {
 		byte[] dataBuffer = null;
 
 		this.isCollectDataStopped = false;
-		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -133,7 +133,7 @@ public class GathererThread extends Thread {
 					if (measurementCount % 10 == 0) {
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "calculate newTimeStep_ms, sumCycleTime = " + sumCycleTime); //$NON-NLS-1$
 						newTimeStep_ms = new Double(String.format("%.1f", (1.0 * sumCycleTime / measurementCount))); //$NON-NLS-1$
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("newTimeStep_ms = %.1f", (1.0 * sumCycleTime / measurementCount))); //$NON-NLS-1$
 						this.device.setTimeStep_ms(newTimeStep_ms);
 						recordSet.setTimeStep_ms(newTimeStep_ms);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
