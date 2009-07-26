@@ -499,7 +499,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											log.log(Level.FINEST, "portSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setPort(DeviceSelectionDialog.this.portSelectCombo.getText());
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.storeDeviceProperties();
-											DeviceSelectionDialog.this.application.updateTitleBar(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName(), DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
+											DeviceSelectionDialog.this.application.updateTitleBar(DeviceSelectionDialog.this.application.getObjectKey(), DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName(), DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
 										}
 									});
 								}
@@ -854,7 +854,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.deviceSlider.setIncrement(0);
 			this.deviceSlider.setSelection(0);
 			log.log(Level.FINE, "activeDevices.size() = 0"); //$NON-NLS-1$
-			this.application.updateTitleBar(Settings.EMPTY, Settings.EMPTY);
+			this.application.updateTitleBar(this.application.getObjectKey(), Settings.EMPTY, Settings.EMPTY);
 		}	
 
 		// update all serial Port settings
@@ -906,7 +906,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
 			this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
 
-			this.application.updateTitleBar(this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
+			this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
 		}
 	}
 

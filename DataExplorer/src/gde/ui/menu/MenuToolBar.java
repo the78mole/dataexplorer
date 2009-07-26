@@ -365,6 +365,7 @@ public class MenuToolBar {
 								}
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
+								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
@@ -425,6 +426,7 @@ public class MenuToolBar {
 										MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 									}
+									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 								}
 							}
 						});		
@@ -488,6 +490,7 @@ public class MenuToolBar {
 								MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
 							}
+							MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 						}
 					});
 				}

@@ -165,7 +165,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 				
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET.ordinal() && this.getActiveChannel().getFileName() != null) {
-					this.application.updateTitleBar(this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 			}
 			else {

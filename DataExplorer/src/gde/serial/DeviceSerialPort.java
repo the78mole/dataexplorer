@@ -196,7 +196,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						this.deviceConfig.setPort(this.serialPortStr);
 					
 					this.deviceConfig.storeDeviceProperties();
-					this.application.updateTitleBar(this.deviceConfig.getName(), this.deviceConfig.getPort());
+					this.application.updateTitleBar(this.application.getObjectKey(), this.deviceConfig.getName(), this.deviceConfig.getPort());
 				}
 				else {
 					throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
