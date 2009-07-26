@@ -523,7 +523,9 @@ public class Settings extends Properties {
 	}
 
 	public String[] getObjectList() {
-		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(";"); //$NON-NLS-1$
+		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(OSDE.STRING_SEMICOLON);
+		objectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+		return objectKeys;
 	}
 
 	public void setObjectList(String[] activeObjectList, int newActiveObjectIndex) {
