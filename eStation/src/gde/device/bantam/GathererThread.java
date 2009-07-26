@@ -131,7 +131,9 @@ public class GathererThread extends Thread {
 						--measurementCount;
 					}
 					if (measurementCount % 10 == 0) {
-						newTimeStep_ms = new Double(String.format("%.1f", 1.0 * sumCycleTime / measurementCount)); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "calculate newTimeStep_ms, sumCycleTime = " + sumCycleTime); //$NON-NLS-1$
+						newTimeStep_ms = new Double(String.format("%.1f", (1.0 * sumCycleTime / measurementCount))); //$NON-NLS-1$
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms); //$NON-NLS-1$
 						this.device.setTimeStep_ms(newTimeStep_ms);
 						recordSet.setTimeStep_ms(newTimeStep_ms);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
@@ -147,7 +149,7 @@ public class GathererThread extends Thread {
 				isProgrammExecuting = this.device.isProcessing(dataBuffer);
 				isCycleMode = this.device.isCycleMode(dataBuffer);
 				if (isCycleMode && measurementCount < 5) dryTimeCycleCount = this.device.getNumberOfCycle(dataBuffer) > 0 ? this.device.getNumberOfCycle(dataBuffer) * 2 - 1 : 0;
-				log.logp(Level.FINER, GathererThread.$CLASS_NAME, GathererThread.$CLASS_NAME,
+				log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,
 						"processing mode = " + processName + " isCycleMode = " + isCycleMode + " dryTimeCycleCount = " + dryTimeCycleCount); //$NON-NLS-1$	//$NON-NLS-2$ //$NON-NLS-3$
 
 				if (isProgrammExecuting && (processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2]))) {
