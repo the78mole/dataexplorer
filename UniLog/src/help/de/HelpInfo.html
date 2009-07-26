@@ -59,6 +59,11 @@ Bild 1 zu sehen.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1" BORDER=0>
 </P>
+<P>Alle analogen Anschl&uuml;sse werden ab Firmware 1.10 vorkonfiguriert. 
+Akiviert man die Limiterfunktion werden ab dem eingestellten Leistungsverbrauch das Signal zum Motorregler heruntergeregelt. 
+Hierzu muss nat&uuml;rlich der Reglersignal &uuml;ber den Unilog geschleift werden. 
+Bei Limiterbetrieb wird das Zeitinterval auf 1/16 Sekunde verändert und es ist nur eine Datenaufnahme m&ouml;glich.
+</P>
 <P>Werden Einstellungen ver&auml;ndert wird „Einstellungen
 speichern“ aktiv. Durch dr&uuml;cken werden die gew&auml;hlten
 Einstellungen in das UniLog geschrieben. 
@@ -134,14 +139,13 @@ Knopf, mit dem die ge&auml;nderte Konfiguration persistent gemacht
 wird. Die Konfiguration aus der Datei wird bei neu aus dem UniLog
 gelesenen Daten angewendet. 
 </P>
-<P>Nun zu den Analog (A1 bis A3) Anschl&uuml;ssen. Der A1 Anschluss
-kann &uuml;ber den „Einstellung“ Tabulator vorkonfiguriert
-werden. Durch Dr&uuml;cken von „A1 Vorgabe aus UniLog
-Einstellungen“ wird diese Einstellung abgerufen und eingetragen. In
-Abh&auml;ngigkeit der Einstellung und dem angeschlossenen Sensor muss
+<P>Nun zu den Analog (A1 bis A3) Anschl&uuml;ssen. Alle Anschl&uuml;sse
+werden &uuml;ber den „Einstellung“ Tabulator vorkonfiguriert.
+Beim Auslesen der Daten, werden entsprechend der UniLog Einstellung, Name und Einheit abgerufen und eingetragen. 
+In Abh&auml;ngigkeit der Einstellung und dem angeschlossenen Sensor muss
 evtl. noch Offset und der Steigungsfaktor angepasst werden. Auch hier
 gilt eine &Auml;nderung aktiviert „Konfiguration speichern“ und
-erm&ouml;glicht das Abspeichern der Konfiguration. 
+erm&ouml;glicht das Abspeichern der Konfiguration in der UniLog Konfigurationsdatei, nicht im UniLog selbst. 
 </P>
 <P>Ist beim &Ouml;ffnen des Dialoges ein Datensatz geladen, springt
 der Konfigurationstabulator auf die dem Datensatz entsprechende
