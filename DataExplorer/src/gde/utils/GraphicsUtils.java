@@ -82,10 +82,12 @@ public class GraphicsUtils {
 				int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
 				int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
 				int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale - deltaScaleValue));
+				
 				if (maxTickRound >= 3 && maxTickRound < maxNumberTicks) 
 					maxNumberTicks = maxTickRound - 1;
-				else 
+				else if (maxTickRound == 1)
 					maxNumberTicks = maxTickRound;
+					
 				if (numberTicks > maxNumberTicks) 
 					numberTicks = maxNumberTicks;
 			}
@@ -104,7 +106,7 @@ public class GraphicsUtils {
 			}
 		}
 		else if (deltaScaleValue <= 0.1) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 40) % 1 > 0.01) {
+				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 40) % 1 > 0.1) {
 					deltaMainTickValue = deltaScaleValue / numberTicks;
 					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
 					++numberTicks;

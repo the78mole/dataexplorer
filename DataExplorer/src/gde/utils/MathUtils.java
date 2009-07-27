@@ -100,9 +100,9 @@ public class MathUtils {
 	private static double checkRoundReq(double value) {
 		double roundValue = 0.0;
 		if (value > 0)
-			roundValue = value <= 0.1 ? value - value*100%5 : value <= 1 ? value - value*10%5 : value <= 10 ? value - value %1 : value <= 50 ? value - value %10 : value <= 500 ? value - value %50 : value - value % 100 ;
+			roundValue = value <= 0.1 ? value - (value*100%5)/100 : value <= 0.5 ? value - (value*100%1)/100 : value <= 1 ? value - (value*10%1)/10 : value <= 10 ? value - value %1 : value <= 50 ? value - value %10 : value <= 500 ? value - value %50 : value - value % 100 ;
 		else
-			roundValue = value >= -0.1 ? value - value*100%5 : value >= -1 ? value - value*10%5 : value >= -10 ? value - value %1 : value >= -50 ? value - value %10 : value >= -500 ? value - value %50 : value - value % 100 ;
+			roundValue = value >= -0.1 ? value - (value*100%5)/100 : value >= -0.5 ? value - (value*100%1)/100 : value >= -1 ? value - (value*10%1)/10 : value >= -10 ? value - value %1 : value >= -50 ? value - value %10 : value >= -500 ? value - value %50 : value - value % 100 ;
 		return roundValue;
 	}
 	
