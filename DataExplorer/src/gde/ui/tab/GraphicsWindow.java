@@ -23,8 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 
 import osde.data.Channels;
@@ -80,12 +78,12 @@ public class GraphicsWindow {
 		SWTResourceManager.registerResourceUser(this.graphic);
 		this.graphic.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.graphic.setText(this.tabName);
-		this.graphic.addListener(SWT.RESIZE, new Listener() {
-			public void handleEvent(Event evt) {
-				log.log(Level.FINE, "controlRezized " + evt);
-				GraphicsWindow.this.setSashFormWeights(GraphicsWindow.this.getCurveSelectorComposite().getSelectorColumnWidth());
-			}
-		});
+//		this.graphic.addListener(SWT.RESIZE, new Listener() {
+//			public void handleEvent(Event evt) {
+//				log.log(Level.FINE, "controlRezized " + evt);
+//				GraphicsWindow.this.setSashFormWeights(GraphicsWindow.this.getCurveSelectorComposite().getSelectorColumnWidth());
+//			}
+//		});
 
 		{ // graphicSashForm
 			this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
@@ -153,21 +151,20 @@ public class GraphicsWindow {
 	 * @param newSelectorCompositeWidth the changed curve selector width
 	 */
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
-		int tabFolderClientAreaWidth = this.tabFolder.getClientArea().width;
+		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
 		int bestGuessWidth = this.application.getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
 			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth);
 			tabFolderClientAreaWidth = bestGuessWidth;
-			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getSize().y);
-			this.tabFolder.layout(true);
+			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth};
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " windowType = " + this.windowType);
+			log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
 		}
 	}
 	

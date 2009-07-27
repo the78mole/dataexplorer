@@ -262,7 +262,7 @@ public class SelectorComposite extends Composite {
 		
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth-1, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-1);
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth-2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
 		}
