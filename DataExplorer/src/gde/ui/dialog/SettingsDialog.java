@@ -699,7 +699,10 @@ public class SettingsDialog extends Dialog {
 													}
 												}
 												SettingsDialog.this.application.setObjectList(objLnkSearch.getObjectList());
-												SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
+												if (SettingsDialog.this.getParent().isDisposed())
+													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
+												else
+													SettingsDialog.this.application.openMessageDialogAsync(SettingsDialog.this.getParent(), Messages.getString(MessageIds.OSDE_MSGI0034));
 										}
 										}.start();
 									}
