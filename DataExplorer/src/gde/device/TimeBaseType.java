@@ -9,6 +9,7 @@
 package osde.device;
 
 import java.math.BigInteger;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -151,8 +152,8 @@ public class TimeBaseType {
      *     
      */
     public void setTimeStep(double value) {
-    		if (value % 1 == 0) this.timeStep = String.format("%.0f", value); //$NON-NLS-1$
-    		else								this.timeStep = String.format("%.2f", value); //$NON-NLS-1$
+    		if (value % 1 == 0) this.timeStep = String.format(Locale.ENGLISH, "%.0f", value); //$NON-NLS-1$
+    		else								this.timeStep = String.format(Locale.ENGLISH, "%.2f", value); //$NON-NLS-1$
         
     }
 

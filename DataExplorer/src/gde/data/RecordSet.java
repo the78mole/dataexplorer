@@ -1510,7 +1510,7 @@ public class RecordSet extends HashMap<String, Record> {
 					//RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
 					for (int i = 0; i < recordEntries; i++) {
 						RecordSet.this.dataTable[i][0] = new Double(getTimeStep_ms() * i).intValue();					
-						//RecordSet.this.dataTable[i][0] = String.format("%.3f", (getTimeStep_ms() * i));
+						//RecordSet.this.dataTable[i][0] = String.format(Locale.ENGLISH, "%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
 					log.log(Level.FINE, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$

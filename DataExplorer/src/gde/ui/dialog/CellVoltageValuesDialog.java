@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.dialog;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -529,7 +530,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	int matchValueToSelection(CCombo combo, int value) {
 		String[] comboValues = combo.getItems();
-		String strValue = String.format("%.3f", (value/1000.0));
+		String strValue = String.format(Locale.ENGLISH, "%.3f", (value/1000.0));
 		int index = 0;
 		for (; index < comboValues.length; ++index) {
 			if (comboValues[index].equals(strValue)) break;

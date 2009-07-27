@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -534,7 +535,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
+			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public double getOffset() {
@@ -557,7 +558,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
+			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public double getReduction() {
@@ -582,7 +583,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format("%.4f", newValue))); //$NON-NLS-1$
+			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
 	}
 
 	public boolean isVisible() {
@@ -1146,7 +1147,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorTime(double newDisplayScaleFactorTime) {
 		this.displayScaleFactorTime = newDisplayScaleFactorTime;
-		log.log(Level.FINER, String.format("displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
+		log.log(Level.FINER, String.format(Locale.ENGLISH, "displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
 	}
 
 	/**
@@ -1161,7 +1162,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		log.log(Level.FINER, String.format("displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
+		log.log(Level.FINER, String.format(Locale.ENGLISH, "displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
 

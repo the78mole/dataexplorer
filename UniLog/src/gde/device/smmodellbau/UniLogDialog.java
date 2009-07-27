@@ -1,5 +1,6 @@
 package osde.device.smmodellbau;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -252,8 +253,8 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						UniLogDialog.log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (UniLogDialog.this.configTab1.getConfigButtonStatus() && UniLogDialog.this.configTab2.getConfigButtonStatus() && UniLogDialog.this.configTab3.getConfigButtonStatus()
-								&& UniLogDialog.this.configTab4.getConfigButtonStatus()) {
+						if (UniLogDialog.this.configTab1.getConfigButtonStatus() || UniLogDialog.this.configTab2.getConfigButtonStatus() || UniLogDialog.this.configTab3.getConfigButtonStatus()
+								|| UniLogDialog.this.configTab4.getConfigButtonStatus()) {
 							String msg = Messages.getString(MessageIds.OSDE_MSGI1300);
 							if (UniLogDialog.this.application.openYesNoMessageDialog(UniLogDialog.this.getDialogShell(), msg) == SWT.YES) {
 								UniLogDialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
@@ -1345,7 +1346,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 		UniLogDialog.log.log(Level.FINER, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
 
-		this.unilogVersion = String.format("v%.2f", new Double(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
+		this.unilogVersion = String.format(Locale.ENGLISH, "v%.2f", new Double(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
 		UniLogDialog.log.log(Level.FINER, "unilogVersion = " + this.unilogVersion); //$NON-NLS-1$
 		this.firmwareVersionLabel.setText(this.unilogVersion);
 
