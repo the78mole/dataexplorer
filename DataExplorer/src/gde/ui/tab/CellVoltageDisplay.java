@@ -99,7 +99,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.BOLD));
 			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.cellTextLabel.setText(this.displayHeaderText);
 			GridData text1LData = new GridData();

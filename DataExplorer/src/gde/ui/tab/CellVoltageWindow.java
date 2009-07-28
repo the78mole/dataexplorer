@@ -163,7 +163,7 @@ public class CellVoltageWindow {
 			this.voltageLimitsSelection.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0370));
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
-			this.voltageLimitsSelection.setBounds(0, 0, 420, 50);
+			this.voltageLimitsSelection.setBounds(0, 0, 420, 40);
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
@@ -182,7 +182,7 @@ public class CellVoltageWindow {
 			{
 				RowData liPoButtonLData = new RowData();
 				liPoButtonLData.width = 70;
-				liPoButtonLData.height = 25;
+				liPoButtonLData.height = 20;
 				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liPoButton.setLayoutData(liPoButtonLData);
 				this.liPoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -210,7 +210,7 @@ public class CellVoltageWindow {
 			{
 				RowData button1LData = new RowData();
 				button1LData.width = 70;
-				button1LData.height = 25;
+				button1LData.height = 18;
 				this.liIoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liIoButton.setLayoutData(button1LData);
 				this.liIoButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -238,7 +238,7 @@ public class CellVoltageWindow {
 			{
 				RowData button2LData = new RowData();
 				button2LData.width = 70;
-				button2LData.height = 25;
+				button2LData.height = 18;
 				this.liFeButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liFeButton.setLayoutData(button2LData);
 				this.liFeButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -266,7 +266,7 @@ public class CellVoltageWindow {
 			{
 				RowData button2LData = new RowData();
 				button2LData.width = 70;
-				button2LData.height = 25;
+				button2LData.height = 18;
 				this.niMhButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.niMhButton.setLayoutData(button2LData);
 				this.niMhButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -294,7 +294,7 @@ public class CellVoltageWindow {
 			{
 				RowData button1LData1 = new RowData();
 				button1LData1.width = 100;
-				button1LData1.height = 25;
+				button1LData1.height = 18;
 				this.individualButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.individualButton.setLayoutData(button1LData1);
 				this.individualButton.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
@@ -374,9 +374,9 @@ public class CellVoltageWindow {
 			this.infoText = new CLabel(this.cellVoltageMainComposite, SWT.CENTER);
 			this.infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.infoText.setBounds(0, 0, 420, 50);
+			this.infoText.setBounds(0, 0, 420, 40);
 			this.infoText.setText(updateInfo);
-			this.infoText.redraw(0, 0, 420, 50, true);
+			this.infoText.redraw(0, 0, 420, 40, true);
 		}
 	}
 
@@ -492,7 +492,7 @@ public class CellVoltageWindow {
 					}
 				}
 				// add test values here
-				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "ZellenSpannung");
+				cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "ZellenSpannung");
 				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "CellVoltage");
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
 				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
@@ -563,10 +563,10 @@ public class CellVoltageWindow {
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
 			int width = mainSize.x - (2 * x);
-			Rectangle bounds = new Rectangle(x, mainSize.y * 10 / 100, width, mainSize.y * 80 / 100);
+			Rectangle bounds = new Rectangle(x, 45, width, mainSize.y - 100);
 			//log.log(Level.FINE, "cover bounds = " + bounds.toString());
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
-			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y * 90 / 100, 350, 50);
+			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y - 50, 350, 50);
 
 		}
 		else {
