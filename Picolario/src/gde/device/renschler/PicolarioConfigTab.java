@@ -255,7 +255,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null) {
-										String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+										String measurementKey = activeRecordSet.getRecordNames()[1]; // height
 										Record activeRecord = activeRecordSet.get(measurementKey);
 										activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 										PicolarioConfigTab.this.application.updateGraphicsWindow();
@@ -599,7 +599,7 @@ public class PicolarioConfigTab extends Composite {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				String measurementKey = PicolarioConfigTab.this.device.getMeasurementNames(PicolarioConfigTab.this.configName)[1]; // height
+				String measurementKey = activeRecordSet.getRecordNames()[1]; // height
 				Record activeRecord = activeRecordSet.get(measurementKey);
 				activeRecord.getProperty(Picolario.DO_NO_ADAPTION).setValue(""+PicolarioConfigTab.this.doNoAdation); //$NON-NLS-1$
 				activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST).setValue(""+PicolarioConfigTab.this.doSubtractFirst); //$NON-NLS-1$

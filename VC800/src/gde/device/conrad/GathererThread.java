@@ -48,7 +48,6 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final Integer							channelNumber;
-	final String[]						measurements;
 	final String							configKey;
 	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
@@ -76,8 +75,6 @@ public class GathererThread extends Thread {
 		this.channelNumber = new Integer(channelName.trim().split(":")[0].trim()); //$NON-NLS-1$
 		this.channel = this.channels.get(this.channelNumber);
 		this.configKey = channelName.trim().split(":")[1].trim(); //$NON-NLS-1$
-
-		this.measurements = useDevice.getMeasurementNames(this.configKey); // 0=Spannung, 1=Höhe, 2=Steigrate, ....
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
