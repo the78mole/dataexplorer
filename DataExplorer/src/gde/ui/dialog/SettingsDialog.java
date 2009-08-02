@@ -34,6 +34,8 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -67,19 +69,8 @@ import osde.ui.SWTResourceManager;
 import osde.ui.menu.LogLevelSelectionContextMenu;
 import osde.utils.ObjectKeyScanner;
 import osde.utils.OperatingSystemHelper;
+import osde.utils.StringHelper;
 
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
@@ -117,6 +108,8 @@ public class SettingsDialog extends Dialog {
 	CCombo															localCombo;
 	Group																groupLocale;
 	Button															doPortAvailabilityCheck;
+	Button															enableBlackListButton;
+	Text																serialPortBlackList;
 	Button															suggestObjectKey;
 	Composite														tabComposite1;
 	Composite														analysisComposite;
@@ -182,15 +175,15 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(496, 527);
+			this.dialogShell.setSize(496, 560);
 			this.dialogShell.setText(OSDE.OSDE_NAME_LONG + Messages.getString(MessageIds.OSDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.gif")); //$NON-NLS-1$
 			{ // begin tab folder
-				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT|SWT.BORDER);
+				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT | SWT.BORDER);
 				this.settingsTabFolder.setSimple(false);
 				FormData cTabFolder1LData = new FormData();
-				cTabFolder1LData.width = 484;
-				cTabFolder1LData.height = 419;
+				cTabFolder1LData.width = 486;
+				cTabFolder1LData.height = 454;
 				cTabFolder1LData.left = new FormAttachment(0, 1000, 0);
 				cTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
 				cTabFolder1LData.top = new FormAttachment(0, 1000, 0);
@@ -377,7 +370,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.deviceDialogOnTopButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogOnTopButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
+								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.OSDE_MSGT0338));
 								this.deviceDialogOnTopButton.setBounds(282, 24, 165, 18);
 								this.deviceDialogOnTopButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
 								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
@@ -496,7 +489,7 @@ public class SettingsDialog extends Dialog {
 							serialPortGroupLData.left = new FormAttachment(0, 1000, 12);
 							serialPortGroupLData.top = new FormAttachment(0, 1000, 335);
 							serialPortGroupLData.width = 451;
-							serialPortGroupLData.height = 55;
+							serialPortGroupLData.height = 88;
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0330));
@@ -506,9 +499,16 @@ public class SettingsDialog extends Dialog {
 									SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
 									SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
 									//serialPort.setText(settings.getSerialPort());
-									SettingsDialog.this.serialPort.setItems(SettingsDialog.this.availablePorts.toArray(new String[SettingsDialog.this.availablePorts.size()]));
-									int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
-									SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
+									//SettingsDialog.this.serialPort.setItems(StringHelper.prepareSerialPortList(SettingsDialog.this.availablePorts));
+									//int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
+									//SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
+
+									SettingsDialog.this.serialPortBlackList.setText(SettingsDialog.this.settings.getSerialPortBlackList());
+									boolean isBlacklistEnabled = SettingsDialog.this.settings.isSerialPortBlackListEnabled();
+									SettingsDialog.this.enableBlackListButton.setSelection(isBlacklistEnabled);
+									SettingsDialog.this.serialPortBlackList.setEditable(isBlacklistEnabled);
+									SettingsDialog.this.serialPortBlackList.setEnabled(isBlacklistEnabled);
+
 								}
 							});
 							{
@@ -522,6 +522,9 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
+										if (SettingsDialog.this.doPortAvailabilityCheck.getSelection()) {
+											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.OSDE_MSGI0036));
+										}
 									}
 								});
 							}
@@ -530,7 +533,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, 43, 243, 22);
+								this.useGlobalSerialPort.setBounds(15, 45, 243, 22);
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -547,14 +550,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.serialPort.setBounds(260, 45, 181, OSDE.IS_WINDOWS ? 21 : 25);
+								this.serialPort.setBounds(260, 47, 181, 21);
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
 								this.serialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText());
+										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText().trim());
 									}
 								});
 							}
@@ -563,6 +566,44 @@ public class SettingsDialog extends Dialog {
 								this.Port.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.Port.setText(Messages.getString(MessageIds.OSDE_MSGT0335));
 								this.Port.setBounds(264, 19, 174, 20);
+							}
+							{
+								this.enableBlackListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
+								this.enableBlackListButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
+								this.enableBlackListButton.setBounds(15, 73, 243, 22);
+								this.enableBlackListButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.enableBlackListButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
+								this.enableBlackListButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "enableBlackListButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (SettingsDialog.this.enableBlackListButton.getSelection()) {
+											SettingsDialog.this.settings.setSerialPortBlackListEnabled(true);
+											SettingsDialog.this.serialPortBlackList.setEditable(true);
+											SettingsDialog.this.serialPortBlackList.setEnabled(true);
+										}
+										else {
+											SettingsDialog.this.settings.setSerialPortBlackListEnabled(false);
+											SettingsDialog.this.serialPortBlackList.setEditable(false);
+											SettingsDialog.this.serialPortBlackList.setEnabled(false);
+										}
+									}
+								});
+							}
+							{
+								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
+								this.serialPortBlackList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
+								this.serialPortBlackList.setBounds(260, 75, 181, 22);
+								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
+									@Override
+									public void keyReleased(KeyEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt);
+										if (evt.character == SWT.CR) {
+											SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
+										}
+									}
+								});
 							}
 						} // end serial port group
 					} // end tabComposite1
@@ -676,7 +717,7 @@ public class SettingsDialog extends Dialog {
 								this.scanObjectKeysButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
 								this.scanObjectKeysButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.scanObjectKeysButton.setText(Messages.getString(MessageIds.OSDE_MSGT0207));
-								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] {this.settings.getDataFilePath()}));
+								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] { this.settings.getDataFilePath() }));
 								RowData scanObjectKeysButtonLData = new RowData();
 								scanObjectKeysButtonLData.width = 300;
 								scanObjectKeysButtonLData.height = 30;
@@ -688,9 +729,10 @@ public class SettingsDialog extends Dialog {
 										final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
 										objLnkSearch.setSearchForKeys(true);
 										objLnkSearch.start();
-										new Thread(){ 
+										new Thread() {
+											@Override
 											public void run() {
-												while(objLnkSearch.isAlive()) {
+												while (objLnkSearch.isAlive()) {
 													try {
 														Thread.sleep(1000);
 													}
@@ -699,11 +741,11 @@ public class SettingsDialog extends Dialog {
 													}
 												}
 												SettingsDialog.this.application.setObjectList(objLnkSearch.getObjectList());
-												if (SettingsDialog.this.getParent().isDisposed())
+												if (getParent().isDisposed())
 													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
 												else
-													SettingsDialog.this.application.openMessageDialogAsync(SettingsDialog.this.getParent(), Messages.getString(MessageIds.OSDE_MSGI0034));
-										}
+													SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.OSDE_MSGI0034));
+											}
 										}.start();
 									}
 								});
@@ -1065,7 +1107,7 @@ public class SettingsDialog extends Dialog {
 					SettingsDialog.this.settings.updateLogLevel();
 					// check for changed local
 					if (SettingsDialog.this.isLocaleLanguageChanged) {
-						SettingsDialog.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0304));
+						SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.OSDE_MSGT0304));
 					}
 				}
 			});
@@ -1117,7 +1159,7 @@ public class SettingsDialog extends Dialog {
 	}
 
 	/**
-	 * 
+	 * query the available serial ports and update the serialPortGroup combo
 	 */
 	void updateAvailablePorts() {
 		// execute independent from dialog UI
@@ -1126,19 +1168,21 @@ public class SettingsDialog extends Dialog {
 			public void run() {
 				try {
 					while (!SettingsDialog.this.dialogShell.isDisposed()) {
-						SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts();
-						if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
-							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+						DeviceSerialPort.listConfiguredSerialPorts(SettingsDialog.this.availablePorts, SettingsDialog.this.settings.doPortAvailabilityCheck(), SettingsDialog.this.settings.getSerialPortBlackList());
+						if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0 && SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) {
+							OpenSerialDataExplorer.display.syncExec(new Runnable() {
 								public void run() {
-									if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) SettingsDialog.this.serialPortGroup.redraw();
+									SettingsDialog.this.serialPort.setItems(StringHelper.prepareSerialPortList(SettingsDialog.this.availablePorts));
+									int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
+									SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
 								}
 							});
-							try {
-								Thread.sleep(2500);
-							}
-							catch (InterruptedException e) {
-								// ignore
-							}
+						}
+						try {
+							Thread.sleep(2500);
+						}
+						catch (InterruptedException e) {
+							// ignore
 						}
 					}
 				}

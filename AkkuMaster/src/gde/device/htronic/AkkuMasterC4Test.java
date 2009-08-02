@@ -20,6 +20,7 @@ import gnu.io.SerialPort;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 import osde.device.DeviceConfiguration;
 import osde.serial.DeviceSerialPort;
@@ -41,7 +42,8 @@ public class AkkuMasterC4Test {
 		try {
 			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/AkkumasterC4.xml"); //$NON-NLS-1$
 			akkuMaster = new AkkuMasterC4SerialPort(deviceConfig, null);
-			DeviceSerialPort.listConfiguredSerialPorts();
+			Vector<String> ports = new Vector<String>();
+			DeviceSerialPort.listConfiguredSerialPorts(ports, true, "");
 			SerialPort serialPort = akkuMaster.open();
 
 			//akkuMaster.print(akkuMaster.getVersion());

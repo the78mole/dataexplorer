@@ -17,6 +17,9 @@
 package osde.device.renschler;
 
 import gnu.io.SerialPort;
+
+import java.util.Vector;
+
 import osde.device.DeviceConfiguration;
 import osde.serial.DeviceSerialPort;
 
@@ -36,7 +39,8 @@ public class PicolarioSerialPortTest {
 		try {
 			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Picolario.xml"); //$NON-NLS-1$
 			picolario = new PicolarioSerialPort(deviceConfig, null);
-			DeviceSerialPort.listConfiguredSerialPorts();
+			Vector<String> ports = new Vector<String>();
+			DeviceSerialPort.listConfiguredSerialPorts(ports, true, "");
 
 			SerialPort serialPort = picolario.open();
 

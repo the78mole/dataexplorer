@@ -125,7 +125,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog(
+			OpenSerialDataExplorer.getInstance().openMessageDialog(this.dialogShell, 
 					Messages.getString(MessageIds.OSDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}

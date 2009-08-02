@@ -757,7 +757,7 @@ public class MenuBar {
 	public void importFileCSV(String dialogName, final boolean isRaw) {
 		IDevice activeDevice = this.application.getActiveDevice();
 		if (activeDevice == null) {
-			this.application.openMessageDialog(Messages.getString(OSDE.FILE_ENDING_STAR_CSV));
+			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0004)); 
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();

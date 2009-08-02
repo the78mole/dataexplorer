@@ -330,18 +330,18 @@ int main(array<System::String ^> ^args)
 		}
 	}
 	catch(System::Security::SecurityException ^ pEx) { 
-		Console::WriteLine( pEx->Message );
+		Console::WriteLine( "SecurityException: " + pEx->Message );
 		rc = 740;
 	}
 	catch(System::UnauthorizedAccessException ^ pEx) { 
-		Console::WriteLine( pEx->Message );
+		Console::WriteLine( "UnauthorizedAccessException: " + pEx->Message );
 		rc = 740;
 	}
 	catch(System::ArgumentException ^ pEx) { 
-		Console::WriteLine( pEx->Message );
+		Console::WriteLine( "ArgumentException: " + pEx->Message );
 	}
 	catch(System::NullReferenceException ^ pEx) { 
-		Console::WriteLine( pEx->Message );
+		Console::WriteLine( "NullReferenceException: " + pEx->Message );
 	}
 
 	return rc;

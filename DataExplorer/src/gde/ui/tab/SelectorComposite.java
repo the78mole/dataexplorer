@@ -167,11 +167,13 @@ public class SelectorComposite extends Composite {
 								if (item.getChecked()) {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
 									recordSet.setSyncRequested(true, true);
+									recordSet.setSyncRecordSelected(true);
 									//item.setChecked(recordSet.isSyncableSynced()); // only allow check if at least one of the syncable records are visible
 								}
 								else {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
 									recordSet.setSyncRequested(false, true);
+									recordSet.setSyncRecordSelected(false);
 								}
 							}
 						}

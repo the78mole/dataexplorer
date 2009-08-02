@@ -139,11 +139,14 @@ public class RecordSet extends HashMap<String, Record> {
 	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
 	int														horizontalGridRecordOrdinal		= -1;																						// recordNames[horizontalGridRecord]
 
-	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			// voltage limits for LiXx cells, initial LiPo
+	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			  // voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										// each main tickmark //$NON-NLS-1$		
 	
+	boolean												isSyncRecordSelected					= false;
+	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
+	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
-			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS, SYNC_RECORD_SELECTED	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
 
@@ -1589,10 +1592,12 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
 				.append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 		
+		sb.append(SYNC_RECORD_SELECTED).append(OSDE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
+
 		sb.append(VOLTAGE_LIMITS).append(OSDE.STRING_EQUAL);
 		for (int value : this.voltageLimits) {
 			sb.append(value).append(OSDE.STRING_COMMA);
-		}
+		}	
 		sb.deleteCharAt(sb.length()-1);
 
 		return sb.toString().endsWith(Record.DELIMITER) ? sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) : sb.toString();
@@ -1646,6 +1651,9 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 5)
 				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(OSDE.STRING_COMMA)[2]));
+				
+			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
+			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = new Boolean(tmpValue.trim());
 			
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
@@ -1654,7 +1662,6 @@ public class RecordSet extends HashMap<String, Record> {
 					this.voltageLimits[i] = new Integer(strVoltageValues[i].trim());
 				}
 			}
-			
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
@@ -1757,11 +1764,11 @@ public class RecordSet extends HashMap<String, Record> {
 				Record tmpRecord = new Record(this.device, this.realSize()+1, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
 				tmpRecord.isSyncPlaceholder = true;
 				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
-				tmpRecord.isVisible = false;
+				tmpRecord.isVisible = this.isSyncRecordSelected;
 				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
 				this.put(syncRecName, tmpRecord);
 				this.addRecordName(syncRecName);
-				this.setSyncRequested(false, false);
+				this.setSyncRequested(this.isSyncRecordSelected, false);
 
 				this.isSyncableChecked = true;
 				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
@@ -1880,6 +1887,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * synchronize the scales of all syncable records
 	 * @param enable the isSyncableSynced to set
 	 * @param countAsChange 
 	 */
@@ -2057,5 +2065,12 @@ public class RecordSet extends HashMap<String, Record> {
 				this.syncScaleOfSyncableRecords();
 			}
 		}
+	}
+
+	/**
+	 * @param enable the isSyncRecordSelected to set
+	 */
+	public void setSyncRecordSelected(boolean enable) {
+		this.isSyncRecordSelected = enable;
 	}
 }

@@ -126,6 +126,8 @@ public class Settings extends Properties {
 	public final static String		IS_GLOBAL_PORT								= "is_global_port"; //$NON-NLS-1$
 	public final static String		GLOBAL_PORT_NAME							= "global_port_name"; //$NON-NLS-1$
 	public final static String		DO_PORT_AVAILABLE_TEST				= "do_port_available_test"; //$NON-NLS-1$
+	public final static String		IS_PORT_BLACKLIST							= "is_port_black_list"; //$NON-NLS-1$
+	public final static String		PORT_BLACKLIST								= "port_black_list"; //$NON-NLS-1$
 	public final static String		DEVICE_DIALOG_USE_MODAL				= "device_dialogs_modal"; //$NON-NLS-1$
 	public static final String		DEVICE_DIALOG_ON_TOP					= "device_dialogs_on_top"; //$NON-NLS-1$
 	public final static String		IS_GLOBAL_LOG_LEVEL						= "is_global_log_level"; //$NON-NLS-1$
@@ -432,6 +434,8 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-30s \t=\t %s\n", IS_GLOBAL_PORT, isGlobalSerialPort())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", GLOBAL_PORT_NAME, getSerialPort())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", PORT_BLACKLIST, getSerialPortBlackList())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", AUTO_OPEN_SERIAL_PORT, isAutoOpenSerialPort())); //$NON-NLS-1$
@@ -699,6 +703,34 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * @return boolean value of port black list enablement
+	 */
+	public boolean isSerialPortBlackListEnabled() {
+		return new Boolean(this.getProperty(IS_PORT_BLACKLIST, "false").trim()).booleanValue(); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the global serial port
+	 */
+	public void setSerialPortBlackListEnabled(boolean enabled) {
+		this.setProperty(IS_PORT_BLACKLIST, ""+enabled);
+	}
+
+	/**
+	 * @return port black list
+	 */
+	public String getSerialPortBlackList() {
+		return " " + this.getProperty(PORT_BLACKLIST, "").trim(); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the serial port black list
+	 */
+	public void setSerialPortBlackList(String newPortBlackList) {
+		this.setProperty(PORT_BLACKLIST, newPortBlackList);
+	}
+
+	/**
 	 * @return the global log level
 	 */
 	public boolean isGlobalLogLevel() {
@@ -716,16 +748,7 @@ public class Settings extends Properties {
 	 * @return the serial port name as string
 	 */
 	public String getSerialPort() {
-		String port = EMPTY;
-		if (getProperty(IS_GLOBAL_PORT) != null) {
-			if (new Boolean(getProperty(IS_GLOBAL_PORT))) {
-				port = getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
-			}
-			else if (getProperty(ACTIVE_DEVICE) != null) {
-				port = getProperty(ACTIVE_DEVICE, EMPTY_SIGNATURE).split(";")[2].trim(); //$NON-NLS-1$
-			}
-		}
-		return port;
+		return getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
 	}
 	
 	/**
@@ -740,7 +763,7 @@ public class Settings extends Properties {
 	 * get property if during port scan a availability check should executed (disable for slow systems)
 	 */
 	public boolean doPortAvailabilityCheck() {
-		return new Boolean(getProperty(DO_PORT_AVAILABLE_TEST, "true")).booleanValue(); //$NON-NLS-1$
+		return new Boolean(getProperty(DO_PORT_AVAILABLE_TEST, "false")).booleanValue(); //$NON-NLS-1$
 	}
 
 	/**

@@ -267,4 +267,16 @@ public class StringHelper {
 		log.log(Level.INFO, "keyCode = SWT." + keyCode);
 	}
 
+	/**
+	 * @return available serial port list
+	 */
+	public static String[] prepareSerialPortList(Vector<String> availablePorts) {
+		String[] serialPortList = new String[availablePorts.size()];
+		String[] tmpSerialPortList = availablePorts.toArray(new String[availablePorts.size()]);
+		for (int i = 0; i < tmpSerialPortList.length; i++) {
+			serialPortList[i] = OSDE.STRING_BLANK + tmpSerialPortList[i];
+		}
+		return serialPortList;
+	}
+
 }
