@@ -108,7 +108,6 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
 		return ""; //$NON-NLS-1$
