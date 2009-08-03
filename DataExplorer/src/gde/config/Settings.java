@@ -128,6 +128,8 @@ public class Settings extends Properties {
 	public final static String		DO_PORT_AVAILABLE_TEST				= "do_port_available_test"; //$NON-NLS-1$
 	public final static String		IS_PORT_BLACKLIST							= "is_port_black_list"; //$NON-NLS-1$
 	public final static String		PORT_BLACKLIST								= "port_black_list"; //$NON-NLS-1$
+	public final static String		IS_PORT_WHITELIST							= "is_port_white_list"; //$NON-NLS-1$
+	public final static String		PORT_WHITELIST								= "port_white_list"; //$NON-NLS-1$
 	public final static String		DEVICE_DIALOG_USE_MODAL				= "device_dialogs_modal"; //$NON-NLS-1$
 	public static final String		DEVICE_DIALOG_ON_TOP					= "device_dialogs_on_top"; //$NON-NLS-1$
 	public final static String		IS_GLOBAL_LOG_LEVEL						= "is_global_log_level"; //$NON-NLS-1$
@@ -436,6 +438,8 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-30s \t=\t %s\n", DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", PORT_BLACKLIST, getSerialPortBlackList())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", IS_PORT_WHITELIST, isSerialPortWhiteListEnabled())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", PORT_WHITELIST, getSerialPortWhiteListString())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", AUTO_OPEN_SERIAL_PORT, isAutoOpenSerialPort())); //$NON-NLS-1$
@@ -710,17 +714,21 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set the global serial port
+	 * set the global serial port black list enabled
 	 */
 	public void setSerialPortBlackListEnabled(boolean enabled) {
-		this.setProperty(IS_PORT_BLACKLIST, ""+enabled);
+		this.setProperty(IS_PORT_BLACKLIST, OSDE.STRING_EMPTY+enabled);
 	}
 
 	/**
 	 * @return port black list
 	 */
 	public String getSerialPortBlackList() {
-		return " " + this.getProperty(PORT_BLACKLIST, "").trim(); //$NON-NLS-1$
+		StringBuffer blackList = new StringBuffer();
+		for (String port : this.getProperty(PORT_BLACKLIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
+			if(port != null && port.length() > 3) blackList.append(port).append(OSDE.STRING_BLANK);
+		}
+		return blackList.toString().trim();
 	}
 
 	/**
@@ -728,6 +736,50 @@ public class Settings extends Properties {
 	 */
 	public void setSerialPortBlackList(String newPortBlackList) {
 		this.setProperty(PORT_BLACKLIST, newPortBlackList);
+	}
+
+
+	/**
+	 * @return boolean value of port white list enablement
+	 */
+	public boolean isSerialPortWhiteListEnabled() {
+		return new Boolean(this.getProperty(IS_PORT_WHITELIST, "false").trim()).booleanValue(); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the serial port white list enabled
+	 */
+	public void setSerialPortWhiteListEnabled(boolean enabled) {
+		this.setProperty(IS_PORT_WHITELIST, ""+enabled);
+	}
+
+	/**
+	 * @return port white list as vector
+	 */
+	public Vector<String> getSerialPortWhiteList() {
+		Vector<String> whiteList = new Vector<String>();
+		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
+			if(port != null && port.length() > 3) whiteList.add(port);
+		}
+		return whiteList;
+	}
+
+	/**
+	 * @return port white list as String
+	 */
+	public String getSerialPortWhiteListString() {
+		StringBuffer whiteList = new StringBuffer();
+		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
+			if(port != null && port.length() > 3) whiteList.append(port).append(OSDE.STRING_BLANK);
+		}
+		return whiteList.toString().trim();
+	}
+
+	/**
+	 * set the serial port white list
+	 */
+	public void setSerialPortWhiteList(String newPortWhiteList) {
+		this.setProperty(PORT_WHITELIST, newPortWhiteList);
 	}
 
 	/**

@@ -105,35 +105,58 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @return a vector with actual available ports at the system
 	 */
 	@SuppressWarnings("unchecked")
-	public static void listConfiguredSerialPorts(final Vector<String> updateAvailablePorts, final boolean isAvialabilityCheck, final String portBlackList) {
+	public static void listConfiguredSerialPorts(final Vector<String> updateAvailablePorts, final boolean isAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
 		try {
-			String serialPortStr;
-			Enumeration<CommPortIdentifier> enumIdentifiers = CommPortIdentifier.getPortIdentifiers(); // initializes serial port
 			updateAvailablePorts.clear();
-
-			// find all available serial ports
-			while (enumIdentifiers.hasMoreElements()) {
-				CommPortIdentifier commPortIdentifier = enumIdentifiers.nextElement();
-				serialPortStr = commPortIdentifier.getName();
-				if (!portBlackList.contains(serialPortStr)) {
-					if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
-						try {
-							if (isAvialabilityCheck) {
-								((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+			
+			if (portWhiteList.size() > 0) { // check ports from the white list only
+				for (String serialPortStr : portWhiteList) {
+					try {
+						CommPortIdentifier commPortIdentifier = CommPortIdentifier.getPortIdentifier(serialPortStr);
+						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
+							try {
+								if (isAvialabilityCheck) {
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+								}
+								updateAvailablePorts.add(serialPortStr);
+								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
-							updateAvailablePorts.add(serialPortStr);
-							log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
+							catch (Exception e) {
+								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
+							}
 						}
-						catch (Exception e) {
-							log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
+					}
+					catch (NoSuchPortException e) {
+						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getClass().getName() + " - " + serialPortStr); //$NON-NLS-1$
+					}
+				}
+			}
+			else {	// find all available serial ports, check against black list
+				String serialPortStr;
+				Enumeration<CommPortIdentifier> enumIdentifiers = CommPortIdentifier.getPortIdentifiers(); // initializes serial port
+				while (enumIdentifiers.hasMoreElements()) {
+					CommPortIdentifier commPortIdentifier = enumIdentifiers.nextElement();
+					serialPortStr = commPortIdentifier.getName();
+					if (!portBlackList.contains(serialPortStr)) {
+						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
+							try {
+								if (isAvialabilityCheck) {
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+								}
+								updateAvailablePorts.add(serialPortStr);
+								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
+							}
+							catch (Exception e) {
+								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
+							}
 						}
 					}
 				}
 			}
-			if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.INFO)) {
 				StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
 				for (String comPort : updateAvailablePorts) {
 					sb.append(comPort).append(" "); //$NON-NLS-1$
@@ -226,7 +249,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			Settings settings = Settings.getInstance();
 			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
-			if(availablePorts.size() == 0 ) listConfiguredSerialPorts(availablePorts, false, Settings.getInstance().getSerialPortBlackList());
+			if(availablePorts.size() == 0 ) listConfiguredSerialPorts(availablePorts, false, Settings.getInstance().getSerialPortBlackList(), Settings.getInstance().getSerialPortWhiteList());
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
 				// no serial port is selected, if only one serial port is available choose this one
 				if (availablePorts.size() == 1) {

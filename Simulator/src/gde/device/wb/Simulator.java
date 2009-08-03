@@ -102,7 +102,6 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -126,7 +125,6 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// unknown device for LogView
 	}
@@ -137,7 +135,6 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		return points;
 	}

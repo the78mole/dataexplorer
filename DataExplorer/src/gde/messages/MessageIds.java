@@ -385,6 +385,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0306 = "OSDE_MSGT0306";
 	public final static String	OSDE_MSGT0307 = "OSDE_MSGT0307";
 	public final static String	OSDE_MSGT0308 = "OSDE_MSGT0308";
+	public final static String	OSDE_MSGT0309 = "OSDE_MSGT0309";
 	public final static String	OSDE_MSGT0310 = "OSDE_MSGT0310";
 	public final static String	OSDE_MSGT0311 = "OSDE_MSGT0311";
 	public final static String	OSDE_MSGT0312 = "OSDE_MSGT0312";
@@ -410,6 +411,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0336 = "OSDE_MSGT0336";
 	public final static String	OSDE_MSGT0337 = "OSDE_MSGT0337";
 	public final static String	OSDE_MSGT0338 = "OSDE_MSGT0338";
+	public final static String	OSDE_MSGT0339 = "OSDE_MSGT0339";
 	public final static String	OSDE_MSGT0340 = "OSDE_MSGT0340";
 	public final static String	OSDE_MSGT0341 = "OSDE_MSGT0341";
 	public final static String	OSDE_MSGT0342 = "OSDE_MSGT0342";
