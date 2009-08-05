@@ -275,7 +275,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @param values
 	 * @param currentConfiguration
 	 * @param currentMeasurements
-	 * @return
+	 * @return map with configuration key value pair
 	 */
 	public static HashMap<String, Object> getConvertedValues(HashMap<String, Object> values, String[] currentConfiguration, String[] currentMeasurements) {
 		boolean isActive = true;
@@ -347,7 +347,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	/**
 	 * convert the recceived data bytes into parseable string array
 	 * @param configurationDataBytes - the data byte array
-	 * @return
+	 * @return string array with device configuration data
 	 */
 	public static String[] convertConfigurationAnswer(byte[] configurationDataBytes) {
 		String[] configStrings = new String[9];
@@ -497,7 +497,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	/**
 	 * convert measurement data bytes into parseable string array
 	 * @param measuredValuesDataBytes
-	 * @return
+	 * @return sting array with measurement values
 	 */
 	public static String[] convertMeasurementValues(byte[] measuredValuesDataBytes) {
 		String[] measurements = new String[11];

@@ -102,10 +102,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * @return a vector with actual available ports at the system
+	 * updates the given vector with actual available according black/white list configuration
+	 * @param updateAvailablePorts
+	 * @param doAvialabilityCheck
+	 * @param portBlackList
+	 * @param portWhiteList
 	 */
 	@SuppressWarnings("unchecked")
-	public static void listConfiguredSerialPorts(final Vector<String> updateAvailablePorts, final boolean isAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
+	public static void listConfiguredSerialPorts(final Vector<String> updateAvailablePorts, final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
@@ -118,7 +122,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						CommPortIdentifier commPortIdentifier = CommPortIdentifier.getPortIdentifier(serialPortStr);
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (isAvialabilityCheck) {
+								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
 								}
 								updateAvailablePorts.add(serialPortStr);
@@ -143,7 +147,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					if (!portBlackList.contains(serialPortStr)) {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (isAvialabilityCheck) {
+								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
 								}
 								updateAvailablePorts.add(serialPortStr);
@@ -176,9 +180,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	/**
 	 * find available serial ports
-	 * @param availablePorts
+	 * @param portBlackList
 	 */
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@Deprecated
 	public static Vector<String> getAvailablePorts(String[] portBlackList) {
 		final String $METHOD_NAME = "getAvailablePorts"; //$NON-NLS-1$
 		String serialPortStr;
@@ -397,10 +402,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	/**
 	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
-	 * @param bytes
+	 * @param readBuffer
 	 * @param timeout_msec
-	 * @param waitTimes
-	 * @return
+	 * @return the red byte array
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
@@ -454,7 +458,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @param bytes
 	 * @param timeout_msec
 	 * @param waitTimes
-	 * @return
+	 * @return the red byte array
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */

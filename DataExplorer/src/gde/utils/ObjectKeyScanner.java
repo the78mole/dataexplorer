@@ -51,7 +51,6 @@ public class ObjectKeyScanner extends Thread {
 	 * starting this as thread all the sub files of the given data path are scanned for object key references 
 	 * using this constructor the object key must be set before starting the scan thread
 	 * and a file link will be created in a directory named with the object key
-	 * @param newObjectKey the object key to be used for scanning existing files
 	 */
 	public ObjectKeyScanner() {
 		super();

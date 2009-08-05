@@ -31,7 +31,7 @@ public class MathUtils {
 	 * round up for a positive value results in a higher value
 	 * round up for a negative value results in a lower value
 	 * @param value
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundUp(double value) {
 		double roundValue = checkRoundReq(value);
@@ -111,7 +111,7 @@ public class MathUtils {
 	 * round down for a positive value results in a lower value
 	 * round down for a negative value results in a higher value
 	 * @param value
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundDown(double value) {
 		double roundValue = checkRoundReq(value);
@@ -179,7 +179,7 @@ public class MathUtils {
 	 * round up for a negative value results in a lower value
 	 * @param value
 	 * @param delta
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundUp(double value, double delta) {
 		double roundValue = checkRoundReq(value);
@@ -247,7 +247,7 @@ public class MathUtils {
 	 * round down for a negative value results in a higher value
 	 * @param value
 	 * @param delta
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundDown(double value, double delta) {
 		double roundValue = checkRoundReq(value);
@@ -315,7 +315,7 @@ public class MathUtils {
 	 * round up for a negative value results in a lower value
 	 * @param value
 	 * @param delta
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundUpAuto(double value, double delta) {
 		double roundValue = checkRoundReq(value);
@@ -387,7 +387,7 @@ public class MathUtils {
 	 * round down for a negative value results in a higher value
 	 * @param value
 	 * @param delta
-	 * @return
+	 * @return rounded double value
 	 */
 	public static double roundDownAuto(double value, double delta) {
 		double roundValue = checkRoundReq(value);

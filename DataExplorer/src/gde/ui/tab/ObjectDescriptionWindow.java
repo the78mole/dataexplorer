@@ -835,7 +835,7 @@ public class ObjectDescriptionWindow {
 	//	}
 
 	/**
-	 * @return the imageCanvas to enable redraw
+	 * redraw the imageCanvas
 	 */
 	public void redrawImageCanvas() {
 		this.imageCanvas.redraw();

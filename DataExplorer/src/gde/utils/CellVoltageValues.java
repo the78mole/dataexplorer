@@ -93,12 +93,7 @@ public class CellVoltageValues {
 
 	/**
 	 * set the voltage limits for the bar graph
-	 * @param newUpperLimitVoltage the upperLimitVoltage to set
-	 * @param newUpperLimitColorRed the upperLimitColorRed to set
-	 * @param newLowerLimitColorRed the lowerLimitColorRed to set
-	 * @param newBeginSpreadVoltage the beginSpreadVoltage to set
-	 * @param newLowerLimitColorGreen the lowerLimitColorGreen to set
-	 * @param newLowerLimitVoltage the lowerLimitVoltage to set
+	 * @param newVoltageLimits the voltage limits to set
 	 */
 	public static void setVoltageLimits(int[] newVoltageLimits) {
 		if (voltageLimits.length <= newVoltageLimits.length)

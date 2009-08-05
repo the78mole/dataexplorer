@@ -169,7 +169,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
-	 * @param initialCapacity the initial size of the data hash map
 	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super(measurementNames.length);
@@ -426,7 +425,6 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * method to add a series of points to the associated records
 	 * @param points as int[], where the length must fit records.size()
-	 * @param doUpdate to manage display update
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
@@ -1935,7 +1933,8 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * query if the given record key is one of syncable records
-	 * @return 
+	 * @param queryRecordKey the record key to be used for the query
+	 * @return true if syncable records contains queryRecordKey
 	 */
 	public boolean isOneOfSyncableRecord(String queryRecordKey) {
 		return this.syncableRecords.contains(queryRecordKey);
@@ -2026,7 +2025,7 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param newVoltageLimits the voltageLimits to set for LiXx cells if enabled
+	 * set the voltage limits to set for battery cells if enabled
 	 */
 	public void setVoltageLimits() {
 		this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);

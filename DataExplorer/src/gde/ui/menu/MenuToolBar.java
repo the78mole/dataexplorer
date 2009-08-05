@@ -1239,7 +1239,8 @@ public class MenuToolBar {
 	/**
 	 * check the object key selected against an eventually existing and ask for replacement
 	 * @param actualSelectionIndex
-	 * @return
+	 * @param newObjectKey
+	 * @return actualSelectionIndex
 	 */
 	public int checkChannelForObjectKeyMissmatch(int actualSelectionIndex, String newObjectKey) {
 		Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();

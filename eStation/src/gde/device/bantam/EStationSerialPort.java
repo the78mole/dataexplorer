@@ -31,8 +31,7 @@ public class EStationSerialPort extends DeviceSerialPort {
 
 	/**
 	 * method to gather data from device, implementation is individual for device
-	 * @param channel signature if device has more than one or required by device
-	 * @return map containing gathered data - this can individual specified per device
+	 * @return byte array containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {

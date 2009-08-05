@@ -191,11 +191,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * convert record logview config data to OSDE config keys into records section
-	 * @param header
-	 * @param lov2osdMap
-	 * @param channelNumber
-	 * @return string with delimited record keys
+	 * convert record LogView config data to OSDE config keys into records section
+	 * @param header reference to header data, contain all key value pairs
+	 * @param lov2osdMap reference to the map where the key mapping
+	 * @param channelNumber 
+	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		String recordSetInfo = new String();
@@ -898,7 +898,6 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * get the analog modus of A1, A2 and A3 to update the analog measurements of the given channel configuration
 	 * @param dataBuffer
 	 * @param configKey
-	 * @return
 	 */
 	public void updateMeasurementByAnalogModi(byte[] dataBuffer, String configKey) {
 		// a1Modus -> 0==Temperature, 1==Millivolt, 2=Speed 250, 3=Speed 400

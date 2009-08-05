@@ -104,11 +104,11 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * convert record logview config data to OSDE config keys into records section
+	 * convert record LogView config data to OSDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber
-	 * @return
+	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		return ""; //$NON-NLS-1$
@@ -116,6 +116,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * @return size of the device data in bytes
 	 */
 	public int getLovDataByteSize() {
 		return 55; // 0x33 = 51 + 4 (counter)

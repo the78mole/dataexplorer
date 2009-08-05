@@ -135,7 +135,6 @@ public class FileUtils {
 	/**
 	 * check existent of a directory and delete underlaying files as well as the directory
 	 * @param fullQualifiedDirectoryPath
-	 * @param versionFileName string qualifier "_V01" checks for file *_V01.* 
 	 * @return true false if directory needs to be created
 	 */
 	public static boolean deleteDirectory(String fullQualifiedDirectoryPath) {
@@ -212,7 +211,7 @@ public class FileUtils {
 	
 	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
-	 * supported Charset encoding :
+	 * supported character set encoding :
 	 * US-ASCII 	Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
 	 * ISO-8859-1   	ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
 	 * UTF-8 	Eight-bit UCS Transformation Format
@@ -226,7 +225,6 @@ public class FileUtils {
 	 * @param targetFilePath
 	 * @param sourceEncoding "UTF-8", "ISO-8859-1"
 	 * @param targetEncoding "UTF-8", "ISO-8859-1"
-	 * @return
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 * @throws FileNotFoundException
@@ -411,8 +409,9 @@ public class FileUtils {
 	/**
 	 * extract directory from a Jar archive
 	 * @param jarFile
-	 * @param sourceFileName
+	 * @param jarInternalSourceDirectory
 	 * @param targetDirectory
+	 * @param permissionsUNIX
 	 */
 	public static void extractDir(JarFile jarFile, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		// normalize input directorys
@@ -552,9 +551,7 @@ public class FileUtils {
 
 	/**
 	 * get the names of the exported device services
-	 * @param jarFileDir 
-	 * @param jarFileName
-	 * @return service names
+	 * @param jarFile 
 	 * @throws IOException
 	 */
 	public static String[] getDeviceJarServicesNames(JarFile jarFile) throws IOException {

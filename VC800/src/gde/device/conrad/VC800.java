@@ -102,11 +102,11 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * convert record logview config data to OSDE config keys into records section
+	 * convert record LogView config data to OSDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber 
-	 * @return
+	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
@@ -230,8 +230,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	
 	/**
 	 * get digit from display
-	 * @param a
-	 * @param b
+	 * @param select
 	 * @return digit value
 	 */
 	public int getDigit(int select) {
@@ -321,7 +320,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	/**
 	 * get the measurement mode
 	 * @param buffer
-	 * @return
+	 * @return the measurement mode key
 	 */
 	public String getMode(byte[] buffer) {
 		String mode = Messages.getString(MessageIds.OSDE_MSGT1510);
