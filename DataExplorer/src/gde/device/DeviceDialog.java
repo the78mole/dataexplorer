@@ -127,7 +127,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * @return the dialogShell
 	 */
 	public Shell getDialogShell() {
-		return this.dialogShell != null ? this.dialogShell : this.application.getShell();
+		return this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : this.application.getShell();
 	}
 
 	/**
