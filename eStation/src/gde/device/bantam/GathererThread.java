@@ -32,7 +32,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * Thread implementation to gather data from UniLog device
+ * Thread implementation to gather data from eStation device
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
@@ -281,7 +281,7 @@ public class GathererThread extends Thread {
 	 * @param throwable
 	 */
 	void stopDataGatheringThread(boolean enableEndMessage, Throwable throwable) {
-		final String $METHOD_NAME = "stopGatheringWhileCheckRecordSet"; //$NON-NLS-1$
+		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
@@ -299,7 +299,8 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1409));
+			if (enableEndMessage) 
+				this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1409));
 		}
 		else {
 			if (throwable != null) {

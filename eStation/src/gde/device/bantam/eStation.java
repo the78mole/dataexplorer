@@ -579,7 +579,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 							this.getDialog().dataGatherThread.start();
 						}
 						catch (RuntimeException e) {
-							log.log(Level.WARNING, e.getMessage(), e);
+							log.log(Level.SEVERE, e.getMessage(), e);
+						}
+						catch (Throwable e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
 						}
 						if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 					}
@@ -592,6 +595,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
+				}
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
 			else {

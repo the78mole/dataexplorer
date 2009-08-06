@@ -254,7 +254,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			Settings settings = Settings.getInstance();
 			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
-			if(availablePorts.size() == 0 ) listConfiguredSerialPorts(availablePorts, false, Settings.getInstance().getSerialPortBlackList(), Settings.getInstance().getSerialPortWhiteList());
+			if(availablePorts.size() == 0 ) 
+				listConfiguredSerialPorts(availablePorts, false, 
+						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
+						settings.isSerialPortWhiteListEnabled() ? settings.getSerialPortWhiteList() : new Vector<String>());
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
 				// no serial port is selected, if only one serial port is available choose this one
 				if (availablePorts.size() == 1) {

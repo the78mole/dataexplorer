@@ -59,7 +59,7 @@ public class GraphicsUtils {
 	 */
 	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
 
-		int yTop = y0-height;
+		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
 		int numberTicks = height / 70 >= 2 ? height / 70 : 1; // initial start value 
 		int maxNumberTicks = height / 30 >= 2 ? height / 30 : 1;

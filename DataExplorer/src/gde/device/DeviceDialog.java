@@ -127,7 +127,14 @@ public abstract class DeviceDialog extends Dialog {
 	 * @return the dialogShell
 	 */
 	public Shell getDialogShell() {
-		return this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : this.application.getShell();
+		Shell shell = OpenSerialDataExplorer.shell;
+		try {
+			shell = this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : shell;
+		}
+		catch (Throwable e) {
+			// return default shell
+		}
+		return shell;
 	}
 
 	/**
