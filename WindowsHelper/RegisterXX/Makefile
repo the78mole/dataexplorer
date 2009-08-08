@@ -25,11 +25,11 @@ $(OUTDIR)\AssemblyInfo.obj: AssemblyInfo.cpp stdafx.h
 #/GL /D "WIN32" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /FD /EHa /MD /Fo"Release\\" /Fd"Release\vc90.pdb" /W3 /nologo /c /Zi /clr /TP /errorReport:prompt /FU "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.dll" /FU "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.Data.dll" /FU "c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\System.XML.dll"
 
 $(OUTDIR)\Register32.exe: $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj
-    $(link) /OUT:$(OUTDIR)\Register32.exe $(conflags) /VERSION:1.60 /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"$(OUTDIR)\Register32.exe.manifest" /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj $(conlibs)
+    $(link) /OUT:$(OUTDIR)\Register32.exe $(conflags) /VERSION:1.70 /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"$(OUTDIR)\Register32.exe.manifest" /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj $(conlibs)
 	mt -manifest $(OUTDIR)\Register32.exe.manifest -outputresource:$(OUTDIR)\Register32.exe
 	
 $(OUTDIR)\Register64.exe: $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj
-    $(link) /OUT:$(OUTDIR)\Register64.exe $(conflags) /VERSION:1.60 /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"$(OUTDIR)\Register64.exe.manifest" /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj $(conlibs)
+    $(link) /OUT:$(OUTDIR)\Register64.exe $(conflags) /VERSION:1.70 /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"$(OUTDIR)\Register64.exe.manifest" /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'" $(OUTDIR)\RegistryHelper.obj $(OUTDIR)\AssemblyInfo.obj $(conlibs)
 	mt -manifest $(OUTDIR)\Register64.exe.manifest -outputresource:$(OUTDIR)\Register64.exe
 
 #/LTCG /DYNAMICBASE /FIXED:No /NXCOMPAT
