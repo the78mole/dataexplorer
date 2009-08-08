@@ -91,7 +91,7 @@ public class GraphicsUtils {
 				if (numberTicks > maxNumberTicks) 
 					numberTicks = maxNumberTicks;
 			}
-			else { // normally this should be used if the graph contains only zero and the axis end values are set to +/- 0.1
+			else if (deltaScaleValue <= 0.1){ // normally this should be used if the graph contains only zero and the axis end values are set to +/- 0.1
 				numberTicks = 2;
 			}
 		}

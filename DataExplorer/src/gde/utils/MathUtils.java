@@ -238,6 +238,14 @@ public class MathUtils {
 					roundValue = value - (100 + (value % 100));
 			}
 		}
+		else if (delta == 0) {
+			if (value > 0) {
+				roundValue = value + 0.05;
+			}
+			else {
+				roundValue = value - 0.05;
+			}
+		}
 		return roundValue;
 	}
 	
@@ -304,6 +312,14 @@ public class MathUtils {
 					roundValue = value - (value % 50);
 				else
 					roundValue = value - (value % 100);
+			}
+		}
+		else if (delta == 0) {
+			if (value > 0) {
+				roundValue = value - 0.05;
+			}
+			else {
+				roundValue = value + 0.05;
 			}
 		}
 		return roundValue;
