@@ -1145,7 +1145,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 							OpenSerialDataExplorer.display.syncExec(new Runnable() {
 								public void run() {
-									if (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 										if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 											String selectedPort = DeviceSelectionDialog.this.portSelectCombo.getText().trim();
 											DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));

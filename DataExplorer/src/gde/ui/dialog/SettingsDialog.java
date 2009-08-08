@@ -1234,14 +1234,15 @@ public class SettingsDialog extends Dialog {
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						OpenSerialDataExplorer.display.syncExec(new Runnable() {
 							public void run() {
-								if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0 && SettingsDialog.this.dialogShell != null
-										&& !SettingsDialog.this.dialogShell.isDisposed()) {
-									SettingsDialog.this.serialPort.setItems(StringHelper.prepareSerialPortList(SettingsDialog.this.availablePorts));
-									int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
-									SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
-								}
-								else {
-									SettingsDialog.this.serialPort.setText(OSDE.STRING_BLANK);
+								if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) {
+									if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
+										SettingsDialog.this.serialPort.setItems(StringHelper.prepareSerialPortList(SettingsDialog.this.availablePorts));
+										int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
+										SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
+									}
+									else {
+										SettingsDialog.this.serialPort.setText(OSDE.STRING_BLANK);
+									}
 								}
 							}
 							});
