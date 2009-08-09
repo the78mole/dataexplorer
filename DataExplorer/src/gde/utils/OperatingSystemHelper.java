@@ -353,7 +353,7 @@ public class OperatingSystemHelper {
 				FileUtils.extract(jarFile, regExe, OSDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
 				command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$	
-				Process process = new ProcessBuilder("cmd", "/C", targetDir+targetDir).start(); //$NON-NLS-1$ //$NON-NLS-2$
+				Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
