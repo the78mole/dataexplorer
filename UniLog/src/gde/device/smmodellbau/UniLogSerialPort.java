@@ -56,8 +56,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
 	final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
 
-	final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
-	final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
+	//final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
+	//final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
 	
 	final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
 	final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
@@ -313,7 +313,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				this.open();
 				// check data ready for read operation
 				if (this.waitDataReady()) {
-					this.write(COMMAND_PREPARE_DELETE);
+					//this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = new byte[1];
 					readBuffer = this.read(readBuffer, 2000);
@@ -352,7 +352,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
 				if (this.checkDataReady()) {
-					this.write(COMMAND_PREPARE_SET_CONFIG);
+					//this.write(COMMAND_PREPARE_SET_CONFIG);
 
 					this.write(updateBuffer);
 					byte[] readBuffer = new byte[1];

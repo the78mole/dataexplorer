@@ -53,6 +53,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
+import osde.device.smmodellbau.unilog.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -161,8 +162,8 @@ public class UniLogDialog extends DeviceDialog {
 	final UniLogSerialPort				serialPort;																																																																	// open/close port execute getData()....
 	final OpenSerialDataExplorer	application;																																																																	// interaction with application instance
 	final UniLog									device;																																																																			// get device specific things, get serial port, ...
-	DataGathererThread						gatherThread;
-	LiveGathererThread						liveThread;
+	UniLogDataGatherer						gatherThread;
+	UniLogLiveGatherer						liveThread;
 	UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 
 	String												statusText								= "";																																																							//$NON-NLS-1$
@@ -342,7 +343,6 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
 							this.configMainComosite.setLayout(null);
-							//configMainComosite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 							this.configMainComosite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									UniLogDialog.log.log(Level.FINER, "configMainComosite.paintControl " + evt); //$NON-NLS-1$
@@ -893,7 +893,6 @@ public class UniLogDialog extends DeviceDialog {
 							this.dataMainComposite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.dataMainComposite.setLayout(null);
 							this.dataTabItem.setControl(this.dataMainComposite);
-							//dataMainComposite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 							{
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
@@ -1005,7 +1004,7 @@ public class UniLogDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											UniLogDialog.log.log(Level.FINEST, "readDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
-											UniLogDialog.this.gatherThread = new DataGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName);
+											UniLogDialog.this.gatherThread = new UniLogDataGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName);
 											try {
 												UniLogDialog.this.gatherThread.start();
 											}
@@ -1110,7 +1109,7 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.this.useConfigCombo.setEnabled(false);
 												UniLogDialog.this.editConfigButton.setEnabled(false);
 												setClosePossible(false);
-												UniLogDialog.this.liveThread = new LiveGathererThread(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
+												UniLogDialog.this.liveThread = new UniLogLiveGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
 												try {
 													UniLogDialog.this.liveThread.start();
 												}
@@ -1304,7 +1303,6 @@ public class UniLogDialog extends DeviceDialog {
 
 				int index = Channels.getInstance().getActiveChannelNumber();
 				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
-				//deviceConfigTabFolder.addMouseTrackListener(mouseTrackerEnterFadeOut);
 				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
 					@Override
 					public void mouseEnter(MouseEvent evt) {

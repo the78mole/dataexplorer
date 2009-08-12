@@ -36,6 +36,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
+import osde.device.smmodellbau.unilog.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
@@ -134,7 +135,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.smmodellbau.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("osde.device.smmodellbau.unilog.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
@@ -150,7 +151,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public UniLog(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.smmodellbau.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("osde.device.smmodellbau.unilog.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);

@@ -42,6 +42,7 @@ import osde.data.RecordSet;
 import osde.device.DataTypes;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
+import osde.device.smmodellbau.unilog.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
