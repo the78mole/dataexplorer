@@ -105,6 +105,7 @@
 		<ant antfile="build.xml" target="clean" dir="UniLog" />
 		<ant antfile="build.xml" target="clean" dir="eStation" />
 		<ant antfile="build.xml" target="clean" dir="VC800" />
+		<ant antfile="build.xml" target="clean" dir="LiPoWatch" />
 		<!-- add new device here -->
 	</target>
 
@@ -188,6 +189,7 @@
 		<ant antfile="build.xml" target="package" dir="UniLog" />
 		<ant antfile="build.xml" target="package" dir="eStation" />
 		<ant antfile="build.xml" target="package" dir="VC800" />
+		<ant antfile="build.xml" target="package" dir="LiPoWatch" />
 		<!-- add new device here -->
 	</target>
 	
@@ -217,6 +219,7 @@
 			<fileset file="UniLog/build/*.jar" />
 			<fileset file="eStation/build/*.jar" />
 			<fileset file="VC800/build/*.jar" />
+			<fileset file="LiPoWatch/build/*.jar" />
 			<!-- add new device here -->
 		</copy>
 		
@@ -236,6 +239,7 @@
 			<fileset file="UniLog/build/*.jar" />
 			<fileset file="eStation/build/*.jar" />
 			<fileset file="VC800/build/*.jar" />
+			<fileset file="LiPoWatch/build/*.jar" />
 			<!-- add new device here -->
 		</copy>
 		
@@ -253,6 +257,7 @@
 			<fileset file="UniLog/build/*.jar" />
 			<fileset file="eStation/build/*.jar" />
 			<fileset file="VC800/build/*.jar" />
+			<fileset file="LiPoWatch/build/*.jar" />
 			<!-- add new device here -->
 		</copy>
 		
@@ -270,6 +275,7 @@
 			<fileset file="UniLog/build/*.jar" />
 			<fileset file="eStation/build/*.jar" />
 			<fileset file="VC800/build/*.jar" />
+			<fileset file="LiPoWatch/build/*.jar" />
 			<!-- add new device here -->
 		</copy>
 		
@@ -287,6 +293,7 @@
 			<fileset file="UniLog/build/*.jar" />
 			<fileset file="eStation/build/*.jar" />
 			<fileset file="VC800/build/*.jar" />
+			<fileset file="LiPoWatch/build/*.jar" />
 			<!-- add new device here -->
 		</copy>
 
