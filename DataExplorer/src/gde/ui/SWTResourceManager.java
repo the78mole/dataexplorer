@@ -400,7 +400,7 @@ public class SWTResourceManager {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl);
 			log.log(Level.SEVERE, e.getMessage(), e);
-			return null;
+			return getImage(activeDeviceInstance, "osde/resource/NoDevicePicture.jpg");
 		}
 	}
 

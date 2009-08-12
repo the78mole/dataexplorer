@@ -19,6 +19,7 @@ package osde.messages;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.config.Settings;
@@ -110,6 +111,11 @@ public class Messages {
 	 * @param newBundleName the deviceResourceBundle to be used
 	 */
 	public static void setDeviceResourceBundle(String newBundleName, Locale newLocale, ClassLoader loader) {
-		Messages.deviceResourceBundle = ResourceBundle.getBundle(newBundleName, newLocale, loader);
+		try {
+			Messages.deviceResourceBundle = ResourceBundle.getBundle(newBundleName, newLocale, loader);
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, newBundleName, e);
+		}
 	}
 }
