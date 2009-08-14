@@ -53,6 +53,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	final static String 				$CLASS_NAME 			= DeviceSerialPort.class.getName();
 	final static Logger					log								= Logger.getLogger($CLASS_NAME);
 
+	final static Vector<String> availablePorts 		= new Vector<String>(); //available port vector used by all application dialogs
+
 	protected final DeviceConfiguration			deviceConfig;
 	protected final OpenSerialDataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
@@ -64,7 +66,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	
 	static CommPortIdentifier								portId;
 	static CommPortIdentifier								saveportId;
-	static Vector<String> 									availablePorts 		= new Vector<String>();
 
 	InputStream															inputStream				= null;
 	OutputStream														outputStream			= null;
@@ -109,12 +110,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @param portWhiteList
 	 */
 	@SuppressWarnings("unchecked")
-	public static void listConfiguredSerialPorts(final Vector<String> updateAvailablePorts, final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
+	public static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
 		try {
-			updateAvailablePorts.clear();
+			availablePorts.clear();
 			
 			if (portWhiteList.size() > 0) { // check ports from the white list only
 				for (String serialPortStr : portWhiteList) {
@@ -125,7 +126,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
 								}
-								updateAvailablePorts.add(serialPortStr);
+								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
@@ -150,7 +151,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
 								}
-								updateAvailablePorts.add(serialPortStr);
+								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
@@ -162,20 +163,21 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			if (log.isLoggable(Level.INFO)) {
 				StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
-				for (String comPort : updateAvailablePorts) {
+				for (String comPort : availablePorts) {
 					sb.append(comPort).append(" "); //$NON-NLS-1$
 				}
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			// Windows COM1, COM2 -> COM20
 			// Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
-			updateAvailablePorts.trimToSize();
+			availablePorts.trimToSize();
 		}
 		catch (Throwable t) {
 			log.log(Level.WARNING, t.getMessage(), t);
 		}
 
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
+		return availablePorts;
 	}
 
 	/**
@@ -255,7 +257,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
 			if(availablePorts.size() == 0 ) 
-				listConfiguredSerialPorts(availablePorts, false, 
+				listConfiguredSerialPorts(false, 
 						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
 						settings.isSerialPortWhiteListEnabled() ? settings.getSerialPortWhiteList() : new Vector<String>());
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
@@ -752,5 +754,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int getXferErrors() {
 		return this.xferErrors;
+	}
+ 	
+	/**
+	 * get reference to available ports vector, this should be single instance application wide 
+	 */
+	public static Vector<String> getAvailableports() {
+		return availablePorts;
 	}
 }
