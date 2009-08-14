@@ -102,8 +102,22 @@ public class AxisEndValuesDialog extends Dialog {
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					AxisEndValuesDialog.this.newValues[0] = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
-					AxisEndValuesDialog.this.newValues[1] = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
+					try {
+						double minValue = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
+						double maxValue = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
+						if (maxValue < minValue) {
+							minValue = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
+							maxValue = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
+						}
+						else if (maxValue == minValue) {
+							minValue = minValue - 0.1;
+							maxValue = maxValue + 0.1;
+						}
+						AxisEndValuesDialog.this.newValues = new double[]{minValue, maxValue};
+					}
+					catch (NumberFormatException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
 				}
 			});
 			this.dialogShell.addPaintListener(new PaintListener() {
@@ -200,7 +214,7 @@ public class AxisEndValuesDialog extends Dialog {
 				this.minValueSelect.select(5);
 				this.minValueSelect.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent evt) {
-						log.log(Level.FINEST, "maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "minValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
 							AxisEndValuesDialog.this.dialogShell.dispose();
 						}
