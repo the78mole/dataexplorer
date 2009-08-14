@@ -43,9 +43,7 @@ public class UniLogSerialPortTest {
 		try {
 			deviceConfig = new DeviceConfiguration("c:\\Documents and Settings\\brueg\\Application Data\\OpenSerialDataExplorer\\Devices\\UniLog.xml"); //$NON-NLS-1$
 			device = new UniLog(deviceConfig);
-			Vector<String> ports = new Vector<String>();
-			DeviceSerialPort.listConfiguredSerialPorts(ports, true, "", new Vector<String>());
-			for (String string : ports) {
+			for (String string : DeviceSerialPort.listConfiguredSerialPorts(true, "", new Vector<String>())) {
 				System.out.println("found port available = " + string); //$NON-NLS-1$
 				if (deviceConfig.getPort().equals(string)) isUniLogPortAvailable = true;
 			}
