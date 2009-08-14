@@ -138,7 +138,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 
 						// switch the active record set if the current record set is child of active channel
 						if (!LiPoWatchLiveGatherer.this.isSwitchedRecordSet && LiPoWatchLiveGatherer.this.channel.getName().equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getName())) {
-							LiPoWatchLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
+							//LiPoWatchLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
 							LiPoWatchLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
 							LiPoWatchLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
 							LiPoWatchLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);

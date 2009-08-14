@@ -1,1 +1,192 @@
-<?xml version="1.0" encoding="UTF-8"?><DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">    <Device>        <name>LiPoWatch</name>        <manufacturer>SM-Modellbau</manufacturer>        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>        <group>logger</group>        <image>LiPoWatch.jpg</image>        <usage>false</usage>    </Device>    <SerialPort>        <port>COM2</port>        <baudeRate>115200</baudeRate>        <dataBits>8</dataBits>        <stopBits>STOPBITS_1</stopBits>        <parity>PARITY_NONE</parity>        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>        <isRTS>true</isRTS>        <isDTR>true</isDTR>        <DataBlock>            <size>24</size>            <checkSum>XOR</checkSum>        </DataBlock>    </SerialPort>    <TimeBase>        <name>Zeit</name>        <symbol>t</symbol>        <unit>ms</unit>        <timeStep>250</timeStep>    </TimeBase>	<Channel type="TYPE_OUTLET" name="Anschluss">		<Measurement>			<name>Spannung 1</name>			<symbol>U1</symbol>			<unit>V</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 2</name>			<symbol>U2</symbol>			<unit>V</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 3</name>			<symbol>U3</symbol>			<unit>V</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 4</name>			<symbol>U4</symbol>			<unit>V</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 5</name>			<symbol>U5</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 6</name>			<symbol>U6</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 7</name>			<symbol>U7</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 8</name>			<symbol>U8</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 9</name>			<symbol>U9</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 10</name>			<symbol>U10</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 11</name>			<symbol>U11</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 12</name>			<symbol>U12</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 13</name>			<symbol>U13</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 14</name>			<symbol>U14</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung 15</name>			<symbol>U15</symbol>			<unit>V</unit>			<active>false</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Spannung T</name>			<symbol>Ut</symbol>			<unit>V</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>		</Measurement>		<Measurement>			<name>ServoImpuls</name>			<symbol>SI</symbol>			<unit>µs</unit>			<active>true</active>            <statistics sigma="false" avg="false" max="true" min="true"/>		</Measurement>		<Measurement>			<name>Temperatur</name>			<symbol>A1</symbol>			<unit>°C</unit>			<active>true</active>            <statistics sigma="true" avg="true" max="true" min="true"/>            <property type="Double" value="0.0" name="offset"/>            <property type="Double" value="1.0" name="factor"/>		</Measurement>	</Channel>    <Desktop>        <Property type="Boolean" value="false" name="table_tab"/>        <Property type="Boolean" value="true" name="digital_tab"/>        <Property type="Boolean" value="true" name="analog_tab"/>        <Property type="Boolean" value="false" name="voltage_per_cell_tab"/>    </Desktop></DeviceProperties>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">
+    <Device>
+        <name>LiPoWatch</name>
+        <manufacturer>SM-Modellbau</manufacturer>
+        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <group>logger</group>
+        <image>LiPoWatch.jpg</image>
+        <usage>true</usage>
+    </Device>
+    <SerialPort>
+        <port>COM10</port>
+        <baudeRate>115200</baudeRate>
+        <dataBits>8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>true</isRTS>
+        <isDTR>true</isDTR>
+        <DataBlock>
+            <size>24</size>
+            <checkSum>XOR</checkSum>
+        </DataBlock>
+    </SerialPort>
+    <TimeBase>
+        <name>Zeit</name>
+        <symbol>t</symbol>
+        <unit>ms</unit>
+        <timeStep>500</timeStep>
+    </TimeBase>
+    <Channel type="TYPE_OUTLET" name="Konfiguration">
+        <Measurement>
+            <name>Zellenspannung 1</name>
+            <symbol>U1</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+            <property type="Double" value="0.0" name="reduction"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 2</name>
+            <symbol>U2</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 3</name>
+            <symbol>U3</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 4</name>
+            <symbol>U4</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 5</name>
+            <symbol>U5</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 6</name>
+            <symbol>U6</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 7</name>
+            <symbol>U7</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 8</name>
+            <symbol>U8</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 9</name>
+            <symbol>U9</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 10</name>
+            <symbol>U10</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 11</name>
+            <symbol>U11</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 12</name>
+            <symbol>U12</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 13</name>
+            <symbol>U13</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 14</name>
+            <symbol>U14</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Zellenspannung 15</name>
+            <symbol>U15</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Gesamtspannung</name>
+            <symbol>Ut</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls E</name>
+            <symbol>SIe</symbol>
+            <unit>µs</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls A</name>
+            <symbol>SIa</symbol>
+            <unit>µs</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Temperatur</name>
+            <symbol>A1</symbol>
+            <unit>°C</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.0" name="offset"/>
+            <property type="Double" value="1.0" name="factor"/>
+        </Measurement>
+    </Channel>
+    <Desktop>
+        <property type="Boolean" value="false" name="table_tab"/>
+        <property type="Boolean" value="true" name="digital_tab"/>
+        <property type="Boolean" value="true" name="analog_tab"/>
+        <property type="Boolean" value="false" name="voltage_per_cell_tab"/>
+    </Desktop>
+</DeviceProperties>

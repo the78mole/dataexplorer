@@ -104,7 +104,7 @@ public class LiPoWatchDataGatherer extends Thread {
 				if (i == 1) firstRecordSetName = recordSetKey;
 				
 				// check analog modus and update channel/configuration
-				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
+				//this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
 				
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), this.configKey, true, false));
 				log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
@@ -118,7 +118,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 				int[] points = new int[this.device.getNumberOfMeasurements(recordSet.getChannelConfigName())];
 
-				for (int j = 2; j < telegrams.size(); j++) {
+				for (int j = 0; j < telegrams.size(); j++) {
 					byte[] dataBuffer = telegrams.get(j);
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 				}
@@ -163,7 +163,7 @@ public class LiPoWatchDataGatherer extends Thread {
 		recordSet.setTableDisplayable(true); // enable table display after calculation
 		this.device.updateVisibilityStatus(recordSet);
 		this.device.makeInActiveDisplayable(recordSet);
-		channel.applyTemplate(recordSetKey, true);
+		//channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey);
 	}

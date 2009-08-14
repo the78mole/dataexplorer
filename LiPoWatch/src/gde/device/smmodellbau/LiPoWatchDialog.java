@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -75,6 +74,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 																															"      5 s   (-> 100 h)", 
 																															"    10 s   (->  200 h)"}; 
 	public final static String[]	RX_AUTO_START_MS					= { " 1,1 ms", " 1,2 ms", " 1,3 ms", " 1,4 ms", " 1,5 ms", " 1,6 ms", " 1,7 ms", " 1,8 ms", " 1,9 ms", " Rx on" };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+
 
 	//Shell dialogShell; // remove this later
 	CTabFolder										mainTabFolder;
@@ -1241,7 +1241,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										readDataProgressBar = new ProgressBar(dataReadGroup, SWT.NONE);
-										readDataProgressBar.setBounds(15, 175, 226, 15);
+										readDataProgressBar.setBounds(15, 175, 226, 20);
 										readDataProgressBar.setMinimum(0);
 										readDataProgressBar.setMaximum(100);
 									}
@@ -1708,39 +1708,36 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 * function to reset all the buttons, normally called after data gathering finished
 	 */
 	public void resetButtons() {
-//		if (Thread.currentThread().getId() == application.getThreadId()) {
-//			editConfigButton.setEnabled(false);
-//			useConfigCombo.setEnabled(true);
-//
-//			readDataButton.setEnabled(true);
-//			stopDataButton.setEnabled(false);
-//
-//			startLoggingButton.setEnabled(true);
-//			stopLoggingButton.setEnabled(false);
-//
-//			startLiveGatherButton.setEnabled(true);
-//			stopLiveGatherButton.setEnabled(false);
-//
-//			deleteMemoryButton.setEnabled(true);
-//			setClosePossible(true);
-//		}
-//		else {
-//			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-//				public void run() {
-//					readDataButton.setEnabled(true);
-//					stopReadDataButton.setEnabled(false);
-//
-//					startLoggingButton.setEnabled(true);
-//					stopLoggingButton.setEnabled(false);
-//
-//					startLiveGatherButton.setEnabled(true);
-//					stopLiveGatherButton.setEnabled(false);
-//
-//					deleteMemoryButton.setEnabled(true);
-//					setClosePossible(true);
-//				}
-//			});
-//		}
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			readDataButton.setEnabled(true);
+			stopReadDataButton.setEnabled(false);
+
+			startLoggingButton.setEnabled(true);
+			stopLoggingButton.setEnabled(false);
+
+			startLiveGatherButton.setEnabled(true);
+			stopLiveGatherButton.setEnabled(false);
+
+			deleteMemoryButton.setEnabled(true);
+			setClosePossible(true);
+		}
+		else {
+			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					readDataButton.setEnabled(true);
+					stopReadDataButton.setEnabled(false);
+
+					startLoggingButton.setEnabled(true);
+					stopLoggingButton.setEnabled(false);
+
+					startLiveGatherButton.setEnabled(true);
+					stopLiveGatherButton.setEnabled(false);
+
+					deleteMemoryButton.setEnabled(true);
+					setClosePossible(true);
+				}
+			});
+		}
 	}
 
 	/**
@@ -1781,15 +1778,30 @@ public class LiPoWatchDialog extends DeviceDialog {
 			public void run() {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
-				//LiPoWatchDialog.readDataProgressBar.setSelection(tmpValue);
+				readDataProgressBar.setSelection(tmpValue);
 			}
 		});
 	}
 	
-	private Button getCloseButton(Composite parent) {
-		if(closeButton == null) {
-		}
-		return closeButton;
+	/**
+	 * update the counter number in the dialog, called out of thread
+	 * @param redTelegrams
+	 * @param numReadErrors
+	 */
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int progress) {
+		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
+		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
+		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				int tmpValue = progress < 0 ? 0 : progress;
+				tmpValue = progress > 100 ? 100 : progress;
+				readDataProgressBar.setSelection(tmpValue);
+				redDataSetLabel.setText(numberRedDataSetsText);
+				actualDataSetNumber.setText(numberActualDataSetsText);
+				numberReadErrorLabel.setText(numberReadErrorText);
+			}
+		});
 	}
 
 }
