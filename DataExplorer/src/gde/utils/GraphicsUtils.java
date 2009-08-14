@@ -78,15 +78,15 @@ public class GraphicsUtils {
 				maxScaleValue = maxScaleValue + tmpDeltaScaleValue;
 			}
 			deltaScaleValue = (maxScaleValue - minScaleValue);
-			if ((minScaleValue != minValue || maxScaleValue != maxValue) && (deltaScale - deltaScaleValue) > 0) {
+			if ((minScaleValue != minValue || maxScaleValue != maxValue) && (deltaScale - deltaScaleValue) > 0 && deltaScaleValue > 0) {
 				int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
 				int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
 				int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale - deltaScaleValue));
 				
 				if (maxTickRound >= 3 && maxTickRound < maxNumberTicks) 
 					maxNumberTicks = maxTickRound - 1;
-				else if (maxTickRound == 1)
-					maxNumberTicks = maxTickRound;
+				else if (maxTickRound <= 2)
+					maxNumberTicks = maxTickRound = 2;
 					
 				if (numberTicks > maxNumberTicks) 
 					numberTicks = maxNumberTicks;
