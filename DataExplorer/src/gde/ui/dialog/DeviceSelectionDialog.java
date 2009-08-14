@@ -70,18 +70,6 @@ import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
-/**
  * Dialog class to select the device to be used
  * @author Winfried Brügmann
  */
@@ -144,7 +132,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	String																activeDeviceName;
 	DeviceConfiguration										selectedActiveDeviceConfig;
 	Thread																listPortsThread;
-	Vector<String>												availablePorts	= new Vector<String>();
+	Vector<String>												availablePorts = new Vector<String>();
 
 	public DeviceSelectionDialog(Shell parent, int style, final OpenSerialDataExplorer currentApplication) {
 		super(parent, style);
@@ -495,14 +483,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										else {
 											DeviceSelectionDialog.this.portDescription.setEnabled(true);
 											DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
-//											DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
-//											int portIndex = 0;
-//											if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-//												portIndex = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
-//
-//												if (portIndex < 0) portIndex = 0; // port not found in the list
-//												DeviceSelectionDialog.this.portSelectCombo.select(portIndex);
-//											}
 										}
 									}
 								});
@@ -952,7 +932,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public boolean checkPortSelection() {
 		boolean matches = true;
 		if (this.availablePorts == null) {
-			DeviceSerialPort.listConfiguredSerialPorts(this.availablePorts, false, DeviceSelectionDialog.this.settings.getSerialPortBlackList(), DeviceSelectionDialog.this.settings.getSerialPortWhiteList());
+			this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(false, DeviceSelectionDialog.this.settings.getSerialPortBlackList(), DeviceSelectionDialog.this.settings.getSerialPortWhiteList());
 		}
 
 		if (this.settings.isGlobalSerialPort() && this.availablePorts.indexOf(this.settings.getSerialPort()) < 0) {
@@ -1139,7 +1119,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			public void run() {
 				try {
 					while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-						DeviceSerialPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.availablePorts, DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), 
+						DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), 
 								DeviceSelectionDialog.this.settings.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
 								DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {

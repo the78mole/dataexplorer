@@ -72,18 +72,6 @@ import osde.utils.OperatingSystemHelper;
 import osde.utils.StringHelper;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
-/**
  * Dialog class to adjust application wide properties
  * @author Winfried Brügmann
  */
@@ -164,7 +152,7 @@ public class SettingsDialog extends Dialog {
 	Tree																tree;
 
 	Thread															listPortsThread;
-	Vector<String>											availablePorts					= new Vector<String>();
+	Vector<String>											availablePorts = new Vector<String>();
 	final Settings											settings;
 	final OpenSerialDataExplorer				application;
 	final String[]											supportedLocals					= { "en", "de" };																	//$NON-NLS-1$ //$NON-NLS-2$
@@ -1229,7 +1217,7 @@ public class SettingsDialog extends Dialog {
 			public void run() {
 				try {
 					while (!SettingsDialog.this.dialogShell.isDisposed()) {
-						DeviceSerialPort.listConfiguredSerialPorts(SettingsDialog.this.availablePorts, SettingsDialog.this.settings.doPortAvailabilityCheck(), 
+						SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : OSDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						OpenSerialDataExplorer.display.syncExec(new Runnable() {
