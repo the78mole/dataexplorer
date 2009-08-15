@@ -86,22 +86,22 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			if (this.waitDataReady()) {
 				// query configuration to have actual values -> get number of entries to calculate percentage and progress bar
 				readBuffer = this.readConfiguration();
-				int memoryUsed = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
-				log.log(Level.INFO, "memoryUsed = " + memoryUsed); //$NON-NLS-1$
-				double progressFactor = 100.0 / memoryUsed;
-				log.log(Level.INFO, "progressFactor = " + progressFactor); //$NON-NLS-1$
+				int memoryLeft = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
+				int memoryUsed = memoryLeft;
+				log.log(Level.INFO, "memoryUsed = " + memoryLeft); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
 
 				dialog.setReadDataProgressBar(0);
 				Vector<byte[]> telegrams = new Vector<byte[]>();
-				int numberRecordSet = 0;
+				int numberRecordSet = 1;
 				int redCounter = 0;
-				int dataLength = 1;
+				int memoryRed = 0;
+				int dataLength = 7;
 				int dataSetType = 1;
 				
-				while ((memoryUsed-=(dataLength-7)) > 0) {
+				while ((memoryLeft-=(dataLength-7)) > 0) {
 					readBuffer = readSingleTelegramm();
 
 					dataLength = (readBuffer[0] & 0x7F); 
@@ -119,17 +119,22 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 						}
 						else {
 							//telegrams.size() > 4 min + max + 2 data points
-							if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
+							if (telegrams.size() > 4) {
+								dataCollection.put(""+numberRecordSet, telegrams); //$NON-NLS-1$
+								log.log(Level.INFO, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+							}
 							numberRecordSet = ((readBuffer[10] & 0xFF) + 1);
 							telegrams = new Vector<byte[]>();
+							telegrams.add(readBuffer);
 						}
-						log.log(Level.INFO, "numberRecordSet = " + numberRecordSet + " time_ms = " + time_ms + " memoryUsed = " + memoryUsed); //$NON-NLS-1$ //$NON-NLS-2$						
+						log.log(Level.FINE, "numberRecordSet = " + numberRecordSet + " time_ms = " + time_ms + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$						
 						
 						
-						redCounter+=(dataLength-7);
+						memoryRed+=(dataLength-7);
+						++redCounter;
 
 						//"Gelesene Datensätze/Werte: " & Datensatznummer & "/" & Werte_gelesen & " von " & Speichernummer & " (" & CInt(CLng(Werte_gelesen) * 100 / Speichernummer) & "%)" ' & " (" & Fehlersumme & ")"
-						if ((redCounter % 5) == 0) dialog.updateDataGatherProgress(redCounter, numberRecordSet, this.reveiceErrors, new Double(redCounter * progressFactor).intValue());
+						if ((redCounter % 5) == 0) dialog.updateDataGatherProgress(memoryRed, numberRecordSet, this.reveiceErrors, memoryUsed);
 
 						if (this.isTransmitFinished) {
 							log.log(Level.WARNING, "transmission stopped by user"); //$NON-NLS-1$
@@ -137,10 +142,14 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 						}
 					}
 					else { // no data telegram received
-						redCounter+=(dataLength-7);
+						memoryRed+=(dataLength-7);
 					}
-					if (telegrams.size() > 4) dataCollection.put("" + numberRecordSet, telegrams.clone()); //$NON-NLS-1$
 				}
+				if (telegrams.size() > 4) {
+					dataCollection.put("" + numberRecordSet, telegrams); //$NON-NLS-1$
+					log.log(Level.INFO, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+				}
+				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, memoryUsed);
 			}
 			else
 				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
@@ -165,16 +174,14 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized byte[] readSingleTelegramm() throws Exception {
 		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer;
+		int length = 0;
 		
 		try {
 			this.write(COMMAND_READ_DATA);
-			tmp1ReadBuffer = this.read(tmp1ReadBuffer, 2000);
-			
-			int length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
-			log.log(Level.INFO, "length = " + length); //$NON-NLS-1$
+			this.read(tmp1ReadBuffer, 2000);			
+			length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 			tmp2ReadBuffer = new byte[length-1];
-			tmp2ReadBuffer = this.read(tmp2ReadBuffer, 2000);
-			
+			this.read(tmp2ReadBuffer, 2000);		
 			readBuffer = new byte[length];
 			readBuffer[0] = tmp1ReadBuffer[0];
 			System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
@@ -183,7 +190,14 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			if (!isChecksumOK(readBuffer)) {
 				++this.reveiceErrors;
 				this.write(COMMAND_REPEAT);
-				readBuffer = this.read(readBuffer, 2000);
+				log.log(Level.WARNING, "errors = " + this.reveiceErrors); //$NON-NLS-1$
+				this.read(tmp1ReadBuffer, 2000);			
+				length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+				tmp2ReadBuffer = new byte[length-1];
+				this.read(tmp2ReadBuffer, 2000);		
+				readBuffer = new byte[length];
+				readBuffer[0] = tmp1ReadBuffer[0];
+				System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
 		}
@@ -211,7 +225,11 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			// read data bytes to clear buffer
-			this.read(new byte[DATA_LENGTH_BYTES], 1000);
+			byte[] tmp1ReadBuffer = new byte[1];
+			this.read(tmp1ReadBuffer, 1000);
+			int length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+			log.log(Level.FINE, "length = " + length); //$NON-NLS-1$
+			this.read(new byte[(tmp1ReadBuffer[0] & 0x7F)-1], 1000);
 			isLifeDataAvailable = true;
 			
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
@@ -228,17 +246,30 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @throws Exception
 	 */
 	public synchronized byte[] queryLiveData() throws Exception {
-		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
+		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer;
+		int length = 0;
 		
 		if (this.isConnected()) {
 			try {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.read(readBuffer, 1000);
+				this.read(tmp1ReadBuffer, 1000);				
+				length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+				tmp2ReadBuffer = new byte[length-1];
+				this.read(tmp2ReadBuffer, 2000);			
+				readBuffer = new byte[length];
+				readBuffer[0] = tmp1ReadBuffer[0];
+				System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
 
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
 					this.write(COMMAND_LIVE_VALUES);
-					readBuffer = this.read(readBuffer, 1000);
+					this.read(tmp1ReadBuffer, 1000);				
+					length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+					tmp2ReadBuffer = new byte[length-1];
+					this.read(tmp2ReadBuffer, 2000);			
+					readBuffer = new byte[length];
+					readBuffer[0] = tmp1ReadBuffer[0];
+					System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
 					verifyChecksum(readBuffer); // throws exception if checksum miss match
 				}
 			}
@@ -264,7 +295,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
-				//waitDataReady();
+				checkConnectionStatus();
 			}
 
 			this.write(COMMAND_START_LOGGING);

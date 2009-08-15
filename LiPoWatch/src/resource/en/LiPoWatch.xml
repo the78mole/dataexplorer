@@ -30,151 +30,28 @@
     </TimeBase>
     <Channel type="TYPE_OUTLET" name="Konfiguration">
         <Measurement>
-            <name>Zellenspannung 1</name>
-            <symbol>U1</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 2</name>
-            <symbol>U2</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 3</name>
-            <symbol>U3</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 4</name>
-            <symbol>U4</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 5</name>
-            <symbol>U5</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 6</name>
-            <symbol>U6</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 7</name>
-            <symbol>U7</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 8</name>
-            <symbol>U8</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 9</name>
-            <symbol>U9</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 10</name>
-            <symbol>U10</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 11</name>
-            <symbol>U11</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 12</name>
-            <symbol>U12</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 13</name>
-            <symbol>U13</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 14</name>
-            <symbol>U14</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Zellenspannung 15</name>
-            <symbol>U15</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Gesamtspannung</name>
+            <name>TotalVoltage</name>
             <symbol>Ut</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>ServoImpuls E</name>
-            <symbol>SIe</symbol>
+            <name>ServoImpuls_in</name>
+            <symbol>SIi</symbol>
             <unit>µs</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>ServoImpuls A</name>
-            <symbol>SIa</symbol>
+            <name>ServoImpuls_out</name>
+            <symbol>SIo</symbol>
             <unit>µs</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Temperatur</name>
+            <name>Temperature</name>
             <symbol>A1</symbol>
             <unit>°C</unit>
             <active>true</active>
@@ -182,11 +59,116 @@
             <property type="Double" value="0.0" name="offset"/>
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
+        <Measurement>
+            <name>CellVoltage 1</name>
+            <symbol>U1</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 2</name>
+            <symbol>U2</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 3</name>
+            <symbol>U3</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 4</name>
+            <symbol>U4</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 5</name>
+            <symbol>U5</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 6</name>
+            <symbol>U6</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 7</name>
+            <symbol>U7</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 8</name>
+            <symbol>U8</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 9</name>
+            <symbol>U9</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 10</name>
+            <symbol>U10</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 11</name>
+            <symbol>U11</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 12</name>
+            <symbol>U12</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 13</name>
+            <symbol>U13</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 14</name>
+            <symbol>U14</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>CellVoltage 15</name>
+            <symbol>U15</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
     </Channel>
     <Desktop>
         <property type="Boolean" value="false" name="table_tab"/>
         <property type="Boolean" value="true" name="digital_tab"/>
         <property type="Boolean" value="true" name="analog_tab"/>
-        <property type="Boolean" value="false" name="voltage_per_cell_tab"/>
+        <property type="Boolean" value="true" name="voltage_per_cell_tab"/>
     </Desktop>
 </DeviceProperties>

@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -95,13 +96,15 @@ public class LiPoWatchDataGatherer extends Thread {
 			log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
 
 			// iterate over number of telegram sets in map
-			for (int i = 1; i <= data.size(); i++) {
-				Vector<byte[]> telegrams = (Vector<byte[]>) data.get("" + i); //$NON-NLS-1$
+			String[] keys = data.keySet().toArray(new String[0]);		
+			Arrays.sort(keys);
+			for (int i = 0; i < keys.length; i++) {
+				Vector<byte[]> telegrams = (Vector<byte[]>) data.get(keys[i]); //$NON-NLS-1$
 				// iterate over telegram entries to build the record set
-				log.log(Level.FINER, "number record set = " + i); //$NON-NLS-1$
+				log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
 
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
-				if (i == 1) firstRecordSetName = recordSetKey;
+				if (i == 0) firstRecordSetName = recordSetKey;
 				
 				// check analog modus and update channel/configuration
 				//this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
@@ -163,7 +166,7 @@ public class LiPoWatchDataGatherer extends Thread {
 		recordSet.setTableDisplayable(true); // enable table display after calculation
 		this.device.updateVisibilityStatus(recordSet);
 		this.device.makeInActiveDisplayable(recordSet);
-		//channel.applyTemplate(recordSetKey, true);
+		channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey);
 	}

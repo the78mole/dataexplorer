@@ -186,8 +186,23 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		StringBuilder sb = new StringBuilder();
 		int tmpValue = 0;
 		int totalVotage = 0;
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+		
+		//Servoimpuls_ein = (CLng(Asc(Mid(strResult, 7, 1))) * 256 + Asc(Mid(strResult, 6, 1)) And &HFFF0) / 16
+		points[1] = (((dataBuffer[6] & 0xFF) << 8) + (dataBuffer[5] & 0xFF) & 0xFFF0) / 16 * 1000;
+		if (log.isLoggable(Level.FINE)) sb.append("(1)" + points[16]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		//Servoimpuls_aus = (CLng(Asc(Mid(strResult, 9, 1))) * 256 + Asc(Mid(strResult, 8, 1)) And &HFFF0) / 16
+		points[2] = (((dataBuffer[8] & 0xFF) << 8) + (dataBuffer[7] & 0xFF) & 0xFFF0) / 16 * 1000;
+		if (log.isLoggable(Level.FINE)) sb.append("(2)" + points[17]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		//Temp_intern = CLng(Asc(Mid(strResult, 15, 1))) * 256 + Asc(Mid(strResult, 14, 1))
+		//Temp_intern = IIf(Temp_intern <= 32768, Temp_intern / 100, (Temp_intern - 65536) / 100)
+		tmpValue = ((dataBuffer[14] & 0xFF) << 8) + (dataBuffer[13] & 0xFF);
+		points[3] = tmpValue <= 32768 ? tmpValue * 10 : (tmpValue - 65536) * 10;
+		if (log.isLoggable(Level.FINE)) sb.append("(3)" + points[18]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+
 		int numberCells = (dataBuffer[5] & 0x0F); //Zellenzahl = Asc(Mid(strResult, 6, 1)) And &HF
-		log.log(Level.INFO, "numberCells = " + numberCells);
+		log.log(Level.FINE, "numberCells = " + numberCells);
 		int i;
 		for (i = 0; i < numberCells; i++) {
 			//For i = 0 To Zellenzahl - 1
@@ -195,30 +210,20 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			//   Spannung(i) = IIf(Spannung(i) <= 32768, Spannung(i) / 500, (Spannung(i) - 65536) / 500)
 			//Next i
 			tmpValue = ((dataBuffer[2 * i + 16] & 0xFF) << 8) + (dataBuffer[2 * i + 15] & 0xFF);
-			points[i] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
-			if (log.isLoggable(Level.INFO)) sb.append("(" + i + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-			totalVotage+= points[i];
+			points[i+4] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
+			if (log.isLoggable(Level.FINE)) sb.append("(" + (i+4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+			totalVotage+= points[i+4];
 		}
 		//Messmodus = CLng(Asc(Mid(strResult, 10, 1)) And &HF0) / 16
 		boolean isRelative = ((dataBuffer[9] & 0xF0) >> 4) == 1;
-		points[15] = isRelative ? totalVotage : points[i-1];
-		if (log.isLoggable(Level.INFO)) sb.append("(15)" + points[15]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		//Servoimpuls_ein = (CLng(Asc(Mid(strResult, 7, 1))) * 256 + Asc(Mid(strResult, 6, 1)) And &HFFF0) / 16
-		points[16] = (((dataBuffer[6] & 0xFF) << 8) + (dataBuffer[5] & 0xFF) & 0xFFF0) / 16 * 1000;
-		if (log.isLoggable(Level.INFO)) sb.append("(16)" + points[16]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		//Servoimpuls_aus = (CLng(Asc(Mid(strResult, 9, 1))) * 256 + Asc(Mid(strResult, 8, 1)) And &HFFF0) / 16
-		points[17] = (((dataBuffer[8] & 0xFF) << 8) + (dataBuffer[7] & 0xFF) & 0xFFF0) / 16 * 1000;
-		if (log.isLoggable(Level.INFO)) sb.append("(17)" + points[17]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		//Temp_intern = CLng(Asc(Mid(strResult, 15, 1))) * 256 + Asc(Mid(strResult, 14, 1))
-		//Temp_intern = IIf(Temp_intern <= 32768, Temp_intern / 100, (Temp_intern - 65536) / 100)
-		tmpValue = ((dataBuffer[14] & 0xFF) << 8) + (dataBuffer[13] & 0xFF);
-		points[18] = tmpValue <= 32768 ? tmpValue * 10 : (tmpValue - 65536) * 10;
-		if (log.isLoggable(Level.INFO)) sb.append("(18)" + points[18]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		
+		if (isRelative)
+			points[0] = totalVotage;
+		else 
+			points[0] = points[i+3];
+		//points[0] = isRelative ? totalVotage : points[i-3]; // total battery voltage
+		if (log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$	
 
-		log.log(Level.INFO, sb.toString());
+		log.log(Level.FINE, sb.toString());
 		return points;
 	}
 	
@@ -244,6 +249,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 			
+			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
@@ -277,7 +283,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 */
 	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
 		try {
-			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 			String[] recordNames = recordSet.getRecordNames();	
 			int numberRecords = recordNames.length;
 			int recordEntries = recordSet.getRecordDataSize(true);
@@ -285,7 +291,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			for (int j = 0; j < numberRecords; j++) {				
 				Record record = recordSet.get(recordNames[j]);
 				switch (j) { 
-				case 18: //18=temperature analog outlet
+				case 3: //3=temperature analog outlet
 					double offset = record.getOffset(); // != 0 if curve has an defined offset
 					double factor = record.getFactor(); // != 1 if a unit translation is required
 					for (int i = 0; i < recordEntries; i++) {
@@ -314,11 +320,11 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		double newValues = value;
 		
-		// 0=cell voltage, 1=cell voltage, 2=cell voltage, .... 15=total voltage, 16=ServoImpuls on, 17=ServoImpulse off, 18=temperature
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		String[] recordNames = record.getRecordSetNames(); 
 
 		PropertyType property = null;
-		if (record.getName().startsWith(recordNames[18])) {//2=18=temperature [°C]
+		if (record.getName().startsWith(recordNames[3])) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
@@ -337,11 +343,11 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		double newValues = value;
 		
-		// 0=cell voltage, 1=cell voltage, 2=cell voltage, .... 15=total voltage, 16=ServoImpuls on, 17=ServoImpulse off, 18=temperature
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		String[] recordNames = record.getRecordSetNames(); 
 
 		PropertyType property = null;
-		if (record.getName().startsWith(recordNames[18])) {//2=18=temperature [°C]
+		if (record.getName().startsWith(recordNames[3])) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
@@ -425,25 +431,6 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public void updateInitialRecordSetComment(RecordSet recordSet) {
 		recordSet.setRecordSetDescription(String.format("%s; \n%s : %s; %s : %s; ",  //$NON-NLS-1$
 				recordSet.getRecordSetDescription(), SERIAL_NUMBER, this.getDialog().serialNumber, FIRMEWARE_VERSION, this.getDialog().lipoWatchVersion));
-	}
-	
-	/**
-	 * invert data of current curve
-	 */
-	public void invertRecordData(Record record) {
-		int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-		for (int i=0; i<record.realSize(); ++i) {
-			int value = record.get(i) * -1;
-			record.set(i, value);
-			if (i != 0) {
-				if (value > max) max = value;
-				if (value < min) min = value;
-			}
-			else {
-				min = max = value;
-			}
-		}
-		record.setMinMax(min, max);
 	}
 	
 	/**

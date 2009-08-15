@@ -52,7 +52,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	TimerTask								timerTask;
 	boolean									isTimerRunning							= false;
 	boolean									isPortOpenedByLiveGatherer	= false;
-	final int[]							time_ms											= { 1000 / 4, 1000 / 2, 1000, 2000, 5000, 10000 };
+	final int[]							time_ms											= { 1000/4, 1000/2, 1000, 2000, 5000, 10000 };
 	boolean 								isSwitchedRecordSet 				= false;
 	boolean									isGatheredRecordSetVisible	= true;
 
@@ -88,7 +88,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		// timer interval
 		int timeIntervalPosition = readBuffer[10] & 0xFF;
 		this.timeStep_ms = this.time_ms[timeIntervalPosition];
-		log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.INFO, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
@@ -132,9 +132,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 						log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 
 						// build the point array according curves from record set
-						byte[] dataBuffer = LiPoWatchLiveGatherer.this.serialPort.queryLiveData();
-
-						recordSet.addPoints(usedDevice.convertDataBytes(points, dataBuffer));
+						recordSet.addPoints(usedDevice.convertDataBytes(points, LiPoWatchLiveGatherer.this.serialPort.queryLiveData()));
 
 						// switch the active record set if the current record set is child of active channel
 						if (!LiPoWatchLiveGatherer.this.isSwitchedRecordSet && LiPoWatchLiveGatherer.this.channel.getName().equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getName())) {
@@ -153,7 +151,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 									LiPoWatchLiveGatherer.this.application.updateDataTable(recordSetKey);
 									LiPoWatchLiveGatherer.this.application.updateDigitalWindowChilds();
 									LiPoWatchLiveGatherer.this.application.updateAnalogWindowChilds();
-									//LiveGathererThread.this.application.updateCellVoltageChilds();
+									LiPoWatchLiveGatherer.this.application.updateCellVoltageChilds();
 								}
 							});
 						}
