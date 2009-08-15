@@ -671,6 +671,7 @@ public class ObjectDescriptionWindow {
 									}
 								});
 							}
+							/* remove the printing functionality due to errors running Linux
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
 								this.printButton = new ToolItem(this.editToolBar, SWT.PUSH | SWT.BORDER);
@@ -684,6 +685,7 @@ public class ObjectDescriptionWindow {
 									}
 								});
 							}
+							*/
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 
 							size = this.editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
