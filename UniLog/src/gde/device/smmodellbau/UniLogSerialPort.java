@@ -106,10 +106,9 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				this.write(COMMAND_QUERY_CONFIG);
 				readBuffer = this.read(readBuffer, 2000);
 				verifyChecksum(readBuffer);
-				int memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
+				int memoryLeft = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
+				int memoryUsed = memoryLeft;
 				log.log(Level.FINER, "memoryUsed = " + memoryUsed); //$NON-NLS-1$
-				double progressFactor = 100.0 / memoryUsed;
-				log.log(Level.FINER, "progressFactor = " + progressFactor); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
@@ -119,7 +118,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				int numberRecordSet = 1;
 				int counter = 0;
 				
-				while (memoryUsed-- > 0) {
+				while (memoryLeft-- > 0) {
 					readBuffer = readSingleTelegramm();
 											
 					// number record set
@@ -131,11 +130,13 @@ public class UniLogSerialPort extends DeviceSerialPort {
 						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
 						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
+						telegrams.add(readBuffer);
 					}
+					log.log(Level.FINER, "numberRecordSet = " + numberRecordSet + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$						
 
 					++counter;
 					
-					dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, new Double(counter * progressFactor).intValue());
+					if ((counter % 5) == 0) dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, memoryUsed);
 
 					if (this.isTransmitFinished) {
 						log.log(Level.WARNING, "transmission stopped by user"); //$NON-NLS-1$
@@ -143,6 +144,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					}
 				}
 				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
+				dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, memoryUsed);
 			}
 			else
 				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));

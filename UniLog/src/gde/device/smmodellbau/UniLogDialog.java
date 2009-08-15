@@ -1600,14 +1600,17 @@ public class UniLogDialog extends DeviceDialog {
 	/**
 	 * update the counter number in the dialog, called out of thread
 	 * @param redTelegrams
+	 * @param numberRecordSet
 	 * @param numReadErrors
+	 * @param memoryUsed
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int progress) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int memoryUsed) {
 		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
+				int progress = redTelegrams * 100 / memoryUsed;
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
