@@ -396,7 +396,18 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//nothing to do here
+		String[] recordKeys = recordSet.getRecordNames();
+		int displayableCounter = 0;
+
+		for (int i=0; i<recordKeys.length; ++i) {
+				Record record = recordSet.get(recordKeys[i]);
+				if (record.isActive() && record.isDisplayable()) {
+					log.log(Level.FINE, "add to displayable counter: " + record.getName());
+					++displayableCounter;
+				}
+		}
+		log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
 	/**
