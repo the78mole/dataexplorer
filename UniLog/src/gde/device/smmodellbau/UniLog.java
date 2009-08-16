@@ -948,4 +948,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		measurement.setName(UniLogDialog.A3_MODUS_NAMES[a3Modus].trim());
 		measurement.setUnit(UniLogDialog.A3_MODUS_UNITS[a3Modus].trim());
 	}
+	
+	/**
+	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * set value of -1 to suppress this measurement
+	 */
+	public int[] getCellVoltageOrdinals() {
+		return new int[] {-1, -1};
+	}
 }
