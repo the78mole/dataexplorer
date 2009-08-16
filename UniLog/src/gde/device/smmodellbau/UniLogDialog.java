@@ -291,7 +291,7 @@ public class UniLogDialog extends DeviceDialog {
 					@Override
 					public void mouseEnter(MouseEvent evt) {
 						UniLogDialog.log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
+						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
 					}
 
 					@Override
@@ -302,7 +302,7 @@ public class UniLogDialog extends DeviceDialog {
 					@Override
 					public void mouseExit(MouseEvent evt) {
 						UniLogDialog.log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
+						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
 					}
 				});
 				{
@@ -1012,7 +1012,8 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.log.log(Level.WARNING, e.getMessage(), e);
 											}
 											setClosePossible(false);
-
+											UniLogDialog.this.readAdjustmentButton.setEnabled(false);
+											UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
 											UniLogDialog.this.readDataButton.setEnabled(false);
 											UniLogDialog.this.editConfigButton.setEnabled(false);
 											UniLogDialog.this.stopDataButton.setEnabled(true);
@@ -1021,6 +1022,7 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.this.useConfigCombo.setEnabled(false);
 											UniLogDialog.this.startLiveGatherButton.setEnabled(false);
 											UniLogDialog.this.clearMemoryButton.setEnabled(false);
+											UniLogDialog.this.closeButton.setEnabled(false);
 										}
 									});
 								}
@@ -1103,11 +1105,16 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
+												UniLogDialog.this.readAdjustmentButton.setEnabled(false);
+												UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
 												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
 												UniLogDialog.this.readDataButton.setEnabled(false);
+												UniLogDialog.this.stopDataButton.setEnabled(false);
 												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
 												UniLogDialog.this.useConfigCombo.setEnabled(false);
 												UniLogDialog.this.editConfigButton.setEnabled(false);
+												UniLogDialog.this.clearMemoryButton.setEnabled(false);
+												UniLogDialog.this.closeButton.setEnabled(false);
 												setClosePossible(false);
 												UniLogDialog.this.liveThread = new UniLogLiveGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
 												try {
@@ -1205,10 +1212,16 @@ public class UniLogDialog extends DeviceDialog {
 													UniLogDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
 												}
 											}
-											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
-											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
+											UniLogDialog.this.readAdjustmentButton.setEnabled(true);
+											UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
+											UniLogDialog.this.editConfigButton.setEnabled(false);
 											UniLogDialog.this.useConfigCombo.setEnabled(true);
-											UniLogDialog.this.editConfigButton.setEnabled(true);
+											UniLogDialog.this.readDataButton.setEnabled(true);
+											UniLogDialog.this.stopDataButton.setEnabled(false);
+											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
+											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
+											UniLogDialog.this.clearMemoryButton.setEnabled(true);
+											UniLogDialog.this.closeButton.setEnabled(true);
 											setClosePossible(true);
 											if (!UniLogDialog.this.stopLoggingButton.getEnabled()) {
 												UniLogDialog.this.readDataButton.setEnabled(true);
@@ -1303,24 +1316,24 @@ public class UniLogDialog extends DeviceDialog {
 
 				int index = Channels.getInstance().getActiveChannelNumber();
 				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
-				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
-					@Override
-					public void mouseEnter(MouseEvent evt) {
-						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, -10);
-					}
-
-					@Override
-					public void mouseHover(MouseEvent evt) {
-						UniLogDialog.log.log(Level.FINEST, "deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
-					}
-
-					@Override
-					public void mouseExit(MouseEvent evt) {
-						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, -10);
-					}
-				});
+//				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
+//					@Override
+//					public void mouseEnter(MouseEvent evt) {
+//						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
+//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 0);
+//					}
+//
+//					@Override
+//					public void mouseHover(MouseEvent evt) {
+//						UniLogDialog.log.log(Level.FINEST, "deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
+//					}
+//
+//					@Override
+//					public void mouseExit(MouseEvent evt) {
+//						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
+//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, -10);
+//					}
+//				});
 
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 320, 100));
 				this.dialogShell.open();
@@ -1654,6 +1667,9 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.readAdjustmentButton.setEnabled(true);
+			this.storeAdjustmentsButton.setEnabled(false);
+
 			this.editConfigButton.setEnabled(false);
 			this.useConfigCombo.setEnabled(true);
 
@@ -1667,11 +1683,15 @@ public class UniLogDialog extends DeviceDialog {
 			this.stopLiveGatherButton.setEnabled(false);
 
 			this.clearMemoryButton.setEnabled(true);
+			this.closeButton.setEnabled(true);
 			setClosePossible(true);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
+					UniLogDialog.this.readAdjustmentButton.setEnabled(true);
+					UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
+
 					UniLogDialog.this.editConfigButton.setEnabled(false);
 					UniLogDialog.this.useConfigCombo.setEnabled(true);
 
@@ -1685,6 +1705,7 @@ public class UniLogDialog extends DeviceDialog {
 					UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
 
 					UniLogDialog.this.clearMemoryButton.setEnabled(true);
+					UniLogDialog.this.closeButton.setEnabled(true);
 					setClosePossible(true);
 				}
 			});

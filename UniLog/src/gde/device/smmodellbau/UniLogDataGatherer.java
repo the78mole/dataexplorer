@@ -73,7 +73,6 @@ public class UniLogDataGatherer extends Thread {
 		Channel channel = Channels.getInstance().get(this.channelNumber);
 		String recordSetKey = null;
 		RecordSet recordSet = null;
-		String firstRecordSetName = ""; //$NON-NLS-1$
 		boolean isPortOpenedByMe = false;
 
 		try {
@@ -104,16 +103,12 @@ public class UniLogDataGatherer extends Thread {
 				log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
 
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
-				if (i == 0) firstRecordSetName = recordSetKey;
 				
 				// check analog modus and update channel/configuration
 				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
 				
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), this.configKey, true, false));
 				log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
-				if (channel.getActiveRecordSet() == null) {
-					Channels.getInstance().switchChannel(new Integer(channel.getName().split(":")[0].trim()).intValue(), recordSetKey); //$NON-NLS-1$
-				}
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
@@ -126,11 +121,14 @@ public class UniLogDataGatherer extends Thread {
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 				}
 
+				if (i == 0 && channel.getActiveRecordSet() == null) {
+					Channels.getInstance().switchChannel(this.channelNumber, recordSetKey);
+					channel.switchRecordSet(recordSetKey);
+				}
 				finalizeRecordSet(channel, recordSetKey, recordSet);
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			channel.switchRecordSet(firstRecordSetName);
 			this.dialog.resetButtons();
 			log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
