@@ -461,4 +461,10 @@ public interface IDevice {
 	 * get calculation thread to enable join , isAlive, ...
 	 */
 	public CalculationThread getCalculationThread();
+	
+	/**
+	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * set value of -1 to suppress this measurement
+	 */
+	public int[] getCellVoltageOrdinals();
 }

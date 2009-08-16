@@ -79,7 +79,7 @@ public class CellVoltageWindow {
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
 	final CTabFolder							displayTab;
-	final CellVoltageValuesDialog			lithiumValuesDialog;
+	final CellVoltageValuesDialog	lithiumValuesDialog;
 
 	RecordSet										oldRecordSet					= null;
 	Channel											oldChannel						= null;
@@ -124,6 +124,8 @@ public class CellVoltageWindow {
 	int								voltageDelta					= 0;
 	Point							displayCompositeSize	= new Point(0, 0);
 	boolean 					isUpdateForced 				= false;
+	int								firstMeasurement 			= 0; // total battery voltage
+	int								secondMeasurement 		= 2; // charged /discharged capacity
 
 	public CellVoltageWindow(CTabFolder currentDisplayTab) {
 		this.displayTab = currentDisplayTab;
@@ -600,12 +602,14 @@ public class CellVoltageWindow {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
 				String[] recordKeys = activeRecordSet.getActiveRecordNames();
-				Record record_U = activeRecordSet.getRecord(recordKeys[0]); // voltage U
-				Record record_C = activeRecordSet.getRecord(recordKeys[2]); // capacitiy C
-				if (record_U != null && record_C != null) {
+				Record record_U = activeRecordSet.getRecord(recordKeys[this.firstMeasurement]); // voltage U
+				if (record_U != null) {
 					CellVoltageWindow.this.voltageValue.setForeground(record_U.getColor());
 					CellVoltageWindow.this.voltageValue.setText(record_U.getDecimalFormat().format(device.translateValue(record_U, new Double(record_U.getLast() / 1000.0))));
 					CellVoltageWindow.this.voltageUnit.setText("[" + record_U.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				Record record_C = activeRecordSet.getRecord(recordKeys[this.secondMeasurement]); // capacitiy C
+				if (record_C != null) {
 					CellVoltageWindow.this.capacitiyValue.setForeground(record_C.getColor());
 					CellVoltageWindow.this.capacitiyValue.setText(record_C.getDecimalFormat().format(device.translateValue(record_C, new Double(record_C.getLast() / 1000.0))));
 					CellVoltageWindow.this.capacityUnit.setText("[" + record_C.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -636,4 +640,15 @@ public class CellVoltageWindow {
 	public void updateVoltageLimitsSelection() {
 		this.voltageLimitsSelection.redraw();
 	}
+	
+	/**
+	 * set the two measurement ordinal to be displayed underneath the cell voltage bars
+	 * @param firstMeasurementOrdinal
+	 * @param secondMeasurementOrdinal
+	 */
+	public void setMeasurements(int firstMeasurementOrdinal, int secondMeasurementOrdinal) {
+		this.firstMeasurement = firstMeasurementOrdinal;
+		this.secondMeasurement = secondMeasurementOrdinal;
+	}
+
 }
