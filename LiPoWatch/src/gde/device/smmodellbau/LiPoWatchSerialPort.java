@@ -88,7 +88,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				readBuffer = this.readConfiguration();
 				int memoryLeft = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
 				int memoryUsed = memoryLeft;
-				log.log(Level.INFO, "memoryUsed = " + memoryLeft); //$NON-NLS-1$
+				log.log(Level.FINE, "memoryUsed = " + memoryLeft); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
@@ -121,7 +121,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 							//telegrams.size() > 4 min + max + 2 data points
 							if (telegrams.size() > 4) {
 								dataCollection.put(""+numberRecordSet, telegrams); //$NON-NLS-1$
-								log.log(Level.INFO, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+								log.log(Level.FINER, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 							}
 							numberRecordSet = ((readBuffer[10] & 0xFF) + 1);
 							telegrams = new Vector<byte[]>();
@@ -433,7 +433,8 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
 				if (this.checkDataReady()) {
-
+					this.waitDataReady();
+					
 					this.write(COMMAND_QUERY_CONFIG);				
 					this.read(readBuffer, 2000);
 					verifyChecksum(readBuffer); // valid data set -> set values

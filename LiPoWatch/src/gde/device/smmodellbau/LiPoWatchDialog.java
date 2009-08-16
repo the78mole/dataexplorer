@@ -128,7 +128,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	
 	Group liveDataCaptureGroup, loggingGroup;
 	Button startLiveGatherButton, stopLiveGatherButton, startLoggingButton, stopLoggingButton; 
-	Button	deleteMemoryButton;
+	Button	clearMemoryButton;
 	
 	Button closeButton;
 		
@@ -222,7 +222,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 							String msg = Messages.getString(MessageIds.OSDE_MSGI1500);
 							if (application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								device.storeDeviceProperties();
+								//device.storeDeviceProperties();
 								setClosePossible(true);
 							}
 							// check threads before close
@@ -245,7 +245,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					public void mouseEnter(MouseEvent evt) {
 						log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
+						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
 					}
 
 					public void mouseHover(MouseEvent evt) {
@@ -254,7 +254,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 					public void mouseExit(MouseEvent evt) {
 						log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
+						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
 					}
 				});
 				{
@@ -653,13 +653,15 @@ public class LiPoWatchDialog extends DeviceDialog {
 													log.log(Level.WARNING, e.getMessage(), e);
 												}
 												setClosePossible(false);
-
+												readConfigButton.setEnabled(false);
+												storeConfigButton.setEnabled(false);
 												readDataButton.setEnabled(false);
 												stopReadDataButton.setEnabled(true);
 												startLoggingButton.setEnabled(false);
 												stopLoggingButton.setEnabled(false);
 												startLiveGatherButton.setEnabled(false);
-												deleteMemoryButton.setEnabled(false);
+												clearMemoryButton.setEnabled(false);
+												closeButton.setEnabled(false);
 											}
 										});
 									}
@@ -742,9 +744,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 											public void widgetSelected(SelectionEvent evt) {
 												log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
+													readConfigButton.setEnabled(false);
+													storeConfigButton.setEnabled(false);
 													startLiveGatherButton.setEnabled(false);
 													readDataButton.setEnabled(false);
+													stopReadDataButton.setEnabled(false);
 													stopLiveGatherButton.setEnabled(true);
+													clearMemoryButton.setEnabled(false);
+													closeButton.setEnabled(false);
 													setClosePossible(false);
 													liveThread = new LiPoWatchLiveGatherer(application, device, serialPort, LiPoWatchDialog.this);
 													try {
@@ -844,8 +851,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 														liveThread.finalizeRecordSet(activeRecordSet.getName());
 													}
 												}
-												stopLiveGatherButton.setEnabled(false);
+												readConfigButton.setEnabled(true);
+												storeConfigButton.setEnabled(false);
+												readDataButton.setEnabled(true);
+												stopReadDataButton.setEnabled(false);
 												startLiveGatherButton.setEnabled(true);
+												stopLiveGatherButton.setEnabled(false);
+												clearMemoryButton.setEnabled(true);
+												closeButton.setEnabled(true);
 												setClosePossible(true);
 												if (!stopLoggingButton.getEnabled()) {
 													readDataButton.setEnabled(true);
@@ -860,16 +873,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 									clearMemoryGroup.setText("Data memory");
 									clearMemoryGroup.setBounds(261, 178, 226, 97);
 									{
-										deleteMemoryButton = new Button(clearMemoryGroup, SWT.PUSH | SWT.CENTER);
-										deleteMemoryButton.setFont(SWTResourceManager.getFont(application,application.getWidgetFontSize(),SWT.NORMAL));
-										deleteMemoryButton.setText("Delete Memory");
-										deleteMemoryButton.setBounds(12, 56, 202, 31);
-										deleteMemoryButton.setToolTipText("data will deleted just before next  data logging begins");
-										deleteMemoryButton.addSelectionListener(new SelectionAdapter() {
+										clearMemoryButton = new Button(clearMemoryGroup, SWT.PUSH | SWT.CENTER);
+										clearMemoryButton.setFont(SWTResourceManager.getFont(application,application.getWidgetFontSize(),SWT.NORMAL));
+										clearMemoryButton.setText("Delete Memory");
+										clearMemoryButton.setBounds(12, 56, 202, 31);
+										clearMemoryButton.setToolTipText("data will deleted just before next  data logging begins");
+										clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 											public void widgetSelected(SelectionEvent evt) {
 												log.log(Level.FINEST, "deleteMemoryButton.widgetSelected, event=" + evt);
 												try {
-													deleteMemoryButton.setEnabled(false);
+													clearMemoryButton.setEnabled(false);
 													serialPort.clearMemory();
 												}
 												catch (Exception e) {
@@ -877,7 +890,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 													application.openMessageDialog(getDialogShell(), Messages.getString(MessageIds.OSDE_MSGE1500, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 													e.printStackTrace();
 												}
-												deleteMemoryButton.setEnabled(true);
+												clearMemoryButton.setEnabled(true);
 											}
 										});
 									}
@@ -1178,6 +1191,9 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
+			readConfigButton.setEnabled(true);
+			storeConfigButton.setEnabled(false);
+
 			readDataButton.setEnabled(true);
 			stopReadDataButton.setEnabled(false);
 
@@ -1187,12 +1203,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 			startLiveGatherButton.setEnabled(true);
 			stopLiveGatherButton.setEnabled(false);
 
-			deleteMemoryButton.setEnabled(true);
+			clearMemoryButton.setEnabled(true);
+			closeButton.setEnabled(true);
 			setClosePossible(true);
 		}
 		else {
 			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
+					readConfigButton.setEnabled(true);
+					storeConfigButton.setEnabled(false);
+
 					readDataButton.setEnabled(true);
 					stopReadDataButton.setEnabled(false);
 
@@ -1202,7 +1222,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 					startLiveGatherButton.setEnabled(true);
 					stopLiveGatherButton.setEnabled(false);
 
-					deleteMemoryButton.setEnabled(true);
+					clearMemoryButton.setEnabled(true);
+					closeButton.setEnabled(true);
 					setClosePossible(true);
 				}
 			});

@@ -254,22 +254,10 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
 			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-			points[4] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
-			points[5] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
-			points[6] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
-			points[7] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
-			points[8] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
-			points[9] = (((convertBuffer[36]&0xff) << 24) + ((convertBuffer[37]&0xff) << 16) + ((convertBuffer[38]&0xff) << 8) + ((convertBuffer[39]&0xff) << 0));
-			points[10] = (((convertBuffer[40]&0xff) << 24) + ((convertBuffer[41]&0xff) << 16) + ((convertBuffer[42]&0xff) << 8) + ((convertBuffer[43]&0xff) << 0));
-			points[11] = (((convertBuffer[44]&0xff) << 24) + ((convertBuffer[45]&0xff) << 16) + ((convertBuffer[46]&0xff) << 8) + ((convertBuffer[47]&0xff) << 0));
-			points[12] = (((convertBuffer[48]&0xff) << 24) + ((convertBuffer[49]&0xff) << 16) + ((convertBuffer[50]&0xff) << 8) + ((convertBuffer[51]&0xff) << 0));
-			points[13] = (((convertBuffer[52]&0xff) << 24) + ((convertBuffer[53]&0xff) << 16) + ((convertBuffer[54]&0xff) << 8) + ((convertBuffer[55]&0xff) << 0));
-			points[14] = (((convertBuffer[56]&0xff) << 24) + ((convertBuffer[57]&0xff) << 16) + ((convertBuffer[58]&0xff) << 8) + ((convertBuffer[59]&0xff) << 0));
-			points[15] = (((convertBuffer[60]&0xff) << 24) + ((convertBuffer[61]&0xff) << 16) + ((convertBuffer[62]&0xff) << 8) + ((convertBuffer[63]&0xff) << 0));
-			points[16] = (((convertBuffer[64]&0xff) << 24) + ((convertBuffer[65]&0xff) << 16) + ((convertBuffer[66]&0xff) << 8) + ((convertBuffer[67]&0xff) << 0));
-			points[17] = (((convertBuffer[68]&0xff) << 24) + ((convertBuffer[69]&0xff) << 16) + ((convertBuffer[70]&0xff) << 8) + ((convertBuffer[71]&0xff) << 0));
-			points[18] = (((convertBuffer[72]&0xff) << 24) + ((convertBuffer[73]&0xff) << 16) + ((convertBuffer[74]&0xff) << 8) + ((convertBuffer[75]&0xff) << 0));
-			
+
+			for (int j = 0; j < points.length-4; j++) {
+				points[j+4] = (((convertBuffer[16+(j*4)]&0xff) << 24) + ((convertBuffer[17+(j*4)]&0xff) << 16) + ((convertBuffer[18+(j*4)]&0xff) << 8) + ((convertBuffer[19+(j*4)]&0xff) << 0));
+			}			
 			recordSet.addPoints(points);
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
@@ -368,14 +356,11 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public void updateVisibilityStatus(RecordSet recordSet) {
 		String[] recordKeys = recordSet.getRecordNames();
 
-		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
-			recordSet.get(recordKey).setActive(true);
-		}
 		for (int i=0; i<recordKeys.length; ++i) {
 				Record record = recordSet.get(recordKeys[i]);
 				boolean hasReasonableData = record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue();
-				record.setVisible(record.isActive() && hasReasonableData);
-				log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
+				//record.setVisible(record.isActive() && hasReasonableData);
+				//log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 				record.setDisplayable(hasReasonableData);
 				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (hasReasonableData));
 		}
