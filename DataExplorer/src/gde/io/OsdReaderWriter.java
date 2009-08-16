@@ -254,6 +254,13 @@ public class OsdReaderWriter {
 					log.log(Level.FINE, sb.toString());
 				}
 				String [] recordKeys = recordSet.getRecordNames();
+				// check if the file content fits measurements form device properties XML which was used to create the record set
+				if (recordsProperties.length != recordKeys.length) { 
+					for (int j = recordsProperties.length; j < recordKeys.length; j++) {
+						recordSet.remove(recordKeys[j]);
+					}
+					recordKeys = recordSet.getRecordNames();
+				}
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
 					record.setSerializedProperties(recordsProperties[i]);

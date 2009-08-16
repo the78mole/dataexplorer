@@ -397,6 +397,14 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * remove the record as well as the key
+	 */
+	public void remove(String recordKey) {
+		super.remove(recordKey);
+		this.removeRecordName(recordKey);
+	}
+	
+	/**
 	 * check all records of this record set are displayable
 	 * @return true/false	
 	 */
@@ -518,7 +526,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param recordName
 	 * @return record number if valid, else -1
 	 */
-	@Deprecated
+	@Deprecated 
 	public int getRecordIndex(String recordName) {
 		int searchedNumber = -1;
 		for (int i = 0; i < this.recordNames.length; ++i) {
@@ -681,7 +689,8 @@ public class RecordSet extends HashMap<String, Record> {
 		if (this.noneCalculationRecords.length == 0) {
 			Vector<String> tmpCalculationRecords = new Vector<String>();
 			String[] deviceMeasurements = this.device.getMeasurementNames(this.channelConfigName);
-			for (int i = 0; i < deviceMeasurements.length; ++i) { // record names may not match device measurements
+			// record names may not match device measurements, but device measurements might be more then existing records
+			for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) { 
 				MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
 				if (!measurement.isCalculation()) { // active or inactive 
 					tmpCalculationRecords.add(this.recordNames[i]);
