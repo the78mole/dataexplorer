@@ -17,6 +17,7 @@
 package osde.data;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -30,9 +31,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import osde.OSDE;
 import osde.config.Settings;
 import osde.device.DataTypes;
+import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
-import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.device.StatisticsType;
 import osde.exception.DataInconsitsentException;
@@ -756,7 +757,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param recordSetName the name of the record set
 	 * @param device the instance of the device 
 	 * @param channelKey (name of the outlet or configuration)
-	 * @param recordNames array of namesto be used for created records
+	 * @param recordNames array of names to be used for created records
  	 * @param recordSymbols array of symbols to be used for created records
 	 * @param recordUnits array of units to be used for created records
 	 * @param timeStep_ms 
@@ -1764,10 +1765,10 @@ public class RecordSet extends HashMap<String, Record> {
 				String syncRecName = this.getSyncableName();
 				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
 				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
-				List<PropertyType> properties = this.device.getProperties(this.channelConfigName, this.get(this.syncableRecords.firstElement()).ordinal);
-				addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
-				addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
-				addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
+				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.channelConfigName, this.get(this.syncableRecords.firstElement()).ordinal));
+				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
+				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
+				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
 				Record tmpRecord = new Record(this.device, this.realSize()+1, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
 				tmpRecord.isSyncPlaceholder = true;
 				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
@@ -1853,21 +1854,6 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param properties
-	 * @param propertyKey
-	 * @param type
-	 * @param value
-	 */
-	private void addProperty(List<PropertyType> properties, String propertyKey, DataTypes type, double value) {
-		ObjectFactory factory = new ObjectFactory();
-		PropertyType newProperty = factory.createPropertyType();
-		newProperty.setName(propertyKey);
-		newProperty.setType(type);
-		newProperty.setValue(OSDE.STRING_EMPTY + value);
-		properties.add(newProperty);
 	}
 
 	/**

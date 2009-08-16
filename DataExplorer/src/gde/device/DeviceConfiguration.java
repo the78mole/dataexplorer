@@ -541,6 +541,22 @@ public class DeviceConfiguration {
 			list = measurement.getProperty();
 		return list;
 	}
+
+	/**
+	 * add a property to a given list of PropertyTypes
+	 * @param properties
+	 * @param propertyKey
+	 * @param type
+	 * @param value
+	 */
+	public static void addProperty(List<PropertyType> properties, String propertyKey, DataTypes type, double value) {
+		ObjectFactory factory = new ObjectFactory();
+		PropertyType newProperty = factory.createPropertyType();
+		newProperty.setName(propertyKey);
+		newProperty.setType(type);
+		newProperty.setValue(OSDE.STRING_EMPTY + value);
+		properties.add(newProperty);
+	}
 	
 	/**
 	 * set new name of specified measurement
