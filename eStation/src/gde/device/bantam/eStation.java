@@ -609,4 +609,13 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
+	
+	/**
+	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * set value of -1 to suppress this measurement
+	 */
+	public int[] getCellVoltageOrdinals() {
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		return new int[] {0, 2};
+	}
 }
