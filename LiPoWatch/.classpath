@@ -5,6 +5,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
-	<classpathentry kind="lib" path="C:/Programs/eclipse_Gallileo/plugins/org.eclipse.swt.win32.win32.x86_3.5.0.v3550b.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
