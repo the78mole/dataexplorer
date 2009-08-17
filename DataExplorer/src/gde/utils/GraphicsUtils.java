@@ -161,7 +161,7 @@ public class GraphicsUtils {
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
 		RecordSet recordSet = record.getParent();
-		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordName().equals(record.getName());
+		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordName(true).equals(record.getName());
 		
 		if (record.getNumberScaleTicks() != numberTicks) {
 			record.setNumberScaleTicks(numberTicks);

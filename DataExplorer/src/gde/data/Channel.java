@@ -268,8 +268,8 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, new Integer(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, new Integer(recordSet.getHorizontalGridType()).toString());
-				if (recordSet.get(recordSet.getHorizontalGridRecordName()) != null) {
-					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
+				if (recordSet.get(recordSet.getHorizontalGridRecordName(false)) != null) {
+					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, new Integer(recordSet.get(recordSet.getHorizontalGridRecordName(false)).ordinal).toString());
 				}
 			}
 			this.template.store();

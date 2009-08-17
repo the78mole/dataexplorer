@@ -1460,10 +1460,19 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * @param isSyncableIncluded while building the horizontal grid vector the scale of the syncRecord must be used
 	 * @return the horizontalGridRecord
 	 */
-	public String getHorizontalGridRecordName() {
-		return this.horizontalGridRecordOrdinal == -1 ? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
+		String gridRecordName = this.horizontalGridRecordOrdinal == -1 ? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+		if (this.isSyncRequested && isSyncRecordIncluded) {
+			for (String syncableRecordName : this.syncableRecords) {
+				if (gridRecordName.equals(syncableRecordName)) {
+					gridRecordName = this.getSyncableName();
+				}
+			}
+		}			
+		return gridRecordName;
 	}
 
 	/**
@@ -1769,7 +1778,7 @@ public class RecordSet extends HashMap<String, Record> {
 				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
 				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
 				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
-				Record tmpRecord = new Record(this.device, this.realSize()+1, syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
+				Record tmpRecord = new Record(this.device, this.realSize(), syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
 				tmpRecord.isSyncPlaceholder = true;
 				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
 				tmpRecord.isVisible = this.isSyncRecordSelected;

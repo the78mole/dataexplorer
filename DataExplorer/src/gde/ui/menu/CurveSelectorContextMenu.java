@@ -817,7 +817,7 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.OSDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName());
+						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.OSDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName(false));
 						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
