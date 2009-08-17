@@ -277,7 +277,6 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						UniLogDialog.log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						//application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$
 						int selection = UniLogDialog.this.deviceConfigTabFolder.getSelectionIndex();
 						if (selection == 0)
 							UniLogDialog.this.application.openHelpDialog(UniLogDialog.DEVICE_NAME, "HelpInfo.html#adjustment"); //$NON-NLS-1$
@@ -291,7 +290,7 @@ public class UniLogDialog extends DeviceDialog {
 					@Override
 					public void mouseEnter(MouseEvent evt) {
 						UniLogDialog.log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
+						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
 					}
 
 					@Override
@@ -302,7 +301,7 @@ public class UniLogDialog extends DeviceDialog {
 					@Override
 					public void mouseExit(MouseEvent evt) {
 						UniLogDialog.log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
+						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
 					}
 				});
 				{
@@ -310,6 +309,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.helpButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.helpButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0280));
 					this.helpButton.setBounds(31, 374, 259, 30);
+					this.helpButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -323,6 +323,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.closeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 					this.closeButton.setBounds(342, 374, 260, 30);
+					this.closeButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -343,6 +344,7 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
 							this.configMainComosite.setLayout(null);
+							this.configMainComosite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 							this.configMainComosite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									UniLogDialog.log.log(Level.FINER, "configMainComosite.paintControl " + evt); //$NON-NLS-1$
@@ -812,6 +814,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.readAdjustmentButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.readAdjustmentButton.setText(Messages.getString(MessageIds.OSDE_MSGT1318));
 								this.readAdjustmentButton.setBounds(12, 74, 300, 30);
+								this.readAdjustmentButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								this.readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -832,6 +835,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.storeAdjustmentsButton.setText(Messages.getString(MessageIds.OSDE_MSGT1319));
 								this.storeAdjustmentsButton.setBounds(335, 296, 281, 30);
 								this.storeAdjustmentsButton.setEnabled(false);
+								this.storeAdjustmentsButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								this.storeAdjustmentsButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -980,6 +984,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.dataReadGroup.setBounds(14, 78, 290, 242);
 								this.dataReadGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1324));
+								this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								this.dataReadGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										UniLogDialog.log.log(Level.FINEST, "dataReadGroup.paintControl, event=" + evt); //$NON-NLS-1$
@@ -992,7 +997,6 @@ public class UniLogDialog extends DeviceDialog {
 										UniLogDialog.this.useConfigCombo.select(index);
 									}
 								});
-								this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
@@ -1141,6 +1145,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.loggingGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.loggingGroup.setBounds(25, 70, 228, 70);
 									this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1332));
+									this.loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
@@ -1316,24 +1321,6 @@ public class UniLogDialog extends DeviceDialog {
 
 				int index = Channels.getInstance().getActiveChannelNumber();
 				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
-//				this.deviceConfigTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
-//					@Override
-//					public void mouseEnter(MouseEvent evt) {
-//						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
-//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 0);
-//					}
-//
-//					@Override
-//					public void mouseHover(MouseEvent evt) {
-//						UniLogDialog.log.log(Level.FINEST, "deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
-//					}
-//
-//					@Override
-//					public void mouseExit(MouseEvent evt) {
-//						UniLogDialog.log.log(Level.FINER, "deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
-//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, -10);
-//					}
-//				});
 
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 320, 100));
 				this.dialogShell.open();

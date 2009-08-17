@@ -98,6 +98,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	CLabel												energyLabel;
 	CLabel												powerLabel;
 	CLabel												prop100WLabel;
+	Group													deviceConfigGroup;
+	CLabel												clearMemoryLabel;
 	Button												setConfigButton;
 	
 	Group													axModusGroup;
@@ -168,6 +170,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
 			this.setSize(630, 340);
+			this.addMouseTrackListener(this.dialog.mouseTrackerEnterFadeOut);
 			{
 				this.setLayout(null);
 				{
@@ -1031,19 +1034,32 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					}
 				}
 				{
-					this.setConfigButton = new Button(this, SWT.PUSH | SWT.CENTER);
-					this.setConfigButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-					this.setConfigButton.setBounds(320, 200, 295, 50);
-					this.setConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1364));
-					this.setConfigButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1365));
-					this.setConfigButton.setEnabled(false);
-					this.setConfigButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "setConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							collectAndUpdateConfiguration();
-							UniLogConfigTab.this.setConfigButton.setEnabled(false);
-						}
-					});
+					this.deviceConfigGroup = new Group(this, SWT.NONE);
+					this.deviceConfigGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.deviceConfigGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1381));
+					this.deviceConfigGroup.setBounds(313, 145, 310, 188);
+					this.deviceConfigGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
+					{
+						this.clearMemoryLabel = new CLabel(this.deviceConfigGroup, SWT.CENTER | SWT.EMBEDDED);
+						this.clearMemoryLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
+						this.clearMemoryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1382));
+						this.clearMemoryLabel.setBounds(7, 40, 295, 50);
+					}
+					{
+						this.setConfigButton = new Button(this.deviceConfigGroup, SWT.PUSH | SWT.CENTER);
+						this.setConfigButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.setConfigButton.setBounds(10, 120, 290, 40);
+						this.setConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1364));
+						this.setConfigButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1365));
+						this.setConfigButton.setEnabled(false);
+						this.setConfigButton.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST, "setConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								collectAndUpdateConfiguration();
+								UniLogConfigTab.this.setConfigButton.setEnabled(false);
+							}
+						});
+					}
 				}
 			}
 			this.layout();
