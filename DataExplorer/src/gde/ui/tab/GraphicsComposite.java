@@ -243,6 +243,7 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
 			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize()+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.recordSetComment.setToolTipText("Datenfreigabe mit Shift+Enter");
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
@@ -271,7 +272,7 @@ public class GraphicsComposite extends Composite {
 					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 						//StringHelper.printSWTKeyCode(evt);
-						if (evt.keyCode == SWT.CR) {
+						if ((evt.stateMask & SWT.SHIFT) != 0 && evt.keyCode == SWT.CR) {
 							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 							if (recordSet != null) {
 								String commentText = GraphicsComposite.this.recordSetComment.getText();
@@ -460,7 +461,7 @@ public class GraphicsComposite extends Composite {
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
-		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
+		String curveGridRecordName = recordSet.getHorizontalGridRecordName(false);
 		String[] recordNames = recordSet.getRecordNames().clone();
 		// sort the record set names to get the one which makes the grid lines drawn first
 		for (int i = 0; i < recordNames.length; i++) {
