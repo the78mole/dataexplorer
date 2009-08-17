@@ -237,6 +237,7 @@ public abstract class DeviceDialog extends Dialog {
 		boolean isExitShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bottom) ? true : false;
 		log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
+			log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 			setShellAlpha(getShellAlpha());
 		}
 	}
@@ -254,6 +255,7 @@ public abstract class DeviceDialog extends Dialog {
 		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
 		log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
+			log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			setShellAlpha(254);
 		}
 	}
@@ -271,6 +273,7 @@ public abstract class DeviceDialog extends Dialog {
 		boolean isExitShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
 		log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
+			log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			setShellAlpha(getShellAlpha());
 		}
 	}
