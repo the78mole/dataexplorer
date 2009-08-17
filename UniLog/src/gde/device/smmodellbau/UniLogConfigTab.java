@@ -99,7 +99,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	CLabel												powerLabel;
 	CLabel												prop100WLabel;
 	Group													deviceConfigGroup;
-	CLabel												clearMemoryLabel;
+	CLabel												setConfigurationLabel;
 	Button												setConfigButton;
 	
 	Group													axModusGroup;
@@ -1040,10 +1040,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.deviceConfigGroup.setBounds(313, 145, 310, 188);
 					this.deviceConfigGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
 					{
-						this.clearMemoryLabel = new CLabel(this.deviceConfigGroup, SWT.CENTER | SWT.EMBEDDED);
-						this.clearMemoryLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
-						this.clearMemoryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1382));
-						this.clearMemoryLabel.setBounds(7, 40, 295, 50);
+						this.setConfigurationLabel = new CLabel(this.deviceConfigGroup, SWT.CENTER | SWT.EMBEDDED);
+						this.setConfigurationLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
+						this.setConfigurationLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1382));
+						this.setConfigurationLabel.setBounds(5, 20, 300, 100);
 					}
 					{
 						this.setConfigButton = new Button(this.deviceConfigGroup, SWT.PUSH | SWT.CENTER);
