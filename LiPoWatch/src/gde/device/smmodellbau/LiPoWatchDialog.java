@@ -237,7 +237,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				});
 				dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						application.openHelpDialog("LiPoWatch", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
@@ -261,12 +261,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 					mainTabFolder = new CTabFolder(dialogShell, SWT.NONE);
 					{
 						configTabItem = new CTabItem(mainTabFolder, SWT.NONE);
+						configTabItem.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 						configTabItem.setText("Configuration");
 						{
 							configMainComosite = new Composite(mainTabFolder, SWT.NONE);
 							configTabItem.setControl(configMainComosite);
 							configMainComosite.setLayout(null);
 							configMainComosite.setToolTipText("F1 (Linux, Strg+F1) for help");
+							configMainComosite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 							configMainComosite.addPaintListener(new PaintListener() {		
 								@Override
 								public void paintControl(PaintEvent evt) {
@@ -290,6 +292,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								statusGroup.setLayout(null);
 								statusGroup.setText("Status");
 								statusGroup.setBounds(12, 4, 473, 45);
+								statusGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								{
 									serialNumberText = new CLabel(statusGroup, SWT.NONE);
 									serialNumberText.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -341,6 +344,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								autoStartGroup.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 								autoStartGroup.setText("Logging Autostart");
 								autoStartGroup.setBounds(12, 136, 232, 107);
+								autoStartGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								{
 									voltageDropTriggerButton = new Button(autoStartGroup, SWT.CHECK | SWT.RIGHT);
 									voltageDropTriggerButton.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -487,6 +491,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								readConfigButton.setText("Read Configuration");
 								readConfigButton.setBounds(135, 56, 232, 30);
 								readConfigButton.setToolTipText("Liest die Konfiguration aus dem LiPoWatch");
+								readConfigButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								readConfigButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "readConfigButton.widgetSelected, event=" + evt);
@@ -507,6 +512,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								storeConfigButton.setBounds(135, 249, 229, 30);
 								storeConfigButton.setToolTipText("speicher die eingestellte Konfiguration ");
 								storeConfigButton.setEnabled(false);
+								storeConfigButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								storeConfigButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										log.log(Level.FINEST, "storeConfigButton.widgetSelected, event=" + evt);
@@ -531,6 +537,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								impuleRegulationGroup.setLayout(null);
 								impuleRegulationGroup.setText("Impuls regulation");
 								impuleRegulationGroup.setBounds(252, 136, 232, 107);
+								impuleRegulationGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								{
 									regulationTypeLabel = new CLabel(impuleRegulationGroup, SWT.RIGHT);
 									regulationTypeLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -598,6 +605,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								measurementTypeGroup.setText("Measurement");
 								measurementTypeGroup.setBounds(252, 89, 232, 45);
 								measurementTypeGroup.setToolTipText("define if voltage will be measured absolute (4, 8 12..) or relative  (4, 4, 4)");
+								measurementTypeGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								{
 									measurementModusLabel = new CLabel(measurementTypeGroup, SWT.RIGHT);
 									measurementModusLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -622,18 +630,20 @@ public class LiPoWatchDialog extends DeviceDialog {
 						}
 						{
 							dataTabItem = new CTabItem(mainTabFolder, SWT.NONE);
-							//dataTabItem.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
+							dataTabItem.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 							dataTabItem.setText("Data I/O");
 							dataTabItem.setToolTipText("Gather data from device, start/stop (life) data logging");
 							{
 								dataMainComposite = new Composite(mainTabFolder, SWT.NONE);
 								dataMainComposite.setLayout(null);
 								dataTabItem.setControl(dataMainComposite);
+								dataMainComposite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								{
 									dataReadGroup = new Group(dataMainComposite, SWT.NONE);
 									dataReadGroup.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 									dataReadGroup.setBounds(12, 12, 241, 263);
 									dataReadGroup.setText("Daten auslesen");
+									dataReadGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										readDataButton = new Button(dataReadGroup, SWT.PUSH | SWT.CENTER);
 										readDataButton.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -732,6 +742,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									liveDataCaptureGroup.setBounds(259, 12, 228, 164);
 									liveDataCaptureGroup.setText("Datenaufzeichnung");
 									liveDataCaptureGroup.setEnabled(false);
+									liveDataCaptureGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										startLiveGatherButton = new Button(liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 										startLiveGatherButton.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -778,6 +789,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										loggingGroup.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 										loggingGroup.setBounds(12, 56, 202, 63);
 										loggingGroup.setText("LiPoWatch Logging");
+										loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 										{
 											startLoggingButton = new Button(loggingGroup, SWT.PUSH | SWT.CENTER);
 											startLoggingButton.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
@@ -869,9 +881,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									clearMemoryGroup = new Group(dataMainComposite, SWT.NONE);
+									clearMemoryGroup.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 									clearMemoryGroup.setLayout(null);
 									clearMemoryGroup.setText("Data memory");
 									clearMemoryGroup.setBounds(261, 178, 226, 97);
+									clearMemoryGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										clearMemoryButton = new Button(clearMemoryGroup, SWT.PUSH | SWT.CENTER);
 										clearMemoryButton.setFont(SWTResourceManager.getFont(application,application.getWidgetFontSize(),SWT.NORMAL));
@@ -896,6 +910,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										clearMemoryLabel = new CLabel(clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
+										clearMemoryLabel.setFont(SWTResourceManager.getFont(application, application.getWidgetFontSize(), SWT.NORMAL));
 										clearMemoryLabel.setText("clear memory will be performed\njust before starting new logging");
 										clearMemoryLabel.setBounds(12, 16, 202, 40);
 									}
@@ -910,6 +925,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					closeButton.setText("Schliessen");
 					closeButton.setBounds(127, 318, 273, 31);
 					closeButton.setToolTipText("Schliesst den Gerätedialog ");
+					closeButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					closeButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "closeButton.widgetSelected, event=" + evt);
@@ -919,24 +935,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 					mainTabFolder.setBounds(0, 0, 501, 312);
 					mainTabFolder.setSelection(0);
-//					mainTabFolder.addMouseTrackListener(new MouseTrackAdapter() {
-//						@Override
-//						public void mouseEnter(MouseEvent evt) {
-//							log.log(Level.FINER, "deviceConfigTabFolder.mouseEnter, event=" + evt); //$NON-NLS-1$
-//							fadeOutAplhaBlending(evt, mainTabFolder.getClientArea(), 10, 10, -10, 0);
-//						}
-//
-//						@Override
-//						public void mouseHover(MouseEvent evt) {
-//							log.log(Level.FINEST, "deviceConfigTabFolder.mouseHover, event=" + evt); //$NON-NLS-1$
-//						}
-//
-//						@Override
-//						public void mouseExit(MouseEvent evt) {
-//							log.log(Level.FINER, "deviceConfigTabFolder.mouseExit, event=" + evt); //$NON-NLS-1$
-//							fadeInAlpaBlending(evt, mainTabFolder.getClientArea(), 10, 10, -10, -10);
-//						}
-//					});
 				}
 				dialogShell.open();
 			}
