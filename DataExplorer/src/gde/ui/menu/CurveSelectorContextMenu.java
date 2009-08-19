@@ -79,7 +79,7 @@ public class CurveSelectorContextMenu {
 	boolean 											isRecordVisible = false;
 	String 												recordNameKey = null;
 	String 												recordNameMeasurement = OSDE.STRING_BLANK;
-	int 													windowType = GraphicsWindow.TYPE_NORMAL;
+	boolean 											isWindowTypeCompare = false;
 	boolean												isSyncPlaceholder = false; // the sync placeholder record
 	boolean												isScaleSynced = false; // scale sync for syncable records is requested
 	
@@ -106,9 +106,10 @@ public class CurveSelectorContextMenu {
 								CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
 							}
 							log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
-							CurveSelectorContextMenu.this.windowType = (Integer) CurveSelectorContextMenu.this.selectedItem.getData(GraphicsWindow.WINDOW_TYPE);
-							CurveSelectorContextMenu.this.recordSet = (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
-									: CurveSelectorContextMenu.this.application.getCompareSet();
+							CurveSelectorContextMenu.this.isWindowTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE);
+							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.isWindowTypeCompare 
+								? CurveSelectorContextMenu.this.application.getCompareSet()
+								: Channels.getInstance().getActiveChannel().getActiveRecordSet();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {
 								setAllEnabled(true);
@@ -174,17 +175,16 @@ public class CurveSelectorContextMenu {
 
 								}
 
-								if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE) {
+								// compare window has fixed defined scale end values
+								if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+									CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
+									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
 								}
 
 								// disable clear, if nothing to clear
 								if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0) {
 									CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
-								}
-								// compare window has fixed defined scale end values
-								if (CurveSelectorContextMenu.this.recordSet.isCompareSet()) {
-									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
 								}
 							}
 							else
@@ -733,7 +733,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_NONE);
 						}
 					}
@@ -749,7 +749,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MAIN);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -767,7 +767,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalType(RecordSet.TIME_GRID_MOD60);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -787,7 +787,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+							if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowVerticalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -859,7 +859,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
 						}
 					}
@@ -872,12 +872,12 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -892,12 +892,12 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordKey(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
-						if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE){
+						if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -918,7 +918,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 							
-							if (CurveSelectorContextMenu.this.windowType == GraphicsWindow.TYPE_COMPARE) {
+							if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 								if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -1011,73 +1011,74 @@ public class CurveSelectorContextMenu {
 			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
-					String oldRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
-					if (oldRecordKey != null && CurveSelectorContextMenu.this.recordSet.get(oldRecordKey).isVisible()) {
-						RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
-						boolean isComparable = true;
-						if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != CurveSelectorContextMenu.this.recordSet.getTimeStep_ms()) {
-							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0003));
-							isComparable = false;
-							return;
-						}
-						if (!compareSet.isEmpty() && !compareSet.getFirstRecordName().startsWith(oldRecordKey)) {
-							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] {oldRecordKey, OSDE.STRING_MESSAGE_CONCAT, compareSet.getFirstRecordName().split(OSDE.STRING_UNDER_BAR)[0]}));
-							isComparable = false;
-							return;
-						}
-						if (compareSet.isEmpty() || isComparable) {
-							// while adding a new curve to compare set - reset the zoom mode
-							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET ,false);
-							
-							compareSet.setTimeStep_ms(CurveSelectorContextMenu.this.recordSet.getTimeStep_ms());
-							String newRecordkey = oldRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();
-							Record oldRecord = CurveSelectorContextMenu.this.recordSet.get(oldRecordKey);
-							compareSet.put(newRecordkey, oldRecord.clone()); // will delete channelConfigKey
-							Record newRecord = compareSet.get(newRecordkey);
-							newRecord.setSourceRecordSetNames(CurveSelectorContextMenu.this.recordSet.getRecordNames());
-							newRecord.setChannelConfigKey(oldRecord.getChannelConfigKey());
-							newRecord.setVisible(true); // if a non visible record added
-							newRecord.setName(newRecordkey);
-							
-							if (compareSet.size() == 1) {	//set grid line mode and color from settings (previous compare behavior)
-								compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
-								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
-								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
-								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-								compareSet.setHorizontalGridRecordKey(compareSet.getRecord(newRecordkey).getOrdinal());
+					String copyFromRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					RecordSet copyFromRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+					if (copyFromRecordSet != null && copyFromRecordKey != null) {
+						Record copyFromRecord = copyFromRecordSet.get(copyFromRecordKey);
+						if (copyFromRecord != null && copyFromRecord.isVisible()) {
+							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
+							boolean isComparable = true;
+							if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != CurveSelectorContextMenu.this.recordSet.getTimeStep_ms()) {
+								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0003));
+								isComparable = false;
+								return;
 							}
-							int maxRecordSize = compareSet.getMaxSize();
-							for (String recordKey : compareSet.keySet()) {
-								if (compareSet.get(recordKey).realSize() > maxRecordSize) {
-									compareSet.setMaxSize(compareSet.get(recordKey).realSize());
-								}
+							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
+								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] {copyFromRecordKey + OSDE.STRING_MESSAGE_CONCAT +	compareSet.getFirstRecordName()}));
+								isComparable = false;
+								return;
 							}
-							log.log(Level.FINE, " adapt compare set maxRecordSize = " + maxRecordSize); //$NON-NLS-1$
-							
-							double oldMinValue = compareSet.getMinValue();
-							double oldMaxValue = compareSet.getMaxValue();
-							log.log(Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
-							for (String recordKey : compareSet.keySet()) {
-								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
-								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
-								log.log(Level.FINE, String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
+							if (compareSet.isEmpty() || isComparable) {
+								// while adding a new curve to compare set - reset the zoom mode
+								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 
-								if (newMinValue < oldMinValue) {
-									compareSet.setMinValue(newMinValue); // store new min value into record set
-								}
-								oldMinValue = compareSet.getMinValue();
-								if (newMaxValue > oldMaxValue) {
-									compareSet.setMaxValue(newMaxValue); // store new max value into record set
-								}
-							}
-							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
-								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
-							}
+								compareSet.setTimeStep_ms(copyFromRecord.getTimeStep_ms());
+								String newRecordkey = compareSet.containsKey(copyFromRecordKey) ? copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size() : copyFromRecordKey;							
+								Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
+								newRecord.setChannelConfigKey(copyFromRecord.getChannelConfigKey());
+								newRecord.setVisible(true); // if a non visible record added
+								newRecord.setName(newRecordkey);
 
-							CurveSelectorContextMenu.this.application.updateCompareWindow();
+								if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
+									compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
+									compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
+									compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
+									compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
+									compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
+								}
+								int maxRecordSize = compareSet.getMaxSize();
+								for (String recordKey : compareSet.keySet()) {
+									if (compareSet.get(recordKey).realSize() > maxRecordSize) {
+										compareSet.setMaxSize(compareSet.get(recordKey).realSize());
+									}
+								}
+								log.log(Level.FINE, " adapt compare set maxRecordSize = " + maxRecordSize); //$NON-NLS-1$
+
+								double oldMinValue = compareSet.getMinValue();
+								double oldMaxValue = compareSet.getMaxValue();
+								log.log(Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
+								for (String recordKey : compareSet.getRecordNames()) {
+									double newMinValue = compareSet.get(recordKey).getMinScaleValue();
+									double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
+									log.log(Level.FINE, String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
+
+									if (newMinValue < oldMinValue) {
+										compareSet.setMinValue(newMinValue); // store new min value into record set
+									}
+									oldMinValue = compareSet.getMinValue();
+									if (newMaxValue > oldMaxValue) {
+										compareSet.setMaxValue(newMaxValue); // store new max value into record set
+									}
+								}
+								for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
+									compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
+								}
+
+								CurveSelectorContextMenu.this.application.updateCompareWindow();
+							}
 						}
+						else if (copyFromRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
 					}
-					else if( oldRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
 				}
 			});
 			this.cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);

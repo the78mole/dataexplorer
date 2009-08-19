@@ -175,7 +175,7 @@ public class GraphicsComposite extends Composite {
 				if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL)
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 				else
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_9.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_10.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		{
@@ -205,7 +205,7 @@ public class GraphicsComposite extends Composite {
 					if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL)
 						GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					else
-						GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
@@ -263,7 +263,7 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.recordSetComment.addKeyListener(new KeyAdapter() {
@@ -324,7 +324,7 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.drawImage(this.canvasImage, 0,0);
 			
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(GraphicsComposite.MODE_MEASURE, true);
+				drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true);
 			}
 			else if (this.isLeftCutMode) {
 				drawCutPointer(GraphicsComposite.MODE_CUT_LEFT, true, false);
@@ -395,8 +395,8 @@ public class GraphicsComposite extends Composite {
 		}
 		//correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
-			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
-			numberCurvesRight = numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
+			numberCurvesLeft = 1; //numberCurvesLeft > 0 ? 1 : 0;
+			numberCurvesRight = 0; //numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
 		log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -413,7 +413,7 @@ public class GraphicsComposite extends Composite {
 		int horizontalGap = pt.x/5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
+		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 		
@@ -584,15 +584,13 @@ public class GraphicsComposite extends Composite {
 
 	/**
 	 * draw the start pointer for measurement modes
+	 * @param recordSet
 	 * @param mode
 	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(int mode, boolean isRefresh) {
+	public void drawMeasurePointer(RecordSet recordSet, int mode, boolean isRefresh) {
 		this.setModeState(mode); // cleans old pointer if required
 
-		// get the record set to work with
-		boolean isGraphicsWindow = this.windowType == GraphicsWindow.TYPE_NORMAL;
-		RecordSet recordSet = isGraphicsWindow ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
 		String measureRecordKey = recordSet.getRecordKeyMeasurement();
 		Record record = recordSet.get(measureRecordKey);
 

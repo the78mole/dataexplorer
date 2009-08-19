@@ -61,7 +61,7 @@ public class Record extends Vector<Integer> {
 	IDevice							device;
 
 	RecordSet						parent;
-	final int						ordinal;													// ordinal position within record set
+	int									ordinal;													// ordinal position within record set
 	String							name;															// measurement name <Höhe>
 	String							unit;															// unit <m>
 	String							symbol;														// yymbol <h>
@@ -151,10 +151,7 @@ public class Record extends Vector<Integer> {
 	// measurement
 	boolean							isMeasurementMode				= false;
 	boolean							isDeltaMeasurementMode	= false;
-	
-	// compare
-	String[]						sourceRecordSetNames		= new String[0];
-	
+		
 	public final static String	NAME									= "_name";							// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
 	public final static String	UNIT									= "_unit";							// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
 	public final static String	SYMBOL								= "_symbol";						// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
@@ -444,7 +441,7 @@ public class Record extends Vector<Integer> {
 
 	public void setName(String newName) {
 		if (!this.name.equals(newName)) {
-			this.parent.replaceRecordName(this.name, newName);
+			this.parent.replaceRecordName(this.name, newName, this.ordinal);
 			this.name = newName;
 		}
 	}
@@ -1422,14 +1419,7 @@ public class Record extends Vector<Integer> {
 	 * @return the getRecordSetNames
 	 */
 	public String[] getRecordSetNames() {
-		return this.getParent().isCompareSet() ? this.sourceRecordSetNames : this.getParent().getRecordNames();
-	}
-
-	/**
-	 * @param newSourceRecordSetNames the sourceRecordSetNames to set during copy operation to compare set
-	 */
-	public void setSourceRecordSetNames(String[] newSourceRecordSetNames) {
-		this.sourceRecordSetNames = newSourceRecordSetNames;
+		return this.getParent().getRecordNames();
 	}
 
 	/**

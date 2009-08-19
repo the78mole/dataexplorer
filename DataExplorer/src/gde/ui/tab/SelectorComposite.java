@@ -24,6 +24,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -92,6 +94,12 @@ public class SelectorComposite extends Composite {
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
+		this.addPaintListener(new PaintListener() {		
+			@Override
+			public void paintControl(PaintEvent arg0) {
+				doUpdateCurveSelectorTable();
+			}
+		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
@@ -208,17 +216,17 @@ public class SelectorComposite extends Composite {
 				int checkBoxWidth = 20;
 				int textSize = 10;
 				for (int i = 0; i < recordSet.size(); i++) {
-					Record record;
-					switch (this.windowType) {
-					case GraphicsWindow.TYPE_COMPARE:
-						String recordKey = recordSet.getFirstRecordName().split("_")[0]; //$NON-NLS-1$
-						record = recordSet.getRecord(recordKey + "_" + i); //$NON-NLS-1$
-						break;
-
-					default: // TYPE_NORMAL
-						record = recordSet.getRecord(recordKeys[i]);
-						break;
-					}
+					Record record = recordSet.getRecord(recordKeys[i]);
+//					switch (this.windowType) {
+//					case GraphicsWindow.TYPE_COMPARE:
+//						String recordKey = recordSet.getFirstRecordName().split("_")[0]; //$NON-NLS-1$
+//						record = recordSet.getRecord(recordKey + "_" + i); //$NON-NLS-1$
+//						break;
+//
+//					default: // TYPE_NORMAL
+//						record = recordSet.getRecord(recordKeys[i]);
+//						break;
+//					}
 					if (record != null) {
 						log.log(Level.FINER, record.getName());
 						textSize = record.getName().length() * 8;

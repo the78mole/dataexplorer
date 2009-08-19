@@ -95,8 +95,8 @@ public class RecordSet extends HashMap<String, Record> {
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
 	int														maxSize												= 0;																						//number of data point * time step = total time
-	double												maxValue											= 0;
-	double												minValue											= 0;																						//min max value
+	double												maxValue											= Integer.MIN_VALUE;
+	double												minValue											= Integer.MAX_VALUE;														//min max value
 
 	//zooming
 	int														zoomLevel											= 0;																						//0 == not zoomed
@@ -598,10 +598,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param oldRecordName
 	 * @param newRecordName
 	 */
-	public void replaceRecordName(String oldRecordName, String newRecordName) {
-		for (int i = 0; i < this.recordNames.length; i++) {
-			if (this.recordNames[i].equals(oldRecordName)) this.recordNames[i] = newRecordName;
-		}
+	public void replaceRecordName(String oldRecordName, String newRecordName, int useRecordOrdinal) {
+		if (this.recordNames[useRecordOrdinal].equals(oldRecordName)) 
+			this.recordNames[useRecordOrdinal] = newRecordName;
+		
 		if (this.get(newRecordName) == null) { // record may be created previously
 			this.put(newRecordName, this.get(oldRecordName).clone(newRecordName));
 			this.remove(oldRecordName);
@@ -858,10 +858,25 @@ public class RecordSet extends HashMap<String, Record> {
 		newRecord.setKeyName(key);
 		newRecord.setParent(this);
 
-		// add key to recordNames[] in case of TYPE_COMPARE_SET
-		if (this.isCompareSet) this.addRecordName(key);
+		// add key to recordNames[] in case of TYPE_COMPARE_SET, reset ordinal might be different to copied
+		if (this.isCompareSet) {
+			this.addRecordName(key);
+			newRecord.ordinal = this.realSize() - 1;
+			
+			if (newRecord.ordinal > 0 || (newRecord.ordinal > 0 && newRecord.color.equals(this.get(newRecord.ordinal-1).color)))
+				newRecord.setColorDefaultsAndPosition(newRecord.ordinal);
+
+			newRecord.setPositionLeft(true);
+		}
 
 		return newRecord;
+	}
+	
+	/**
+	 * get record based on ordinal
+	 */
+	public Record get(int recordOrdinal) {
+		return this.get(this.recordNames[recordOrdinal]);
 	}
 
 	/**
@@ -1464,7 +1479,11 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the horizontalGridRecord
 	 */
 	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
-		String gridRecordName = this.horizontalGridRecordOrdinal == -1 ? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
+		? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+		if (this.isCompareSet) {
+			log.log(Level.FINE, "gridRecordName = " + gridRecordName);
+		}
 		if (this.isSyncRequested && isSyncRecordIncluded) {
 			for (String syncableRecordName : this.syncableRecords) {
 				if (gridRecordName.equals(syncableRecordName)) {
@@ -1485,7 +1504,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
 	 */
-	public void setHorizontalGridRecordKey(int newHorizontalGridRecordOrdinal) {
+	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
 		this.horizontalGridRecordOrdinal = newHorizontalGridRecordOrdinal;
 	}
 

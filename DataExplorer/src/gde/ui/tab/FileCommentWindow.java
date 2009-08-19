@@ -110,7 +110,7 @@ public class FileCommentWindow {
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.fileCommentText.addKeyListener(new KeyAdapter() {
