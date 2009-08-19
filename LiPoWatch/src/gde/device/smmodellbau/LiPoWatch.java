@@ -309,10 +309,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		double newValues = value;
 		
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
-		String[] recordNames = record.getRecordSetNames(); 
-
 		PropertyType property = null;
-		if (record.getName().startsWith(recordNames[3])) {//3=temperature [°C]
+		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
@@ -332,10 +330,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		double newValues = value;
 		
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
-		String[] recordNames = record.getRecordSetNames(); 
-
 		PropertyType property = null;
-		if (record.getName().startsWith(recordNames[3])) {//3=temperature [°C]
+		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
