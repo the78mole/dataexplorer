@@ -275,15 +275,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		double newValue = 0.0;
 		try {
 			// 0=Spannung, 1=Höhe, 2=Steigung
-			String[] recordNames = record.getRecordSetNames(); 
-			
 			recordKey = record.getName();
 			double offset = record.getOffset(); // != 0 if curve has an defined offset
 			double reduction = record.getReduction();
 			double factor = record.getFactor(); // != 1 if a unit translation is required
 
 			// height calculation need special procedure
-			if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
+			if (record.getOrdinal() == 1) { // 1=Höhe
 				PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 				boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
@@ -291,18 +289,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 				try {
 					if (subtractFirst) {
-						// get the record set to be used
-						RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-						reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000.0;
+						reduction = record.getFirst().intValue() / 1000.0;
 					}
 					else if (subtractLast) {
-						// get the record set to be used
-						RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-						reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000.0;
+						reduction = record.getLast().intValue() / 1000.0;
 					}
 				}
 				catch (Throwable e) {
@@ -311,7 +301,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			}
 
 			// slope calculation needs height factor for calculation
-			else if (recordKey.startsWith(recordNames[2])) { // 2=slope
+			else if (record.getOrdinal() == 2) { // 2=slope
 				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
 			}
 
@@ -334,15 +324,13 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		final String $METHOD_NAME = "reverseTranslateValue()";
 
 		// 0=Spannung, 1=Höhe, 2=Steigung
-		String[] recordNames = record.getRecordSetNames(); 
-
 		String recordKey = record.getName();
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double reduction = record.getReduction();
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		// height calculation need special procedure
-		if (recordKey.startsWith(recordNames[1])) { // 1=Höhe
+		if (record.getOrdinal() == 1) { // 1=Höhe
 			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
@@ -350,18 +338,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 			try {
 				if (subtractFirst) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-					reduction = recordSet.getRecord(recordKey).getFirst().intValue() / 1000;
+					reduction = record.getFirst().intValue() / 1000;
 				}
 				else if (subtractLast) {
-					// get the record set to be used
-					RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordKey.substring(recordKey.length() - 2).startsWith("_")) recordSet = this.application.getCompareSet(); //$NON-NLS-1$
-
-					reduction = recordSet.getRecord(recordKey).getLast().intValue() / 1000;
+					reduction = record.getLast().intValue() / 1000;
 				}
 			}
 			catch (Throwable e) {
@@ -370,7 +350,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		}
 
 		// slope calculation needs height factor for calculation
-		else if (recordKey.startsWith(recordNames[2])) { // 2=slope
+		else if (record.getOrdinal() == 2) { // 2=slope
 			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
 		}
 
