@@ -49,18 +49,19 @@ public class TimeLine {
 	boolean									isTimeLinePrepared	= false;
 
 	/**
-	 * calculates the maximum time number to be displayed and the scale number factor
+	 * calculates the maximum time to be displayed and the scale number factor
+	 * @param numberOfTimeInterval (record size - 1)
+	 * @param timeStep_ms
 	 * @return maxTimeNumber, scale number factor
 	 */
-	public synchronized int[] getScaleMaxTimeNumber(RecordSet recordSet) {
+	public synchronized int[] getScaleMaxTimeNumber(int numberOfTimeInterval, double timeStep_ms) {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
 		int format = TimeLine.TIME_LINE_MSEC; // the time format type 
 
-		int numberOfPoints = recordSet.getRecordDataSize(false);
-		log.log(Level.FINE, "numberOfPoints = " + numberOfPoints + "; timeStep_ms = " + recordSet.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "numberOfPoints = " + numberOfTimeInterval + "; timeStep_ms = " + timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
-		long totalTime_msec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1)).longValue();
-		long totalTime_sec = new Double(recordSet.getTimeStep_ms() * (numberOfPoints - 1) / 1000.0).longValue();
+		long totalTime_msec = new Double(timeStep_ms * numberOfTimeInterval).longValue();
+		long totalTime_sec = new Double(timeStep_ms * numberOfTimeInterval / 1000.0).longValue();
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		log.log(Level.FINE, "totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

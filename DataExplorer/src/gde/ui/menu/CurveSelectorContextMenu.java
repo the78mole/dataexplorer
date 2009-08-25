@@ -44,6 +44,7 @@ import osde.ui.SWTResourceManager;
 import osde.ui.dialog.AxisEndValuesDialog;
 import osde.ui.tab.GraphicsComposite;
 import osde.ui.tab.GraphicsWindow;
+import osde.utils.TimeLine;
 
 /**
  * Context menu class of the curve selection window acts as popup menu
@@ -1017,27 +1018,16 @@ public class CurveSelectorContextMenu {
 						Record copyFromRecord = copyFromRecordSet.get(copyFromRecordKey);
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
 							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
-							boolean isComparable = true;
-							if (!compareSet.isEmpty() && compareSet.getTimeStep_ms() != CurveSelectorContextMenu.this.recordSet.getTimeStep_ms()) {
-								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0003));
-								isComparable = false;
-								return;
-							}
 							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
 								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] {copyFromRecordKey + OSDE.STRING_MESSAGE_CONCAT +	compareSet.getFirstRecordName()}));
-								isComparable = false;
 								return;
 							}
-							if (compareSet.isEmpty() || isComparable) {
 								// while adding a new curve to compare set - reset the zoom mode
 								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 
-								compareSet.setTimeStep_ms(copyFromRecord.getTimeStep_ms());
 								String newRecordkey = compareSet.containsKey(copyFromRecordKey) ? copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size() : copyFromRecordKey;							
 								Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
-								newRecord.setChannelConfigKey(copyFromRecord.getChannelConfigKey());
 								newRecord.setVisible(true); // if a non visible record added
-								newRecord.setName(newRecordkey);
 
 								if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
 									compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
@@ -1046,13 +1036,37 @@ public class CurveSelectorContextMenu {
 									compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
 									compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
 								}
-								int maxRecordSize = compareSet.getMaxSize();
-								for (String recordKey : compareSet.keySet()) {
-									if (compareSet.get(recordKey).realSize() > maxRecordSize) {
-										compareSet.setMaxSize(compareSet.get(recordKey).realSize());
+								// check if the new added record exceeds the existing one in time or set draw limit and fill
+								double maxRecordTime_ms = (compareSet.getMaxSize()-1)*compareSet.getTimeStep_ms();
+								int tmpRecordIntervals = compareSet.get(newRecordkey).realSize()-1;
+								double tmpTimeStep_ms = compareSet.get(newRecordkey).getTimeStep_ms();
+								if ((tmpRecordIntervals * tmpTimeStep_ms) > maxRecordTime_ms) {
+										compareSet.setMaxSize(tmpRecordIntervals+1);
+										compareSet.setTimeStep_ms(tmpTimeStep_ms);
+										maxRecordTime_ms = tmpRecordIntervals * tmpTimeStep_ms;
+										log.log(Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
+										
+										// new added record exceed existing, existing needs drwa limit to be updated and to be filled
+										for (String tmpRecordKey : compareSet.keySet()) {
+											if (!newRecordkey.equals(tmpRecordKey)) {
+												Record tmpRecord = compareSet.get(tmpRecordKey);
+												int oldSize = tmpRecord.realSize();
+												if(tmpRecord.getDrawLimit() == Integer.MAX_VALUE) { // draw linit untouched
+													tmpRecord.setDrawLimit(oldSize);
+												}
+												for (int i = 0; i < (int)(maxRecordTime_ms/tmpRecord.getTimeStep_ms()) - oldSize; i++) {
+													tmpRecord.add(0);
+												}
+											}
+										}
+								}
+								else { // new record is shorter and needs to be filled and the draw limit to set
+									int oldSize = newRecord.realSize();
+									newRecord.setDrawLimit(newRecord.realSize());
+									for (int i = 0; i < (int)(maxRecordTime_ms/newRecord.getTimeStep_ms()) - oldSize; i++) {
+										newRecord.add(0);
 									}
 								}
-								log.log(Level.FINE, " adapt compare set maxRecordSize = " + maxRecordSize); //$NON-NLS-1$
 
 								double oldMinValue = compareSet.getMinValue();
 								double oldMaxValue = compareSet.getMaxValue();
@@ -1075,7 +1089,6 @@ public class CurveSelectorContextMenu {
 								}
 
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
-							}
 						}
 						else if (copyFromRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
 					}

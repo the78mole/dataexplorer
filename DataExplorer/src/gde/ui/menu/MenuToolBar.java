@@ -89,6 +89,7 @@ public class MenuToolBar {
 	Point													scopePointsComboSize = new Point(70, OSDE.IS_WINDOWS ? 21 : 25);
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
+	boolean												isScopePointsCombo = true;
 	int														toolButtonHeight = 23;
 
 	CoolItem											portCoolItem;
@@ -1217,7 +1218,7 @@ public class MenuToolBar {
 		this.panItem.setEnabled(false);
 		this.cutLeftItem.setEnabled(false);
 		this.cutRightItem.setEnabled(false);
-		this.scopePointsCombo.setEnabled(true);
+		this.scopePointsCombo.setEnabled(this.isScopePointsCombo);
 		this.scopePointsCombo.select(0);
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
@@ -1338,5 +1339,14 @@ public class MenuToolBar {
 	
 	public String[] getObjectKeyList() {
 		return this.objectSelectCombo.getItems();
+	}
+
+	/**
+	 * enable or disable the ScopePointsCombo
+	 * @param enabled true will enable the scopePointCombo
+	 */
+	public void enableScopePointsCombo(boolean enabled) {
+		this.isScopePointsCombo = enabled;
+		this.scopePointsCombo.setEnabled(enabled);
 	}
 }

@@ -59,9 +59,10 @@ public class Record extends Vector<Integer> {
 	String							keyName;
 	double							timeStep_ms						= 0;				// time base of measurement points
 	IDevice							device;
+	final int						ordinal;	// ordinal is referencing the source position of the record relative to the initial 
+																// device measurement configuration and used to find specific properties
 
 	RecordSet						parent;
-	int									ordinal;													// ordinal position within record set
 	String							name;															// measurement name <Höhe>
 	String							unit;															// unit <m>
 	String							symbol;														// yymbol <h>
@@ -138,6 +139,10 @@ public class Record extends Vector<Integer> {
 	int									sigmaValue						= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
 	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
+	
+	int 								drawLimit							= Integer.MAX_VALUE;		// above this limit the record will not be drawn (compareSet with different records) 
+	int									zoomOffset			= 0;													// number of measurements point until zoom area begins
+	int									zoomSize				= 0;													// number of measurements point of the zoom area width
 	double							maxZoomScaleValue			= this.maxScaleValue;
 	double							minZoomScaleValue			= this.minScaleValue;
 	int									numberScaleTicks			= 0;
@@ -220,6 +225,7 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
+		this.timeStep_ms = record.timeStep_ms;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -241,6 +247,8 @@ public class Record extends Vector<Integer> {
 		this.isStartEndDefined = record.isStartEndDefined;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
+		this.zoomOffset = 0;
+		this.zoomSize = record.realSize();
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
@@ -276,6 +284,7 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
+		this.timeStep_ms = record.timeStep_ms;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -309,10 +318,11 @@ public class Record extends Vector<Integer> {
 		this.isStartpointZero = record.isStartpointZero;
 		this.maxScaleValue = this.maxValue;
 		this.minScaleValue = this.minValue;
+		this.zoomOffset = 0;
+		this.zoomSize = record.realSize();
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
-		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device
 	}
 
@@ -441,7 +451,7 @@ public class Record extends Vector<Integer> {
 
 	public void setName(String newName) {
 		if (!this.name.equals(newName)) {
-			this.parent.replaceRecordName(this.name, newName, this.ordinal);
+			this.parent.replaceRecordName(this.name, newName);
 			this.name = newName;
 		}
 	}
@@ -680,7 +690,7 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -688,7 +698,7 @@ public class Record extends Vector<Integer> {
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
-			int countDelta = new Double(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
+			int countDelta = new Double(this.minTriggerTimeSec / (this.timeStep_ms / 1000.0)).intValue();
 			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
 				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
 			}
@@ -696,7 +706,7 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.parent.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.parent.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -749,10 +759,10 @@ public class Record extends Vector<Integer> {
 	public int size() {
 		int tmpSize = super.size();
 		
-		if (this.parent.isZoomMode || this.parent.isScopeMode )
-			tmpSize = this.parent.getRecordZoomSize();
-		else if (this.parent.isCompareSet())
-			tmpSize = this.parent.getRecordDataSize(true); // for compare set size is different, real flag has no effect
+		if (this.parent.isZoomMode)
+			tmpSize = this.zoomSize;
+		else if (this.parent.isScopeMode)
+			tmpSize = this.parent.scopeModeSize;
 		
 		return tmpSize;
 	}
@@ -779,8 +789,13 @@ public class Record extends Vector<Integer> {
 	 */
 	public Integer get(int index) {
 		int size = super.size();
-		if(this.parent.isZoomMode || this.parent.isScopeMode) {
-			index = index + this.parent.getRecordZoomOffset();
+		if(this.parent.isZoomMode) {
+			index = index + this.zoomOffset;
+			index = index > (size-1) ? (size-1) : index;
+			index = index < 0 ? 0 : index;
+		}
+		else if(this.parent.isScopeMode) {
+			index = index + this.parent.scopeModeOffset;
 			index = index > (size-1) ? (size-1) : index;
 			index = index < 0 ? 0 : index;
 		}
@@ -806,7 +821,7 @@ public class Record extends Vector<Integer> {
 	public Integer elementAt(int index) {
 		Integer value;
 		if(this.parent.isZoomMode || this.parent.isScopeMode)
-			value = super.elementAt(index + this.parent.getRecordZoomOffset());
+			value = super.elementAt(index + this.zoomOffset);
 		else
 			value = super.elementAt(index);
 		
@@ -984,9 +999,7 @@ public class Record extends Vector<Integer> {
 	 * @return time step in ms
 	 */
 	public double getTimeStep_ms() {
-		if (this.timeStep_ms == 0)
-			this.timeStep_ms = this.parent.getTimeStep_ms();
-		return this.timeStep_ms;
+		return this.timeStep_ms == 0 ? this.parent.getTimeStep_ms() : this.timeStep_ms;
 	}
 
 	/**
@@ -1044,7 +1057,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
-		returnPoint.x = new Double((xDisplayOffset + (this.getTimeStep_ms() * index) * this.displayScaleFactorTime)).intValue();
+		returnPoint.x = new Double((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
 		returnPoint.y = new Double(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}
@@ -1057,7 +1070,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
-		scaledIndex = this.parent.getRecordZoomOffset() + scaledIndex >= this.realSize() ? this.realSize() - this.parent.getRecordZoomOffset() -1 : scaledIndex;
+		scaledIndex = this.zoomOffset + scaledIndex >= this.realSize() ? this.realSize() - this.zoomOffset -1 : scaledIndex;
 		log.log(Level.FINER, "scaledIndex = " + scaledIndex); //$NON-NLS-1$
 		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
@@ -1130,6 +1143,67 @@ public class Record extends Vector<Integer> {
 		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
 		log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the zoom bounds from display as record point offset and size, min/max scale values
+	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
+	 */
+	public void setZoomBounds(Rectangle zoomBounds) {
+		int size = super.size();
+		this.zoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.zoomOffset;
+		this.zoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
+		this.zoomSize = this.zoomOffset + this.zoomSize > size ? size - this.zoomOffset : this.zoomSize;
+		this.minZoomScaleValue = this.getDisplayPointValue(zoomBounds.y, this.parent.drawAreaBounds);
+		this.maxZoomScaleValue = this.getDisplayPointValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
+	}
+
+	/**
+	 * set the zoom size to record set to enable to display only the last size point
+	 * recordZoomOffset must be calculated each graphics refresh
+	 * @param newZoomSize number of points shown
+	 */
+	public void setZoomSize(int newZoomSize) {
+		this.zoomSize = newZoomSize;
+		this.parent.isScopeMode = true;
+	}
+	
+	/**
+	 * query actual recordZoomOffset
+	 * @return recordZoomOffset
+	 */
+	public int getZoomOffset() {
+		return this.zoomOffset;
+	}
+	
+	/**
+	 * set a new recordZoomOffset
+	 * @param newRecordZoomOffset
+	 */
+	public void setZoomOffset(int newRecordZoomOffset) {
+		this.zoomOffset = newRecordZoomOffset;
+	}
+
+	public int getZoomSize() {
+		return this.zoomSize;
+	}
+
+	/**
+	* get the formatted time at given position
+	* @param xPos of the display point
+	* @return string of time value in simple date format HH:ss:mm:SSS
+	*/
+	public String getDisplayPointTime(int xPos) {
+		return TimeLine.getFomatedTimeWithUnit(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.timeStep_ms).intValue());
+	}
+
+	/**
+	 * calculate index in data vector from given display point
+	 * @param xPos
+	 * @return position integer value
+	 */
+	public int getPointIndexFromDisplayPoint(int xPos) {
+		return new Double(1.0 * xPos * this.zoomSize / this.parent.getDrawAreaBounds().width).intValue();
 	}
 	
 	/**
@@ -1644,7 +1718,7 @@ public class Record extends Vector<Integer> {
 		double sum = 0;
 		if (this.triggerRanges != null) {
 			for (TriggerRange range : this.triggerRanges) {
-				sum += (range.out - range.in) * this.parent.getTimeStep_ms();
+				sum += (range.out - range.in) * this.getTimeStep_ms();
 			}
 		}
 		return TimeLine.getFomatedTimeWithUnit(sum);
@@ -1696,6 +1770,22 @@ public class Record extends Vector<Integer> {
 	public void setScopeMinMax(int newScopeMin, int newScopeMax) {
 		this.scopeMin = newScopeMin;
 		this.scopeMax = newScopeMax;
+	}
+	
+	/**
+	 * get the curve index until the curve will be drawn (for compare set with different time length curves)
+	 * @return the drawLimit
+	 */
+	public int getDrawLimit() {
+		return this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
+	}
+
+	/**
+	 * set the curve index until the curve will be drawn
+	 * @param drawLimit the drawLimit to set
+	 */
+	public void setDrawLimit(int drawLimit) {
+		this.drawLimit = drawLimit;
 	}
 }
 

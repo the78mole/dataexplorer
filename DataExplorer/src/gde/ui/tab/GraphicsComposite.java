@@ -346,19 +346,19 @@ public class GraphicsComposite extends Composite {
 	private void drawCurves(RecordSet recordSet, Rectangle bounds, GC gc) {
 		// prime the record set regarding scope mode and/or zoom mode
 		if (this.isScopeMode) {
-			int offset = recordSet.get(recordSet.getFirstRecordName()).realSize() - recordSet.getRecordZoomSize();
+			int offset = recordSet.get(0).realSize() - recordSet.getScopeModeSize();
 			if (offset < 1) {
-				recordSet.setRecordZoomOffset(0);
+				recordSet.setScopeModeOffset(0);
 				recordSet.setScopeMode(false);
 			}
 			else {
-				recordSet.setRecordZoomOffset(offset);
+				recordSet.setScopeModeOffset(offset);
 				recordSet.setScopeMode(true);
 			}
 		}
 		
 		//prepare time scale
-		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
+		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet.get(0).size()-1, recordSet.get(0).getTimeStep_ms());
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
@@ -440,17 +440,18 @@ public class GraphicsComposite extends Composite {
 		log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
 		//draw the time scale
-		int detaTime_ms = new Double(recordSet.getTimeStep_ms() * (recordSet.getRecordDataSize(false) - 1)).intValue();		
+		int deltaTime_ms = new Double(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + detaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, detaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + deltaTime_ms + " endTime = " + endTimeFormated);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, deltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		if(OSDE.IS_WINDOWS)  
 			gc.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 		else
 			gc.setForeground(OpenSerialDataExplorer.COLOR_GREY);
+		
 		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
 		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
 		gc.drawLine(xMax+1, yMax-1, xMax+1, y0);
@@ -610,7 +611,7 @@ public class GraphicsComposite extends Composite {
 
 			this.application.setStatusMessage(Messages.getString(
 					MessageIds.OSDE_MSGT0256, 
-					new Object[] { record.getName(), record.getDisplayPointValueString(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), recordSet.getDisplayPointTime(this.xPosMeasure) }
+					new Object[] { record.getName(), record.getDisplayPointValueString(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getDisplayPointTime(this.xPosMeasure) }
 			));
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
@@ -1036,7 +1037,7 @@ public class GraphicsComposite extends Composite {
 							else {
 								this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0256, 
 										new Object[] { record.getName(), record.getDisplayPointValueString(this.yPosMeasure, this.curveAreaBounds),
-										record.getUnit(), recordSet.getDisplayPointTime(this.xPosMeasure) }
+										record.getUnit(), record.getDisplayPointTime(this.xPosMeasure) }
 								)); 
 							}
 						}
@@ -1208,11 +1209,11 @@ public class GraphicsComposite extends Composite {
 					// sort the zoom values
 					int xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
 					int xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp + 1;
-					int yMin = this.curveAreaBounds.height - 1 - (this.yDown > this.yUp ? this.yDown : this.yUp);
+					int yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp);
 					int yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
 					log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					if (xEnd - xStart > 5 && yMax - yMin > 5) {
-						recordSet.setZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+						recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
 						this.redrawGraphics(); //this.graphicCanvas.redraw();
 					}
 				}
@@ -1226,7 +1227,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isLeftCutMode) {
 					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
-						recordSet = recordSet.clone(recordSet.getPointIndexFromDisplayPoint(this.xUp), true);
+						recordSet = recordSet.clone(recordSet.get(0).getPointIndexFromDisplayPoint(this.xUp), true);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
@@ -1237,7 +1238,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isRightCutMode) {
 					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
-						recordSet = recordSet.clone(recordSet.getRecordZoomOffset() + recordSet.getPointIndexFromDisplayPoint(this.xUp), false);
+						recordSet = recordSet.clone(recordSet.getScopeModeOffset() + recordSet.get(0).getPointIndexFromDisplayPoint(this.xUp), false);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());

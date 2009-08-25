@@ -60,7 +60,7 @@ public class LinearRegression extends CalculationThread {
 			if (record != null && !this.threadStop) {
 				record.clear(); // make sure to clean the target record before calculate new data points
 				Record recordHeight = this.recordSet.get(this.sourceRecordKey);
-				double timeStep_sec = this.recordSet.getTimeStep_ms() / 1000;
+				double timeStep_sec = recordHeight.getTimeStep_ms() / 1000;
 				int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
 				log.log(Level.FINE, "calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$

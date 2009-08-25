@@ -43,10 +43,10 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.tab.GraphicsWindow;
 import osde.utils.CalculationThread;
 import osde.utils.CellVoltageValues;
 import osde.utils.StringHelper;
-import osde.utils.TimeLine;
 
 /**
  * DeviceRecords class holds all the data records for the configured measurement
@@ -74,7 +74,7 @@ public class RecordSet extends HashMap<String, Record> {
 	long													fileDataPointer								= 0; 																						//file pointer where the data of this record begins
 	boolean												hasDisplayableData						= false;
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
-	Rectangle											drawAreaBounds;
+	Rectangle											drawAreaBounds;																										// draw area in display pixel
 
 	// data table
 	Thread												waitAllDisplayableThread;
@@ -102,8 +102,8 @@ public class RecordSet extends HashMap<String, Record> {
 	int														zoomLevel											= 0;																						//0 == not zoomed
 	boolean												isZoomMode										= false;
 	boolean												isScopeMode										= false;
-	int														recordZoomOffset;
-	int														recordZoomSize;
+	int														scopeModeOffset; 						// defines the offset in record pixel
+	int														scopeModeSize;							// defines the number of record pixels to be displayed
 
 	// measurement
 	String												recordKeyMeasurement;
@@ -209,7 +209,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * copy constructor - used to copy a record set to another channel/configuration, 
-	 * wherer the configuration comming from the device properties file
+	 * where the configuration coming from the device properties file
 	 * @param recordSet
 	 * @param newChannelConfiguration
 	 */
@@ -288,8 +288,6 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.zoomLevel = recordSet.zoomLevel;
 		this.isZoomMode = recordSet.isZoomMode;
-		this.recordZoomOffset = recordSet.recordZoomOffset;
-		this.recordZoomSize = recordSet.recordZoomSize;
 
 		this.recordKeyMeasurement = recordSet.recordKeyMeasurement;
 
@@ -364,8 +362,6 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.zoomLevel = 0;
 		this.isZoomMode = false;
-		this.recordZoomOffset = 0;
-		this.recordZoomSize = super.size();
 
 		this.recordKeyMeasurement = recordSet.recordKeyMeasurement;
 
@@ -598,10 +594,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param oldRecordName
 	 * @param newRecordName
 	 */
-	public void replaceRecordName(String oldRecordName, String newRecordName, int useRecordOrdinal) {
-		if (this.recordNames[useRecordOrdinal].equals(oldRecordName)) 
-			this.recordNames[useRecordOrdinal] = newRecordName;
-		
+	public void replaceRecordName(String oldRecordName, String newRecordName) {
+		for (int i = 0; i < this.recordNames.length; i++) {
+			if (this.recordNames[i].equals(oldRecordName)) this.recordNames[i] = newRecordName;
+		}
 		if (this.get(newRecordName) == null) { // record may be created previously
 			this.put(newRecordName, this.get(oldRecordName).clone(newRecordName));
 			this.remove(oldRecordName);
@@ -773,6 +769,7 @@ public class RecordSet extends HashMap<String, Record> {
 			MeasurementType measurement = device.getMeasurement(channelKey, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 			tmpRecord.setColorDefaultsAndPosition(i);
+			tmpRecord.timeStep_ms = timeStep_ms;
 			newRecordSet.put(recordNames[i], tmpRecord);
 			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}
@@ -855,16 +852,16 @@ public class RecordSet extends HashMap<String, Record> {
 		super.put(key, record);
 		Record newRecord = this.get(key);
 		//for compare set record following properties has to be checked at the point where
-		newRecord.setKeyName(key);
-		newRecord.setParent(this);
+		newRecord.keyName = key;
+		newRecord.parent = this;
 
-		// add key to recordNames[] in case of TYPE_COMPARE_SET, reset ordinal might be different to copied
+		// add key to recordNames[] in case of TYPE_COMPARE_SET, keep ordinal to enable translate value
 		if (this.isCompareSet) {
 			this.addRecordName(key);
-			newRecord.ordinal = this.realSize() - 1;
+			newRecord.name = key;
 			
-			if (newRecord.ordinal > 0 || (newRecord.ordinal > 0 && newRecord.color.equals(this.get(newRecord.ordinal-1).color)))
-				newRecord.setColorDefaultsAndPosition(newRecord.ordinal);
+			if (this.realSize() > 1) // keep the color of first added record
+				newRecord.setColorDefaultsAndPosition(this.realSize());
 
 			newRecord.setPositionLeft(true);
 		}
@@ -1008,31 +1005,25 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * query the size of record set child record 
-	 * - compare set not zoomed will return the size of the largest record
 	 * - normal record set will return the size of the data vector of first active in recordNames
 	 * - zoomed set will return size of zoomOffset + zoomWith
 	 * @return the size of data point to calculate the time unit
 	 */
 	public int getRecordDataSize(boolean isReal) {
 		int size = 0;
-		if (this.isCompareSet) {
-			size = this.isZoomMode ? this.recordZoomSize : this.maxSize;
-		}
-		else {
-			if (isReal) {
-				for (String recordKey : this.recordNames) {
-					if (get(recordKey).isActive()) {
-						size = get(recordKey).realSize();
-						break;
-					}
+		if (isReal) {
+			for (String recordKey : this.recordNames) {
+				if (get(recordKey).isActive()) {
+					size = get(recordKey).realSize();
+					break;
 				}
 			}
-			else {
-				for (String recordKey : this.recordNames) {
-					if (get(recordKey).isActive()) {
-						size = get(recordKey).size();
-						break;
-					}
+		}
+		else {
+			for (String recordKey : this.recordNames) {
+				if (get(recordKey).isActive()) {
+					size = get(recordKey).size();
+					break;
 				}
 			}
 		}
@@ -1179,16 +1170,15 @@ public class RecordSet extends HashMap<String, Record> {
 		if (!this.isZoomMode) {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
-				this.recordZoomSize = this.isCompareSet ? this.getMaxSize() : this.get(this.recordNames[0]).realSize();
 				// iterate children and reset min/max values
 				for (int i = 0; i < this.recordNames.length; i++) {
-					Record record = this.get(this.recordNames[i]);
-					record.setMinMaxZoomScaleValues(record.getMinScaleValue(), record.getMaxScaleValue());
+					Record record = this.get(i);
+					record.zoomOffset = 0;
+					record.zoomSize = this.get(i).realSize();
+					record.minZoomScaleValue	= record.minScaleValue;
+					record.maxZoomScaleValue	= record.maxScaleValue;
 				}
 			}
-		}
-		if (!zoomModeEnabled) { // reset
-			this.recordZoomOffset = 0;
 		}
 		this.isZoomMode = zoomModeEnabled;
 		this.isScopeMode = false;
@@ -1219,95 +1209,85 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
+	 * set the zoom bounds from display to child records as record point offset and size
+	 * @param newDisplayZoomBounds - where the start point offset is x,y and the area is width, height
 	 */
-	public void setZoomBounds(Rectangle zoomBounds) {
-		this.recordZoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.recordZoomOffset;
-		this.recordZoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width)+1;
-		// iterate children and set min/max values
+	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
+		// iterate children 
 		for (String recordKey : this.recordNames) {
-			Record record = this.get(recordKey);
-			double minZoomScaleValue = record.getDisplayPointValue(zoomBounds.y, this.drawAreaBounds);
-			double maxZoomScaleValue = record.getDisplayPointValue(zoomBounds.height + zoomBounds.y, this.drawAreaBounds);
-			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
+			this.get(recordKey).setZoomBounds(newDisplayZoomBounds);
 		}
 	}
 
 	/**
-	 * set the zoom size to record set to enable to display only the last size point
+	 * set the scope size to record set to enable to display only the last size records point (scope mode)
 	 * recordZoomOffset must be calculated each graphics refresh
-	 * @param newZoomSize number of points shown
+	 * @param newScopeSize number of points shown
 	 */
-	public void setZoomSize(int newZoomSize) {
-		this.recordZoomSize = newZoomSize;
+	public void setScopeSizeRecordPoints(int newScopeSize) {
 		this.isScopeMode = true;
+		this.scopeModeSize = newScopeSize;
 	}
 	
 	/**
-	 * query actual recordZoomOffset
-	 * @return recordZoomOffset
+	 * query actual scope mode offset in record points
+	 * @return scopeModeOffset
 	 */
-	public int getRecordZoomOffset() {
-		return this.recordZoomOffset;
+	public int getScopeModeOffset() {
+		return this.scopeModeOffset;
 	}
 	
 	/**
-	 * set a new recordZoomOffset
-	 * @param newRecordZoomOffset
+	 * set a new scope mode offset in record points
+	 * @param newScopeModeOffset
 	 */
-	public void setRecordZoomOffset(int newRecordZoomOffset) {
-		this.recordZoomOffset = newRecordZoomOffset;
-	}
-
-	public int getRecordZoomSize() {
-		return this.recordZoomSize;
+	public void setScopeModeOffset(int newScopeModeOffset) {
+		this.scopeModeOffset = newScopeModeOffset;
 	}
 
 	/**
-	 * calculate index in data vector from given display point
-	 * @param xPos
-	 * @return position integer value
+	 * @return the scope mode size in record points
 	 */
-	public int getPointIndexFromDisplayPoint(int xPos) {
-		return new Double(1.0 * xPos * this.getRecordDataSize(false) / this.drawAreaBounds.width).intValue();
+	public int getScopeModeSize() {
+		return this.scopeModeSize;
 	}
 
 	/**
-	 * get the formatted time at given position
-	 * @param xPos of the display point
-	 * @return string of time value in simple date format HH:ss:mm:SSS
+	 * @return the display start time in msec
 	 */
-	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.recordZoomOffset) * this.getTimeStep_ms()).intValue());
-	}
-
 	public double getStartTime() {
-		return this.isZoomMode || this.isScopeMode ? this.recordZoomOffset * this.timeStep_ms : 0;
+		double startTime = 0;
+		if (this.isZoomMode) {
+			startTime = this.get(0).zoomOffset * this.get(0).timeStep_ms;
+		}
+		else if (this.isScopeMode) {
+			startTime = this.scopeModeOffset * this.timeStep_ms;
+		}
+		return startTime;
 	}
 
 	/**
-	 * @return the isPanMode
+	 * @return the isPanMode, panning is only possible in zoom mode
 	 */
 	public boolean isPanMode() {
-		return this.recordZoomOffset != 0 || this.isZoomMode;
+		return this.isZoomMode;
 	}
 
 	public void shift(int xPercent, int yPercent) {
-		int xShift = new Double(1.0 * this.recordZoomSize * xPercent / 100).intValue();
-		if (this.recordZoomOffset + xShift <= 0)
-			this.recordZoomOffset = 0;
-		else if (this.recordZoomOffset + this.recordZoomSize + xShift > this.get(this.recordNames[0]).realSize())
-			this.recordZoomOffset = this.get(this.recordNames[0]).realSize() - this.recordZoomSize;
-		else
-			this.recordZoomOffset = this.recordZoomOffset + xShift;
-
 		// iterate children and set min/max values
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
+			int xShift = new Double(1.0 * record.zoomSize * xPercent / 100).intValue();
+			if (record.zoomOffset + xShift <= 0)
+				record.zoomOffset = 0;
+			else if (record.zoomOffset + record.zoomSize + xShift > record.realSize())
+				record.zoomOffset = record.realSize() - record.zoomSize;
+			else
+				record.zoomOffset = record.zoomOffset + xShift;
+			
 			double yShift = (record.getMaxScaleValue() - record.getMinScaleValue()) * yPercent / 100;
-			double minZoomScaleValue = record.getMinScaleValue() + yShift;
-			double maxZoomScaleValue = record.getMaxScaleValue() + yShift;
-			record.setMinMaxZoomScaleValues(minZoomScaleValue, maxZoomScaleValue);
+			record.minZoomScaleValue = record.getMinScaleValue() + yShift;
+			record.maxZoomScaleValue = record.getMaxScaleValue() + yShift;
 		}
 	}
 
@@ -1482,6 +1462,7 @@ public class RecordSet extends HashMap<String, Record> {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
 		? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
 		if (this.isCompareSet) {
+			gridRecordName = this.realSize() == 0 ? OSDE.STRING_DASH : this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName);
 		}
 		if (this.isSyncRequested && isSyncRecordIncluded) {
@@ -1710,7 +1691,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true if zoom is active and starts at left edge of curve
 	 */
 	public boolean isCutLeftEdgeEnabled() {
-		return this.isZoomMode && (this.recordZoomOffset == 0);
+		try {
+			return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (this.get(0).zoomOffset == 0);
+		}
+		catch (Exception e) {
+			return false;
+		}
 	}
 
 	/**
@@ -1718,7 +1704,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true if zoom is active and starts at right edge of curve
 	 */
 	public boolean isCutRightEdgeEnabled() {
-		return this.isZoomMode && (this.recordZoomOffset + this.recordZoomSize >= this.get(this.getFirstRecordName()).realSize() - 1);
+		Record tmpRecord;
+		try {
+			tmpRecord = this.get(0);
+		}
+		catch (Exception e) {
+			return false;
+		}
+		return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (tmpRecord.zoomOffset + tmpRecord.zoomSize >= tmpRecord.realSize() - 1);
 	}
 
 	public String getHeader() {
@@ -2067,9 +2060,9 @@ public class RecordSet extends HashMap<String, Record> {
 				Record record = this.get(recordKey);
 				if (record.isVisible && record.isDisplayable){
 					int min = 0, max = 0, value;
-					for (int i = this.recordZoomOffset; i < record.realSize(); i++) {
+					for (int i = this.scopeModeOffset; i < record.realSize(); i++) {
 						value = record.realGet(i);
-						if (i == this.recordZoomOffset) 
+						if (i == this.scopeModeOffset) 
 							min = max = value;
 						else {
 							if 			(value > max) max = value;
