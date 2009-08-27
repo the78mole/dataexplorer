@@ -927,12 +927,17 @@ public class Record extends Vector<Integer> {
 		case 1:
 			this.df.applyPattern("0.0"); //$NON-NLS-1$
 			break;
+		case 2:
 		default:
 			this.df.applyPattern("0.00"); //$NON-NLS-1$
 			break;
 		case 3:
 			this.df.applyPattern("0.000"); //$NON-NLS-1$
 			break;
+		}
+		RecordSet compareSet = OpenSerialDataExplorer.getInstance().getCompareSet();
+		if (compareSet != null && compareSet.size() > 0) {
+			this.parent.syncScaleNumberFormat(this.keyName, this.numberFormat);
 		}
 	}
 

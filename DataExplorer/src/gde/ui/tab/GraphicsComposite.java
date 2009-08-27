@@ -918,7 +918,7 @@ public class GraphicsComposite extends Composite {
 	 * 
 	 */
 	private void updatePanMenueButton() {
-		this.application.getMenuToolBar().enablePanButton(this.isZoomMouse);
+		this.application.getMenuToolBar().enablePanButton(this.isZoomMouse || this.isPanMouse);
 	}
 
 	/**

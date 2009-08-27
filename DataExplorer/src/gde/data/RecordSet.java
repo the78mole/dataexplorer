@@ -860,10 +860,15 @@ public class RecordSet extends HashMap<String, Record> {
 			this.addRecordName(key);
 			newRecord.name = key;
 			
-			if (this.realSize() > 1) // keep the color of first added record
+			if (this.realSize() > 1) { 
+				// keep the color of first added record
 				newRecord.setColorDefaultsAndPosition(this.realSize());
-
-			newRecord.setPositionLeft(true);
+				// synchronize scale format
+				newRecord.numberFormat = this.get(0).numberFormat;
+				newRecord.df = (DecimalFormat)this.get(0).df.clone();
+			}
+			// set all scales of compare set to left
+			newRecord.isPositionLeft = true;
 		}
 
 		return newRecord;
@@ -900,13 +905,16 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * set data unsaved with a given reason RecordSet.UNSAVED_REASON_*
+	 * no influence for compare set
 	 * @param unsavedReason
 	 */
 	public void setUnsaved(String unsavedReason) {
-		this.changeCounter++;
-		this.isSaved = false;
-		if (!this.unsaveReasons.contains(unsavedReason)) {
-			this.unsaveReasons.add(unsavedReason);
+		if (!this.isCompareSet) {
+			this.changeCounter++;
+			this.isSaved = false;
+			if (!this.unsaveReasons.contains(unsavedReason)) {
+				this.unsaveReasons.add(unsavedReason);
+			}
 		}
 	}
 
@@ -2087,5 +2095,22 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setSyncRecordSelected(boolean enable) {
 		this.isSyncRecordSelected = enable;
+	}
+	
+	/**
+	 * synchronize the scale number format for compare set only
+	 * @param initator record ordinal
+	 * @param newNumberFormat
+	 */
+	public void syncScaleNumberFormat(String sourceRecordKey, int newNumberFormat) {
+		if (this.isCompareSet) {
+			Record srcRecord = this.get(sourceRecordKey);
+			for (String tmpRecordKey : this.keySet()) {
+				Record tmpRecord = this.get(tmpRecordKey);
+				if (!tmpRecordKey.equals(sourceRecordKey)) {
+					tmpRecord.df = (DecimalFormat)srcRecord.df.clone();
+				}
+			}
+		}
 	}
 }

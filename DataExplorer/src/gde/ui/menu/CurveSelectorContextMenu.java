@@ -1025,7 +1025,7 @@ public class CurveSelectorContextMenu {
 								// while adding a new curve to compare set - reset the zoom mode
 								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 
-								String newRecordkey = compareSet.containsKey(copyFromRecordKey) ? copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size() : copyFromRecordKey;							
+								String newRecordkey = copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();							
 								Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
 								newRecord.setVisible(true); // if a non visible record added
 
