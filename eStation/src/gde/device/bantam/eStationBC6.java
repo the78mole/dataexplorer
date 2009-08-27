@@ -11,7 +11,7 @@ import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
 
 /**
- * Sample device class, used as template for new device implementations
+ * eStation BC6 device class
  * @author Winfried Brügmann
  */
 public class eStationBC6 extends eStation implements IDevice {

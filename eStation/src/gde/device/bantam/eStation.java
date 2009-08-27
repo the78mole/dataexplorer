@@ -39,7 +39,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
- * Sample device class, used as template for new device implementations
+ * eStation base device class
  * @author Winfried Brügmann
  */
 public class eStation extends DeviceConfiguration implements IDevice {
