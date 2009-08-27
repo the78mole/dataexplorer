@@ -39,7 +39,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(LiPoWatchLiveGatherer.class.getName());
 
 	OpenSerialDataExplorer	application;
-	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.OSDE_MSGT1501);
+	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.OSDE_MSGT1601);
 	final LiPoWatchSerialPort	serialPort;
 	final LiPoWatch						device;
 	final LiPoWatchDialog			dialog;

@@ -40,7 +40,7 @@ public class LiPoWatchDataGatherer extends Thread {
 	final static Logger			log							= Logger.getLogger(LiPoWatchDataGatherer.class.getName());
 
 	OpenSerialDataExplorer		application;
-	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1501);
+	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1601);
 	final LiPoWatchSerialPort	serialPort;
 	final LiPoWatchDialog			dialog;
 	final LiPoWatch						device;
@@ -146,13 +146,13 @@ public class LiPoWatchDataGatherer extends Thread {
 		}
 		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage());
+			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage()); //$NON-NLS-1$
 			this.device.getDialog().resetButtons();
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1502)); //$NON-NLS-1$
+			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602)); //$NON-NLS-1$
 			this.device.getDialog().resetButtons();
 		}
 		finally {

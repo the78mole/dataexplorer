@@ -1,6 +1,19 @@
-/**
- * 
- */
+/**************************************************************************************
+  	This file is part of OpenSerialDataExplorer.
+
+    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+****************************************************************************************/
 package osde.device.smmodellbau;
 
 import java.io.FileNotFoundException;
@@ -87,7 +100,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1501);
+		return Messages.getString(MessageIds.OSDE_MSGT1601);
 	}
 
 	/**
@@ -153,7 +166,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		int size = this.getLovDataByteSize();
 		byte[] readBuffer = new byte[size];
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
@@ -202,7 +215,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		if (log.isLoggable(Level.FINE)) sb.append("(3)" + points[18]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
 		int numberCells = (dataBuffer[5] & 0x0F); //Zellenzahl = Asc(Mid(strResult, 6, 1)) And &HF
-		log.log(Level.FINE, "numberCells = " + numberCells);
+		log.log(Level.FINE, "numberCells = " + numberCells); //$NON-NLS-1$
 		int i;
 		for (i = 0; i < numberCells; i++) {
 			//For i = 0 To Zellenzahl - 1
@@ -211,7 +224,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			//Next i
 			tmpValue = ((dataBuffer[2 * i + 16] & 0xFF) << 8) + (dataBuffer[2 * i + 15] & 0xFF);
 			points[i+4] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
-			if (log.isLoggable(Level.FINE)) sb.append("(" + (i+4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) sb.append("(" + (i+4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			totalVotage+= points[i+4];
 		}
 		//Messmodus = CLng(Asc(Mid(strResult, 10, 1)) And &HF0) / 16
@@ -242,7 +255,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
@@ -358,14 +371,14 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				//record.setVisible(record.isActive() && hasReasonableData);
 				//log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 				record.setDisplayable(hasReasonableData);
-				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (hasReasonableData));
+				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (hasReasonableData)); //$NON-NLS-1$
 		}
 		recordSet.isSyncableDisplayableRecords(true);
 		
 		if (log.isLoggable(Level.FINE)) {
 			for (String recordKey : recordKeys) {
 				Record record = recordSet.get(recordKey);
-				log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
+				log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -383,7 +396,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i=0; i<recordKeys.length; ++i) {
 				Record record = recordSet.get(recordKeys[i]);
 				if (record.isActive() && record.isDisplayable()) {
-					log.log(Level.FINE, "add to displayable counter: " + record.getName());
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 					++displayableCounter;
 				}
 		}
