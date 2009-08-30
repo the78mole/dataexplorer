@@ -23,12 +23,12 @@
         </DataBlock>
     </SerialPort>
     <TimeBase>
-        <name>Zeit</name>
+        <name>Time</name>
         <symbol>t</symbol>
         <unit>ms</unit>
         <timeStep>500</timeStep>
     </TimeBase>
-    <Channel type="TYPE_OUTLET" name="Konfiguration">
+    <Channel type="TYPE_OUTLET" name="Configuration">
         <Measurement>
             <name>TotalVoltage</name>
             <symbol>Ut</symbol>
