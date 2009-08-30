@@ -163,7 +163,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				}
 				if (telegrams.size() > 4) {
 					dataCollection.put("" + numberRecordSet, telegrams); //$NON-NLS-1$
-					log.log(Level.INFO, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+					log.log(Level.FINE, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 				}
 				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, memoryUsed);
 			}
