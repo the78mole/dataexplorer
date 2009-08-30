@@ -55,14 +55,15 @@ public class GraphicsUtils {
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 * @param isPositionLeft position of to be drawn scale
+	 * @param numberTickmarks 
 	 * @param df - decimal format
 	 */
-	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, DecimalFormat df) {
+	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, DecimalFormat df) {
 
 		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
-		int numberTicks = height / 70 >= 2 ? height / 70 : 1; // initial start value 
-		int maxNumberTicks = height / 30 >= 2 ? height / 30 : 1;
+		int numberTicks = numberTickmarks == 0 ? height / 50 >= 2 ? height / 50 : 1 : numberTickmarks; // initial start value 
+		int maxNumberTicks = height / 20 >= 2 ? height / 20 : 1;
 		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
 		if (record.isRoundOut() || record.isStartEndDefined()) {
@@ -70,94 +71,15 @@ public class GraphicsUtils {
 			maxScaleValue = maxValue;
 		}
 		else {
-			minScaleValue = minValue > 0 ? MathUtils.roundUpAuto(minValue, deltaScale) : MathUtils.roundDownAuto(minValue, deltaScale);
-			maxScaleValue = maxValue > 0 ? MathUtils.roundDownAuto(maxValue, deltaScale) : MathUtils.roundUpAuto(maxValue, deltaScale);
-			if (minScaleValue > maxScaleValue) {
-				double tmpDeltaScaleValue = minScaleValue - maxScaleValue;
-				minScaleValue = minScaleValue - tmpDeltaScaleValue;
-				maxScaleValue = maxScaleValue + tmpDeltaScaleValue;
-			}
+			Object[] roundResult = MathUtils.adaptRounding(minValue, maxValue, record.getDecimalFormat(), true, maxNumberTicks);
+			minScaleValue = (Double)roundResult[0];
+			maxScaleValue = (Double)roundResult[1];
+			numberTicks = (Integer)roundResult[2];
+			miniticks = (Integer)roundResult[3];
+			if (record.getDecimalFormat().getMinimumIntegerDigits() == 0) df = (DecimalFormat)roundResult[4];
 			deltaScaleValue = (maxScaleValue - minScaleValue);
-			if ((minScaleValue != minValue || maxScaleValue != maxValue) && (deltaScale - deltaScaleValue) > 0 && deltaScaleValue > 0) {
-				int lowerMiniTicks = (minScaleValue != minValue) ? 1 : 0;
-				int upperMiniTicks = (maxScaleValue != maxValue) ? 1 : 0;
-				int maxTickRound = (int) (deltaScaleValue * (lowerMiniTicks + upperMiniTicks) / (deltaScale - deltaScaleValue));
-				
-				if (maxTickRound >= 3 && maxTickRound < maxNumberTicks) 
-					maxNumberTicks = maxTickRound - 1;
-				else if (maxTickRound <= 2)
-					maxNumberTicks = maxTickRound = 2;
-					
-				if (numberTicks > maxNumberTicks) 
-					numberTicks = maxNumberTicks;
-			}
-			else if (deltaScaleValue <= 0.1){ // normally this should be used if the graph contains only zero and the axis end values are set to +/- 0.1
-				numberTicks = 2;
-			}
 		}
-		double deltaMainTickValue = deltaScaleValue / numberTicks; 
-		log.log(Level.FINE, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
-		
-		if (deltaScaleValue <= 0.05) {
-			while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 100) % 1 > 0.1) {
-				deltaMainTickValue = deltaScaleValue / numberTicks;
-				log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-				++numberTicks;
-			}
-		}
-		else if (deltaScaleValue <= 0.1) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 40) % 1 > 0.1) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			else if (deltaScaleValue <= 1) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 20)%1 > 0.1) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue + " " + (deltaScaleValue / numberTicks * 20) % 1);
-					++numberTicks;
-				}
-			}
-			else if (deltaScaleValue <= 5) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 10) % 1 > 0.05) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			else if (deltaScaleValue <= 10) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 5) % 1 > 0.01) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			else if (deltaScaleValue <= 25) {
-				while (numberTicks < maxNumberTicks && (deltaScaleValue / numberTicks * 2) % 1 > 0.01) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			else if (deltaScaleValue <= 50) {
-				while (numberTicks < maxNumberTicks) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					if (deltaMainTickValue%1 < 0.5 || deltaMainTickValue%1 < 0.2 || deltaMainTickValue%1 < 0.1) break;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			else {
-				while (numberTicks < maxNumberTicks) {
-					deltaMainTickValue = deltaScaleValue / numberTicks;
-					if (deltaMainTickValue%5 < 0.5 || deltaMainTickValue%5 < 0.2 || deltaMainTickValue%5 < 0.1) break;
-					log.log(Level.FINER, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-					++numberTicks;
-				}
-			}
-			log.log(Level.FINE, "numberTicks = " + numberTicks + "; deltaMainTickValue = " + deltaMainTickValue);
-		
+		 
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
 		RecordSet recordSet = record.getParent();
@@ -179,13 +101,9 @@ public class GraphicsUtils {
 			dist = dist * -1;
 		}
 		
-		deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
+		double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
 		log.log(Level.FINE, "minScaleValue = " + minScaleValue + "; maxScaleValue = " + maxScaleValue + ", deltaMainTickValue = " + deltaMainTickValue);
 		double deltaMainTickPixel = deltaScaleValue * height / deltaScale / numberTicks; //1.0 * height / numberTicks;
-		miniticks = 5;
-//		while (miniticks >= 3 && (((deltaValue/miniticks) * Math.pow(10, df.getMaximumFractionDigits()+1)+0.01) % 1) > 0.1) {
-//			--miniticks;
-//		}
 		double deltaPosMini = deltaMainTickPixel / miniticks;
 
 		//draw mini ticks below first main tick

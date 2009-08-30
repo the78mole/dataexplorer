@@ -50,6 +50,7 @@ public class CurveUtils {
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		final boolean isCompareSet = record.getParent().isCompareSet();
+		int numberTicks = 10, miniticks = 5;
 
 		log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isSyncPlaceholder()) return; // nothing to display
@@ -93,8 +94,13 @@ public class CurveUtils {
 
 			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling alogorithm
 				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
-				yMaxValueDisplay = yMaxValueDisplay > 0 ? MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay) : MathUtils.roundDown(yMaxValueDisplay, deltaValueDisplay); // max
-				yMinValueDisplay = yMinValueDisplay > 0 ? MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay) : MathUtils.roundUp(yMinValueDisplay, deltaValueDisplay); // min
+				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
+				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
+				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, record.getDecimalFormat(), false, height / 25 >= 3 ? height / 25 : 2);
+				yMinValueDisplay = (Double)roundResult[0];
+				yMaxValueDisplay = (Double)roundResult[1];
+				numberTicks = (Integer)roundResult[2];
+				miniticks = (Integer)roundResult[3];
 				if (isRaw) {
 					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 					yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
@@ -107,12 +113,24 @@ public class CurveUtils {
 				log.log(Level.FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
 			}
 			if (record.isStartpointZero()) {
-				yMinValueDisplay = 0;
-				if (isRaw) {
-					yMinValue = yMinValueDisplay - record.getOffset();
+				// check if the main part of the curve is on positive side
+				if (record.getAvgValue() > 0) { // main part of curve is on positive side
+					yMinValueDisplay = 0;
+					if (isRaw) {
+						yMinValue = yMinValueDisplay - record.getOffset();
+					}
+					else {
+						yMinValue = yMinValueDisplay;
+					}
 				}
-				else {
-					yMinValue = yMinValueDisplay;
+				else {// main part of curve is on negative side
+					yMaxValueDisplay = 0;
+					if (isRaw) {
+						yMaxValue = yMaxValueDisplay - record.getOffset();
+					}
+					else {
+						yMaxValue = yMaxValueDisplay;
+					}
 				}
 				log.log(Level.FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -128,7 +146,6 @@ public class CurveUtils {
 		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int ticklength = 5;
 		int gap = 10;
-		int miniticks = 4;
 
 		// prepare axis position
 		gc.setLineWidth(1);
@@ -143,7 +160,7 @@ public class CurveUtils {
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
 			log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, df);
 			log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
 			if (!isCompareSet) GraphicsUtils.drawText(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
@@ -152,7 +169,7 @@ public class CurveUtils {
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //yMax
 			gc.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, df);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, df);
 			if (!isCompareSet) GraphicsUtils.drawText(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 

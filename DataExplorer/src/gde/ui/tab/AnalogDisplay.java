@@ -135,8 +135,8 @@ public class AnalogDisplay extends Composite {
 			double tmpMinValue = this.device.translateValue(this.record, this.record.getMinValue() / 1000.0);
 			double tmpMaxValue = this.device.translateValue(this.record, this.record.getMaxValue() / 1000.0);
 			double deltaScale = tmpMaxValue - tmpMinValue;
-			tmpMinValue = tmpMinValue > 0 ? MathUtils.roundDown(tmpMinValue, deltaScale) : MathUtils.roundUp(tmpMinValue, deltaScale);
-			tmpMaxValue = tmpMaxValue > 0 ? MathUtils.roundUp(tmpMaxValue, deltaScale) : MathUtils.roundDown(tmpMaxValue, deltaScale);
+			tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
+			tmpMaxValue = MathUtils.roundUp(tmpMaxValue, deltaScale);
 			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
 				this.minValue = tmpMinValue;
 				this.maxValue = tmpMaxValue;
