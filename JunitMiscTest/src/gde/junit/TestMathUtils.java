@@ -15,7 +15,8 @@ import osde.utils.MathUtils;
 public class TestMathUtils  extends TestSuperClass {
 	static Logger	log = Logger.getLogger(TestMathUtils.class.getName());
 	
-	double cat[] = {0,0, 0.22, 0.45, 0.81, 0.90, 1.0, 1.12, 1.87, 2.0, 2.12, 2.54, 3.87, 4.0, 4.33, 4.54, 4.91, 5.0, 5.12, 7.34, 8.0, 10.0, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, 300, 500, 740, 1000, 1345, 2000, 2569, 5000} ;
+	double cat[] = {0,0, 1.0, 2.0, 4.0, 5.0, 8.0, 10.0, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, 300, 500, 740, 1000, 1345, 2000, 2569, 5000} ;
+	//double cat[] = {5.0} ;
 
 
 	/* (non-Javadoc)
@@ -44,30 +45,30 @@ public class TestMathUtils  extends TestSuperClass {
 	private void checkRoundUp(double category) {
 		double value;
 		if (category > 0) {
-			log.log(Level.INFO, category + " roundUp " + MathUtils.roundUp(category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category));
 			value = category + 0.17;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category + 0.27;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category + 0.42;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category + 0.57;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category + 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 		}
 		else {
-			log.log(Level.INFO, category + " roundUp " + MathUtils.roundUp(category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category));
 			value = category - 0.17;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category - 0.27;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category - 0.42;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category - 0.57;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 			value = category - 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
 		}
 	}
 
@@ -87,30 +88,30 @@ public class TestMathUtils  extends TestSuperClass {
 	private void checkRoundDown(double category) {
 		double value;
 		if (category > 0) {
-			log.log(Level.INFO, category + " roundDown " + MathUtils.roundDown(category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category));
 			value = category + 0.17;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category + 0.27;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category + 0.42;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category + 0.57;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category + 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 		}
 		else {
-			log.log(Level.INFO, category + " roundDown " + MathUtils.roundDown(category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category));
 			value = category - 0.17;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category - 0.27;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category - 0.42;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category - 0.57;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 			value = category - 0.77;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
 		}
 	}
 	
@@ -131,30 +132,30 @@ public class TestMathUtils  extends TestSuperClass {
 	private void checkRoundUp(double val, double category) {
 		double value;
 		if (category > 0) {
-			log.log(Level.INFO, category + " roundUp " + MathUtils.roundUp(category, category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category, category));
 			value = val + 0.17;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val + 0.27;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val + 0.42;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val + 0.57;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val + 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 		}
 		else {
-			log.log(Level.INFO, category + " roundUp " + MathUtils.roundUp(category, category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category, category));
 			value = val - 0.17;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val - 0.27;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val - 0.42;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val - 0.57;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 			value = val - 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundUp(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value, category));
 		}
 	}
 
@@ -174,30 +175,116 @@ public class TestMathUtils  extends TestSuperClass {
 	private void checkRoundDown(double val, double category) {
 		double value;
 		if (category > 0) {
-			log.log(Level.INFO, category + " roundDown " + MathUtils.roundDown(category, category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category, category));
 			value = val + 0.17;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val + 0.27;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val + 0.42;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val + 0.57;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val + 0.77;
-			log.log(Level.INFO, value + " roundUp " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 		}
 		else {
-			log.log(Level.INFO, category + " roundDown " + MathUtils.roundDown(category, category));
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category, category));
 			value = val - 0.17;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val - 0.27;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val - 0.42;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val - 0.57;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
 			value = val - 0.77;
-			log.log(Level.INFO, value + " roundDown " + MathUtils.roundDown(value, category));
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value, category));
+		}
+	}
+
+	public void testRoundUpAutoAlgorithmWithDeltaval() {
+
+		for (double d : this.cat) {
+			checkRoundUpAuto(d,d);
+		}
+		for (double d : this.cat) {
+			checkRoundUpAuto(d * -1,d);
+		}
+	}
+
+	/**
+	 * @param category
+	 */
+	private void checkRoundUpAuto(double val, double category) {
+		double value;
+		if (category > 0) {
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUpAuto(category, category));
+			value = val + 0.17;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val + 0.27;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val + 0.42;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val + 0.57;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val + 0.77;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+		}
+		else {
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundUpAuto(category, category));
+			value = val - 0.17;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val - 0.27;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val - 0.42;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val - 0.57;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+			value = val - 0.77;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundUpAuto(value, category));
+		}
+	}
+
+	public void testRoundDownAutoAlgorithmWithDeltaVal() {
+
+		for (double d : this.cat) {
+			checkRoundDownAuto(d, d);
+		}
+		for (double d : this.cat) {
+			checkRoundDownAuto(d * -1, d);
+		}
+	}
+
+	/**
+	 * @param category
+	 */
+	private void checkRoundDownAuto(double val, double category) {
+		double value;
+		if (category > 0) {
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDownAuto(category, category));
+			value = val + 0.17;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val + 0.27;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val + 0.42;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val + 0.57;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val + 0.77;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+		}
+		else {
+			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category, category));
+			value = val - 0.17;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val - 0.27;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val - 0.42;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val - 0.57;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
+			value = val - 0.77;
+			log.log(Level.INFO, value + " ---> " + MathUtils.roundDownAuto(value, category));
 		}
 	}
 	

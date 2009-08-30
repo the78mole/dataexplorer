@@ -203,7 +203,7 @@ public class TestSuperClass extends TestCase {
 	 * @param maxY
 	 */
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
-		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet);
+		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet.get(0).size()-1, recordSet.get(0).getTimeStep_ms());
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
@@ -309,7 +309,7 @@ public class TestSuperClass extends TestCase {
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
-		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
+		String curveGridRecordName = recordSet.getHorizontalGridRecordName(false);
 		String[] recordNames = recordSet.getRecordNames().clone();
 		// sort the record set names to get the one which makes the grid lines drawn first
 		for (int i = 0; i < recordNames.length; i++) {
