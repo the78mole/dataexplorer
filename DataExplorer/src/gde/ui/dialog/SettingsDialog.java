@@ -606,7 +606,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt);
 										if (evt.character == SWT.CR) {
 											SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
-											SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + (OSDE.IS_WINDOWS ? SettingsDialog.this.settings.getSerialPortBlackList().toUpperCase() : SettingsDialog.this.settings.getSerialPortBlackList()));
+											SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
 										}
 									}
 								});
@@ -649,7 +649,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt);
 										if (evt.character == SWT.CR) {
 											SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
-											SettingsDialog.this.serialPortWhiteList.setText(OSDE.STRING_BLANK + (OSDE.IS_WINDOWS ? SettingsDialog.this.settings.getSerialPortWhiteListString().toUpperCase() : SettingsDialog.this.settings.getSerialPortWhiteListString()));
+											SettingsDialog.this.serialPortWhiteList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortWhiteListString());
 										}
 									}
 								});
@@ -1154,6 +1154,13 @@ public class SettingsDialog extends Dialog {
 					if (SettingsDialog.this.settings.isGlobalSerialPort()) SettingsDialog.this.application.setGloabalSerialPort(SettingsDialog.this.serialPort.getText());
 					// set logging levels
 					SettingsDialog.this.settings.updateLogLevel();
+					// check if black or white list enabled and some chars typed but not accepted
+					if (SettingsDialog.this.settings.isSerialPortBlackListEnabled()) {
+						SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
+					}
+					else if (SettingsDialog.this.settings.isSerialPortWhiteListEnabled()) {
+						SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
+					}
 					// check for changed local
 					if (SettingsDialog.this.isLocaleLanguageChanged) {
 						SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.OSDE_MSGT0304));

@@ -735,7 +735,14 @@ public class Settings extends Properties {
 	 * set the serial port black list
 	 */
 	public void setSerialPortBlackList(String newPortBlackList) {
-		this.setProperty(PORT_BLACKLIST, newPortBlackList);
+		StringBuilder blackList = new StringBuilder();
+		for (String tmpPort : newPortBlackList.split(OSDE.STRING_BLANK)) {
+			if (OSDE.IS_WINDOWS && tmpPort.toUpperCase().startsWith("COM"))
+				blackList.append(tmpPort.toUpperCase()).append(OSDE.STRING_BLANK);
+			else if (tmpPort.startsWith("/dev/tty"))
+				blackList.append(tmpPort).append(OSDE.STRING_BLANK);
+		}
+		this.setProperty(PORT_BLACKLIST, blackList.toString());
 	}
 
 
@@ -779,7 +786,14 @@ public class Settings extends Properties {
 	 * set the serial port white list
 	 */
 	public void setSerialPortWhiteList(String newPortWhiteList) {
-		this.setProperty(PORT_WHITELIST, newPortWhiteList);
+		StringBuilder whiteList = new StringBuilder();
+		for (String tmpPort : newPortWhiteList.split(OSDE.STRING_BLANK)) {
+			if (OSDE.IS_WINDOWS && tmpPort.toUpperCase().startsWith("COM"))
+				whiteList.append(tmpPort.toUpperCase()).append(OSDE.STRING_BLANK);
+			else if (tmpPort.startsWith("/dev/tty"))
+					whiteList.append(tmpPort).append(OSDE.STRING_BLANK);
+		}
+		this.setProperty(PORT_WHITELIST, whiteList.toString());
 	}
 
 	/**
