@@ -76,7 +76,7 @@ public class GraphicsUtils {
 			maxScaleValue = (Double)roundResult[1];
 			numberTicks = (Integer)roundResult[2];
 			miniticks = (Integer)roundResult[3];
-			if (record.getDecimalFormat().getMinimumIntegerDigits() == 0) df = (DecimalFormat)roundResult[4];
+			if (record.getNumberFormat() == -1) df = (DecimalFormat)roundResult[4];
 			deltaScaleValue = (maxScaleValue - minScaleValue);
 		}
 		 

@@ -51,6 +51,7 @@ public class CurveUtils {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		final boolean isCompareSet = record.getParent().isCompareSet();
 		int numberTicks = 10, miniticks = 5;
+		DecimalFormat df = record.getDecimalFormat();
 
 		log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isSyncPlaceholder()) return; // nothing to display
@@ -101,6 +102,7 @@ public class CurveUtils {
 				yMaxValueDisplay = (Double)roundResult[1];
 				numberTicks = (Integer)roundResult[2];
 				miniticks = (Integer)roundResult[3];
+				//if (record.getNumberFormat() == -1) df = (DecimalFormat)roundResult[4];
 				if (isRaw) {
 					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 					yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
@@ -153,7 +155,6 @@ public class CurveUtils {
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
 		log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
-		DecimalFormat df = record.getDecimalFormat();
 		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;

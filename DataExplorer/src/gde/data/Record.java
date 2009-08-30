@@ -921,6 +921,17 @@ public class Record extends Vector<Integer> {
 	public void setNumberFormat(int newNumberFormat) {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
+		case -1:
+			double delta = this.maxScaleValue - this.minScaleValue;
+			if (delta <= 0.1)
+				this.df.applyPattern("0.000"); //$NON-NLS-1$
+			else if(delta <= 1)
+				this.df.applyPattern("0.00"); //$NON-NLS-1$
+			else if(delta <= 100)
+				this.df.applyPattern("0.0"); //$NON-NLS-1$
+			else
+				this.df.applyPattern("0"); //$NON-NLS-1$
+			break;
 		case 0:
 			this.df.applyPattern("0"); //$NON-NLS-1$
 			break;

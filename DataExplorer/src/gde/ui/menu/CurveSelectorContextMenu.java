@@ -59,7 +59,7 @@ public class CurveSelectorContextMenu {
 	MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
 	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
 	MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
-	MenuItem											axisNumberFormat, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
+	MenuItem											axisNumberFormat, axisNumberFormatAuto, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
 	MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
 	MenuItem 											measurement, measurementRecordName, simpleMeasure, deltaMeasure;
 	MenuItem											timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60;
@@ -550,13 +550,22 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						int format = CurveSelectorContextMenu.this.actualRecord.getNumberFormat();
 						switch (format) {
+						case -1:
+							CurveSelectorContextMenu.this.axisNumberFormatAuto.setSelection(true);
+							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
+							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
+							break;
 						case 0:
+							CurveSelectorContextMenu.this.axisNumberFormatAuto.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(true);
 							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
 							break;
 						case 1:
+							CurveSelectorContextMenu.this.axisNumberFormatAuto.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(true);
 							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
@@ -564,12 +573,14 @@ public class CurveSelectorContextMenu {
 							break;
 						default:
 						case 2:
+							CurveSelectorContextMenu.this.axisNumberFormatAuto.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(true);
 							CurveSelectorContextMenu.this.axisNumberFormat3.setSelection(false);
 							break;
 						case 3:
+							CurveSelectorContextMenu.this.axisNumberFormatAuto.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat0.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat1.setSelection(false);
 							CurveSelectorContextMenu.this.axisNumberFormat2.setSelection(false);
@@ -584,6 +595,19 @@ public class CurveSelectorContextMenu {
 				}
 			});
 
+			this.axisNumberFormatAuto = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
+			this.axisNumberFormatAuto.setText(Messages.getString(MessageIds.OSDE_MSGT0099));
+			this.axisNumberFormatAuto.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "axisNumberFormatAuto " + e); //$NON-NLS-1$
+					if (CurveSelectorContextMenu.this.recordNameKey != null) {
+						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(-1);
+						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
+						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
+					}
+				}
+			});
 			this.axisNumberFormat0 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
 			this.axisNumberFormat0.setText(Messages.getString(MessageIds.OSDE_MSGT0106));
 			this.axisNumberFormat0.addListener(SWT.Selection, new Listener() {
