@@ -56,10 +56,10 @@
 		<property name="output.linux64.program.devices" location="${output.linux64}/OpenSerialDataExplorer/devices" />
 		<property name="output.linux64.java.ext" location="${output.linux64}/OpenSerialDataExplorer/java/ext" />
 
-		<property name="output.mac" location="${output.dir}/Mac" />
-		<property name="output.mac.program" location="${output.mac}/OpenSerialDataExplorer" />
-		<property name="output.mac.program.devices" location="${output.mac}/OpenSerialDataExplorer/devices" />
-		<property name="output.mac.java.ext" location="${output.mac}/OpenSerialDataExplorer/java/ext" />
+		<property name="output.mac.carbon" location="${output.dir}/Mac_Carbon" />
+		<property name="output.mac.carbon.program" location="${output.mac.carbon}/OpenSerialDataExplorer" />
+		<property name="output.mac.carbon.program.devices" location="${output.mac.carbon}/OpenSerialDataExplorer/devices" />
+		<property name="output.mac.carbon.java.ext" location="${output.mac.carbon}/OpenSerialDataExplorer/java/ext" />
 
 		<!-- create output directory structure -->
 		<mkdir dir="${output.dir}" />
@@ -85,10 +85,10 @@
 		<mkdir dir="${output.linux64.program.devices}" />
 		<mkdir dir="${output.linux64.java.ext}" />
 
-		<mkdir dir="${output.mac}" />
-		<mkdir dir="${output.mac.program}" />
-		<mkdir dir="${output.mac.program.devices}" />
-		<mkdir dir="${output.mac.java.ext}" />
+		<mkdir dir="${output.mac.carbon}" />
+		<mkdir dir="${output.mac.carbon.program}" />
+		<mkdir dir="${output.mac.carbon.program.devices}" />
+		<mkdir dir="${output.mac.carbon.java.ext}" />
 
 		<!-- create src directory varaible -->
 		<property name="source.dir" location="${basedir}" />
@@ -285,14 +285,14 @@
 			<!-- add new device here -->
 		</copy>
 		
-		<copy todir="${output.mac.program}" flatten="yes">
+		<copy todir="${output.mac.carbon.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
 			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
 		</copy>
-		<copy todir="${output.mac.program.devices}" flatten="yes">
+		<copy todir="${output.mac.carbon.program.devices}" flatten="yes">
 			<fileset file="Picolario/build/*.jar" />
 			<fileset file="AkkuMaster/build/*.jar" />
 			<fileset file="Simulator/build/*.jar" />
@@ -325,7 +325,7 @@
 			<fileset file="build/lib/Linux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
-		<copy todir="${output.mac.java.ext}" flatten="yes">
+		<copy todir="${output.mac.carbon.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
@@ -344,7 +344,7 @@
 		<copy todir="${output.linux64}/OpenSerialDataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
-		<copy todir="${output.mac}/OpenSerialDataExplorer" flatten="yes">
+		<copy todir="${output.mac.carbon}/OpenSerialDataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
 
@@ -394,14 +394,14 @@
 		</tar>
 
 		<echo message="tar Mac files" />
-		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac.tar.gz" compression="gzip">
-			<tarfileset dir="${output.mac}" casesensitive="true" mode="755" >
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_carbon.tar.gz" compression="gzip">
+			<tarfileset dir="${output.mac.carbon}" casesensitive="true" mode="755" >
 				<include name="*/OpenSerialDataExplorer"/>
 			</tarfileset>
-			<tarfileset dir="${output.mac}" casesensitive="true" mode="766" >
+			<tarfileset dir="${output.mac.carbon}" casesensitive="true" mode="766" >
 				<include name="*/OpenSerialDataExplorer.desktop"/>
 			</tarfileset>
-			<tarfileset dir="${output.mac}" casesensitive="true" >
+			<tarfileset dir="${output.mac.carbon}" casesensitive="true" >
 				<include name="**"/>
 				<exclude name="*/OpenSerialDataExplorer"/>
 				<exclude name="*/OpenSerialDataExplorer.desktop"/>
