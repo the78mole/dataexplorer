@@ -12,7 +12,7 @@
 <entry key="0_isVisible">true</entry>
 <entry key="0_lineStyle">1</entry>
 <entry key="0_lineWidth">1</entry>
-<entry key="0_numberFormat">1</entry>
+<entry key="0_numberFormat">-1</entry>
 <entry key="1_color">0,128,0</entry>
 <entry key="1_defMaxValue">150.0</entry>
 <entry key="1_defMinValue">-10.0</entry>
@@ -23,7 +23,7 @@
 <entry key="1_isVisible">true</entry>
 <entry key="1_lineStyle">1</entry>
 <entry key="1_lineWidth">1</entry>
-<entry key="1_numberFormat">0</entry>
+<entry key="1_numberFormat">-1</entry>
 <entry key="2_color">255,128,0</entry>
 <entry key="2_defMaxValue">6.0</entry>
 <entry key="2_defMinValue">-3.0</entry>
@@ -34,7 +34,7 @@
 <entry key="2_isVisible">true</entry>
 <entry key="2_lineStyle">1</entry>
 <entry key="2_lineWidth">1</entry>
-<entry key="2_numberFormat">1</entry>
+<entry key="2_numberFormat">-1</entry>
 <entry key="RecordSet_horizontalGridColor">192,192,192</entry>
 <entry key="RecordSet_horizontalGridLineStyle">2</entry>
 <entry key="RecordSet_horizontalGridRecordOrdinal">1</entry>
