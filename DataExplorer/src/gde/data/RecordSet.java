@@ -398,7 +398,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void remove(String recordKey) {
 		super.remove(recordKey);
-		this.removeRecordName(recordKey);
+		if (this.recordNames != null) this.removeRecordName(recordKey);
 	}
 	
 	/**
