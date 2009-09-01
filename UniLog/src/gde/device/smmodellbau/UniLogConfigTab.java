@@ -1349,7 +1349,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetA3 = record.getOffset();
 			this.factorA3 = record.getFactor();
 		}
-		else { // no active record, load data from device properties
+		// no active record, load data from device properties
 			measurement = this.device.getMeasurement(this.configName, 0);
 			this.isActiveUe = measurement.isActive();
 
@@ -1401,7 +1401,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				this.offsetA3 = this.device.getMeasurementOffset(this.configName, 13);
 				this.factorA3 = this.device.getMeasurementFactor(this.configName, 13);
 			}
-		}
 	}
 
 	/**

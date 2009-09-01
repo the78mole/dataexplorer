@@ -1300,16 +1300,25 @@ public class UniLogDialog extends DeviceDialog {
 											switch (channelNumber) {
 											case 1:
 												UniLogDialog.this.configTab1.initEditable();
+												UniLogDialog.this.configTab1.checkUpdateAnalog();
 												break;
 											case 2:
 												UniLogDialog.this.configTab2.initEditable();
+												UniLogDialog.this.configTab2.checkUpdateAnalog();
 												break;
 											case 3:
 												UniLogDialog.this.configTab3.initEditable();
+												UniLogDialog.this.configTab3.checkUpdateAnalog();
 												break;
 											case 4:
 												UniLogDialog.this.configTab4.initEditable();
+												UniLogDialog.this.configTab4.checkUpdateAnalog();
 												break;
+											}
+											RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
+											if (newActiveRecordSet != null) {
+												UniLogDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+												UniLogDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 											}
 										}
 									}
