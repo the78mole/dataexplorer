@@ -6,7 +6,7 @@
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image>LiPoWatch.jpg</image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <SerialPort>
         <port>COM10</port>
