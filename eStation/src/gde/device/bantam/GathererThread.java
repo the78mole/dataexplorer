@@ -107,6 +107,8 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
+		int posCells = this.device.getName().endsWith("BC6") || this.device.getName().endsWith("P6") || this.device.getName().endsWith("P60") ? 6 : 8; //$NON-NLS-1$
+
 		while (!this.isCollectDataStopped) {
 			try {
 				// get data from device
@@ -180,14 +182,13 @@ public class GathererThread extends Thread {
 					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 					
-					int posCells = this.device.getName().endsWith("BC6") ? 6 : 8; //$NON-NLS-1$
 					this.numberBatteryCells = 0; //this.device.getNumberOfLithiumXCells(dataBuffer);
 					String[] recordKeys = recordSet.getRecordNames();
 					for (int i = posCells; i < recordSet.size(); i++) {
 						Record record = recordSet.get(recordKeys[i]);
 						if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
 							this.numberBatteryCells++;
-							log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
 
