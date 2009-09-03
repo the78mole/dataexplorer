@@ -63,7 +63,7 @@ public class GraphicsUtils {
 		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
 		int numberTicks = numberTickmarks == 0 ? height / 50 >= 2 ? height / 50 : 1 : numberTickmarks; // initial start value 
-		int maxNumberTicks = height / 20 >= 2 ? height / 20 : 1;
+		int maxNumberTicks = height / 25 >= 2 ? height / 25 : 1;
 		double deltaScaleValue = deltaScale;
 		double minScaleValue, maxScaleValue;
 		if (record.isRoundOut() || record.isStartEndDefined()) {

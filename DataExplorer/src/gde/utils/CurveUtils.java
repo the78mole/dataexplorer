@@ -102,7 +102,7 @@ public class CurveUtils {
 				yMaxValueDisplay = (Double)roundResult[1];
 				numberTicks = (Integer)roundResult[2];
 				miniticks = (Integer)roundResult[3];
-				//if (record.getNumberFormat() == -1) df = (DecimalFormat)roundResult[4];
+				if (record.getNumberFormat() == -1) df = (DecimalFormat)roundResult[4];
 				if (isRaw) {
 					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 					yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);

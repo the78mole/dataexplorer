@@ -522,71 +522,135 @@ public class MathUtils {
 
 		// check delta scale enable easy readable tick marks
 		double tmpDeltaScale = tmpMaxValue - tmpMinValue;
-			if (tmpDeltaScale <= 0) {
-				results = evaluateNumTicks(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
-			}
-			if (tmpDeltaScale <= 0.005) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
-				results[4] = new DecimalFormat("0.000");
-			}
-			else if (tmpDeltaScale <= 0.010) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
-				results[4] = new DecimalFormat("0.000");
-			}
-			else if (tmpDeltaScale <= 0.050) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 5000);
-				results[4] = new DecimalFormat("0.000");
-			}
-			else if (tmpDeltaScale <= 0.10) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
-			}
-			else if (tmpDeltaScale <= 0.50) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 500);
-				results[4] = new DecimalFormat("0.00");
-			}
-			else if (tmpDeltaScale <= 1) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 100);
-				results[4] = new DecimalFormat("0.00");
-			}
-			else if (tmpDeltaScale <= 5) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50);
-				results[4] = new DecimalFormat("0.00");
-			}
-			else if (tmpDeltaScale <= 10) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10);
-				results[4] = new DecimalFormat("0.0");
-			}
-			else if (tmpDeltaScale <= 50) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 2);
-				results[4] = new DecimalFormat("0");
-			}
-			else if (tmpDeltaScale <= 100) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1);
-				results[4] = new DecimalFormat("0");
-			}
-			else if (tmpDeltaScale <= 500) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.5);
-				results[4] = new DecimalFormat("0");
-			}
-			else if (tmpDeltaScale <= 1000) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.1);
-				results[4] = new DecimalFormat("0");
-			}
-			else if (tmpDeltaScale <= 5000) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.05);
-				results[4] = new DecimalFormat("0");
+			if (isAuto) {
+				if (tmpDeltaScale <= 0) {
+					results = evaluateNumTicksAuto(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				if (tmpDeltaScale <= 0.005) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.010) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.050) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 5000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.10) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 1000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.50) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 500);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 1) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 100);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 5) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 50);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 10) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 10);
+					results[4] = new DecimalFormat("0.0");
+				}
+				else if (tmpDeltaScale <= 50) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 2);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 100) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 1);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 500) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.5);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 1000) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.1);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 5000) {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.05);
+					results[4] = new DecimalFormat("0");
+				}
+				else {
+					results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
+					results[4] = new DecimalFormat("0");
+				}
 			}
 			else {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
-				results[4] = new DecimalFormat("0");
+				if (tmpDeltaScale <= 0) {
+					results = evaluateNumTicks(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				if (tmpDeltaScale <= 0.005) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.010) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.050) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 5000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.10) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1000);
+					results[4] = new DecimalFormat("0.000");
+				}
+				else if (tmpDeltaScale <= 0.50) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 500);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 1) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 100);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 5) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50);
+					results[4] = new DecimalFormat("0.00");
+				}
+				else if (tmpDeltaScale <= 10) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10);
+					results[4] = new DecimalFormat("0.0");
+				}
+				else if (tmpDeltaScale <= 50) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 2);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 100) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 500) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.5);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 1000) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.1);
+					results[4] = new DecimalFormat("0");
+				}
+				else if (tmpDeltaScale <= 5000) {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.05);
+					results[4] = new DecimalFormat("0");
+				}
+				else {
+					results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
+					results[4] = new DecimalFormat("0");
+				}
 			}
 		log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$	
 		return results;
 	}
 
-	private static Object[] evaluateNumTicks(double tmpMinValue, double tmpMaxValue, int maxNumberTicks, double raise) {
+	private static Object[] evaluateNumTicksAuto(double tmpMinValue, double tmpMaxValue, int maxNumberTicks, double raise) {
 		int newNumberTicks = 2, newNumberMiniTicks = 5;
 		double newMinValue = 0.0, newMaxValue = 0.0;
 		boolean isMinNegative = tmpMinValue < 0, isMaxNegative = tmpMaxValue < 0;
@@ -699,6 +763,194 @@ public class MathUtils {
 											if (newNumberTicks > maxNumberTicks) {
 												newMinValue = tmpMinValue * raise % 80 != 0 ? tmpMinValue - (tmpMinValue * raise % 80) / raise : tmpMinValue;
 												newMaxValue = tmpMaxValue * raise % 80 != 0 ? tmpMaxValue - (tmpMaxValue * raise % 80) / raise : tmpMaxValue;
+												newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 80 + 0.5);
+												newNumberMiniTicks = 5;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (isMinNegative && isMaxNegative) {
+			newMinValue = tmpMinValue * raise % 2 != 0 ? tmpMinValue - (tmpMinValue * raise % 2) / raise : tmpMinValue;
+			newMaxValue = tmpMaxValue * raise % 2 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 2) / raise : tmpMaxValue;
+			newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 2 + 0.5);
+			newNumberMiniTicks = 4;
+			if (newNumberTicks > maxNumberTicks) {
+				newMinValue = tmpMinValue * raise % 4 != 0 ? tmpMinValue - (tmpMinValue * raise % 4) / raise : tmpMinValue;
+				newMaxValue = tmpMaxValue * raise % 4 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 4) / raise : tmpMaxValue;
+				newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 4 + 0.5);
+				newNumberMiniTicks = 4;
+				if (newNumberTicks > maxNumberTicks) {
+					newMinValue = tmpMinValue * raise % 5 != 0 ? tmpMinValue - (tmpMinValue * raise % 5) / raise : tmpMinValue;
+					newMaxValue = tmpMaxValue * raise % 5 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 5) / raise : tmpMaxValue;
+					newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 5 + 0.5);
+					newNumberMiniTicks = 5;
+					if (newNumberTicks > maxNumberTicks) {
+						newMinValue = tmpMinValue * raise % 8 != 0 ? tmpMinValue - (tmpMinValue * raise % 8) / raise : tmpMinValue;
+						newMaxValue = tmpMaxValue * raise % 8 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 8) / raise : tmpMaxValue;
+						newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 8 + 0.5);
+						newNumberMiniTicks = 4;
+						if (newNumberTicks > maxNumberTicks) {
+							newMinValue = tmpMinValue * raise % 10 != 0 ? tmpMinValue - (tmpMinValue * raise % 10) / raise : tmpMinValue;
+							newMaxValue = tmpMaxValue * raise % 10 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 10) / raise : tmpMaxValue;
+							newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 10 + 0.5);
+							newNumberMiniTicks = 5;
+							if (newNumberTicks > maxNumberTicks) {
+								newMinValue = tmpMinValue * raise % 16 != 0 ? tmpMinValue - (tmpMinValue * raise % 16) / raise : tmpMinValue;
+								newMaxValue = tmpMaxValue * raise % 16 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 16) / raise : tmpMaxValue;
+								newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 16 + 0.5);
+								newNumberMiniTicks = 4;
+								if (newNumberTicks > maxNumberTicks) {
+									newMinValue = tmpMinValue * raise % 20 != 0 ? tmpMinValue - (tmpMinValue * raise % 20) / raise : tmpMinValue;
+									newMaxValue = tmpMaxValue * raise % 20 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 20) / raise : tmpMaxValue;
+									newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 20 + 0.5);
+									newNumberMiniTicks = 5;
+									if (newNumberTicks > maxNumberTicks) {
+										newMinValue = tmpMinValue * raise % 32 != 0 ? tmpMinValue - (tmpMinValue * raise % 32) / raise : tmpMinValue;
+										newMaxValue = tmpMaxValue * raise % 32 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 32) / raise : tmpMaxValue;
+										newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 32 + 0.5);
+										newNumberMiniTicks = 4;
+										if (newNumberTicks > maxNumberTicks) {
+											newMinValue = tmpMinValue * raise % 40 != 0 ? tmpMinValue - (tmpMinValue * raise % 40) / raise : tmpMinValue;
+											newMaxValue = tmpMaxValue * raise % 40 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 40) / raise : tmpMaxValue;
+											newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 40 + 0.5);
+											newNumberMiniTicks = 5;
+											if (newNumberTicks > maxNumberTicks) {
+												newMinValue = tmpMinValue * raise % 80 != 0 ? tmpMinValue - (tmpMinValue * raise % 80) / raise : tmpMinValue;
+												newMaxValue = tmpMaxValue * raise % 80 != 0 ? tmpMaxValue + (tmpMaxValue * raise % 80) / raise : tmpMaxValue;
+												newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 80 + 0.5);
+												newNumberMiniTicks = 5;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return new Object[] {newMinValue, newMaxValue, newNumberTicks, newNumberMiniTicks, new Object()};
+	}
+
+	private static Object[] evaluateNumTicks(double tmpMinValue, double tmpMaxValue, int maxNumberTicks, double raise) {
+		int newNumberTicks = 2, newNumberMiniTicks = 5;
+		double newMinValue = 0.0, newMaxValue = 0.0;
+		boolean isMinNegative = tmpMinValue < 0, isMaxNegative = tmpMaxValue < 0;
+		
+		if (!isMinNegative && !isMaxNegative) {
+			newMinValue = tmpMinValue * raise % 2 != 0 ? tmpMinValue - (tmpMinValue * raise % 2) / raise : tmpMinValue;
+			newMaxValue = tmpMaxValue * raise % 2 != 0 ? tmpMaxValue + (2 - tmpMaxValue * raise % 2) / raise : tmpMaxValue;
+			newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 2 + 0.5);
+			newNumberMiniTicks = 4;
+			if (newNumberTicks > maxNumberTicks) {
+				newMinValue = tmpMinValue * raise % 4 != 0 ? tmpMinValue - (tmpMinValue * raise % 4) / raise : tmpMinValue;
+				newMaxValue = tmpMaxValue * raise % 4 != 0 ? tmpMaxValue + (4 - tmpMaxValue * raise % 4) / raise : tmpMaxValue;
+				newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 4 + 0.5);
+				newNumberMiniTicks = 4;
+				if (newNumberTicks > maxNumberTicks) {
+					newMinValue = tmpMinValue * raise % 5 != 0 ? tmpMinValue - (tmpMinValue * raise % 5) / raise : tmpMinValue;
+					newMaxValue = tmpMaxValue * raise % 5 != 0 ? tmpMaxValue + (5 - tmpMaxValue * raise % 5) / raise : tmpMaxValue;
+					newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 5 + 0.5);
+					newNumberMiniTicks = 5;
+					if (newNumberTicks > maxNumberTicks) {
+						newMinValue = tmpMinValue * raise % 8 != 0 ? tmpMinValue - (tmpMinValue * raise % 8) / raise : tmpMinValue;
+						newMaxValue = tmpMaxValue * raise % 8 != 0 ? tmpMaxValue + (8 - tmpMaxValue * raise % 8) / raise : tmpMaxValue;
+						newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 8 + 0.5);
+						newNumberMiniTicks = 4;
+						if (newNumberTicks > maxNumberTicks) {
+							newMinValue = tmpMinValue * raise % 10 != 0 ? tmpMinValue - (tmpMinValue * raise % 10) / raise : tmpMinValue;
+							newMaxValue = tmpMaxValue * raise % 10 != 0 ? tmpMaxValue + (10 - tmpMaxValue * raise % 10) / raise : tmpMaxValue;
+							newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 10 + 0.5);
+							newNumberMiniTicks = 5;
+							if (newNumberTicks > maxNumberTicks) {
+								newMinValue = tmpMinValue * raise % 16 != 0 ? tmpMinValue - (tmpMinValue * raise % 16) / raise : tmpMinValue;
+								newMaxValue = tmpMaxValue * raise % 16 != 0 ? tmpMaxValue + (16 - tmpMaxValue * raise % 16) / raise : tmpMaxValue;
+								newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 16 + 0.5);
+								newNumberMiniTicks = 4;
+								if (newNumberTicks > maxNumberTicks) {
+									newMinValue = tmpMinValue * raise % 20 != 0 ? tmpMinValue - (tmpMinValue * raise % 20) / raise : tmpMinValue;
+									newMaxValue = tmpMaxValue * raise % 20 != 0 ? tmpMaxValue + (20 - tmpMaxValue * raise % 20) / raise : tmpMaxValue;
+									newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 20 + 0.5);
+									newNumberMiniTicks = 5;
+									if (newNumberTicks > maxNumberTicks) {
+										newMinValue = tmpMinValue * raise % 32 != 0 ? tmpMinValue - (tmpMinValue * raise % 32) / raise : tmpMinValue;
+										newMaxValue = tmpMaxValue * raise % 32 != 0 ? tmpMaxValue + (32 - tmpMaxValue * raise % 32) / raise : tmpMaxValue;
+										newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 32 + 0.5);
+										newNumberMiniTicks = 4;
+										if (newNumberTicks > maxNumberTicks) {
+											newMinValue = tmpMinValue * raise % 40 != 0 ? tmpMinValue - (tmpMinValue * raise % 40) / raise : tmpMinValue;
+											newMaxValue = tmpMaxValue * raise % 40 != 0 ? tmpMaxValue + (40 - tmpMaxValue * raise % 40) / raise : tmpMaxValue;
+											newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 40 + 0.5);
+											newNumberMiniTicks = 5;
+											if (newNumberTicks > maxNumberTicks) {
+												newMinValue = tmpMinValue * raise % 80 != 0 ? tmpMinValue - (tmpMinValue * raise % 80) / raise : tmpMinValue;
+												newMaxValue = tmpMaxValue * raise % 80 != 0 ? tmpMaxValue + (80 - tmpMaxValue * raise % 80) / raise : tmpMaxValue;
+												newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 80 + 0.5);
+												newNumberMiniTicks = 5;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (isMinNegative && !isMaxNegative) {
+			newMinValue = tmpMinValue * raise % 2 != 0 ? tmpMinValue - (2 + tmpMinValue * raise % 2) / raise : tmpMinValue;
+			newMaxValue = tmpMaxValue * raise % 2 != 0 ? tmpMaxValue + (2 - tmpMaxValue * raise % 2) / raise : tmpMaxValue;
+			newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 2 + 0.5);
+			newNumberMiniTicks = 4;
+			if (newNumberTicks > maxNumberTicks) {
+				newMinValue = tmpMinValue * raise % 4 != 0 ? tmpMinValue - (4 + tmpMinValue * raise % 4) / raise : tmpMinValue;
+				newMaxValue = tmpMaxValue * raise % 4 != 0 ? tmpMaxValue + (4 - tmpMaxValue * raise % 4) / raise : tmpMaxValue;
+				newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 4 + 0.5);
+				newNumberMiniTicks = 4;
+				if (newNumberTicks > maxNumberTicks) {
+					newMinValue = tmpMinValue * raise % 5 != 0 ? tmpMinValue - (5 + tmpMinValue * raise % 5) / raise : tmpMinValue;
+					newMaxValue = tmpMaxValue * raise % 5 != 0 ? tmpMaxValue + (5 - tmpMaxValue * raise % 5) / raise : tmpMaxValue;
+					newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 5 + 0.5);
+					newNumberMiniTicks = 5;
+					if (newNumberTicks > maxNumberTicks) {
+						newMinValue = tmpMinValue * raise % 8 != 0 ? tmpMinValue - (8 + tmpMinValue * raise % 8) / raise : tmpMinValue;
+						newMaxValue = tmpMaxValue * raise % 8 != 0 ? tmpMaxValue + (8 - tmpMaxValue * raise % 8) / raise : tmpMaxValue;
+						newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 8 + 0.5);
+						newNumberMiniTicks = 4;
+						if (newNumberTicks > maxNumberTicks) {
+							newMinValue = tmpMinValue * raise % 10 != 0 ? tmpMinValue - (10 + tmpMinValue * raise % 10) / raise : tmpMinValue;
+							newMaxValue = tmpMaxValue * raise % 10 != 0 ? tmpMaxValue + (10 - tmpMaxValue * raise % 10) / raise : tmpMaxValue;
+							newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 10 + 0.5);
+							newNumberMiniTicks = 5;
+							if (newNumberTicks > maxNumberTicks) {
+								newMinValue = tmpMinValue * raise % 16 != 0 ? tmpMinValue - (16 + tmpMinValue * raise % 16) / raise : tmpMinValue;
+								newMaxValue = tmpMaxValue * raise % 16 != 0 ? tmpMaxValue + (16 - tmpMaxValue * raise % 16) / raise : tmpMaxValue;
+								newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 16 + 0.5);
+								newNumberMiniTicks = 4;
+								if (newNumberTicks > maxNumberTicks) {
+									newMinValue = tmpMinValue * raise % 20 != 0 ? tmpMinValue - (20 + tmpMinValue * raise % 20) / raise : tmpMinValue;
+									newMaxValue = tmpMaxValue * raise % 20 != 0 ? tmpMaxValue + (20 - tmpMaxValue * raise % 20) / raise : tmpMaxValue;
+									newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 20 + 0.5);
+									newNumberMiniTicks = 5;
+									if (newNumberTicks > maxNumberTicks) {
+										newMinValue = tmpMinValue * raise % 32 != 0 ? tmpMinValue - (32 + tmpMinValue * raise % 32) / raise : tmpMinValue;
+										newMaxValue = tmpMaxValue * raise % 32 != 0 ? tmpMaxValue + (32 - tmpMaxValue * raise % 32) / raise : tmpMaxValue;
+										newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 32 + 0.5);
+										newNumberMiniTicks = 4;
+										if (newNumberTicks > maxNumberTicks) {
+											newMinValue = tmpMinValue * raise % 40 != 0 ? tmpMinValue - (40 + tmpMinValue * raise % 40) / raise : tmpMinValue;
+											newMaxValue = tmpMaxValue * raise % 40 != 0 ? tmpMaxValue + (40 - tmpMaxValue * raise % 40) / raise : tmpMaxValue;
+											newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 40 + 0.5);
+											newNumberMiniTicks = 5;
+											if (newNumberTicks > maxNumberTicks) {
+												newMinValue = tmpMinValue * raise % 80 != 0 ? tmpMinValue - (80 + tmpMinValue * raise % 80) / raise : tmpMinValue;
+												newMaxValue = tmpMaxValue * raise % 80 != 0 ? tmpMaxValue + (80 - tmpMaxValue * raise % 80) / raise : tmpMaxValue;
 												newNumberTicks = (int) ((newMaxValue - newMinValue) * raise / 80 + 0.5);
 												newNumberMiniTicks = 5;
 											}
