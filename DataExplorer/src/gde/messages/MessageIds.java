@@ -322,6 +322,9 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0193 = "OSDE_MSGT0193";
 	public final static String	OSDE_MSGT0195 = "OSDE_MSGT0195";
 	public final static String	OSDE_MSGT0196 = "OSDE_MSGT0196";
+	public final static String	OSDE_MSGT0197 = "OSDE_MSGT0197";
+	public final static String	OSDE_MSGT0198 = "OSDE_MSGT0198";
+	public final static String	OSDE_MSGT0199 = "OSDE_MSGT0199";
 	public final static String	OSDE_MSGT0200 = "OSDE_MSGT0200";
 	public final static String	OSDE_MSGT0201 = "OSDE_MSGT0201";
 	public final static String	OSDE_MSGT0202 = "OSDE_MSGT0202";

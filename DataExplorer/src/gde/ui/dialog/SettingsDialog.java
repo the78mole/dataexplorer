@@ -40,6 +40,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -552,6 +554,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPort.setBounds(260, 39, 181, 21);
+								this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
 								this.serialPort.addSelectionListener(new SelectionAdapter() {
@@ -600,11 +603,21 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
 								this.serialPortBlackList.setBounds(260, 61, 181, 22);
+								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
+									@Override
+									public void verifyText(VerifyEvent e) {
+										log.log(Level.FINER, ""+StringHelper.verifyPortInput(e.text));
+										e.doit = StringHelper.verifyPortInput(e.text);
+									}
+								});
 								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
 									@Override
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt);
-										if (evt.character == SWT.CR) {
+										if (evt.character == ' ') {
+											SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
+										}
+										else if (evt.character == SWT.CR) {
 											SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
 											SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
 										}
@@ -643,11 +656,21 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
 								this.serialPortWhiteList.setBounds(260, 84, 181, 22);
+								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
+									@Override
+									public void verifyText(VerifyEvent e) {
+										log.log(Level.FINER, ""+StringHelper.verifyPortInput(e.text));
+										e.doit = StringHelper.verifyPortInput(e.text);
+									}
+								});
 								this.serialPortWhiteList.addKeyListener(new KeyAdapter() {
 									@Override
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt);
-										if (evt.character == SWT.CR) {
+										if (evt.character == ' ') {
+											SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
+										}
+										else if (evt.character == SWT.CR) {
 											SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
 											SettingsDialog.this.serialPortWhiteList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortWhiteListString());
 										}
@@ -1233,10 +1256,16 @@ public class SettingsDialog extends Dialog {
 									if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {
 										SettingsDialog.this.serialPort.setItems(StringHelper.prepareSerialPortList(SettingsDialog.this.availablePorts));
 										int index = SettingsDialog.this.availablePorts.indexOf(SettingsDialog.this.settings.getSerialPort());
-										SettingsDialog.this.serialPort.select(index != -1 ? index : 0);
+										if (index > -1) {
+											SettingsDialog.this.serialPort.select(index);
+										}
+										else {
+											SettingsDialog.this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+										}
 									}
 									else {
-										SettingsDialog.this.serialPort.setText(OSDE.STRING_BLANK);
+										SettingsDialog.this.serialPort.setItems(new String[0]);
+										SettingsDialog.this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
 									}
 								}
 							}

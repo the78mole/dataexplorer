@@ -499,6 +499,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.portSelectCombo.setBounds(249, 27, 205, OSDE.IS_WINDOWS ? 21 : 25);
 									this.portSelectCombo.setEditable(false);
+									this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
 									this.portSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.portSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -906,12 +907,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.OSDE_MSGT0191);
 			this.internetLinkText.setText(link);
 
-			this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
-			int portIndex = this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort()); // -1 means not available
-			//			if(portIndex < 0 && availablePorts.size() > 0) {
-			//				selectedActiveDeviceConfig.setPort(availablePorts.firstElement());
-			//			}
-			this.portSelectCombo.select(portIndex > 0 ? portIndex : 0);
+			if (this.availablePorts != null && this.availablePorts.size() > 0) {
+				this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
+				int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
+				if (index > -1) {
+					this.portSelectCombo.select(index);
+				}
+				else {
+					this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+				}
+			}
+			else {
+				this.portSelectCombo.setItems(new String[0]);
+				this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
+			}
 
 			// com port adjustments group
 			this.baudeSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
@@ -1127,20 +1136,19 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							OpenSerialDataExplorer.display.syncExec(new Runnable() {
 								public void run() {
 									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-										if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-											String selectedPort = DeviceSelectionDialog.this.portSelectCombo.getText().trim();
+										if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 											DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
-											int portIndex = 0;
-											portIndex = DeviceSelectionDialog.this.availablePorts.indexOf(selectedPort);
-											//for (String  portStr : DeviceSelectionDialog.this.availablePorts) {
-											//	System.out.print("'" + portStr + "' ");
-											//}
-											//System.out.println(portIndex + "   '" + selectedPort + "'");
-											if (portIndex < 0) portIndex = 0; // port not found in the list
-											DeviceSelectionDialog.this.portSelectCombo.select(portIndex);
+											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
+											if (index > -1) {
+												DeviceSelectionDialog.this.portSelectCombo.select(index);
+											}
+											else {
+												DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+											}
 										}
 										else {
-											DeviceSelectionDialog.this.portSelectCombo.setText(OSDE.STRING_BLANK);
+											DeviceSelectionDialog.this.portSelectCombo.setItems(new String[0]);
+											DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
 										}
 									}
 								}

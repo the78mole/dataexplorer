@@ -814,7 +814,8 @@ public class Settings extends Properties {
 	 * @return the serial port name as string
 	 */
 	public String getSerialPort() {
-		return getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
+		String port = getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
+		return port == null ? EMPTY : port;
 	}
 	
 	/**

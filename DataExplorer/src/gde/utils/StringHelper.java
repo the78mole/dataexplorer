@@ -279,4 +279,36 @@ public class StringHelper {
 		return serialPortList;
 	}
 
+	/**
+	 * verify the user input while typing port names
+	 * @param eventText of the VerifyEvent test containing the char(s) to be verified
+	 */
+	public static boolean verifyPortInput(String eventText) {
+		char[] chars = new char[eventText.length()];
+		eventText.getChars(0, chars.length, chars, 0);
+		for (int i = 0; i < chars.length; i++) {
+			log.log(Level.FINER, "\"" + chars[i] + "\"");
+			if (OSDE.IS_WINDOWS) {
+				if (!('0' <= chars[i] && chars[i] <= '9' || 'c' == chars[i] || 'C' == chars[i] || 'o' == chars[i] || 'O' == chars[i] || 'm' == chars[i] || 'M' == chars[i] || ' ' == chars[i])) {
+					return false;
+				}
+			}
+			else if (OSDE.IS_LINUX) {
+				if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i]
+						|| 'U' == chars[i] || 'S' == chars[i] || 'B' == chars[i])) {
+					return false;
+				}
+			}
+			else { //OSDE.IS_MAC
+				//if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i]
+				//		|| 'u' == chars[i] || 's' == chars[i] || 'b' == chars[i])) {
+				//	e.doit = false;
+				//	return;
+				//}
+				return true;
+			}
+		}
+		return true;
+	}
+
 }
