@@ -124,7 +124,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 5)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -149,7 +149,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 5)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
