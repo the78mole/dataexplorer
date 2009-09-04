@@ -10,7 +10,9 @@ At the moment the following devices are enabled:
 											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
 											 - Picolario (Renschler) variometer
 											 - UniLog (SM-Modellbau) multi measurement
+											 - LiPoWatch (SM-Modellbau)
 											 - eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger (LiPo)
+											 - Pichler P6 , P60 (Pichler)
 											 - VC820, VC840 (Conrad/VoltCraft)
 											 - Simulator
 
