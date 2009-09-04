@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -71,6 +73,12 @@ public class DataTableWindow {
 			this.dataTable.setLinesVisible(true);
 			this.dataTable.setHeaderVisible(true);
 			this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.dataTable.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 		}
 	}
 

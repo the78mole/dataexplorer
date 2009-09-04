@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -110,6 +112,12 @@ public class AnalogDisplay extends Composite {
 	}
 
 	public void create() {
+		this.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "AnalogDisplay.helpRequested " + evt); //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
 		this.tacho = new Canvas(this, SWT.NONE);
 		this.tacho.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {

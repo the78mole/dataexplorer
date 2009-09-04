@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -65,6 +67,12 @@ public class DigitalDisplay extends Composite {
 
 	public void create() {
 		{
+			this.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD));
 			this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);

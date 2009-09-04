@@ -23,12 +23,10 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -41,6 +39,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
@@ -146,14 +146,9 @@ public class GraphicsComposite extends Composite {
 		this.setLayout(null);
 		this.setDragDetect(false);
 		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-		this.addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent evt) {
-				log.log(Level.FINE, "GraphicsComposite.paintControl() = " + evt);
-				doRedrawGraphics();
-			}
-		});
-		this.addControlListener(new ControlListener() {
-			public void controlResized(ControlEvent evt) {
+		// help lister does not get active on Composite as well as on Canvas
+		this.addListener(SWT.Resize, new Listener() {
+			public void handleEvent( Event evt) {
 				log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt);
 				Rectangle clientRect = GraphicsComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
@@ -165,23 +160,17 @@ public class GraphicsComposite extends Composite {
 					doRedrawGraphics();
 				}
 			}
-			public void controlMoved(ControlEvent evt) {
-				log.log(Level.FINEST, "GraphicsComposite.controlMoved() = " + evt);
-			}
-		});
-		this.addHelpListener(new HelpListener() {
-			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "graphicsComposite.helpRequested " + evt); 			//$NON-NLS-1$
-				if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL)
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
-				else
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_10.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
-			}
 		});
 		{
 			this.recordSetHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
 			this.recordSetHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.recordSetHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.recordSetHeader.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); 			//$NON-NLS-1$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.recordSetHeader.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
@@ -199,15 +188,6 @@ public class GraphicsComposite extends Composite {
 		{
 			this.graphicCanvas = new Canvas(this, SWT.NONE);
 			this.graphicCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-			this.graphicCanvas.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "graphicCanvas.helpRequested " + evt); //$NON-NLS-1$
-					if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL)
-						GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					else
-						GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_10.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 				public void mouseMove(MouseEvent evt) {
 					log.log(Level.FINEST, "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
@@ -243,13 +223,9 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
 			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize()+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-			this.recordSetComment.setToolTipText("Datenfreigabe mit Shift+Enter");
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
-					GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-
 					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 						if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
@@ -266,22 +242,67 @@ public class GraphicsComposite extends Composite {
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			this.recordSetComment.addKeyListener(new KeyAdapter() {
-				public void keyPressed(KeyEvent evt) {
-					log.log(Level.FINER, "recordSetCommentText.log.log(Level.FINER, , event=" + evt); //$NON-NLS-1$
+			//			this.recordSetComment.addKeyListener(new KeyAdapter() {
+			//				public void keyPressed(KeyEvent evt) {
+			//					log.log(Level.FINER, "recordSetCommentText.log.log(Level.FINER, , event=" + evt); //$NON-NLS-1$
+			//					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			//					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
+			//						//StringHelper.printSWTKeyCode(evt);
+			//						if (evt.keyCode == ' ' || evt.keyCode == SWT.CR) {
+			//							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+			//							if (recordSet != null) {
+			//								recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+			//								recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+			//							}
+			//						}
+			//					}
+			//
+			//				}
+			//			});
+			//			this.recordSetComment.addVerifyListener(new VerifyListener() {				
+			//				@Override
+			//				public void verifyText(VerifyEvent e) {
+			//					if (e.keyCode == SWT.CR) {
+			//						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+			//						if (recordSet != null) {
+			//							recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+			//							recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+			//						}
+			//						e.doit = false;
+			//						return;
+			//					}			
+			//				}
+			//			});
+			//			this.recordSetComment.addModifyListener(new ModifyListener() {
+			//				
+			//				@Override
+			//				public void modifyText(ModifyEvent evt) {
+			//					log.log(Level.INFO, "recordSetComment,modifyText() , event=" + evt); //$NON-NLS-1$
+			//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+			//					if (recordSet != null) {
+			//						recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+			//						recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+			//					}
+			//				}
+			//			});		
+			this.recordSetComment.addFocusListener(new FocusListener() {				
+				@Override
+				public void focusLost(FocusEvent evt) {
+					log.log(Level.FINEST, "recordSetComment,focusLost() , event=" + evt); //$NON-NLS-1$
+					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+					if (recordSet != null) {
+						recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+						recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+					}					
+					GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					GraphicsComposite.this.recordSetComment.redraw();
+				}
+				
+				@Override
+				public void focusGained(FocusEvent evt) {
+					log.log(Level.FINEST, "recordSetComment,focusGained() , event=" + evt); //$NON-NLS-1$
 					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-						//StringHelper.printSWTKeyCode(evt);
-						if ((evt.stateMask & SWT.SHIFT) != 0 && evt.keyCode == SWT.CR) {
-							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-							if (recordSet != null) {
-								String commentText = GraphicsComposite.this.recordSetComment.getText();
-								recordSet.setRecordSetDescription(commentText);
-								recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-							}
-						}
-					}
-
+					GraphicsComposite.this.recordSetComment.redraw();
 				}
 			});
 		}
@@ -1345,7 +1366,7 @@ public class GraphicsComposite extends Composite {
 		
 		y =  this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
-		this.recordSetComment.setBounds(20, y, width-20, height);
+		this.recordSetComment.setBounds(20, y, width-40, height-5);
 		log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
 	}
 

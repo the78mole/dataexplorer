@@ -24,6 +24,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -142,9 +144,15 @@ public class CellVoltageWindow {
 		SWTResourceManager.registerResourceUser(this.displayTab);
 		this.cellVoltageTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.cellVoltageTab.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
-		{
+{
 			this.cellVoltageMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.cellVoltageTab.setControl(this.cellVoltageMainComposite);
+			this.cellVoltageMainComposite.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "cellVoltageMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINE, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
@@ -166,6 +174,12 @@ public class CellVoltageWindow {
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
 			this.voltageLimitsSelection.setBounds(0, 0, 420, 40);
+			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$

@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -94,6 +96,12 @@ public class CellVoltageDisplay extends Composite {
 		this.beginSpreadVoltage = voltageLimits[3];
 		this.lowerLimitColorRed = voltageLimits[4];
 		this.lowerLimitVoltage = voltageLimits[5];
+		this.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "CellVoltageDisplay.helpRequested " + evt); //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
 	}
 
 	public void create() {

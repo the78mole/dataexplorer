@@ -24,6 +24,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -79,6 +81,12 @@ public class AnalogWindow {
 			this.analogTab.setControl(this.analogMainComposite);
 			this.analogMainComposite.setLayout(null);
 			log.log(Level.FINE, "digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
+			this.analogMainComposite.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "analogMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$

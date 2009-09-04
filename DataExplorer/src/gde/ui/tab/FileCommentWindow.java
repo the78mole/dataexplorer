@@ -24,10 +24,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -95,6 +95,12 @@ public class FileCommentWindow {
 					updateRecordSetTable();
 				}
 			});
+			this.commentMainComposite.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			{
 				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
 				this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
@@ -113,14 +119,28 @@ public class FileCommentWindow {
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
-				this.fileCommentText.addKeyListener(new KeyAdapter() {
-					public void keyPressed(KeyEvent evt) {
-						log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
-						if (evt.character == SWT.CR) {
-								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
-						}
+				this.fileCommentText.addFocusListener(new FocusListener() {
+					
+					@Override
+					public void focusLost(FocusEvent evt) {
+						log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
+						FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());						
+					}
+					
+					@Override
+					public void focusGained(FocusEvent evt) {
+						log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
+						
 					}
 				});
+				//				this.fileCommentText.addKeyListener(new KeyAdapter() {
+				//					public void keyPressed(KeyEvent evt) {
+				//						log.log(Level.FINEST, "fileCommentText.keyPressed, event=" + evt); //$NON-NLS-1$
+				//						if (evt.character == SWT.CR) {
+				//								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
+				//						}
+				//					}
+				//				});
 			}
 			{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
@@ -129,6 +149,12 @@ public class FileCommentWindow {
 			//this.table.setControl(this.dataTable);
 			this.recordCommentTable.setLinesVisible(true);
 			this.recordCommentTable.setHeaderVisible(true);
+			this.recordCommentTable.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 
 			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader.setWidth(250);

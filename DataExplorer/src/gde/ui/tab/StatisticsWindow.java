@@ -11,6 +11,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -93,6 +95,12 @@ public class StatisticsWindow {
 			this.statistics.setControl(this.composite);
 			this.composite.setLayout(null);
 			this.composite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.composite.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "composite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.composite.addControlListener(new ControlListener() {
 				public void controlResized(ControlEvent evt) {
 					log.log(Level.FINE, "composite.controlResized evt=" + evt); //$NON-NLS-1$
@@ -111,6 +119,12 @@ public class StatisticsWindow {
 				this.descriptionGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
 				this.descriptionGroup.setBackground(SWTResourceManager.getColor(255, 255, 255));
+				this.descriptionGroup.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						log.log(Level.FINER, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINE, "group0.paintControl, event=" + evt); //$NON-NLS-1$
@@ -132,6 +146,12 @@ public class StatisticsWindow {
 				this.dataTable.setHeaderVisible(true);
 				this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
+				this.dataTable.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				{
 					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.measurementTableColumn.setWidth(180);

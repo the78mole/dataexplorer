@@ -1027,6 +1027,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public DecimalFormat getDecimalFormat() {
+		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual delta
 		return this.df;
 	}
 
