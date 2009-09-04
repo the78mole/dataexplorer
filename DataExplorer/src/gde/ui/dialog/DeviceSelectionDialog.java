@@ -919,7 +919,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			else {
 				this.portSelectCombo.setItems(new String[0]);
-				this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
+				this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 			}
 
 			// com port adjustments group

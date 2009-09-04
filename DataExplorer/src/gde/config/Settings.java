@@ -765,7 +765,7 @@ public class Settings extends Properties {
 	 */
 	public Vector<String> getSerialPortWhiteList() {
 		Vector<String> whiteList = new Vector<String>();
-		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
+		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
 			if(port != null && port.length() > 3) whiteList.add(port);
 		}
 		return whiteList;
@@ -776,7 +776,7 @@ public class Settings extends Properties {
 	 */
 	public String getSerialPortWhiteListString() {
 		StringBuffer whiteList = new StringBuffer();
-		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
+		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
 			if(port != null && port.length() > 3) whiteList.append(port).append(OSDE.STRING_BLANK);
 		}
 		return whiteList.toString().trim();
@@ -789,10 +789,11 @@ public class Settings extends Properties {
 		StringBuilder whiteList = new StringBuilder();
 		for (String tmpPort : newPortWhiteList.split(OSDE.STRING_BLANK)) {
 			if (OSDE.IS_WINDOWS && tmpPort.toUpperCase().startsWith("COM"))
-				whiteList.append(tmpPort.toUpperCase()).append(OSDE.STRING_BLANK);
+				whiteList.append(tmpPort.toUpperCase()).append(OSDE.STRING_SEMICOLON);
 			else if (tmpPort.startsWith("/dev/tty"))
 					whiteList.append(tmpPort).append(OSDE.STRING_BLANK);
 		}
+		System.setProperty("gnu.io.rxtx.SerialPorts", whiteList.toString());
 		this.setProperty(PORT_WHITELIST, whiteList.toString());
 	}
 

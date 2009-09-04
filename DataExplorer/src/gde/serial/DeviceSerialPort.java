@@ -124,7 +124,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 5)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -149,7 +149,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 5)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -202,7 +202,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 					try {
 						if(Settings.getInstance().doPortAvailabilityCheck()) {
-							((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 2000)).close(); //$NON-NLS-1$
+							((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 						}
 						availablePorts.add(serialPortStr);
 						System.out.println("Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -279,7 +279,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
 			
 			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
-			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 2000); //$NON-NLS-1$
+			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 10000); //$NON-NLS-1$
 			// set port parameters
 			this.serialPort.setInputBufferSize(2048);
 			this.serialPort.setOutputBufferSize(2048);
