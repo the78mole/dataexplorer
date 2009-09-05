@@ -1463,7 +1463,8 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @param isSyncableIncluded while building the horizontal grid vector the scale of the syncRecord must be used
+	 * get the record name to decide for horizontal grid lines 
+	 * @param isSyncRecordIncluded while building the horizontal grid vector the scale of the syncRecord must be used
 	 * @return the horizontalGridRecord
 	 */
 	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
@@ -2099,7 +2100,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	/**
 	 * synchronize the scale number format for compare set only
-	 * @param initator record ordinal
+	 * @param sourceRecordKey
 	 * @param newNumberFormat
 	 */
 	public void syncScaleNumberFormat(String sourceRecordKey, int newNumberFormat) {
