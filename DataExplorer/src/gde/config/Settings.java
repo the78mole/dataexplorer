@@ -159,7 +159,7 @@ public class Settings extends Properties {
 	public final static String		DEVICE_PROPERTIES_DIR_NAME		= "Devices"; //$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_NAME		= "DeviceProperties_V07.xsd"; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_DIR_NAME		= "GraphicsTemplates"; //$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates_V03.xsd"; //$NON-NLS-1$
+	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates_V04.xsd"; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= "*.xml";
 	
 	
