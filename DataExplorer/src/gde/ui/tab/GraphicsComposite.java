@@ -122,6 +122,7 @@ public class GraphicsComposite extends Composite {
 	int														xPosDelta								= 0, yPosDelta = 0;
 
 	boolean												isZoomMouse							= false;
+	boolean												isResetZoomPosition			= false;
 
 	boolean												isPanMouse							= false;
 	int														xDeltaPan								= 0;
@@ -982,7 +983,7 @@ public class GraphicsComposite extends Composite {
 
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
 					try {
-						if (this.isZoomMouse && recordSet.isZoomMode()) {
+						if (this.isZoomMouse && recordSet.isZoomMode() && this.isResetZoomPosition) {
 							log.log(Level.FINER, String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast)); //$NON-NLS-1$
 
 							//clean obsolete rectangle
@@ -1205,6 +1206,11 @@ public class GraphicsComposite extends Composite {
 					this.isRightMouseMeasure = true;
 					this.isLeftMouseMeasure = false;
 				}
+				else if (this.isZoomMouse) {
+					this.xLast = this.xDown;
+					this.yLast = this.yDown;
+					this.isResetZoomPosition = true;
+				}
 				else {
 					this.isLeftMouseMeasure = false;
 					this.isRightMouseMeasure = false;
@@ -1227,6 +1233,8 @@ public class GraphicsComposite extends Composite {
 				this.yUp = point.y;
 
 				if (this.isZoomMouse) {
+					this.isResetZoomPosition = false;
+
 					// sort the zoom values
 					int xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
 					int xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp + 1;
