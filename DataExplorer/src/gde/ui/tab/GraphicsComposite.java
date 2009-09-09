@@ -1261,18 +1261,16 @@ public class GraphicsComposite extends Composite {
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						this.channels.getActiveChannel().applyTemplate(recordSet.getName(), false);
 						setModeState(GraphicsComposite.MODE_RESET);
 					}
 				}
 				else if (this.isRightCutMode) {
 					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
-						recordSet = recordSet.clone(recordSet.getScopeModeOffset() + recordSet.get(0).getPointIndexFromDisplayPoint(this.xUp), false);
+						recordSet = recordSet.clone(recordSet.get(0).getZoomOffset() + recordSet.get(0).getPointIndexFromDisplayPoint(this.xUp), false);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());
 						this.channels.getActiveChannel().switchRecordSet(recordSet.getName());
-						this.channels.getActiveChannel().applyTemplate(recordSet.getName(), false);
 						setModeState(GraphicsComposite.MODE_RESET);
 					}
 				}

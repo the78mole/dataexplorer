@@ -331,15 +331,14 @@ public class RecordSet extends HashMap<String, Record> {
 		if (recordSet.isSyncableChecked) {
 			String syncRecordName = recordSet.getSyncableName();
 			if (syncRecordName.length() > 5) { // " 1..2"
-				recordSet.removeRecordName(syncRecordName);
 				this.remove(syncRecordName);
 			}
 		}
 
-		this.recordNames = recordSet.recordNames.clone();
+		this.recordNames = recordSet.getRecordNames().clone(); // copy record names without possible syncableName
 
 		// update child records
-		for (String recordKey : this.keySet()) {
+		for (String recordKey : this.recordNames) {
 			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
 		}
 
@@ -1584,10 +1583,11 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
 		this.setTableDataCalculated(false);
-		for (int i = 0; i < this.device.getMeasurementNames(this.channelConfigName).length; ++i) {
-			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation()) this.get(this.getRecordNames()[i]).resetMinMax();
-
-			this.get(this.getRecordNames()[i]).resetStatiticCalculationBase();
+		for (int i = 0; i < this.device.getMeasurementNames(this.channelConfigName).length && i < this.getRecordNames().length; ++i) {
+			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation()) {
+				this.get(i).resetMinMax();
+			}
+			this.get(i).resetStatiticCalculationBase();
 		}
 	}
 
