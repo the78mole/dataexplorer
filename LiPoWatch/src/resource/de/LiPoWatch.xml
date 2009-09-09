@@ -91,49 +91,49 @@
             <name>Zellenspannung 5</name>
             <symbol>U5</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 6</name>
             <symbol>U6</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 7</name>
             <symbol>U7</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 8</name>
             <symbol>U8</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 9</name>
             <symbol>U9</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 10</name>
             <symbol>U10</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 11</name>
             <symbol>U11</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
@@ -147,21 +147,21 @@
             <name>Zellenspannung 13</name>
             <symbol>U13</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 14</name>
             <symbol>U14</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 15</name>
             <symbol>U15</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
     </Channel>

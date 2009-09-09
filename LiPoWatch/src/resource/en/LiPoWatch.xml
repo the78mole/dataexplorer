@@ -91,77 +91,77 @@
             <name>CellVoltage 5</name>
             <symbol>U5</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 6</name>
             <symbol>U6</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 7</name>
             <symbol>U7</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 8</name>
             <symbol>U8</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 9</name>
             <symbol>U9</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 10</name>
             <symbol>U10</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 11</name>
             <symbol>U11</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 12</name>
             <symbol>U12</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 13</name>
             <symbol>U13</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 14</name>
             <symbol>U14</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 15</name>
             <symbol>U15</symbol>
             <unit>V</unit>
-            <active>false</active>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
     </Channel>
