@@ -113,18 +113,23 @@ public class LiPoWatchDataGatherer extends Thread {
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
 				
-				//reduce receodSet to really available number of cells
-				byte[] dataBuffer = telegrams.get(3);
-				int numberRecords = (dataBuffer[5] & 0x0F) + 4; // number cells + total battery voltage + servo impuls in + servio impuls out + temperature
+				int[] points = new int[recordSet.realSize()];
+				byte[] dataBuffer;
+				for (int j = 1; j < telegrams.size(); j++) {
+					dataBuffer = telegrams.get(j);
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+				}
+
+				//reduce receodSet to really available number of cells, calculate average over first 10 measurements since I got different number of cells
+				int numCells = 0;
+				for (int j = 0; j < 10; j++) {
+					dataBuffer = telegrams.get(j);
+					numCells += (dataBuffer[5] & 0x0F);
+				}
+				int numberRecords = numCells/10 + 4; // number cells + total battery voltage + servo impuls in + servio impuls out + temperature
 				String[] recordKeys = recordSet.getRecordNames();
 				for (int j = numberRecords; j < this.device.getNumberOfMeasurements(recordSet.getChannelConfigName()); j++) {
 					recordSet.remove(recordKeys[j]);
-				}
-				int[] points = new int[recordSet.realSize()];
-
-				for (int j = 0; j < telegrams.size(); j++) {
-					dataBuffer = telegrams.get(j);
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 				}
 
 				if (i == 0 && channel.getActiveRecordSet() == null) {
