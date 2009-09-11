@@ -17,16 +17,16 @@ $(OUTDIR) :
 # Update the object files if necessary
 
 $(OUTDIR)\WinHelper.obj: WinHelper.cpp WinHelper.h
-    $(cc) $(cflags) $(cvarsdll) /D "NDEBUG" /D "_WINDLL" /D "_AFXDLL" /D "_UNICODE" /D "UNICODE" /I. /I"$(JDK)\include" /I"$(JDK)\include\win32" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\" WinHelper.cpp
+    $(cc) $(cflags) -EHsc $(cvarsdll) /D "NDEBUG" /D "_WINDLL" /D "_AFXDLL" /D "_UNICODE" /D "UNICODE" /I. /I"$(JDK)\include" /I"$(JDK)\include\win32" /Fo"$(OUTDIR)\\" /Fd"$(OUTDIR)\\" WinHelper.cpp
 
 # Update the dynamic link library
 
 $(OUTDIR)\WinHelper32.dll: $(OUTDIR)\WinHelper.obj
-    $(link) $(linkdebug) $(dlllflags) -out:$(OUTDIR)\WinHelper32.dll $(OUTDIR)\WinHelper.obj ole32.lib uuid.lib
+    $(link) $(linkdebug) $(dlllflags) -out:$(OUTDIR)\WinHelper32.dll $(OUTDIR)\WinHelper.obj ole32.lib uuid.lib setupapi.lib
     mt -manifest $(OUTDIR)\WinHelper32.dll.manifest -outputresource:$(OUTDIR)\WinHelper32.dll;2
 
 $(OUTDIR)\WinHelper64.dll: $(OUTDIR)\WinHelper.obj
-    $(link) $(linkdebug) $(dlllflags) -out:$(OUTDIR)\WinHelper64.dll $(OUTDIR)\WinHelper.obj ole32.lib uuid.lib
+    $(link) $(linkdebug) $(dlllflags) -out:$(OUTDIR)\WinHelper64.dll $(OUTDIR)\WinHelper.obj ole32.lib uuid.lib setupapi.lib comsuppw.lib
     mt -manifest $(OUTDIR)\WinHelper64.dll.manifest -outputresource:$(OUTDIR)\WinHelper64.dll;2
 
 #--------------------- Clean Rule --------------------------------------------------------

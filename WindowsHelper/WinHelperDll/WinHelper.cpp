@@ -15,17 +15,33 @@
     along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 
+
 #include <WinHelper.h>
 #include <windowsx.h>
 #include <objbase.h>
 #include <shlobj.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <initguid.h>
 #include <stdlib.h>
 #include <io.h>
+#include <Setupapi.h>
+#include <vector>
+#include <string>
+#include <swprintf.inl>
+#include <iostream>
+
+
+//#include <WinIoCtl.h>
+#ifndef GUID_DEVINTERFACE_COMPORT //{86E0D1E0-8089-11D0-9CE4-08003E301F73}
+	DEFINE_GUID(GUID_DEVINTERFACE_COMPORT, 0x86e0d1e0L, 0x8089, 0x11d0, 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73);
+#endif
 
 /*****************************************************************************************************************
 WinHelper is a collection of windows native functions which are not accessible from Java 
+
+create header file:
+D:\workspaces\osde\WindowsHelper\WinHelperDll>"C:\Program Files\Java\jdk1.6.0_11\bin\javah.exe" -jni -classpath ..\..\OpenSerialDataExplorer\bin osde.utils.WindowsHelper
 
 build:
 prepare the cygwin environment definitn e variable pointing to used JDK
@@ -284,4 +300,86 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
 
 	env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
 	return env->NewStringUTF(szReturn);
+}
+
+
+/*****************************************************************************************************************
+Methoid to enumerate serial ports using ole32, uuid, setupapi libs
+*****************************************************************************************************************/
+JNIEXPORT jobjectArray JNICALL Java_osde_utils_WindowsHelper_enumerateSerialPorts
+  (JNIEnv *env, jclass cl)
+{	
+	using namespace std;
+
+	jobjectArray ret;
+	ret= (jobjectArray)env->NewObjectArray(256, env->FindClass("java/lang/String"), env->NewStringUTF(""));
+	
+	char szReturn[MAX_PATH];
+	wchar_t wszTmpResult[MAX_PATH];
+	HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, NULL, NULL,	DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+	if(hDevInfo == INVALID_HANDLE_VALUE) {
+		printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+		sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+		env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
+		return ret; 
+	}
+
+	
+	DWORD dwDetailDataSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + 256;
+	SP_DEVICE_INTERFACE_DETAIL_DATA *pDetailData = (SP_DEVICE_INTERFACE_DETAIL_DATA*) new char[dwDetailDataSize];
+	SP_DEVICE_INTERFACE_DATA deviceInterfaceData;
+ 	deviceInterfaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+	pDetailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+	
+	for (DWORD deviceIndex = 0; TRUE; ++deviceIndex) {
+		//printf("run for loop %d\n", deviceIndex);
+		if (SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &GUID_DEVINTERFACE_COMPORT, deviceIndex, &deviceInterfaceData)) { // received device interface
+			SP_DEVINFO_DATA devInfoData = {sizeof(SP_DEVINFO_DATA)};			
+			if (SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, pDetailData, dwDetailDataSize, NULL, &devInfoData)) {
+				
+				//SPDRP_FRIENDLYNAME SPDRP_DEVICEDESC SPDRP_DEVTYPE SPDRP_DRIVER SPDRP_ENUMERATOR_NAME SPDRP_LEGACYBUSTYPE SPDRP_MFG SPDRP_PHYSICAL_DEVICE_OBJECT_NAME
+				// get more info about what was found, using the device path
+				TCHAR frendlyName[MAX_PATH], manufacturer[MAX_PATH];
+				SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_FRIENDLYNAME, NULL, (PBYTE)frendlyName, sizeof(frendlyName), NULL);
+				//wprintf(TEXT("frendlyName = %s\n"), frendlyName);
+				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_DEVICEDESC, NULL, (PBYTE)description, sizeof(description), NULL);
+				//wprintf(TEXT("description = %s\n"), description);
+				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_DRIVER, NULL, (PBYTE)driver, sizeof(driver), NULL);
+				//wprintf(TEXT("driver = %s\n"), driver);
+				SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_MFG, NULL, (PBYTE)manufacturer, sizeof(manufacturer), NULL);
+				//wprintf(TEXT("manufacturer = %s\n"), manufacturer);
+				
+				swprintf_s(wszTmpResult, TEXT("%s;%s"), manufacturer, frendlyName);				
+				//wprintf(L"%s", wszTmpResult);
+				
+				size_t wszTmpResultSize = wcslen(wszTmpResult) + 1;
+				size_t convertedChars = 0;
+				const size_t newsize = wszTmpResultSize*2;
+				char *nstring = new char[newsize];
+				wcstombs_s(&convertedChars, nstring, newsize, wszTmpResult, _TRUNCATE);
+				//printf("%s\n", nstring);
+				env->SetObjectArrayElement(	ret, deviceIndex, env->NewStringUTF(nstring));
+
+				
+			}
+			else {
+				printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+				sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
+				return ret; 
+			}
+		}
+		else {
+			if (GetLastError() == ERROR_NO_MORE_ITEMS) {
+				break;
+			}
+			else {
+				printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+				sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
+				return ret; 
+			}
+		}
+	}	
+	return ret;
 }
