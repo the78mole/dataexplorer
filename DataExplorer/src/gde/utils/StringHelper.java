@@ -28,6 +28,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
 import osde.OSDE;
+import osde.serial.DeviceSerialPort;
 
 /**
  * @author Winfried Brügmann
@@ -274,6 +275,17 @@ public class StringHelper {
 		String[] serialPortList = new String[availablePorts.size()];
 		String[] tmpSerialPortList = availablePorts.toArray(new String[availablePorts.size()]);
 		for (int i = 0; i < tmpSerialPortList.length; i++) {
+			if (OSDE.IS_WINDOWS) {
+				try {
+					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
+					String portDescription = DeviceSerialPort.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPort.getWindowsPorts().get(portNumber);
+					serialPortList[i] = OSDE.STRING_BLANK + tmpSerialPortList[i] + " - " + portDescription;
+				}
+				catch (Exception e) {
+					serialPortList[i] = OSDE.STRING_BLANK + tmpSerialPortList[i];
+				}
+			}
+			else
 			serialPortList[i] = OSDE.STRING_BLANK + tmpSerialPortList[i];
 		}
 		return serialPortList;

@@ -398,9 +398,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%s\n", HEADER_TEXT)); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", DEVICE_BLOCK)); // [Gerät] //$NON-NLS-1$
-			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_DEVICE, this.getProperty(ACTIVE_DEVICE))); //$NON-NLS-1$
-			this.writer.write(String.format("%-30s \t=\t %s\n", OBJECT_LIST, this.getProperty(OBJECT_LIST))); //$NON-NLS-1$
-			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_OBJECT, this.getProperty(ACTIVE_OBJECT))); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_DEVICE, this.getActiveDevice())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", OBJECT_LIST, this.getObjectListAsString())); //$NON-NLS-1$
+			this.writer.write(String.format("%-30s \t=\t %s\n", ACTIVE_OBJECT, this.getActiveObject())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", WINDOW_BLOCK)); // [Fenster Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-30s \t=\t %s\n", WINDOW_LEFT, this.window.x)); //$NON-NLS-1$
@@ -529,6 +529,10 @@ public class Settings extends Properties {
 	public void setActiveDevice(String activeDeviceString) {
 		this.setProperty(ACTIVE_DEVICE, activeDeviceString.trim());
 	}
+	
+	public String getObjectListAsString() {
+		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200));
+	}
 
 	public String[] getObjectList() {
 		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(OSDE.STRING_SEMICOLON);
@@ -563,7 +567,14 @@ public class Settings extends Properties {
 	}
 
 	public int getActiveObjectIndex() {
-		return new Integer(this.getProperty(ACTIVE_OBJECT, "0").trim()); //$NON-NLS-1$
+		int index = 0;
+		try {
+			index = new Integer(this.getProperty(ACTIVE_OBJECT, "0").trim()); //$NON-NLS-1$
+		}
+		catch (NumberFormatException e) {
+			// ignore
+		}
+		return index;
 	}
 
 	public String getActiveObject() {
@@ -793,7 +804,6 @@ public class Settings extends Properties {
 			else if (tmpPort.startsWith("/dev/tty"))
 					whiteList.append(tmpPort).append(OSDE.STRING_BLANK);
 		}
-		System.setProperty("gnu.io.rxtx.SerialPorts", whiteList.toString());
 		this.setProperty(PORT_WHITELIST, whiteList.toString());
 	}
 

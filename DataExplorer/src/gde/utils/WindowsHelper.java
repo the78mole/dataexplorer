@@ -16,12 +16,17 @@
 ****************************************************************************************/
 package osde.utils;
 
+import java.util.Date;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
+
+
 
 
 /**
@@ -30,7 +35,7 @@ import osde.ui.OpenSerialDataExplorer;
  */
 public class WindowsHelper {
 	private final static Logger	log	= Logger.getLogger(WindowsHelper.class.getName());
-
+	
 	static {
 		try {
 			//using internal load functionality where the library may packed within the jar
@@ -54,16 +59,69 @@ public class WindowsHelper {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
+//		String [] shellLinkArgs = {
+//				"C:\\Documents and Settings\\brueg\\Desktop\\OpenSerialDataExplorer.lnk", //%USERPROFILE% //$NON-NLS-1$
+//				"%WINDIR%\\system32\\javaw.exe", //$NON-NLS-1$
+//				"-jar -Xms40M -Xmx256M \"C:\\Program Files\\OpenSerialDataExplorer\\OpenserialDataExplorer.jar\"", //$NON-NLS-1$
+//				"C:\\Program Files\\OpenSerialDataExplorer", //$NON-NLS-1$
+//				"C:\\Program Files\\OpenSerialDataExplorer\\OpenSerialDataExplorer.ico",  //$NON-NLS-1$
+//				"OpenSerialData Explorer" }; //$NON-NLS-1$
+//		
+//		createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+		registerSerialPorts();
+	}
+
+	public static void registerSerialPorts() {
+		long startTime = new Date().getTime();
+		String[] enumPorts = enumerateSerialPorts();
+		if (enumPorts[0].startsWith("OSDE_MSG")) {			
+			log.log(Level.WARNING, Messages.getString(MessageIds.OSDE_MSGW0035, new Object[] {enumPorts[0].split(";")[1]}));
+			return;
+		}
 		
-		String [] shellLinkArgs = {
-				"C:\\Documents and Settings\\brueg\\Desktop\\OpenSerialDataExplorer.lnk", //%USERPROFILE% //$NON-NLS-1$
-				"%WINDIR%\\system32\\javaw.exe", //$NON-NLS-1$
-				"-jar -Xms40M -Xmx256M \"C:\\Program Files\\OpenSerialDataExplorer\\OpenserialDataExplorer.jar\"", //$NON-NLS-1$
-				"C:\\Program Files\\OpenSerialDataExplorer", //$NON-NLS-1$
-				"C:\\Program Files\\OpenSerialDataExplorer\\OpenSerialDataExplorer.ico",  //$NON-NLS-1$
-				"OpenSerialData Explorer" }; //$NON-NLS-1$
+		TreeMap<Integer, String> winPorts = DeviceSerialPort.getWindowsPorts();
+		winPorts.clear();
+		for (String portString : enumPorts) {
+			if (portString != null && portString.length() > 1 && !portString.toLowerCase().contains("bluetooth")) {
+					try {
+						int portNumber = Integer.parseInt(portString.substring(portString.indexOf("COM")+3, portString.indexOf(')')));
+						String[] tmpDesc = portString.split(";");
+						String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf("COM")-2);
+						String manufacturer = tmpDesc[0].split(" ")[0];
+						if (manufacturer.length() > 1) {
+							if (!portDescription.contains(manufacturer)) {
+								portDescription = manufacturer + " " + portDescription;
+							}
+						}
+						log.log(Level.INFO, "COM" + portNumber + " - " +portDescription);
+						winPorts.put(portNumber, portDescription);
+					}
+					catch (NumberFormatException e) {
+						log.log(Level.FINER, portString);
+					}
+			}
+		}
 		
-		createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
+		if (log.isLoggable(Level.FINER)) {
+			for (int number : winPorts.keySet()) {
+				log.log(Level.FINE, "COM" + number + " - " + winPorts.get(number));
+			}
+		}
+		
+		if (winPorts.size() > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (int number : winPorts.keySet()) {
+				sb.append("COM").append(number).append(";");
+			}
+			log.log(Level.INFO, "Windows port list = " + sb.toString());
+			System.setProperty("gnu.io.rxtx.SerialPorts", sb.toString());
+		}
+		else {
+			System.setProperty("gnu.io.rxtx.SerialPorts", "");
+			//System.clearProperty("gnu.io.rxtx.SerialPorts");
+		}
+		log.log(Level.INFO, "enum Windows ports  takes = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
 	/**
@@ -76,7 +134,7 @@ public class WindowsHelper {
 	 * @param iconPosition
 	 * @param description
 	 */
-	public static native void createDesktopLink(
+	public static native String createDesktopLink(
 			String fqShellLinkPath,
 			String fqExecutablePath,
 			String executableArguments,
@@ -103,4 +161,10 @@ public class WindowsHelper {
 	 * native method called via load library to enable use of native windows functions to remove file type association
 	 */
 	//public static native String deregisterMimeType() throws SecurityException, IOException;
+
+	/**
+	 * native method called via load library to enable use of native windows ole32 functions
+	 * @return enum list of system serial ports
+	 */
+	public static native String[] enumerateSerialPorts();
 }

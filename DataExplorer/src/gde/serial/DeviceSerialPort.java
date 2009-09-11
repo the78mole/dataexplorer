@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.StringHelper;
+import osde.utils.WindowsHelper;
 
 /**
  * DeviceSerialPort is the abstract class of the serial port implementation as parent for a device specific serial port implementation
@@ -54,7 +56,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	final static Logger					log								= Logger.getLogger($CLASS_NAME);
 
 	final static Vector<String> availablePorts 		= new Vector<String>(); //available port vector used by all application dialogs
-
+	final static TreeMap<Integer, String> windowsPorts = new TreeMap<Integer, String>();
+	
 	protected final DeviceConfiguration			deviceConfig;
 	protected final OpenSerialDataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
@@ -114,6 +117,15 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
+		if (OSDE.IS_WINDOWS) {
+			try {
+				WindowsHelper.registerSerialPorts();
+			}
+			catch (Throwable e) {
+				log.log(Level.WARNING, Messages.getString(MessageIds.OSDE_MSGW0035));
+			}
+		}
+		
 		try {
 			availablePorts.clear();
 			
@@ -123,7 +135,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						CommPortIdentifier commPortIdentifier = CommPortIdentifier.getPortIdentifier(serialPortStr);
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (doAvialabilityCheck) {
+								if (false) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
@@ -148,7 +160,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					if (!portBlackList.contains(serialPortStr)) {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (doAvialabilityCheck) {
+								if (false) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
@@ -761,5 +773,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public static Vector<String> getAvailableports() {
 		return availablePorts;
+	}
+
+	/**
+	 * @return the windowsports
+	 */
+	public static TreeMap<Integer, String> getWindowsPorts() {
+		return windowsPorts;
 	}
 }

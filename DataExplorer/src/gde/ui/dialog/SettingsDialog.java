@@ -103,7 +103,7 @@ public class SettingsDialog extends Dialog {
 	Shell																dialogShell;
 	CLabel															defaultDataPathLabel;
 	Group																defaultDataPathGroup;
-	CLabel															Port;
+	CLabel															portLabel;
 	CCombo															serialPort;
 	Button															useGlobalSerialPort;
 	CLabel															localLabel;
@@ -498,7 +498,7 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
+									//SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
 									SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
 
 									SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
@@ -515,28 +515,28 @@ public class SettingsDialog extends Dialog {
 								}
 							});
 							{
-								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
-								this.doPortAvailabilityCheck.setBounds(15, 15, 243, 22);
-								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.OSDE_MSGT0331));
-								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0332));
-								this.doPortAvailabilityCheck.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
-										if (SettingsDialog.this.doPortAvailabilityCheck.getSelection()) {
-											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.OSDE_MSGI0036));
-										}
-									}
-								});
+//								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
+//								this.doPortAvailabilityCheck.setBounds(15, 15, 243, 22);
+//								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+//								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.OSDE_MSGT0331));
+//								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0332));
+//								this.doPortAvailabilityCheck.addSelectionListener(new SelectionAdapter() {
+//									@Override
+//									public void widgetSelected(SelectionEvent evt) {
+//										SettingsDialog.log.log(Level.FINE, "doPortAvailabilityCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
+//										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
+//										if (SettingsDialog.this.doPortAvailabilityCheck.getSelection()) {
+//											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.OSDE_MSGI0036));
+//										}
+//									}
+//								});
 							}
 							{
 								this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, 37, 243, 22);
+								this.useGlobalSerialPort.setBounds(15, 15, 243, 22);;
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -551,30 +551,9 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
-								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.serialPort.setBounds(260, 39, 181, 21);
-								this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
-								this.serialPort.setEditable(false);
-								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
-								this.serialPort.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText().trim());
-									}
-								});
-							}
-							{
-								this.Port = new CLabel(this.serialPortGroup, SWT.LEFT);
-								this.Port.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.Port.setText(Messages.getString(MessageIds.OSDE_MSGT0335));
-								this.Port.setBounds(264, 15, 174, 20);
-							}
-							{
 								this.enableBlackListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableBlackListButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
-								this.enableBlackListButton.setBounds(15, 59, 243, 22);
+								this.enableBlackListButton.setBounds(15, 37, 243, 22);
 								this.enableBlackListButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.enableBlackListButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
 								this.enableBlackListButton.addSelectionListener(new SelectionAdapter() {
@@ -603,7 +582,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, 61, 181, 22);
+								this.serialPortBlackList.setBounds(260, 36, 181, 22);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -622,7 +601,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.enableWhiteListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableWhiteListButton.setText(Messages.getString(MessageIds.OSDE_MSGT0338));
-								this.enableWhiteListButton.setBounds(15, 80, 243, 22);
+								this.enableWhiteListButton.setBounds(15, 60, 243, 22);
 								this.enableWhiteListButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.enableWhiteListButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
 								this.enableWhiteListButton.addSelectionListener(new SelectionAdapter() {
@@ -652,7 +631,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, 84, 181, 22);
+								this.serialPortWhiteList.setBounds(260, 60, 181, 22);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -665,6 +644,28 @@ public class SettingsDialog extends Dialog {
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt);
 										SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
+									}
+								});
+							}
+							{
+								this.portLabel = new CLabel(this.serialPortGroup, SWT.LEFT);
+								this.portLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.portLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0164));
+								this.portLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
+								this.portLabel.setBounds(12, 83, 120, 20);
+							}
+							{
+								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
+								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.serialPort.setBounds(135, 85, 307, OSDE.IS_WINDOWS ? 21 : 25);
+								this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
+								this.serialPort.setEditable(false);
+								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
+								this.serialPort.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "serialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSerialPort(SettingsDialog.this.serialPort.getText().trim().split(OSDE.STRING_BLANK)[0]);
 									}
 								});
 							}
