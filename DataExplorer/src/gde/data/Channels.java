@@ -155,6 +155,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
 		log.log(Level.FINE, "switching to channel " + channelNumber);		 //$NON-NLS-1$
+		if (this.application.isFileCommentChanged()) this.application.updateFileComment();
+			
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
 				this.setActiveChannelNumber(channelNumber);
