@@ -490,14 +490,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.portDescription = new Label(this.serialPortGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.portDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0164));
-									this.portDescription.setBounds(30, 29, 183, 18);
+									this.portDescription.setBounds(30, 29, 150, 18);
 									this.portDescription.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
 									this.portDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								}
 								{
 									this.portSelectCombo = new CCombo(this.serialPortGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.portSelectCombo.setBounds(249, 27, 205, OSDE.IS_WINDOWS ? 21 : 25);
+									this.portSelectCombo.setBounds(185, 27, 320, OSDE.IS_WINDOWS ? 21 : 25);
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
@@ -506,7 +506,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											DeviceSelectionDialog.log.log(Level.FINEST, "portSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setPort(DeviceSelectionDialog.this.portSelectCombo.getText().trim());
+											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setPort(DeviceSelectionDialog.this.portSelectCombo.getText().trim().split(OSDE.STRING_BLANK)[0]);
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.storeDeviceProperties();
 											DeviceSelectionDialog.this.application.updateTitleBar(DeviceSelectionDialog.this.application.getObjectKey(), DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName(),
 													DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
@@ -1135,7 +1135,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 							OpenSerialDataExplorer.display.syncExec(new Runnable() {
 								public void run() {
-									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
 										if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 											DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
 											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
