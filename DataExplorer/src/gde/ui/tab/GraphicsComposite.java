@@ -27,6 +27,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -82,6 +84,8 @@ public class GraphicsComposite extends Composite {
 	// drawing canvas
 	Text													recordSetHeader;
 	Text													recordSetComment;
+	boolean 											isRecordCommentChanged = false;
+
 	Canvas												graphicCanvas;
 	int														headerHeight						= 0;
 	int														headerGap								= 0;
@@ -243,67 +247,28 @@ public class GraphicsComposite extends Composite {
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			//			this.recordSetComment.addKeyListener(new KeyAdapter() {
-			//				public void keyPressed(KeyEvent evt) {
-			//					log.log(Level.FINER, "recordSetCommentText.log.log(Level.FINER, , event=" + evt); //$NON-NLS-1$
-			//					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			//					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-			//						//StringHelper.printSWTKeyCode(evt);
-			//						if (evt.keyCode == ' ' || evt.keyCode == SWT.CR) {
-			//							RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-			//							if (recordSet != null) {
-			//								recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-			//								recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-			//							}
-			//						}
-			//					}
-			//
-			//				}
-			//			});
-			//			this.recordSetComment.addVerifyListener(new VerifyListener() {				
-			//				@Override
-			//				public void verifyText(VerifyEvent e) {
-			//					if (e.keyCode == SWT.CR) {
-			//						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-			//						if (recordSet != null) {
-			//							recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-			//							recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-			//						}
-			//						e.doit = false;
-			//						return;
-			//					}			
-			//				}
-			//			});
-			//			this.recordSetComment.addModifyListener(new ModifyListener() {
-			//				
-			//				@Override
-			//				public void modifyText(ModifyEvent evt) {
-			//					log.log(Level.INFO, "recordSetComment,modifyText() , event=" + evt); //$NON-NLS-1$
-			//					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-			//					if (recordSet != null) {
-			//						recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-			//						recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-			//					}
-			//				}
-			//			});		
+			this.recordSetComment.addModifyListener( new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent e) {
+					log.log(Level.FINEST, "recordSetComment.modifyText() , event=" + e); //$NON-NLS-1$
+					isRecordCommentChanged = true;
+				}
+			});
 			this.recordSetComment.addFocusListener(new FocusListener() {				
 				@Override
 				public void focusLost(FocusEvent evt) {
-					log.log(Level.FINEST, "recordSetComment,focusLost() , event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "recordSetComment.focusLost() , event=" + evt); //$NON-NLS-1$
 					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 					if (recordSet != null) {
-						recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+						isRecordCommentChanged = false;
+						recordSet.setRecordSetDescription(getRecordComment());
 						recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 					}					
-					GraphicsComposite.this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-					GraphicsComposite.this.recordSetComment.redraw();
 				}
 				
 				@Override
 				public void focusGained(FocusEvent evt) {
-					log.log(Level.FINEST, "recordSetComment,focusGained() , event=" + evt); //$NON-NLS-1$
-					GraphicsComposite.this.recordSetComment.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					GraphicsComposite.this.recordSetComment.redraw();
+					log.log(Level.FINEST, "recordSetComment.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -603,6 +568,10 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.redraw(); // do full update
 		
 		this.recordSetComment.redraw();
+	}
+
+	public void notifySelected() {
+		this.recordSetComment.notifyListeners(SWT.FocusOut, new Event());
 	}
 
 	/**
@@ -1374,6 +1343,18 @@ public class GraphicsComposite extends Composite {
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width-40, height-5);
 		log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
+	}
+
+	public String getRecordComment() {
+		this.isRecordCommentChanged = false;
+		return GraphicsComposite.this.recordSetComment.getText();
+	}
+
+	/**
+	 * @return the isRecordCommentChanged
+	 */
+	public boolean isRecordCommentChanged() {
+		return isRecordCommentChanged;
 	}
 
 }

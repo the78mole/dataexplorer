@@ -28,6 +28,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -58,6 +60,7 @@ public class FileCommentWindow {
 	Composite				commentMainComposite;
 	CLabel 					infoLabel;
 	Text						fileCommentText;
+	boolean 				isFileCommentChanged = false;
 	Table						recordCommentTable;
 	TableColumn			recordCommentTableHeader;
 	TableColumn			recordCommentTableHeader2;
@@ -119,12 +122,20 @@ public class FileCommentWindow {
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
+				this.fileCommentText.addModifyListener( new ModifyListener() {			
+					@Override
+					public void modifyText(ModifyEvent e) {
+						log.log(Level.FINER, "fileCommentText.modifyText() , event=" + e); //$NON-NLS-1$
+						isFileCommentChanged = true;
+					}
+				});
 				this.fileCommentText.addFocusListener(new FocusListener() {
 					
 					@Override
 					public void focusLost(FocusEvent evt) {
 						log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
-						FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());						
+						isFileCommentChanged = false;
+						setFileComment();						
 					}
 					
 					@Override
@@ -133,14 +144,6 @@ public class FileCommentWindow {
 						
 					}
 				});
-				//				this.fileCommentText.addKeyListener(new KeyAdapter() {
-				//					public void keyPressed(KeyEvent evt) {
-				//						log.log(Level.FINEST, "fileCommentText.keyPressed, event=" + evt); //$NON-NLS-1$
-				//						if (evt.character == SWT.CR) {
-				//								FileCommentWindow.this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
-				//						}
-				//					}
-				//				});
 			}
 			{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
@@ -203,5 +206,17 @@ public class FileCommentWindow {
 					}
 				}
 		}
+	}
+
+	/**
+	 * @return the isFileCommentChanged
+	 */
+	public boolean isFileCommentChanged() {
+		return isFileCommentChanged;
+	}
+
+	public void setFileComment() {
+		this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
+		this.channels.getActiveChannel().setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 	}
 }
