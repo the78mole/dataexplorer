@@ -69,7 +69,12 @@ public class WindowsHelper {
 //				"OpenSerialData Explorer" }; //$NON-NLS-1$
 //		
 //		createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
-		registerSerialPorts();
+		log.setLevel(Level.WARNING);
+		String[] enumPorts = enumerateSerialPorts();
+		for (String port : enumPorts) {
+			if (port.length() > 5) System.out.println(port);
+		}
+		//registerSerialPorts();
 	}
 
 	public static void registerSerialPorts() {
