@@ -94,7 +94,7 @@ public class WindowsHelper {
 								portDescription = manufacturer + " " + portDescription;
 							}
 						}
-						log.log(Level.INFO, "COM" + portNumber + " - " +portDescription);
+						log.log(Level.FINE, "COM" + portNumber + " - " +portDescription);
 						winPorts.put(portNumber, portDescription);
 					}
 					catch (NumberFormatException e) {
@@ -114,14 +114,14 @@ public class WindowsHelper {
 			for (int number : winPorts.keySet()) {
 				sb.append("COM").append(number).append(";");
 			}
-			log.log(Level.INFO, "Windows port list = " + sb.toString());
+			log.log(Level.FINE, "Windows port list = " + sb.toString());
 			System.setProperty("gnu.io.rxtx.SerialPorts", sb.toString());
 		}
 		else {
 			System.setProperty("gnu.io.rxtx.SerialPorts", "");
 			//System.clearProperty("gnu.io.rxtx.SerialPorts");
 		}
-		log.log(Level.INFO, "enum Windows ports  takes = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		log.log(Level.FINE, "enum Windows ports  takes = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
 	/**
