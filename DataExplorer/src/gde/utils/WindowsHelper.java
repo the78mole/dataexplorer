@@ -94,7 +94,7 @@ public class WindowsHelper {
 						String[] tmpDesc = portString.split(";");
 						String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf("COM")-2);
 						String manufacturer = tmpDesc[0].split(" ")[0];
-						if (manufacturer.length() > 1) {
+						if (manufacturer.length() > 1 && !manufacturer.startsWith("(")) {
 							if (!portDescription.contains(manufacturer)) {
 								portDescription = manufacturer + " " + portDescription;
 							}
