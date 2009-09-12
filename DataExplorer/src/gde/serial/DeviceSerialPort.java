@@ -135,7 +135,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						CommPortIdentifier commPortIdentifier = CommPortIdentifier.getPortIdentifier(serialPortStr);
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (false) {
+								if (!OSDE.IS_WINDOWS) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
@@ -160,7 +160,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					if (!portBlackList.contains(serialPortStr)) {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (false) {
+								if (!OSDE.IS_WINDOWS) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
