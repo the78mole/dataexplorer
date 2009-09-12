@@ -90,7 +90,7 @@ public class WindowsHelper {
 		for (String portString : enumPorts) {
 			if (portString != null && portString.length() > 1 && !portString.toLowerCase().contains("bluetooth")) {
 					try {
-						int portNumber = Integer.parseInt(portString.substring(portString.indexOf("COM")+3, portString.indexOf(')')));
+						int portNumber = Integer.parseInt(portString.substring(portString.indexOf("COM")+3, portString.lastIndexOf(')')));
 						String[] tmpDesc = portString.split(";");
 						String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf("COM")-2);
 						String manufacturer = tmpDesc[0].split(" ")[0];
@@ -102,7 +102,7 @@ public class WindowsHelper {
 						log.log(Level.FINE, "COM" + portNumber + " - " +portDescription);
 						winPorts.put(portNumber, portDescription);
 					}
-					catch (NumberFormatException e) {
+					catch (Throwable e) {
 						log.log(Level.FINER, portString);
 					}
 			}
