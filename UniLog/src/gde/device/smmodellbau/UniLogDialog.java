@@ -680,6 +680,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.sensorGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.currentSensorLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.currentSensorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.currentSensorLabel.setText("Current");
 									this.currentSensorLabel.setBounds(42, 19, 60, OSDE.IS_WINDOWS ? 20 : 22);
 
@@ -700,6 +701,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.a1ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a1ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a1ModusLabel.setText("A1 Modus");
 									this.a1ModusLabel.setBounds(42, 47, 60, OSDE.IS_WINDOWS ? 20 : 22);
 									
@@ -720,6 +722,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.a2ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a2ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a2ModusLabel.setText("A2 Modus");
 									this.a2ModusLabel.setBounds(42, 72, 60, OSDE.IS_WINDOWS ? 20 : 22);
 									
@@ -740,6 +743,7 @@ public class UniLogDialog extends DeviceDialog {
 								}
 								{
 									this.a3ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a3ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a3ModusLabel.setText("A3 Modus");
 									this.a3ModusLabel.setBounds(42, 97, 60, OSDE.IS_WINDOWS ? 20 : 22);
 									
@@ -767,6 +771,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.limiterGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.limiterButton = new Button(this.limiterGroup, SWT.CHECK);
+									this.limiterButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.limiterButton.setBounds(55, 17, 90, OSDE.IS_WINDOWS ? 18 : 20);
 									this.limiterButton.setText("      [ W min ] ");
 									this.limiterButton.addSelectionListener(new SelectionAdapter() {
