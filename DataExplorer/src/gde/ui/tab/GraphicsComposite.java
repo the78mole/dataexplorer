@@ -258,12 +258,7 @@ public class GraphicsComposite extends Composite {
 				@Override
 				public void focusLost(FocusEvent evt) {
 					log.log(Level.FINEST, "recordSetComment.focusLost() , event=" + evt); //$NON-NLS-1$
-					RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-					if (recordSet != null) {
-						isRecordCommentChanged = false;
-						recordSet.setRecordSetDescription(getRecordComment());
-						recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-					}					
+					updateRecordSetComment();					
 				}
 				
 				@Override
@@ -1355,6 +1350,15 @@ public class GraphicsComposite extends Composite {
 	 */
 	public boolean isRecordCommentChanged() {
 		return isRecordCommentChanged;
+	}
+
+	public void updateRecordSetComment() {
+		RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
+		if (recordSet != null) {
+			isRecordCommentChanged = false;
+			recordSet.setRecordSetDescription(getRecordComment());
+			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+		}
 	}
 
 }

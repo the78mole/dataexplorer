@@ -406,10 +406,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetKey of the activeRecordSet to set
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
-		if (this.activeRecordSet != null && this.application.isRecordCommentChanged()) {
-			this.activeRecordSet.recordSetDescription = this.application.getRecordComment();
-			this.activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
-		}
+		this.application.checkUpdateFileComment();
+		this.application.checkUpdateRecordSetComment();
 		
 		RecordSet newActiveRecordSet = this.get(recordSetKey);
 		if (newActiveRecordSet != null) {
