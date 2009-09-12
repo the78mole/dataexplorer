@@ -27,8 +27,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -247,10 +247,10 @@ public class GraphicsComposite extends Composite {
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			this.recordSetComment.addModifyListener( new ModifyListener() {
+			this.recordSetComment.addKeyListener( new KeyAdapter() {
 				@Override
-				public void modifyText(ModifyEvent e) {
-					log.log(Level.FINEST, "recordSetComment.modifyText() , event=" + e); //$NON-NLS-1$
+				public void keyPressed(KeyEvent e) {
+					log.log(Level.FINEST, "recordSetComment.keyPressed() , event=" + e); //$NON-NLS-1$
 					isRecordCommentChanged = true;
 				}
 			});

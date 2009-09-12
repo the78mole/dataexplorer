@@ -28,8 +28,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -122,11 +122,11 @@ public class FileCommentWindow {
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
-				this.fileCommentText.addModifyListener( new ModifyListener() {			
+				this.fileCommentText.addKeyListener( new KeyAdapter() {
 					@Override
-					public void modifyText(ModifyEvent e) {
-						log.log(Level.FINER, "fileCommentText.modifyText() , event=" + e); //$NON-NLS-1$
-						isFileCommentChanged = true;
+					public void keyPressed(KeyEvent e) {
+						log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
+						isFileCommentChanged = true;						
 					}
 				});
 				this.fileCommentText.addFocusListener(new FocusListener() {
