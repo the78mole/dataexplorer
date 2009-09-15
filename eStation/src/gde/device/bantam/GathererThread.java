@@ -188,7 +188,7 @@ public class GathererThread extends Thread {
 						Record record = recordSet.get(recordKeys[i]);
 						if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
 							this.numberBatteryCells++;
-							log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
 
