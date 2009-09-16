@@ -68,6 +68,9 @@ public class LogViewReader {
 		deviceMap.put("e-station bc6", "eStationBC6"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc610", "eStationBC610"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
+		deviceMap.put("pichler p60", "PichlerP60"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
