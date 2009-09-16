@@ -28,6 +28,7 @@ import osde.data.RecordSet;
 import osde.device.smmodellbau.unilog.MessageIds;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
+import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
@@ -114,7 +115,7 @@ public class UniLogDataGatherer extends Thread {
 				this.device.updateInitialRecordSetComment(recordSet);
 				
 
-				int[] points = new int[this.device.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+				int[] points = new int[recordSet.realSize()];
 
 				for (int j = 2; j < telegrams.size(); j++) {
 					byte[] dataBuffer = telegrams.get(j);
@@ -129,27 +130,28 @@ public class UniLogDataGatherer extends Thread {
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			this.dialog.resetButtons();
 			log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
-			this.device.getDialog().resetButtons();
 		}
 		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage());
-			this.device.getDialog().resetButtons();
 		}
-		catch (Throwable e) {
+		catch (TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1300)); //$NON-NLS-1$
-			this.device.getDialog().resetButtons();
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 		finally {
+			this.device.getDialog().resetButtons();
 			if(isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()

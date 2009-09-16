@@ -916,9 +916,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// A3 Modus == 2 -> energy in Wmin; A3 Modus == 3 -> mills voltage
 		int a3Modus = (dataBuffer[4] & 0xC0) >> 6; // 11000000
 
-		if (log.isLoggable(Level.INFO)) {
+		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("a1Modus = " + a1Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("a1Modus = " + a1Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
 			sb.append("a2Modus = " + a2Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
 			sb.append("a3Modus = " + a3Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
 			log.log(Level.FINE, sb.toString());
