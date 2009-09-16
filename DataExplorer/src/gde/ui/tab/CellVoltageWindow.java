@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -619,13 +620,13 @@ public class CellVoltageWindow {
 				Record record_U = activeRecordSet.getRecord(recordKeys[this.firstMeasurement]); // voltage U
 				if (record_U != null) {
 					CellVoltageWindow.this.voltageValue.setForeground(record_U.getColor());
-					CellVoltageWindow.this.voltageValue.setText(record_U.getDecimalFormat().format(device.translateValue(record_U, new Double(record_U.getLast() / 1000.0))));
+					CellVoltageWindow.this.voltageValue.setText(new DecimalFormat("0.00").format(device.translateValue(record_U, new Double(record_U.getLast() / 1000.0))));
 					CellVoltageWindow.this.voltageUnit.setText("[" + record_U.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				Record record_C = activeRecordSet.getRecord(recordKeys[this.secondMeasurement]); // capacitiy C
 				if (record_C != null) {
 					CellVoltageWindow.this.capacitiyValue.setForeground(record_C.getColor());
-					CellVoltageWindow.this.capacitiyValue.setText(record_C.getDecimalFormat().format(device.translateValue(record_C, new Double(record_C.getLast() / 1000.0))));
+					CellVoltageWindow.this.capacitiyValue.setText(new DecimalFormat("0").format(device.translateValue(record_C, new Double(record_C.getLast() / 1000.0))));
 					CellVoltageWindow.this.capacityUnit.setText("[" + record_C.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}

@@ -56,9 +56,8 @@ public class GraphicsUtils {
 	 * @param gap distance between ticks and the number scale
 	 * @param isPositionLeft position of to be drawn scale
 	 * @param numberTickmarks 
-	 * @param df - decimal format
 	 */
-	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, DecimalFormat df) {
+	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks) {
 
 		int yTop = y0-height+1;
 		double deltaScale = (maxValue - minValue);
@@ -71,14 +70,14 @@ public class GraphicsUtils {
 			maxScaleValue = maxValue;
 		}
 		else {
-			Object[] roundResult = MathUtils.adaptRounding(minValue, maxValue, record.getDecimalFormat(), true, maxNumberTicks);
+			Object[] roundResult = MathUtils.adaptRounding(minValue, maxValue, true, maxNumberTicks);
 			minScaleValue = (Double)roundResult[0];
 			maxScaleValue = (Double)roundResult[1];
 			numberTicks = (Integer)roundResult[2];
 			miniticks = (Integer)roundResult[3];
-			if (record.getNumberFormat() == -1) df = (DecimalFormat)roundResult[4];
 			deltaScaleValue = (maxScaleValue - minScaleValue);
 		}
+		DecimalFormat df = record.getDecimalFormat();
 		 
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();

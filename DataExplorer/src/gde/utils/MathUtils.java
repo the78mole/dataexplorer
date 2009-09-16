@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -494,20 +493,17 @@ public class MathUtils {
 	 * - think about delta scale at this time to enable %2 or %5 or %10, depending on delta value
 	 * @param minValue
 	 * @param maxValue 
+	 * @param isAuto - if true no real rounding will applied, scale end values are calculated during scale value calculation
+	 * 							 - if false end values are rounded and based on this values the scale will be calculated
+	 * @param maxNumberTicks - required as limit for scale value calculation
 	 * @return double array roundMinValue, roundMaxValue 
 	 */
-	public static Object[] adaptRounding(double minValue, double maxValue, DecimalFormat df, boolean isAuto, int maxNumberTicks) {
+	public static Object[] adaptRounding(double minValue, double maxValue, boolean isAuto, int maxNumberTicks) {
 		Object[] results = null;
 		double tmpMinValue = 0.0, tmpMaxValue = 0.0, deltaValue = maxValue - minValue;
 
 		// process normal rounding mechanism first
 		if (isAuto) {
-//			if (minValue != 0) {
-//					tmpMinValue = MathUtils.roundUpAuto(minValue, deltaValue);
-//			}
-//			if (maxValue != 0) {
-//					tmpMaxValue = MathUtils.roundDownAuto(maxValue, deltaValue);
-//			}
 			tmpMinValue = minValue;
 			tmpMaxValue = maxValue;
 		}
@@ -525,125 +521,95 @@ public class MathUtils {
 		if (isAuto) {
 			if (tmpDeltaScale <= 0) {
 				results = evaluateNumTicksAuto(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			if (tmpDeltaScale <= 0.005) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.010) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.050) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 2000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.10) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.50) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 200);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 1) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 100);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 5) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 20);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 10) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 10);
-				results[4] = new DecimalFormat("0.0");
 			}
 			else if (tmpDeltaScale <= 50) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 2);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 100) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 1);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 500) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.2);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 1000) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.1);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 5000) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.02);
-				results[4] = new DecimalFormat("0");
 			}
 			else {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
-				results[4] = new DecimalFormat("0");
 			}
 		}
 		else {
 			if (tmpDeltaScale <= 0) {
 				results = evaluateNumTicks(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			if (tmpDeltaScale <= 0.005) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.010) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.050) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 2000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.10) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1000);
-				results[4] = new DecimalFormat("0.000");
 			}
 			else if (tmpDeltaScale <= 0.50) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 200);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 1) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 100);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 5) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50);
-				results[4] = new DecimalFormat("0.00");
 			}
 			else if (tmpDeltaScale <= 10) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10);
-				results[4] = new DecimalFormat("0.0");
 			}
 			else if (tmpDeltaScale <= 50) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 2);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 100) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 1);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 500) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.2);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 1000) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.1);
-				results[4] = new DecimalFormat("0");
 			}
 			else if (tmpDeltaScale <= 5000) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.02);
-				results[4] = new DecimalFormat("0");
 			}
 			else {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
-				results[4] = new DecimalFormat("0");
 			}
 		}
 		log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$	
