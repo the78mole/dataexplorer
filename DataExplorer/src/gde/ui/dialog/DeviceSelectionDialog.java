@@ -965,9 +965,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @throws NotSupportedException 
 	 */
 	public void setupDevice(String newDeviceName) throws NotSupportedException {
-		int selection = getActiveDevices().indexOf(newDeviceName);
-		if (selection != -1 && getDevices().containsKey(newDeviceName)) {
-			setActiveConfig(getDevices().get(getActiveDevices().get(selection)));
+		int selection = this.activeDevices.indexOf(newDeviceName);
+		if (selection != -1 || getDevices().keySet().contains(newDeviceName)) {
+			this.activeDevices.add(newDeviceName);
+			DeviceConfiguration tmpDeviceConfig = this.getDevices().get(newDeviceName);
+			tmpDeviceConfig.setUsed(true);
+			setActiveConfig(tmpDeviceConfig);
 			setupDevice();
 		}
 		else {
