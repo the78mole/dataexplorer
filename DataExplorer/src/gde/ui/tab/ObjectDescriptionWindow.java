@@ -402,7 +402,7 @@ public class ObjectDescriptionWindow {
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 120;
-						group1LData.height = OSDE.IS_WINDOWS ? 21 : 24;
+						group1LData.height = OSDE.IS_WINDOWS ? 21 : 25;
 						this.statusText.setLayoutData(group1LData);
 						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
 						this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));

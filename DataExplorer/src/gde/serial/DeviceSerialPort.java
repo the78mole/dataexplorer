@@ -135,7 +135,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						CommPortIdentifier commPortIdentifier = CommPortIdentifier.getPortIdentifier(serialPortStr);
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (!OSDE.IS_WINDOWS) {
+								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
@@ -160,7 +160,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					if (!portBlackList.contains(serialPortStr)) {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
-								if (!OSDE.IS_WINDOWS) {
+								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
@@ -268,7 +268,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			Settings settings = Settings.getInstance();
 			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
-			if(availablePorts.size() == 0 ) 
+			if(availablePorts.size() == 0 || (this.serialPortStr != null && !availablePorts.contains(this.serialPortStr))) 
 				listConfiguredSerialPorts(false, 
 						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
 						settings.isSerialPortWhiteListEnabled() ? settings.getSerialPortWhiteList() : new Vector<String>());
