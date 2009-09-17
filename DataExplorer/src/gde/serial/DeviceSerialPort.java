@@ -439,7 +439,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
-				if (bytes != readBytes) Thread.sleep(sleepTime);
+				if (bytes != readBytes) {
+					try {
+						Thread.sleep(sleepTime);
+					}
+					catch (InterruptedException e) {
+						// ignore
+					}
+				}
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
@@ -494,7 +501,14 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
-				if (bytes != readBytes) Thread.sleep(sleepTime);
+				if (bytes != readBytes) {
+					try {
+						Thread.sleep(sleepTime);
+					}
+					catch (InterruptedException e) {
+						// ignore
+					}
+				}
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
@@ -541,7 +555,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		while (0 == this.inputStream.available()) {
-			Thread.sleep(sleepTime);	
+			try {
+				Thread.sleep(sleepTime);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
 			if (timeOutCounter-- <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -567,7 +586,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int resBytes = 0;
 
 		while ((resBytes = this.inputStream.available()) < numBytes) {
-			Thread.sleep(sleepTime);
+			try {
+				Thread.sleep(sleepTime);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
 			timeOutCounter--;
 			//log.logp(Level.FINER, "time out counter = " + counter);
 			if (timeOutCounter <= 0) {
@@ -609,7 +633,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
 
 				if (expectedBytes != readBytes) {
-					Thread.sleep(sleepTime);
+					try {
+						Thread.sleep(sleepTime);
+					}
+					catch (InterruptedException e) {
+						// ignore
+					}
 				}
 			}
 			//this.dataAvailable = false;
@@ -668,7 +697,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		// availableBytes are updated by event handler
 		int byteCounter = 0, numBytesAvailable = 0;
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			Thread.sleep(sleepTime);
+			try {
+				Thread.sleep(sleepTime);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
 
 			if (byteCounter == (numBytesAvailable = this.inputStream.available()))
 				--stableCounter;
@@ -718,7 +752,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				public void run() {
 					log.logp(Level.CONFIG, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 					try {
-						Thread.sleep(5);
+						try {
+							Thread.sleep(5);
+						}
+						catch (InterruptedException e) {
+							// ignore
+						}
 						byte[] buf = new byte[getInputStream().available()];
 						if (buf.length > 0) getInputStream().read(buf);
 					}
