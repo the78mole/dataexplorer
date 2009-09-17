@@ -89,6 +89,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public HashMap<String, Object> getData(UniLogDialog dialog) throws Exception {
 		boolean isPortOpenedByMe = false;
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
+		int numberMeasurementsLess4 = 0;
 		
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
 		
@@ -128,6 +129,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					else {
 						//telegrams.size() > 4 min + max + 2 data points
 						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
+						else ++numberMeasurementsLess4;
 						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
 						telegrams.add(readBuffer);
@@ -136,7 +138,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 					++counter;
 					
-					if ((counter % 5) == 0) dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, memoryUsed);
+					if ((counter % 5) == 0) dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, numberMeasurementsLess4, memoryUsed);
 
 					if (this.isTransmitFinished) {
 						log.log(Level.WARNING, "transmission stopped by user"); //$NON-NLS-1$
@@ -144,7 +146,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					}
 				}
 				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
-				dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, memoryUsed);
+				else ++numberMeasurementsLess4;
+				dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, numberMeasurementsLess4, memoryUsed);
 			}
 			else
 				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));

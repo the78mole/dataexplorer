@@ -131,6 +131,8 @@ public class UniLogDialog extends DeviceDialog {
 	CLabel												numberReadErrorLabel;
 	CLabel												readDataErrorLabel;
 	CLabel												redDataSetLabel;
+	CLabel												readDataLess2Label;
+	CLabel												numberLess2Label;
 	CLabel												dataSetLabel;
 	CLabel												actualDataSetNumberLabel;
 	CLabel												actualDataSetNumber;
@@ -197,6 +199,7 @@ public class UniLogDialog extends DeviceDialog {
 	String												numberRedDataSetsText			= "0";																																																							//$NON-NLS-1$
 	String												numberActualDataSetsText	= "0";																																																							//$NON-NLS-1$
 	String												numberReadErrorText				= "0";																																																							//$NON-NLS-1$
+	String												numberLess2Text						= "0";																																																							//$NON-NLS-1$
 	int														channelSelectionIndex			= 0;
 
 	/**
@@ -1006,7 +1009,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.readDataButton.setText(Messages.getString(MessageIds.OSDE_MSGT1325));
-									this.readDataButton.setBounds(11, 40, 260, 30);
+									this.readDataButton.setBounds(11, 30, 260, 30);
 									this.readDataButton.setEnabled(true);
 									this.readDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1038,42 +1041,54 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.dataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.dataSetLabel.setBounds(22, 78, 180, 20);
+									this.dataSetLabel.setBounds(22, 68, 180, 20);
 									this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1326));
 								}
 								{
 									this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.redDataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.redDataSetLabel.setBounds(205, 78, 55, 20);
+									this.redDataSetLabel.setBounds(205, 68, 55, 20);
 									this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.actualDataSetNumberLabel.setBounds(22, 101, 180, 20);
+									this.actualDataSetNumberLabel.setBounds(22, 91, 180, 20);
 									this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1327));
 								}
 								{
 									this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumber.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.actualDataSetNumber.setBounds(205, 101, 55, 20);
+									this.actualDataSetNumber.setBounds(205, 91, 55, 20);
 									this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.readDataErrorLabel.setBounds(22, 123, 180, 20);
+									this.readDataErrorLabel.setBounds(22, 113, 180, 20);
 									this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1328));
 								}
 								{
 									this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.numberReadErrorLabel.setBounds(205, 123, 55, 20);
+									this.numberReadErrorLabel.setBounds(205, 113, 55, 20);
 									this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
+									this.readDataLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
+									this.readDataLess2Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.readDataLess2Label.setBounds(22, 135, 180, 20);
+									this.readDataLess2Label.setText(Messages.getString(MessageIds.OSDE_MSGT1331));
+								}
+								{
+									this.numberLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
+									this.numberLess2Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.numberLess2Label.setBounds(205, 135, 55, 20);
+									this.numberLess2Label.setText("0"); //$NON-NLS-1$
+								}
+								{
 									this.readDataProgressBar = new ProgressBar(this.dataReadGroup, SWT.NONE);
-									this.readDataProgressBar.setBounds(15, 158, 260, 15);
+									this.readDataProgressBar.setBounds(15, 165, 260, 15);
 									this.readDataProgressBar.setMinimum(0);
 									this.readDataProgressBar.setMaximum(100);
 								}
@@ -1616,21 +1631,24 @@ public class UniLogDialog extends DeviceDialog {
 	 * @param redTelegrams
 	 * @param numberRecordSet
 	 * @param numReadErrors
+	 * @param numLess2Measurements
 	 * @param memoryUsed
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int memoryUsed) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess2Measurements, final int memoryUsed) {
 		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
+		this.numberLess2Text = "" + numLess2Measurements; //$NON-NLS-1$
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				int progress = redTelegrams * 100 / memoryUsed;
+				int progress = memoryUsed > 0 ? redTelegrams * 100 / memoryUsed : 100;
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
 				UniLogDialog.this.redDataSetLabel.setText(UniLogDialog.this.numberRedDataSetsText);
 				UniLogDialog.this.actualDataSetNumber.setText(UniLogDialog.this.numberActualDataSetsText);
 				UniLogDialog.this.numberReadErrorLabel.setText(UniLogDialog.this.numberReadErrorText);
+				UniLogDialog.this.numberLess2Label.setText(UniLogDialog.this.numberLess2Text);
 			}
 		});
 	}
@@ -1643,9 +1661,11 @@ public class UniLogDialog extends DeviceDialog {
 			this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 			this.numberActualDataSetsText = "0"; //$NON-NLS-1$
 			this.numberReadErrorText = "0"; //$NON-NLS-1$
+			this.numberLess2Text = "0"; //$NON-NLS-1$
 			this.redDataSetLabel.setText(this.numberRedDataSetsText);
 			this.actualDataSetNumber.setText(this.numberActualDataSetsText);
 			this.numberReadErrorLabel.setText(this.numberReadErrorText);
+			this.numberLess2Label.setText(this.numberLess2Text);
 			this.readDataProgressBar.setSelection(0);
 		}
 		else {
@@ -1657,6 +1677,7 @@ public class UniLogDialog extends DeviceDialog {
 					UniLogDialog.this.redDataSetLabel.setText(UniLogDialog.this.numberRedDataSetsText);
 					UniLogDialog.this.actualDataSetNumber.setText(UniLogDialog.this.numberActualDataSetsText);
 					UniLogDialog.this.numberReadErrorLabel.setText(UniLogDialog.this.numberReadErrorText);
+					UniLogDialog.this.numberLess2Label.setText(UniLogDialog.this.numberLess2Text);
 					UniLogDialog.this.readDataProgressBar.setSelection(0);
 				}
 			});

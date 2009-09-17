@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
@@ -142,6 +143,11 @@ public class UniLogDataGatherer extends Thread {
 			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 		catch (TimeOutException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1300)); //$NON-NLS-1$
+		}
+		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1300)); //$NON-NLS-1$
