@@ -269,10 +269,18 @@ public class UniLogDialog extends DeviceDialog {
 								UniLogDialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
-							// check threads before close
-							if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) UniLogDialog.this.gatherThread.interrupt();
-							if (UniLogDialog.this.liveThread != null && UniLogDialog.this.liveThread.isTimerRunning) {
+						}
+
+						// check threads before close
+						if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) {
+							UniLogDialog.this.gatherThread.interrupt();
+						}
+						if (UniLogDialog.this.liveThread != null) {
+							if (UniLogDialog.this.liveThread.isTimerRunning) {
 								UniLogDialog.this.liveThread.stopTimerThread();
+							}
+							if (UniLogDialog.this.liveThread.isAlive()) {
+								UniLogDialog.this.liveThread.interrupt();
 							}
 						}
 					}
@@ -1115,11 +1123,13 @@ public class UniLogDialog extends DeviceDialog {
 								this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.liveDataCaptureGroup.setBounds(324, 12, 284, 198);
 								this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1329));
+								this.liveDataCaptureGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1384));
 								this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.startLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1330));
+									this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1384));
 									this.startLiveGatherButton.setBounds(16, 26, 246, 30);
 									this.startLiveGatherButton.setSize(260, 30);
 									this.startLiveGatherButton.setEnabled(true);
@@ -1165,11 +1175,13 @@ public class UniLogDialog extends DeviceDialog {
 									this.loggingGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.loggingGroup.setBounds(25, 70, 228, 70);
 									this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1332));
+									this.loggingGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1383));
 									this.loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 										this.startLoggingButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
+										this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1383));
 										this.startLoggingButton.setBounds(12, 27, 100, 30);
 										this.startLoggingButton.setEnabled(true);
 										this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -1228,13 +1240,21 @@ public class UniLogDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											UniLogDialog.log.log(Level.FINE, "stopLiveGatherButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											if (UniLogDialog.this.liveThread != null) {
-												UniLogDialog.this.liveThread.stopTimerThread();
+												if (UniLogDialog.this.liveThread.isTimerRunning) {
+													UniLogDialog.this.liveThread.stopTimerThread();
+												}
+												UniLogDialog.this.serialPort.isInterruptedByUser = true;
 												UniLogDialog.this.liveThread.interrupt();
 
 												if (Channels.getInstance().getActiveChannel() != null) {
-													RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-													// active record set name == life gatherer record name
-													UniLogDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
+													Channel activeChannle = Channels.getInstance().getActiveChannel();
+													if (activeChannle != null) {
+														RecordSet activeRecordSet = activeChannle.getActiveRecordSet();
+														if (activeRecordSet != null) {
+															// active record set name == life gatherer record name
+															UniLogDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
+														}
+													}
 												}
 											}
 											UniLogDialog.this.readAdjustmentButton.setEnabled(true);
@@ -1261,11 +1281,13 @@ public class UniLogDialog extends DeviceDialog {
 								this.clearDataBufferGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.clearDataBufferGroup.setBounds(324, 216, 284, 104);
 								this.clearDataBufferGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1334));
+								this.clearDataBufferGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1385));
 								this.clearDataBufferGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.clearMemoryButton = new Button(this.clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 									this.clearMemoryButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.clearMemoryButton.setText(Messages.getString(MessageIds.OSDE_MSGT1335));
+									this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1385));
 									this.clearMemoryButton.setBounds(15, 60, 260, 30);
 									this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 										@Override

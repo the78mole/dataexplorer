@@ -928,11 +928,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		measurement.setName(UniLogDialog.A1_MODUS_NAMES[a1Modus].trim());
 		measurement.setUnit(UniLogDialog.A1_MODUS_UNITS[a1Modus].trim());
 
-		measurement = this.getMeasurement(configKey, 12); // 12=A1
+		measurement = this.getMeasurement(configKey, 12); // 12=A2
 		measurement.setName(UniLogDialog.A2_MODUS_NAMES[a2Modus].trim());
 		measurement.setUnit(UniLogDialog.A2_MODUS_UNITS[a2Modus].trim());
 		
-		measurement = this.getMeasurement(configKey, 13); // 13=A1
+		measurement = this.getMeasurement(configKey, 13); // 13=A3
 		measurement.setName(UniLogDialog.A3_MODUS_NAMES[a3Modus].trim());
 		measurement.setUnit(UniLogDialog.A3_MODUS_UNITS[a3Modus].trim());
 	}

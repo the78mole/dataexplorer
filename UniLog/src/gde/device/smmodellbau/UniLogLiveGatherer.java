@@ -90,10 +90,11 @@ public class UniLogLiveGatherer extends Thread {
 		this.calcValues.put(UniLog.PROP_N_100_WATT, (double)prop_n100W);
 
 		if (!this.serialPort.isConnected()) {
-			this.serialPort.open();
+			UniLogLiveGatherer.this.serialPort.open();
 			this.isPortOpenedByLiveGatherer = true;
+			Thread.sleep(2000);
 		}
-
+		
 		// get UniLog configuration for timeStep info
 		byte[] readBuffer = useSerialPort.readConfiguration();
 		useDialog.updateConfigurationValues(readBuffer);
@@ -106,10 +107,10 @@ public class UniLogLiveGatherer extends Thread {
 	}
 
 	public void run() {
-		this.isTimerRunning = true;
 		this.channels.switchChannel(this.channel.getName());
 
 		// prepare timed data gatherer thread
+		this.serialPort.isInterruptedByUser = false;
 		int delay = 0;
 		int period = this.timeStep_ms;
 		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -124,83 +125,91 @@ public class UniLogLiveGatherer extends Thread {
 		updateActiveState(recordSet);
 		final int[] points = new int[recordSet.size()];
 		final UniLog usedDevice = this.device;
-		
+
 		try {
 			this.serialPort.checkConnectionStatus();
 			this.serialPort.wait4LifeData(100);
 		}
 		catch (Throwable e) {
-			String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1301);
-			cleanup(recordSetKey, message, e);
+			log.log(Level.SEVERE, e.getMessage(), e);
+			String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + System.getProperty("line.separator")
+					+ Messages.getString(MessageIds.OSDE_MSGW1301);
+			cleanup(recordSetKey, message);
 		}
-		
-		this.timer = new Timer();
-		this.timerTask = new TimerTask() {
 
-			public void run() {
-				log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
-				try {
-					if (UniLogLiveGatherer.this.isTimerRunning) {
-						// prepare the data for adding to record set
-						log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (!this.serialPort.isInterruptedByUser) {
+			this.timer = new Timer();
+			this.timerTask = new TimerTask() {
 
-						// build the point array according curves from record set
-						byte[] dataBuffer = UniLogLiveGatherer.this.serialPort.queryLiveData();
+				public void run() {
+					log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
+					try {
+						if (UniLogLiveGatherer.this.isTimerRunning) {
+							// prepare the data for adding to record set
+							log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 
-						recordSet.addPoints(usedDevice.convertDataBytes(points, dataBuffer));
+							// build the point array according curves from record set
+							byte[] dataBuffer = UniLogLiveGatherer.this.serialPort.queryLiveData();
 
-						// switch the active record set if the current record set is child of active channel
-						if (!UniLogLiveGatherer.this.isSwitchedRecordSet && UniLogLiveGatherer.this.channel.getName().equals(UniLogLiveGatherer.this.channels.getActiveChannel().getName())) {
-							UniLogLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
-							UniLogLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
-							UniLogLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
-							UniLogLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
-							UniLogLiveGatherer.this.isSwitchedRecordSet = true;
-						}
-						
-						if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLogLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-							OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-								public void run() {
-									UniLogLiveGatherer.this.application.updateGraphicsWindow();
-									UniLogLiveGatherer.this.application.updateStatisticsData();
-									UniLogLiveGatherer.this.application.updateDataTable(recordSetKey);
-									UniLogLiveGatherer.this.application.updateDigitalWindowChilds();
-									UniLogLiveGatherer.this.application.updateAnalogWindowChilds();
-									//LiveGathererThread.this.application.updateCellVoltageChilds();
-								}
-							});
+							recordSet.addPoints(usedDevice.convertDataBytes(points, dataBuffer));
+
+							// switch the active record set if the current record set is child of active channel
+							if (!UniLogLiveGatherer.this.isSwitchedRecordSet && UniLogLiveGatherer.this.channel.getName().equals(UniLogLiveGatherer.this.channels.getActiveChannel().getName())) {
+								UniLogLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
+								UniLogLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
+								UniLogLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
+								UniLogLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
+								UniLogLiveGatherer.this.isSwitchedRecordSet = true;
+							}
+
+							if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLogLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
+								OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+									public void run() {
+										UniLogLiveGatherer.this.application.updateGraphicsWindow();
+										UniLogLiveGatherer.this.application.updateStatisticsData();
+										//UniLogLiveGatherer.this.application.updateDataTable(recordSetKey);
+										UniLogLiveGatherer.this.application.updateDigitalWindowChilds();
+										UniLogLiveGatherer.this.application.updateAnalogWindowChilds();
+										//LiveGathererThread.this.application.updateCellVoltageChilds();
+									}
+								});
+							}
 						}
 					}
+					catch (DataInconsitsentException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
+						cleanup(recordSetKey, message);
+					}
+					catch (TimeOutException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+								+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1301); //$NON-NLS-1$ 
+						cleanup(recordSetKey, message);
+					}
+					catch (IOException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+								+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1301); //$NON-NLS-1$ 
+						cleanup(recordSetKey, message);
+					}
+					catch (Throwable e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
+						cleanup(recordSetKey, message);
+					}
+					log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 				}
-				catch (DataInconsitsentException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
-					cleanup(recordSetKey, message, e);				}
-				catch (TimeOutException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1301); //$NON-NLS-1$ 
-					cleanup(recordSetKey, message, e);
-				}
-				catch (IOException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1301); //$NON-NLS-1$ 
-					cleanup(recordSetKey, message, e);
-				}
-				catch (Throwable e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
-					cleanup(recordSetKey, message, e);
-				}
-				log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
-			}
-		};
-		
-		// start the prepared timer thread within the life data gatherer thread
-		this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
-		log.log(Level.FINE, "exit"); //$NON-NLS-1$
+			};
+
+			// start the prepared timer thread within the life data gatherer thread
+			this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
+			this.isTimerRunning = true;
+			log.log(Level.FINE, "exit"); //$NON-NLS-1$
+		}
+		else {
+			cleanup(recordSetKey, null);
+		}
 	}
 
 	/**
@@ -240,8 +249,12 @@ public class UniLogLiveGatherer extends Thread {
 	 * waits for all running timers tasks are ended before return 
 	 */
 	public synchronized void stopTimerThread() {
-		if (this.timerTask != null) this.timerTask.cancel();
-		if (this.timer != null) this.timer.cancel();
+		if (this.timerTask != null) 
+			this.timerTask.cancel();
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer.purge();
+		}
 		this.isTimerRunning = false;
 	}
 
@@ -249,18 +262,19 @@ public class UniLogLiveGatherer extends Thread {
 	 * cleanup all allocated resources and display the message
 	 * @param recordSetKey
 	 * @param message
-	 * @param e
 	 */
-	void cleanup(final String recordSetKey, String message, Throwable e) {
+	void cleanup(final String recordSetKey, String message) {
 		this.stopTimerThread();
-		if(this.isPortOpenedByLiveGatherer) this.serialPort.close(); 
+		if(this.isPortOpenedByLiveGatherer) 
+			this.serialPort.close(); 
 		this.channel.get(recordSetKey).clear();
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey);
-		this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 		this.device.getDialog().resetButtons();
-		log.log(Level.SEVERE, e.getMessage(), e);
+		if (message != null && message.length() > 5) {
+			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
+		}
 	}
 }

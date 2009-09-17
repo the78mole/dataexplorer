@@ -69,6 +69,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	boolean 							isTransmitFinished			= false;
 	
 	int 									reveiceErrors 					= 0;
+	
+	boolean								isInterruptedByUser						= false;	
 
 	/**
 	 * constructor of default implementation
@@ -146,7 +148,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					}
 				}
 				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
-				else ++numberMeasurementsLess4;
+				//read numberRecordSet might different from really readable, UniLog suppress invalid data sets internally !
+				numberMeasurementsLess4 = numberRecordSet - dataCollection.size();
 				dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, numberMeasurementsLess4, memoryUsed);
 			}
 			else
@@ -199,19 +202,25 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true, if data can received after the adjusted time period
 	 * @throws Exception
 	 */
-	public synchronized boolean wait4LifeData(int retrys) throws Exception {
+	public boolean wait4LifeData(int retrys) throws Exception {
 		boolean isLifeDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-			while (this.getInputStream().available() < 10 && retrys-- > 0) {
+			while (this.getInputStream().available() < 10 && retrys-- > 0 && !isInterruptedByUser) {
 				this.write(COMMAND_LIVE_VALUES);
-				Thread.sleep(250);
+				try {
+					Thread.sleep(250);
+				}
+				catch (InterruptedException e) {
+					// ignore
+				}
 				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
-			// read data bytes to clear buffer
-			this.read(new byte[DATA_LENGTH_BYTES], 1000);
-			isLifeDataAvailable = true;
-			
+			if (!isInterruptedByUser) {
+				// read data bytes to clear buffer
+				this.read(new byte[DATA_LENGTH_BYTES], 1000);
+				isLifeDataAvailable = true;
+			}
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
@@ -262,7 +271,12 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
-				//waitDataReady();
+				try {
+					Thread.sleep(2000);
+				}
+				catch (InterruptedException e) {
+					// ignore
+				}
 			}
 
 			this.write(COMMAND_START_LOGGING);

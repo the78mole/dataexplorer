@@ -107,5 +107,8 @@ public class MessageIds {
 	public final static String	OSDE_MSGT1380 = "OSDE_MSGT1380";
 	public final static String	OSDE_MSGT1381 = "OSDE_MSGT1381";
 	public final static String	OSDE_MSGT1382 = "OSDE_MSGT1382";
+	public final static String	OSDE_MSGT1383 = "OSDE_MSGT1383";
+	public final static String	OSDE_MSGT1384 = "OSDE_MSGT1384";
+	public final static String	OSDE_MSGT1385 = "OSDE_MSGT1385";
 
  }
