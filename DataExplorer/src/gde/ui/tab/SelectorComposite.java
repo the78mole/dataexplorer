@@ -176,7 +176,6 @@ public class SelectorComposite extends Composite {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
 									recordSet.setSyncRequested(true, true);
 									recordSet.setSyncRecordSelected(true);
-									//item.setChecked(recordSet.isSyncableSynced()); // only allow check if at least one of the syncable records are visible
 								}
 								else {
 									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
@@ -210,29 +209,16 @@ public class SelectorComposite extends Composite {
 		if (recordSet != null && recordSet.size() > 0) {
 				log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();
-				//this.curveSelectorHeader.pack(true);
-				//itemWidth = this.selectorHeaderWidth = this.curveSelectorHeader.getSize().x;
 				String[] recordKeys = recordSet.getRecordNames();
 				int checkBoxWidth = 20;
 				int textSize = 10;
-				for (int i = 0; i < recordSet.size(); i++) {
-					Record record = recordSet.getRecord(recordKeys[i]);
-//					switch (this.windowType) {
-//					case GraphicsWindow.TYPE_COMPARE:
-//						String recordKey = recordSet.getFirstRecordName().split("_")[0]; //$NON-NLS-1$
-//						record = recordSet.getRecord(recordKey + "_" + i); //$NON-NLS-1$
-//						break;
-//
-//					default: // TYPE_NORMAL
-//						record = recordSet.getRecord(recordKeys[i]);
-//						break;
-//					}
+				for (String recordKey : recordKeys) {
+					Record record = recordSet.getRecord(recordKey);
 					if (record != null) {
 						log.log(Level.FINER, record.getName());
 						textSize = record.getName().length() * 8;
 						if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
 						//log.log(Level.FINE, item.getText() + " " + itemWidth);
-						//item.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.jpg"));
 						if (record.isDisplayable()) {
 							TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 							item.setForeground(record.getColor());
