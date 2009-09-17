@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
@@ -28,6 +29,7 @@ import osde.data.RecordSet;
 import osde.device.smmodellbau.lipowatch.MessageIds;
 import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
+import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
@@ -140,27 +142,33 @@ public class LiPoWatchDataGatherer extends Thread {
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			this.dialog.resetButtons();
 			log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
-			this.device.getDialog().resetButtons();
 		}
 		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage()); //$NON-NLS-1$
-			this.device.getDialog().resetButtons();
 		}
-		catch (Throwable e) {
+		catch (TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602)); //$NON-NLS-1$
-			this.device.getDialog().resetButtons();
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602)); //$NON-NLS-1$
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialog(this.dialog.getDialogShell(), e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 		finally {
+			this.dialog.resetButtons();
 			if(isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()

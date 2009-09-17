@@ -87,6 +87,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	public HashMap<String, Object> getData(LiPoWatchDialog dialog) throws Exception {
 		boolean isPortOpenedByMe = false;
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
+		int numberLess4measurements = 0;
 		
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES + 2];
 		
@@ -139,6 +140,9 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 								dataCollection.put(""+numberRecordSet, telegrams); //$NON-NLS-1$
 								log.log(Level.FINER, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 							}
+							else 
+								++numberLess4measurements;
+								
 							numberRecordSet = ((readBuffer[10] & 0xFF) + 1);
 							telegrams = new Vector<byte[]>();
 							telegrams.add(readBuffer);
@@ -150,7 +154,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 						++redCounter;
 
 						//"Gelesene Datensätze/Werte: " & Datensatznummer & "/" & Werte_gelesen & " von " & Speichernummer & " (" & CInt(CLng(Werte_gelesen) * 100 / Speichernummer) & "%)" ' & " (" & Fehlersumme & ")"
-						if ((redCounter % 5) == 0) dialog.updateDataGatherProgress(memoryRed, numberRecordSet, this.reveiceErrors, memoryUsed);
+						if ((redCounter % 5) == 0) dialog.updateDataGatherProgress(memoryRed, numberRecordSet, this.reveiceErrors, numberLess4measurements, memoryUsed);
 
 						if (this.isTransmitFinished) {
 							log.log(Level.WARNING, "transmission stopped by user"); //$NON-NLS-1$
@@ -165,7 +169,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					dataCollection.put("" + numberRecordSet, telegrams); //$NON-NLS-1$
 					log.log(Level.FINE, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 				}
-				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, memoryUsed);
+				else 
+					++numberLess4measurements;
+				
+				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, numberLess4measurements, memoryUsed);
 			}
 			else
 				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));

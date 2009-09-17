@@ -123,7 +123,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	CLabel												clearMemoryLabel;
 	Group													clearMemoryGroup;
 	Button												readDataButton, stopReadDataButton;
-	CLabel												dataSetLabel, redDataSetLabel, actualDataSetNumberLabel, actualDataSetNumber, readDataErrorLabel, numberReadErrorLabel;
+	CLabel												dataSetLabel, redDataSetLabel, actualDataSetNumberLabel, actualDataSetNumber, readDataErrorLabel, numberReadErrorLabel, readLess4Label, numberLess4Label;
 	ProgressBar										readDataProgressBar;
 
 	Group													liveDataCaptureGroup, loggingGroup;
@@ -155,6 +155,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	String												numberRedDataSetsText				= "0";																																											//$NON-NLS-1$
 	String												numberActualDataSetsText		= "0";																																											//$NON-NLS-1$
 	String												numberReadErrorText					= "0";																																											//$NON-NLS-1$	
+	String												numberLess4Text							= "0";																																											//$NON-NLS-1$	
 
 	final LiPoWatch								device;																																																								// get device specific things, get serial port, ...
 	final LiPoWatchSerialPort			serialPort;																																																						// open/close port execute getData()....
@@ -689,38 +690,50 @@ public class LiPoWatchDialog extends DeviceDialog {
 									{
 										this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.dataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.dataSetLabel.setBounds(4, 74, 164, 20);
+										this.dataSetLabel.setBounds(5, 74, 165, 20);
 										this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1653));
 									}
 									{
 										this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.redDataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.redDataSetLabel.setBounds(174, 74, 55, 20);
+										this.redDataSetLabel.setBounds(175, 74, 55, 20);
 										this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.actualDataSetNumberLabel.setBounds(4, 106, 164, 20);
+										this.actualDataSetNumberLabel.setBounds(5, 96, 190, 20);
 										this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1654));
 									}
 									{
 										this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.actualDataSetNumber.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.actualDataSetNumber.setBounds(174, 106, 55, 20);
+										this.actualDataSetNumber.setBounds(200, 96, 30, 20);
 										this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.readDataErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.readDataErrorLabel.setBounds(4, 138, 164, 20);
+										this.readDataErrorLabel.setBounds(5, 118, 190, 20);
 										this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1655));
 									}
 									{
 										this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-										this.numberReadErrorLabel.setBounds(174, 138, 55, 20);
+										this.numberReadErrorLabel.setBounds(200, 118, 30, 20);
 										this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
+									}
+									{
+										this.readLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
+										this.readLess4Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.readLess4Label.setBounds(5, 140, 190, 20);
+										this.readLess4Label.setText(Messages.getString(MessageIds.OSDE_MSGT1659));
+									}
+									{
+										this.numberLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
+										this.numberLess4Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.numberLess4Label.setBounds(200, 140, 30, 20);
+										this.numberLess4Label.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readDataProgressBar = new ProgressBar(this.dataReadGroup, SWT.NONE);
@@ -1181,9 +1194,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 			this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 			this.numberActualDataSetsText = "0"; //$NON-NLS-1$
 			this.numberReadErrorText = "0"; //$NON-NLS-1$
+			this.numberLess4Text = "0"; //$NON-NLS-1$
 			this.redDataSetLabel.setText(this.numberRedDataSetsText);
 			this.actualDataSetNumber.setText(this.numberActualDataSetsText);
 			this.numberReadErrorLabel.setText(this.numberReadErrorText);
+			this.numberLess4Label.setText(this.numberLess4Text);
 			this.readDataProgressBar.setSelection(0);
 		}
 		else {
@@ -1195,6 +1210,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					LiPoWatchDialog.this.redDataSetLabel.setText(LiPoWatchDialog.this.numberRedDataSetsText);
 					LiPoWatchDialog.this.actualDataSetNumber.setText(LiPoWatchDialog.this.numberActualDataSetsText);
 					LiPoWatchDialog.this.numberReadErrorLabel.setText(LiPoWatchDialog.this.numberReadErrorText);
+					LiPoWatchDialog.this.numberLess4Label.setText(LiPoWatchDialog.this.numberLess4Text);
 					LiPoWatchDialog.this.readDataProgressBar.setSelection(0);
 				}
 			});
@@ -1293,12 +1309,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 * @param redTelegrams
 	 * @param numberRecordSet
 	 * @param numReadErrors
+	 * @param numLess4Measurements
 	 * @param memoryUsed
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int memoryUsed) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess4Measurements, final int memoryUsed) {
 		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
+		this.numberLess4Text = "" + numLess4Measurements; //$NON-NLS-1$
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				int progress = redTelegrams * 100 / memoryUsed;
@@ -1308,6 +1326,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				LiPoWatchDialog.this.redDataSetLabel.setText(LiPoWatchDialog.this.numberRedDataSetsText);
 				LiPoWatchDialog.this.actualDataSetNumber.setText(LiPoWatchDialog.this.numberActualDataSetsText);
 				LiPoWatchDialog.this.numberReadErrorLabel.setText(LiPoWatchDialog.this.numberReadErrorText);
+				LiPoWatchDialog.this.numberLess4Label.setText(LiPoWatchDialog.this.numberLess4Text);
 			}
 		});
 	}

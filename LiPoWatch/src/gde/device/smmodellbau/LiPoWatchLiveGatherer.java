@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.smmodellbau.lipowatch.MessageIds;
 import osde.exception.DataInconsitsentException;
+import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
@@ -160,8 +162,21 @@ public class LiPoWatchLiveGatherer extends Thread {
 				catch (DataInconsitsentException e) {
 					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 					cleanup(recordSetKey, message, e);				}
+				catch (TimeOutException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602); //$NON-NLS-1$ 
+					cleanup(recordSetKey, message, e);
+				}
+				catch (IOException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602); //$NON-NLS-1$ 
+					cleanup(recordSetKey, message, e);
+				}
 				catch (Throwable e) {
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}
 				log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
