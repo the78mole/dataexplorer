@@ -867,6 +867,9 @@ public class MenuBar {
 			else {
 				String devicePath = this.application.getActiveDevice() != null ? OSDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : OSDE.STRING_EMPTY;
 				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + OSDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+				if (!FileUtils.checkDirectoryAndCreate(path)) {
+					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 
+				}
 			}
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_OSD, OSDE.FILE_ENDING_STAR_LOV }, path); 
 			if (openFileDialog.getFileName().length() > 4) {
