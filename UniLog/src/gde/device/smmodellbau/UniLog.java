@@ -387,6 +387,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		// a1Modus -> 0==Temperatur, 1==Millivolt, 2=Speed 250, 3=Speed 400
 		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
+		a1Modus = a1Modus > 3 ? 3 : a1Modus;
 		tmpValue = (((dataBuffer[17] & 0xFF) << 8) + (dataBuffer[16] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
 		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
@@ -907,6 +908,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public void updateMeasurementByAnalogModi(byte[] dataBuffer, String configKey) {
 		// a1Modus -> 0==Temperature, 1==Millivolt, 2=Speed 250, 3=Speed 400
 		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
+				a1Modus = a1Modus > 3 ? 3 : a1Modus;
 
 		// A2 Modus == 0 -> temperature; A2 Modus == 1 -> impulse time length
 		// A2 Modus == 2 -> mills voltage; A2 Modus == 3 -> capacity mAh
