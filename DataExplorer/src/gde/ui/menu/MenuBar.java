@@ -25,12 +25,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.ImageTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -351,14 +356,14 @@ public class MenuBar {
 				{
 					this.copyGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.copyGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0026));
-					this.copyGraphicMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "copyGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							//							Clipboard clipboard = new Clipboard(display);
-							//			        RTFTransfer rftTransfer = RTFTransfer.getInstance();
-							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
-							//			        clipboard.dispose();
+							log.log(Level.FINEST, "copyGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
+							Image graphicsImage = MenuBar.this.application.getGraphicsAsImage();
+							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
+							clipboard.dispose();
+							graphicsImage.dispose();
 						}
 					});
 				}
@@ -369,10 +374,9 @@ public class MenuBar {
 					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "copyTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							//							Clipboard clipboard = new Clipboard(display);
-							//			        TextTransfer transfer = TextTransfer.getInstance();
-							//			        clipboard.setContents(new String[]{"graphics copy"}, new Transfer[]{rftTransfer});
-							//			        clipboard.dispose();						}
+							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
+							clipboard.setContents(new String[] { "graphics copy" }, new Transfer[] { TextTransfer.getInstance() });
+							clipboard.dispose();
 						}
 					});
 				}

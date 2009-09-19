@@ -56,6 +56,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CurveUtils;
+import osde.utils.GraphicsUtils;
 import osde.utils.TimeLine;
 
 /**
@@ -1340,11 +1341,6 @@ public class GraphicsComposite extends Composite {
 		log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
 	}
 
-	public String getRecordComment() {
-		this.isRecordCommentChanged = false;
-		return GraphicsComposite.this.recordSetComment.getText();
-	}
-
 	/**
 	 * @return the isRecordCommentChanged
 	 */
@@ -1356,9 +1352,72 @@ public class GraphicsComposite extends Composite {
 		RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) {
 			isRecordCommentChanged = false;
-			recordSet.setRecordSetDescription(getRecordComment());
+			recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
 			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}
+	}
+
+	/**
+	 * @return the graphic window content as image - only if compare window is visible return the compare window graphics
+	 */
+	public Image getGraphicsAsImage() {	
+		boolean isCompareSet = this.windowType == GraphicsWindow.TYPE_COMPARE;
+		RecordSet compareRecordSet = OpenSerialDataExplorer.getInstance().getCompareSet();
+		String[] compareSetNames = compareRecordSet.getRecordNames();
+		int graphicsHeight = isCompareSet ? 30+this.canvasBounds.height+10+compareSetNames.length*20 : 30+this.canvasBounds.height+40;
+		Image graphicsImage = new Image(OpenSerialDataExplorer.display, this.canvasBounds.width, graphicsHeight);
+		// decide if normal graphics window or compare window should be copied
+		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
+				GC graphicsGC = new GC(graphicsImage);
+				graphicsGC.setBackground(this.recordSetHeader.getBackground());
+				graphicsGC.setForeground(this.recordSetHeader.getForeground());
+				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+				graphicsGC.setFont(this.recordSetHeader.getFont());
+				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.OSDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+				graphicsGC.setFont(this.recordSetComment.getFont());
+				for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
+					Record compareRecord = compareRecordSet.get(compareSetNames[i]);
+					if (compareRecord != null) {
+						graphicsGC.setForeground(compareRecord.getColor());
+						String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$
+						GraphicsUtils.drawText(recordName, 20, yPos, graphicsGC, SWT.HORIZONTAL);
+						graphicsGC.setForeground(this.recordSetComment.getForeground());
+						String description = compareRecord.getDescription();
+						description = description.contains("\n") ? description.substring(0, description.indexOf("\n")) : description; //$NON-NLS-1$ //$NON-NLS-2$
+						Point pt = graphicsGC.textExtent(recordName); // string dimensions
+						GraphicsUtils.drawText(description, pt.x+30, yPos, graphicsGC, SWT.HORIZONTAL);
+					}
+				}
+				graphicsGC.drawImage(this.canvasImage, 0, 30);
+				graphicsGC.dispose();
+		}
+		else {
+			Channel activeChannel = this.channels.getActiveChannel();
+			if (activeChannel != null) {
+				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+				if (activeRecordSet != null) {
+					this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
+					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
+					this.canvasImageGC.setBackground(this.graphicCanvas.getBackground());
+					this.canvasImageGC.fillRectangle(this.canvasBounds);
+					this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
+
+					GC graphicsGC = new GC(graphicsImage);
+					graphicsGC.setForeground(this.recordSetHeader.getForeground());
+					graphicsGC.setBackground(this.recordSetHeader.getBackground());
+					graphicsGC.setFont(this.recordSetHeader.getFont());
+					graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+					GraphicsUtils.drawTextCentered(activeRecordSet.getName(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+					graphicsGC.setFont(this.recordSetComment.getFont());
+					GraphicsUtils.drawText(activeRecordSet.getRecordSetDescription(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
+					graphicsGC.drawImage(this.canvasImage, 0, 30);
+					graphicsGC.dispose();
+				}
+			}
+		}
+		return graphicsImage;
 	}
 
 }

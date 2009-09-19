@@ -1051,6 +1051,7 @@ public class CurveSelectorContextMenu {
 
 								String newRecordkey = copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();							
 								Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
+								newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
 								newRecord.setVisible(true); // if a non visible record added
 
 								if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)

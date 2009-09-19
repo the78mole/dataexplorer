@@ -313,15 +313,15 @@ public class TimeLine {
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
 						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
 							timeGrid.add(intXTickPosition);
-						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
 					}
 					else {
-						GraphicsUtils.drawText(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 					}
 				}
 				else
-					GraphicsUtils.drawText(("" + timeValue), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$
+					GraphicsUtils.drawTextCentered(("" + timeValue), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$
 			}
 			recordSet.setTimeGrid(timeGrid);
 		}

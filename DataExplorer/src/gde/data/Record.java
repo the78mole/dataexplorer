@@ -63,9 +63,10 @@ public class Record extends Vector<Integer> {
 																// device measurement configuration and used to find specific properties
 
 	RecordSet						parent;
-	String							name;															// measurement name <Höhe>
-	String							unit;															// unit <m>
-	String							symbol;														// yymbol <h>
+	String							name;																				// measurement name Höhe
+	String							unit;																				// unit [m]
+	String							symbol;																			// symbol h
+	String							description						= OSDE.STRING_BLANK;	// only set if copied into compare set 
 	boolean							isActive;
 	boolean							isDisplayable;
 	boolean							isVisible							= true;
@@ -239,7 +240,7 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
-		this.color = new Color(record.color.getDevice(), record.color.getRGB());
+		this.color = SWTResourceManager.getColor(record.color.getRGB().red, record.color.getRGB().green, record.color.getRGB().blue);
 		this.lineWidth = record.lineWidth;
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
@@ -311,7 +312,7 @@ public class Record extends Vector<Integer> {
 		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
-		this.color = new Color(record.color.getDevice(), record.color.getRGB());
+		this.color = SWTResourceManager.getColor(record.color.getRGB().red, record.color.getRGB().green, record.color.getRGB().blue);
 		this.lineWidth = record.lineWidth;
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
@@ -363,55 +364,55 @@ public class Record extends Vector<Integer> {
 		// set color defaults
 		switch (recordOrdinal) {
 		case 0: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(0, 0, 255)); //(SWT.COLOR_BLUE));
+			this.color = SWTResourceManager.getColor(0, 0, 255); //(SWT.COLOR_BLUE));
 			break;
 		case 1: // zweite Kurve
-			this.setColor(SWTResourceManager.getColor(0, 128, 0)); //SWT.COLOR_DARK_GREEN));
+			this.color = SWTResourceManager.getColor(0, 128, 0); //SWT.COLOR_DARK_GREEN));
 			break;
 		case 2: // dritte Kurve
-			this.setColor(SWTResourceManager.getColor(128, 0, 0)); //(SWT.COLOR_DARK_RED));
+			this.color = SWTResourceManager.getColor(128, 0, 0); //(SWT.COLOR_DARK_RED));
 			break;
 		case 3: // vierte Kurve
-			this.setColor(SWTResourceManager.getColor(255, 0, 255)); //(SWT.COLOR_MAGENTA));
+			this.color = SWTResourceManager.getColor(255, 0, 255); //(SWT.COLOR_MAGENTA));
 			break;
 		case 4: // fünfte Kurve
-			this.setColor(SWTResourceManager.getColor(64, 0, 64)); //(SWT.COLOR_CYAN));
+			this.color = SWTResourceManager.getColor(64, 0, 64); //(SWT.COLOR_CYAN));
 			break;
 		case 5: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(0, 128, 128)); //(SWT.COLOR_DARK_YELLOW));
+			this.color = SWTResourceManager.getColor(0, 128, 128); //(SWT.COLOR_DARK_YELLOW));
 			break;
 		case 6: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(128, 128, 0));
+			this.color = SWTResourceManager.getColor(128, 128, 0);
 			break;
 		case 7: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(128, 0, 128));
+			this.color = SWTResourceManager.getColor(128, 0, 128);
 			break;
 		case 8: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(0, 128, 255));
+			this.color = SWTResourceManager.getColor(0, 128, 255);
 			break;
 		case 9: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(128, 255, 0));
+			this.color = SWTResourceManager.getColor(128, 255, 0);
 			break;
 		case 10: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(255, 0, 128));
+			this.color = SWTResourceManager.getColor(255, 0, 128);
 			break;
 		case 11: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(0, 64, 128));
+			this.color = SWTResourceManager.getColor(0, 64, 128);
 			break;
 		case 12: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(64, 128, 0));
+			this.color = SWTResourceManager.getColor(64, 128, 0);
 			break;
 		case 13: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(128, 0, 64));
+			this.color = SWTResourceManager.getColor(128, 0, 64);
 			break;
 		case 14: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(128, 64, 0));
+			this.color = SWTResourceManager.getColor(128, 64, 0);
 			break;
 		case 15: // erste Kurve
-			this.setColor(SWTResourceManager.getColor(0, 128, 64));
+			this.color = SWTResourceManager.getColor(0, 128, 64);
 			break;
 		default:
-			this.setColor(SWTResourceManager.getColor(128, 255, 128)); //(SWT.COLOR_GREEN));
+			this.color = SWTResourceManager.getColor(128, 255, 128); //(SWT.COLOR_GREEN));
 			break;
 		}
 		// set position defaults
@@ -1819,6 +1820,20 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDrawLimit(int drawLimit) {
 		this.drawLimit = drawLimit;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
 

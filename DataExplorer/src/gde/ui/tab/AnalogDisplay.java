@@ -198,7 +198,7 @@ public class AnalogDisplay extends Composite {
 				dxtext = new Double((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytext = new Double((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
 				String valueText = this.record.getDecimalFormat().format(this.minValue + (i * deltaValue));
-				GraphicsUtils.drawText(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
+				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
 			// center knob
 			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_GREY);

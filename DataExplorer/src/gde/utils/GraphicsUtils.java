@@ -126,7 +126,7 @@ public class GraphicsUtils {
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
 			//draw numbers to the scale	
-			drawText(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+			drawTextCentered(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 		}
 		//draw mini ticks above first main tick
 		int yTickPositionMax = new Double(yTickPositionMin - numberTicks * deltaMainTickPixel).intValue();
@@ -142,49 +142,66 @@ public class GraphicsUtils {
 	}
 
 	/**
-	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees). Uses the current
-	 * font, color, and background.
+	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered. 
+	 * Uses the current font, color, and background.
 	 * @param string the text to draw
-	 * @param x the x coordinate of the top left corner of the drawing rectangle
-	 * @param y the y coordinate of the top left corner of the drawing rectangle
+	 * @param x the x coordinate of the center of the drawing rectangle
+	 * @param y the y coordinate of the center of the drawing rectangle
 	 * @param gc the GC on which to draw the text
 	 * @param style the style (SWT.UP or SWT.DOWN)
 	 */
-	public static void drawText(String string, int x, int y, GC gc, int style) {
-		// Get the current display
+	public static void drawTextCentered(String string, int x, int y, GC gc, int style) {
 		Display display = Display.getCurrent();
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
-		// Determine string's dimensions
-		Point pt = gc.textExtent(string);
-
-		// Create an image the same size as the string
+		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
-
-		// Create a GC so we can draw the image
 		GC stringGc = SWTResourceManager.getGC(stringImage);
-
-		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
-
-		// clear the image
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
-		// draw the text onto the image
 		stringGc.drawText(string, 0, 0);
 
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
-		if (isHorizontal) {
-			// Draw the horizontally image onto the original GC
+		if (isHorizontal) { // draw the horizontally image onto the original GC		
 			gc.drawImage(stringImage, x - pt.x / 2, y - pt.y / 2);
 		}
-		else {
-			// Draw the image vertically onto the original GC
+		else { // draw the image vertically onto the original GC	
 			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string);
 		}
 	}
 
+	/**
+	 * Draws text horizontal or vertically (rotates plus or minus 90 degrees) centered. 
+	 * Uses the current font, color, and background.
+	 * @param string the text to draw
+	 * @param x the x left delta coordinate of the drawing rectangle
+	 * @param y the y top delta coordinate of the drawing rectangle
+	 * @param gc the GC on which to draw the text
+	 * @param style the style (SWT.UP or SWT.DOWN)
+	 */
+	public static void drawText(String string, int x, int y, GC gc, int style) {
+		Display display = Display.getCurrent();
+		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
+	
+		Point pt = gc.textExtent(string); // string dimensions
+		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
+		GC stringGc = SWTResourceManager.getGC(stringImage);
+		stringGc.setForeground(gc.getForeground());
+		stringGc.setBackground(gc.getBackground());
+		stringGc.setFont(gc.getFont());
+		stringGc.fillRectangle(0, 0, pt.x, pt.y);
+		stringGc.drawText(string, 0, 0);
+
+		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
+		if (isHorizontal) {	// draw the horizontally image onto the original GC
+			gc.drawImage(stringImage, x, y);
+		}
+		else { // draw the image vertically onto the original GC			
+			drawVerticalImage(stringImage, x, y, gc, style, string);
+		}
+	}
 
 	/**
 	 * Draws time line text horizontal [min, hrs], where hrs is bold 
@@ -196,29 +213,16 @@ public class GraphicsUtils {
 	 * @param style the style (SWT.UP or SWT.DOWN)
 	 */
 	public static void drawTimeLineText(String string, int x, int y, GC gc, int style) {
-		// Get the current display
 		Display display = Display.getCurrent();
 		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
 
-		// Determine string's dimensions
-		//if (GraphicsUtils.application != null) // gc already primed with font GraphicsComposite.drawCurves(); 
-		//	gc.setFont(SWTResourceManager.getFont(GraphicsUtils.application, GraphicsUtils.application.getWidgetFontSize(), SWT.NORMAL));
-		Point pt = gc.textExtent(string);
-		
-		// Create an image the same size as the string
+		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
-
-		// Create a GC so we can draw the image
 		GC stringGc = SWTResourceManager.getGC(stringImage);
-
-		// Set attributes from the original GC to the new GC
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
-
-		// clear the image with background color
 		stringGc.fillRectangle(0, 0, pt.x, pt.y);
-		// draw the text into the image
 		stringGc.drawText(string, 0, 0);
 		
 		if (string.contains(", ")) { // string [min, hrs]
@@ -229,12 +233,10 @@ public class GraphicsUtils {
 		}
 
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
-		if (isHorizontal) {
-			// Draw the horizontally image onto the original GC
+		if (isHorizontal) { // draw the horizontally image onto the original GC
 			gc.drawImage(stringImage, x - pt.x / 2, y - pt.y / 2);
 		}
-		else {
-			// Draw the image vertically onto the original GC
+		else { // draw the image vertically onto the original GC
 			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string);
 		}
 	}
@@ -247,12 +249,7 @@ public class GraphicsUtils {
 	 * @param gc the GC on which to draw the image
 	 * @param style the style (SWT.UP or SWT.DOWN)
 	 */
-	public static void drawVerticalImage(Image image, int x, int y, GC gc, int style, String imgKey) {
-		// Get the current display
-		Display display = Display.getCurrent();
-		if (display == null) SWT.error(SWT.ERROR_THREAD_INVALID_ACCESS);
-
-		// Draw the vertical image onto the original GC
+	private static void drawVerticalImage(Image image, int x, int y, GC gc, int style, String imgKey) {
 		gc.drawImage(SWTResourceManager.getRotatedImage(image, style, imgKey), x, y);
 	}
 }
