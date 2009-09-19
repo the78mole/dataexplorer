@@ -370,12 +370,11 @@ public class MenuBar {
 				{
 					this.copyTableMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.copyTableMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
-					this.copyTableMenuItem.setEnabled(false); //TODO enable after implementation
 					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "copyTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							clipboard.setContents(new String[] { "graphics copy" }, new Transfer[] { TextTransfer.getInstance() });
+							clipboard.setContents(new String[] { MenuBar.this.application.getStatistics() }, new Transfer[] { TextTransfer.getInstance() });
 							clipboard.dispose();
 						}
 					});

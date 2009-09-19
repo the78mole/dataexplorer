@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import osde.OSDE;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -41,7 +42,7 @@ public class StatisticsWindow {
 	final static Logger						log						= Logger.getLogger(StatisticsWindow.class.getName());
 
 	static final String	DELIMITER	= "!"; //$NON-NLS-1$
-	static final String	NO_VALUE	= "---"; //$NON-NLS-1$
+	static final String	NO_VALUE	= "    ---    "; //$NON-NLS-1$
 
 	CTabItem											statistics;
 	Composite											composite;
@@ -219,7 +220,7 @@ public class StatisticsWindow {
 					String time = Messages.getString(MessageIds.OSDE_MSGT0234);
 					sb.append(time.split(" ")[0]).append(DELIMITER); //$NON-NLS-1$
 					sb.append(Messages.getString(MessageIds.OSDE_MSGT0359)).append(DELIMITER);
-					sb.append("0").append(DELIMITER); //$NON-NLS-1$
+					sb.append("     0      ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
@@ -383,7 +384,7 @@ public class StatisticsWindow {
 	 */
 	String formatOutput(String inDecimalString) {
 		String[] tmp = inDecimalString.replace('.', ';').replace(',', ';').split(";"); //$NON-NLS-1$
-		return tmp.length>1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return tmp.length>1 ? String.format("%6s.%-5s", tmp[0], tmp[1]) : String.format("%6s%-6s", tmp[0], ".0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -432,5 +433,32 @@ public class StatisticsWindow {
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
 		//log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
+	}
+	
+	/**
+	 * create statistics window content as formated string
+	 * 
+	 */
+	public String getContent() {
+		StringBuilder sb = new StringBuilder();
+		//header
+		sb.append(OSDE.OSDE_NAME_LONG).append(OSDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
+		//description
+		sb.append(Messages.getString(MessageIds.OSDE_MSGT0351)).append(OSDE.LINE_SEPARATOR);
+		sb.append(this.textLabel.getText()).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
+		//table header
+		sb.append(String.format("%-18s %-15s %10s  %12s  %10s %-18s  %s", 
+				Messages.getString(MessageIds.OSDE_MSGT0352), Messages.getString(MessageIds.OSDE_MSGT0353), Messages.getString(MessageIds.OSDE_MSGT0354), 
+				Messages.getString(MessageIds.OSDE_MSGT0355), Messages.getString(MessageIds.OSDE_MSGT0356), Messages.getString(MessageIds.OSDE_MSGT0357), 
+				Messages.getString(MessageIds.OSDE_MSGT0358))).append(OSDE.LINE_SEPARATOR);
+		//table data
+		for (String tableText : this.tabelItemText) {
+			String[] itemsText = tableText.split(DELIMITER);
+			sb.append(String.format("%-18s %-15s %12s %12s %12s %12s      ", itemsText[0],itemsText[1],itemsText[2],itemsText[3],itemsText[4],itemsText[5]));
+			if (itemsText.length > 6)
+				sb.append(itemsText[6]);
+			sb.append(OSDE.LINE_SEPARATOR);
+		}
+		return sb.toString();
 	}
 }
