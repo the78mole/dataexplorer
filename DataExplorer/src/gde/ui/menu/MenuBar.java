@@ -61,6 +61,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
+import osde.ui.dialog.PrintSelectionDialog;
 import osde.ui.tab.GraphicsComposite;
 import osde.utils.FileUtils;
 import osde.utils.OperatingSystemHelper;
@@ -98,6 +99,7 @@ public class MenuBar {
 	MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
 	Menu													editMenu;
 	MenuItem											editMenuItem;
+	MenuItem											printMenuItem;
 	MenuItem											exitMenuItem;
 	MenuItem											preferencesFileMenuItem;
 	Menu													exportMenu;
@@ -283,6 +285,19 @@ public class MenuBar {
 							}
 							else
 								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
+						}
+					});
+				}
+				{
+					new MenuItem(this.fileMenu, SWT.SEPARATOR);
+				}
+				{
+					this.printMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.printMenuItem.setText("Drucken"); // TODO Messages.getString(MessageIds.OSDE_MSGT0021));
+					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new PrintSelectionDialog(OpenSerialDataExplorer.shell, SWT.NULL).open();
 						}
 					});
 				}

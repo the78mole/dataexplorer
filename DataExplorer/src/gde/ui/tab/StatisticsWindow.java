@@ -445,7 +445,12 @@ public class StatisticsWindow {
 		sb.append(OSDE.OSDE_NAME_LONG).append(OSDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
 		//description
 		sb.append(Messages.getString(MessageIds.OSDE_MSGT0351)).append(OSDE.LINE_SEPARATOR);
-		sb.append(this.textLabel.getText()).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
+		this.descriptionText = this.channels.getFileDescription() + "\n--------------------------\n"; //$NON-NLS-1$
+		RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+		if (activeRecordSet != null) {
+			this.descriptionText = this.descriptionText + activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+		}
+		sb.append(this.descriptionText).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
 		//table header
 		sb.append(String.format("%-18s %-15s %10s  %12s  %10s %-18s  %s", 
 				Messages.getString(MessageIds.OSDE_MSGT0352), Messages.getString(MessageIds.OSDE_MSGT0353), Messages.getString(MessageIds.OSDE_MSGT0354), 

@@ -37,6 +37,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -671,29 +672,11 @@ public class ObjectDescriptionWindow {
 									}
 								});
 							}
-							/* remove the printing functionality due to errors running Linux
-							new ToolItem(this.editToolBar, SWT.SEPARATOR);
-							{
-								this.printButton = new ToolItem(this.editToolBar, SWT.PUSH | SWT.BORDER);
-								this.printButton.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
-								this.printButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0429));
-								this.printButton.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "printButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										ObjectDescriptionWindow.this.object.print();
-									}
-								});
-							}
-							*/
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 
 							size = this.editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 							this.editToolBar.setSize(size);
 						}
-//						System.out.println(this.editToolBar.getSize() + " " + this.fontSelectToolBar.getSize());
-//						System.out.println(this.editCoolItem.getSize());
-//						this.editCoolItem.setMinimumSize(500, this.fontSelectToolBar.getSize().y);
 					}
 				}
 				{
@@ -706,8 +689,6 @@ public class ObjectDescriptionWindow {
 					styledTextGData.horizontalAlignment = GridData.FILL;
 					styledTextGData.grabExcessVerticalSpace = true;
 					styledTextGData.verticalAlignment = GridData.FILL;
-					//styledTextGData.widthHint = 200;
-					//styledTextGData.heightHint = 200;					
 					this.styledTextComposite.setLayoutData(styledTextGData);
 					{
 						this.styledText = new StyledText(this.styledTextComposite, SWT.MULTI | SWT.WRAP | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -935,5 +916,59 @@ public class ObjectDescriptionWindow {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * prepare object description window as image for printing purpose
+	 * @return object description window as image
+	 */
+	public Image getContentAsImage() {
+		if(this.objectTabItem.isDisposed()) SWT.error(SWT.ERROR_WIDGET_DISPOSED);
+		
+		Rectangle bounds = this.tabFolder.getClientArea();
+		Image objectImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(objectImage);
+		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+		imageGC.fillRectangle(0, 0, bounds.width, bounds.height);
+		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
+		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0404), 15, 20);
+		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+		imageGC.drawText(this.objectName.getText(), 150, 20);
+
+		//main object description group
+		imageGC.drawRoundRectangle(15, 60, 410, 425, 5, 5);
+		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLUE);
+		imageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0416), 25, 53);
+
+		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0425), 30, 75);
+		imageGC.setBackground(SWTResourceManager.getColor(255, 255, 255));
+		imageGC.fillRectangle(160, 73, 240, 22);
+		imageGC.drawRectangle(160, 73, 240, 22);
+		imageGC.drawText(this.objectTypeText.getText(), 165, 75);
+		
+		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0406), 30, 100);
+		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+		imageGC.fillRectangle(160, 98, 180, 22);
+		imageGC.drawRectangle(160, 98, 180, 22);
+		imageGC.drawText(this.dateText.getText(), 165, 100);
+		
+		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0410), 30, 130);
+		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+		imageGC.fillRectangle(160, 128, 180, 22);
+		imageGC.drawRectangle(160, 128, 180, 22);
+		imageGC.drawText(this.statusText.getText(), 165, 130);
+
+		if (this.object.getImage() != null) {
+			Image tmpImage = SWTResourceManager.getImage(this.object.getImage().getImageData(), this.objectName.getText().trim(), 400, 300, false);
+			imageGC.drawImage(tmpImage, 20, 180);
+		}
+		imageGC.dispose();
+
+		return objectImage;
 	}
 }
