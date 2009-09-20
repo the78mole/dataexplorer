@@ -551,30 +551,26 @@ public class Settings extends Properties {
 		//check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : activeObjectList) {
-			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
+			if (objectKey.length() > 1) tmpObjectVector.add(objectKey.trim());
 		}
 		activeObjectList = tmpObjectVector.toArray(new String[1]);
 		
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
-		int newIndex = 0;
 		for (int i = 0; i < activeObjectList.length; ++i) {
 			sb.append(activeObjectList[i]).append(";"); //$NON-NLS-1$
-			if (activeObjectKey.equals(activeObjectList[i])) newIndex = i;
 		}
 		this.setProperty(OBJECT_LIST, sb.toString());
-		this.setProperty(ACTIVE_OBJECT, ""+newIndex);
+		this.setProperty(ACTIVE_OBJECT, activeObjectKey);
 	}
 
 	public int getActiveObjectIndex() {
-		int index = 0;
-		try {
-			index = new Integer(this.getProperty(ACTIVE_OBJECT, "0").trim()); //$NON-NLS-1$
+		Vector<String> tmpObjectVector = new Vector<String>();
+		for (String objectKey : this.getObjectList()) {
+			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
 		}
-		catch (NumberFormatException e) {
-			// ignore
-		}
-		return index;
+		int index = tmpObjectVector.indexOf(this.getProperty(ACTIVE_OBJECT, Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0]).trim());
+		return index < 0 ? 0 : index;
 	}
 
 	public String getActiveObject() {
