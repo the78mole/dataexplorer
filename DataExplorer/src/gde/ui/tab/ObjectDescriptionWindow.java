@@ -455,6 +455,7 @@ public class ObjectDescriptionWindow {
 							ObjectDescriptionWindow.this.imageCanvas.setSize(400, 300);
 							if (ObjectDescriptionWindow.this.image != null) {
 								Rectangle imgBounds = ObjectDescriptionWindow.this.image.getBounds();
+								evt.gc.setClipping(0, 0, 400, 300);
 								evt.gc.drawImage(ObjectDescriptionWindow.this.image, 0, 0, imgBounds.width, imgBounds.height, 0, 0, 400, 300);
 							}
 						}
@@ -928,45 +929,48 @@ public class ObjectDescriptionWindow {
 		Rectangle bounds = this.tabFolder.getClientArea();
 		Image objectImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
-		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-		imageGC.fillRectangle(0, 0, bounds.width, bounds.height);
-		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
-		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0404), 15, 20);
-		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
-		imageGC.drawText(this.objectName.getText(), 150, 20);
-
-		//main object description group
-		imageGC.drawRoundRectangle(15, 60, 410, 425, 5, 5);
-		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLUE);
-		imageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0416), 25, 53);
-
-		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0425), 30, 75);
-		imageGC.setBackground(SWTResourceManager.getColor(255, 255, 255));
-		imageGC.fillRectangle(160, 73, 240, 22);
-		imageGC.drawRectangle(160, 73, 240, 22);
-		imageGC.drawText(this.objectTypeText.getText(), 165, 75);
+		this.tabComposite.print(imageGC);
 		
-		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0406), 30, 100);
-		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-		imageGC.fillRectangle(160, 98, 180, 22);
-		imageGC.drawRectangle(160, 98, 180, 22);
-		imageGC.drawText(this.dateText.getText(), 165, 100);
-		
-		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0410), 30, 130);
-		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-		imageGC.fillRectangle(160, 128, 180, 22);
-		imageGC.drawRectangle(160, 128, 180, 22);
-		imageGC.drawText(this.statusText.getText(), 165, 130);
-
-		if (this.object.getImage() != null) {
-			Image tmpImage = SWTResourceManager.getImage(this.object.getImage().getImageData(), this.objectName.getText().trim(), 400, 300, false);
-			imageGC.drawImage(tmpImage, 20, 180);
-		}
+//		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+//		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+//		imageGC.fillRectangle(0, 0, bounds.width, bounds.height);
+//		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
+//		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0404), 15, 20);
+//		imageGC.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+//		imageGC.drawText(this.objectName.getText(), 150, 20);
+//
+//		//main object description group
+//		imageGC.drawRoundRectangle(15, 60, 410, 425, 5, 5);
+//		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLUE);
+//		imageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+//		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0416), 25, 53);
+//
+//		imageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+//		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0425), 30, 75);
+//		imageGC.setBackground(SWTResourceManager.getColor(255, 255, 255));
+//		imageGC.fillRectangle(160, 73, 240, 22);
+//		imageGC.drawRectangle(160, 73, 240, 22);
+//		imageGC.drawText(this.objectTypeText.getText(), 165, 75);
+//		
+//		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+//		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0406), 30, 100);
+//		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+//		imageGC.fillRectangle(160, 98, 180, 22);
+//		imageGC.drawRectangle(160, 98, 180, 22);
+//		imageGC.drawText(this.dateText.getText(), 165, 100);
+//		
+//		imageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+//		imageGC.drawText(Messages.getString(MessageIds.OSDE_MSGT0410), 30, 130);
+//		imageGC.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+//		imageGC.fillRectangle(160, 128, 180, 22);
+//		imageGC.drawRectangle(160, 128, 180, 22);
+//		imageGC.drawText(this.statusText.getText(), 165, 130);
+//
+//		if (this.object.getImage() != null) {
+//			imageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
+//			imageGC.fillRectangle(19, 179, 402, 302);
+//			imageGC.drawImage(this.object.getImage(), 20, 180);
+//		}
 		imageGC.dispose();
 
 		return objectImage;

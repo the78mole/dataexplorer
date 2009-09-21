@@ -95,7 +95,7 @@ public class MenuBar {
 	MenuItem											selectDeviceMenuItem;
 	Menu													deviceMenu;
 	MenuItem											deviceMenuItem;
-	MenuItem											copyTableMenuItem;
+	MenuItem											copyStatisticsAsTextMenuItem, copyStatisticsAsImageMenuItem, copyObjectMenuItem;
 	MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
 	Menu													editMenu;
 	MenuItem											editMenuItem;
@@ -383,14 +383,42 @@ public class MenuBar {
 					});
 				}
 				{
-					this.copyTableMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyTableMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
-					this.copyTableMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.copyStatisticsAsImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyStatisticsAsImageMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0073));
+					this.copyStatisticsAsImageMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "copyTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.log.log(Level.FINEST, "copyStatisticsAsImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							clipboard.setContents(new String[] { MenuBar.this.application.getStatistics() }, new Transfer[] { TextTransfer.getInstance() });
+							Image statisticsImage = MenuBar.this.application.getStatisticsAsImage();
+							clipboard.setContents(new Object[]{statisticsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
 							clipboard.dispose();
+							statisticsImage.dispose();
+						}
+					});
+				}
+				{
+					this.copyStatisticsAsTextMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyStatisticsAsTextMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0074));
+					this.copyStatisticsAsTextMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "copyStatisticsAsTextMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
+							clipboard.setContents(new String[] { MenuBar.this.application.getStatisticsAsText() }, new Transfer[] { TextTransfer.getInstance() });
+							clipboard.dispose();
+						}
+					});
+				}
+				{
+					this.copyObjectMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyObjectMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
+					this.copyObjectMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "copyObjectMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
+							Image graphicsImage = MenuBar.this.application.getObjectContentAsImage();
+							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
+							clipboard.dispose();
+							graphicsImage.dispose();
 						}
 					});
 				}

@@ -15,7 +15,10 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
@@ -439,7 +442,7 @@ public class StatisticsWindow {
 	 * create statistics window content as formated string
 	 * 
 	 */
-	public String getContent() {
+	public String getContentAsText() {
 		StringBuilder sb = new StringBuilder();
 		//header
 		sb.append(OSDE.OSDE_NAME_LONG).append(OSDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
@@ -466,4 +469,20 @@ public class StatisticsWindow {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * create statistics window content as image
+	 * 
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.tabFolder.getClientArea();
+		Image objectImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(objectImage);
+		this.composite.print(imageGC);
+		imageGC.dispose();
+
+		return objectImage;
+
+	}
+
 }
