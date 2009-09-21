@@ -15,6 +15,11 @@
     along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.WritableRaster;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +32,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.Printer;
@@ -216,7 +224,6 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			// resolution in order to correctly size the image for the printer
 			Point screenDPI = Display.getCurrent().getDPI();
 			Point printerDPI = printer.getDPI();
-			double scaleFactor = printerDPI.x / screenDPI.x;
 
 			// Determine the bounds of the entire area of the printer
 			Rectangle trim = printer.computeTrim(0, 0, 0, 0);
@@ -227,6 +234,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			log.log(Level.INFO, "bounds = " + bounds);
 			Rectangle printBounds = new Rectangle(-trim.x, -trim.y, clientArea.width-(trim.width), clientArea.height-(trim.height)); 
 			log.log(Level.INFO, "printBounds = " + printBounds);
+
+			double scaleFactor = printerDPI.x / screenDPI.x;
 
 			// Start the print job
 			if (isLandscape) {
@@ -243,6 +252,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						Image graphicsImage = this.application.getGraphicsAsImage();
 						ImageData graphicsImageData = graphicsImage.getImageData();
 						Image graphicsPrinterImage = new Image(printer, graphicsImageData);
+						scaleFactor = 1.0 * printBounds.width / graphicsImageData.width;
 						gc.drawImage(graphicsPrinterImage, 0, 0, graphicsImageData.width, graphicsImageData.height, 
 							printBounds.x, printBounds.y + pt.y + 20, (int) (scaleFactor * graphicsImageData.width), (int) (scaleFactor * graphicsImageData.height));
 						graphicsPrinterImage.dispose();
@@ -251,7 +261,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 						if (isStatistics) {
 							gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
-							String statistics = this.application.getStatistics();
+							String statistics = this.application.getStatisticsAsText();
 							statistics = statistics.substring(statistics.indexOf(OSDE.LINE_SEPARATOR));
 							gc.drawText(statistics, printBounds.x, printBounds.y + printBounds.height / 2);
 							isStatistics = false;
@@ -260,6 +270,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							Image objectImage = this.application.getObjectContentAsImage();
 							ImageData objectImageData = objectImage.getImageData();
 							Image objectPrinterImage = new Image(printer, objectImageData);
+							scaleFactor = 1.0 * printBounds.width / objectImageData.width;
 							gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
 								printBounds.x, printBounds.y + printBounds.height / 2, (int) (scaleFactor * objectImageData.width),	(int) (scaleFactor * objectImageData.height));
 							objectPrinterImage.dispose();
@@ -276,7 +287,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						Point pt = drawHeader(printBounds, gc, "Statistics");
 
 						gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
-						String statistics = this.application.getStatistics();
+						String statistics = this.application.getStatisticsAsText();
 						statistics = statistics.substring(statistics.indexOf(OSDE.LINE_SEPARATOR));
 						gc.drawText(statistics, printBounds.x, printBounds.y + pt.y + 20);
 						isStatistics = false;
@@ -285,6 +296,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							Image objectImage = this.application.getObjectContentAsImage();
 							ImageData objectImageData = objectImage.getImageData();
 							Image objectPrinterImage = new Image(printer, objectImageData);
+							scaleFactor = 1.0 * printBounds.width / objectImageData.width;
 							gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
 								printBounds.x, printBounds.y + printBounds.height / 2, (int) (scaleFactor * objectImageData.width),	(int) (scaleFactor * objectImageData.height));
 							objectPrinterImage.dispose();
@@ -296,15 +308,16 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						printer.endPage();
 					}
 					if (isObject && printer.startPage()) {
-						GC gc = new GC(printer);
+						GC gc = new GC(printer, SWT.IMAGE_JPEG);
 						gc.setFont(SWTResourceManager.getFont(this.application, 50, SWT.NORMAL));
 						Point pt = drawHeader(printBounds, gc, "Object characteristics");
 
 						Image objectImage = this.application.getObjectContentAsImage();
 						ImageData objectImageData = objectImage.getImageData();
 						Image objectPrinterImage = new Image(printer, objectImageData);
+						scaleFactor = 1.0 * printBounds.width / objectImageData.width;
 						gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
-							printBounds.x, printBounds.y + pt.y + 20, (int) (scaleFactor * objectImageData.width),	(int) (scaleFactor * objectImageData.height));
+							printBounds.x, printBounds.y + pt.y + 20, (int)(scaleFactor * objectImageData.width),	(int)(scaleFactor * objectImageData.height));
 						objectPrinterImage.dispose();
 						objectImage.dispose();
 						isObject = false;
@@ -328,4 +341,142 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		return pt;
 	}
 	
+	BufferedImage transformImage(ImageData data) {
+		DirectColorModel colorModel = new DirectColorModel(data.depth, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+
+		BufferedImage bufferedImage = new BufferedImage(colorModel, colorModel.createCompatibleWritableRaster(data.width, data.height), false, null);
+		if (data.getTransparencyType() == SWT.TRANSPARENCY_MASK) {
+			ImageData alphaMask = data.getTransparencyMask();
+			PaletteData palette = data.palette;
+			WritableRaster raster = bufferedImage.getRaster();
+			int[] pixelArray = new int[4];
+			for (int y = 0; y < data.height; y++) {
+				for (int x = 0; x < data.width; x++) {
+					int pixel = data.getPixel(x, y);
+
+					RGB rgb = palette.getRGB(pixel);
+
+					pixelArray[0] = rgb.red;
+					pixelArray[1] = rgb.green;
+					pixelArray[2] = rgb.blue;
+					int bit = y * data.width + x;
+					byte transparencyMask = alphaMask.data[bit / 8];
+					int mask = 1;
+					mask = mask << (7 - (bit % 8));
+					if ((mask & transparencyMask) == mask) {
+						pixelArray[3] = 255;
+					}
+					else
+						pixelArray[3] = 0;
+
+					raster.setPixels(x, y, 1, 1, pixelArray);
+				}
+			}
+		}
+		return bufferedImage;
+	}
+	
+	static BufferedImage convertToAWT(ImageData data) {
+		ColorModel colorModel = null;
+		PaletteData palette = data.palette;
+		if (palette.isDirect) {
+			colorModel = new DirectColorModel(data.depth, palette.redMask, palette.greenMask, palette.blueMask);
+			BufferedImage bufferedImage = new BufferedImage(colorModel, colorModel.createCompatibleWritableRaster(data.width, data.height), false, null);
+			WritableRaster raster = bufferedImage.getRaster();
+			int[] pixelArray = new int[3];
+			for (int y = 0; y < data.height; y++) {
+				for (int x = 0; x < data.width; x++) {
+					int pixel = data.getPixel(x, y);
+					RGB rgb = palette.getRGB(pixel);
+					pixelArray[0] = rgb.red;
+					pixelArray[1] = rgb.green;
+					pixelArray[2] = rgb.blue;
+					raster.setPixels(x, y, 1, 1, pixelArray);
+				}
+			}
+			return bufferedImage;
+		}
+		else {
+			RGB[] rgbs = palette.getRGBs();
+			byte[] red = new byte[rgbs.length];
+			byte[] green = new byte[rgbs.length];
+			byte[] blue = new byte[rgbs.length];
+			for (int i = 0; i < rgbs.length; i++) {
+				RGB rgb = rgbs[i];
+				red[i] = (byte) rgb.red;
+				green[i] = (byte) rgb.green;
+				blue[i] = (byte) rgb.blue;
+			}
+			if (data.transparentPixel != -1) {
+				colorModel = new IndexColorModel(data.depth, rgbs.length, red, green, blue, data.transparentPixel);
+			}
+			else {
+				colorModel = new IndexColorModel(data.depth, rgbs.length, red, green, blue);
+			}
+			BufferedImage bufferedImage = new BufferedImage(colorModel, colorModel.createCompatibleWritableRaster(data.width, data.height), false, null);
+			WritableRaster raster = bufferedImage.getRaster();
+			int[] pixelArray = new int[1];
+			for (int y = 0; y < data.height; y++) {
+				for (int x = 0; x < data.width; x++) {
+					int pixel = data.getPixel(x, y);
+					pixelArray[0] = pixel;
+					raster.setPixel(x, y, pixelArray);
+				}
+			}
+			return bufferedImage;
+		}
+	}
+
+  static ImageData convertToSWT(BufferedImage bufferedImage) {
+    if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+      DirectColorModel colorModel = (DirectColorModel) bufferedImage
+          .getColorModel();
+      PaletteData palette = new PaletteData(colorModel.getRedMask(),
+          colorModel.getGreenMask(), colorModel.getBlueMask());
+      ImageData data = new ImageData(bufferedImage.getWidth(),
+          bufferedImage.getHeight(), colorModel.getPixelSize(),
+          palette);
+      WritableRaster raster = bufferedImage.getRaster();
+      int[] pixelArray = new int[3];
+      for (int y = 0; y < data.height; y++) {
+        for (int x = 0; x < data.width; x++) {
+          raster.getPixel(x, y, pixelArray);
+          int pixel = palette.getPixel(new RGB(pixelArray[0],
+              pixelArray[1], pixelArray[2]));
+          data.setPixel(x, y, pixel);
+        }
+      }
+      return data;
+    } else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+      IndexColorModel colorModel = (IndexColorModel) bufferedImage
+          .getColorModel();
+      int size = colorModel.getMapSize();
+      byte[] reds = new byte[size];
+      byte[] greens = new byte[size];
+      byte[] blues = new byte[size];
+      colorModel.getReds(reds);
+      colorModel.getGreens(greens);
+      colorModel.getBlues(blues);
+      RGB[] rgbs = new RGB[size];
+      for (int i = 0; i < rgbs.length; i++) {
+        rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF,
+            blues[i] & 0xFF);
+      }
+      PaletteData palette = new PaletteData(rgbs);
+      ImageData data = new ImageData(bufferedImage.getWidth(),
+          bufferedImage.getHeight(), colorModel.getPixelSize(),
+          palette);
+      data.transparentPixel = colorModel.getTransparentPixel();
+      WritableRaster raster = bufferedImage.getRaster();
+      int[] pixelArray = new int[1];
+      for (int y = 0; y < data.height; y++) {
+        for (int x = 0; x < data.width; x++) {
+          raster.getPixel(x, y, pixelArray);
+          data.setPixel(x, y, pixelArray[0]);
+        }
+      }
+      return data;
+    }
+    return null;
+  }
 }
