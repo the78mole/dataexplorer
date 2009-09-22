@@ -268,47 +268,42 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
 		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
+		int selectionIndex = this.application.getTabSelectionIndex();
 
 		//get all required images
 		if (isGraphics) {
-			if (PrintSelectionDialog.this.application.getTabSelectionIndex() == 6) {
-				PrintSelectionDialog.this.application.selectTab(0, true);
-			}
-			graphicsImageAWT = convertToAWT((graphicsImageSWT = PrintSelectionDialog.this.application.getGraphicsAsImage()).getImageData());
+			this.application.selectTab(0);
+			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsAsImage()).getImageData());
 			graphicsImageSWT.dispose();
 		}
 		else
 			graphicsImageAWT = null;
 
 		if (isStatistics) {
-			if (PrintSelectionDialog.this.application.getTabSelectionIndex() != 1) {
-				PrintSelectionDialog.this.application.selectTab(1, false);
-			}
-			statisticsImageAWT = convertToAWT((statisticsImageSWT = PrintSelectionDialog.this.application.getStatisticsAsImage()).getImageData());
+			this.application.selectTab(1);
+			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsAsImage()).getImageData());
 			statisticsImageSWT.dispose();
 		}
 		else
 			statisticsImageAWT = null;
 
-		if (PrintSelectionDialog.this.application.isObjectoriented() && isObject) {
-			if (PrintSelectionDialog.this.application.getTabSelectionIndex() != 8) {
-				PrintSelectionDialog.this.application.selectTab(8, false);
-			}
-			objectImageAWT = convertToAWT((objectImageSWT = PrintSelectionDialog.this.application.getObjectContentAsImage()).getImageData());
+		if (this.application.isObjectoriented() && isObject) {
+			this.application.selectTab(8);
+			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectContentAsImage()).getImageData());
 			objectImageSWT.dispose();
 		}
 		else
 			objectImageAWT = null;
 
 		if (isCompare) {
-			if (PrintSelectionDialog.this.application.getTabSelectionIndex() != 6) {
-				PrintSelectionDialog.this.application.selectTab(6, true);
-			}
-			compareImageAWT = convertToAWT((compareImageSWT = PrintSelectionDialog.this.application.getGraphicsAsImage()).getImageData());
+			this.application.selectTab(6);
+			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsAsImage()).getImageData());
 			compareImageSWT.dispose();
 		}
 		else
 			compareImageAWT = null;
+		
+		this.application.selectTab(selectionIndex);
 
 		Thread printThread = new Thread() {
 			@Override
