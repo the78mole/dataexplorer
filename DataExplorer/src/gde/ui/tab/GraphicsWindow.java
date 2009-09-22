@@ -78,12 +78,6 @@ public class GraphicsWindow {
 		SWTResourceManager.registerResourceUser(this.graphic);
 		this.graphic.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.graphic.setText(this.tabName);
-//		this.graphic.addListener(SWT.RESIZE, new Listener() {
-//			public void handleEvent(Event evt) {
-//				log.log(Level.FINE, "controlRezized " + evt);
-//				GraphicsWindow.this.setSashFormWeights(GraphicsWindow.this.getCurveSelectorComposite().getSelectorColumnWidth());
-//			}
-//		});
 
 		{ // graphicSashForm
 			this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);

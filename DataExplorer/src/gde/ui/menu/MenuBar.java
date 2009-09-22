@@ -293,7 +293,8 @@ public class MenuBar {
 				}
 				{
 					this.printMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.printMenuItem.setText("Drucken"); // TODO Messages.getString(MessageIds.OSDE_MSGT0021));
+					this.printMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0052));
+					this.printMenuItem.setImage(SWTResourceManager.getImage("osde/resource/PrintHot.gif")); //$NON-NLS-1$
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -332,6 +333,29 @@ public class MenuBar {
 			{
 				this.editMenu = new Menu(this.editMenuItem);
 				this.editMenuItem.setMenu(this.editMenu);
+				this.editMenu.addMenuListener(new MenuListener() {				
+					@Override
+					public void menuShown(MenuEvent e) {
+						MenuBar.log.log(Level.FINEST, "editMenu.menuShown, event=" + e); //$NON-NLS-1$
+						Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+						boolean isRecordSetRelatedCopyable = false;
+						if(activeChannel != null) {
+							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+							if (activeRecordSet != null)
+								isRecordSetRelatedCopyable = activeRecordSet.size() > 0;
+						}
+						boolean isCompareSetCopyable = MenuBar.this.application.getCompareSet().size() > 0 && MenuBar.this.application.getTabSelectionIndex() == 6;
+						
+						MenuBar.this.copyGraphicMenuItem.setEnabled((isRecordSetRelatedCopyable  && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
+						MenuBar.this.copyStatisticsAsImageMenuItem.setEnabled(isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 1);
+						MenuBar.this.copyStatisticsAsTextMenuItem.setEnabled(isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 1);
+						MenuBar.this.copyObjectMenuItem.setEnabled(MenuBar.this.application.isObjectoriented() && MenuBar.this.application.getTabSelectionIndex() == 8);
+					}
+					@Override
+					public void menuHidden(MenuEvent e) {
+						MenuBar.log.log(Level.FINEST, "editMenu.menuHidden, event=" + e); //$NON-NLS-1$
+					}
+				});
 				{
 					this.activateZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0023));

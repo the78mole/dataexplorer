@@ -47,6 +47,7 @@ import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
+import osde.ui.dialog.PrintSelectionDialog;
 import osde.ui.tab.GraphicsComposite;
 import osde.utils.FileUtils;
 import osde.utils.ObjectKeyScanner;
@@ -67,7 +68,7 @@ public class MenuToolBar {
 
 	CoolItem											fileCoolItem;
 	ToolBar												fileToolBar;
-	ToolItem											newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
+	ToolItem											printToolItem, newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
 	
 	CoolItem											deviceObjectCoolItem;
 	ToolBar												deviceObjectToolBar;
@@ -133,6 +134,18 @@ public class MenuToolBar {
 			{ // begin file tool bar
 				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.fileCoolItem.setControl(this.fileToolBar);
+				{
+					this.printToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.printToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
+					this.printToolItem.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
+					this.printToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/PrintHot.gif")); //$NON-NLS-1$
+					this.printToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new PrintSelectionDialog(OpenSerialDataExplorer.shell, SWT.NULL).open();
+						}
+					});
+				}
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
 					this.newToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));

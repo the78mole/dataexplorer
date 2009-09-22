@@ -472,7 +472,7 @@ public class StatisticsWindow {
 	
 	/**
 	 * create statistics window content as image
-	 * 
+	 * @return image with content
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.tabFolder.getClientArea();
@@ -482,7 +482,6 @@ public class StatisticsWindow {
 		imageGC.dispose();
 
 		return objectImage;
-
 	}
 
 }
