@@ -271,7 +271,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 	/**
 	 * convert the input string array of configuration and measurements into a hash map 
-	 * which contains all information for life view and building record data points
+	 * which contains all information for live view and building record data points
 	 * @param values
 	 * @param currentConfiguration
 	 * @param currentMeasurements
