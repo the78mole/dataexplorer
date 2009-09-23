@@ -24,6 +24,9 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -186,5 +189,19 @@ public class DataTableWindow {
 			TableItem item = new TableItem(this.dataTable, SWT.RIGHT);
 			item.setText(Messages.getString(MessageIds.OSDE_MSGT0230).split(OSDE.STRING_BLANK));
 		}
+	}
+	
+	/**
+	 * create visible tab window content as image
+	 * @return image with content
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.dataTable.getClientArea();
+		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.dataTable.print(imageGC);
+		imageGC.dispose();
+
+		return tabContentImage;
 	}
 }

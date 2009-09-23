@@ -22,10 +22,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.ImageTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
@@ -68,7 +72,7 @@ public class MenuToolBar {
 
 	CoolItem											fileCoolItem;
 	ToolBar												fileToolBar;
-	ToolItem											printToolItem, newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
+	ToolItem											copyToolItem, printToolItem, newToolItem, openToolItem, saveToolItem, saveAsToolItem, settingsToolItem;
 	
 	CoolItem											deviceObjectCoolItem;
 	ToolBar												deviceObjectToolBar;
@@ -80,7 +84,6 @@ public class MenuToolBar {
 	ToolItem											newObject, deleteObject, editObject;
 	String												oldObjectKey = null;
 	boolean												isObjectoriented = false;
-	//String												activeObjectKey = OSDE.STRING_EMPTY;
 
 	CoolItem											zoomCoolItem;
 	ToolBar												zoomToolBar;
@@ -134,18 +137,6 @@ public class MenuToolBar {
 			{ // begin file tool bar
 				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.fileCoolItem.setControl(this.fileToolBar);
-				{
-					this.printToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.printToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
-					this.printToolItem.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
-					this.printToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/PrintHot.gif")); //$NON-NLS-1$
-					this.printToolItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							new PrintSelectionDialog(OpenSerialDataExplorer.shell, SWT.NULL).open();
-						}
-					});
-				}
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
 					this.newToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0050));
@@ -218,6 +209,62 @@ public class MenuToolBar {
 							}
 							else
 								MenuToolBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGW0002), SWT.COLOR_RED);
+						}
+					});
+				}
+				{
+					this.copyToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.copyToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0073));
+					this.copyToolItem.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif")); //$NON-NLS-1$
+					this.copyToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/CopyHot.gif")); //$NON-NLS-1$
+					this.copyToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "copyToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Image graphicsImage = null;
+							switch (MenuToolBar.this.application.getTabSelectionIndex()) {
+							case 0: // graphics
+							case 6: // curve compare
+							default:
+								graphicsImage = MenuToolBar.this.application.getGraphicsTabContentAsImage();
+								break;
+							case 1: // statistics
+								graphicsImage = MenuToolBar.this.application.getStatisticsTabContentAsImage();
+								break;
+							case 2: // table
+								graphicsImage = MenuToolBar.this.application.getTableTabContentAsImage();
+								break;
+							case 3: // digital
+								graphicsImage = MenuToolBar.this.application.getDigitalTabContentAsImage();
+								break;
+							case 4: // analog
+								graphicsImage = MenuToolBar.this.application.getAnalogTabContentAsImage();
+								break;
+							case 5: // cell voltage
+								graphicsImage = MenuToolBar.this.application.getCellVoltageTabContentAsImage();
+								break;
+							case 7: // file comment
+								graphicsImage = MenuToolBar.this.application.getFileDescriptionTabContentAsImage();
+								break;
+							case 8: // object
+								graphicsImage = MenuToolBar.this.application.getObjectTabContentAsImage();
+								break;
+							}
+							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
+							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
+							clipboard.dispose();
+							graphicsImage.dispose();
+						}
+					});
+				}
+				{
+					this.printToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
+					this.printToolItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0074));
+					this.printToolItem.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
+					this.printToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/PrintHot.gif")); //$NON-NLS-1$
+					this.printToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new PrintSelectionDialog(OpenSerialDataExplorer.shell, SWT.NULL).open();
 						}
 					});
 				}

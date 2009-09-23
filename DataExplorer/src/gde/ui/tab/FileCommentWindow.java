@@ -32,6 +32,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -218,5 +220,19 @@ public class FileCommentWindow {
 	public void setFileComment() {
 		this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
 		this.channels.getActiveChannel().setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+	}
+	
+	/**
+	 * create visible tab window content as image
+	 * @return image with content
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.commentMainComposite.getClientArea();
+		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.commentMainComposite.print(imageGC);
+		imageGC.dispose();
+
+		return tabContentImage;
 	}
 }

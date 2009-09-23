@@ -31,6 +31,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -665,5 +667,18 @@ public class CellVoltageWindow {
 		this.firstMeasurement = firstMeasurementOrdinal;
 		this.secondMeasurement = secondMeasurementOrdinal;
 	}
+	
+	/**
+	 * create visible tab window content as image
+	 * @return image with content
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.cellVoltageMainComposite.getClientArea();
+		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.cellVoltageMainComposite.print(imageGC);
+		imageGC.dispose();
 
+		return tabContentImage;
+	}
 }

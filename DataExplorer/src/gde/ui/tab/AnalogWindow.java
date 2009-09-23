@@ -28,6 +28,9 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -192,5 +195,19 @@ public class AnalogWindow {
 			this.oldChannel = activeChannel;
 			this.analogMainComposite.layout();
 		}
+	}
+	
+	/**
+	 * create visible tab window content as image
+	 * @return image with content
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.analogMainComposite.getClientArea();
+		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.analogMainComposite.print(imageGC);
+		imageGC.dispose();
+
+		return tabContentImage;
 	}
 }

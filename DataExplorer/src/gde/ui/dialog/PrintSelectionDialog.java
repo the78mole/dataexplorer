@@ -273,7 +273,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		//get all required images
 		if (isGraphics) {
 			this.application.selectTab(0);
-			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsAsImage()).getImageData());
+			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			graphicsImageSWT.dispose();
 		}
 		else
@@ -281,7 +281,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isStatistics) {
 			this.application.selectTab(1);
-			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsAsImage()).getImageData());
+			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
 			statisticsImageSWT.dispose();
 		}
 		else
@@ -289,7 +289,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (this.application.isObjectoriented() && isObject) {
 			this.application.selectTab(8);
-			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectContentAsImage()).getImageData());
+			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
 			objectImageSWT.dispose();
 		}
 		else
@@ -297,7 +297,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isCompare) {
 			this.application.selectTab(6);
-			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsAsImage()).getImageData());
+			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			compareImageSWT.dispose();
 		}
 		else

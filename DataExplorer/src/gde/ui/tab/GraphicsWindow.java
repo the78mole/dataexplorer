@@ -23,6 +23,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
 
 import osde.data.Channels;
@@ -250,5 +253,19 @@ public class GraphicsWindow {
 	 */
 	public boolean isActiveCurveSelectorContextMenu() {
 		return this.contextMenu.isActive();
+	}
+	
+	/**
+	 * create visible tab window content as image
+	 * @return image with content
+	 */
+	public Image getContentAsImage() {
+		Rectangle bounds = this.graphicSashForm.getClientArea();
+		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.graphicSashForm.print(imageGC);
+		imageGC.dispose();
+
+		return tabContentImage;
 	}
 }

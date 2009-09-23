@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.ImageTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -95,8 +94,8 @@ public class MenuBar {
 	MenuItem											selectDeviceMenuItem;
 	Menu													deviceMenu;
 	MenuItem											deviceMenuItem;
-	MenuItem											copyStatisticsAsTextMenuItem, copyStatisticsAsImageMenuItem, copyObjectMenuItem;
-	MenuItem											copyGraphicMenuItem, activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
+	MenuItem											copyTabContentAsImageMenuItem, copyGraphicsPrintImageMenuItem;
+	MenuItem											activateZoomGraphicMenuItem, resetZoomGraphicMenuItem, panGraphicMenuItem;
 	Menu													editMenu;
 	MenuItem											editMenuItem;
 	MenuItem											printMenuItem;
@@ -346,10 +345,8 @@ public class MenuBar {
 						}
 						boolean isCompareSetCopyable = MenuBar.this.application.getCompareSet().size() > 0 && MenuBar.this.application.getTabSelectionIndex() == 6;
 						
-						MenuBar.this.copyGraphicMenuItem.setEnabled((isRecordSetRelatedCopyable  && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
-						MenuBar.this.copyStatisticsAsImageMenuItem.setEnabled(isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 1);
-						MenuBar.this.copyStatisticsAsTextMenuItem.setEnabled(isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 1);
-						MenuBar.this.copyObjectMenuItem.setEnabled(MenuBar.this.application.isObjectoriented() && MenuBar.this.application.getTabSelectionIndex() == 8);
+						MenuBar.this.copyTabContentAsImageMenuItem.setEnabled(isRecordSetRelatedCopyable);
+						MenuBar.this.copyGraphicsPrintImageMenuItem.setEnabled((isRecordSetRelatedCopyable  && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
 					}
 					@Override
 					public void menuHidden(MenuEvent e) {
@@ -393,13 +390,41 @@ public class MenuBar {
 					new MenuItem(this.editMenu, SWT.SEPARATOR);
 				}
 				{
-					this.copyGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyGraphicMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0026));
-					this.copyGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.copyTabContentAsImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyTabContentAsImageMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0026));
+					this.copyTabContentAsImageMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "copyGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "copyTabContentAsImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Image graphicsImage = null;
+							switch (MenuBar.this.application.getTabSelectionIndex()) {
+							case 0: // graphics
+							case 6: // curve compare
+							default:
+								graphicsImage = MenuBar.this.application.getGraphicsTabContentAsImage();
+								break;
+							case 1: // statistics
+								graphicsImage = MenuBar.this.application.getStatisticsTabContentAsImage();
+								break;
+							case 2: // table
+								graphicsImage = MenuBar.this.application.getTableTabContentAsImage();
+								break;
+							case 3: // digital
+								graphicsImage = MenuBar.this.application.getDigitalTabContentAsImage();
+								break;
+							case 4: // analog
+								graphicsImage = MenuBar.this.application.getAnalogTabContentAsImage();
+								break;
+							case 5: // cell voltage
+								graphicsImage = MenuBar.this.application.getCellVoltageTabContentAsImage();
+								break;
+							case 7: // file comment
+								graphicsImage = MenuBar.this.application.getFileDescriptionTabContentAsImage();
+								break;
+							case 8: // object
+								graphicsImage = MenuBar.this.application.getObjectTabContentAsImage();
+								break;
+							}
 							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							Image graphicsImage = MenuBar.this.application.getGraphicsAsImage();
 							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
 							clipboard.dispose();
 							graphicsImage.dispose();
@@ -407,39 +432,13 @@ public class MenuBar {
 					});
 				}
 				{
-					this.copyStatisticsAsImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyStatisticsAsImageMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0073));
-					this.copyStatisticsAsImageMenuItem.addSelectionListener(new SelectionAdapter() {
+					this.copyGraphicsPrintImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
+					this.copyGraphicsPrintImageMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
+					this.copyGraphicsPrintImageMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "copyStatisticsAsImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "copyGraphicsPrintImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Image graphicsImage = MenuBar.this.application.getGraphicsPrintImage();
 							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							Image statisticsImage = MenuBar.this.application.getStatisticsAsImage();
-							clipboard.setContents(new Object[]{statisticsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
-							clipboard.dispose();
-							statisticsImage.dispose();
-						}
-					});
-				}
-				{
-					this.copyStatisticsAsTextMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyStatisticsAsTextMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0074));
-					this.copyStatisticsAsTextMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "copyStatisticsAsTextMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							clipboard.setContents(new String[] { MenuBar.this.application.getStatisticsAsText() }, new Transfer[] { TextTransfer.getInstance() });
-							clipboard.dispose();
-						}
-					});
-				}
-				{
-					this.copyObjectMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyObjectMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0027));
-					this.copyObjectMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "copyObjectMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							Image graphicsImage = MenuBar.this.application.getObjectContentAsImage();
 							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
 							clipboard.dispose();
 							graphicsImage.dispose();

@@ -1360,7 +1360,7 @@ public class GraphicsComposite extends Composite {
 	/**
 	 * @return the graphic window content as image - only if compare window is visible return the compare window graphics
 	 */
-	public Image getGraphicsAsImage() {	
+	public Image getGraphicsPrintImage() {	
 		boolean isCompareSet = this.windowType == GraphicsWindow.TYPE_COMPARE;
 		RecordSet compareRecordSet = OpenSerialDataExplorer.getInstance().getCompareSet();
 		String[] compareSetNames = compareRecordSet.getRecordNames();
@@ -1419,5 +1419,4 @@ public class GraphicsComposite extends Composite {
 		}
 		return graphicsImage;
 	}
-
 }
