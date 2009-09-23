@@ -202,8 +202,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true, if data can received after the adjusted time period
 	 * @throws Exception
 	 */
-	public boolean wait4LifeData(int retrys) throws Exception {
-		boolean isLifeDataAvailable = false;
+	public boolean wait4LiveData(int retrys) throws Exception {
+		boolean isLiveDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 			while (this.getInputStream().available() < 10 && retrys-- > 0 && !isInterruptedByUser) {
@@ -219,14 +219,14 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			if (!isInterruptedByUser) {
 				// read data bytes to clear buffer
 				this.read(new byte[DATA_LENGTH_BYTES], 1000);
-				isLifeDataAvailable = true;
+				isLiveDataAvailable = true;
 			}
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
 			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
 		
-		return isLifeDataAvailable;
+		return isLiveDataAvailable;
 	}
 	
 	/**

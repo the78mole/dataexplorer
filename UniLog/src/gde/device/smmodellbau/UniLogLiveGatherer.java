@@ -128,7 +128,7 @@ public class UniLogLiveGatherer extends Thread {
 
 		try {
 			this.serialPort.checkConnectionStatus();
-			this.serialPort.wait4LifeData(100);
+			this.serialPort.wait4LiveData(100);
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -202,7 +202,7 @@ public class UniLogLiveGatherer extends Thread {
 				}
 			};
 
-			// start the prepared timer thread within the life data gatherer thread
+			// start the prepared timer thread within the live data gatherer thread
 			this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
 			this.isTimerRunning = true;
 			log.log(Level.FINE, "exit"); //$NON-NLS-1$

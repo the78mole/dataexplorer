@@ -1251,7 +1251,7 @@ public class UniLogDialog extends DeviceDialog {
 													if (activeChannle != null) {
 														RecordSet activeRecordSet = activeChannle.getActiveRecordSet();
 														if (activeRecordSet != null) {
-															// active record set name == life gatherer record name
+															// active record set name == live gatherer record name
 															UniLogDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
 														}
 													}
