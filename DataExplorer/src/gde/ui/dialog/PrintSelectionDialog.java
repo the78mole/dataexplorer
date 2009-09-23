@@ -105,19 +105,19 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setLayout(null);
-			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Print.gif"));
-			dialogShell.setText("Print layout configuration");
+			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
+			dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0441));
 			dialogShell.layout();
 			dialogShell.pack();			
 			dialogShell.setSize(400, 320);
 			{
 				configurationGroup = new Group(dialogShell, SWT.NONE);
 				configurationGroup.setLayout(null);
-				configurationGroup.setText("selection");
+				configurationGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0448));
 				configurationGroup.setBounds(7, 10, 168, 206);
 				configurationGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "configurationGroup.paintControl, event="+evt);
+						log.log(Level.FINEST, "configurationGroup.paintControl, event="+evt); //$NON-NLS-1$
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
 						boolean isRecordSetGraphicsPrintable = false;
 						if(activeChannel != null) {
@@ -142,28 +142,28 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				});
 				{
 					graphicsButton = new Button(configurationGroup, SWT.CHECK | SWT.LEFT);
-					graphicsButton.setText("graphics");
-					graphicsButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif"));
+					graphicsButton.setText(Messages.getString(MessageIds.OSDE_MSGT0453));
+					graphicsButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif")); //$NON-NLS-1$
 					graphicsButton.setSelection(true);
 					graphicsButton.setBounds(8, 16, 148, 45);
 				}
 				{
 					statisticsButton = new Button(configurationGroup, SWT.CHECK | SWT.LEFT);
-					statisticsButton.setText("statistics");
-					statisticsButton.setImage(SWTResourceManager.getImage("osde/resource/Statistics.gif"));
+					statisticsButton.setText(Messages.getString(MessageIds.OSDE_MSGT0454));
+					statisticsButton.setImage(SWTResourceManager.getImage("osde/resource/Statistics.gif")); //$NON-NLS-1$
 					statisticsButton.setSelection(true);
 					statisticsButton.setBounds(8, 62, 148, 45);
 				}
 				{
 					objectButton = new Button(configurationGroup, SWT.CHECK | SWT.LEFT);
-					objectButton.setText("object");
-					objectButton.setImage(SWTResourceManager.getImage("osde/resource/Object.gif"));
+					objectButton.setText(Messages.getString(MessageIds.OSDE_MSGT0455));
+					objectButton.setImage(SWTResourceManager.getImage("osde/resource/Object.gif")); //$NON-NLS-1$
 					objectButton.setBounds(8, 108, 148, 45);
 				}
 				{
 					curveCompareButton = new Button(configurationGroup, SWT.CHECK | SWT.LEFT);
-					curveCompareButton.setText("compare");
-					curveCompareButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif"));
+					curveCompareButton.setText(Messages.getString(MessageIds.OSDE_MSGT0442));
+					curveCompareButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif")); //$NON-NLS-1$
 					curveCompareButton.setSelection(false);
 					curveCompareButton.setBounds(8, 155, 148, 45);
 				}
@@ -172,17 +172,17 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				orientationGroup = new Group(dialogShell, SWT.NONE);
 				orientationGroup.setLayout(null);
 				orientationGroup.setBounds(181, 10, 203, 206);
-				orientationGroup.setText("orientation");
+				orientationGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0443));
 				{
 					portraitButton = new Button(orientationGroup, SWT.RADIO | SWT.LEFT);
-					portraitButton.setText("Portrait");
-					portraitButton.setToolTipText("if possible will print more then one selection on one page");
-					portraitButton.setImage(SWTResourceManager.getImage("osde/resource/Portrait.gif"));
+					portraitButton.setText(Messages.getString(MessageIds.OSDE_MSGT0444));
+					portraitButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0445));
+					portraitButton.setImage(SWTResourceManager.getImage("osde/resource/Portrait.gif")); //$NON-NLS-1$
 					portraitButton.setSelection(true);
 					portraitButton.setBounds(8, 16, 183, 65);
 					portraitButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "portraitButton.widgetSelected, event="+evt);
+							log.log(Level.FINEST, "portraitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 							portraitButton.setSelection(true);
 							landscapeReverseButton.setSelection(false);
 							landscapeButton.setSelection(false);
@@ -191,14 +191,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					landscapeButton = new Button(orientationGroup, SWT.RADIO | SWT.LEFT);
-					landscapeButton.setText("Landscape");
-					landscapeButton.setToolTipText("this will print one selection on one page");
-					landscapeButton.setImage(SWTResourceManager.getImage("osde/resource/Landscape.gif"));
+					landscapeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0446));
+					landscapeButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0447));
+					landscapeButton.setImage(SWTResourceManager.getImage("osde/resource/Landscape.gif")); //$NON-NLS-1$
 					landscapeButton.setSelection(false);
 					landscapeButton.setBounds(8, 74, 183, 65);
 					landscapeButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "landscapeButton.widgetSelected, event="+evt);
+							log.log(Level.FINEST, "landscapeButton.widgetSelected, event="+evt); //$NON-NLS-1$
 							portraitButton.setSelection(false);
 							landscapeReverseButton.setSelection(false);
 							landscapeButton.setSelection(true);
@@ -207,14 +207,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					landscapeReverseButton = new Button(orientationGroup, SWT.RADIO | SWT.LEFT);
-					landscapeReverseButton.setText("Landscape(rev)");
-					landscapeReverseButton.setToolTipText("this will print all selections on one large (height) page\nusable for PDF printer");
-					landscapeReverseButton.setImage(SWTResourceManager.getImage("osde/resource/LandscapeReverse.gif"));
+					landscapeReverseButton.setText(Messages.getString(MessageIds.OSDE_MSGT0449));
+					landscapeReverseButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0450));
+					landscapeReverseButton.setImage(SWTResourceManager.getImage("osde/resource/LandscapeReverse.gif")); //$NON-NLS-1$
 					landscapeReverseButton.setSelection(false);
 					landscapeReverseButton.setBounds(8, 134, 183, 65);
 					landscapeReverseButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "portraitAllButton.widgetSelected, event="+evt);
+							log.log(Level.FINEST, "portraitAllButton.widgetSelected, event="+evt); //$NON-NLS-1$
 							landscapeReverseButton.setSelection(true);
 							portraitButton.setSelection(false);
 							landscapeButton.setSelection(false);
@@ -224,11 +224,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			{
 				printButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				printButton.setText("print");
+				printButton.setText(Messages.getString(MessageIds.OSDE_MSGT0451));
 				printButton.setBounds(212, 241, 149, 30);
 				printButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "okButton.widgetSelected, event="+evt);
+						log.log(Level.FINEST, "okButton.widgetSelected, event="+evt); //$NON-NLS-1$
 						final int orientation = landscapeButton.getSelection() ? PageFormat.REVERSE_LANDSCAPE 
 								: portraitButton.getSelection() ? PageFormat.PORTRAIT
 								: PageFormat.LANDSCAPE;
@@ -243,11 +243,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			{
 				cancelButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				cancelButton.setText("cancel");
+				cancelButton.setText(Messages.getString(MessageIds.OSDE_MSGT0452));
 				cancelButton.setBounds(29, 241, 149, 30);
 				cancelButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "cancelButton.widgetSelected, event="+evt);
+						log.log(Level.FINEST, "cancelButton.widgetSelected, event="+evt); //$NON-NLS-1$
 						dialogShell.dispose();
 					}
 				});
@@ -312,7 +312,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				Book book = new Book();
 				PageFormat documentPageFormat = new PageFormat();
 
-				printJob.setJobName(System.getProperty("user.name") + OSDE.STRING_MESSAGE_CONCAT + OSDE.OSDE_NAME_LONG);
+				printJob.setJobName(System.getProperty("user.name") + OSDE.STRING_MESSAGE_CONCAT + OSDE.OSDE_NAME_LONG); //$NON-NLS-1$
 				printJob.setPageable(book);
 
 				// show the choose printer dialog
@@ -408,7 +408,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			super();
 			this.docType1 = documentType;
 			this.awtBufferedImage1 = awtImage;
-			this.docType2 = "";
+			this.docType2 = ""; //$NON-NLS-1$
 			this.awtBufferedImage2 = null;
 		}
 
@@ -432,7 +432,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
       Graphics2D g2d = (Graphics2D) g;
       g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY()); // set the origin to 0,0 for the top left corner
       g2d.setPaint(Color.black);
-      g2d.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10));
+      g2d.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10)); //$NON-NLS-1$
       String date = StringHelper.getDate();
       Rectangle2D rectDate = g2d.getFontMetrics().getStringBounds(date, g2d);
 
