@@ -238,8 +238,8 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true, if data can received after the adjusted time period
 	 * @throws Exception
 	 */
-	public synchronized boolean wait4LifeData(int retrys) throws Exception {
-		boolean isLifeDataAvailable = false;
+	public synchronized boolean wait4LiveData(int retrys) throws Exception {
+		boolean isLiveDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 			while (this.getInputStream().available() < 10 && retrys-- > 0) {
@@ -253,14 +253,14 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			int length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 			log.log(Level.FINE, "length = " + length); //$NON-NLS-1$
 			this.read(new byte[(tmp1ReadBuffer[0] & 0x7F)-1], 1000);
-			isLifeDataAvailable = true;
+			isLiveDataAvailable = true;
 			
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
 			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
 		
-		return isLifeDataAvailable;
+		return isLiveDataAvailable;
 	}
 	
 	/**

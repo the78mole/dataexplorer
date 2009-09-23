@@ -886,7 +886,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 													if (Channels.getInstance().getActiveChannel() != null) {
 														RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
-														// active record set name == life gatherer record name
+														// active record set name == live gatherer record name
 														LiPoWatchDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
 													}
 												}
