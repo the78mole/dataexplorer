@@ -192,7 +192,7 @@ public class ObjectKeyScanner extends Thread {
 							}
 						}
 					}
-					this.settings.setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());		
+					OpenSerialDataExplorer.getInstance().setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
 				}
 			}
 		}

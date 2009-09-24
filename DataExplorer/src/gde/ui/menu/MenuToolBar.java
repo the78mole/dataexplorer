@@ -1389,8 +1389,8 @@ public class MenuToolBar {
 	/**
 	 * set a new object key list from outside (object key scanner)
 	 */
-	public void setObjectList(String[] newObjectKeyList) {
-		this.settings.setObjectList(newObjectKeyList, this.objectSelectCombo.getSelectionIndex());
+	public void setObjectList(String[] newObjectKeyList, String newObjectKey) {
+		this.settings.setObjectList(newObjectKeyList, newObjectKey);
 		this.objectSelectCombo.setItems(this.settings.getObjectList());
 		this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
 		this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
