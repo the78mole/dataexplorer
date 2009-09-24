@@ -133,7 +133,7 @@ public class ObjectKeyScanner extends Thread {
 			else {
 				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
 
-				Vector<String> foundObjectKeys = new Vector<String>();
+				this.objectKeys.clear();
 				HashMap<String,Vector<File>> objectFilesMap = new HashMap<String,Vector<File>>();
 				int fileCounter = 0;
 				if (this.searchForKeys) {
@@ -147,9 +147,9 @@ public class ObjectKeyScanner extends Thread {
 									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(OSDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
-										if (!foundObjectKeys.contains(foundObjectKey)) {
+										if (!this.objectKeys.contains(foundObjectKey)) {
 											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
-											foundObjectKeys.add(foundObjectKey);
+											this.objectKeys.add(foundObjectKey);
 											Vector<File> tmpObjectFiles = new Vector<File>();
 											tmpObjectFiles.add(file);
 											objectFilesMap.put(foundObjectKey, tmpObjectFiles);
@@ -171,13 +171,15 @@ public class ObjectKeyScanner extends Thread {
 							log.log(Level.WARNING, t.getLocalizedMessage(), t);
 						}
 					}
-					Iterator<String> iterator = foundObjectKeys.iterator();
+					Iterator<String> iterator = this.objectKeys.iterator();
 					log.log(Level.FINE, "\nscanned " + fileCounter + " files for object key , found following keys"); //$NON-NLS-1$ //$NON-NLS-2$
 					//iterate all found object keys
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();
 						log.log(Level.FINE, "found object key in vector = " + tmpObjKey); //$NON-NLS-1$
 						//iterate all files of temporary object key
+						objectKeyDirPath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + tmpObjKey;
+						FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
 						for (File file : objectFilesMap.get(tmpObjKey)) {
 							try {
 								String newLinkFilePath = objectKeyDirPath + OSDE.FILE_SEPARATOR_UNIX + file.getName();
@@ -190,6 +192,7 @@ public class ObjectKeyScanner extends Thread {
 							}
 						}
 					}
+					this.settings.setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());		
 				}
 			}
 		}
@@ -217,6 +220,6 @@ public class ObjectKeyScanner extends Thread {
 	 * @return object key list found during scan
 	 */
 	public String[] getObjectList() {
-		return this.objectKeys.toArray(new String[1]);
+		return this.objectKeys.toArray(new String[0]);
 	}
 }

@@ -803,7 +803,7 @@ public class SettingsDialog extends Dialog {
 														// ignore
 													}
 												}
-												SettingsDialog.this.application.setObjectList(objLnkSearch.getObjectList());
+												//SettingsDialog.this.application.setObjectList(objLnkSearch.getObjectList());
 												if (getParent().isDisposed())
 													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
 												else
