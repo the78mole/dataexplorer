@@ -541,10 +541,18 @@ public class Settings extends Properties {
 	}
 
 	public void setObjectList(String[] activeObjectList, int newActiveObjectIndex) {
-		setObjectList(activeObjectList, activeObjectList[newActiveObjectIndex]);
+		String activeObjectKey = activeObjectList[0];
+		try {
+			activeObjectKey = activeObjectList[newActiveObjectIndex];
+		}
+		catch (Exception e) {
+			// IndexOutOfBounds may occur while object keys are renamed and not deleted
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		setObjectList(activeObjectList, activeObjectKey);
 	}
 
-	public void setObjectList(String[] activeObjectList, String newObjectKey) {
+	public void setObjectList(String[] activeObjectList, String activeObjectKey) {
 		// keep object oriented out of the sorting game
 		String[] tmpObjectKeys = new String[activeObjectList.length - 1];
 		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
@@ -564,7 +572,7 @@ public class Settings extends Properties {
 			sb.append(activeObjectList[i]).append(";"); //$NON-NLS-1$
 		}
 		this.setProperty(OBJECT_LIST, sb.toString());
-		this.setProperty(ACTIVE_OBJECT, newObjectKey);
+		this.setProperty(ACTIVE_OBJECT, activeObjectKey);
 	}
 
 	public int getActiveObjectIndex() {
