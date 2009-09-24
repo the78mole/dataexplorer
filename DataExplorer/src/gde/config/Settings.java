@@ -552,7 +552,7 @@ public class Settings extends Properties {
 		setObjectList(activeObjectList, activeObjectKey);
 	}
 
-	public void setObjectList(String[] activeObjectList, String activeObjectKey) {
+	public void setObjectList(String[] activeObjectList, String newObjectKey) {
 		// keep object oriented out of the sorting game
 		String[] tmpObjectKeys = new String[activeObjectList.length - 1];
 		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
@@ -572,7 +572,7 @@ public class Settings extends Properties {
 			sb.append(activeObjectList[i]).append(";"); //$NON-NLS-1$
 		}
 		this.setProperty(OBJECT_LIST, sb.toString());
-		this.setProperty(ACTIVE_OBJECT, activeObjectKey);
+		this.setProperty(ACTIVE_OBJECT, newObjectKey);
 	}
 
 	public int getActiveObjectIndex() {
