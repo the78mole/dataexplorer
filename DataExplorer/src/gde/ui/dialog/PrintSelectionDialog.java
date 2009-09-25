@@ -268,11 +268,16 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
 		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
-		int selectionIndex = this.application.getTabSelectionIndex();
 
 		//get all required images
 		if (isGraphics) {
 			this.application.selectTab(0);
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
 			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			graphicsImageSWT.dispose();
 		}
@@ -281,6 +286,12 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isStatistics) {
 			this.application.selectTab(1);
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
 			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
 			statisticsImageSWT.dispose();
 		}
@@ -289,6 +300,12 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (this.application.isObjectoriented() && isObject) {
 			this.application.selectTab(8);
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
 			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
 			objectImageSWT.dispose();
 		}
@@ -297,13 +314,19 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isCompare) {
 			this.application.selectTab(6);
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
 			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			compareImageSWT.dispose();
 		}
 		else
 			compareImageAWT = null;
 		
-		this.application.selectTab(selectionIndex);
+		this.application.selectTab(0);
 
 		Thread printThread = new Thread() {
 			@Override
