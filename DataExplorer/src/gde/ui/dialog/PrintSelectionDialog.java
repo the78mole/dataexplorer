@@ -468,16 +468,33 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 //      log.log(Level.INFO, "pageFormat.getImageableX() = " + pageFormat.getImageableX());
 //      log.log(Level.INFO, "pageFormat.getImageableY() = " + pageFormat.getImageableY());
       
-      double scaleFactor1 = pageFormat.getImageableWidth() / this.awtBufferedImage1.getWidth(this);
       g2d.drawString(OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT + docType1, 0, 10);
       g2d.drawString(date, (int)(pageFormat.getImageableWidth()-rectDate.getWidth()), 10);
-      g2d.drawImage(awtBufferedImage1, 0, 20, (int)pageFormat.getImageableWidth(), (int)(scaleFactor1*awtBufferedImage1.getHeight(this)), this);
+      double scaleFactor1 = pageFormat.getImageableWidth() / this.awtBufferedImage1.getWidth(this);
+      if (scaleFactor1*awtBufferedImage1.getHeight(this) < pageFormat.getImageableHeight()) {
+      	g2d.drawImage(awtBufferedImage1, 0, 20, (int)pageFormat.getImageableWidth(), (int)(scaleFactor1*awtBufferedImage1.getHeight(this)), this);
+      }
+      else {
+      	scaleFactor1 = pageFormat.getImageableHeight() / this.awtBufferedImage1.getHeight(this);
+      	int printWidth = (int)(scaleFactor1 * pageFormat.getImageableWidth());
+       	g2d.drawImage(awtBufferedImage1, (int)((pageFormat.getImageableWidth()-printWidth)/2), 20, printWidth, awtBufferedImage1.getHeight(this), this);
+      }
 
       if (this.awtBufferedImage2 != null) {
-        double scaleFactor2 = pageFormat.getImageableWidth() / this.awtBufferedImage2.getWidth(this);
         g2d.drawString(OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT + docType2, 0, (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
         g2d.drawString(date, (int)(pageFormat.getImageableWidth()-rectDate.getWidth()), (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
-				g2d.drawImage(awtBufferedImage2, 0, (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 50), (int) pageFormat.getImageableWidth(), (int) (scaleFactor2 * awtBufferedImage2.getHeight(this)), this);
+        double scaleFactor2 = pageFormat.getImageableWidth() / this.awtBufferedImage2.getWidth(this);
+        scaleFactor2 = scaleFactor2 * awtBufferedImage2.getHeight(this) > pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40)
+        	? pageFormat.getImageableHeight() / this.awtBufferedImage2.getHeight(this) : scaleFactor2;
+        if (scaleFactor2 * awtBufferedImage2.getHeight(this) < pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40)) {
+        	g2d.drawImage(awtBufferedImage2, 0, (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 50), (int) pageFormat.getImageableWidth(), (int) (scaleFactor2 * awtBufferedImage2.getHeight(this)), this);
+        }
+        else {
+        	scaleFactor2 = pageFormat.getImageableHeight() / this.awtBufferedImage2.getHeight(this);
+        	int printWidth = (int)(scaleFactor2 * pageFormat.getImageableWidth());
+        	int printHeight = (int)(pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
+        	g2d.drawImage(awtBufferedImage2, (int)((pageFormat.getImageableWidth()-printWidth)/2), (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 50), printWidth, printHeight, this);
+        }
 			}
 			return (PAGE_EXISTS);
     }
