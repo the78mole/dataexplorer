@@ -334,6 +334,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				PrinterJob printJob = PrinterJob.getPrinterJob();
 				Book book = new Book();
 				PageFormat documentPageFormat = new PageFormat();
+				documentPageFormat.setOrientation(orientation);
+				documentPageFormat = printJob.validatePage(documentPageFormat);
 
 				printJob.setJobName(System.getProperty("user.name") + OSDE.STRING_MESSAGE_CONCAT + OSDE.OSDE_NAME_LONG); //$NON-NLS-1$
 				printJob.setPageable(book);
@@ -341,21 +343,18 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				// show the choose printer dialog
 				if (printJob.printDialog()) {
 					if (orientation == PageFormat.REVERSE_LANDSCAPE) {
-						documentPageFormat.setOrientation(PageFormat.REVERSE_LANDSCAPE);
 						if (isGraphics) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0143), graphicsImageAWT), documentPageFormat);
 						if (isStatistics) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0350), statisticsImageAWT), documentPageFormat);
 						if (isObject) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0403), objectImageAWT), documentPageFormat);
 						if (isCompare) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0144), compareImageAWT), documentPageFormat);
 					}
 					else if (orientation == PageFormat.LANDSCAPE) {
-						documentPageFormat.setOrientation(PageFormat.LANDSCAPE);
 						if (isGraphics) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0143), graphicsImageAWT), documentPageFormat);
 						if (isStatistics) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0350), statisticsImageAWT), documentPageFormat);
 						if (isObject) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0403), objectImageAWT), documentPageFormat);
 						if (isCompare) book.append(new Document(Messages.getString(MessageIds.OSDE_MSGT0144), compareImageAWT), documentPageFormat);
 					}
 					else if (orientation == PageFormat.PORTRAIT) {
-						documentPageFormat.setOrientation(PageFormat.PORTRAIT);
 						boolean isGraphicsToBePrinted = isGraphics;
 						boolean isStatisticsToBePrinted = isStatistics;
 						boolean isObjectToBePrinted = isObject;
@@ -470,27 +469,28 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
       
       g2d.drawString(OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT + docType1, 0, 10);
       g2d.drawString(date, (int)(pageFormat.getImageableWidth()-rectDate.getWidth()), 10);
+
       double scaleFactor1 = pageFormat.getImageableWidth() / this.awtBufferedImage1.getWidth(this);
-      if (scaleFactor1*awtBufferedImage1.getHeight(this) < pageFormat.getImageableHeight()) {
+      if (scaleFactor1*awtBufferedImage1.getHeight(this) < (pageFormat.getImageableHeight()-10)) {
       	g2d.drawImage(awtBufferedImage1, 0, 20, (int)pageFormat.getImageableWidth(), (int)(scaleFactor1*awtBufferedImage1.getHeight(this)), this);
       }
       else {
-      	scaleFactor1 = pageFormat.getImageableHeight() / this.awtBufferedImage1.getHeight(this);
+      	scaleFactor1 = (pageFormat.getImageableHeight()-10) / this.awtBufferedImage1.getHeight(this);
       	int printWidth = (int)(scaleFactor1 * pageFormat.getImageableWidth());
-       	g2d.drawImage(awtBufferedImage1, (int)((pageFormat.getImageableWidth()-printWidth)/2), 20, printWidth, awtBufferedImage1.getHeight(this), this);
+      	int printHeight = (int)(pageFormat.getImageableHeight()-10);
+       	g2d.drawImage(awtBufferedImage1, (int)((pageFormat.getImageableWidth()-printWidth)/2), 20, printWidth, printHeight, this);
       }
 
       if (this.awtBufferedImage2 != null) {
         g2d.drawString(OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT + docType2, 0, (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
         g2d.drawString(date, (int)(pageFormat.getImageableWidth()-rectDate.getWidth()), (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
+
         double scaleFactor2 = pageFormat.getImageableWidth() / this.awtBufferedImage2.getWidth(this);
-        scaleFactor2 = scaleFactor2 * awtBufferedImage2.getHeight(this) > pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40)
-        	? pageFormat.getImageableHeight() / this.awtBufferedImage2.getHeight(this) : scaleFactor2;
         if (scaleFactor2 * awtBufferedImage2.getHeight(this) < pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40)) {
         	g2d.drawImage(awtBufferedImage2, 0, (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 50), (int) pageFormat.getImageableWidth(), (int) (scaleFactor2 * awtBufferedImage2.getHeight(this)), this);
         }
         else {
-        	scaleFactor2 = pageFormat.getImageableHeight() / this.awtBufferedImage2.getHeight(this);
+        	scaleFactor2 = (pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40)) / this.awtBufferedImage2.getHeight(this);
         	int printWidth = (int)(scaleFactor2 * pageFormat.getImageableWidth());
         	int printHeight = (int)(pageFormat.getImageableHeight() - (scaleFactor1 * awtBufferedImage1.getHeight(this) + 40));
         	g2d.drawImage(awtBufferedImage2, (int)((pageFormat.getImageableWidth()-printWidth)/2), (int) (scaleFactor1 * awtBufferedImage1.getHeight(this) + 50), printWidth, printHeight, this);
