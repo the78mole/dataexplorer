@@ -157,6 +157,7 @@ public class ObjectKeyScanner extends Thread {
 										else {
 											objectFilesMap.get(foundObjectKey).add(file);
 										}
+										log.log(Level.FINE, "add file " + file.getName() + " to object key " + foundObjectKey); //$NON-NLS-1$
 									}
 								}
 							}
@@ -172,7 +173,7 @@ public class ObjectKeyScanner extends Thread {
 						}
 					}
 					Iterator<String> iterator = this.objectKeys.iterator();
-					log.log(Level.FINE, "\nscanned " + fileCounter + " files for object key , found following keys"); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , found following keys :"); //$NON-NLS-1$ //$NON-NLS-2$
 					//iterate all found object keys
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();

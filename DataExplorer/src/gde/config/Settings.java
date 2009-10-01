@@ -554,11 +554,20 @@ public class Settings extends Properties {
 
 	public void setObjectList(String[] activeObjectList, String newObjectKey) {
 		// keep object oriented out of the sorting game
-		String[] tmpObjectKeys = new String[activeObjectList.length - 1];
-		System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
-		Arrays.sort(tmpObjectKeys, this.comparator);
-		System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
-		
+		boolean startsWithDeviceOriented = activeObjectList[0].startsWith(Messages.getString(MessageIds.OSDE_MSGT0200).substring(0, 10));
+		if (startsWithDeviceOriented) {
+			String[] tmpObjectKeys = new String[activeObjectList.length - 1];
+			System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
+			Arrays.sort(tmpObjectKeys, this.comparator);
+			System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
+		}
+		else {
+			Arrays.sort(activeObjectList, this.comparator);
+			String[] tmpObjectKeys = new String[activeObjectList.length + 1];
+			tmpObjectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);
+			activeObjectList = tmpObjectKeys;
+		}
 		//check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : activeObjectList) {
