@@ -113,7 +113,7 @@ public class SettingsDialog extends Dialog {
 	Button															enableBlackListButton, enableWhiteListButton;
 	Text																serialPortBlackList, serialPortWhiteList;
 	Button															suggestObjectKey;
-	Composite														tabComposite1;
+	Composite														generalTabComposite;
 	Composite														analysisComposite;
 	CTabItem														generalTabItem;
 	CTabItem														analysisTabItem;
@@ -200,16 +200,16 @@ public class SettingsDialog extends Dialog {
 						tabComposite1LData.left = new FormAttachment(0, 1000, 10);
 						tabComposite1LData.right = new FormAttachment(1000, 1000, -10);
 						tabComposite1LData.top = new FormAttachment(0, 1000, 0);
-						this.tabComposite1 = new Composite(this.settingsTabFolder, SWT.NONE);
-						this.generalTabItem.setControl(this.tabComposite1);
-						this.tabComposite1.setLayout(new FormLayout());
+						this.generalTabComposite = new Composite(this.settingsTabFolder, SWT.NONE);
+						this.generalTabItem.setControl(this.generalTabComposite);
+						this.generalTabComposite.setLayout(new FormLayout());
 						{
 							FormData groupLocaleLData = new FormData();
 							groupLocaleLData.height = 38;
 							groupLocaleLData.left = new FormAttachment(0, 1000, 12);
 							groupLocaleLData.right = new FormAttachment(1000, 1000, -12);
 							groupLocaleLData.top = new FormAttachment(0, 1000, 7);
-							this.groupLocale = new Group(this.tabComposite1, SWT.NONE);
+							this.groupLocale = new Group(this.generalTabComposite, SWT.NONE);
 							this.groupLocale.setLayout(null);
 							this.groupLocale.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.groupLocale.setLayoutData(groupLocaleLData);
@@ -242,7 +242,7 @@ public class SettingsDialog extends Dialog {
 							}
 						}
 						{ // begin default data path group
-							this.defaultDataPathGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.defaultDataPathGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.defaultDataPathGroup.setLayout(null);
 							FormData classSelectionGroupLData = new FormData();
 							classSelectionGroupLData.height = 42;
@@ -292,7 +292,7 @@ public class SettingsDialog extends Dialog {
 							fileOpenSaveDialogGroupLData.left = new FormAttachment(0, 1000, 12);
 							fileOpenSaveDialogGroupLData.right = new FormAttachment(1000, 1000, -12);
 							fileOpenSaveDialogGroupLData.top = new FormAttachment(0, 1000, 129);
-							this.fileOpenSaveDialogGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.fileOpenSaveDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.fileOpenSaveDialogGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.fileOpenSaveDialogGroup.setLayout(null);
 							this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
@@ -337,7 +337,7 @@ public class SettingsDialog extends Dialog {
 							deviceDialogLData.left = new FormAttachment(0, 1000, 12);
 							deviceDialogLData.right = new FormAttachment(1000, 1000, -12);
 							deviceDialogLData.top = new FormAttachment(0, 1000, 194);
-							this.deviceDialogGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.deviceDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.deviceDialogGroup.setLayout(null);
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
 							this.deviceDialogGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
@@ -423,7 +423,7 @@ public class SettingsDialog extends Dialog {
 							}
 						} // end device dialog settings
 						{ // begin CSV separator group
-							this.separatorGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.separatorGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.separatorGroup.setLayout(null);
 							this.separatorGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							FormData separatorGroupLData = new FormData();
@@ -484,7 +484,7 @@ public class SettingsDialog extends Dialog {
 							}
 						} // end CSV separator group
 						{ // begin serial port group
-							this.serialPortGroup = new Group(this.tabComposite1, SWT.NONE);
+							this.serialPortGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.serialPortGroup.setLayout(null);
 							FormData serialPortGroupLData = new FormData();
 							serialPortGroupLData.left = new FormAttachment(0, 1000, 12);

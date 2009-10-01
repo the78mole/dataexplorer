@@ -323,4 +323,22 @@ public class StringHelper {
 		return true;
 	}
 
+	/**
+	 * prints a byte in 8 digits binary display
+	 * @param inByte
+	 * @param newLine true appends a new line at the end, false will append a blank
+	 */
+	public static void printBinary(byte inByte, boolean newLine) {
+		for (int i = 0; i < 8; i++) {
+			log.log(Level.INFO, ""+((0x80 & inByte) >> 7));
+			inByte = (byte)(inByte << 1); 
+		}
+		if (newLine) {
+			log.log(Level.INFO, OSDE.LINE_SEPARATOR);
+		}
+		else {
+			log.log(Level.INFO, OSDE.STRING_BLANK);
+		}
+	}
+
 }
