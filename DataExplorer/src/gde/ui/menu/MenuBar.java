@@ -964,6 +964,7 @@ public class MenuBar {
 	 */
 	public void openOsdFile(String openFilePath) {
 		try {
+			boolean existAsObjectLinkFile = true;
 			openFilePath = OperatingSystemHelper.getLinkContainedFilePath(openFilePath); // check if windows link
 			//check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
@@ -976,6 +977,7 @@ public class MenuBar {
 			//only switch object key, if application is object oriented
 			String objectkey = osdHeader.get(OSDE.OBJECT_KEY);
 			if (this.application.isObjectoriented() && objectkey != null && !objectkey.equals(OSDE.STRING_EMPTY)) {
+				existAsObjectLinkFile = FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + objectkey);
 				this.application.getMenuToolBar().selectObjectKey(0, objectkey);
 			}
 			else {
@@ -1012,6 +1014,7 @@ public class MenuBar {
 				this.application.enableMenuActions(false);
 				OsdReaderWriter.read(openFilePath);
 				this.channels.getActiveChannel().setFileName(openFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
+				if (!existAsObjectLinkFile) this.channels.getActiveChannel().setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);

@@ -1342,8 +1342,9 @@ public class MenuToolBar {
 				tmpObjects.add(tmpObject);
 			}
 			tmpObjects.add(newObjectKey);
-			MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1]));
-			MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
+			MenuToolBar.this.settings.setObjectList(tmpObjects.toArray(new String[1]), newObjectKey);
+			MenuToolBar.this.objectSelectCombo.setItems(MenuToolBar.this.settings.getObjectList());
+			MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.settings.getActiveObjectIndex());
 		}
 		this.isObjectoriented = this.objectSelectCombo.getSelectionIndex() > 0;
 		this.application.getObjectDescriptionWindow().setVisible(this.isObjectoriented);
