@@ -234,9 +234,9 @@ public class LogViewReader {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
 					isFirstRecordSetDisplayed = true;
-					channels.setFileName(filePath);
-					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
-					channels.setSaved(true);
+					channel.setFileName(filePath);
+					channel.setFileDescription(header.get(OSDE.FILE_COMMENT));
+					channel.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 				

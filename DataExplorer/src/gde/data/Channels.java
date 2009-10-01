@@ -16,8 +16,6 @@
 ****************************************************************************************/
 package osde.data;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +25,6 @@ import osde.device.ChannelTypes;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
-import osde.utils.StringHelper;
 
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
@@ -38,7 +35,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	final static Logger						log									= Logger.getLogger(Channels.class.getName());
 
 	static Channels								channles								= null;
-	String												fileDescription					= StringHelper.getDate();
 	int														activeChannelNumber			= 1;		// default at least one channel must exist
 	String[]											channelNames 						= new String[1];
 	final OpenSerialDataExplorer	application;
@@ -230,7 +226,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * method to cleanup all child and dependent
 	 */
 	public void cleanup() {
-		this.fileDescription	= new SimpleDateFormat("yyyy-MM-dd").format(new Date()); //$NON-NLS-1$
 		this.activeChannelNumber	= 1;		// default at least one channel must exist
 		this.channelNames = new String[1];
 		try {
@@ -261,14 +256,6 @@ public class Channels extends HashMap<Integer, Channel> {
 		this.clear(); // clear channel
 		log.log(Level.FINE, "visited"); //$NON-NLS-1$
 	}
-
-	public String getFileDescription() {
-		return this.fileDescription;
-	}
-
-	public void setFileDescription(String newFileDescription) {
-		this.fileDescription = newFileDescription;
-	}
 	
 	/**
 	 * method checking all channels has saved record set
@@ -293,13 +280,5 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}		
 		return sb.toString();
-	}
-	
-	public void setSaved(boolean value) {
-		this.getActiveChannel().setSaved(value);
-	}
-	
-	public void setFileName(String newFileName) {
-		this.getActiveChannel().setFileName(newFileName);
 	}
 }

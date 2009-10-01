@@ -303,9 +303,9 @@ public class OsdReaderWriter {
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
 					isFirstRecordSetDisplayed = true;
-					channels.setFileName(filePath);
-					channels.setFileDescription(header.get(OSDE.FILE_COMMENT));
-					channels.setSaved(true);
+					channel.setFileName(filePath);
+					channel.setFileDescription(header.get(OSDE.FILE_COMMENT));
+					channel.setSaved(true);
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
@@ -363,7 +363,7 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// second line : size file comment , file comment
 				sb = new StringBuilder();
-				sb.append(OSDE.FILE_COMMENT).append(Channels.getInstance().getFileDescription()).append(OSDE.STRING_NEW_LINE);
+				sb.append(OSDE.FILE_COMMENT).append(activeChannel.getFileDescription()).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
 				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

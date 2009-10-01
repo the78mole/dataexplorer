@@ -35,6 +35,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.RecordSetNameComparator;
+import osde.utils.StringHelper;
 
 /**
  * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
@@ -54,6 +55,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	RecordSet											activeRecordSet;
 	String												objectKey	= OSDE.STRING_EMPTY;
 	String 												fileName;
+	String												fileDescription		= StringHelper.getDate();
 	boolean												isSaved = false;
 	final OpenSerialDataExplorer	application;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
@@ -536,6 +538,15 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.fileName = newFileName;
 		}
 		if (this.fileName != null) this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+	}
+
+
+	public String getFileDescription() {
+		return this.fileDescription;
+	}
+
+	public void setFileDescription(String newFileDescription) {
+		this.fileDescription = newFileDescription;
 	}
 
 	public boolean isSaved() {

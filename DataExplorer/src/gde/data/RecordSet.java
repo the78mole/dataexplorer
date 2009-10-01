@@ -59,12 +59,14 @@ public class RecordSet extends HashMap<String, Record> {
 	final DecimalFormat						df														= new DecimalFormat("0.000");										//$NON-NLS-1$
 
 	String												name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	final Channel									parent;
 	final String									channelConfigName;
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																// records/measurements which are active or inactive
 	double												timeStep_ms										= 0;																						//Zeitbasis der Messpunkte
-	String												recordSetDescription					= DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
+	String												recordSetDescription					= (this.device !=null ? this.device.getName()+OSDE.STRING_MESSAGE_CONCAT : OSDE.STRING_EMPTY) 
+																																+ DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	boolean												isSaved												= false;																				//indicates if the record set is saved to file
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
 	boolean												isFromFile										= false;																				//indicates that this record set was created by loading data from file
@@ -173,7 +175,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super(measurementNames.length);
+		this.channels = Channels.getInstance();
 		this.device = useDevice;
+		this.parent = this.channels.get(this.channels.getChannelNumber(newChannelName));
 		this.channelConfigName = newChannelName;
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = measurementNames.clone();
@@ -181,30 +185,28 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
-		this.channels = Channels.getInstance();
 	}
 
 	/**
-	 * record set data buffers according the size of given names array, where
-	 * the name is the key to access the data buffer
+	 * special record set data buffers according the size of given names array, where
+	 * the name is the key to access the data buffer used to hold compare able records (compare set) 
 	 * @param useDevice the device
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
 	 * @param newTimeStep_ms time in msec of device measures points
-	 * @param isRawValue
-	 * @param isCompareSetValue
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, boolean isRawValue, boolean isCompareSetValue) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms) {
 		super();
+		this.application = OpenSerialDataExplorer.getInstance();
+		this.channels = null;
 		this.device = useDevice;
+		this.parent = null;
 		this.channelConfigName = newChannelName;
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = new String[0];
 		this.timeStep_ms = newTimeStep_ms;
-		this.application = OpenSerialDataExplorer.getInstance();
-		this.isRaw = isRawValue;
-		this.isCompareSet = isCompareSetValue;
-		this.channels = null;
+		this.isRaw = true;
+		this.isCompareSet = true;
 	}
 
 	/**
@@ -220,6 +222,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = recordSet.name;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
+		this.parent = recordSet.parent;
 		this.channelConfigName = newChannelConfiguration;
 
 		// check if there is a miss match of measurement names and correction required
@@ -326,6 +329,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + OSDE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + OSDE.STRING_UNDER_BAR;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
+		this.parent = recordSet.parent;
 		this.channelConfigName = recordSet.channelConfigName;
 
 		if (recordSet.isSyncableChecked) {
@@ -1721,15 +1725,6 @@ public class RecordSet extends HashMap<String, Record> {
 			return false;
 		}
 		return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (tmpRecord.zoomOffset + tmpRecord.zoomSize >= tmpRecord.realSize() - 1);
-	}
-
-	public String getHeader() {
-		return this.header != null ? this.header : this.name;
-	}
-
-	public void setHeader(String newHeader) {
-		this.header = newHeader;
-		this.application.updateHeaderText(newHeader);
 	}
 
 	/**
