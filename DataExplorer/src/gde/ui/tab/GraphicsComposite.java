@@ -83,7 +83,7 @@ public class GraphicsComposite extends Composite {
 	final int											windowType;
 
 	// drawing canvas
-	Text													recordSetHeader;
+	Text													graphicsHeader;
 	Text													recordSetComment;
 	boolean 											isRecordCommentChanged = false;
 
@@ -92,12 +92,14 @@ public class GraphicsComposite extends Composite {
 	int														headerGap								= 0;
 	int														commentHeight						= 0;
 	int														commentGap							= 0;
-	String												oldRecordSetHeader, oldRecordSetComment;
+	String												graphicsHeaderText, recordSetCommentText;
 	Point													oldSize = new Point(0,0); // composite size - control resized
 	
 	// update graphics only area required
 	RecordSet											oldActiveRecordSet	= null;
 	int 													oldChangeCounter = 0;
+	boolean												isFileCommentChanged = false;
+
 	HashMap<String, Integer>			leftSideScales = new HashMap<String, Integer>();
 	HashMap<String, Integer>			rightSideScales = new HashMap<String, Integer>();
 	int 													oldScopeLevel = 0;
@@ -168,26 +170,49 @@ public class GraphicsComposite extends Composite {
 			}
 		});
 		{
-			this.recordSetHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
-			this.recordSetHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
-			this.recordSetHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
-			this.recordSetHeader.addHelpListener(new HelpListener() {
+			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
+			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+			this.graphicsHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.graphicsHeader.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); 			//$NON-NLS-1$
 					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			this.recordSetHeader.addPaintListener(new PaintListener() {
+			this.graphicsHeader.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
-					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
-						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordSet != null && (GraphicsComposite.this.oldRecordSetHeader == null || !recordSet.getHeader().equals(GraphicsComposite.this.oldRecordSetHeader))) {
-							GraphicsComposite.this.recordSetHeader.setText(recordSet.getHeader());
-							GraphicsComposite.this.oldRecordSetHeader = recordSet.getHeader();
+					Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet recordSet = activeChannel.getActiveRecordSet();
+						if (recordSet != null) {
+							String tmpHeader = activeChannel.getFileDescription() + OSDE.STRING_MESSAGE_CONCAT + recordSet.getName();
+							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
+								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
+							}
 						}
 					}
+				}
+			});
+			this.graphicsHeader.addKeyListener( new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
+					isFileCommentChanged = true;						
+				}
+			});
+			this.graphicsHeader.addFocusListener(new FocusListener() {			
+				@Override
+				public void focusLost(FocusEvent evt) {
+					log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
+					isFileCommentChanged = false;
+					setFileComment();						
+				}
+				
+				@Override
+				public void focusGained(FocusEvent evt) {
+					log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -231,12 +256,11 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
 					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordSet != null && (GraphicsComposite.this.oldRecordSetComment == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.oldRecordSetComment))) {
-							GraphicsComposite.this.recordSetComment.setText(recordSet.getRecordSetDescription());
-							GraphicsComposite.this.oldRecordSetComment = recordSet.getRecordSetDescription();
+						if (recordSet != null && (GraphicsComposite.this.recordSetCommentText == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.recordSetCommentText))) {
+							GraphicsComposite.this.recordSetComment.setText(GraphicsComposite.this.recordSetCommentText = recordSet.getRecordSetDescription());
 						}
 					}
 				}
@@ -551,7 +575,7 @@ public class GraphicsComposite extends Composite {
 	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
-		this.recordSetHeader.redraw();
+		this.graphicsHeader.redraw();
 		
 		if (OSDE.IS_WINDOWS) {
 			Point size = this.graphicCanvas.getSize();
@@ -1299,21 +1323,17 @@ public class GraphicsComposite extends Composite {
 		setComponentBounds();
 	}
 	
-	public void updateHeaderText(String newHeaderText) {
-		this.recordSetHeader.setText(newHeaderText);
-	}
-
 	public void clearHeaderAndComment() {
 		if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 			RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 			if (recordSet == null) {
 				GraphicsComposite.this.recordSetComment.setText(OSDE.STRING_EMPTY);
-				GraphicsComposite.this.recordSetHeader.setText(OSDE.STRING_EMPTY);
-				GraphicsComposite.this.oldRecordSetHeader = null;
-				GraphicsComposite.this.oldRecordSetComment = null;
+				GraphicsComposite.this.graphicsHeader.setText(OSDE.STRING_EMPTY);
+				GraphicsComposite.this.graphicsHeaderText = null;
+				GraphicsComposite.this.recordSetCommentText = null;
 			}
 			GraphicsComposite.this.recordSetComment.redraw();
-			GraphicsComposite.this.recordSetHeader.redraw();
+			GraphicsComposite.this.graphicsHeader.redraw();
 		}
 	}
 
@@ -1327,8 +1347,8 @@ public class GraphicsComposite extends Composite {
 		int y = this.headerGap;
 		int width = graphicsBounds.width;
 		int height = this.headerHeight;
-		this.recordSetHeader.setBounds(x, y, width, height);
-		log.log(Level.FINER, "recordSetHeader.setBounds " + this.recordSetHeader.getBounds());
+		this.graphicsHeader.setBounds(x, y, width, height);
+		log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds());
 		
 		y = this.headerGap + this.headerHeight;
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
@@ -1369,10 +1389,10 @@ public class GraphicsComposite extends Composite {
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 				GC graphicsGC = new GC(graphicsImage);
-				graphicsGC.setBackground(this.recordSetHeader.getBackground());
-				graphicsGC.setForeground(this.recordSetHeader.getForeground());
+				graphicsGC.setBackground(this.graphicsHeader.getBackground());
+				graphicsGC.setForeground(this.graphicsHeader.getForeground());
 				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-				graphicsGC.setFont(this.recordSetHeader.getFont());
+				graphicsGC.setFont(this.graphicsHeader.getFont());
 				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.OSDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 				graphicsGC.setFont(this.recordSetComment.getFont());
 				for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
@@ -1405,9 +1425,9 @@ public class GraphicsComposite extends Composite {
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 
 					GC graphicsGC = new GC(graphicsImage);
-					graphicsGC.setForeground(this.recordSetHeader.getForeground());
-					graphicsGC.setBackground(this.recordSetHeader.getBackground());
-					graphicsGC.setFont(this.recordSetHeader.getFont());
+					graphicsGC.setForeground(this.graphicsHeader.getForeground());
+					graphicsGC.setBackground(this.graphicsHeader.getBackground());
+					graphicsGC.setFont(this.graphicsHeader.getFont());
 					graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
 					GraphicsUtils.drawTextCentered(activeRecordSet.getName(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 					graphicsGC.setFont(this.recordSetComment.getFont());
@@ -1419,4 +1439,15 @@ public class GraphicsComposite extends Composite {
 		}
 		return graphicsImage;
 	}
+	
+	public void setFileComment() {
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			String fileComment = this.graphicsHeader.getText();
+			fileComment = fileComment.substring(0, fileComment.indexOf(OSDE.STRING_MESSAGE_CONCAT));
+			activeChannel.setFileDescription(fileComment);
+			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+		}
+	}
+
 }

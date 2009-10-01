@@ -216,15 +216,10 @@ public class GraphicsWindow {
 		this.graphicsComposite.enableRecordSetComment(enabled);
 	}
 	
-	public void updateHeaderText(String newHeaderText) {
-		this.graphicsComposite.updateHeaderText(newHeaderText);
-	}
-
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
 	}
 	
-
 	/**
 	 * switch graphics window mouse mode
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE

@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import osde.OSDE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -117,7 +118,7 @@ public class FileCommentWindow {
 				this.fileCommentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
 				this.fileCommentText.setBounds(50, 40, 500, 100);
-				this.fileCommentText.setText(this.channels.getFileDescription());
+				this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : OSDE.STRING_EMPTY);
 				this.fileCommentText.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
@@ -174,7 +175,7 @@ public class FileCommentWindow {
 	
 	public void update() {
 		if (this.channels.getActiveChannel() != null) {
-			this.fileCommentText.setText(this.channels.getFileDescription());
+			this.fileCommentText.setText(this.channels.getActiveChannel().getFileDescription());
 		}
 		updateRecordSetTable();
 	}
@@ -190,7 +191,9 @@ public class FileCommentWindow {
 		//log.log(Level.FINE, "cover bounds = " + bounds.toString());
 		FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y-10);
 		FileCommentWindow.this.fileCommentText.setBounds(bounds);
-		FileCommentWindow.this.fileCommentText.setText(FileCommentWindow.this.channels.getFileDescription());
+		if (this.channels.getActiveChannel() != null) {
+			this.fileCommentText.setText(this.channels.getActiveChannel().getFileDescription());
+		}
 		
 		bounds = new Rectangle(mainSize.x * 5/100, mainSize.y * 50/100
 				, mainSize.x * 90/100, mainSize.y * 40/100);
@@ -218,8 +221,11 @@ public class FileCommentWindow {
 	}
 
 	public void setFileComment() {
-		this.channels.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
-		this.channels.getActiveChannel().setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			activeChannel.setFileDescription(FileCommentWindow.this.fileCommentText.getText());
+			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+		}
 	}
 	
 	/**
