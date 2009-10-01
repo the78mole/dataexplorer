@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -51,7 +52,7 @@ public class StatisticsWindow {
 	Composite											composite;
 	Composite											filler;
 	Group													descriptionGroup;
-	Text													textLabel;
+	Text													descriptionTextLabel;
 	CLabel												minLabel;
 	CLabel												maxLabel;
 	CLabel												avgLabel;
@@ -109,7 +110,7 @@ public class StatisticsWindow {
 				public void controlResized(ControlEvent evt) {
 					log.log(Level.FINE, "composite.controlResized evt=" + evt); //$NON-NLS-1$
 					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
-					StatisticsWindow.this.textLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
+					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
 				public void controlMoved(ControlEvent evt) {
@@ -132,16 +133,26 @@ public class StatisticsWindow {
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINE, "group0.paintControl, event=" + evt); //$NON-NLS-1$
-						StatisticsWindow.this.textLabel.setText(StatisticsWindow.this.descriptionText);
+						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
+						if (activeChannel != null) {
+							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+							if (activeRecordSet != null) {
+								String tmpDescriptionText = StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
+									+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+								if (StatisticsWindow.this.descriptionTextLabel == null || !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel)) {
+									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
+								}
+							}
+						}
 					}
 				});
 				{
-					this.textLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
-					this.textLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-					this.textLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
-					this.textLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-					this.textLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
-					this.textLabel.setEditable(false);
+					this.descriptionTextLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
+					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
+					this.descriptionTextLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
+					this.descriptionTextLabel.setEditable(false);
 				}
 			}
 			{
@@ -205,10 +216,11 @@ public class StatisticsWindow {
 	 * update statistics window display data
 	 */
 	public void updateStatisticsData() {
-		if (StatisticsWindow.this.channels.getActiveChannel() != null) {
-			RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				StatisticsWindow.this.descriptionText = StatisticsWindow.this.channels.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
+				StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
 						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
 				this.descriptionGroup.redraw();
 				this.customTableColumnWidth = 0;
@@ -448,7 +460,13 @@ public class StatisticsWindow {
 		sb.append(OSDE.OSDE_NAME_LONG).append(OSDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
 		//description
 		sb.append(Messages.getString(MessageIds.OSDE_MSGT0351)).append(OSDE.LINE_SEPARATOR);
-		this.descriptionText = this.channels.getFileDescription() + "\n--------------------------\n"; //$NON-NLS-1$
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n"; //$NON-NLS-1$
+		}
+		else {
+			this.descriptionText = Messages.getString(MessageIds.OSDE_MSGW0036) + "\n--------------------------\n"; //$NON-NLS-1$
+		}
 		RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (activeRecordSet != null) {
 			this.descriptionText = this.descriptionText + activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
