@@ -67,16 +67,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 	public final static int				FLASH_POSITION_DATA_BEGIN		= 0x100;
 	public final static int				MAX_DATA_VALUES							= LiPoWatchDialog.FLASH_SIZE - 0x100;
 
-	public final static String[]	TIME_INTERVAL								= { "   1/4 s  (->     5 h)", //$NON-NLS-1$
-			"   1/2 s  (->   10 h)", //$NON-NLS-1$
-			"      1 s   (->   20 h)", //$NON-NLS-1$
-			"      2 s   (->   40 h)", //$NON-NLS-1$
+	public final static String[]	TIME_INTERVAL								= { 
+			"   1/4 s  (->     5 h)", //$NON-NLS-1$
+			"   1/2 s  (->   10 h)", 	//$NON-NLS-1$
+			"      1 s   (->   20 h)",//$NON-NLS-1$
+			"      2 s   (->   40 h)",//$NON-NLS-1$
 			"      5 s   (-> 100 h)", //$NON-NLS-1$
-			"    10 s   (->  200 h)"															};																																											//$NON-NLS-1$
-	public final static String[]	RX_AUTO_START_MS						= { " 1,1", " 1,2", " 1,3", " 1,4", " 1,5", " 1,6", " 1,7", " 1,8", " 1,9", " Rx on" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-	public final static String[]	CELL_VOLTAGE_LIMITS					= new String[] { " 2.0", " 2.1", " 2.2", " 2.3", " 2.4", " 2.5", " 2.6", " 2.7", " 2.8", " 2.9", " 3.0", " 3.1", " 3.2", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$
-			" 3.3", " 3.4", " 3.5", " 3.6", " 3.7"								};																																											//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-
+			"    10 s   (->  200 h)"};//$NON-NLS-1$
+	public final static String[]	RX_AUTO_START_MS						= { " 1,1", " 1,2", " 1,3", " 1,4", " 1,5", " 1,6", " 1,7", " 1,8", " 1,9", " Rx on" }; //$NON-NLS-$
+	public final static String[]	CELL_VOLTAGE_LIMITS					= { " 2.0", " 2.1", " 2.2", " 2.3", " 2.4", " 2.5", " 2.6", " 2.7", " 2.8", " 2.9", " 3.0", " 3.1", " 3.2", " 3.3", " 3.4", " 3.5", " 3.6", " 3.7"};	//$NON-NLS-$
+	
 	//Shell dialogShell; // remove this later
 	CTabFolder										mainTabFolder;
 	CTabItem											configTabItem;
@@ -224,7 +224,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 							String msg = Messages.getString(MessageIds.OSDE_MSGI1600);
 							if (LiPoWatchDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								LiPoWatchDialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								//device.storeDeviceProperties();
+								//device.storeDeviceProperties(); // only used for configurable analog input 
 								setClosePossible(true);
 							}
 							// check threads before close
@@ -765,7 +765,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.liveDataCaptureGroup.setBounds(259, 12, 228, 164);
 									this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1657));
-									this.liveDataCaptureGroup.setEnabled(false);
+									this.liveDataCaptureGroup.setEnabled(false); //TODO after enabling this function -> true
 									this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 									{
 										this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
@@ -844,7 +844,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.stopLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 												this.stopLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1663));
 												this.stopLoggingButton.setBounds(94, 21, 82, 30);
-												this.stopLoggingButton.setEnabled(false);
+												this.stopLoggingButton.setEnabled(false);//TODO after enabling this function -> true
 												this.stopLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1664));
 												this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
 													@Override
@@ -874,7 +874,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 										this.stopLiveGatherButton.setBounds(12, 126, 202, 30);
 										this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1665));
-										this.stopLiveGatherButton.setEnabled(false);
+										this.stopLiveGatherButton.setEnabled(false);//TODO after enabling this function -> true
 										this.stopLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1666));
 										this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -982,11 +982,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 		}
 	}
 
-	/**
-	 * analog connection propertis ahas to be adjusted manually if required
-	 * updates the analog record descriptors according input fields
-	 * attention: set new record name replaces the record, setName() must the last operation in sequence
-	 */
+	//	/**
+	//	 * analog connection properties to be adjusted manually if required
+	//	 * updates the analog record descriptors according input fields
+	//	 * attention: set new record name replaces the record, setName() must the last operation in sequence
+	//	 */
 	//	public void checkUpdateAnalog() {
 	//		if (channels.getActiveChannel() != null) {
 	//			RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
@@ -1011,25 +1011,22 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 */
 	public void updateConfigurationValues(byte[] readBuffer) {
 
-		//int length = (readBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
-		//log.log(Level.INFO, "length = " + length); //$NON-NLS-1$
 
 		//status field
-		//Speichernummer = (CLng(Asc(Mid(strResult, 9, 1))) * 256 * 256 * 256 + CLng(Asc(Mid(strResult, 8, 1))) * 256 * 256 + CLng(Asc(Mid(strResult, 7, 1))) * 256 + Asc(Mid(strResult, 6, 1)))
 		this.memoryUsed = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
 		LiPoWatchDialog.log.log(Level.FINE, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
 
-		//Seriennummer = CLng(Asc(Mid(strResult, 11, 1))) * 256 + Asc(Mid(strResult, 10, 1))
+		//serial number
 		this.serialNumber = "" + (((readBuffer[10] & 0xFF) << 8) + (readBuffer[9] & 0xFF)); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "serialNumber = " + this.serialNumber); //$NON-NLS-1$
 		this.snLabel.setText(this.serialNumber);
 
-		//LiPoWatch_Version = CLng(Asc(Mid(strResult, 12, 1)))
+		//firmware version
 		this.lipoWatchVersion = String.format(Locale.ENGLISH, "v%.2f", new Double((readBuffer[11] & 0xFF) / 100)); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "unilogVersion = " + this.lipoWatchVersion); //$NON-NLS-1$
 		this.firmwareVersionLabel.setText(this.lipoWatchVersion);
 
-		//Speicher_geloescht = CLng(Asc(Mid(strResult, 13, 1)))
+		//memory delete flag
 		int memoryDeleted = readBuffer[12] & 0xFF;
 		int tmpMemoryUsed = 0;
 		if (memoryDeleted > 0)
@@ -1041,23 +1038,22 @@ public class LiPoWatchDialog extends DeviceDialog {
 		this.memUsagePercent.setText(this.memoryUsedPercent);
 
 		// timer interval
-		//Speicherrate_Box.Value = CLng(Asc(Mid(strResult, 14, 1)))
 		this.timeIntervalPosition = readBuffer[13] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "timeIntervalPosition = " + this.timeIntervalPosition); //$NON-NLS-1$
 		this.timeIntervalCombo.select(this.timeIntervalPosition);
 		updateTimeStep_ms(this.timeIntervalPosition);
 
-		//Modus_Spannung_Box.Value = CLng(Asc(Mid(strResult, 15, 1)))
+		// voltage modus absolute/relative
 		this.measurementModus = readBuffer[14] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "measurementModus(relative, absolute) = " + this.measurementModus); //$NON-NLS-1$
 		this.measurementModusCombo.select(this.measurementModus);
 
+		// auto start time
 		this.isAutoStartTime = false;
 		this.timeAutoStart_sec = 0;
 		if ((readBuffer[15] & 0x80) != 0) {
 			this.isAutoStartTime = true;
 		}
-		//Autostart_Zeit_Box.Value = CLng(Asc(Mid(strResult, 16, 1))) And &H7F
 		this.timeAutoStart_sec = readBuffer[15] & 0x7F;
 		LiPoWatchDialog.log.log(Level.FINE, "isAutoStartTime = " + this.isAutoStartTime + " timeAutoStart_sec = " + this.timeAutoStart_sec); //$NON-NLS-1$ //$NON-NLS-2$
 		this.timeTriggerButton.setSelection(this.isAutoStartTime);
@@ -1068,41 +1064,38 @@ public class LiPoWatchDialog extends DeviceDialog {
 		this.timeTriggerCombo.select(timeSelect);
 		this.timeTriggerCombo.setText(String.format("%4s", this.timeAutoStart_sec)); //$NON-NLS-1$
 
-		//Spannungsschwelle_Box.Value = CLng(Asc(Mid(strResult, 17, 1))) - 20
+		// auto start voltage limit
 		this.voltageLevelRegulationLimit = (readBuffer[16] & 0xFF) - 20;
 		LiPoWatchDialog.log.log(Level.FINE, "voltageLevelRegulationLimit = " + this.voltageLevelRegulationLimit); //$NON-NLS-1$
 		this.voltageLevelRegulationCombo.select(this.voltageLevelRegulationLimit);
 
-		//If (CLng(Asc(Mid(strResult, 18, 1))) And &H80) = 0 Then CheckBox_Empfaengersteuerung.Value = False
+		// auto start rx signal
 		this.isAutStartRx = (readBuffer[17] & 0x80) != 0;
 		this.impulseTriggerButton.setSelection(this.isAutStartRx);
 
-		//If (CLng(Asc(Mid(strResult, 18, 1))) And &H7F) = 0 Then Startimpuls_Box.Text = "Rx an"
+		
 		this.isRxOn = (readBuffer[17] & 0x7F) == 0;
-		if (this.isRxOn) {
+		if (this.isRxOn) {// auto start rx impulse "Rx on"
 			this.rxAutoStartValue = (readBuffer[17] & 0x7F) + 9; // 9 = Rx on 
 		}
-		else {
-			//Startimpuls_Box.Value = (CLng(Asc(Mid(strResult, 18, 1))) And &H7F) - 11  ' Wert wird in us geteilt durch 100 gespeichert
-			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
+		else {// auto start rx impulse length	
+			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms 
 		}
 		this.impulseTriggerCombo.select(this.rxAutoStartValue);
 		LiPoWatchDialog.log.log(Level.FINE, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		//Abregelung_Box.Value = CLng(Asc(Mid(strResult, 19, 1)))
+		// auto start voltage drop
 		this.impulsReductionType = (readBuffer[18] & 0x7F);
 		LiPoWatchDialog.log.log(Level.FINE, "impulsReductionType = " + this.impulsReductionType); //$NON-NLS-1$
 		this.regulationTypeCombo.select(this.impulsReductionType);
-
 		this.isAutoStartVoltageDrop = false;
-		//If CLng(Asc(Mid(strResult, 20, 1))) = 0 Then
 		if ((readBuffer[19] & 0xFF) != 0) {
 			this.isAutoStartVoltageDrop = true;
 		}
 		LiPoWatchDialog.log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$ 
 		this.voltageDropTriggerButton.setSelection(this.isAutoStartVoltageDrop);
 
-		//Zellentyp_Box.Value = CLng(Asc(Mid(strResult, 21, 1)))
+		// cell type
 		this.cellType = readBuffer[20] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "cellType = " + this.cellType); //$NON-NLS-1$
 		this.cellTypeCombo.select(this.cellType);

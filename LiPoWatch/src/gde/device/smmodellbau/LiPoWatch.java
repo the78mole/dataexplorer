@@ -201,33 +201,30 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		int totalVotage = 0;
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 
-		//Servoimpuls_ein = (CLng(Asc(Mid(strResult, 7, 1))) * 256 + Asc(Mid(strResult, 6, 1)) And &HFFF0) / 16
+		//Servoimpuls_in
 		points[1] = (((dataBuffer[6] & 0xFF) << 8) + (dataBuffer[5] & 0xFF) & 0xFFF0) / 16 * 1000;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(1)" + points[16]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		//Servoimpuls_aus = (CLng(Asc(Mid(strResult, 9, 1))) * 256 + Asc(Mid(strResult, 8, 1)) And &HFFF0) / 16
+		//Servoimpuls_out 
 		points[2] = (((dataBuffer[8] & 0xFF) << 8) + (dataBuffer[7] & 0xFF) & 0xFFF0) / 16 * 1000;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(2)" + points[17]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
-		//Temp_intern = CLng(Asc(Mid(strResult, 15, 1))) * 256 + Asc(Mid(strResult, 14, 1))
-		//Temp_intern = IIf(Temp_intern <= 32768, Temp_intern / 100, (Temp_intern - 65536) / 100)
+		//Temp_intern
 		tmpValue = ((dataBuffer[14] & 0xFF) << 8) + (dataBuffer[13] & 0xFF);
 		points[3] = tmpValue <= 32768 ? tmpValue * 10 : (tmpValue - 65536) * 10;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(3)" + points[18]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
-		int numberCells = (dataBuffer[5] & 0x0F); //Zellenzahl = Asc(Mid(strResult, 6, 1)) And &HF
+		// number cells (first measurement might be wrong, so use avarage if possible)
+		int numberCells = (dataBuffer[5] & 0x0F); 
 		LiPoWatch.log.log(Level.FINE, "numberCells = " + numberCells); //$NON-NLS-1$
+		// read cell voltage values
 		int i;
 		for (i = 0; i < numberCells; i++) {
-			//For i = 0 To Zellenzahl - 1
-			//   Spannung(i) = CLng(Asc(Mid(strResult, 17 + (2 * i), 1))) * 256 + Asc(Mid(strResult, 16 + (2 * i), 1))
-			//   Spannung(i) = IIf(Spannung(i) <= 32768, Spannung(i) / 500, (Spannung(i) - 65536) / 500)
-			//Next i
 			tmpValue = ((dataBuffer[2 * i + 16] & 0xFF) << 8) + (dataBuffer[2 * i + 15] & 0xFF);
 			points[i + 4] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
 			if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			totalVotage += points[i + 4];
 		}
-		//Messmodus = CLng(Asc(Mid(strResult, 10, 1)) And &HF0) / 16
+		//measurement modus absolute/relative
 		boolean isRelative = ((dataBuffer[9] & 0xF0) >> 4) == 1;
 		if (isRelative)
 			points[0] = totalVotage;
@@ -429,7 +426,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * enhance initial record set comment device specific
-	 * UniLog has serial number and a firmeware version
+	 * LiPoWatch has serial number and a firmeware version
 	 * @param recordSet
 	 */
 	public void updateInitialRecordSetComment(RecordSet recordSet) {

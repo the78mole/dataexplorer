@@ -69,7 +69,7 @@ public class LiPoWatchDataGatherer extends Thread {
 	 */
 	@Override
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	// cast from Object to Vector<Integer>
+	// cast from Object to Vector<byte[]>
 	public void run() {
 		log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
 		Channel channel = Channels.getInstance().get(this.channelNumber);
