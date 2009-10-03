@@ -179,7 +179,7 @@ public class GathererThread extends Thread {
 							public void run() {
 								GathererThread.this.application.updateGraphicsWindow();
 								GathererThread.this.application.updateStatisticsData();
-								GathererThread.this.application.updateDataTable(GathererThread.this.recordSetKey);
+								//GathererThread.this.application.updateDataTable(GathererThread.this.recordSetKey);
 								GathererThread.this.application.updateDigitalWindowChilds();
 								GathererThread.this.application.updateAnalogWindowChilds();
 								//GathererThread.this.application.updateCellVoltageChilds();
