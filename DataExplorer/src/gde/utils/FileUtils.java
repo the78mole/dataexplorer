@@ -201,13 +201,38 @@ public class FileUtils {
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
 		fileBasePath = fileBasePath.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + OSDE.FILE_SEPARATOR_UNIX;
+		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
-			if (fileName.length() > 4 ) // "a.csv"
+			if (fileName.length() > 4 && !fileName.contains(OSDE.STRING_STAR)) { // "a.csv"
 				FileUtils.cleanFile(fileBasePath + fileName);
+			}
+			else {
+				fileNamesWildCard.add(fileName);
+			}
+		}
+		if (fileNamesWildCard.size() > 0) {
+			for (String fileName : fileNamesWildCard) {
+				String startSignature = fileName.substring(0, fileName.indexOf(OSDE.STRING_STAR));
+				String endingSignature = fileName.substring(fileName.lastIndexOf(OSDE.STRING_STAR)+1);
+				try {
+					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
+					for (File file : fileList) {
+						String tmpFileName = file.getName();
+						log.log(Level.FINE, "evaluating " + tmpFileName);
+						if ( (startSignature.length() == 0 && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature)) 	// "*register.sh"
+							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() == 0) 	// "bootstrap.log*"
+							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature))) {  // "swt*448.dll"
+							log.log(Level.FINE, "deleting " + tmpFileName);
+							FileUtils.cleanFile(fileBasePath + tmpFileName);
+						}
+					}
+				}
+				catch (FileNotFoundException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+			}
 		}
 	}
-
-	
 	
 	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
