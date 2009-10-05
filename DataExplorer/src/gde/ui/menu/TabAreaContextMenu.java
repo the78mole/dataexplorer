@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -63,65 +65,20 @@ public class TabAreaContextMenu {
 	}
 
 	public void createMenu(Menu popupMenu, int type) {
-//		popupMenu.addMenuListener(new MenuListener() {
-//			@Override
-//			public void menuShown(MenuEvent e) {
-//				int tabSelectionIndex = TabAreaContextMenu.this.application.getTabSelectionIndex();
-//				if (tabSelectionIndex == 0) {
-//					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
-//					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
-//					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
-//				}
-//				else if (tabSelectionIndex != 0 && tabSelectionIndex != 6) {
-//					if (TabAreaContextMenu.this.curveSelectionItem != null && !TabAreaContextMenu.this.curveSelectionItem.isDisposed()) {
-//						TabAreaContextMenu.this.curveSelectionItem.dispose();
-//						TabAreaContextMenu.this.curveSelectionItem = null;
-//					}
-//					if (TabAreaContextMenu.this.displayGraphicsHeaderItem != null && !TabAreaContextMenu.this.displayGraphicsHeaderItem.isDisposed()) {
-//						TabAreaContextMenu.this.displayGraphicsHeaderItem.dispose();
-//						TabAreaContextMenu.this.displayGraphicsHeaderItem = null;
-//					}
-//					if (TabAreaContextMenu.this.displayGraphicsCommentItem != null && !TabAreaContextMenu.this.displayGraphicsCommentItem.isDisposed()) {
-//						TabAreaContextMenu.this.displayGraphicsCommentItem.dispose();
-//						TabAreaContextMenu.this.displayGraphicsCommentItem = null;
-//					}
-//					if (TabAreaContextMenu.this.separatorView != null && !TabAreaContextMenu.this.separatorView.isDisposed()) {
-//						TabAreaContextMenu.this.separatorView.dispose();
-//						TabAreaContextMenu.this.separatorView = null;
-//					}
-//					if (TabAreaContextMenu.this.copyPrintImageItem != null && !TabAreaContextMenu.this.copyPrintImageItem.isDisposed()) {
-//						TabAreaContextMenu.this.copyPrintImageItem.dispose();
-//						TabAreaContextMenu.this.copyPrintImageItem = null;
-//					}
-//					if (TabAreaContextMenu.this.borderColorItem != null && !TabAreaContextMenu.this.borderColorItem.isDisposed()) {
-//						TabAreaContextMenu.this.borderColorItem.dispose();
-//						TabAreaContextMenu.this.borderColorItem = null;
-//					}
-//				}
-//				else {
-//					if (TabAreaContextMenu.this.curveSelectionItem != null && !TabAreaContextMenu.this.curveSelectionItem.isDisposed()) {
-//						TabAreaContextMenu.this.curveSelectionItem.dispose();
-//						TabAreaContextMenu.this.curveSelectionItem = null;
-//					}
-//					if (TabAreaContextMenu.this.displayGraphicsHeaderItem != null && !TabAreaContextMenu.this.displayGraphicsHeaderItem.isDisposed()) {
-//						TabAreaContextMenu.this.displayGraphicsHeaderItem.dispose();
-//						TabAreaContextMenu.this.displayGraphicsHeaderItem = null;
-//					}
-//					if (TabAreaContextMenu.this.displayGraphicsCommentItem != null && !TabAreaContextMenu.this.displayGraphicsCommentItem.isDisposed()) {
-//						TabAreaContextMenu.this.displayGraphicsCommentItem.dispose();
-//						TabAreaContextMenu.this.displayGraphicsCommentItem = null;
-//					}
-//					if (TabAreaContextMenu.this.separatorView != null && !TabAreaContextMenu.this.separatorView.isDisposed()) {
-//						TabAreaContextMenu.this.separatorView.dispose();
-//						TabAreaContextMenu.this.separatorView = null;
-//					}
-//				}
-//				
-//			}
-//			@Override
-//			public void menuHidden(MenuEvent e) {
-//			}
-//		});
+		popupMenu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuShown(MenuEvent e) {
+				int tabSelectionIndex = TabAreaContextMenu.this.application.getTabSelectionIndex();
+				if (tabSelectionIndex == 0) {
+					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
+					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
+				}
+			}
+			@Override
+			public void menuHidden(MenuEvent e) {
+			}
+		});
 		if (!isCreated) {
 			if (type == TYPE_GRAPHICS) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
