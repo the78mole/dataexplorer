@@ -126,10 +126,11 @@ public class ObjectDescriptionWindow {
 	final OpenSerialDataExplorer	application;
 	final Settings								settings;
 	final Channels								channels;
-	final Menu										imagePopupMenu;
-	final ObjectImageContextMenu	imageContextMenu;
-	final Menu										popupmenu;
-	final TabAreaContextMenu			contextMenu;
+	
+	Menu													imagePopupMenu;
+	ObjectImageContextMenu				imageContextMenu;
+	Menu													popupmenu;
+	TabAreaContextMenu						contextMenu;
 
 	String												objectFilePath;
 	String												activeObjectKey;
@@ -147,10 +148,6 @@ public class ObjectDescriptionWindow {
 		this.channels = Channels.getInstance();
 		this.activeObjectKey = this.settings.getActiveObject();
 		
-		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.imageContextMenu = new ObjectImageContextMenu();
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
 		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
 	}
@@ -264,6 +261,11 @@ public class ObjectDescriptionWindow {
 		SWTResourceManager.registerResourceUser(this.objectTabItem);
 		this.objectTabItem.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.objectTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0403));
+		
+		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.imageContextMenu = new ObjectImageContextMenu();
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
 		{
 			this.tabComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.objectTabItem.setControl(this.tabComposite);
