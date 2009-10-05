@@ -25,6 +25,7 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -33,9 +34,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 
+import osde.config.Settings;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.CellVoltageValues;
 
 /**
@@ -63,6 +67,10 @@ public class CellVoltageDisplay extends Composite {
 	final OpenSerialDataExplorer	application;
 	final String									displayHeaderText;
 
+	final Color										backgroundColor;
+	final Menu										popupmenu;
+	final TabAreaContextMenu			contextMenu;
+
 	int									voltage;
 	int 								lastTop = 0;
 	int 								lastVoltageLevel = 0;
@@ -83,9 +91,10 @@ public class CellVoltageDisplay extends Composite {
 		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.parent = useParent;
-		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+		this.setBackground(this.backgroundColor);
 		GridLayout mainCompositeLayout = new GridLayout();
 		mainCompositeLayout.makeColumnsEqualWidth = true;
+		mainCompositeLayout.verticalSpacing = 0;
 		mainCompositeLayout.marginHeight = 0;
 		mainCompositeLayout.marginWidth = 0;
 		this.setLayout(mainCompositeLayout);
@@ -96,20 +105,27 @@ public class CellVoltageDisplay extends Composite {
 		this.beginSpreadVoltage = voltageLimits[3];
 		this.lowerLimitColorRed = voltageLimits[4];
 		this.lowerLimitVoltage = voltageLimits[5];
+		this.setMenu(this.popupmenu);
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "CellVoltageDisplay.helpRequested " + evt); //$NON-NLS-1$
 				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
+		
+		this.backgroundColor = Settings.getInstance().getCellVoltageInnerAreaBackground();
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 	}
 
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
 			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.BOLD));
-			this.cellTextLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.cellTextLabel.setBackground(this.backgroundColor);
 			this.cellTextLabel.setText(this.displayHeaderText);
+			this.cellTextLabel.setMenu(this.popupmenu);
 			GridData text1LData = new GridData();
 			text1LData.horizontalAlignment = GridData.FILL;
 			text1LData.grabExcessHorizontalSpace = true;
@@ -117,9 +133,10 @@ public class CellVoltageDisplay extends Composite {
 		}
 		{
 			this.cellVoltageDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellVoltageDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
+			this.cellVoltageDigitalLabel.setBackground(this.backgroundColor);
+			this.cellVoltageDigitalLabel.setMenu(this.popupmenu);
 			this.cellVoltageDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 32, SWT.NORMAL));
+			this.cellVoltageDigitalLabel.setText("0,00"); //$NON-NLS-1$
 			GridData actualDigitalLabelLData = new GridData();
 			actualDigitalLabelLData.horizontalAlignment = GridData.FILL;
 			actualDigitalLabelLData.grabExcessHorizontalSpace = true;
@@ -138,15 +155,15 @@ public class CellVoltageDisplay extends Composite {
 			canvas1Layout.marginHeight = 0;
 			canvas1Layout.marginWidth = 0;
 			this.cellComposite.setLayout(canvas1Layout);
+			this.cellComposite.setMenu(this.popupmenu);
 			{
 				this.fillLeft = new Composite(this.cellComposite, SWT.NONE);
 				this.fillLeft.setDragDetect(false);
 				this.fillLeft.setEnabled(false);
-				this.fillLeft.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.fillLeft.setBackground(this.backgroundColor);
 			}
 			{
 				this.cellCanvas = new Canvas(this.cellComposite, SWT.NONE);
-				this.cellCanvas.setBackground(OpenSerialDataExplorer.COLOR_GREY);
 				this.cellCanvas.setDragDetect(false);
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
@@ -159,7 +176,7 @@ public class CellVoltageDisplay extends Composite {
 				this.fillRight = new Composite(this.cellComposite, SWT.NONE);
 				this.fillRight.setEnabled(false);
 				this.fillRight.setDragDetect(false);
-				this.fillRight.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.fillRight.setBackground(this.backgroundColor);
 			}
 		}
 		this.layout();

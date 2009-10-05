@@ -46,6 +46,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.CurveSelectorContextMenu;
 
 /**
  * This class defines a composite whith a header (Curve Selector, ..) and a table with checkable table items
@@ -55,12 +56,13 @@ import osde.ui.SWTResourceManager;
 public class SelectorComposite extends Composite {
   final static Logger           log                                 = Logger.getLogger(SelectorComposite.class.getName());
 
-  final OpenSerialDataExplorer  application = OpenSerialDataExplorer.getInstance();
-  final Channels                channels       = Channels.getInstance();
-  final SashForm								parent;
-  final int											windowType;
-  final String                  headerText;
-  final Menu                    popupmenu;
+  final OpenSerialDataExplorer  	application = OpenSerialDataExplorer.getInstance();
+  final Channels                	channels    = Channels.getInstance();
+  final SashForm									parent;
+  final int												windowType;
+  final String                  	headerText;
+  final Menu                    	popupmenu;
+	final CurveSelectorContextMenu	contextMenu;
   
   int                           headerTextExtentFactor = 9;
 	CLabel												curveSelectorHeader;
@@ -76,14 +78,18 @@ public class SelectorComposite extends Composite {
 	 * @param useParent
 	 * @param useWindowType
 	 */
-	public SelectorComposite(final SashForm useParent, final int useWindowType, final String useHeaderText, final Menu usePopUpMenu) {
+	public SelectorComposite(final SashForm useParent, final int useWindowType, final String useHeaderText) {
 		super(useParent, SWT.NONE);
 		//this = new Composite(this.graphicSashForm, SWT.NONE);
 		this.parent = useParent;
 		this.windowType = useWindowType;
 		this.headerText = useHeaderText;
-		this.popupmenu = usePopUpMenu;
 		SWTResourceManager.registerResourceUser(this);
+		
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new CurveSelectorContextMenu();
+		this.contextMenu.createMenu(SelectorComposite.this.popupmenu);		
+		
 		initGUI();
 	}
 
@@ -132,10 +138,11 @@ public class SelectorComposite extends Composite {
 			curveTableLData.bottom = new FormAttachment(1000, 1000, 0);
 			curveTableLData.right = new FormAttachment(1000, 1000, 0);
 			this.curveSelectorTable.setLayoutData(curveTableLData);
-			if (this.popupmenu != null) this.curveSelectorTable.setMenu(this.popupmenu);
+			this.curveSelectorTable.setMenu(this.popupmenu);
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "curveTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					TableItem item = (TableItem) evt.item;
 					String recordName = ((TableItem) evt.item).getText();
 					log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$

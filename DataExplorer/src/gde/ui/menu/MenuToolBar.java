@@ -22,14 +22,10 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.ImageTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
@@ -45,6 +41,7 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
+import osde.io.FileHandler;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
@@ -113,7 +110,7 @@ public class MenuToolBar {
 	final Channels								channels;
 	final Settings								settings;
 	final String									language;
-	final String									osdeDataPath;
+	final FileHandler							fileHandler;
 
 	public MenuToolBar(OpenSerialDataExplorer parent, CoolBar menuCoolBar) {
 		this.application = parent;
@@ -121,7 +118,7 @@ public class MenuToolBar {
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 		this.language = this.settings.getLocale().getLanguage();
-		this.osdeDataPath = MenuToolBar.this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX;
+		this.fileHandler = new FileHandler();
 	}
 
 	public void init() {
@@ -159,7 +156,7 @@ public class MenuToolBar {
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "openToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.getMenuBar().openFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
+							MenuToolBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.OSDE_MSGT0004));
 						}
 					});
 				}
@@ -174,9 +171,9 @@ public class MenuToolBar {
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
+									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
 								else
-									MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName());
+									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName());
 							}
 						}
 					});
@@ -189,7 +186,7 @@ public class MenuToolBar {
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.application.getMenuBar().saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
+							MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);
 						}
 					});
 				}
@@ -220,39 +217,7 @@ public class MenuToolBar {
 					this.copyToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "copyToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							Image graphicsImage = null;
-							switch (MenuToolBar.this.application.getTabSelectionIndex()) {
-							case 0: // graphics
-							case 6: // curve compare
-							default:
-								graphicsImage = MenuToolBar.this.application.getGraphicsTabContentAsImage();
-								break;
-							case 1: // statistics
-								graphicsImage = MenuToolBar.this.application.getStatisticsTabContentAsImage();
-								break;
-							case 2: // table
-								graphicsImage = MenuToolBar.this.application.getTableTabContentAsImage();
-								break;
-							case 3: // digital
-								graphicsImage = MenuToolBar.this.application.getDigitalTabContentAsImage();
-								break;
-							case 4: // analog
-								graphicsImage = MenuToolBar.this.application.getAnalogTabContentAsImage();
-								break;
-							case 5: // cell voltage
-								graphicsImage = MenuToolBar.this.application.getCellVoltageTabContentAsImage();
-								break;
-							case 7: // file comment
-								graphicsImage = MenuToolBar.this.application.getFileDescriptionTabContentAsImage();
-								break;
-							case 8: // object
-								graphicsImage = MenuToolBar.this.application.getObjectTabContentAsImage();
-								break;
-							}
-							Clipboard clipboard = new Clipboard(OpenSerialDataExplorer.display);
-							clipboard.setContents(new Object[]{graphicsImage.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});	
-							clipboard.dispose();
-							graphicsImage.dispose();
+							MenuToolBar.this.application.copyTabContentAsImage();
 						}
 					});
 				}
@@ -454,7 +419,7 @@ public class MenuToolBar {
 											if (MenuToolBar.this.oldObjectKey.length() >= 1) {
 												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0031));
 												if (answer == SWT.YES) 
-													FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + MenuToolBar.this.oldObjectKey);
+													FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX  + MenuToolBar.this.oldObjectKey);
 											}
 											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
 												if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
@@ -540,7 +505,7 @@ public class MenuToolBar {
 								MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 								currentIndex = currentIndex >= 2 ? currentIndex - 1 : tmpObjects.size() > 1 ? 1 : 0;
 								MenuToolBar.this.objectSelectCombo.select(currentIndex);
-								FileUtils.deleteDirectory(MenuToolBar.this.osdeDataPath + delObjectKey);
+								FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + delObjectKey);
 								if (currentIndex == 0) {
 									MenuToolBar.this.deleteObject.setEnabled(false);
 									MenuToolBar.this.editObject.setEnabled(false);

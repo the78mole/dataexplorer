@@ -28,12 +28,15 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 
+import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -41,6 +44,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.TabAreaContextMenu;
 
 /**
  * Display window parent of digital displays
@@ -53,12 +57,17 @@ public class DigitalWindow {
 	CTabItem												digitalTab;
 	HashMap<String, DigitalDisplay>	displays;
 	CLabel													infoText;
-	FillLayout 											digitalMainCompositeLayout;
+	FillLayout 											digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
+
+	Color														surroundingBackground;
 
 	final OpenSerialDataExplorer		application;
 	final Channels									channels;
 	final CTabFolder								displayTab;
+	final Menu											popupmenu;
+	final TabAreaContextMenu				contextMenu;
+	
 	RecordSet												oldRecordSet;
 	Channel													oldChannel;
 	String[] 												oldRecordsToDisplay;
@@ -67,6 +76,12 @@ public class DigitalWindow {
 		this.displayTab = currentDisplayTab;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+			
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		this.surroundingBackground = Settings.getInstance().getDigitalSurroundingAreaBackground();
+		
+		this.displays = new HashMap<String, DigitalDisplay>(3);
 	}
 
 	public void create() {
@@ -74,13 +89,12 @@ public class DigitalWindow {
 		SWTResourceManager.registerResourceUser(this.digitalTab);
 		this.digitalTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
-		
-		this.displays = new HashMap<String, DigitalDisplay>(3);
 		{
 			this.digitalMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.digitalTab.setControl(this.digitalMainComposite);
-			this.digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
+			this.digitalMainComposite.setBackground(this.surroundingBackground);
 			this.digitalMainComposite.setLayout(null);
+			this.digitalMainComposite.setMenu(this.popupmenu);
 			this.digitalMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "digitalMainComposite.helpRequested " + evt); //$NON-NLS-1$
@@ -90,24 +104,12 @@ public class DigitalWindow {
 			this.digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					update();
+					DigitalWindow.this.contextMenu.createMenu(DigitalWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+					update(false);
 				}
 			});
 			setActiveInfoText(this.info);
-			this.infoText.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINE, "infoText.paintControl, event=" + evt); //$NON-NLS-1$
-					update();
-				}
-			});
-			this.infoText.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "infoText.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
 			
-			this.digitalMainComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
 			this.digitalMainComposite.layout();
 		}
 	}
@@ -119,7 +121,7 @@ public class DigitalWindow {
 		if (this.infoText == null || this.infoText.isDisposed()) {
 			this.digitalMainComposite.setLayout(null);
 			this.infoText = new CLabel(this.digitalMainComposite, SWT.LEFT);
-			this.infoText.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.infoText.setBackground(this.surroundingBackground);
 			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 			this.infoText.setBounds(10, 10, 200, 30);
 			this.infoText.setText(udateInfo);
@@ -143,7 +145,7 @@ public class DigitalWindow {
 	/**
 	 * method to update digital window by adding removing digital displays
 	 */
-	public void update() {
+	public void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
@@ -152,7 +154,7 @@ public class DigitalWindow {
 				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
 		
 				// if recordSet name signature changed new displays need to be created
-				boolean isUpdateRequired = this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
+				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
 				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
@@ -189,9 +191,10 @@ public class DigitalWindow {
 						this.displays.remove(recordKey);
 					}
 				}
-				if (recordSet != null && !recordSet.getDevice().isDigitalTabRequested())
+				if (recordSet != null && !recordSet.getDevice().isDigitalTabRequested()) {
 					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
 					else this.infoText.setText(this.info);
+				}
 			}
 			this.oldChannel = activeChannel;
 			this.digitalMainComposite.layout();
@@ -210,5 +213,24 @@ public class DigitalWindow {
 		imageGC.dispose();
 
 		return tabContentImage;
+	}
+
+	/**
+	 * @param newInnerAreaBackground the innerAreaBackground to set
+	 */
+	public void setInnerAreaBackground(Color newInnerAreaBackground) {
+		this.update(true);
+	}
+
+	/**
+	 * @param newSurroundingBackground the surroundingAreaBackground to set
+	 */
+	public void setSurroundingAreaBackground(Color newSurroundingBackground) {
+		this.digitalMainComposite.setBackground(newSurroundingBackground);
+		this.surroundingBackground = newSurroundingBackground;
+		if (this.infoText != null && !this.infoText.isDisposed()) {
+			this.infoText.setBackground(newSurroundingBackground);
+		}
+		this.digitalMainComposite.redraw();
 	}
 }

@@ -33,7 +33,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 
+import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -41,6 +43,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.GraphicsUtils;
 import osde.utils.MathUtils;
 
@@ -52,7 +55,7 @@ public class AnalogDisplay extends Composite {
 	final static Logger			log								= Logger.getLogger(AnalogDisplay.class.getName());
 
 	Canvas					tacho;
-	CLabel					textDigitalLabel;
+	CLabel					textAnalogLabel;
 	final int				textHeight				= 30;
 
 	Image						tachoImage;
@@ -78,12 +81,17 @@ public class AnalogDisplay extends Composite {
 	final Record									record;
 	final String									recordKey;
 	final IDevice									device;
+	
+	final Color										backgroundColor;
+	final Menu										popupmenu;
+	final TabAreaContextMenu			contextMenu;
+
 
 	/**
 	 * 
 	 */
-	public AnalogDisplay(Composite analogWindow, String currentRecordKey, IDevice currentDevice) {
-		super(analogWindow, SWT.BORDER);
+	public AnalogDisplay(Composite analogMainComposite, String currentRecordKey, IDevice currentDevice) {
+		super(analogMainComposite, SWT.BORDER);
 		FillLayout AnalogDisplayLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		GridData analogDisplayLData = new GridData();
 		analogDisplayLData.grabExcessVerticalSpace = true;
@@ -91,11 +99,11 @@ public class AnalogDisplay extends Composite {
 		analogDisplayLData.verticalAlignment = GridData.FILL;
 		analogDisplayLData.horizontalAlignment = GridData.FILL;
 		this.setLayoutData(analogDisplayLData);
-		this.setLayout(AnalogDisplayLayout);
+		this.setLayout(AnalogDisplayLayout);		
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
 		this.channel = Channels.getInstance().getActiveChannel();
-		this.application = OpenSerialDataExplorer.getInstance();
 		if (this.channel != null) {
 			this.recordSet = this.channel.getActiveRecordSet();
 			if (this.recordSet != null) {
@@ -109,6 +117,11 @@ public class AnalogDisplay extends Composite {
 			this.recordSet = null;
 			this.record = null;
 		}
+		
+		this.backgroundColor = Settings.getInstance().getAnalogInnerAreaBackground();
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 	}
 
 	public void create() {
@@ -119,16 +132,18 @@ public class AnalogDisplay extends Composite {
 			}
 		});
 		this.tacho = new Canvas(this, SWT.NONE);
+		this.tacho.setMenu(this.popupmenu);
 		this.tacho.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				tachoPaintControl(evt);
 			}
 		});
-		this.textDigitalLabel = new CLabel(this.tacho, SWT.CENTER);
-		this.textDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD)); //$NON-NLS-1$
-		this.textDigitalLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-		this.textDigitalLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-		this.textDigitalLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);
+		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
+		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD)); //$NON-NLS-1$
+		this.textAnalogLabel.setBackground(this.backgroundColor);
+		this.textAnalogLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);
+		this.textAnalogLabel.setMenu(this.popupmenu);
 	}
 
 	void tachoPaintControl(PaintEvent evt) {
@@ -160,11 +175,11 @@ public class AnalogDisplay extends Composite {
 			this.tachoImage = SWTResourceManager.getImage(this.width, this.height, this.recordKey);
 			this.tachoImageGC = SWTResourceManager.getGC(this.tachoImage);
 			//clear image with background color
-			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.tachoImageGC.setBackground(this.backgroundColor);
 			this.tachoImageGC.fillRectangle(0, 0, this.width, this.height);
 			String recordText = this.recordKey + " [ " + this.record.getUnit() + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.textDigitalLabel.setSize(this.width, this.textHeight);
-			this.textDigitalLabel.setText(recordText);
+			this.textAnalogLabel.setSize(this.width, this.textHeight);
+			this.textAnalogLabel.setText(recordText);
 			this.centerX = this.width / 2;
 			this.centerY = (int) (this.height * 0.75);
 			double radiusW = this.width / 2 * 0.80;

@@ -15,18 +15,21 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
+import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -37,6 +40,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.TimeLine;
 
 /**
@@ -68,6 +72,11 @@ public class StatisticsWindow {
 	TableColumn										maxTableColumn;
 	TableColumn										minTableColumn;
 	
+	Menu													popupmenu;
+	TabAreaContextMenu						contextMenu;
+	Color													innerAreaBackground;
+	Color													surroundingBackground;
+
 	// internal display variables
 	String descriptionText = ""; //$NON-NLS-1$
 	Vector<String> tabelItemText = new Vector<String>();
@@ -78,19 +87,28 @@ public class StatisticsWindow {
 	int														oldNumberDisplayableRecords = 0;
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
+	final Settings								settings;
 	final CTabFolder							tabFolder;
 
 	public StatisticsWindow(OpenSerialDataExplorer currentApplication, CTabFolder currentDisplayTab) {
 		this.application = currentApplication;
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
+		
+		this.innerAreaBackground = this.settings.getStatisticsInnerAreaBackground();
+		this.surroundingBackground = this.settings.getStatisticsSurroundingAreaBackground();
 	}
 
 	public void create() {
 		this.statistics = new CTabItem(this.tabFolder, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.statistics);
 		this.statistics.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
+		SWTResourceManager.registerResourceUser(this.statistics);
+		
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		
 		initGUI();
 	}
 
@@ -99,20 +117,31 @@ public class StatisticsWindow {
 			this.composite = new Composite(this.tabFolder, SWT.NONE);
 			this.statistics.setControl(this.composite);
 			this.composite.setLayout(null);
-			this.composite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.composite.setBackground(this.surroundingBackground);
+			this.composite.setMenu(this.popupmenu);			
+//			this.composite.addPaintListener(new PaintListener() {			
+//				@Override
+//				public void paintControl(PaintEvent evt) {
+//					log.log(Level.FINEST, "composite.paintControl " + evt); //$NON-NLS-1$
+//					StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu);
+//				}
+//			});
 			this.composite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "composite.helpRequested " + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.composite.addControlListener(new ControlListener() {
+				@Override
 				public void controlResized(ControlEvent evt) {
-					log.log(Level.FINE, "composite.controlResized evt=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
 					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
 					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
+				@Override
 				public void controlMoved(ControlEvent evt) {
 					log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
@@ -123,22 +152,32 @@ public class StatisticsWindow {
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
 				this.descriptionGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
-				this.descriptionGroup.setBackground(SWTResourceManager.getColor(255, 255, 255));
+				this.descriptionGroup.setBackground(this.innerAreaBackground);
+				this.descriptionGroup.setMenu(this.popupmenu);			
 				this.descriptionGroup.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.descriptionGroup.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINE, "group0.paintControl, event=" + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
+						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null) {
 								String tmpDescriptionText = StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
 									+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
+								if (StatisticsWindow.this.descriptionTextLabel == null || !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel)) {
+									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
+								}
+							}
+							else {
+								String tmpDescriptionText = OSDE.STRING_EMPTY;
 								if (StatisticsWindow.this.descriptionTextLabel == null || !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel)) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
@@ -150,9 +189,10 @@ public class StatisticsWindow {
 					this.descriptionTextLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
 					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
-					this.descriptionTextLabel.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
 					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
 					this.descriptionTextLabel.setEditable(false);
+					this.descriptionTextLabel.setMenu(this.popupmenu);			
 				}
 			}
 			{
@@ -161,10 +201,20 @@ public class StatisticsWindow {
 				this.dataTable.setHeaderVisible(true);
 				this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
+				this.dataTable.setBackground(this.innerAreaBackground);
+				this.dataTable.setMenu(this.popupmenu);			
 				this.dataTable.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+						log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
+				this.dataTable.addPaintListener(new PaintListener() {
+					@Override
+					public void paintControl(PaintEvent evt) {
+						log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
+						updateStatisticsData();
 					}
 				});
 				{
@@ -216,13 +266,15 @@ public class StatisticsWindow {
 	 * update statistics window display data
 	 */
 	public void updateStatisticsData() {
+		log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
+
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null) {
-				StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
-						+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
-				this.descriptionGroup.redraw();
+			if (activeRecordSet != null && !activeRecordSet.equals(oldRecordSet)) {
+				// cleanup old data table
+				this.dataTable.removeAll();
+				
 				this.customTableColumnWidth = 0;
 				try {
 					String[] displayableRecords = activeRecordSet.getDisplayableRecordNames();
@@ -358,21 +410,35 @@ public class StatisticsWindow {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
 				this.oldRecordSet = activeRecordSet;
+				
+				// set items (rows) of data table
+				TableItem row;
+				if (!this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer between header and table enties only
+				for (String itemsText : this.tabelItemText) {
+					if (this.isWindows) this.dataTable.setItemCount(this.dataTable.getItemCount() + 1); // add spacer line for windows
+					row = new TableItem(this.dataTable, SWT.NONE);
+					row.setText(itemsText.split(DELIMITER));
+				}
 			}
-			else {
-				StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$
+			else if (activeRecordSet == null){
+				if (oldRecordSet != null && this.tabelItemText.size() > 0) {
+					// cleanup old data table
+					this.dataTable.removeAll();
+				}
 				this.tabelItemText = new Vector<String>();
 				this.oldRecordSet = null;
 			}
 		}
 		else {
-			StatisticsWindow.this.descriptionText = ""; //$NON-NLS-1$
+			if (oldRecordSet != null && this.tabelItemText.size() > 0) {
+				// cleanup old data table
+				this.dataTable.removeAll();
+			}
 			this.tabelItemText = new Vector<String>();
 			this.oldRecordSet = null;
 		}
-		//StatisticsWindow.this.descriptionGroup.redraw();
-		updateDataTable();
-		this.dataTable.redraw();
+		adaptTableSize();
+		this.descriptionGroup.redraw();
 	}
 
 	/**
@@ -421,8 +487,6 @@ public class StatisticsWindow {
 			row = new TableItem(this.dataTable, SWT.NONE);
 			row.setText(itemsText.split(DELIMITER));
 		}
-		//this.dataTable.setItemCount(this.dataTable.getItemCount() + 1);
-		adaptTableSize();
 
 		log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
 	}
@@ -502,4 +566,24 @@ public class StatisticsWindow {
 		return objectImage;
 	}
 
+	/**
+	 * @param newInnerAreaBackground the innerAreaBackground to set
+	 */
+	public void setInnerAreaBackground(Color newInnerAreaBackground) {
+		this.innerAreaBackground = newInnerAreaBackground;
+		this.descriptionGroup.setBackground(newInnerAreaBackground);
+		this.descriptionTextLabel.setBackground(newInnerAreaBackground);
+		this.descriptionGroup.redraw();
+		this.dataTable.setBackground(newInnerAreaBackground);
+		this.dataTable.redraw();
+	}
+
+	/**
+	 * @param newSurroundingBackground the surroundingAreaBackground to set
+	 */
+	public void setSurroundingAreaBackground(Color newSurroundingBackground) {
+		this.composite.setBackground(newSurroundingBackground);
+		this.surroundingBackground = newSurroundingBackground;
+		this.composite.redraw();
+	}
 }

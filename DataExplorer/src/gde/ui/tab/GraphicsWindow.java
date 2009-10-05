@@ -23,17 +23,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Menu;
 
+import osde.config.Settings;
 import osde.data.Channels;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.ui.menu.CurveSelectorContextMenu;
 import osde.utils.TimeLine;
 
 /**
@@ -56,14 +56,13 @@ public class GraphicsWindow {
 	
 	// Curve Selector Table with popup menu
 	SelectorComposite							curveSelectorComposite;
-	Menu													popupmenu;
-	CurveSelectorContextMenu			contextMenu;
 
 	// drawing canvas
 	GraphicsComposite							graphicsComposite;
 
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
+	final Settings								settings;
 	final String									tabName;
 	final TimeLine								timeLine								= new TimeLine();
 	final int											windowType;
@@ -74,6 +73,7 @@ public class GraphicsWindow {
 		this.windowType = currentType;
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
+		this.settings = Settings.getInstance();
 	}
 
 	public void create() {
@@ -87,11 +87,7 @@ public class GraphicsWindow {
 			this.graphic.setControl(this.graphicSashForm);
 			
 			{ // curveSelector
-				this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-				this.contextMenu = new CurveSelectorContextMenu();
-				this.contextMenu.createMenu(this.popupmenu);
-				this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254), this.popupmenu);
-				
+				this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254));			
 			} // curveSelector
 			
 			{ // graphics composite
@@ -247,7 +243,7 @@ public class GraphicsWindow {
 	 * @return state true/false
 	 */
 	public boolean isActiveCurveSelectorContextMenu() {
-		return this.contextMenu.isActive();
+		return this.curveSelectorComposite.contextMenu.isActive();
 	}
 	
 	/**
@@ -262,5 +258,35 @@ public class GraphicsWindow {
 		imageGC.dispose();
 
 		return tabContentImage;
+	}
+	
+	/**
+	 * set the curve graphics background color
+	 * @param curveAreaBackground the curveAreaBackground to set
+	 */
+	public void setCurveAreaBackground(Color curveAreaBackground) {
+		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
+		this.graphicsComposite.graphicCanvas.redraw();
+	}
+	
+	/**
+	 * set the curve graphics background color
+	 * @param curveAreaBackground the curveAreaBackground to set
+	 */
+	public void setCurveAreaBorderColor(Color borderColor) {
+		this.graphicsComposite.curveAreaBorderColor = borderColor;
+		this.graphicsComposite.graphicCanvas.redraw();
+	}
+
+	/**
+	 * set the curve graphics surrounding background color
+	 * @param surroundingBackground the surroundingBackground to set
+	 */
+	public void setSurroundingBackground(Color surroundingBackground) {
+		this.graphicsComposite.surroundingBackground = surroundingBackground;
+		this.graphicsComposite.setBackground(surroundingBackground);
+		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
+		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
+		this.graphicsComposite.doRedrawGraphics();
 	}
 }

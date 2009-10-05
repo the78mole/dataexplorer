@@ -65,8 +65,7 @@ public class RecordSet extends HashMap<String, Record> {
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																// records/measurements which are active or inactive
 	double												timeStep_ms										= 0;																						//Zeitbasis der Messpunkte
-	String												recordSetDescription					= (this.device !=null ? this.device.getName()+OSDE.STRING_MESSAGE_CONCAT : OSDE.STRING_EMPTY) 
-																																+ DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
+	String												description										= OSDE.STRING_EMPTY;
 	boolean												isSaved												= false;																				//indicates if the record set is saved to file
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
 	boolean												isFromFile										= false;																				//indicates that this record set was created by loading data from file
@@ -76,7 +75,7 @@ public class RecordSet extends HashMap<String, Record> {
 	long													fileDataPointer								= 0; 																						//file pointer where the data of this record begins
 	boolean												hasDisplayableData						= false;
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
-	Rectangle											drawAreaBounds;																										// draw area in display pixel
+	Rectangle											drawAreaBounds;																																// draw area in display pixel
 
 	// data table
 	Thread												waitAllDisplayableThread;
@@ -185,6 +184,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
+		this.description = (this.device != null ? this.device.getName()+OSDE.STRING_MESSAGE_CONCAT : OSDE.STRING_EMPTY) 
+			+ DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	}
 
 	/**
@@ -273,7 +274,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 
 		this.timeStep_ms = recordSet.timeStep_ms;
-		this.recordSetDescription = recordSet.recordSetDescription;
+		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;
@@ -347,7 +348,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 
 		this.timeStep_ms = recordSet.timeStep_ms;
-		this.recordSetDescription = recordSet.recordSetDescription;
+		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;
@@ -932,14 +933,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the recordSetDescription
 	 */
 	public String getRecordSetDescription() {
-		return this.recordSetDescription;
+		return this.description;
 	}
 
 	/**
 	 * @param newRecordSetDescription the recordSetDescription to set
 	 */
 	public void setRecordSetDescription(String newRecordSetDescription) {
-		this.recordSetDescription = newRecordSetDescription;
+		this.description = newRecordSetDescription;
 	}
 
 	/**

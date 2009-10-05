@@ -36,6 +36,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -72,6 +73,7 @@ import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.ObjectImageContextMenu;
+import osde.ui.menu.TabAreaContextMenu;
 
 /**
  * @author Winfried Brügmann
@@ -85,6 +87,7 @@ public class ObjectDescriptionWindow {
 
 	Group													editGroup;
 	CoolBar												editCoolBar;
+	GridData 											editCoolBarLData;
 	ToolBar												fontSelectToolBar;
 	ToolBar												editToolBar;
 	int														toolButtonHeight		= 23;
@@ -106,8 +109,8 @@ public class ObjectDescriptionWindow {
 	Composite											headerComposite;	
 	CLabel												objectNameLabel;
 	CLabel												objectName;
-	Composite											typeComposite;
-	CLabel												objectTypeLable;
+	Composite											objectTypeComposite;
+	CLabel												objectTypeLabel;
 	Text													objectTypeText;
 	Composite											dateComposite;
 	CLabel												dateLabel;
@@ -117,20 +120,25 @@ public class ObjectDescriptionWindow {
 	CLabel												statusLabel;
 
 	Canvas												imageCanvas;
-	Menu													popupmenu;
-	ObjectImageContextMenu				contextMenu;
 
 	final CTabFolder							tabFolder;
 	//static CTabFolder cTabFolder1;
 	final OpenSerialDataExplorer	application;
 	final Settings								settings;
 	final Channels								channels;
+	final Menu										imagePopupMenu;
+	final ObjectImageContextMenu	imageContextMenu;
+	final Menu										popupmenu;
+	final TabAreaContextMenu			contextMenu;
+
 	String												objectFilePath;
 	String												activeObjectKey;
 	boolean												isObjectDataSaved		= true;
 	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
 	ObjectData										object;
 	Image													image;
+	Color													innerAreaBackground;
+	Color													surroundingBackground;
 
 	public ObjectDescriptionWindow(OpenSerialDataExplorer currenApplication, CTabFolder objectDescriptionTab) {
 		this.application = currenApplication;
@@ -138,6 +146,13 @@ public class ObjectDescriptionWindow {
 		this.settings = Settings.getInstance();
 		this.channels = Channels.getInstance();
 		this.activeObjectKey = this.settings.getActiveObject();
+		
+		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.imageContextMenu = new ObjectImageContextMenu();
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
+		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
 	}
 
 	public ObjectDescriptionWindow(CTabFolder objectDescriptionTab) {
@@ -146,6 +161,13 @@ public class ObjectDescriptionWindow {
 		this.settings = null;
 		this.channels = null;
 		this.tabFolder.setSize(1020, 554);
+		
+		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.imageContextMenu = new ObjectImageContextMenu();
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		this.innerAreaBackground = Settings.getInstance().getFileCommentInnerAreaBackground();
+		this.surroundingBackground = Settings.getInstance().getFileCommentSurroundingAreaBackground();
 	}
 	
 	public boolean isVisible() {
@@ -247,7 +269,8 @@ public class ObjectDescriptionWindow {
 			this.objectTabItem.setControl(this.tabComposite);
 			FormLayout composite1Layout = new FormLayout();
 			this.tabComposite.setLayout(composite1Layout);
-			this.tabComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+			this.tabComposite.setBackground(this.surroundingBackground);
+			this.tabComposite.setMenu(this.popupmenu);
 			{
 				this.headerComposite = new Composite(this.tabComposite, SWT.NONE);
 				RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -258,7 +281,8 @@ public class ObjectDescriptionWindow {
 				composite2LData.left = new FormAttachment(0, 1000, 15);
 				composite2LData.top = new FormAttachment(0, 1000, 17);
 				this.headerComposite.setLayoutData(composite2LData);
-				this.headerComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.headerComposite.setBackground(this.surroundingBackground);
+				this.headerComposite.setMenu(this.popupmenu);
 				{
 					this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
 					this.objectNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0404));
@@ -267,7 +291,8 @@ public class ObjectDescriptionWindow {
 					cLabel1LData.width = 130;
 					cLabel1LData.height = 26;
 					this.objectNameLabel.setLayoutData(cLabel1LData);
-					this.objectNameLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.objectNameLabel.setBackground(this.surroundingBackground);
+					this.objectNameLabel.setMenu(this.popupmenu);
 				}
 				{
 					this.objectName = new CLabel(this.headerComposite, SWT.NONE);
@@ -276,7 +301,8 @@ public class ObjectDescriptionWindow {
 					cLabel1LData.width = 300;
 					cLabel1LData.height = 26;
 					this.objectName.setLayoutData(cLabel1LData);
-					this.objectName.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.objectName.setBackground(this.surroundingBackground);
+					this.objectName.setMenu(this.popupmenu);
 				}
 			}
 			{
@@ -291,32 +317,36 @@ public class ObjectDescriptionWindow {
 				group2LData.top = new FormAttachment(0, 1000, 60);
 				this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
 				this.mainObjectCharacterisitcsGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0416));
-				this.mainObjectCharacterisitcsGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.mainObjectCharacterisitcsGroup.setBackground(this.surroundingBackground);
+				this.mainObjectCharacterisitcsGroup.setMenu(this.popupmenu);
 				{
-					this.typeComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
+					this.objectTypeComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
 					RowLayout composite1Layout3 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					this.typeComposite.setLayout(composite1Layout3);
+					this.objectTypeComposite.setLayout(composite1Layout3);
 					GridData typeCompositeLData = new GridData();
 					typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 					typeCompositeLData.grabExcessHorizontalSpace = true;
 					typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					typeCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
-					this.typeComposite.setLayoutData(typeCompositeLData);
-					this.typeComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.objectTypeComposite.setLayoutData(typeCompositeLData);
+					this.objectTypeComposite.setBackground(this.surroundingBackground);
+					this.objectTypeComposite.setMenu(this.popupmenu);
 					{
-						this.objectTypeLable = new CLabel(this.typeComposite, SWT.NONE);
-						this.objectTypeLable.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
-						this.objectTypeLable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-						this.objectTypeLable.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
+						this.objectTypeLabel = new CLabel(this.objectTypeComposite, SWT.NONE);
+						this.objectTypeLabel.setBackground(this.surroundingBackground);
+						this.objectTypeLabel.setMenu(this.popupmenu);
+						this.objectTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.objectTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
 						RowData cLabel1LData1 = new RowData();
 						cLabel1LData1.width = 140;
 						cLabel1LData1.height = 22;
-						this.objectTypeLable.setLayoutData(cLabel1LData1);
-						this.objectTypeLable.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0405));
+						this.objectTypeLabel.setLayoutData(cLabel1LData1);
+						this.objectTypeLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0405));
 					}
 					{
-						this.objectTypeText = new Text(this.typeComposite, SWT.BORDER);
-						this.objectTypeText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.objectTypeText = new Text(this.objectTypeComposite, SWT.BORDER);
+						this.objectTypeText.setBackground(this.innerAreaBackground);
+						this.objectTypeText.setMenu(this.popupmenu);
 						this.objectTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						this.objectTypeText.setEditable(true);
 						RowData cLabel2LData = new RowData();
@@ -343,10 +373,11 @@ public class ObjectDescriptionWindow {
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					dateCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
 					this.dateComposite.setLayoutData(dateCompositeLData);
-					this.dateComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.dateComposite.setBackground(this.surroundingBackground);
+					this.dateComposite.setMenu(this.popupmenu);
 					{
 						this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
-						this.dateLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.dateLabel.setMenu(this.popupmenu);
 						this.dateLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						RowData dateLabelLData = new RowData();
 						dateLabelLData.width = 140;
@@ -354,6 +385,8 @@ public class ObjectDescriptionWindow {
 						this.dateLabel.setLayoutData(dateLabelLData);
 						this.dateLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0406));
 						this.dateLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0407));
+						this.dateLabel.setBackground(this.surroundingBackground);
+						this.dateLabel.setMenu(this.popupmenu);
 					}
 					{
 						this.dateText = new Text(this.dateComposite, SWT.BORDER);
@@ -362,7 +395,8 @@ public class ObjectDescriptionWindow {
 						dateTextLData.width = OSDE.IS_WINDOWS ? 118: 116;
 						dateTextLData.height = 18;
 						this.dateText.setLayoutData(dateTextLData);
-						this.dateText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.dateText.setBackground(this.innerAreaBackground);
+						this.dateText.setMenu(this.popupmenu);
 						this.dateText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0407));
 						this.dateText.setEditable(true);
 						this.dateText.addKeyListener(new KeyAdapter() {
@@ -384,10 +418,12 @@ public class ObjectDescriptionWindow {
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
 					statusCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
 					this.statusComposite.setLayoutData(statusCompositeLData);
-					this.statusComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.statusComposite.setBackground(this.surroundingBackground);
+					this.statusComposite.setMenu(this.popupmenu);
 					{
 						this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
-						this.statusLabel.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+						this.statusLabel.setBackground(this.surroundingBackground);
+						this.statusLabel.setMenu(this.popupmenu);
 						this.statusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						RowData statusLabelLData = new RowData();
 						statusLabelLData.width = 140;
@@ -400,12 +436,14 @@ public class ObjectDescriptionWindow {
 						this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
 						this.statusText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL)); 
 						this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(OSDE.STRING_SEMICOLON));
+						this.statusText.setBackground(this.innerAreaBackground);
+						this.statusText.setMenu(this.popupmenu);
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 120;
 						group1LData.height = OSDE.IS_WINDOWS ? 21 : 25;
 						this.statusText.setLayoutData(group1LData);
-						this.statusText.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						this.statusText.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));
 						this.statusText.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -428,15 +466,16 @@ public class ObjectDescriptionWindow {
 					this.imageCanvas.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0413));
 					this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.imageCanvas.setSize(400, 300);
-					this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-					this.contextMenu = new ObjectImageContextMenu();
-					this.contextMenu.createMenu(this.popupmenu);
-					this.imageCanvas.setMenu(this.popupmenu);
+
+					this.imageContextMenu.createMenu(this.imagePopupMenu);
+					
+					this.imageCanvas.setMenu(this.imagePopupMenu);
 					this.imageCanvas.addPaintListener(new PaintListener() {
 						public void paintControl(PaintEvent evt) {
 							log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
-							if (ObjectDescriptionWindow.this.popupmenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean) ObjectDescriptionWindow.this.popupmenu.getData("OBJECT_IMAGE_CHANGED")) {
-								String imagePath = (String) ObjectDescriptionWindow.this.popupmenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
+							ObjectDescriptionWindow.this.contextMenu.createMenu(ObjectDescriptionWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+							if (ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED) != null && (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
+								String imagePath = (String) ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
 								if (imagePath != null) {
 								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(ObjectDescriptionWindow.this.imageCanvas.getDisplay(), 
 										imagePath).getImageData(), 
@@ -448,7 +487,7 @@ public class ObjectDescriptionWindow {
 									ObjectDescriptionWindow.this.image = null;
 								}
 								ObjectDescriptionWindow.this.object.setImage(ObjectDescriptionWindow.this.image);
-								ObjectDescriptionWindow.this.popupmenu.setData("OBJECT_IMAGE_CHANGED", false);
+								ObjectDescriptionWindow.this.imagePopupMenu.setData("OBJECT_IMAGE_CHANGED", false);
 								ObjectDescriptionWindow.this.isObjectDataSaved = false;
 								//imageCanvas.redraw(0,0,400,300,true);
 							}
@@ -465,33 +504,34 @@ public class ObjectDescriptionWindow {
 			{
 				this.editGroup = new Group(this.tabComposite, SWT.NONE);
 				FormData composite1LData = new FormData();
-				composite1LData.width = 540;
+				//composite1LData.width = 540;
+				composite1LData.height = 425;
 				composite1LData.right = new FormAttachment(1000, 1000, -15);
 				composite1LData.top = new FormAttachment(0, 1000, 60);
-				composite1LData.bottom = new FormAttachment(1000, 1000, -15);
 				composite1LData.left = new FormAttachment(0, 1000, 440);
 				this.editGroup.setLayoutData(composite1LData);				
 				this.editGroup.setLayout(new GridLayout());
 				this.editGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0414));
-				this.editGroup.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+				this.editGroup.setBackground(this.surroundingBackground);
+				this.editGroup.setMenu(this.popupmenu);
 				{
 					this.editCoolBar = new CoolBar(this.editGroup, SWT.FLAT);
-					GridData editCoolBarLData = new GridData();
+					editCoolBarLData = new GridData();
 					editCoolBarLData.grabExcessHorizontalSpace = true;
 					editCoolBarLData.horizontalAlignment = GridData.FILL;
 					editCoolBarLData.verticalAlignment = GridData.BEGINNING;
-					editCoolBarLData.minimumWidth = 505;
 					editCoolBarLData.heightHint = 40;		
 					editCoolBarLData.minimumHeight = 40;				
 					this.editCoolBar.setLayoutData(editCoolBarLData);		
 					this.editCoolBar.setLayout(new RowLayout(SWT.HORIZONTAL));
-					this.editCoolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+					this.editCoolBar.setBackground(this.surroundingBackground);
+					this.editCoolBar.setMenu(this.popupmenu);
 					{
 						this.editCoolItem = new CoolItem(this.editCoolBar, SWT.FLAT);
 						{
 							this.fontSelectToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 							this.editCoolItem.setControl(this.fontSelectToolBar);
-							this.fontSelectToolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+							this.fontSelectToolBar.setBackground(this.surroundingBackground);
 
 							new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 							{
@@ -511,7 +551,7 @@ public class ObjectDescriptionWindow {
 								ToolItem fontSizeSelectComboSep = new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 								{
 									this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
-									this.fontSizeSelectComposite.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+									this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 									this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 									this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
@@ -540,7 +580,7 @@ public class ObjectDescriptionWindow {
 
 							this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 							this.editCoolItem.setControl(this.editToolBar);
-							this.editToolBar.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW);
+							this.editToolBar.setBackground(this.surroundingBackground);
 
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
 							{
@@ -674,9 +714,12 @@ public class ObjectDescriptionWindow {
 								});
 							}
 							new ToolItem(this.editToolBar, SWT.SEPARATOR);
-
+							
+							int tmpWidth = size.x;
 							size = this.editToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 							this.editToolBar.setSize(size);
+							editCoolBarLData.minimumWidth = 8 + tmpWidth + size.x;
+							this.editCoolBar.setLayoutData(editCoolBarLData);		
 						}
 					}
 				}
@@ -684,8 +727,9 @@ public class ObjectDescriptionWindow {
 					this.styledTextComposite = new Composite(this.editGroup, SWT.BORDER);
 					FormLayout styledTextCompositeLayout = new FormLayout();
 					this.styledTextComposite.setLayout(styledTextCompositeLayout);
-					this.styledTextComposite.setBackground(SWTResourceManager.getColor(255, 255, 255));
+					this.styledTextComposite.setBackground(this.innerAreaBackground);
 					GridData styledTextGData = new GridData();
+					styledTextGData.minimumWidth = 300;
 					styledTextGData.grabExcessHorizontalSpace = true;
 					styledTextGData.horizontalAlignment = GridData.FILL;
 					styledTextGData.grabExcessVerticalSpace = true;
@@ -700,13 +744,13 @@ public class ObjectDescriptionWindow {
 						this.styledText.setHorizontalIndex(2);
 						this.styledText.setTopIndex(1);
 						FormData styledTextLData = new FormData();
-						styledTextLData.width = 400;
-						styledTextLData.height = 300;
 						styledTextLData.top = new FormAttachment(0, 1000, 5);
 						styledTextLData.left = new FormAttachment(0, 1000, 8);
 						styledTextLData.bottom = new FormAttachment(1000, 1000, 0);
 						styledTextLData.right = new FormAttachment(1000, 1000, 0);
 						this.styledText.setLayoutData(styledTextLData);
+						this.styledText.setBackground(this.innerAreaBackground);
+						this.styledText.setMenu(this.popupmenu);
 						this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 							public void modifyText(ExtendedModifyEvent evt) {
 								log.log(Level.FINEST, "styledText.modifyText, event=" + evt); //$NON-NLS-1$
@@ -933,5 +977,48 @@ public class ObjectDescriptionWindow {
 		imageGC.dispose();
 
 		return objectImage;
+	}
+
+	/**
+	 * @param newInnerAreaBackground the innerAreaBackground to set
+	 */
+	public void setInnerAreaBackground(Color newInnerAreaBackground) {
+		this.innerAreaBackground = newInnerAreaBackground;
+		this.objectTypeText.setBackground(this.innerAreaBackground);
+		this.dateText.setBackground(this.innerAreaBackground);
+		this.statusText.setBackground(this.innerAreaBackground);
+		this.styledTextComposite.setBackground(this.innerAreaBackground);
+		this.styledText.setBackground(this.innerAreaBackground);
+		this.fontSizeSelectCombo.setBackground(this.innerAreaBackground);
+		this.objectTypeText.redraw();
+		this.dateText.redraw();
+		this.statusText.redraw();
+		this.styledTextComposite.redraw();
+		this.fontSizeSelectCombo.redraw();
+	}
+
+	/**
+	 * @param newSurroundingBackground the surroundingAreaBackground to set
+	 */
+	public void setSurroundingAreaBackground(Color newSurroundingBackground) {
+		this.surroundingBackground = newSurroundingBackground;
+		this.tabComposite.setBackground(this.surroundingBackground);
+		this.headerComposite.setBackground(this.surroundingBackground);
+		this.mainObjectCharacterisitcsGroup.setBackground(this.surroundingBackground);
+		this.objectNameLabel.setBackground(this.surroundingBackground);
+		this.objectName.setBackground(this.surroundingBackground);
+		this.objectTypeComposite.setBackground(this.surroundingBackground);
+		this.objectTypeLabel.setBackground(this.surroundingBackground);
+		this.objectName.setBackground(this.surroundingBackground);
+		this.dateComposite.setBackground(this.surroundingBackground);
+		this.dateLabel.setBackground(this.surroundingBackground);
+		this.statusComposite.setBackground(this.surroundingBackground);
+		this.statusLabel.setBackground(this.surroundingBackground);
+		this.editGroup.setBackground(this.surroundingBackground);
+		this.editCoolBar.setBackground(this.surroundingBackground);
+		this.editToolBar.setBackground(this.surroundingBackground);
+		this.fontSelectToolBar.setBackground(this.surroundingBackground);
+		this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
+		this.tabComposite.redraw();
 	}
 }

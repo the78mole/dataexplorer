@@ -35,6 +35,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -43,6 +44,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
@@ -55,6 +57,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
+import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.CurveUtils;
 import osde.utils.GraphicsUtils;
 import osde.utils.TimeLine;
@@ -81,6 +84,12 @@ public class GraphicsComposite extends Composite {
 	final TimeLine								timeLine								= new TimeLine();
 	final SashForm								graphicSashForm;
 	final int											windowType;
+
+	Menu													popupmenu;
+	TabAreaContextMenu						contextMenu;
+	Color													curveAreaBackground;
+	Color													surroundingBackground;
+	Color													curveAreaBorderColor;
 
 	// drawing canvas
 	Text													graphicsHeader;
@@ -122,7 +131,7 @@ public class GraphicsComposite extends Composite {
 	GC														canvasImageGC;
 	GC														canvasGC;
 	Rectangle											curveAreaBounds					= new Rectangle(0,0,1,1);
-	
+		
 	boolean												isLeftMouseMeasure			= false;
 	boolean												isRightMouseMeasure			= false;
 	int														xPosMeasure							= 0, yPosMeasure = 0;
@@ -143,17 +152,35 @@ public class GraphicsComposite extends Composite {
 
 	GraphicsComposite(final SashForm useParent, int useWindowType) {
 		super(useParent, SWT.NONE);
+		SWTResourceManager.registerResourceUser(this);
 		this.graphicSashForm = useParent;
 		this.windowType = useWindowType;
-
-		SWTResourceManager.registerResourceUser(this);
+		
+		//get the background colors
+		if (this.windowType == GraphicsWindow.TYPE_NORMAL) {			
+			this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
+			this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
+			this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
+		}
+		else {
+			this.curveAreaBackground = this.settings.getCompareCurveAreaBackground();
+			this.surroundingBackground = this.settings.getCompareSurroundingBackground();
+			this.curveAreaBorderColor = this.settings.getCurveCompareBorderColor();
+		}
+			
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
+		
 		init();
 	}
 
 	void init() {
 		this.setLayout(null);
 		this.setDragDetect(false);
-		this.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+		this.setBackground(this.surroundingBackground);
+		
+		this.contextMenu.createMenu(this.popupmenu, this.windowType);
+		
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
 			public void handleEvent( Event evt) {
@@ -172,7 +199,8 @@ public class GraphicsComposite extends Composite {
 		{
 			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
 			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
-			this.graphicsHeader.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.graphicsHeader.setBackground(this.surroundingBackground);
+			this.graphicsHeader.setMenu(this.popupmenu);
 			this.graphicsHeader.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); 			//$NON-NLS-1$
@@ -187,7 +215,14 @@ public class GraphicsComposite extends Composite {
 					if (activeChannel != null) {
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 						if (recordSet != null) {
-							String tmpHeader = activeChannel.getFileDescription() + OSDE.STRING_MESSAGE_CONCAT + recordSet.getName();
+							String tmpDescription = activeChannel.getFileDescription();
+							if (tmpDescription.contains(",") ) {
+								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(","));
+							}
+							else if (tmpDescription.contains("\n")) {
+								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
+							}
+							String tmpHeader = tmpDescription + OSDE.STRING_MESSAGE_CONCAT + recordSet.getName();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
 							}
@@ -218,7 +253,8 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.graphicCanvas = new Canvas(this, SWT.NONE);
-			this.graphicCanvas.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.graphicCanvas.setBackground(this.surroundingBackground);
+			this.graphicCanvas.setMenu(this.popupmenu);
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 				public void mouseMove(MouseEvent evt) {
 					log.log(Level.FINEST, "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
@@ -253,7 +289,8 @@ public class GraphicsComposite extends Composite {
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
 			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize()+1, SWT.NORMAL));
-			this.recordSetComment.setBackground(OpenSerialDataExplorer.COLOR_CANVAS_YELLOW); // light yellow
+			this.recordSetComment.setBackground(this.surroundingBackground); 
+			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
@@ -306,7 +343,7 @@ public class GraphicsComposite extends Composite {
 		
 		this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
 		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
-		this.canvasImageGC.setBackground(this.graphicCanvas.getBackground());
+		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 		//get gc for other drawing operations
@@ -442,9 +479,13 @@ public class GraphicsComposite extends Composite {
 		this.offSetY = y0 - height;
 
 		// draw curves for each active record
-		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
+		this.curveAreaBounds = new Rectangle(x0, y0 - height, width+1, height+1);
 		recordSet.setDrawAreaBounds(this.curveAreaBounds);
 		log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+		
+		gc.setBackground(this.curveAreaBackground);
+		gc.fillRectangle(this.curveAreaBounds);
+		gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
 		int deltaTime_ms = new Double(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
@@ -454,10 +495,7 @@ public class GraphicsComposite extends Composite {
 		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, deltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
-		if(OSDE.IS_WINDOWS)  
-			gc.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-		else
-			gc.setForeground(OpenSerialDataExplorer.COLOR_GREY);
+		gc.setForeground(this.curveAreaBorderColor);
 		
 		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
 		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
@@ -515,6 +553,7 @@ public class GraphicsComposite extends Composite {
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 			log.log(Level.FINER, strStartTime);
 		}
+		
 	}
 
 	/**
@@ -576,6 +615,7 @@ public class GraphicsComposite extends Composite {
 	 */
 	synchronized void doRedrawGraphics() {
 		this.graphicsHeader.redraw();
+		this.recordSetComment.redraw();
 		
 		if (OSDE.IS_WINDOWS) {
 			Point size = this.graphicCanvas.getSize();
@@ -586,8 +626,6 @@ public class GraphicsComposite extends Composite {
 		}
 		else
 			this.graphicCanvas.redraw(); // do full update
-		
-		this.recordSetComment.redraw();
 	}
 
 	public void notifySelected() {
@@ -1389,7 +1427,7 @@ public class GraphicsComposite extends Composite {
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 				GC graphicsGC = new GC(graphicsImage);
-				graphicsGC.setBackground(this.graphicsHeader.getBackground());
+				graphicsGC.setBackground(this.surroundingBackground);
 				graphicsGC.setForeground(this.graphicsHeader.getForeground());
 				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
 				graphicsGC.setFont(this.graphicsHeader.getFont());
@@ -1418,7 +1456,7 @@ public class GraphicsComposite extends Composite {
 				if (activeRecordSet != null) {
 					this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
 					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
-					this.canvasImageGC.setBackground(this.graphicCanvas.getBackground());
+					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
 					this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
@@ -1426,12 +1464,12 @@ public class GraphicsComposite extends Composite {
 
 					GC graphicsGC = new GC(graphicsImage);
 					graphicsGC.setForeground(this.graphicsHeader.getForeground());
-					graphicsGC.setBackground(this.graphicsHeader.getBackground());
+					graphicsGC.setBackground(this.surroundingBackground);
 					graphicsGC.setFont(this.graphicsHeader.getFont());
 					graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-					GraphicsUtils.drawTextCentered(activeRecordSet.getName(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+					GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 					graphicsGC.setFont(this.recordSetComment.getFont());
-					GraphicsUtils.drawText(activeRecordSet.getRecordSetDescription(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
+					GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
 					graphicsGC.drawImage(this.canvasImage, 0, 30);
 					graphicsGC.dispose();
 				}
@@ -1449,5 +1487,4 @@ public class GraphicsComposite extends Composite {
 			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}
 	}
-
 }
