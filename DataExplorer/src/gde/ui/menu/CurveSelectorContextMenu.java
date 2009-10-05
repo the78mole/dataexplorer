@@ -234,8 +234,8 @@ public class CurveSelectorContextMenu {
 			this.lineColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event evt) {
 					log.log(Level.FINER, "lineColor performed! " + evt); //$NON-NLS-1$
-					CurveSelectorContextMenu.this.isActiveColorDialog = true;
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
+						CurveSelectorContextMenu.this.isActiveColorDialog = true;
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
 							Color color = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
@@ -243,10 +243,10 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.actualRecord.setColor(color);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 						}
+						CurveSelectorContextMenu.this.isActiveColorDialog = false;
+						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
-					CurveSelectorContextMenu.this.isActiveColorDialog = false;
 				}
 			});
 			this.lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
