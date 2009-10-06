@@ -140,13 +140,18 @@ public class FileUtils {
 	public static boolean deleteDirectory(String fullQualifiedDirectoryPath) {
 		boolean exist = false;
 		File dir = new File(fullQualifiedDirectoryPath);
-		if (dir.exists() && dir.isDirectory()) {
+		if (dir.exists() && dir.isDirectory() && dir.canWrite()) {
 			exist = true;
 			
 			try {
 				List<File> files = FileUtils.getFileListing(dir);
 				for (File file : files) {
-					file.delete();
+					if (file.canWrite()) {
+						file.delete();
+					}
+					else {
+						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath());
+					}
 				}
 				dir.delete();
 			}
@@ -158,6 +163,9 @@ public class FileUtils {
 					log.log(Level.SEVERE, dir.getAbsolutePath(), e);
 				}
 			}
+		}
+		else {
+			log.log(Level.WARNING, "no delete permission on " + dir.getAbsolutePath());
 		}
 		return exist;
 	}	
@@ -178,7 +186,12 @@ public class FileUtils {
 	public static void renameFile(String filePath, String extension) {
 		if (checkFileExist(filePath)) {
 			File file = new File(filePath);
-			file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(".")+1) + extension)); //$NON-NLS-1$
+			if (file.canWrite()) {
+				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(".")+1) + extension)); //$NON-NLS-1$
+			}
+			else {
+				log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath());
+			}
 		}
 	}
 
@@ -189,10 +202,10 @@ public class FileUtils {
 	    
 		if (FileUtils.checkFileExist(fullQualifiedFilePath)) {
 		    File fileToBeDeleted = new File(fullQualifiedFilePath);
-			if (!fileToBeDeleted.isDirectory()) 
+			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) 
 				fileToBeDeleted.delete();
 			else
-				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory, use different method !" );
+				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !" );
 		}
 	}
 
@@ -691,14 +704,18 @@ public class FileUtils {
 	 */
 	private static List<File> getFileListingNoSort(File rootDirectory) throws FileNotFoundException {
 		List<File> result = new ArrayList<File>();
-		File[] filesAndDirs = rootDirectory.listFiles();
-		List<File> filesDirs = Arrays.asList(filesAndDirs);
-		for (File file : filesDirs) {
-			result.add(file);
-			if (!file.isFile()) {
-				//recursive walk by calling itself
-				List<File> deeperList = getFileListingNoSort(file);
-				result.addAll(deeperList);
+		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
+			File[] filesAndDirs = rootDirectory.listFiles();
+			List<File> filesDirs = Arrays.asList(filesAndDirs);
+			for (File file : filesDirs) {
+				if (file.isFile()) {
+					result.add(file);
+				}
+				else { // isDirectory()
+					//recursive walk by calling itself
+					List<File> deeperList = getFileListingNoSort(file);
+					result.addAll(deeperList);
+				}
 			}
 		}
 		return result;
