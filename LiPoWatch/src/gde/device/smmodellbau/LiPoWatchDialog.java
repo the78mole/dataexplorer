@@ -765,14 +765,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.liveDataCaptureGroup.setBounds(259, 12, 228, 164);
 									this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1657));
-									this.liveDataCaptureGroup.setEnabled(false); //TODO after enabling this function -> true
 									this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 									{
 										this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 										this.startLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 										this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1658));
 										this.startLiveGatherButton.setBounds(12, 24, 202, 30);
-										this.startLiveGatherButton.setEnabled(false); //TODO after enabling this function -> true
+										this.startLiveGatherButton.setEnabled(true);
 										this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1658));
 										this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -819,7 +818,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.startLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 												this.startLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1661));
 												this.startLoggingButton.setBounds(12, 21, 70, 30);
-												this.startLoggingButton.setEnabled(false); //TODO after enabling this function -> true
+												this.startLoggingButton.setEnabled(true);
 												this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1662));
 												this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
 													@Override
@@ -844,7 +843,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.stopLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 												this.stopLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1663));
 												this.stopLoggingButton.setBounds(94, 21, 82, 30);
-												this.stopLoggingButton.setEnabled(false);//TODO after enabling this function -> true
+												this.stopLoggingButton.setEnabled(false);
 												this.stopLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1664));
 												this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
 													@Override
@@ -874,7 +873,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 										this.stopLiveGatherButton.setBounds(12, 126, 202, 30);
 										this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1665));
-										this.stopLiveGatherButton.setEnabled(false);//TODO after enabling this function -> true
+										this.stopLiveGatherButton.setEnabled(false);
 										this.stopLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1666));
 										this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -1240,10 +1239,10 @@ public class LiPoWatchDialog extends DeviceDialog {
 					LiPoWatchDialog.this.readDataButton.setEnabled(true);
 					LiPoWatchDialog.this.stopReadDataButton.setEnabled(false);
 
-					LiPoWatchDialog.this.startLoggingButton.setEnabled(false); //TODO after enabling this function -> true
+					LiPoWatchDialog.this.startLoggingButton.setEnabled(true); 
 					LiPoWatchDialog.this.stopLoggingButton.setEnabled(false);
 
-					LiPoWatchDialog.this.startLiveGatherButton.setEnabled(false);//TODO after enabling this function -> true
+					LiPoWatchDialog.this.startLiveGatherButton.setEnabled(true);
 					LiPoWatchDialog.this.stopLiveGatherButton.setEnabled(false);
 
 					LiPoWatchDialog.this.clearMemoryButton.setEnabled(true);

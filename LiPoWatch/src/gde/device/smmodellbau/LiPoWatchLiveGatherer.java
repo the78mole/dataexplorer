@@ -81,6 +81,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
 			this.isPortOpenedByLiveGatherer = true;
+			Thread.sleep(2000);
 		}
 
 		// get LiPoWatch configuration for timeStep info
@@ -88,7 +89,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		useDialog.updateConfigurationValues(readBuffer);
 
 		// timer interval
-		int timeIntervalPosition = readBuffer[10] & 0xFF;
+		int timeIntervalPosition = readBuffer[13] & 0xFF;
 		this.timeStep_ms = this.time_ms[timeIntervalPosition];
 		log.log(Level.INFO, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -160,6 +161,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 					}
 				}
 				catch (DataInconsitsentException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 					cleanup(recordSetKey, message, e);				}
 				catch (TimeOutException e) {
