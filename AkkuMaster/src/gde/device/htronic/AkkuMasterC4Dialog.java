@@ -155,22 +155,22 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				///////////////////////////////////////////////////				
 				if (this.channel1Tab == null && this.numberChannels > 0)
-					this.channel1Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(1)), AkkuMasterC4SerialPort.channel_1, this.getSerialPort(), this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel1Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(1) + " 1 "), AkkuMasterC4SerialPort.channel_1, this.getSerialPort(), this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel1Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel2Tab == null && this.numberChannels > 1)
-					this.channel2Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(2)), AkkuMasterC4SerialPort.channel_2, this.getSerialPort(), this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel2Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(2) + " 2 "), AkkuMasterC4SerialPort.channel_2, this.getSerialPort(), this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel2Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel3Tab == null && this.numberChannels > 2)
-					this.channel3Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(3)), AkkuMasterC4SerialPort.channel_3, this.getSerialPort(), this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel3Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(3) + " 3 "), AkkuMasterC4SerialPort.channel_3, this.getSerialPort(), this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel3Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel4Tab == null && this.numberChannels > 3)
-					this.channel4Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(4)), AkkuMasterC4SerialPort.channel_4, this.getSerialPort(), this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel4Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(4) + " 4 "), AkkuMasterC4SerialPort.channel_4, this.getSerialPort(), this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel4Tab.addChannelTab(this.tabFolder);
 				///////////////////////////////////////////////////		
@@ -247,8 +247,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
-						setTotalDischargeCurrentLabelText(getTotalDischargeCurrent());
-						setTotalChargeCurrentLabelText(getTotalChargeCurrent());
+						AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText("" + AkkuMasterC4Dialog.this.totalDischargeCurrent);
+						AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText("" + AkkuMasterC4Dialog.this.totalChargeCurrent);
 					}
 				});
 				{
@@ -298,7 +298,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (getSerialPort() != null && getSerialPort().isConnected()) getSerialPort().close();
-					if (getVersionThread() != null && getVersionThread().isAlive()) getVersionThread().interrupt();
+					Thread thread = AkkuMasterC4Dialog.this.versionThread;
+					if (thread != null && thread.isAlive()) thread.interrupt();
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
@@ -413,7 +414,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								setVersion(getSerialPort().getVersion());
 								getDialogShell().getDisplay().asyncExec(new Runnable() {
 									public void run() {
-										versionCompositeRedraw();
+										AkkuMasterC4Dialog.this.versionComposite.redraw();
 									}
 								});
 							}
@@ -490,48 +491,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	}
 
 	/**
-	 * @param text the totalDischargeCurrentLabel to set
-	 */
-	public void setTotalDischargeCurrentLabelText(String text) {
-		this.totalDischargeCurrentLabel.setText(text);
-	}
-
-	/**
-	 * @return the totalDischargeCurrent
-	 */
-	public String getTotalDischargeCurrent() {
-		return "" + this.totalDischargeCurrent; //$NON-NLS-1$
-	}
-
-	/**
-	 * @param text the totalChargeCurrentLabel to set
-	 */
-	public void setTotalChargeCurrentLabelText(String text) {
-		this.totalChargeCurrentLabel.setText(text);
-	}
-
-	/**
-	 * @return the totalChargeCurrent
-	 */
-	public String getTotalChargeCurrent() {
-		return "" + this.totalChargeCurrent; //$NON-NLS-1$
-	}
-
-	/**
-	 * redraw the versionComposite
-	 */
-	public void versionCompositeRedraw() {
-		this.versionComposite.redraw();
-	}
-
-	/**
-	 * @return the versionThread
-	 */
-	public Thread getVersionThread() {
-		return this.versionThread;
-	}
-
-	/**
 	 * update the version text displayed in version tab
 	 */
 	void updateVersionText(String versionNumberText, String versionDateText, String versionTypeText, String versionPanelText) {
@@ -546,5 +505,13 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public AkkuMasterC4 getDevice() {
 		return this.device;
+	}
+	
+	public void updateCurrentStatus() {
+		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+					AkkuMasterC4Dialog.this.statusComposite.redraw();
+			}
+		});
 	}
 }

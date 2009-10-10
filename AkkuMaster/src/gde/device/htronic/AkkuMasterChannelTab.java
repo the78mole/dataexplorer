@@ -564,6 +564,7 @@ public class AkkuMasterChannelTab {
 															else if (processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.OSDE_MSGT1127).trim()) && isChargeCurrentAdded()) {
 																AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(actualCurrent);
 															}
+															AkkuMasterChannelTab.this.parent.updateCurrentStatus();
 														}
 														else {
 															log.log(Level.FINE, "re-using " + AkkuMasterChannelTab.this.recordSetKey); //$NON-NLS-1$
