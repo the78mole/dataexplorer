@@ -98,6 +98,7 @@ public class UniLogLiveGatherer extends Thread {
 		// get UniLog configuration for timeStep info
 		byte[] readBuffer = useSerialPort.readConfiguration();
 		useDialog.updateConfigurationValues(readBuffer);
+		useDialog.updateActualConfigTabItemAnalogModi(this.channel.getOrdinal());
 
 		// timer interval
 		int timeIntervalPosition = readBuffer[10] & 0xFF;

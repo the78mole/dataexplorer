@@ -1408,6 +1408,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 * attention: set new record name replaces the record, setName() must the last operation in sequence
 	 */
 	public void checkUpdateAnalog() {
+		log.log(Level.FINE, "visit checkUpdateAnalog");
 		if (this.channels.getActiveChannel() != null) {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {

@@ -905,7 +905,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param configKey
 	 */
-	public void updateMeasurementByAnalogModi(byte[] dataBuffer, String configKey) {
+	public void updateMeasurementByAnalogModi(byte[] dataBuffer, final String configKey) {
+		log.log(Level.FINE, "visit updateMeasurementByAnalogModi");
 		// a1Modus -> 0==Temperature, 1==Millivolt, 2=Speed 250, 3=Speed 400
 		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
 				a1Modus = a1Modus > 3 ? 3 : a1Modus;

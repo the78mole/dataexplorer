@@ -1818,4 +1818,26 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		this.device.storeDeviceProperties();
 	}
+
+	/**
+	 * check and update analog modus name, unit according device configuration
+	 * @param configTabIndex the index of the configuration tabulator item
+	 */
+	public void updateActualConfigTabItemAnalogModi(int configTabIndex) {
+		log.log(Level.FINE, "updating configTab" + configTabIndex);
+		switch (configTabIndex) {
+		case 1:
+			this.configTab1.checkUpdateAnalog();
+			break;
+		case 2:
+			this.configTab2.checkUpdateAnalog();
+			break;
+		case 3:
+			this.configTab3.checkUpdateAnalog();
+			break;
+		case 4:
+			this.configTab4.checkUpdateAnalog();
+			break;
+		}
+	}
 }
