@@ -212,7 +212,7 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
     IShellLink *pShellLink;                            // pointer to IShellLink i/f
     HRESULT hres;
     WIN32_FIND_DATA wfd;
-    char szGotPath[MAX_PATH];
+    char szGotPath[512];
 	
 	//printf("fqShellLinkPath = %s\n", fqShellLinkPath); 
 
@@ -235,10 +235,10 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
 
         if (SUCCEEDED(hres))
         {
-            WCHAR wszLinkPath[MAX_PATH];
+            WCHAR wszLinkPath[512];
 
             // Ensure string is Unicode.
-            MultiByteToWideChar(CP_UTF8, 0, fqShellLinkPath, -1, wszLinkPath, MAX_PATH);
+            MultiByteToWideChar(CP_UTF8, 0, fqShellLinkPath, -1, wszLinkPath, 512);
             //int MultiByteToWideChar(UINT, DWORD, const CHAR*, int, WCHAR*, int)
 
             // Load the shell link if exist
@@ -258,14 +258,14 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
                 {
                     strcpy_s(szGotPath, fqShellLinkPath);
 
-                    hres = pShellLink->GetPath((LPWSTR)szGotPath, MAX_PATH,
+                    hres = pShellLink->GetPath((LPWSTR)szGotPath, 512,
                                                (WIN32_FIND_DATA *)&wfd, SLGP_UNCPRIORITY );
                     if (!SUCCEEDED(hres)) {
-                        sprintf_s(&szReturn[0], MAX_PATH,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
+                        sprintf_s(&szReturn[0], 512,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
                         //printf(szReturn);
                     }
                     else if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
+                        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
                         //printf(szReturn);
                     } 
 
@@ -274,7 +274,7 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
                     //printf("link contained file path = %s\n", szReturn);
  
 					if (utf8_length == 0) {
-                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0046; WideCharToMultiByte failed!\n");
+                        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0046; WideCharToMultiByte failed!\n");
                         //printf(szReturn);
 					}
                     
@@ -282,19 +282,19 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
             }
             else // file does not exist
             {
-                sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0042; IPersistFile Load Error\n");
+                sprintf_s(&szReturn[0], 512, "OSDE_MSGE0042; IPersistFile Load Error\n");
                 //printf(szReturn);
             }
             pPersistFile->Release();
         }
         else {
-            sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0041; QueryInterface Error\n");
+            sprintf_s(&szReturn[0], 512, "OSDE_MSGE0041; QueryInterface Error\n");
             //printf(szReturn);
         }
         pShellLink->Release();
     }
     else {
-        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
+        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
         //printf(szReturn);
     }
 
