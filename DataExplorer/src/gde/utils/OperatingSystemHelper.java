@@ -547,7 +547,9 @@ public class OperatingSystemHelper {
 			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			reader.close();
 			if (!line.contains(OSDE.OPEN_SERIAL_DATA)) {
+				log.log(Level.FINE, "source filePath = " + filePath); //$NON-NLS-1$
 				ret = WindowsHelper.getFilePathFromLink(filePath);
+				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
 				if (ret.startsWith("OSDE_MSGE")) { //$NON-NLS-1$
 					String msgKey = ret.split(OSDE.STRING_SEMICOLON)[0];
 					String msgValue = ret.split("; ")[1];
