@@ -126,6 +126,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		
 		this.timer = new Timer();
 		this.timerTask = new TimerTask() {
+			int updateViewCounter = -5;
 
 			public void run() {
 				log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
@@ -144,6 +145,11 @@ public class LiPoWatchLiveGatherer extends Thread {
 							LiPoWatchLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
 							LiPoWatchLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
 							LiPoWatchLiveGatherer.this.isSwitchedRecordSet = true;
+						}
+						
+						if (updateViewCounter++ % 10 == 0) {
+							log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
+							usedDevice.updateVisibilityStatus(recordSet);
 						}
 						
 						if (recordSet.isChildOfActiveChannel() && recordSet.equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
