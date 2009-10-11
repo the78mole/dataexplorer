@@ -78,6 +78,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.application = OpenSerialDataExplorer.getInstance();
 		String templateFileName = this.application.getActiveDevice().getName() + OSDE.STRING_UNDER_BAR + this.name.split(OSDE.STRING_COLON)[0].trim();
 		this.template = new GraphicsTemplate(templateFileName);
+		this.fileDescription = OpenSerialDataExplorer.getInstance().isObjectoriented() 
+			? this.fileDescription + OSDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
 	}
 
 	/**
@@ -94,6 +96,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.application = OpenSerialDataExplorer.getInstance();
 		String templateFileName = this.application.getActiveDevice().getName() + OSDE.STRING_UNDER_BAR + this.name.split(OSDE.STRING_COLON)[0];
 		this.template = new GraphicsTemplate(templateFileName);
+		this.fileDescription = OpenSerialDataExplorer.getInstance().isObjectoriented() 
+			? this.fileDescription + OSDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
 	}
 
 	/**
@@ -123,9 +127,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 	
 	/**
-	 * method to calculate next record set number, usally a record starts with a number followed by ")"
+	 * method to calculate next record set number, usually a record starts with a number followed by ")"
 	 * this method is used to build a new record set name while gathering data "3") flight record
-	 * @return preceeding record set number
+	 * @return next record set number
 	 */
 	public int getNextRecordSetNumber() {
 		int recordNumber = 1;
