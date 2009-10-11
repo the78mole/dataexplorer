@@ -219,7 +219,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						{
 							this.versionNumberText = new Text(this.versionComposite, SWT.NONE);
 							this.versionNumberText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionNumberText.setBounds(230, 63, 50, 20);
+							this.versionNumberText.setBounds(230, 63, 100, 20);
 							this.versionNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.versionNumberText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 							this.versionNumberText.setEditable(false);
@@ -235,7 +235,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						{
 							this.versionDateText = new Text(this.versionComposite, SWT.NONE);
 							this.versionDateText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionDateText.setBounds(230, 113, 50, 20);
+							this.versionDateText.setBounds(230, 113, 100, 20);
 							this.versionDateText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.versionDateText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 							this.versionDateText.setEditable(false);
@@ -251,7 +251,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						{
 							this.versionCurrentTypeText = new Text(this.versionComposite, SWT.NONE);
 							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionCurrentTypeText.setBounds(230, 163, 50, 20);
+							this.versionCurrentTypeText.setBounds(230, 163, 100, 20);
 							this.versionCurrentTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.versionCurrentTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 							this.versionCurrentTypeText.setEditable(false);
@@ -267,7 +267,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						{
 							this.versionFrontplateTypeText = new Text(this.versionComposite, SWT.NONE);
 							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionFrontplateTypeText.setBounds(230, 213, 50, 20);
+							this.versionFrontplateTypeText.setBounds(230, 213, 100, 20);
 							this.versionFrontplateTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.versionFrontplateTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
 							this.versionFrontplateTypeText.setEditable(false);
