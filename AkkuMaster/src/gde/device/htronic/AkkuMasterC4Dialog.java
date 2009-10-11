@@ -63,10 +63,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	Text													totalChargeCurrentUnit;
 	Text													totalDischargeCurrentUnit;
 	Composite											statusComposite;
-	Text													versionFrontplateType;
-	Text													versionCurrentType;
-	Text													versionDate;
-	Text													versionNumber;
+	CLabel												versionFrontplateTypeLabel;
+	CLabel												versionCurrentTypeLabel;
+	CLabel												versionDateLabel;
+	CLabel												versionNumberLabel;
+	Text													versionFrontplateTypeText;
+	Text													versionCurrentTypeText;
+	Text													versionDateText;
+	Text													versionNumberText;
 	Composite											versionComposite;
 	CTabItem											versionTabItem;
 	CTabFolder										tabFolder;
@@ -81,7 +85,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	int														totalDischargeCurrent	= 0000;			// mA
 	int														totalChargeCurrent		= 0000;			// mA
-	HashMap<String, Object>				version;
+	HashMap<String, String>				version;
 	Thread												versionThread;
 	final int											numberChannels;
 	final int											maxCurrent						= 2000;			// [mA]
@@ -110,11 +114,11 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		AkkuMasterC4Dialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 			if (this.settings.isDeviceDialogsModal())
-				this.dialogShell = new Shell(this.getApplication().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+				this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			else if (this.settings.isDeviceDialogsOnTop())
 				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
 			else
-				this.dialogShell = new Shell(getApplication().getDisplay(), SWT.DIALOG_TRIM);
+				this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
@@ -155,22 +159,22 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				///////////////////////////////////////////////////				
 				if (this.channel1Tab == null && this.numberChannels > 0)
-					this.channel1Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(1) + " 1 "), AkkuMasterC4SerialPort.channel_1, this.getSerialPort(), this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel1Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(1) + " 1 "), AkkuMasterC4SerialPort.channel_1, AkkuMasterC4Dialog.this.serialPort, this.channels.get(1), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel1Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel2Tab == null && this.numberChannels > 1)
-					this.channel2Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(2) + " 2 "), AkkuMasterC4SerialPort.channel_2, this.getSerialPort(), this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel2Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(2) + " 2 "), AkkuMasterC4SerialPort.channel_2, AkkuMasterC4Dialog.this.serialPort, this.channels.get(2), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel2Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel3Tab == null && this.numberChannels > 2)
-					this.channel3Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(3) + " 3 "), AkkuMasterC4SerialPort.channel_3, this.getSerialPort(), this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel3Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(3) + " 3 "), AkkuMasterC4SerialPort.channel_3, AkkuMasterC4Dialog.this.serialPort, this.channels.get(3), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel3Tab.addChannelTab(this.tabFolder);
 
 				if (this.channel4Tab == null && this.numberChannels > 3)
-					this.channel4Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(4) + " 4 "), AkkuMasterC4SerialPort.channel_4, this.getSerialPort(), this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
+					this.channel4Tab = new AkkuMasterChannelTab(this, (" " + this.device.getChannelName(4) + " 4 "), AkkuMasterC4SerialPort.channel_4, AkkuMasterC4Dialog.this.serialPort, this.channels.get(4), aCapacity, aCellCount, //$NON-NLS-1$
 							aAkkuType, aProgramm, aChargeCurrent_mA, aDischargeCurrent_mA);
 				this.channel4Tab.addChannelTab(this.tabFolder);
 				///////////////////////////////////////////////////		
@@ -186,55 +190,87 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						this.versionComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								AkkuMasterC4Dialog.log.log(Level.FINEST, "versionComposite.paintControl, event=" + evt); //$NON-NLS-1$
-								if (getVersion() != null) {
+								if (AkkuMasterC4Dialog.this.version != null) {
 									updateVersionText(
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_NUMBER, "\t\t", getVersion().get(AkkuMasterC4SerialPort.VERSION_NUMBER)), //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_DATE, "\t\t", getVersion().get(AkkuMasterC4SerialPort.VERSION_DATE)),  //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "\t\t", getVersion().get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT)),  //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "\t\t", getVersion().get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT)));  //$NON-NLS-1$ //$NON-NLS-2$
+											String.format(":    %s", AkkuMasterC4Dialog.this.version.get(AkkuMasterC4SerialPort.VERSION_NUMBER)), //$NON-NLS-1$
+											String.format(":    %s", AkkuMasterC4Dialog.this.version.get(AkkuMasterC4SerialPort.VERSION_DATE)), //$NON-NLS-1$
+											String.format(":    %s", AkkuMasterC4Dialog.this.version.get(AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT)), //$NON-NLS-1$
+											String.format(":    %s", AkkuMasterC4Dialog.this.version.get(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT))); //$NON-NLS-1$
 
 								}
 								else {
 									updateVersionText(
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_NUMBER, "\t\t", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)), //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_DATE, "\t\t", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)),  //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_CURRENT, "\t\t", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)),  //$NON-NLS-1$ //$NON-NLS-2$
-											String.format("%-20s %s:   %s", AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, "\t\t", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)));  //$NON-NLS-1$ //$NON-NLS-2$
+											String.format(":    %s", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(osde.messages.MessageIds.OSDE_MSGT0276))); //$NON-NLS-1$
 									startUpdateVersionThread();
 								}
 							}
 						});
 						{
-							this.versionNumber = new Text(this.versionComposite, SWT.NONE);
-							this.versionNumber.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionNumber.setBounds(24, 62, 288, 30);
-							this.versionNumber.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionNumber.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-							this.versionNumber.setEditable(false);
+							this.versionNumberLabel = new CLabel(this.versionComposite, SWT.LEFT);
+							this.versionNumberLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionNumberLabel.setBounds(25, 60, 150, 20);
+							this.versionNumberLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionNumberLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1122));
 						}
 						{
-							this.versionDate = new Text(this.versionComposite, SWT.NONE);
-							this.versionDate.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionDate.setBounds(24, 111, 288, 30);
-							this.versionDate.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionDate.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-							this.versionDate.setEditable(false);
+							this.versionNumberText = new Text(this.versionComposite, SWT.NONE);
+							this.versionNumberText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionNumberText.setBounds(230, 63, 50, 20);
+							this.versionNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionNumberText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionNumberText.setEditable(false);
 						}
 						{
-							this.versionCurrentType = new Text(this.versionComposite, SWT.NONE);
-							this.versionCurrentType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionCurrentType.setBounds(24, 159, 288, 30);
-							this.versionCurrentType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionCurrentType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-							this.versionCurrentType.setEditable(false);
+							this.versionDateLabel = new CLabel(this.versionComposite, SWT.LEFT);
+							this.versionDateLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionDateLabel.setBounds(25, 110, 150, 20);
+							this.versionDateLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionDateLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionDateLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1123));
 						}
 						{
-							this.versionFrontplateType = new Text(this.versionComposite, SWT.NONE);
-							this.versionFrontplateType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.versionFrontplateType.setBounds(24, 212, 288, 30);
-							this.versionFrontplateType.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionFrontplateType.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-							this.versionFrontplateType.setEditable(false);
+							this.versionDateText = new Text(this.versionComposite, SWT.NONE);
+							this.versionDateText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionDateText.setBounds(230, 113, 50, 20);
+							this.versionDateText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionDateText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionDateText.setEditable(false);
+						}
+						{
+							this.versionCurrentTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
+							this.versionCurrentTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionCurrentTypeLabel.setBounds(25, 160, 150, 20);
+							this.versionCurrentTypeLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionCurrentTypeLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionCurrentTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1124));
+						}
+						{
+							this.versionCurrentTypeText = new Text(this.versionComposite, SWT.NONE);
+							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionCurrentTypeText.setBounds(230, 163, 50, 20);
+							this.versionCurrentTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionCurrentTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionCurrentTypeText.setEditable(false);
+						}
+						{
+							this.versionFrontplateTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
+							this.versionFrontplateTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionFrontplateTypeLabel.setBounds(25, 210, 150, 20);
+							this.versionFrontplateTypeLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionFrontplateTypeLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionFrontplateTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1125));
+						}
+						{
+							this.versionFrontplateTypeText = new Text(this.versionComposite, SWT.NONE);
+							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.versionFrontplateTypeText.setBounds(230, 213, 50, 20);
+							this.versionFrontplateTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+							this.versionFrontplateTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionFrontplateTypeText.setEditable(false);
 						}
 					}
 				}
@@ -297,7 +333,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					if (getSerialPort() != null && getSerialPort().isConnected()) getSerialPort().close();
+					if (AkkuMasterC4Dialog.this.serialPort != null && AkkuMasterC4Dialog.this.serialPort.isConnected()) AkkuMasterC4Dialog.this.serialPort.close();
 					Thread thread = AkkuMasterC4Dialog.this.versionThread;
 					if (thread != null && thread.isAlive()) thread.interrupt();
 				}
@@ -305,7 +341,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-					getApplication().openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
+					AkkuMasterC4Dialog.this.application.openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -403,15 +439,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	void startUpdateVersionThread() {
 		try {
-			if (this.getSerialPort() != null && !this.isWarnedConnectError) {
-				if (!this.getSerialPort().isConnected()) {
-					this.getSerialPort().open();
+			if (this.serialPort != null && !this.isWarnedConnectError) {
+				if (!this.serialPort.isConnected()) {
+					this.serialPort.open();
 				}
 				if (this.versionThread == null || !this.versionThread.isAlive()) {
 					this.versionThread = new Thread() {
 						public void run() {
 							try {
-								setVersion(getSerialPort().getVersion());
+								AkkuMasterC4Dialog.this.version = AkkuMasterC4Dialog.this.serialPort.getVersion();
 								getDialogShell().getDisplay().asyncExec(new Runnable() {
 									public void run() {
 										AkkuMasterC4Dialog.this.versionComposite.redraw();
@@ -419,7 +455,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								});
 							}
 							catch (Exception e) {
-								getApplication().openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 							}
 						}
 					};
@@ -434,37 +470,9 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		}
 		catch (Exception e) {
 			AkkuMasterC4Dialog.log.log(Level.WARNING, e.getMessage(), e);
-			this.getApplication().openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+			AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 			this.isWarnedConnectError = true;
 		}
-	}
-
-	/**
-	 * @return the application
-	 */
-	public OpenSerialDataExplorer getApplication() {
-		return this.application;
-	}
-
-	/**
-	 * @return the serialPort
-	 */
-	public AkkuMasterC4SerialPort getSerialPort() {
-		return this.serialPort;
-	}
-
-	/**
-	 * @return the version
-	 */
-	public HashMap<String, Object> getVersion() {
-		return this.version;
-	}
-
-	/**
-	 * @param newVersion the version to set
-	 */
-	public void setVersion(HashMap<String, Object> newVersion) {
-		this.version = new HashMap<String, Object>(newVersion);
 	}
 
 	/**
@@ -494,10 +502,10 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 * update the version text displayed in version tab
 	 */
 	void updateVersionText(String versionNumberText, String versionDateText, String versionTypeText, String versionPanelText) {
-		this.versionNumber.setText(versionNumberText);
-		this.versionDate.setText(versionDateText);
-		this.versionCurrentType.setText(versionTypeText);
-		this.versionFrontplateType.setText(versionPanelText);
+		this.versionNumberText.setText(versionNumberText);
+		this.versionDateText.setText(versionDateText);
+		this.versionCurrentTypeText.setText(versionTypeText);
+		this.versionFrontplateTypeText.setText(versionPanelText);
 	}
 
 	/**

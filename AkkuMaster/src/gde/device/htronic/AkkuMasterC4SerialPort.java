@@ -43,10 +43,10 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public static final String	PROCESS_ENERGIE									= Messages.getString(MessageIds.OSDE_MSGT1120);	// [mWh]
 	public static final String	PROCESS_TIME										= Messages.getString(MessageIds.OSDE_MSGT1121);	// [msec]
 
-	public static final String	VERSION_NUMBER									= Messages.getString(MessageIds.OSDE_MSGT1122);
-	public static final String	VERSION_DATE										= Messages.getString(MessageIds.OSDE_MSGT1123);
-	public static final String	VERSION_TYPE_CURRENT						= Messages.getString(MessageIds.OSDE_MSGT1124);
-	public static final String	VERSION_TYPE_FRONT							= Messages.getString(MessageIds.OSDE_MSGT1125);
+	public static final String	VERSION_NUMBER									= Messages.getString(MessageIds.OSDE_MSGT1122).trim();
+	public static final String	VERSION_DATE										= Messages.getString(MessageIds.OSDE_MSGT1123).trim();
+	public static final String	VERSION_TYPE_CURRENT						= Messages.getString(MessageIds.OSDE_MSGT1124).trim();
+	public static final String	VERSION_TYPE_FRONT							= Messages.getString(MessageIds.OSDE_MSGT1125).trim();
 
 	public static final byte		channel_1[]											= new byte[] { 0x00 };
 	public static final byte		channel_2[]											= new byte[] { 0x40 };
@@ -547,8 +547,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * @return String[] containing described values
 	 * @throws Exception 
 	 */
-	public synchronized HashMap<String, Object> getVersion() throws Exception {
-		HashMap<String, Object> result = new HashMap<String, Object>(4);
+	public synchronized HashMap<String, String> getVersion() throws Exception {
+		HashMap<String, String> result = new HashMap<String, String>(4);
 		try {
 			if (!this.isConnected()) {
 				this.open();
