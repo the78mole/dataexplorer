@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
@@ -88,22 +87,22 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Button																closeButton;
 	Button																rtsCheckBox;
 	Button																dtrCheckBox;
-	CLabel																flowControlSelectLabel;
-	CLabel																dataBitsSelectLabel;
-	CLabel																paritySelectLabel;
-	CLabel																stopBitsSelectLabel;
-	CLabel																baudeSelectLabel;
+	Label																	flowControlSelectLabel;
+	Label																	dataBitsSelectLabel;
+	Label																	paritySelectLabel;
+	Label																	stopBitsSelectLabel;
+	Label																	baudeSelectLabel;
 	Label																	rtsDescription;
 	Label																	dtrDescription;
 	Label																	parityDescription;
 	Label																	stopbitsDescription;
-	Label																	databbitsDescription;
+	Label																	dataBitsDescription;
 	Label																	flowcontrolDescription;
 	Label																	baudeDescription;
-	Group																	portSettings;
+	Group																	portSettingsGroup;
 	CCombo																portSelectCombo;
 	Label																	portDescription;
-	Group																	serialPortGroup;
+	Group																	serialPortSelectionGroup;
 	Button																voltagePerCellButton;
 	Button																analogTabButton;
 	Button																digitalTabButton;
@@ -133,6 +132,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	DeviceConfiguration										selectedActiveDeviceConfig;
 	Thread																listPortsThread;
 	Vector<String>												availablePorts = new Vector<String>();
+	boolean																isUpdateSerialPorts = true;
+
 
 	public DeviceSelectionDialog(Shell parent, int style, final OpenSerialDataExplorer currentApplication) {
 		super(parent, style);
@@ -468,15 +469,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 							}
 							{
-								this.serialPortGroup = new Group(this.composite2, SWT.NONE);
-								this.serialPortGroup.setLayout(null);
-								this.serialPortGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0163));
-								this.serialPortGroup.setBounds(12, 265, 524, 58);
-								this.serialPortGroup.addPaintListener(new PaintListener() {
+								this.serialPortSelectionGroup = new Group(this.composite2, SWT.NONE);
+								this.serialPortSelectionGroup.setLayout(null);
+								this.serialPortSelectionGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.serialPortSelectionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0163));
+								this.serialPortSelectionGroup.setBounds(12, 265, 524, 58);
+								this.serialPortSelectionGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
-										DeviceSelectionDialog.log.log(Level.FINEST, "portGroup.addPaintListener, event=" + evt); //$NON-NLS-1$
-										if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()) {
+										DeviceSelectionDialog.log.log(Level.FINEST, "serialPortSelectionGroup.paintControl, event=" + evt); //$NON-NLS-1$
+										if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()  
+												|| !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
 											DeviceSelectionDialog.this.portDescription.setEnabled(false);
 											DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
 										}
@@ -487,7 +489,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									}
 								});
 								{
-									this.portDescription = new Label(this.serialPortGroup, SWT.NONE);
+									this.portDescription = new Label(this.serialPortSelectionGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.portDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0164));
 									this.portDescription.setBounds(30, 29, 150, 18);
@@ -495,7 +497,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.portDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 								}
 								{
-									this.portSelectCombo = new CCombo(this.serialPortGroup, SWT.FLAT | SWT.BORDER);
+									this.portSelectCombo = new CCombo(this.serialPortSelectionGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.portSelectCombo.setBounds(185, 27, 320, OSDE.IS_WINDOWS ? 21 : 25);
 									this.portSelectCombo.setEditable(false);
@@ -515,101 +517,140 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 							}
 							{
-								this.portSettings = new Group(this.composite2, SWT.NONE);
-								this.portSettings.setLayout(null);
-								this.portSettings.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.portSettings.setText(Messages.getString(MessageIds.OSDE_MSGT0166));
-								this.portSettings.setBounds(12, 409, 524, 115);
+								this.portSettingsGroup = new Group(this.composite2, SWT.NONE);
+								this.portSettingsGroup.setLayout(null);
+								this.portSettingsGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.portSettingsGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0166));
+								this.portSettingsGroup.setBounds(12, 409, 524, 115);
+								this.portSettingsGroup.addPaintListener(new PaintListener() {
+									public void paintControl(PaintEvent evt) {
+										DeviceSelectionDialog.log.log(Level.FINEST, "portSettingsGroup.paintControl, event=" + evt); //$NON-NLS-1$
+										if (DeviceSelectionDialog.this.portSettingsGroup.getEnabled()) {
+											DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
+											DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
+											DeviceSelectionDialog.this.dataBitsDescription.setEnabled(true);
+											DeviceSelectionDialog.this.stopbitsDescription.setEnabled(true);
+											DeviceSelectionDialog.this.parityDescription.setEnabled(true);
+											DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(true);
+											DeviceSelectionDialog.this.dtrDescription.setEnabled(true);
+											DeviceSelectionDialog.this.rtsDescription.setEnabled(true);
+											DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(true);
+											DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(true);
+											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(true);
+											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(true);
+											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(true);
+											//DeviceSelectionDialog.this.dtrCheckBox.setVisible(true);
+											//DeviceSelectionDialog.this.rtsCheckBox.setVisible(true);
+										}
+										else {
+											DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
+											DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
+											DeviceSelectionDialog.this.dataBitsDescription.setEnabled(false);
+											DeviceSelectionDialog.this.stopbitsDescription.setEnabled(false);
+											DeviceSelectionDialog.this.parityDescription.setEnabled(false);
+											DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(false);
+											DeviceSelectionDialog.this.dtrDescription.setEnabled(false);
+											DeviceSelectionDialog.this.rtsDescription.setEnabled(false);
+											DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(false);
+											DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(false);
+											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(false);
+											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(false);
+											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(false);
+											//DeviceSelectionDialog.this.dtrCheckBox.setVisible(false);
+											//DeviceSelectionDialog.this.rtsCheckBox.setVisible(false);
+										}
+								}
+								});
 								{
-									this.baudeDescription = new Label(this.portSettings, SWT.NONE);
+									this.baudeDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.baudeDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.baudeDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.baudeDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0167));
 									this.baudeDescription.setBounds(8, 21, 100, 16);
 								}
 								{
-									this.stopbitsDescription = new Label(this.portSettings, SWT.NONE);
+									this.stopbitsDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.stopbitsDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.stopbitsDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.stopbitsDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0168));
 									this.stopbitsDescription.setBounds(8, 65, 100, 16);
 								}
 								{
-									this.flowcontrolDescription = new Label(this.portSettings, SWT.NONE);
+									this.flowcontrolDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.flowcontrolDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.flowcontrolDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.flowcontrolDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0169));
 									this.flowcontrolDescription.setBounds(261, 21, 100, 16);
 								}
 								{
-									this.databbitsDescription = new Label(this.portSettings, SWT.NONE);
-									this.databbitsDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-									this.databbitsDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.databbitsDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0170));
-									this.databbitsDescription.setBounds(8, 43, 100, 16);
+									this.dataBitsDescription = new Label(this.portSettingsGroup, SWT.NONE);
+									this.dataBitsDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+									this.dataBitsDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.dataBitsDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0170));
+									this.dataBitsDescription.setBounds(8, 43, 100, 16);
 								}
 								{
-									this.parityDescription = new Label(this.portSettings, SWT.NONE);
+									this.parityDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.parityDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.parityDescription.setBounds(8, 86, 100, 16);
 									this.parityDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.parityDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0171));
 								}
 								{
-									this.dtrDescription = new Label(this.portSettings, SWT.NONE);
+									this.dtrDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.dtrDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.dtrDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.dtrDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0172));
 									this.dtrDescription.setBounds(261, 49, 105, 17);
 								}
 								{
-									this.rtsDescription = new Label(this.portSettings, SWT.NONE);
+									this.rtsDescription = new Label(this.portSettingsGroup, SWT.NONE);
 									this.rtsDescription.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.rtsDescription.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.rtsDescription.setText(Messages.getString(MessageIds.OSDE_MSGT0173));
 									this.rtsDescription.setBounds(261, 72, 77, 17);
 								}
 								{
-									this.baudeSelectLabel = new CLabel(this.portSettings, SWT.RIGHT);
-									FillLayout cLabel1Layout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
+									this.baudeSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
+									//FillLayout cLabel1Layout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 									this.baudeSelectLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.baudeSelectLabel.setLayout(cLabel1Layout);
+									//this.baudeSelectLabel.setLayout(cLabel1Layout);
 									this.baudeSelectLabel.setBounds(115, 23, 90, 19);
-									this.baudeSelectLabel.setEnabled(false);
+									//this.baudeSelectLabel.setEnabled(false);
 								}
 								{
-									this.stopBitsSelectLabel = new CLabel(this.portSettings, SWT.RIGHT);
+									this.stopBitsSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.stopBitsSelectLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.stopBitsSelectLabel.setBounds(115, 67, 90, 19);
-									this.stopBitsSelectLabel.setEnabled(false);
+									//this.stopBitsSelectLabel.setEnabled(false);
 								}
 								{
-									this.paritySelectLabel = new CLabel(this.portSettings, SWT.RIGHT);
+									this.paritySelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.paritySelectLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.paritySelectLabel.setBounds(115, 89, 90, 19);
-									this.paritySelectLabel.setEnabled(false);
+									//this.paritySelectLabel.setEnabled(false);
 								}
 								{
-									this.dataBitsSelectLabel = new CLabel(this.portSettings, SWT.RIGHT);
+									this.dataBitsSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.dataBitsSelectLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.dataBitsSelectLabel.setBounds(115, 45, 90, 19);
-									this.dataBitsSelectLabel.setEnabled(false);
+									//this.dataBitsSelectLabel.setEnabled(false);
 								}
 								{
-									this.flowControlSelectLabel = new CLabel(this.portSettings, SWT.LEFT);
+									this.flowControlSelectLabel = new Label(this.portSettingsGroup, SWT.LEFT);
 									this.flowControlSelectLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.flowControlSelectLabel.setBounds(372, 21, 90, 19);
-									this.flowControlSelectLabel.setEnabled(false);
+									//this.flowControlSelectLabel.setEnabled(false);
 								}
 								{
-									this.dtrCheckBox = new Button(this.portSettings, SWT.CHECK | SWT.LEFT);
+									this.dtrCheckBox = new Button(this.portSettingsGroup, SWT.CHECK | SWT.LEFT);
 									this.dtrCheckBox.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.dtrCheckBox.setBounds(372, 49, 92, 17);
 									this.dtrCheckBox.setText(Messages.getString(MessageIds.OSDE_MSGT0174));
 									this.dtrCheckBox.setEnabled(false);
 								}
 								{
-									this.rtsCheckBox = new Button(this.portSettings, SWT.CHECK | SWT.LEFT);
+									this.rtsCheckBox = new Button(this.portSettingsGroup, SWT.CHECK | SWT.LEFT);
 									this.rtsCheckBox.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.rtsCheckBox.setBounds(372, 72, 102, 17);
 									this.rtsCheckBox.setText(Messages.getString(MessageIds.OSDE_MSGT0175));
@@ -775,7 +816,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										DeviceConfiguration config = this.deviceConfigurations.get(deviceKey);
 
 										TableItem item = new TableItem(this.deviceTable, SWT.NULL);
-										item.setText(new String[] { config.getName(), config.getManufacturer(), config.getPort() });
+										item.setText(new String[] { config.getName(), config.getManufacturer(), config.getSerialPortType() != null ? config.getPort() : OSDE.STRING_MESSAGE_CONCAT });
 										if (new Boolean(config.isUsed())) {
 											item.setChecked(true);
 										}
@@ -922,21 +963,52 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 			}
 
-			// com port adjustments group
-			this.baudeSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
-			this.dataBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getDataBits()).toString());
-			this.stopBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getStopBits()).toString());
-			this.paritySelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getParity()).toString());
-			this.flowControlSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
-			this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
-			this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
-
+			if (this.deviceConfigurations.get(activeDeviceName).getSerialPortType() != null) {
+				if (!this.serialPortSelectionGroup.getEnabled() ||	!this.portSettingsGroup.getEnabled()) {
+					enableSerialPortEntries(true);
+				}
+				// serial port adjustments group
+				this.baudeSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
+				this.dataBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getDataBits()).toString());
+				this.stopBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getStopBits()).toString());
+				this.paritySelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getParity()).toString());
+				this.flowControlSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
+				this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
+				this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
+			}
+			else {
+				if (this.serialPortSelectionGroup.getEnabled() ||	this.portSettingsGroup.getEnabled()) {
+					enableSerialPortEntries(false);
+				}
+				this.baudeSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+				this.dataBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+				this.stopBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+				this.paritySelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+				this.flowControlSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+				this.dtrCheckBox.setSelection(false);
+				this.rtsCheckBox.setSelection(false);
+			}
 			this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
+//			this.serialPortSelectionGroup.redraw();
+//			this.portSettingsGroup.redraw();
+
 		}
 	}
 
 	/**
-	 * check if the configure com port matches system available
+	 * enable or disable serial port related groups
+	 * @param enable true | false
+	 */
+	private void enableSerialPortEntries(boolean enable) {
+		this.isUpdateSerialPorts = enable;	
+		this.serialPortSelectionGroup.setEnabled(enable);
+		this.portSettingsGroup.setEnabled(enable);
+		this.serialPortSelectionGroup.redraw();
+		this.portSettingsGroup.redraw();
+	}
+
+	/**
+	 * check if the configure serial port matches system available
 	 */
 	public boolean checkPortSelection() {
 		boolean matches = true;
@@ -1132,30 +1204,32 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			public void run() {
 				try {
 					while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-						DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), 
-								DeviceSelectionDialog.this.settings.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
-								DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
-						if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-							OpenSerialDataExplorer.display.syncExec(new Runnable() {
-								public void run() {
-									if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
-										if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-											DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
-											int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
-											if (index > -1) {
-												DeviceSelectionDialog.this.portSelectCombo.select(index);
+						if (DeviceSelectionDialog.this.isUpdateSerialPorts) {
+							DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), DeviceSelectionDialog.this.settings
+									.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, DeviceSelectionDialog.this.settings
+									.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
+							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+								OpenSerialDataExplorer.display.syncExec(new Runnable() {
+									public void run() {
+										if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
+											if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
+												DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
+												int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
+												if (index > -1) {
+													DeviceSelectionDialog.this.portSelectCombo.select(index);
+												}
+												else {
+													DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+												}
 											}
 											else {
-												DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+												DeviceSelectionDialog.this.portSelectCombo.setItems(new String[0]);
+												DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
 											}
 										}
-										else {
-											DeviceSelectionDialog.this.portSelectCombo.setItems(new String[0]);
-											DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0198));
-										}
 									}
-								}
-							});
+								});
+							}
 						}
 						try {
 							Thread.sleep(2500);
