@@ -62,6 +62,8 @@ public class DeviceConfiguration {
 	private DevicePropertiesType							deviceProps;
 	private DeviceType												device;
 	private SerialPortType										serialPort;
+	private DataBlockType											dataBlock;
+	private ModeStateType											modeState;
 	private TimeBaseType											timeBase;
 	private DesktopType												desktop;
 	private boolean														isChangePropery						= false;
@@ -143,6 +145,8 @@ public class DeviceConfiguration {
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
+		this.dataBlock = this.deviceProps.getDataBlock();
+		this.modeState = this.deviceProps.getModeState();
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
@@ -162,8 +166,10 @@ public class DeviceConfiguration {
 		this.deviceProps = deviceConfig.deviceProps;
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
+		this.dataBlock = deviceProps.getDataBlock();
+		this.modeState = deviceProps.getModeState();
 		this.timeBase = deviceConfig.timeBase;	
-		this.desktop = this.deviceProps.getDesktop();
+		this.desktop = deviceProps.getDesktop();
 		this.isChangePropery = deviceConfig.isChangePropery;
 
 		log.log(Level.FINE, this.toString());
@@ -218,32 +224,72 @@ public class DeviceConfiguration {
 		return this.xmlFile.getAbsolutePath();
 	}
 
+	/**
+	 * @return the device name
+	 */
 	public String getName() {
 		return this.device.getName();
 	}
 
-	public void setName(String newName) {
+	/**
+	 * @param set a new device name
+	 */
+	public void setName(String newDeviceName) {
 		this.isChangePropery = true;
-		this.device.setName(newName);
+		this.device.setName(newDeviceName);
+	}
+
+	/**
+	 * @return the device name
+	 */
+	public String getImageFileName() {
+		return this.device.getImage();
+	}
+
+	/**
+	 * @param set a new image filename(.jpg|.gif|.png)
+	 */
+	public void setImageFileName(String newImageFileName) {
+		this.isChangePropery = true;
+		this.device.setImage(newImageFileName);
 	}
 
 	public String getManufacturer() {
 		return this.device.getManufacturer();
 	}
 
+	/**
+	 * @param set a new device manufacture name
+	 */
+	public void setManufacturer(String name) {
+		this.isChangePropery = true;
+		this.device.setManufacturer(name);
+	}
+
 	public String getManufacturerURL() {
 		return this.device.getManufacturerURL();
+	}
+
+	/**
+	 * @param set a new manufacture name
+	 */
+	public void setManufacturerURL(String name) {
+		this.isChangePropery = true;
+		this.device.setManufacturerURL(name);
 	}
 
 	public String getDeviceGroup() {
 		return this.device.getGroup();
 	}
 
-	public String getImageFileName() {
-		return this.device.getImage();
+	/**
+	 * @param set a new manufacture name
+	 */
+	public void setDeviceGroup(String name) {
+		this.device.setGroup(name);
 	}
 
-	public Double getTimeStep_ms() {
+	public double getTimeStep_ms() {
 		return this.timeBase.getTimeStep() > 0 ? this.timeBase.getTimeStep() : 1000;
 	}
 
@@ -252,8 +298,11 @@ public class DeviceConfiguration {
 		this.timeBase.setTimeStep(newTimeStep_ms);
 	}
 
+	/**
+	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
+	 */
 	public String getPort() {
-		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort.getPort();
+		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort != null ? this.serialPort.getPort() : OSDE.STRING_EMPTY;
 	}
 
 	public void setPort(String newPort) {
@@ -281,25 +330,26 @@ public class DeviceConfiguration {
 		return this.serialPort.getParity().ordinal();
 	}
 
-	public int getDataBlockSize() {
-		return this.serialPort.getDataBlock().getSize().intValue();
-	}
-
-	public void setDataBlockSize(int newSize) {
-		this.isChangePropery = true;
-		this.serialPort.getDataBlock().setSize(new BigInteger(OSDE.STRING_EMPTY + newSize));
-	}
-
-	public byte getEndingByte() {
-		return this.serialPort.getDataBlock().getEndingByte();
-	}
-
 	public boolean isDTR() {
 		return this.serialPort.isIsDTR();
 	}
 
 	public boolean isRTS() {
 		return this.serialPort.isIsRTS();
+	}
+	
+	public PropertyType getModeStateProperty(int modeStateOrdinal) {
+		PropertyType property = null;
+		if (this.modeState != null) {
+			List<PropertyType> properties = this.modeState.getProperty();
+			for (PropertyType propertyType : properties) {
+				if (Integer.parseInt(propertyType.getValue()) == modeStateOrdinal) { //TODO error handling if somehow 1.0 is returned by getValue()
+					property = propertyType;
+					break;
+				}
+			}
+		}
+		return property;
 	}
 	
 	/**
@@ -321,6 +371,51 @@ public class DeviceConfiguration {
 		return property;
 	}
 	
+	public int getDataBlockSize() {
+		return this.dataBlock.getSize().intValue();
+	}
+
+	public void setDataBlockSize(int newSize) {
+		this.isChangePropery = true;
+		this.dataBlock.setSize(new BigInteger(OSDE.STRING_EMPTY + newSize));
+	}
+	
+	public FormatType getDataBlockFormat() {
+		return this.dataBlock.getFormat();
+	}
+	
+	public void setDataBlockFormat(FormatType value) {
+		this.isChangePropery = true;
+		this.dataBlock.setFormat(value);
+	}
+
+	public ChecksumType getDataBlockCheckSumType() {
+		return this.dataBlock.getCheckSum(); 
+	}
+
+	public void setDataBlockCheckSumType(ChecksumType value) {
+		this.isChangePropery = true;
+		this.dataBlock.setCheckSum(value); 
+	}
+	
+	public FormatType getDataBlockCheckSumFormat() {
+		return this.dataBlock.getCheckSumFormat();
+	}
+	
+	public void setDataBlockCheckSumFormat(FormatType value) {
+		this.isChangePropery = true;
+		this.dataBlock.setCheckSumFormat(value);
+	}
+
+	public byte[] getDataBlockEnding() {
+		return this.dataBlock.getEnding();
+	}
+
+	public void setDataBlockEnding(byte[] value) {
+		this.isChangePropery = true;
+		this.dataBlock.setEnding(value);
+	}
+
 	/**
 	 * query if the table tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)

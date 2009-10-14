@@ -57,8 +57,7 @@ import javax.xml.bind.annotation.XmlType;
     "flowControlMode", //$NON-NLS-1$
     "isRTS", //$NON-NLS-1$
     "isDTR", //$NON-NLS-1$
-    "timeOut", //$NON-NLS-1$
-    "dataBlock" //$NON-NLS-1$
+    "timeOut" //$NON-NLS-1$
 })
 public class SerialPortType {
 
@@ -78,8 +77,6 @@ public class SerialPortType {
     protected boolean isDTR;
     @XmlElement(name = "TimeOut") //$NON-NLS-1$
     protected TimeOutType timeOut;
-    @XmlElement(name = "DataBlock") //$NON-NLS-1$
-    protected DataBlockType dataBlock;
 
     /**
      * Gets the value of the port property.
@@ -279,30 +276,6 @@ public class SerialPortType {
      */
     public void setTimeOut(TimeOutType value) {
         this.timeOut = value;
-    }
-
-    /**
-     * Gets the value of the dataBlock property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DataBlockType }
-     *     
-     */
-    public DataBlockType getDataBlock() {
-        return this.dataBlock;
-    }
-
-    /**
-     * Sets the value of the dataBlock property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DataBlockType }
-     *     
-     */
-    public void setDataBlock(DataBlockType value) {
-        this.dataBlock = value;
     }
 
 }

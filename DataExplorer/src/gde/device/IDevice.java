@@ -52,6 +52,11 @@ public interface IDevice {
 	public String	getName();
 	
 	/**
+	 * @param set a new device name
+	 */
+	public void setName(String newName);
+	
+	/**
 	 * @return usage device state
 	 */
 	public boolean isUsed();
@@ -62,14 +67,39 @@ public interface IDevice {
 	public String getManufacturer();
 	
 	/**
+	 * @param set a new manufacture name
+	 */
+	public void setManufacturer(String name);
+
+	/**
 	 * @return device group
 	 */
 	public String getDeviceGroup();
 	
 	/**
+	 * @param set a new manufacture name
+	 */
+	public void setDeviceGroup(String name);
+	
+	/**
 	 * @return link to manufacturer
 	 */
 	public String getManufacturerURL();
+
+	/**
+	 * @param set a new manufacture name
+	 */
+	public void setManufacturerURL(String name);
+
+	/**
+	 * @return the device name
+	 */
+	public String getImageFileName();
+
+	/**
+	 * @param set a new image filename(.jpg|.gif|.png)
+	 */
+	public void setImageFileName(String newImageFileName);
 	
 	/**
 	 * query if the table tab should be updated
@@ -122,7 +152,7 @@ public interface IDevice {
 	/**
 	 * @return time step in ms
 	 */
-	public Double getTimeStep_ms();
+	public double getTimeStep_ms();
 	
 	/**
 	 * set new time step in ms
@@ -130,7 +160,12 @@ public interface IDevice {
 	public void setTimeStep_ms(double newTimeStep_ms);
 	
 	/**
-	 * @return the port configured for the device
+	 * @return the serial port type, optional configure for the device
+	 */
+	//public SerialPortType getSerialPortType();
+
+	/**
+	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort();
 	
@@ -173,6 +208,56 @@ public interface IDevice {
 	 * @return  the RTS configuration of the device
 	 */
 	public boolean isRTS();
+	
+	/**
+	 * @return the current data block size
+	 */
+	public int getDataBlockSize();
+
+	/**
+	 * @param set a new date block size/length
+	 */
+	public void setDataBlockSize(int newSize);
+	
+	/**
+	 * @return the format type of the data block ASCII(text) or BINARY(hex)
+	 */
+	public FormatType getDataBlockFormat();
+	
+	/**
+	 * @param set a new format type of the data block ASCII(text) or BINARY(hex)
+	 */
+	public void setDataBlockFormat(FormatType value);
+	
+	/**
+	 * @return the checksum type of the data block XOR, ADD, ..
+	 */
+	public ChecksumType getDataBlockCheckSumType();
+
+	/**
+	 * @param set a new date block size/length
+	 */
+	public void setDataBlockCheckSumType(ChecksumType value);
+	
+	/**
+	 * @return the format type of the data block checksum ASCII(text) or BINARY(hex)
+	 */
+	public FormatType getDataBlockCheckSumFormat();
+	
+	/**
+	 * @param set a new date block checksum format type ASCII(text) or BINARY(hex)
+	 */
+	public void setDataBlockCheckSumFormat(FormatType value);
+
+	/**
+	 * @return the format type of the data block ASCII(text) or BINARY(hex)
+	 */
+	public byte[] getDataBlockEnding();
+
+	/**
+	 * @param set a new date block ending (single byte, new line, ...) as byte array
+	 */
+	public void setDataBlockEnding(byte[] value);
 	
 	/**
 	 * @return the channel count
