@@ -37,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -56,12 +57,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	static final String						DEVICE_NAME						= "Akkumaster C4";
 	static final String						AKKU_MASTER_HELP_DIR	= "AkkuMaster";
 
-	CLabel												totalDischargeCurrentLabel;
-	CLabel												totalChargeCurrentLabel;
-	Text													totalDischargeCurrentText;
-	Text													totalChargeCurrentText;
-	Text													totalChargeCurrentUnit;
-	Text													totalDischargeCurrentUnit;
+	Label													totalDischargeCurrentLabel;
+	Label													totalChargeCurrentLabel;
+	Label													totalDischargeCurrentText;
+	Label													totalChargeCurrentText;
+	Label													totalChargeCurrentUnit;
+	Label													totalDischargeCurrentUnit;
 	Composite											statusComposite;
 	CLabel												versionFrontplateTypeLabel;
 	CLabel												versionCurrentTypeLabel;
@@ -125,7 +126,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.setLayout(null);
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			this.dialogShell.setSize(440, 590);
+			this.dialogShell.setSize(440, 555);
 			this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
@@ -279,7 +280,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			{
 				this.statusComposite = new Composite(this.dialogShell, SWT.NONE);
 				this.statusComposite.setLayout(null);
-				this.statusComposite.setBounds(0, 430, 430, 65);
+				this.statusComposite.setBounds(0, 430, 430, 45);
 				this.statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -288,67 +289,53 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 				{
-					this.totalDischargeCurrentLabel = new CLabel(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					this.totalDischargeCurrentLabel.setBounds(235, 34, 50, 16);
-					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
-					this.totalDischargeCurrentLabel.setText(new Double(this.totalDischargeCurrent).toString());
-					this.totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalChargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
+					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1110));
+					this.totalChargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.totalChargeCurrentText.setBounds(20, 3, 190, 20);
 				}
 				{
-					this.totalChargeCurrentLabel = new CLabel(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
-					this.totalChargeCurrentLabel.setBounds(235, 8, 50, 16);
+					this.totalChargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
+					this.totalChargeCurrentLabel.setBounds(235, 3, 50, 20);
 					this.totalChargeCurrentLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 					this.totalChargeCurrentLabel.setText(new Double(this.totalChargeCurrent).toString());
 					this.totalChargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
-					this.totalChargeCurrentText = new Text(this.statusComposite, SWT.LEFT);
-					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1110));
-					this.totalChargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
-					this.totalChargeCurrentText.setBounds(20, 10, 190, 20);
-				}
-				{
-					this.totalDischargeCurrentText = new Text(this.statusComposite, SWT.LEFT);
-					this.totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
-					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1111));
-					this.totalDischargeCurrentText.setBounds(20, 35, 190, 20);
-				}
-				{
-					this.totalDischargeCurrentUnit = new Text(this.statusComposite, SWT.NONE);
-					this.totalDischargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1112));
-					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
-					this.totalDischargeCurrentUnit.setBounds(300, 10, 119, 20);
-				}
-				{
-					this.totalChargeCurrentUnit = new Text(this.statusComposite, SWT.NONE);
+					this.totalChargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
 					this.totalChargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 					this.totalChargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1113));
-					this.totalChargeCurrentUnit.setBounds(300, 35, 119, 20);
+					this.totalChargeCurrentUnit.setBounds(300, 3, 119, 20);
+				}
+				{
+					this.totalDischargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
+					this.totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1111));
+					this.totalDischargeCurrentText.setBounds(20, 25, 190, 20);
+				}
+				{
+					this.totalDischargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
+					this.totalDischargeCurrentLabel.setBounds(235, 25, 50, 20);
+					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.totalDischargeCurrentLabel.setText(new Double(this.totalDischargeCurrent).toString());
+					this.totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				}
+				{
+					this.totalDischargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
+					this.totalDischargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1112));
+					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.totalDischargeCurrentUnit.setBounds(300, 25, 119, 20);
 				}
 			}
-			this.dialogShell.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent evt) {
-					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					if (AkkuMasterC4Dialog.this.serialPort != null && AkkuMasterC4Dialog.this.serialPort.isConnected()) AkkuMasterC4Dialog.this.serialPort.close();
-					Thread thread = AkkuMasterC4Dialog.this.versionThread;
-					if (thread != null && thread.isAlive()) thread.interrupt();
-				}
-			});
-			this.dialogShell.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-					AkkuMasterC4Dialog.this.application.openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
-				}
-			});
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.closeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 				this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
-				this.closeButton.setBounds(82, 509, 260, 30);
+				this.closeButton.setBounds(87, 485, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
@@ -361,7 +348,23 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 			}
-			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-220, 100));
+			this.dialogShell.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent evt) {
+					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+					if (AkkuMasterC4Dialog.this.serialPort != null && AkkuMasterC4Dialog.this.serialPort.isConnected()) {
+						AkkuMasterC4Dialog.this.serialPort.close();
+					}
+					Thread thread = AkkuMasterC4Dialog.this.versionThread;
+					if (thread != null && thread.isAlive()) thread.interrupt();
+				}
+			});
+			this.dialogShell.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					AkkuMasterC4Dialog.this.application.openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
+				}
+			});
+			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-220, 70));
 			this.dialogShell.open();
 			startUpdateVersionThread();
 		}
@@ -440,13 +443,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	void startUpdateVersionThread() {
 		try {
 			if (this.serialPort != null && !this.isWarnedConnectError) {
-				if (!this.serialPort.isConnected()) {
-					this.serialPort.open();
-				}
 				if (this.versionThread == null || !this.versionThread.isAlive()) {
 					this.versionThread = new Thread() {
+						
 						public void run() {
 							try {
+								if (!AkkuMasterC4Dialog.this.serialPort.isConnected()) {
+									AkkuMasterC4Dialog.this.serialPort.open();
+								}
 								AkkuMasterC4Dialog.this.version = AkkuMasterC4Dialog.this.serialPort.getVersion();
 								getDialogShell().getDisplay().asyncExec(new Runnable() {
 									public void run() {
@@ -460,7 +464,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 					};
 					try {
-						this.versionThread.start();
+						this.versionThread.run();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
