@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+import osde.OSDE;
+
 
 /**
  * <p>Java class for data_types.
@@ -61,4 +63,11 @@ public enum DataTypes {
         throw new IllegalArgumentException(v);
     }
 
+    public static String[] valuesAsStingArray() {
+    	StringBuilder sb = new StringBuilder();
+    	for (DataTypes element : DataTypes.values()) {
+    		sb.append(element.value).append(OSDE.STRING_SEMICOLON);
+			}
+    	return sb.toString().split(OSDE.STRING_SEMICOLON);
+     }
 }

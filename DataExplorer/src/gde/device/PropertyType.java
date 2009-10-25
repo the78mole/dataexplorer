@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import osde.OSDE;
+
 
 /**
  * <p>Java class for PropertyType complex type.
@@ -155,7 +157,7 @@ public class PropertyType {
      *     
      */
     public String getDescription() {
-        return this.description;
+        return this.description != null ? this.description : OSDE.STRING_EMPTY;
     }
 
     /**

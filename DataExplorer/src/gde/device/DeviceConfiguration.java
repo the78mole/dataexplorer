@@ -43,6 +43,7 @@ import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.utils.CalculationThread;
+import osde.utils.StringHelper;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -94,7 +95,6 @@ public class DeviceConfiguration {
 		Logger.getLogger(OSDE.STRING_EMPTY).setLevel(Level.ALL);
 
 		String basePath = "C:/Documents and Settings/brueg/Application Data/OpenSerialDataExplorer/Devices/"; //$NON-NLS-1$
-		//String basePath = "D:/Belchen2/workspaces/test/OpenSerialDataExplorer/doc/";
 
 		try {
       Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V03.xsd")); //$NON-NLS-1$
@@ -166,10 +166,10 @@ public class DeviceConfiguration {
 		this.deviceProps = deviceConfig.deviceProps;
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
-		this.dataBlock = deviceProps.getDataBlock();
-		this.modeState = deviceProps.getModeState();
+		this.dataBlock = deviceProps.dataBlock;
+		this.modeState = deviceProps.modeState;
 		this.timeBase = deviceConfig.timeBase;	
-		this.desktop = deviceProps.getDesktop();
+		this.desktop = deviceProps.desktop;
 		this.isChangePropery = deviceConfig.isChangePropery;
 
 		log.log(Level.FINE, this.toString());
@@ -202,6 +202,15 @@ public class DeviceConfiguration {
 	 */
 	public SerialPortType getSerialPortType() {
 		return this.serialPort;
+	}
+	
+	/**
+	 * @return the serialPort
+	 */
+	public void removeSerialPortType() {
+		this.isChangePropery = true;
+		this.deviceProps.setSerialPort(null);
+		this.serialPort = this.deviceProps.serialPort;
 	}
 
 	/**
@@ -305,6 +314,13 @@ public class DeviceConfiguration {
 		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort != null ? this.serialPort.getPort() : OSDE.STRING_EMPTY;
 	}
 
+	/**
+	 * @return the port configured in SerialPortType
+	 */
+	public String getPortString() {
+		return this.serialPort.getPort();
+	}
+
 	public void setPort(String newPort) {
 		this.isChangePropery = true;
 		this.serialPort.setPort(newPort);
@@ -338,12 +354,35 @@ public class DeviceConfiguration {
 		return this.serialPort.isIsRTS();
 	}
 	
-	public PropertyType getModeStateProperty(int modeStateOrdinal) {
+	/**
+	 * set a new desktop type
+	 * @param newDesktopType
+	 */
+	public void setDesktopType(DesktopType newDesktopType) {
+		this.deviceProps.setDesktop(newDesktopType);
+		this.desktop = this.deviceProps.desktop;
+		this.isChangePropery = true;
+	}
+	
+	/**
+	 * get the desktop type
+	 * @return DesktopType
+	 */
+	public DesktopType getDesktopType() {
+		return this.desktop;
+	}
+	
+	/**
+	 * method to query desktop properties, like: table tab switched of, ...
+	 * @param dektopType
+	 * @return property of the queried type or null if not defined
+	 */
+	public PropertyType getDesktopProperty(String dektopType) {
 		PropertyType property = null;
-		if (this.modeState != null) {
-			List<PropertyType> properties = this.modeState.getProperty();
+		if (this.desktop != null) {
+			List<PropertyType> properties = this.desktop.getProperty();
 			for (PropertyType propertyType : properties) {
-				if (Integer.parseInt(propertyType.getValue()) == modeStateOrdinal) { //TODO error handling if somehow 1.0 is returned by getValue()
+				if (propertyType.getName().equals(dektopType)) {
 					property = propertyType;
 					break;
 				}
@@ -353,18 +392,95 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * @return size of mode states
+	 */
+	public int getModeStateSize() {
+		return this.modeState.property.size();
+	}
+	
+	/**
+	 * @return actual ModeStateType
+	 */
+	public ModeStateType getModeStateType() {
+		return this.deviceProps.modeState;
+	}
+	
+	/**
+	 * append a new mode state type property
+	 * @param newModeStateProperty
+	 */
+	public void appendModeStateType(PropertyType newModeStateProperty) {
+		this.isChangePropery = true;
+		this.deviceProps.modeState.append(newModeStateProperty);
+	}
+	
+	/**
+	 * remove a mode state type property
+	 * @param removeModeStateProperty
+	 */
+	public void removeModeStateType(PropertyType removeModeStateProperty) {
+		this.isChangePropery = true;
+		this.deviceProps.modeState.remove(removeModeStateProperty);
+	}
+	
+	/**
+	 * set a new mode state name
+	 * @param modeStateOrdinal
+	 * @param newName
+	 */
+	public void setModeStateName(int modeStateOrdinal, String newName) {
+		this.isChangePropery = true;
+		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		if (tmpPoperty != null) {
+			tmpPoperty.setName(newName);
+		}
+	}
+	
+	/**
+	 * set a new mode state value
+	 * @param modeStateOrdinal
+	 * @param newValue
+	 */
+	public void setModeStateValue(int modeStateOrdinal, String newValue) {
+		this.isChangePropery = true;
+		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		if (tmpPoperty != null) {
+			tmpPoperty.setValue(StringHelper.verifyTypedInput(tmpPoperty.getType(), newValue));
+		}
+	}
+	
+	/**
+	 * set a new mode state description
+	 * @param modeStateOrdinal
+	 * @param newDescription
+	 */
+	public void setModeStateDescription(int modeStateOrdinal, String newDescription) {
+		this.isChangePropery = true;
+		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		if (tmpPoperty != null) {
+			tmpPoperty.setDescription(newDescription);
+		}
+	}
+	
+	/**
 	 * method to query desktop properties, like: table tab switched of, ...
 	 * @param dektopType
 	 * @return property of the queried type or null if not defined
 	 */
-	private PropertyType getDesktopProperty(String dektopType) {
+	public PropertyType getModeStateProperty(int modeStateOrdinal) {
 		PropertyType property = null;
-		if (this.desktop != null) {
-			List<PropertyType> properties = this.desktop.getProperty();
+		if (this.modeState != null) {
+			List<PropertyType> properties = this.modeState.getProperty();
 			for (PropertyType propertyType : properties) {
-				if (propertyType.getName().equals(dektopType)) {
-					property = propertyType;
-					break;
+				try {
+					int propertyValue = Integer.parseInt(propertyType.getValue());
+					if (propertyValue == modeStateOrdinal) {
+						property = propertyType;
+						break;
+					}
+				}
+				catch (NumberFormatException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}
 		}
@@ -513,6 +629,16 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * set a new desktop type description
+	 * @param dektopType
+	 * @param newDescription
+	 */
+	public void setDesktopTypeDesription(String dektopType, String newDescription) {
+		this.getDesktopProperty(dektopType).setDescription(newDescription);
+		this.isChangePropery = true;
+	}
+	
+	/**
 	 * @return the channel count
 	 */
 	public int getChannelCount() {
@@ -644,7 +770,7 @@ public class DeviceConfiguration {
 	 * @param type
 	 * @param value
 	 */
-	public static void addProperty(List<PropertyType> properties, String propertyKey, DataTypes type, double value) {
+	public static void addProperty(List<PropertyType> properties, String propertyKey, DataTypes type, Object value) {
 		ObjectFactory factory = new ObjectFactory();
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);

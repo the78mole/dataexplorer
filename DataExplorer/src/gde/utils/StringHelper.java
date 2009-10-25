@@ -28,6 +28,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
 import osde.OSDE;
+import osde.device.DataTypes;
 import osde.serial.DeviceSerialPort;
 
 /**
@@ -311,16 +312,100 @@ public class StringHelper {
 					return false;
 				}
 			}
-			else { //OSDE.IS_MAC
-				//if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i]
-				//		|| 'u' == chars[i] || 's' == chars[i] || 'b' == chars[i])) {
-				//	e.doit = false;
-				//	return;
-				//}
+			else if (OSDE.IS_MAC) { 
+				if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 'u' == chars[i] || 's' == chars[i] || ' ' == chars[i]
+						|| 'e' == chars[i] || 'r' == chars[i] || 'i' == chars[i] || 'a' == chars[i] || 'l' == chars[i] || '.' == chars[i])) {
+					return false;
+				}
 				return true;
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * verify the user input while typing DataTypes typed input text
+	 * @param eventText of the VerifyEvent test containing the char(s) to be verified
+	 */
+	public static boolean verifyTypedInput(DataTypes useType, String eventText) {
+		boolean doIt = true;
+		switch (useType) {
+		case INTEGER:
+			try {
+				Integer.parseInt(eventText);
+			}
+			catch (Exception e) {
+				doIt = false;
+			}
+			break;
+		case DOUBLE:
+			try {
+				Double.parseDouble(eventText.replace(',', '.'));
+			}
+			catch (Exception e) {
+				doIt = false;
+			}
+			break;
+		case BOOLEAN:
+			try {
+				Boolean.parseBoolean(eventText.trim());
+			}
+			catch (Exception e) {
+				doIt = false;
+			}
+		case STRING:
+		default:
+			doIt = true;
+			break;
+		}
+		return doIt;
+	}
+
+	/**
+	 * verify the user input while typing DataTypes typed input text
+	 * @param eventText of the VerifyEvent test containing the char(s) to be verified
+	 */
+	public static String verifyTypedString(DataTypes useType, String eventText) {
+		String result = eventText;
+		while (result.startsWith("0")) {
+			result = result.substring(1);
+		}
+		switch (useType) {
+		case INTEGER:
+			try {
+				if (eventText.replace(',', '.').contains(".")) {
+					result = eventText.substring(0, eventText.indexOf('.'));
+				}
+				Integer.parseInt(result);
+			}
+			catch (Exception e) {
+				result = "0";
+			}
+			break;
+		case DOUBLE:
+			try {
+				if (!eventText.replace(',', '.').contains(".")) {
+					result = eventText + ".0";
+				}
+				if (result.startsWith(".")) {
+					result = "0" + result;
+				}
+				Double.parseDouble(result);
+			}
+			catch (Exception e) {
+				result = "1.0";
+			}
+			break;
+		case BOOLEAN:
+			if (!(result.equals("true") || result.equals("false"))) {
+				result = "true";
+			}
+			break;
+		case STRING:
+		default:
+			break;
+		}
+		return result;
 	}
 
 	/**

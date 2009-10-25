@@ -394,6 +394,37 @@ public class FileUtils {
 		
 		return is;
 	}
+	
+	
+	/**
+	 * extract a file from a Jar archive and rename
+	 * @param runtimeInstance
+	 * @param sourceFileName
+	 * @param targetFileName
+	 * @param jarInternalSourceDirectory
+	 * @param targetDirectory
+	 * @param unixPermissions
+	 */
+	public static boolean extract(Class<?> runtimeInstance, String sourceFileName, String targetFileName, String jarInternalSourceDirectory, String targetDirectory, String unixPermissions) {
+		boolean isRenamed = false;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + OSDE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
+		targetDirectory = targetDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + OSDE.FILE_SEPARATOR_UNIX : targetDirectory;
+		FileUtils.extract(runtimeInstance, sourceFileName, jarInternalSourceDirectory, targetDirectory, unixPermissions);
+		File sourceFile = new File(targetDirectory + sourceFileName);
+		if(new File(targetDirectory + targetFileName).exists()) {
+			log.log(Level.WARNING, targetDirectory + targetFileName);
+		}
+		if (sourceFile.exists() && sourceFile.canWrite()) {
+			isRenamed = sourceFile.renameTo(new File(targetDirectory + targetFileName));
+			if (!isRenamed) {
+				log.log(Level.WARNING, "renaming to " + targetDirectory + targetFileName + " failed !");
+			}
+		}
+		return isRenamed;
+	}
+
 			
 	/**
 	 * extract a file from a Jar archive
