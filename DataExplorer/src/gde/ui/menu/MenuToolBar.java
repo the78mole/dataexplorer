@@ -1277,6 +1277,15 @@ public class MenuToolBar {
 				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0205, new Object[] {channelObjKey, newObjectKey}));
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
+					String updateFileDescription = activeChannel.getFileDescription();
+					if (updateFileDescription.contains(channelObjKey)) {
+						updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey))
+						+ newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
+					}
+					else if (newObjectKey.length() > 1){
+						updateFileDescription = updateFileDescription + OSDE.STRING_BLANK + newObjectKey;
+					}
+					activeChannel.setFileDescription(updateFileDescription);
 				}
 				// do not exchange the object key in the channel/configuration, but keep the selector switch to enable new data load
 			}

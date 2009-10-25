@@ -166,6 +166,10 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET.ordinal() && this.getActiveChannel().getFileName() != null) {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
+				if (!this.application.getObjectKey().equals(this.getActiveChannel().getObjectKey())) {
+					log.log(Level.FINE, "switch to channels object key \"" + this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$
+					this.application.getMenuToolBar().updateObjectSelector();
+				}
 			}
 			else {
 				log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
