@@ -240,12 +240,11 @@ public class Settings extends Properties {
 	private Settings() throws SAXException, JAXBException {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
-		String osname = System.getProperty("os.name", OSDE.STRING_EMPTY).toLowerCase(); //$NON-NLS-1$
-		if (osname.startsWith("windows")) { //$NON-NLS-1$
+		if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
 			this.applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer").replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			this.settingsFilePath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
 		}
-		else if (osname.startsWith("linux")) { //$NON-NLS-1$
+		else if (OSDE.IS_LINUX || OSDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
 			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 			this.settingsFilePath = this.applHomePath  + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
 		}
