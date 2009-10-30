@@ -394,7 +394,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.timeTriggerCombo.setBounds(159, 52, 59, OSDE.IS_WINDOWS ? 20 : 22);
+									this.timeTriggerCombo.setBounds(159, 52, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.timeTriggerCombo.setItems(new String[] { " 15", " 20", " 25", " 30", " 60", " 90" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 									this.timeTriggerCombo.select(3);
 									this.timeTriggerCombo.setEditable(true);
@@ -450,7 +450,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.impulseTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.impulseTriggerCombo.setBounds(159, 78, 59, OSDE.IS_WINDOWS ? 20 : 22);
+									this.impulseTriggerCombo.setBounds(159, 78, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
 									this.impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(LiPoWatchDialog.RX_AUTO_START_MS);
@@ -476,7 +476,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.timeIntervalCombo.setItems(LiPoWatchDialog.TIME_INTERVAL);
-									this.timeIntervalCombo.setBounds(49, 17, 133, OSDE.IS_WINDOWS ? 20 : 22);
+									this.timeIntervalCombo.setBounds(49, 17, 133, OSDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
 									this.timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -570,7 +570,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.regulationTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER | SWT.CENTER);
 									this.regulationTypeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.regulationTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1637).split(OSDE.STRING_SEMICOLON));
-									this.regulationTypeCombo.setBounds(134, 23, 69, OSDE.IS_WINDOWS ? 20 : 22);
+									this.regulationTypeCombo.setBounds(134, 23, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.regulationTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -584,7 +584,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.voltageLevelRegulationCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
 									this.voltageLevelRegulationCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.voltageLevelRegulationCombo.setItems(LiPoWatchDialog.CELL_VOLTAGE_LIMITS);
-									this.voltageLevelRegulationCombo.setBounds(134, 51, 69, OSDE.IS_WINDOWS ? 20 : 22);
+									this.voltageLevelRegulationCombo.setBounds(134, 51, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.voltageLevelRegulationCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -597,7 +597,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.cellTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
 									this.cellTypeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.cellTypeCombo.setBounds(134, 77, 69, OSDE.IS_WINDOWS ? 20 : 22);
+									this.cellTypeCombo.setBounds(134, 77, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.cellTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1640).split(OSDE.STRING_SEMICOLON));
 									this.cellTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -627,7 +627,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.measurementModusCombo = new CCombo(this.measurementTypeGroup, SWT.BORDER);
 									this.measurementModusCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.measurementModusCombo.setBounds(96, 17, 104, OSDE.IS_WINDOWS ? 20 : 22);
+									this.measurementModusCombo.setBounds(96, 17, 104, OSDE.IS_LINUX ? 22 : 20);
 									this.measurementModusCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1646).split(OSDE.STRING_SEMICOLON));
 									this.measurementModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
