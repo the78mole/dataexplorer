@@ -300,7 +300,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.recordSetSelectCombo = new CCombo(this.readDataGroup3, SWT.BORDER | SWT.RIGHT);
 					this.recordSetSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.recordSetSelectCombo.setText("0"); //$NON-NLS-1$
-					this.recordSetSelectCombo.setBounds(260, 47, 45, OSDE.IS_WINDOWS ? 21 : 25);
+					this.recordSetSelectCombo.setBounds(260, 47, 45, OSDE.IS_LINUX ? 22 : 20);
 				}
 				{
 					this.numberRedTelegramLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
