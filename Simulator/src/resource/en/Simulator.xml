@@ -1,32 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V08.xsd">
     <Device>
         <name>Simulator</name>
         <manufacturer>WB</manufacturer>
-		<manufacturerURL/>
+        <manufacturerURL>http://www.bruegmaenner.de/en/winfried</manufacturerURL>
         <group>multimeter</group>
         <image>Simulator.jpg</image>
         <usage>false</usage>
     </Device>
-    <SerialPort>
-        <port>COM3</port>
-        <baudeRate>38400</baudeRate>
-        <dataBits>8</dataBits>
-        <stopBits>STOPBITS_1</stopBits>
-        <parity>PARITY_NONE</parity>
-        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
-        <isRTS>false</isRTS>
-        <isDTR>false</isDTR>
-        <DataBlock>
-            <size>50</size>
-        </DataBlock>
-    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
         <unit>ms</unit>
         <timeStep>5</timeStep>
     </TimeBase>
+	<DataBlock>
+		<format>BINARY</format>
+		<size>50</size>
+	</DataBlock>
     <Channel type="TYPE_CONFIG" name="Sinus">
         <Measurement>
             <name>Voltage</name>
