@@ -17,7 +17,6 @@
 package osde.utils;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,7 +68,6 @@ public class WebBrowser {
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	public static void openBrowser(String stringUrl) {
 		try {
 			if (OSDE.IS_WINDOWS) {
@@ -88,10 +86,8 @@ public class WebBrowser {
 				Runtime.getRuntime().exec(browser + OSDE.STRING_BLANK + stringUrl);
 			}
 			else if (OSDE.IS_MAC) {
-				Class fileMgr = Class.forName("com.apple.eio.FileManager");
-				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] { String.class });
-				openURL.invoke(null, new Object[] { stringUrl });
-			}
+		 		Runtime.getRuntime().exec("open" + OSDE.STRING_BLANK + stringUrl);
+		 }
 			else {
 				throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0020, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)} )); 
 			}

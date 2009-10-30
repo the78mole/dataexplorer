@@ -132,6 +132,7 @@ public class OperatingSystemHelper {
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
 				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0032, new Object[] {System.getProperty(OSDE.STRING_OS_NAME)}));
+				isCreated = true;
 			}
 		}
 		log.log(Level.INFO, "OpenSerialDataExplorer desktop created = " + isCreated); //$NON-NLS-1$
