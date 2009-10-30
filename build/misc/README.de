@@ -1,12 +1,12 @@
 ******** OpenSerialDataExplorer README ***********  18 Apr 2009 WB
 
-Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
-Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
-des Programms auf Windows, Linux und anderen Plattformen möglich. Voraussetzung ist eine Java Version 1.6 oder höher. 
-Getestet und gebaut wird zu Zeit nur die Version für Windows und Linux in 32 und 64 Bit. Die Version für Mac OS sollte prinzipiell
+Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewï¿½hrleistung, dafï¿½r aber kostenfrei und ohne Spende zur Verfï¿½gung gestellt. 
+Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausfï¿½hrung
+des Programms auf Windows, Linux und anderen Plattformen mï¿½glich. Voraussetzung ist eine Java Version 1.6 oder hï¿½her. 
+Getestet und gebaut wird zu Zeit nur die Version fï¿½r Windows und Linux in 32 und 64 Bit. Die Version fï¿½r Mac OS sollte prinzipiell
 laufen kann aber mangels Mac OS nicht getestet werden.
-Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für weiteres Auswerten an. 
-Zur Zeit sind folgende Geräte eingebunden: 
+Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Gerï¿½ten entgegen, zeigt diese fï¿½r weiteres Auswerten an. 
+Zur Zeit sind folgende Gerï¿½te eingebunden: 
 											 - AkkuMasterC4 (Htronic)
 											 - Picolario (Renschler)
 											 - UniLog (SM-Modellbau)
@@ -16,43 +16,45 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - VC820, VC840 (Conrad/VoltCraft)
 											 - Simulator
 											 
-Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
+Weitere Gerï¿½te sind in Arbeit. Hilfe bei der Einbindung von zusï¿½tzlichen Gerï¿½ten ist herzlich willkommen.
 
-Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
-einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
-Für Windowsbenutzer wäre das z.B. %ProgramFiles% für Linuxbenutzer "/opt" oder "/usr".
+Eine Installation ist nicht nï¿½tig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
+einfach an einen Ort entpacken, wo Ausfï¿½hrungsrechte vorliegen. 
+Fï¿½r Windowsbenutzer wï¿½re das z.B. %ProgramFiles% fï¿½r Linuxbenutzer "/opt" oder "/usr".
 
-Für den ersten Start des Programms über ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
-wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausführen. 
+Fï¿½r den ersten Start des Programms ï¿½ber ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
+wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausfï¿½hren. 
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
 OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
 OpenSerialDataExplorer\OpenSerialDataExplorer.ini (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorerMac32 (Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
 OpenSerialDataExplorer\OpenSerialDataExplorer.jar
 OpenSerialDataExplorer\Devices\*.jar
 
-Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
+Erweiterung der Java Laufzeitumgebung fï¿½r RXTXcomm und SWT:
 OpenSerialDataExplorer\java\ext\*.jar
 OpenSerialDataExplorer\java\ext\*.LICENSE
 
-Hinweis für Linux-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angehören. In Abhängigkeit
-der verwendeten Distribution kann evtl. kein serieller Port geöffnet werden.
+Hinweis fï¿½r Linux-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angehï¿½ren. In Abhï¿½ngigkeit
+der verwendeten Distribution kann evtl. kein serieller Port geï¿½ffnet werden.
 
 Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
 %APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows)
-/home/<Benutzer>/.OpenSerialDataExplorer (Linux, Mac OS)
+/home/<Benutzer>/.OpenSerialDataExplorer (Linux)
+/user/<Benutzer>/.OpenSerialDataExplorer (Mac OS)
 angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
 
-Für das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
+Fï¿½r das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterlegt.
 
-Hinweis: Erscheint nach der Ausführung von OpenSerialDataExplorer.exe/OpenSerialDataExplorer folgende oder ähnliche Fehlermeldung 
+Hinweis: Erscheint nach der Ausfï¿½hrung von OpenSerialDataExplorer.exe/OpenSerialDataExplorer folgende oder ï¿½hnliche Fehlermeldung 
 "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major Version at offset=6"
 ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version > 1.6 ausgetauscht werden.
-Für Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
-"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
+Fï¿½r Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nï¿½tig sein das System mit dem 
+"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurï¿½sten (Desktopicon, Objektlink).
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.

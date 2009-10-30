@@ -28,9 +28,10 @@ directory and execute running Windows, OpenSerialDataExplorer.exe, running Unix,
 As overview the following files are under the OpenSerialDataExplorer program directory:
 OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
 OpenSerialDataExplorer\OpenSerialDataExplorer.ini (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer (Linux)
+OpenSerialDataExplorer\OpenSerialDataExplorerMac32 (Mac OS)
 OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux, Mac OS)
+OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
 OpenSerialDataExplorer\OpenSerialDataExplorer.jar
 OpenSerialDataExplorer\devices\*.jar
 
@@ -43,7 +44,8 @@ of this group open an serial port might be impossible. This depends on the used 
 
 During the first execution of the program the application configuration directories are created 
 %APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
-/home/<user>/.OpenSerialDataExplorer (Linux, Mac OS)
+/home/<user>/.OpenSerialDataExplorer (Linux)
+/user/<user>/.OpenSerialDataExplorer (Mac OS)
 At this place also application configuration and trace log files are located.
 
 The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file
