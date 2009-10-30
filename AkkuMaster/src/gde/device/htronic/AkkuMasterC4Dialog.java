@@ -460,6 +460,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							}
 							catch (Exception e) {
 								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+								return;
 							}
 						}
 					};

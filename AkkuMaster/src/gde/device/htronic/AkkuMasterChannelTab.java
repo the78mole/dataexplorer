@@ -282,11 +282,11 @@ public class AkkuMasterChannelTab {
 							this.capacityText.setEditable(false);
 						}
 						{
-							this.capacityMilliAh = new CCombo(this.akkuGroup, SWT.NONE);
+							this.capacityMilliAh = new CCombo(this.akkuGroup, SWT.BORDER);
 							this.capacityMilliAh.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.capacityMilliAh.setItems(this.aCapacity);
 							this.capacityMilliAh.setText(this.aCapacity[5]);
-							this.capacityMilliAh.setBounds(12, 40, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.capacityMilliAh.setBounds(12, 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.capacityMilliAh.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -304,9 +304,9 @@ public class AkkuMasterChannelTab {
 							this.countCellsText.setEditable(false);
 						}
 						{
-							this.countCells = new CCombo(this.akkuGroup, SWT.NONE);
+							this.countCells = new CCombo(this.akkuGroup, SWT.BORDER);
 							this.countCells.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.countCells.setBounds(130, 40, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.countCells.setBounds(130, 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.countCells.setItems(this.aCellCount);
 							this.countCells.setText(this.aCellCount[3]);
 							this.countCells.setEditable(false);
@@ -330,9 +330,9 @@ public class AkkuMasterChannelTab {
 							this.akkuTypeText.setEditable(false);
 						}
 						{
-							this.akkuType = new CCombo(this.akkuGroup, SWT.NONE);
+							this.akkuType = new CCombo(this.akkuGroup, SWT.BORDER);
 							this.akkuType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.akkuType.setBounds(255, 40, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.akkuType.setBounds(255, 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.akkuType.setItems(this.aAkkuTyp);
 							this.akkuType.setText(this.aAkkuTyp[0]);
 							this.akkuType.setEditable(false);
@@ -369,9 +369,9 @@ public class AkkuMasterChannelTab {
 							this.programText.setText(Messages.getString(MessageIds.OSDE_MSGT1181)); 
 						}
 						{
-							this.program = new CCombo(this.programTypeGroup, SWT.NONE);
+							this.program = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.program.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.program.setBounds(12, 40, 347, OSDE.IS_WINDOWS ? 18 : 22);
+							this.program.setBounds(12, 40, 347, OSDE.IS_LINUX ? 22 : 20);
 							this.program.setItems(this.aProgramm);
 							this.program.select(2);
 							this.program.setEditable(false);
@@ -392,9 +392,9 @@ public class AkkuMasterChannelTab {
 							this.chargeCurrentText.setEditable(false);
 						}
 						{
-							this.chargeCurrent = new CCombo(this.programTypeGroup, SWT.NONE);
+							this.chargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.chargeCurrent.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.chargeCurrent.setBounds(12, 93, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.chargeCurrent.setBounds(12, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.chargeCurrent.setItems(this.aChargeCurrent_mA);
 							this.chargeCurrent.setText(this.aChargeCurrent_mA[5]);
 							this.chargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -415,9 +415,9 @@ public class AkkuMasterChannelTab {
 							this.dischargeCurrentText.setEditable(false);
 						}
 						{
-							this.dischargeCurrent = new CCombo(this.programTypeGroup, SWT.NONE);
+							this.dischargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.dischargeCurrent.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.dischargeCurrent.setBounds(130, 93, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.dischargeCurrent.setBounds(130, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.dischargeCurrent.setItems(this.aDischargeCurrent_mA);
 							this.dischargeCurrent.setText(this.aDischargeCurrent_mA[5]);
 							this.dischargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -436,9 +436,9 @@ public class AkkuMasterChannelTab {
 							this.memoryNumberText.setEditable(false);
 						}
 						{
-							this.memoryNumberCombo = new CCombo(this.programTypeGroup, SWT.NONE);
+							this.memoryNumberCombo = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-							this.memoryNumberCombo.setBounds(255, 93, 105, OSDE.IS_WINDOWS ? 18 : 22);
+							this.memoryNumberCombo.setBounds(255, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 							this.memoryNumberCombo.select(1);
 							this.memoryNumberCombo.setEditable(false);
