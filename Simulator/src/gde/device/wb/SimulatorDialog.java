@@ -172,7 +172,7 @@ public class SimulatorDialog extends DeviceDialog {
 				{
 					FormData clusterComboLData = new FormData();
 					clusterComboLData.width = 84;
-					clusterComboLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+					clusterComboLData.height = OSDE.IS_LINUX ? 22 : 20;
 					clusterComboLData.left = new FormAttachment(0, 1000, 125);
 					clusterComboLData.top = new FormAttachment(0, 1000, 138);
 					this.clusterCombo = new CCombo(this.dialogShell, SWT.BORDER);
@@ -214,7 +214,7 @@ public class SimulatorDialog extends DeviceDialog {
 				{
 					FormData currentComboLData = new FormData();
 					currentComboLData.width = 84;
-					currentComboLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+					currentComboLData.height = OSDE.IS_LINUX ? 22 : 20;
 					currentComboLData.left = new FormAttachment(0, 1000, 29);
 					currentComboLData.top = new FormAttachment(0, 1000, 244);
 					this.currentCombo = new CCombo(this.dialogShell, SWT.BORDER);
@@ -243,7 +243,7 @@ public class SimulatorDialog extends DeviceDialog {
 				{
 					FormData voltageComboLData = new FormData();
 					voltageComboLData.width = 84;
-					voltageComboLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+					voltageComboLData.height = OSDE.IS_LINUX ? 22 : 20;
 					voltageComboLData.left = new FormAttachment(0, 1000, 29);
 					voltageComboLData.top = new FormAttachment(0, 1000, 198);
 					this.voltageCombo = new CCombo(this.dialogShell, SWT.BORDER);
@@ -271,7 +271,7 @@ public class SimulatorDialog extends DeviceDialog {
 				{
 					FormData timeComboLData = new FormData();
 					timeComboLData.width = 84;
-					timeComboLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+					timeComboLData.height = OSDE.IS_LINUX ? 22 : 20;
 					timeComboLData.left = new FormAttachment(0, 1000, 29);
 					timeComboLData.top = new FormAttachment(0, 1000, 138);
 					this.timeCombo = new CCombo(this.dialogShell, SWT.BORDER);
