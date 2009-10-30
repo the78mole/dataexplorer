@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V07.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V08.xsd">
     <Device>
         <name>UniLog</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -17,10 +17,6 @@
         <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
         <isRTS>true</isRTS>
         <isDTR>true</isDTR>
-        <DataBlock>
-            <size>24</size>
-            <checkSum>XOR</checkSum>
-        </DataBlock>
     </SerialPort>
     <TimeBase>
         <name>Zeit</name>
@@ -28,6 +24,11 @@
         <unit>ms</unit>
         <timeStep>250</timeStep>
     </TimeBase>
+    <DataBlock>
+        <format>BINARY</format>
+        <size>24</size>
+        <checkSum>XOR</checkSum>
+    </DataBlock>
     <Channel type="TYPE_CONFIG" name="Höhe">
         <Measurement>
             <name>SpannungEmpf</name>
