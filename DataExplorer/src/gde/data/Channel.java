@@ -541,7 +541,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		else {
 			this.fileName = newFileName;
 		}
-		if (this.fileName != null) this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+		if (this.fileName != null && this.application.getActiveDevice() != null) this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 	}
 
 
