@@ -95,7 +95,7 @@ public class ObjectDescriptionWindow {
 	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
-	Point													fontSizeSelectSize	= new Point((OSDE.IS_WINDOWS ? 40 : 60), (OSDE.IS_WINDOWS ? 21 : 25));
+	Point													fontSizeSelectSize	= new Point((OSDE.IS_LINUX ? 60 : 40), (OSDE.IS_LINUX ? 22 : 20));
 	ToolItem											strikeoutButton;
 	ToolItem											underlineButton;
 	ToolItem											italicButton;
@@ -329,7 +329,7 @@ public class ObjectDescriptionWindow {
 					typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 					typeCompositeLData.grabExcessHorizontalSpace = true;
 					typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					typeCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
+					typeCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
 					this.objectTypeComposite.setLayoutData(typeCompositeLData);
 					this.objectTypeComposite.setBackground(this.surroundingBackground);
 					this.objectTypeComposite.setMenu(this.popupmenu);
@@ -373,7 +373,7 @@ public class ObjectDescriptionWindow {
 					dateCompositeLData.grabExcessHorizontalSpace = true;
 					dateCompositeLData.verticalAlignment = GridData.BEGINNING;
 					dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					dateCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
+					dateCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
 					this.dateComposite.setLayoutData(dateCompositeLData);
 					this.dateComposite.setBackground(this.surroundingBackground);
 					this.dateComposite.setMenu(this.popupmenu);
@@ -394,7 +394,7 @@ public class ObjectDescriptionWindow {
 						this.dateText = new Text(this.dateComposite, SWT.BORDER);
 						this.dateText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						RowData dateTextLData = new RowData();
-						dateTextLData.width = OSDE.IS_WINDOWS ? 118: 116;
+						dateTextLData.width = OSDE.IS_LINUX ? 116: 118;
 						dateTextLData.height = 18;
 						this.dateText.setLayoutData(dateTextLData);
 						this.dateText.setBackground(this.innerAreaBackground);
@@ -418,7 +418,7 @@ public class ObjectDescriptionWindow {
 					statusCompositeLData.grabExcessHorizontalSpace = true;
 					statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 					statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-					statusCompositeLData.heightHint = OSDE.IS_WINDOWS ? 28 : 32;
+					statusCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
 					this.statusComposite.setLayoutData(statusCompositeLData);
 					this.statusComposite.setBackground(this.surroundingBackground);
 					this.statusComposite.setMenu(this.popupmenu);
@@ -443,7 +443,7 @@ public class ObjectDescriptionWindow {
 						this.statusText.select(0);
 						RowData group1LData = new RowData();
 						group1LData.width = 120;
-						group1LData.height = OSDE.IS_WINDOWS ? 21 : 25;
+						group1LData.height = OSDE.IS_LINUX ? 22 : 20;
 						this.statusText.setLayoutData(group1LData);
 						this.statusText.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 						this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));

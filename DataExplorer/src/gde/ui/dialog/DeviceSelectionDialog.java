@@ -302,10 +302,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									}
 								});
 								{
-									this.deviceSelectCombo = new CCombo(this.deviceSelectionGroup, SWT.FLAT | SWT.BORDER);
+									this.deviceSelectCombo = new CCombo(this.deviceSelectionGroup, SWT.BORDER);
 									this.deviceSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.deviceSelectCombo.setItems(new String[] { Messages.getString(MessageIds.OSDE_MSGT0156) });
-									this.deviceSelectCombo.setBounds(12, 20, 375, OSDE.IS_WINDOWS ? 21 : 25);
+									this.deviceSelectCombo.setBounds(12, 20, 375, OSDE.IS_LINUX ? 22 : 20);
 									this.deviceSelectCombo.setEditable(false);
 									this.deviceSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.deviceSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -333,7 +333,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.deviceSlider = new Slider(this.deviceSelectionGroup, SWT.HORIZONTAL);
-									this.deviceSlider.setBounds(393, 18, 119, OSDE.IS_WINDOWS ? 25 : 32);
+									this.deviceSlider.setBounds(393, OSDE.IS_WINDOWS ? 18 : 16, 119, OSDE.IS_WINDOWS ? 22 : 28);
 									this.deviceSlider.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 									this.deviceSlider.setMinimum(0);
 									this.deviceSlider.setMaximum(1);
@@ -499,7 +499,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.portSelectCombo = new CCombo(this.serialPortSelectionGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.portSelectCombo.setBounds(185, 27, 320, OSDE.IS_WINDOWS ? 21 : 25);
+									this.portSelectCombo.setBounds(185, 27, 320, OSDE.IS_LINUX ? 22 : 20);
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));

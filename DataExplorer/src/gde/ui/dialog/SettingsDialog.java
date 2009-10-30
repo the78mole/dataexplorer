@@ -219,7 +219,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
-								this.localCombo.setBounds(354, 22, 54, OSDE.IS_WINDOWS ? 21 : 25);
+								this.localCombo.setBounds(354, 22, 54, OSDE.IS_LINUX ? 22 : 20);
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -267,7 +267,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
 								this.defaultDataPath.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.defaultDataPath.setBounds(107, 24, 295, OSDE.IS_WINDOWS ? 21 : 25);
+								this.defaultDataPath.setBounds(107, 24, 295, OSDE.IS_LINUX ? 22 : 20);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
@@ -451,7 +451,7 @@ public class SettingsDialog extends Dialog {
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 								this.decimalSeparator.setItems(new String[] { " . ", " , " }); //$NON-NLS-1$ //$NON-NLS-2$
-								this.decimalSeparator.setBounds(153, 24, 43, OSDE.IS_WINDOWS ? 21 : 25);
+								this.decimalSeparator.setBounds(153, 24, 43, OSDE.IS_LINUX ? 22 : 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -472,7 +472,7 @@ public class SettingsDialog extends Dialog {
 								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.listSeparator.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
 								this.listSeparator.setItems(new String[] { " , ", " ; ", " : " }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								this.listSeparator.setBounds(370, 24, 47, OSDE.IS_WINDOWS ? 21 : 25);
+								this.listSeparator.setBounds(370, 24, 47, OSDE.IS_LINUX ? 22 : 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -564,7 +564,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, 34, 181, 22);
+								this.serialPortBlackList.setBounds(260, 34, 181, OSDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -613,7 +613,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, 55, 181, 22);
+								this.serialPortWhiteList.setBounds(260, 57, 181, OSDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -656,7 +656,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 								this.serialPort.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.serialPort.setBounds(135, 101, 307, OSDE.IS_WINDOWS ? 21 : 25);
+								this.serialPort.setBounds(135, 101, 307, OSDE.IS_LINUX ? 22 : 20);
 								this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -900,7 +900,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.globalLoggingCombo = new CCombo(this.globalLoggingComposite, SWT.BORDER);
 								this.globalLoggingCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.globalLoggingCombo.setBounds(214, 12, 212, OSDE.IS_WINDOWS ? 21 : 25);
+								this.globalLoggingCombo.setBounds(214, 12, 212, OSDE.IS_LINUX ? 22 : 20);
 								this.globalLoggingCombo.setItems(Settings.LOGGING_LEVEL);
 								this.globalLoggingCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -928,7 +928,7 @@ public class SettingsDialog extends Dialog {
 								this.uiLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.uiLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.uiLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.uiLevelCombo.setBounds(183, 3, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.uiLevelCombo.setBounds(183, 3, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.uiLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -949,7 +949,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.deviceLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.deviceLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.deviceLevelCombo.setBounds(183, 27, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.deviceLevelCombo.setBounds(183, 27, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.deviceLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -970,7 +970,7 @@ public class SettingsDialog extends Dialog {
 								this.commonLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.commonLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.commonLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.commonLevelCombo.setBounds(183, 51, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.commonLevelCombo.setBounds(183, 51, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.commonLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -991,7 +991,7 @@ public class SettingsDialog extends Dialog {
 								this.configLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.configLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.configLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.configLevelCombo.setBounds(183, 75, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.configLevelCombo.setBounds(183, 75, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.configLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -1012,7 +1012,7 @@ public class SettingsDialog extends Dialog {
 								this.utilsLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.utilsLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.utilsLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.utilsLevelCombo.setBounds(183, 99, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.utilsLevelCombo.setBounds(183, 99, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.utilsLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -1033,7 +1033,7 @@ public class SettingsDialog extends Dialog {
 								this.fileIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.fileIOLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.fileIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.fileIOLevelCombo.setBounds(183, 124, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.fileIOLevelCombo.setBounds(183, 124, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.fileIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -1054,7 +1054,7 @@ public class SettingsDialog extends Dialog {
 								this.serialIOLevelCombo = new CCombo(this.individualLoggingComosite, SWT.BORDER);
 								this.serialIOLevelCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 								this.serialIOLevelCombo.setItems(Settings.LOGGING_LEVEL);
-								this.serialIOLevelCombo.setBounds(183, 149, 79, OSDE.IS_WINDOWS ? 21 : 25);
+								this.serialIOLevelCombo.setBounds(183, 149, 79, OSDE.IS_LINUX ? 22 : 20);
 								this.serialIOLevelCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {

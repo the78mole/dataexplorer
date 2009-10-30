@@ -173,7 +173,7 @@ public class AxisEndValuesDialog extends Dialog {
 			{
 				FormData maxValueSelectLData = new FormData();
 				maxValueSelectLData.width = 84;
-				maxValueSelectLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+				maxValueSelectLData.height = OSDE.IS_LINUX ? 22 : 20;
 				maxValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
@@ -204,7 +204,7 @@ public class AxisEndValuesDialog extends Dialog {
 			{
 				FormData minValueSelectLData = new FormData();
 				minValueSelectLData.width = 84;
-				minValueSelectLData.height = OSDE.IS_WINDOWS ? 17 : 21;
+				minValueSelectLData.height = OSDE.IS_LINUX ? 22 : 20;
 				minValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);

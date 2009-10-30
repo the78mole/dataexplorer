@@ -77,7 +77,7 @@ public class MenuToolBar {
 	ToolItem											prevDeviceToolItem, nextDeviceToolItem;
 	Composite											objectSelectComposite;
 	CCombo												objectSelectCombo;
-	Point													objectSelectSize = new Point(200, OSDE.IS_WINDOWS ? 21 : 25);
+	Point													objectSelectSize = new Point(200, OSDE.IS_LINUX ? 22 : 20);
 	ToolItem											newObject, deleteObject, editObject;
 	String												oldObjectKey = null;
 	boolean												isObjectoriented = false;
@@ -87,7 +87,7 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													scopePointsComboSize = new Point(70, OSDE.IS_WINDOWS ? 21 : 25);
+	Point													scopePointsComboSize = new Point(70, OSDE.IS_LINUX ? 22 : 20);
 	static final int							leadFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	static final int							trailFill	= 4+(OSDE.IS_WINDOWS == true ? 0 : 3);
 	boolean												isScopePointsCombo = true;
@@ -103,8 +103,8 @@ public class MenuToolBar {
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite											channelSelectComposite, recordSelectComposite;
 	CCombo												channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, OSDE.IS_WINDOWS ? 21 : 25);
-	Point													recordSelectSize = new Point(260, OSDE.IS_WINDOWS ? 21 : 25);
+	Point													channelSelectSize = new Point(180, OSDE.IS_LINUX ? 22 : 20);
+	Point													recordSelectSize = new Point(260, OSDE.IS_LINUX ? 22 : 20);
 	
 	final OpenSerialDataExplorer	application;
 	final Channels								channels;
@@ -361,7 +361,7 @@ public class MenuToolBar {
 					{
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_WINDOWS ? 10 : 9, SWT.NORMAL));
+						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
 						this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
 						this.isObjectoriented = this.settings.getActiveObjectIndex() > 0;
@@ -619,7 +619,7 @@ public class MenuToolBar {
 					{
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_WINDOWS ? 10 : 9, SWT.NORMAL));
+						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						this.scopePointsCombo.select(0);
@@ -703,7 +703,7 @@ public class MenuToolBar {
 					{
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_WINDOWS ? 10 : 9, SWT.NORMAL));
+						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0075));
@@ -769,7 +769,7 @@ public class MenuToolBar {
 					{
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.recordSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
-						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_WINDOWS ? 10 : 9, SWT.NORMAL));
+						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);

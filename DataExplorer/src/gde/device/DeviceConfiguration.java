@@ -488,7 +488,7 @@ public class DeviceConfiguration {
 	}
 	
 	public int getDataBlockSize() {
-		return this.dataBlock.getSize().intValue();
+		return this.dataBlock != null ? this.dataBlock.getSize().intValue() : -1;
 	}
 
 	public void setDataBlockSize(int newSize) {
