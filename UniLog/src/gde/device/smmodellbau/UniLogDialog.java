@@ -490,7 +490,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.currentTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.currentTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.currentTriggerCombo.setBounds(200, 22, 80, OSDE.IS_WINDOWS ? 20 : 22);
+									this.currentTriggerCombo.setBounds(200, 22, 80, OSDE.IS_LINUX ? 22 : 20);
 									this.currentTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
 									this.currentTriggerCombo.select(2);
 									this.currentTriggerCombo.setEditable(false);
@@ -506,7 +506,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.timeTriggerCombo.setBounds(200, 46, 80, OSDE.IS_WINDOWS ? 20 : 22);
+									this.timeTriggerCombo.setBounds(200, 46, 80, OSDE.IS_LINUX ? 22 : 20);
 									this.timeTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$
 											" 20", " 30", " 60", " 120" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.timeTriggerCombo.select(16);
@@ -523,7 +523,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.impulseTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.impulseTriggerCombo.setBounds(200, 70, 80, OSDE.IS_WINDOWS ? 20 : 22);
+									this.impulseTriggerCombo.setBounds(200, 70, 80, OSDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
 									this.impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(UniLogDialog.RX_AUTO_START_MS);
@@ -569,7 +569,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.motorPoleCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.motorPoleCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.motorPoleCombo.setBounds(198, 20, 63, OSDE.IS_WINDOWS ? 20 : 22);
+									this.motorPoleCombo.setBounds(198, 20, 63, OSDE.IS_LINUX ? 22 : 20);
 									this.motorPoleCombo.setItems(new String[] { "  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 									this.motorPoleCombo.select(6);
 									this.motorPoleCombo.setEditable(false);
@@ -591,7 +591,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.gearFactorCombo = new Text(this.motorPropGroup, SWT.LEFT | SWT.BORDER);
 									this.gearFactorCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.gearFactorCombo.setBounds(198, 44, 63, OSDE.IS_WINDOWS ? 20 : 22);
+									this.gearFactorCombo.setBounds(198, 44, 63, OSDE.IS_LINUX ? 22 : 20);
 									this.gearFactorCombo.setText(" 1.0  :  1"); //$NON-NLS-1$
 									this.gearFactorCombo.setEditable(false);
 									this.gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -645,7 +645,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.numbeProbCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.numbeProbCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.numbeProbCombo.setBounds(198, 68, 63, OSDE.IS_WINDOWS ? 20 : 22);
+									this.numbeProbCombo.setBounds(198, 68, 63, OSDE.IS_LINUX ? 22 : 20);
 									this.numbeProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.numbeProbCombo.select(1);
 									this.numbeProbCombo.setEditable(false);
@@ -669,7 +669,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.timeIntervalCombo.setItems(UniLogDialog.TIME_INTERVAL);
-									this.timeIntervalCombo.setBounds(60, 17, 156, OSDE.IS_WINDOWS ? 20 : 22);
+									this.timeIntervalCombo.setBounds(60, 17, 156, OSDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
 									this.timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -693,11 +693,11 @@ public class UniLogDialog extends DeviceDialog {
 									this.currentSensorLabel = new Label(this.sensorGroup, SWT.RIGHT);
 									this.currentSensorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.currentSensorLabel.setText("Current");
-									this.currentSensorLabel.setBounds(42, 19, 60, OSDE.IS_WINDOWS ? 20 : 22);
+									this.currentSensorLabel.setBounds(42, 19, 60, OSDE.IS_LINUX ? 22 : 20);
 
 									this.sensorCurrentCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.sensorCurrentCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.sensorCurrentCombo.setBounds(110, 17, 120, OSDE.IS_WINDOWS ? 20 : 22);
+									this.sensorCurrentCombo.setBounds(110, 17, 120, OSDE.IS_LINUX ? 22 : 20);
 									this.sensorCurrentCombo.setItems(UniLogDialog.CURRENT_SENSOR);
 									this.sensorCurrentCombo.select(2);
 									this.sensorCurrentCombo.setEditable(false);
@@ -714,14 +714,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a1ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
 									this.a1ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a1ModusLabel.setText("A1 Modus");
-									this.a1ModusLabel.setBounds(42, 47, 60, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a1ModusLabel.setBounds(42, 47, 60, OSDE.IS_LINUX ? 22 : 20);
 									
 									this.a1ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a1ModusCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a1ModusCombo.setItems(UniLogDialog.A1_MODUS_NAMES_COMBO);
 									this.a1ModusCombo.select(0);
 									this.a1ModusCombo.setEditable(false);
-									this.a1ModusCombo.setBounds(110, 45, 135, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a1ModusCombo.setBounds(110, 45, 135, OSDE.IS_LINUX ? 22 : 20);
 									this.a1ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -735,14 +735,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a2ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
 									this.a2ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a2ModusLabel.setText("A2 Modus");
-									this.a2ModusLabel.setBounds(42, 72, 60, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a2ModusLabel.setBounds(42, 72, 60, OSDE.IS_LINUX ? 22 : 20);
 									
 									this.a2ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a2ModusCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a2ModusCombo.setItems(UniLogDialog.A2_MODUS_NAMES_COMBO);
 									this.a2ModusCombo.select(0);
 									this.a2ModusCombo.setEditable(false);
-									this.a2ModusCombo.setBounds(110, 70, 135, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a2ModusCombo.setBounds(110, 70, 135, OSDE.IS_LINUX ? 22 : 20);
 									this.a2ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -756,14 +756,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a3ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
 									this.a3ModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a3ModusLabel.setText("A3 Modus");
-									this.a3ModusLabel.setBounds(42, 97, 60, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a3ModusLabel.setBounds(42, 97, 60, OSDE.IS_LINUX ? 22 : 20);
 									
 									this.a3ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a3ModusCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.a3ModusCombo.setItems(UniLogDialog.A3_MODUS_NAMES_COMBO);
 									this.a3ModusCombo.select(0);
 									this.a3ModusCombo.setEditable(false);
-									this.a3ModusCombo.setBounds(110, 95, 135, OSDE.IS_WINDOWS ? 20 : 22);
+									this.a3ModusCombo.setBounds(110, 95, 135, OSDE.IS_LINUX ? 22 : 20);
 									this.a3ModusCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
 										public void widgetSelected(SelectionEvent evt) {
@@ -783,7 +783,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.limiterButton = new Button(this.limiterGroup, SWT.CHECK);
 									this.limiterButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.limiterButton.setBounds(55, 17, 90, OSDE.IS_WINDOWS ? 18 : 20);
+									this.limiterButton.setBounds(55, 17, 90, OSDE.IS_LINUX ? 22 : 20);
 									this.limiterButton.setText("      [ W min ] ");
 									this.limiterButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -802,7 +802,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.limiterEnergyCombo = new CCombo(this.limiterGroup, SWT.BORDER);
 									this.limiterEnergyCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 									this.limiterEnergyCombo.setItems(new String[]{" 100", " 250", " 500"," 1000", " 1500", " 2000", " 2500", " 3000"});
-									this.limiterEnergyCombo.setBounds(150, 17, 60, OSDE.IS_WINDOWS ? 20 : 22);
+									this.limiterEnergyCombo.setBounds(150, 17, 60, OSDE.IS_LINUX ? 22 : 20);
 									this.limiterEnergyCombo.select(1);
 									this.limiterEnergyCombo.setEditable(true);
 									this.limiterEnergyCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -922,7 +922,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
 									this.useConfigCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-									this.useConfigCombo.setBounds(24, 24, 140, OSDE.IS_WINDOWS ? 20 : 22);
+									this.useConfigCombo.setBounds(24, 24, 140, OSDE.IS_LINUX ? 22 : 20);
 									this.useConfigCombo.setItems(this.configurationNames);
 									this.useConfigCombo.select(this.channelSelectionIndex);
 									this.useConfigCombo.setEditable(false);
