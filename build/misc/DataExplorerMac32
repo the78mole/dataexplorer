@@ -1,6 +1,1 @@
-#!/bin/bash
-# ***** script to launch OpenSerialDataExplorer ** 27 Apr 2009 WB *****
-
-echo java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar
-java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar
-
+#!/bin/bash# ***** script to launch OpenSerialDataExplorer ** 27 Apr 2009 WB *****echo java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jarjava -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar
