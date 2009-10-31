@@ -70,8 +70,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 						this.channels.setActiveChannelNumber(channelConfigNumber);
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
-						this.channels.setSaved(true);
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
 						
 						RecordSet recordSet = CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test", fileHeader.get(OSDE.CSV_DATA_TYPE).equals(OSDE.CSV_DATA_TYPE_RAW));
 
@@ -136,8 +136,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						this.channels.setSaved(true);
+						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+						activeChannel.setSaved(true);
 						activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 						
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
@@ -212,8 +212,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						this.channels.setSaved(true);
+						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+						activeChannel.setSaved(true);
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 						
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
@@ -283,8 +283,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						this.channels.setSaved(true);
+						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+						activeChannel.setSaved(true);
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 						
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
@@ -353,8 +353,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 						Channel activeChannel = this.channels.getActiveChannel();
 						activeChannel.setFileName(file.getAbsolutePath());
-						this.channels.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						this.channels.setSaved(true);
+						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+						activeChannel.setSaved(true);
 						activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 						
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
