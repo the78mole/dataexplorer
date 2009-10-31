@@ -1254,4 +1254,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public int getNumberOfActiveDevices() {
 		return this.activeDevices.size();
 	}
+
+	/**
+	 * @return the dialogShell visible status
+	 */
+	public boolean isDisposed() {
+		return dialogShell.isDisposed();
+	}
 }
