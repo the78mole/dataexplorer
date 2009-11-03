@@ -209,8 +209,7 @@ public class DeviceConfiguration {
 	 */
 	public void removeSerialPortType() {
 		this.isChangePropery = true;
-		this.deviceProps.setSerialPort(null);
-		this.serialPort = this.deviceProps.serialPort;
+		this.serialPort = this.deviceProps.serialPort = null;
 	}
 
 	/**
@@ -329,31 +328,121 @@ public class DeviceConfiguration {
 	public int getBaudeRate() {
 		return this.serialPort.getBaudeRate().intValue();
 	}
+	
+	public void setBaudeRate(BigInteger value) {
+		this.isChangePropery = true;
+		this.serialPort.setBaudeRate(value);
+	}
 
 	public int getDataBits() {
 		return this.serialPort.getDataBits().intValue();
+	}
+
+	public void setDataBits(BigInteger value) {
+		this.isChangePropery = true;
+		this.serialPort.setDataBits(value);
 	}
 
 	public int getStopBits() {
 		return this.serialPort.getStopBits().ordinal()+1; // starts with 1
 	}
 
+	public void setStopBits(StopBitsType enumOrdinal) {
+		this.isChangePropery = true;
+		this.serialPort.setStopBits(enumOrdinal);
+	}
+
 	public int getFlowCtrlMode() {
 		return this.serialPort.getFlowControlMode().ordinal();
+	}
+
+	public void setFlowCtrlMode(FlowControlType value) {
+		this.isChangePropery = true;
+		this.serialPort.setFlowControlMode(value);
 	}
 
 	public int getParity() {
 		return this.serialPort.getParity().ordinal();
 	}
 
+	public void setParity(ParityType value) {
+		this.isChangePropery = true;
+		this.serialPort.setParity(value);
+	}
+
 	public boolean isDTR() {
 		return this.serialPort.isIsDTR();
+	}
+
+	public void setIsDTR(boolean value) {
+		this.isChangePropery = true;
+		this.serialPort.setIsDTR(value);
 	}
 
 	public boolean isRTS() {
 		return this.serialPort.isIsRTS();
 	}
+
+	public void setIsRTS(boolean value) {
+		this.isChangePropery = true;
+		this.serialPort.setIsRTS(value);
+	}
 	
+	public int getRTOCharDelayTime() {
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOCharDelayTime() : 0;
+	}
+
+	public void setRTOCharDelayTime(int value) {
+		this.isChangePropery = true;
+		if (this.serialPort.getTimeOut() == null) {
+			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
+		}
+		this.serialPort.getTimeOut().setRTOCharDelayTime(value);
+	}
+	
+	public int getRTOExtraDelayTime() {
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOExtraDelayTime() : 0;
+	}
+
+	public void setRTOExtraDelayTime(int value) {
+		this.isChangePropery = true;
+		if (this.serialPort.getTimeOut() == null) {
+			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
+		}
+		this.serialPort.getTimeOut().setRTOExtraDelayTime(value);
+	}
+	
+	public int getWTOCharDelayTime() {
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOCharDelayTime() : 0;
+	}
+
+	public void setWTOCharDelayTime(int value) {
+		this.isChangePropery = true;
+		if (this.serialPort.getTimeOut() == null) {
+			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
+		}
+		this.serialPort.getTimeOut().setWTOCharDelayTime(value);
+	}
+	
+	public int getWTOExtraDelayTime() {
+		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOExtraDelayTime() : 0;
+	}
+
+	public void setWTOExtraDelayTime(int value) {
+		this.isChangePropery = true;
+		if (this.serialPort.getTimeOut() == null) {
+			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
+		}
+		this.serialPort.getTimeOut().setWTOExtraDelayTime(value);
+	}
+	
+	public void removeSerialPortTimeOut() {
+		this.isChangePropery = true;
+		if (this.serialPort.getTimeOut() != null) {
+			this.serialPort.setTimeOut(null);
+		}
+	}
+
 	/**
 	 * set a new desktop type
 	 * @param newDesktopType
@@ -403,6 +492,14 @@ public class DeviceConfiguration {
 	 */
 	public ModeStateType getModeStateType() {
 		return this.deviceProps.modeState;
+	}
+	
+	/**
+	 * remove optional mode state
+	 */
+	public void removeModeStateType() {
+		this.isChangePropery = true;
+		this.modeState = this.deviceProps.modeState = null;
 	}
 	
 	/**
@@ -485,6 +582,15 @@ public class DeviceConfiguration {
 			}
 		}
 		return property;
+	}
+	
+	public DataBlockType getDataBlockType() {
+		return this.dataBlock;
+	}
+	
+	public void removeDataBlockType() {
+		this.isChangePropery = true;
+		this.dataBlock = this.deviceProps.dataBlock = null;
 	}
 	
 	public int getDataBlockSize() {

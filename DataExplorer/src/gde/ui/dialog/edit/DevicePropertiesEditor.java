@@ -16,6 +16,8 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 import java.io.File;
+import java.math.BigInteger;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,15 +51,22 @@ import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.device.ChecksumType;
 import osde.device.DataTypes;
 import osde.device.DesktopType;
 import osde.device.DeviceConfiguration;
+import osde.device.FlowControlType;
+import osde.device.FormatType;
 import osde.device.ObjectFactory;
+import osde.device.ParityType;
 import osde.device.PropertyType;
+import osde.device.StopBitsType;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.FileUtils;
+import osde.utils.StringHelper;
 
 
 /**
@@ -112,8 +121,8 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	Text	portNameText;
 	CCombo	baudeRateCombo, dataBitsCombo, stopBitsCombo, parityCombo, flowControlCombo;
 	Button	isRTSButton, isDTRButton, timeOutButton;
-	Label	_RTOCharDelayTimeLabel, _RTOExtraDelayTimeLabel, _WRTOCharDelayTimeLabel, _WTOExtraDelayTimeLabel;
-	Text	_RTOCharDelayTimeText, _RTOExtraDelayTimeText, _WRTOCharDelayTimeText, _WTOExtraDelayTimeText;
+	Label	_RTOCharDelayTimeLabel, _RTOExtraDelayTimeLabel, _WTOCharDelayTimeLabel, _WTOExtraDelayTimeLabel;
+	Text	_RTOCharDelayTimeText, _RTOExtraDelayTimeText, _WTOCharDelayTimeText, _WTOExtraDelayTimeText;
 
 	String portName = OSDE.STRING_EMPTY;
 	int baudeRateIndex = 0;
@@ -124,6 +133,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	boolean isRTS = false;
 	boolean isDTR = false;
 	boolean useTimeOut = false;
+	int RTOCharDelayTime = 0;
+	int RTOExtraDelayTime = 0;
+	int WTOCharDelayTime = 0;
+	int WTOExtraDelayTime = 0;
 	
 	CTabItem timeBaseTabItem;
 	Composite timeBaseComposite;
@@ -137,9 +150,15 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	Composite dataBlockComposite;
 	Label dataBlockDescriptionLabel;
 	Label dataBlockFormatLabel, dataBlockSizeLabel, dataBlockCheckSumFormatLabel, dataBlockCheckSumLabel, dataBlockEndingLabel;
-	CCombo dataBlockFormatCombo, dataBlockceckSumFormatCombo;
-	Text dataBlockSizeText, dataBlockCheckSumText, dataBlockEndingText;
+	CCombo dataBlockFormatCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo;
+	Text dataBlockSizeText, dataBlockEndingText;
 	Group dataBlockRequiredGroup, dataBlockOptionalGroup;
+	Button dataBlockOptionalEnableButton;
+	
+	FormatType dataBlockFormat = FormatType.BINARY, dataBlockcheckSumFormat = FormatType.BINARY;
+	int dataBlockSize = 30;
+	ChecksumType dataBlockCheckSumType = ChecksumType.XOR;
+	String dataBlockEnding = "0a0d";
 	
 	CTabItem modeStateTabItem, modeStateInnerTabItem;
 	Composite modeStateComposite;
@@ -207,9 +226,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event="+evt);
-					if (deviceConfig != null)
-						deviceConfig.storeDeviceProperties();
-					//TODO add your code for dialogShell.widgetDisposed
+					if (deviceConfig != null && deviceConfig.isChangePropery()) {
+						String msg = "The content of file " + devicePropertiesFileName + " was changed, do you want to save chenges ?";
+						if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(dialogShell, msg) == SWT.YES) {
+							deviceConfig.storeDeviceProperties();
+						}
+					}
 				}
 			});
 			{
@@ -220,6 +242,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				fileSelectionButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "fileSelectionButton.widgetSelected, event="+evt);
+						if (deviceConfig != null && deviceConfig.isChangePropery()) {
+							String msg = "The content of file " + devicePropertiesFileName + " was changed, do you want to save chenges ?";
+							if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(dialogShell, msg) == SWT.YES) {
+								deviceConfig.storeDeviceProperties();
+							}
+						}
 						FileDialog fileSelectionDialog = new FileDialog(dialogShell);
 						fileSelectionDialog.setFilterPath(getDevicesPath());
 						fileSelectionDialog.setText("OpenSerialDataExplorer DeviceProperties");
@@ -457,204 +485,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 				}
 				{
-					serialPortTabItem = new CTabItem(tabFolder, SWT.CLOSE);
-					serialPortTabItem.setText("Serial Port");
-					serialPortTabItem.addDisposeListener(new DisposeListener() {
-						public void widgetDisposed(DisposeEvent evt) {
-							log.log(Level.FINEST, "serialPortTabItem.widgetDisposed, event="+evt);
-							if (deviceConfig != null) {
-								deviceConfig.removeSerialPortType();
-							}
-						}
-					});
-					{
-						serialPortComposite = new Composite(tabFolder, SWT.NONE);
-						serialPortComposite.setLayout(null);
-						serialPortTabItem.setControl(serialPortComposite);
-						serialPortComposite.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent evt) {
-								log.log(Level.FINEST, "serialPortComposite.paintControl, event=" + evt);
-								portNameText.setText(portName);
-								baudeRateCombo.select(baudeRateIndex);
-								dataBitsCombo.select(dataBitsIndex);
-								stopBitsCombo.select(stopBitsIndex);
-								parityCombo.select(parityIndex);
-								flowControlCombo.select(flowControlIndex);
-								isRTSButton.setSelection(isRTS);
-								isDTRButton.setSelection(isDTR);
-							}
-						});
-						{
-							serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER);
-							serialPortDescriptionLabel.setText("This optional field descibes the serial port configuration.\nIt can be removed.");
-							serialPortDescriptionLabel.setBounds(5, 5, 605, 50);
-						}
-						{
-							portNameLabel = new Label(serialPortComposite, SWT.RIGHT);
-							portNameLabel.setText("port name");
-							portNameLabel.setBounds(5, 55, 100, 20);
-						}
-						{
-							portNameText = new Text(serialPortComposite, SWT.BORDER);
-							portNameText.setBounds(140, 55, 180, 20);
-						}
-						{
-							baudeRateLabel = new Label(serialPortComposite, SWT.RIGHT);
-							baudeRateLabel.setText("baude rate");
-							baudeRateLabel.setBounds(5, 80, 100, 20);
-						}
-						{
-							baudeRateCombo = new CCombo(serialPortComposite, SWT.BORDER);
-							baudeRateCombo.setItems(new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" });
-							baudeRateCombo.setBounds(140, 80, 180, 20);
-						}
-						{
-							dataBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
-							dataBitsLabel.setText("data bits");
-							dataBitsLabel.setBounds(5, 105, 100, 20);
-						}
-						{
-							dataBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
-							dataBitsCombo.setItems(new String[] {"5", "6", "7", "8"});
-							dataBitsCombo.setBounds(140, 105, 180, 20);
-						}
-						{
-							stopBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
-							stopBitsLabel.setText("stop bits");
-							stopBitsLabel.setBounds(5, 130, 100, 20);
-						}
-						{
-							stopBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
-							stopBitsCombo.setItems(new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" });
-							stopBitsCombo.setBounds(140, 130, 180, 20);
-						}
-						{
-							parityLabel = new Label(serialPortComposite, SWT.RIGHT);
-							parityLabel.setText("parity");
-							parityLabel.setBounds(5, 155, 100, 20);
-						}
-						{
-							parityCombo = new CCombo(serialPortComposite, SWT.BORDER);
-							parityCombo.setItems(new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" });
-							parityCombo.setBounds(140, 155, 180, 20);
-						}
-						{
-							flowControlLabel = new Label(serialPortComposite, SWT.RIGHT);
-							flowControlLabel.setText("flow control");
-							flowControlLabel.setBounds(5, 180, 100, 20);
-						}
-						{
-							flowControlCombo = new CCombo(serialPortComposite, SWT.BORDER);
-							flowControlCombo.setItems(new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" });
-							flowControlCombo.setBounds(140, 180, 180, 20);
-						}
-						{
-							rtsLabel = new Label(serialPortComposite, SWT.RIGHT);
-							rtsLabel.setText(" RTS");
-							rtsLabel.setBounds(5, 205, 100, 20);
-						}
-						{
-							isRTSButton = new Button(serialPortComposite, SWT.CHECK);
-							isRTSButton.setBounds(140, 205, 180, 20);
-						}
-						{
-							dtrLabel = new Label(serialPortComposite, SWT.RIGHT);
-							dtrLabel.setText(" DTR");
-							dtrLabel.setBounds(5, 230, 100, 20);
-						}
-						{
-							isDTRButton = new Button(serialPortComposite, SWT.CHECK);
-							isDTRButton.setBounds(140, 230, 180, 20);
-						}
-						{
-							timeOutComposite = new Composite(serialPortComposite, SWT.BORDER);
-							timeOutComposite.setLayout(null);
-							timeOutComposite.setBounds(354, 57, 250, 207);
-							timeOutComposite.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									log.log(Level.FINEST, "dialogShell.paintControl, event="+evt);
-									timeOutButton.setSelection(useTimeOut);
-									if (timeOutButton.getSelection()) {
-										_RTOCharDelayTimeLabel.setEnabled(true);
-										_RTOCharDelayTimeText.setEnabled(true);
-										_RTOExtraDelayTimeLabel.setEnabled(true);
-										_RTOExtraDelayTimeText.setEnabled(true);
-										_WRTOCharDelayTimeLabel.setEnabled(true);
-										_WRTOCharDelayTimeText.setEnabled(true);
-										_WTOExtraDelayTimeLabel.setEnabled(true);
-										_WTOExtraDelayTimeText.setEnabled(true);
-									}
-									else {
-										_RTOCharDelayTimeLabel.setEnabled(false);
-										_RTOCharDelayTimeText.setEnabled(false);
-										_RTOExtraDelayTimeLabel.setEnabled(false);
-										_RTOExtraDelayTimeText.setEnabled(false);
-										_WRTOCharDelayTimeLabel.setEnabled(false);
-										_WRTOCharDelayTimeText.setEnabled(false);
-										_WTOExtraDelayTimeLabel.setEnabled(false);
-										_WTOExtraDelayTimeText.setEnabled(false);
-									}
-								}
-							});
-							{
-								timeOutLabel = new Label(timeOutComposite, SWT.RIGHT);
-								timeOutLabel.setText("specify time out");
-								timeOutLabel.setBounds(6, 58, 140, 20);
-							}
-							{
-								timeOutButton = new Button(timeOutComposite, SWT.CHECK);
-								timeOutButton.setBounds(161, 56, 70, 20);
-								timeOutButton.addSelectionListener(new SelectionAdapter() {
-									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "timeOutButton.widgetSelected, event="+evt);
-										useTimeOut = timeOutButton.getSelection();
-										timeOutComposite.redraw();
-									}
-								});
-							}
-							{
-								_RTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-								_RTOCharDelayTimeLabel.setText("RTOCharDelayTime");
-								_RTOCharDelayTimeLabel.setBounds(6, 88, 140, 20);
-							}
-							{
-								_RTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-								_RTOCharDelayTimeText.setBounds(162, 86, 70, 20);
-							}
-							{
-								_RTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-								_RTOExtraDelayTimeLabel.setText("RTOExtraDelayTime");
-								_RTOExtraDelayTimeLabel.setBounds(6, 118, 140, 20);
-							}
-							{
-								_RTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-								_RTOExtraDelayTimeText.setBounds(162, 116, 70, 20);
-							}
-							{
-								_WRTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-								_WRTOCharDelayTimeLabel.setText("WTOCharDelayTime");
-								_WRTOCharDelayTimeLabel.setBounds(6, 148, 140, 20);
-							}
-							{
-								_WRTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-								_WRTOCharDelayTimeText.setBounds(162, 146, 70, 20);
-							}
-							{
-								_WTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-								_WTOExtraDelayTimeLabel.setText("WTOExtraDelayTime");
-								_WTOExtraDelayTimeLabel.setBounds(6, 178, 140, 20);
-							}
-							{
-								_WTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-								_WTOExtraDelayTimeText.setBounds(162, 176, 70, 20);
-							}
-							{
-								timeOutDescriptionLabel = new Label(timeOutComposite, SWT.WRAP);
-								timeOutDescriptionLabel.setText("Time out section describes Read and Write delay time. This delay and extra delay are only required in special purpose. ");
-								timeOutDescriptionLabel.setBounds(6, 3, 232, 52);
-							}
-						}
-					}
+					createSeriaPortType();
 				}
 				{
 					timeBaseTabItem = new CTabItem(tabFolder, SWT.NONE);
@@ -665,7 +496,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						timeBaseComposite.setLayout(null);
 						timeBaseComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
-								System.out.println("timeBaseComposite.paintControl, event="+evt);
+								log.log(Level.FINEST, "timeBaseComposite.paintControl, event="+evt);
 								timeBaseTimeStepText.setText(String.format("%.1f", timeStep_ms));
 							}
 						});
@@ -681,8 +512,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							timeBaseNameText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
-							timeBaseNameText.setText("Time");
+							timeBaseNameText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[0]);
 							timeBaseNameText.setBounds(322, 94, 60, 20);
+							timeBaseNameText.setEditable(false);
 						}
 						{
 							timeBaseSymbolLabel = new Label(timeBaseComposite, SWT.RIGHT);
@@ -691,8 +523,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							timeBaseSymbolText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
-							timeBaseSymbolText.setText("U");
+							timeBaseSymbolText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[1]);
 							timeBaseSymbolText.setBounds(322, 124, 60, 20);
+							timeBaseSymbolText.setEditable(false);
 						}
 						{
 							timeBaseUnitLabel = new Label(timeBaseComposite, SWT.RIGHT);
@@ -701,27 +534,36 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							timeBaseUnitText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
-							timeBaseUnitText.setText("V");
+							timeBaseUnitText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[3]);
 							timeBaseUnitText.setBounds(322, 154, 60, 20);
+							timeBaseUnitText.setEditable(false);
 						}
 						{
 							timeBaseTimeStepLabel = new Label(timeBaseComposite, SWT.RIGHT);
-							timeBaseTimeStepLabel.setText("msec");
+							timeBaseTimeStepLabel.setText("time step");
 							timeBaseTimeStepLabel.setBounds(142, 185, 150, 20);
 						}
 						{
 							timeBaseTimeStepText = new Text(timeBaseComposite, SWT.RIGHT | SWT.BORDER);
 							timeBaseTimeStepText.setText("1000.0");
 							timeBaseTimeStepText.setBounds(322, 184, 60, 20);
+							timeBaseTimeStepText.addVerifyListener(new VerifyListener() {
+								public void verifyText(VerifyEvent evt) {
+									log.log(Level.FINEST, "timeBaseTimeStepText.verifyText, event="+evt);
+									evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
+								}
+							});
 							timeBaseTimeStepText.addKeyListener(new KeyAdapter() {
 								public void keyReleased(KeyEvent evt) {
-									System.out.println("timeBaseTimeStepText.keyReleased, event="+evt);
+									log.log(Level.FINEST, "timeBaseTimeStepText.keyReleased, event="+evt);
 									try { 
-										String tmpTimeStep = timeBaseTimeStepText.getText();
-										timeStep_ms = Double.parseDouble(tmpTimeStep);
+										timeStep_ms = Double.parseDouble(timeBaseTimeStepText.getText().replace(OSDE.STRING_COMMA, OSDE.STRING_DOT));
+										timeStep_ms = Double.parseDouble(String.format(Locale.ENGLISH, "%.1f", timeStep_ms));
+										if (deviceConfig != null) 
+											deviceConfig.setTimeStep_ms(timeStep_ms);
 									}
 									catch (NumberFormatException e) {
-										// ignore
+										// ignore input
 									}
 								}
 							});
@@ -729,129 +571,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 				}
 				{
-					dataBlockTabItem = new CTabItem(tabFolder, SWT.CLOSE);
-					dataBlockTabItem.setText("Data Block");
-					{
-						dataBlockComposite = new Composite(tabFolder, SWT.NONE);
-						dataBlockComposite.setLayout(null);
-						dataBlockTabItem.setControl(dataBlockComposite);
-						{
-							dataBlockDescriptionLabel = new Label(dataBlockComposite, SWT.CENTER);
-							dataBlockDescriptionLabel.setText("This describes the data as to be interpreted as input.\nNomally this is handeled by individual device plug-in.\nThe default values loaded here refers to TEXT input related to LogViews OpenFormat");
-							dataBlockDescriptionLabel.setBounds(12, 5, 602, 51);
-						}
-						{
-							dataBlockRequiredGroup = new Group(dataBlockComposite, SWT.NONE);
-							dataBlockRequiredGroup.setLayout(null);
-							dataBlockRequiredGroup.setText("Required Entries");
-							dataBlockRequiredGroup.setBounds(40, 80, 250, 170);
-							{
-								dataBlockFormatLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
-								dataBlockFormatLabel.setText("format");
-								dataBlockFormatLabel.setBounds(19, 51, 85, 16);
-							}
-							{
-								dataBlockFormatCombo = new CCombo(dataBlockRequiredGroup, SWT.BORDER);
-								dataBlockFormatCombo.setBounds(125, 49, 84, 21);
-								dataBlockFormatCombo.setItems(new java.lang.String[]{"TEXT"," BINARY"});
-								dataBlockFormatCombo.setLayout(null);
-								dataBlockFormatCombo.addSelectionListener(new SelectionAdapter() {
-									public void widgetSelected(SelectionEvent evt) {
-										System.out.println("dataBlockFormatCombo.widgetSelected, event="+evt);
-										//TODO add your code for dataBlockFormatCombo.widgetSelected
-									}
-								});
-							}
-							{
-								dataBlockSizeText = new Text(dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
-								dataBlockSizeText.setText("30");
-								dataBlockSizeText.setBounds(127, 103, 64, 22);
-								dataBlockSizeText.addKeyListener(new KeyAdapter() {
-									public void keyReleased(KeyEvent evt) {
-										System.out.println("dataBlockSizeText.keyReleased, event="+evt);
-										//TODO add your code for dataBlockSizeText.keyReleased
-									}
-								});
-								dataBlockSizeText.addVerifyListener(new VerifyListener() {
-									public void verifyText(VerifyEvent evt) {
-										System.out.println("dataBlockSizeText.verifyText, event="+evt);
-										//TODO add your code for dataBlockSizeText.verifyText
-									}
-								});
-							}
-							{
-								dataBlockSizeLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
-								dataBlockSizeLabel.setText("size");
-								dataBlockSizeLabel.setBounds(19, 105, 85, 16);
-							}
-						}
-						{
-							dataBlockOptionalGroup = new Group(dataBlockComposite, SWT.NONE);
-							dataBlockOptionalGroup.setLayout(null);
-							dataBlockOptionalGroup.setText("Optional Entries");
-							dataBlockOptionalGroup.setBounds(330, 80, 250, 170);
-							{
-								dataBlockCheckSumFormatLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
-								dataBlockCheckSumFormatLabel.setText("checkSum format");
-								dataBlockCheckSumFormatLabel.setBounds(6, 46, 122, 20);
-							}
-							{
-								dataBlockCheckSumLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
-								dataBlockCheckSumLabel.setText("checkSum");
-								dataBlockCheckSumLabel.setBounds(6, 77, 122, 20);
-							}
-							{
-								dataBlockEndingLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
-								dataBlockEndingLabel.setText("ending [bytes]");
-								dataBlockEndingLabel.setBounds(6, 111, 122, 20);
-							}
-							{
-								dataBlockceckSumFormatCombo = new CCombo(dataBlockOptionalGroup, SWT.BORDER);
-								dataBlockceckSumFormatCombo.setItems(new java.lang.String[]{"TEXT"," BINARY"});
-								dataBlockceckSumFormatCombo.setBounds(144, 44, 99, 20);
-								dataBlockceckSumFormatCombo.addSelectionListener(new SelectionAdapter() {
-									public void widgetSelected(SelectionEvent evt) {
-										System.out.println("dataBlockceckSumFormatCombo.widgetSelected, event="+evt);
-										//TODO add your code for dataBlockceckSumFormatCombo.widgetSelected
-									}
-								});
-							}
-							{
-								dataBlockCheckSumText = new Text(dataBlockOptionalGroup, SWT.RIGHT | SWT.BORDER);
-								dataBlockCheckSumText.setText("25");
-								dataBlockCheckSumText.setBounds(144, 76, 61, 20);
-								dataBlockCheckSumText.addVerifyListener(new VerifyListener() {
-									public void verifyText(VerifyEvent evt) {
-										System.out.println("dataBlockCheckSumText.verifyText, event="+evt);
-										//TODO add your code for dataBlockCheckSumText.verifyText
-									}
-								});
-								dataBlockCheckSumText.addKeyListener(new KeyAdapter() {
-									public void keyReleased(KeyEvent evt) {
-										System.out.println("dataBlockCheckSumText.keyReleased, event="+evt);
-										//TODO add your code for dataBlockCheckSumText.keyReleased
-									}
-								});
-							}
-							{
-								dataBlockEndingText = new Text(dataBlockOptionalGroup, SWT.BORDER);
-								dataBlockEndingText.setText("0a0d");
-								dataBlockEndingText.setBounds(144, 109, 61, 20);
-								dataBlockEndingText.addKeyListener(new KeyAdapter() {
-									public void keyReleased(KeyEvent evt) {
-										System.out.println("dataBlockEndingText.keyReleased, event="+evt);
-										//TODO add your code for dataBlockEndingText.keyReleased
-									}
-								});
-								dataBlockEndingText.addVerifyListener(new VerifyListener() {
-									public void verifyText(VerifyEvent evt) {
-										System.out.println("dataBlockEndingText.verifyText, event="+evt);
-										//TODO add your code for dataBlockEndingText.verifyText
-									}
-								});
-							}
-						}
-					}
+					createDataBlockType();
 				}
 //				{
 //					channelConfigurationTabItem = new CTabItem(tabFolder, SWT.NONE);
@@ -931,82 +651,28 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 				}
 				{
-					modeStateTabItem = new CTabItem(tabFolder, SWT.CLOSE);
-					modeStateTabItem.setText("Mode State");
-					{
-						modeStateComposite = new Composite(tabFolder, SWT.NONE);
-						modeStateComposite.setLayout(null);
-						modeStateTabItem.setControl(modeStateComposite);
-						modeStateComposite.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent evt) {
-								log.log(Level.FINEST, "modeStateComposite.paintControl, event="+evt);
-								for (Control child : modeStateTabFolder.getChildren()) {
-									((PropertyTypeComposite)child).redraw();
-								}
-							}
-						});
-						{
-							modeStateDescriptionLabel = new Label(modeStateComposite, SWT.CENTER);
-							modeStateDescriptionLabel.setText("Defines device processing states, like 1 charge, 2, discharge, ...");
-							modeStateDescriptionLabel.setBounds(5, 5, 615, 55);
-						}
-						{
-							modeStateTabFolder = new CTabFolder(modeStateComposite, SWT.BORDER);
-							modeStateTabFolder.setBounds(165, 65, 300, 170);
-							modeStateTabFolder.setSelection(0);
-							{
-								modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-								modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-								modeStateInnerTabItem.setShowClose(true);
-								modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
-								{
-									modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-									modeStateInnerTabItem.setControl(modeStateItemComposite);
-								}
-							}
-							modeStateTabFolder.setSelection(0);
-							modeStateTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
-								public void close(CTabFolderEvent evt) {
-									System.out.println("modeStateTabFolder.close, event="+evt);
-									if (deviceConfig != null) {
-										int childIndex = Integer.parseInt(evt.item.toString().split(" |}")[2]) - 1;
-										modeStateTabFolder.getChildren()[childIndex].dispose();
-										deviceConfig.removeModeStateType(deviceConfig.getModeStateType().getProperty().get(childIndex));
-									}
-									evt.item.dispose();
-								}
-							});
-						}
-						{
-							addButton = new Button(modeStateComposite, SWT.PUSH | SWT.CENTER);
-							addButton.setText("add a new state");
-							addButton.setBounds(165, 237, 300, 30);
-							addButton.addSelectionListener(new SelectionAdapter() {
-								public void widgetSelected(SelectionEvent evt) {
-									System.out.println("addButton.widgetSelected, event="+evt);
-									{
-										modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-										modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-										modeStateInnerTabItem.setShowClose(true);
-										{
-											modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-											modeStateInnerTabItem.setControl(modeStateItemComposite);
-											PropertyType property = new ObjectFactory().createPropertyType();
-											property.setName("new mode state");
-											property.setType(DataTypes.INTEGER);
-											property.setValue(OSDE.STRING_EMPTY+modeStateTabFolder.getItemCount());
-											property.setDescription("new mode state description");
-											deviceConfig.appendModeStateType(property);
-											update();
-										}
-									}
-								}
-							});
-						}
-					}
+					createInitialModeStateTabItem();
 				}
 				tabFolder.setSelection(0);
 				tabFolder.setBounds(0, 40, 632, 300);
+				tabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+					public void restore(CTabFolderEvent evt) {
+						log.log(Level.FINEST, "tabFolder.restore, event="+evt);
+						((CTabItem)evt.item).getControl();
+					}
+					public void close(CTabFolderEvent evt) {
+						log.log(Level.FINEST, "tabFolder.close, event="+evt);
+						CTabItem tabItem = ((CTabItem)evt.item);
+						if (deviceConfig != null) {
+							if (tabItem.getText().equals("Mode State")) deviceConfig.removeModeStateType();
+							else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
+							else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
+						}
+						tabItem.dispose();
+						if(deviceConfig != null) 
+							update();
+					}
+				});
 			}
 			dialogShell.setLocation(getParent().toDisplay(100, 100));
 			dialogShell.open();
@@ -1017,6 +683,622 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * create a new data block type and place it right after time base
+	 */
+	void createDataBlockType() {
+		for (int i = 1; i < tabFolder.getItemCount(); i++) {
+			if (tabFolder.getItem(i).getText().equals("Time Base")) {
+				dataBlockTabItem = new CTabItem(tabFolder, SWT.CLOSE, i+1);
+				break;
+			}
+		}
+		//dataBlockTabItem = new CTabItem(tabFolder, SWT.CLOSE); //remove the leading comment to enable visual edit
+		dataBlockTabItem.setText("Data Block");
+		{
+			dataBlockComposite = new Composite(tabFolder, SWT.NONE);
+			dataBlockComposite.setLayout(null);
+			dataBlockTabItem.setControl(dataBlockComposite);
+			{
+				dataBlockDescriptionLabel = new Label(dataBlockComposite, SWT.CENTER);
+				dataBlockDescriptionLabel.setText("This describes the data as to be interpreted as input.\nNomally this is handeled by individual device plug-in.\nThe default values loaded here refers to TEXT input related to LogViews OpenFormat");
+				dataBlockDescriptionLabel.setBounds(12, 5, 602, 51);
+			}
+			{
+				dataBlockRequiredGroup = new Group(dataBlockComposite, SWT.NONE);
+				dataBlockRequiredGroup.setLayout(null);
+				dataBlockRequiredGroup.setText("Required Entries");
+				dataBlockRequiredGroup.setBounds(40, 80, 250, 170);
+				dataBlockRequiredGroup.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						log.log(Level.FINEST, "dataBlockRequiredGroup.paintControl, event="+evt);
+						dataBlockFormatCombo.select(dataBlockFormat == FormatType.TEXT ? 0 : 1);
+						dataBlockSizeText.setText(OSDE.STRING_EMPTY + dataBlockSize);
+					}
+				});
+				{
+					dataBlockFormatLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
+					dataBlockFormatLabel.setText("format");
+					dataBlockFormatLabel.setBounds(19, 51, 85, 16);
+				}
+				{
+					dataBlockFormatCombo = new CCombo(dataBlockRequiredGroup, SWT.BORDER);
+					dataBlockFormatCombo.setBounds(125, 49, 84, 21);
+					dataBlockFormatCombo.setItems(new java.lang.String[]{"TEXT","BINARY"});
+					dataBlockFormatCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					dataBlockFormatCombo.setLayout(null);
+					dataBlockFormatCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "dataBlockFormatCombo.widgetSelected, event="+evt);
+							dataBlockFormat = FormatType.valueOf(dataBlockFormatCombo.getText());
+							if (deviceConfig != null) {
+								deviceConfig.setDataBlockFormat(dataBlockFormat);
+							}
+						} 
+					});
+				}
+				{
+					dataBlockSizeLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
+					dataBlockSizeLabel.setText("size");
+					dataBlockSizeLabel.setToolTipText("define size in bytes for BINARY, or value count for TEXT format");
+					dataBlockSizeLabel.setBounds(19, 105, 85, 16);
+				}
+				{
+					dataBlockSizeText = new Text(dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
+					dataBlockSizeText.setBounds(127, 103, 64, 22);
+					dataBlockSizeText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "dataBlockSizeText.keyReleased, event="+evt);
+							dataBlockSize = Integer.parseInt(dataBlockSizeText.getText());
+							if (deviceConfig != null) {
+								deviceConfig.setDataBlockSize(dataBlockSize);
+							}
+						}
+					});
+					dataBlockSizeText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "dataBlockSizeText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+				}
+			}
+			{
+				dataBlockOptionalGroup = new Group(dataBlockComposite, SWT.NONE);
+				dataBlockOptionalGroup.setLayout(null);
+				dataBlockOptionalGroup.setText("Optional Entries");
+				dataBlockOptionalGroup.setBounds(330, 80, 250, 170);
+				dataBlockOptionalGroup.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						log.log(Level.FINEST, "dataBlockOptionalGroup.paintControl, event="+evt);
+						if (deviceConfig.getDataBlockCheckSumFormat() != null && deviceConfig.getDataBlockCheckSumType() != null && deviceConfig.getDataBlockEnding() != null) {
+							dataBlockOptionalEnableButton.setSelection(true);
+							dataBlockcheckSumFormatCombo.select(dataBlockcheckSumFormat == FormatType.TEXT ? 0 : 1);
+							dataBlockCheckSumTypeCombo.select(dataBlockCheckSumType == ChecksumType.XOR ? 0 : 1);
+							dataBlockEndingText.setText(dataBlockEnding);
+						}
+						else {
+							dataBlockOptionalEnableButton.setSelection(false);
+						}
+					}
+				});
+				{
+					dataBlockOptionalEnableButton = new Button(dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
+					dataBlockOptionalEnableButton.setText("enable");
+					dataBlockOptionalEnableButton.setBounds(143, 14, 92, 20);
+					dataBlockOptionalEnableButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "dataBlockOptionalEnableButton.widgetSelected, event="+evt);
+							enableDataBlockOptionalPart(dataBlockOptionalEnableButton.getSelection());
+						}
+					});
+				}
+				{
+					dataBlockCheckSumFormatLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
+					dataBlockCheckSumFormatLabel.setText("checkSum format");
+					dataBlockCheckSumFormatLabel.setBounds(6, 46, 122, 20);
+				}
+				{
+					dataBlockCheckSumLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
+					dataBlockCheckSumLabel.setText("checkSum");
+					dataBlockCheckSumLabel.setBounds(6, 77, 122, 20);
+				}
+				{
+					dataBlockEndingLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
+					dataBlockEndingLabel.setText("ending [bytes]");
+					dataBlockEndingLabel.setBounds(6, 111, 122, 20);
+				}
+				{
+					dataBlockcheckSumFormatCombo = new CCombo(dataBlockOptionalGroup, SWT.BORDER);
+					dataBlockcheckSumFormatCombo.setItems(new java.lang.String[]{"TEXT","BINARY"});
+					dataBlockcheckSumFormatCombo.setBounds(143, 44, 92, 20);
+					dataBlockcheckSumFormatCombo.setEditable(false);
+					dataBlockcheckSumFormatCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					dataBlockcheckSumFormatCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "dataBlockceckSumFormatCombo.widgetSelected, event="+evt);
+							dataBlockcheckSumFormat = FormatType.valueOf(dataBlockcheckSumFormatCombo.getText());
+							if (deviceConfig != null) {
+								deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat);
+							}
+						}
+					});
+				}
+				{
+					dataBlockCheckSumTypeCombo = new CCombo(dataBlockOptionalGroup, SWT.RIGHT | SWT.BORDER);
+					dataBlockCheckSumTypeCombo.setItems(new String[] {"XOR", "ADD"});
+					dataBlockCheckSumTypeCombo.setBounds(143, 74, 92, 20);
+					dataBlockCheckSumTypeCombo.setEditable(false);
+					dataBlockCheckSumTypeCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					dataBlockCheckSumTypeCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "dataBlockCheckSumCombo.widgetSelected, event="+evt);
+							dataBlockCheckSumType = ChecksumType.valueOf(dataBlockCheckSumTypeCombo.getText());
+							if (deviceConfig != null) {
+								deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType);
+							}
+						}
+					});
+				}
+				{
+					dataBlockEndingText = new Text(dataBlockOptionalGroup, SWT.BORDER);
+					dataBlockEndingText.setBounds(144, 109, 61, 20);
+					dataBlockEndingText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "dataBlockEndingText.keyReleased, event="+evt);
+							dataBlockEnding = dataBlockEndingText.getText();
+							if (deviceConfig != null) {
+								deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding));
+							}
+						}
+					});
+					dataBlockEndingText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "dataBlockEndingText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyHexAsString(evt.text);
+						}
+					});
+				}
+			}
+		}
+	}
+
+	/**
+	 * create a new serial port type tabulator item
+	 */
+	CTabItem createSeriaPortType() {
+		serialPortTabItem = new CTabItem(tabFolder, SWT.CLOSE, 1);
+		serialPortTabItem.setText("Serial Port");
+		serialPortTabItem.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent evt) {
+				log.log(Level.FINEST, "serialPortTabItem.widgetDisposed, event="+evt);
+				if (deviceConfig != null) {
+					deviceConfig.removeSerialPortType();
+				}
+			}
+		});
+		{
+			serialPortComposite = new Composite(tabFolder, SWT.NONE);
+			serialPortComposite.setLayout(null);
+			serialPortTabItem.setControl(serialPortComposite);
+			serialPortComposite.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					log.log(Level.FINEST, "serialPortComposite.paintControl, event=" + evt);
+					portNameText.setText(portName);
+					baudeRateCombo.select(baudeRateIndex);
+					dataBitsCombo.select(dataBitsIndex);
+					stopBitsCombo.select(stopBitsIndex);
+					parityCombo.select(parityIndex);
+					flowControlCombo.select(flowControlIndex);
+					isRTSButton.setSelection(isRTS);
+					isDTRButton.setSelection(isDTR);
+				}
+			});
+			{
+				serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER);
+				serialPortDescriptionLabel.setText("This optional field descibes the serial port configuration.\nIt can be removed.");
+				serialPortDescriptionLabel.setBounds(5, 5, 605, 50);
+			}
+			{
+				portNameLabel = new Label(serialPortComposite, SWT.RIGHT);
+				portNameLabel.setText("port name");
+				portNameLabel.setBounds(5, 55, 100, 20);
+			}
+			{
+				portNameText = new Text(serialPortComposite, SWT.BORDER);
+				portNameText.setBounds(140, 55, 180, 20);
+				portNameText.setEditable(false);
+			}
+			{
+				baudeRateLabel = new Label(serialPortComposite, SWT.RIGHT);
+				baudeRateLabel.setText("baude rate");
+				baudeRateLabel.setBounds(5, 80, 100, 20);
+			}
+			{
+				baudeRateCombo = new CCombo(serialPortComposite, SWT.BORDER);
+				baudeRateCombo.setItems(new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" });
+				baudeRateCombo.setBounds(140, 80, 180, 20);
+				baudeRateCombo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "baudeRateCombo.widgetSelected, event=" + evt);
+						if (deviceConfig != null) {
+							deviceConfig.setBaudeRate(new BigInteger(baudeRateCombo.getText()));
+						}
+						baudeRateIndex = baudeRateCombo.getSelectionIndex();
+					}
+				});
+			}
+			{
+				dataBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
+				dataBitsLabel.setText("data bits");
+				dataBitsLabel.setBounds(5, 105, 100, 20);
+			}
+			{
+				dataBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
+				dataBitsCombo.setItems(new String[] {"5", "6", "7", "8"});
+				dataBitsCombo.setBounds(140, 105, 180, 20);
+				dataBitsCombo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "dataBitsCombo.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setDataBits(new BigInteger(dataBitsCombo.getText()));
+						}
+						dataBitsIndex = dataBitsCombo.getSelectionIndex();
+					}
+				});
+			}
+			{
+				stopBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
+				stopBitsLabel.setText("stop bits");
+				stopBitsLabel.setBounds(5, 130, 100, 20);
+			}
+			{
+				stopBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
+				stopBitsCombo.setItems(new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" });
+				stopBitsCombo.setBounds(140, 130, 180, 20);
+				stopBitsCombo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "stopBitsCombo.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setStopBits(StopBitsType.values()[stopBitsCombo.getSelectionIndex()]);
+						}
+						stopBitsIndex = stopBitsCombo.getSelectionIndex();
+					}
+				});
+			}
+			{
+				parityLabel = new Label(serialPortComposite, SWT.RIGHT);
+				parityLabel.setText("parity");
+				parityLabel.setBounds(5, 155, 100, 20);
+			}
+			{
+				parityCombo = new CCombo(serialPortComposite, SWT.BORDER);
+				parityCombo.setItems(new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" });
+				parityCombo.setBounds(140, 155, 180, 20);
+				parityCombo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "parityCombo.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setParity(ParityType.values()[parityCombo.getSelectionIndex()]);
+						}
+						parityIndex = parityCombo.getSelectionIndex();
+					}
+				});
+			}
+			{
+				flowControlLabel = new Label(serialPortComposite, SWT.RIGHT);
+				flowControlLabel.setText("flow control");
+				flowControlLabel.setBounds(5, 180, 100, 20);
+			}
+			{
+				flowControlCombo = new CCombo(serialPortComposite, SWT.BORDER);
+				flowControlCombo.setItems(new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" });
+				flowControlCombo.setBounds(140, 180, 180, 20);
+				flowControlCombo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "flowControlCombo.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setFlowCtrlMode(FlowControlType.values()[flowControlCombo.getSelectionIndex()]);
+						}
+						flowControlIndex = flowControlCombo.getSelectionIndex();
+					}
+				});
+			}
+			{
+				rtsLabel = new Label(serialPortComposite, SWT.RIGHT);
+				rtsLabel.setText(" RTS");
+				rtsLabel.setBounds(5, 205, 100, 20);
+			}
+			{
+				isRTSButton = new Button(serialPortComposite, SWT.CHECK);
+				isRTSButton.setBounds(140, 205, 180, 20);
+				isRTSButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "isRTSButton.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setIsRTS(isRTSButton.getSelection());
+						}
+						isRTS = isRTSButton.getSelection();
+					}
+				});
+			}
+			{
+				dtrLabel = new Label(serialPortComposite, SWT.RIGHT);
+				dtrLabel.setText(" DTR");
+				dtrLabel.setBounds(5, 230, 100, 20);
+			}
+			{
+				isDTRButton = new Button(serialPortComposite, SWT.CHECK);
+				isDTRButton.setBounds(140, 230, 180, 20);
+				isDTRButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "isDTRButton.widgetSelected, event="+evt);
+						if (deviceConfig != null) {
+							deviceConfig.setIsDTR(isDTRButton.getSelection());
+						}
+						isDTR = isDTRButton.getSelection();
+					}
+				});
+			}
+			{
+				timeOutComposite = new Composite(serialPortComposite, SWT.BORDER);
+				timeOutComposite.setLayout(null);
+				timeOutComposite.setBounds(354, 57, 250, 207);
+				timeOutComposite.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent evt) {
+						log.log(Level.FINEST, "dialogShell.paintControl, event="+evt);
+						_RTOCharDelayTimeText.setText(""+RTOCharDelayTime);
+						_RTOExtraDelayTimeText.setText(""+RTOExtraDelayTime);
+						_WTOCharDelayTimeText.setText(""+WTOCharDelayTime);
+						_WTOExtraDelayTimeText.setText(""+WTOExtraDelayTime);
+						
+						timeOutButton.setSelection(useTimeOut);
+						if (timeOutButton.getSelection()) {
+							_RTOCharDelayTimeLabel.setEnabled(true);
+							_RTOCharDelayTimeText.setEnabled(true);
+							_RTOExtraDelayTimeLabel.setEnabled(true);
+							_RTOExtraDelayTimeText.setEnabled(true);
+							_WTOCharDelayTimeLabel.setEnabled(true);
+							_WTOCharDelayTimeText.setEnabled(true);
+							_WTOExtraDelayTimeLabel.setEnabled(true);
+							_WTOExtraDelayTimeText.setEnabled(true);
+						}
+						else {
+							_RTOCharDelayTimeLabel.setEnabled(false);
+							_RTOCharDelayTimeText.setEnabled(false);
+							_RTOExtraDelayTimeLabel.setEnabled(false);
+							_RTOExtraDelayTimeText.setEnabled(false);
+							_WTOCharDelayTimeLabel.setEnabled(false);
+							_WTOCharDelayTimeText.setEnabled(false);
+							_WTOExtraDelayTimeLabel.setEnabled(false);
+							_WTOExtraDelayTimeText.setEnabled(false);
+						}
+					}
+				});
+				{
+					timeOutLabel = new Label(timeOutComposite, SWT.RIGHT);
+					timeOutLabel.setText("specify time out");
+					timeOutLabel.setBounds(6, 58, 140, 20);
+				}
+				{
+					timeOutButton = new Button(timeOutComposite, SWT.CHECK);
+					timeOutButton.setBounds(161, 56, 70, 20);
+					timeOutButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "timeOutButton.widgetSelected, event="+evt);
+							useTimeOut = timeOutButton.getSelection();
+							if (useTimeOut) {
+								if (deviceConfig != null) {
+									RTOCharDelayTime = deviceConfig.getRTOCharDelayTime();
+									RTOExtraDelayTime = deviceConfig.getRTOExtraDelayTime();
+									WTOCharDelayTime = deviceConfig.getWTOCharDelayTime();
+									WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
+								}
+								else {
+									RTOCharDelayTime = 0;
+									RTOExtraDelayTime = 0;
+									WTOCharDelayTime = 0;
+									WTOExtraDelayTime = 0;
+								}
+							}
+							else {
+								if (deviceConfig != null) {
+									deviceConfig.removeSerialPortTimeOut();
+								}
+									RTOCharDelayTime = 0;
+									RTOExtraDelayTime = 0;
+									WTOCharDelayTime = 0;
+									WTOExtraDelayTime = 0;
+							}
+							timeOutComposite.redraw();
+						}
+					});
+				}
+				{
+					_RTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
+					_RTOCharDelayTimeLabel.setText("RTOCharDelayTime");
+					_RTOCharDelayTimeLabel.setBounds(6, 88, 140, 20);
+				}
+				{
+					_RTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+					_RTOCharDelayTimeText.setBounds(162, 86, 70, 20);
+					_RTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "_RTOCharDelayTimeText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+					_RTOCharDelayTimeText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "_RTOCharDelayTimeText.keyReleased, event="+evt);
+							RTOCharDelayTime = Integer.parseInt(_RTOCharDelayTimeText.getText());
+							if(deviceConfig != null) {
+								deviceConfig.setRTOCharDelayTime(RTOCharDelayTime);
+							}
+						}
+					});
+				}
+				{
+					_RTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
+					_RTOExtraDelayTimeLabel.setText("RTOExtraDelayTime");
+					_RTOExtraDelayTimeLabel.setBounds(6, 118, 140, 20);
+				}
+				{
+					_RTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+					_RTOExtraDelayTimeText.setBounds(162, 116, 70, 20);
+					_RTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "_RTOExtraDelayTimeText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+					_RTOExtraDelayTimeText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "_RTOExtraDelayTimeText.keyReleased, event="+evt);
+							RTOExtraDelayTime = Integer.parseInt(_RTOExtraDelayTimeText.getText());
+							if(deviceConfig != null) {
+								deviceConfig.setRTOExtraDelayTime(RTOExtraDelayTime);
+							}
+						}
+					});
+				}
+				{
+					_WTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
+					_WTOCharDelayTimeLabel.setText("WTOCharDelayTime");
+					_WTOCharDelayTimeLabel.setBounds(6, 148, 140, 20);
+				}
+				{
+					_WTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+					_WTOCharDelayTimeText.setBounds(162, 146, 70, 20);
+					_WTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "_WRTOCharDelayTimeText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+					_WTOCharDelayTimeText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "_WRTOCharDelayTimeText.keyReleased, event="+evt);
+							WTOCharDelayTime = Integer.parseInt(_WTOCharDelayTimeText.getText());
+							if(deviceConfig != null) {
+								deviceConfig.setWTOCharDelayTime(WTOCharDelayTime);
+							}
+						}
+					});
+				}
+				{
+					_WTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
+					_WTOExtraDelayTimeLabel.setText("WTOExtraDelayTime");
+					_WTOExtraDelayTimeLabel.setBounds(6, 178, 140, 20);
+				}
+				{
+					_WTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+					_WTOExtraDelayTimeText.setBounds(162, 176, 70, 20);
+					_WTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST, "_WTOExtraDelayTimeText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+					_WTOExtraDelayTimeText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent evt) {
+							log.log(Level.FINEST, "_WTOExtraDelayTimeText.keyReleased, event="+evt);
+							WTOExtraDelayTime = Integer.parseInt(_WTOExtraDelayTimeText.getText());
+							if(deviceConfig != null) {
+								deviceConfig.setWTOExtraDelayTime(WTOExtraDelayTime);
+							}
+						}
+					});
+				}
+				{
+					timeOutDescriptionLabel = new Label(timeOutComposite, SWT.WRAP);
+					timeOutDescriptionLabel.setText("Time out section describes Read and Write delay time. This delay and extra delay are only required in special purpose. ");
+					timeOutDescriptionLabel.setBounds(6, 3, 232, 52);
+				}
+			}
+		}
+		return serialPortTabItem;
+	}
+
+	/**
+	 * create a new mode state tabulator with one mode state entry
+	 */
+	void createInitialModeStateTabItem() {
+		modeStateTabItem = new CTabItem(tabFolder, SWT.CLOSE);
+		modeStateTabItem.setText("Mode State");
+		{
+			modeStateComposite = new Composite(tabFolder, SWT.NONE);
+			modeStateComposite.setLayout(null);
+			modeStateTabItem.setControl(modeStateComposite);
+			modeStateComposite.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent evt) {
+					log.log(Level.FINEST, "modeStateComposite.paintControl, event="+evt);
+					for (Control child : modeStateTabFolder.getChildren()) {
+						((PropertyTypeComposite)child).redraw();
+					}
+				}
+			});
+			{
+				modeStateDescriptionLabel = new Label(modeStateComposite, SWT.CENTER);
+				modeStateDescriptionLabel.setText("Defines device processing states, like 1 charge, 2, discharge, ...");
+				modeStateDescriptionLabel.setBounds(5, 5, 615, 55);
+			}
+			{
+				modeStateTabFolder = new CTabFolder(modeStateComposite, SWT.BORDER);
+				modeStateTabFolder.setBounds(165, 65, 300, 170);
+				modeStateTabFolder.setSelection(0);
+				{
+					modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
+					modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
+					modeStateInnerTabItem.setShowClose(true);
+					modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
+					{
+						modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
+						modeStateInnerTabItem.setControl(modeStateItemComposite);
+					}
+				}
+				modeStateTabFolder.setSelection(0);
+				modeStateTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+					public void close(CTabFolderEvent evt) {
+						log.log(Level.FINEST, "modeStateTabFolder.close, event="+evt);
+						if (deviceConfig != null) {
+							int childIndex = Integer.parseInt(evt.item.toString().split(" |}")[2]) - 1;
+							modeStateTabFolder.getChildren()[childIndex].dispose();
+							deviceConfig.removeModeStateType(deviceConfig.getModeStateType().getProperty().get(childIndex));
+						}
+						evt.item.dispose();
+					}
+				});
+			}
+			{
+				addButton = new Button(modeStateComposite, SWT.PUSH | SWT.CENTER);
+				addButton.setText("add a new state");
+				addButton.setBounds(165, 237, 300, 30);
+				addButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "addButton.widgetSelected, event="+evt);
+						{
+							modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
+							modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
+							modeStateInnerTabItem.setShowClose(true);
+							{
+								modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
+								modeStateInnerTabItem.setControl(modeStateItemComposite);
+								PropertyType property = new ObjectFactory().createPropertyType();
+								property.setName("new mode state");
+								property.setType(DataTypes.INTEGER);
+								property.setValue(OSDE.STRING_EMPTY+modeStateTabFolder.getItemCount());
+								property.setDescription("new mode state description");
+								deviceConfig.appendModeStateType(property);
+								update();
+							}
+						}
+					}
+				});
+			}
 		}
 	}
 	
@@ -1063,18 +1345,68 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		deviceGroup = deviceConfig.getDeviceGroup();
 		devicePropsComposite.redraw();
 		
-		portName = deviceConfig.getPortString();
-		baudeRateIndex = getSelectionIndex(baudeRateCombo, ""+deviceConfig.getBaudeRate());
-		dataBitsIndex = getSelectionIndex(dataBitsCombo, ""+deviceConfig.getDataBits());
-		stopBitsIndex = deviceConfig.getStopBits() - 1;
-		parityIndex = deviceConfig.getParity();
-		flowControlIndex = deviceConfig.getFlowCtrlMode();
-		isRTS = deviceConfig.isRTS();
-		isDTR = deviceConfig.isDTR();
-		serialPortComposite.redraw();
+		if (deviceConfig.getSerialPortType() == null && !serialPortTabItem.isDisposed()) {
+			serialPortTabItem.dispose();
+		}
+		else {
+			if (deviceConfig.getSerialPortType() != null && serialPortTabItem.isDisposed()) {
+				createSeriaPortType();			
+			}
+			if (deviceConfig.getSerialPortType() != null && !serialPortTabItem.isDisposed()) {
+				String tmpPortString = OSDE.IS_WINDOWS ? "COM1" : OSDE.IS_LINUX ? "/dev/ttyS0" : OSDE.IS_MAC ? "/dev/tty.usbserial" : "COMx";
+				deviceConfig.setPort(tmpPortString);
+				portName = tmpPortString;
+				baudeRateIndex = getSelectionIndex(baudeRateCombo, "" + deviceConfig.getBaudeRate());
+				dataBitsIndex = getSelectionIndex(dataBitsCombo, "" + deviceConfig.getDataBits());
+				stopBitsIndex = deviceConfig.getStopBits() - 1;
+				parityIndex = deviceConfig.getParity();
+				flowControlIndex = deviceConfig.getFlowCtrlMode();
+				isRTS = deviceConfig.isRTS();
+				isDTR = deviceConfig.isDTR();
+				
+				if(deviceConfig.getSerialPortType().getTimeOut() != null) {
+					timeOutButton.setSelection(useTimeOut = true);
+				}
+				else {
+					timeOutButton.setSelection(useTimeOut = false);
+				}
+				RTOCharDelayTime = deviceConfig.getRTOCharDelayTime();
+				RTOExtraDelayTime = deviceConfig.getRTOExtraDelayTime();
+				WTOCharDelayTime = deviceConfig.getWTOCharDelayTime();
+				WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
+				timeOutComposite.redraw();
+		
+				serialPortComposite.redraw();
+			}
+		}
 		
 		timeStep_ms = deviceConfig.getTimeStep_ms();
 		timeBaseComposite.redraw();
+		
+		if (deviceConfig.getDataBlockType() == null && !dataBlockTabItem.isDisposed()) {
+			dataBlockTabItem.dispose();
+		}
+		else {
+			if (deviceConfig.getDataBlockType() != null && dataBlockTabItem.isDisposed()) {
+				createDataBlockType();		
+			}
+			if (deviceConfig.getDataBlockType() != null && !dataBlockTabItem.isDisposed()) {
+				dataBlockFormat = deviceConfig.getDataBlockFormat();
+				dataBlockSize = deviceConfig.getDataBlockSize();
+				dataBlockRequiredGroup.redraw();
+
+				if (deviceConfig.getDataBlockCheckSumFormat() != null && deviceConfig.getDataBlockCheckSumType() != null && deviceConfig.getDataBlockEnding() != null) {
+					dataBlockcheckSumFormat = deviceConfig.getDataBlockCheckSumFormat();
+					dataBlockCheckSumType = deviceConfig.getDataBlockCheckSumType();
+					dataBlockEnding = StringHelper.convertHexInput(deviceConfig.getDataBlockEnding());
+					enableDataBlockOptionalPart(true);				
+				}
+				else {
+					enableDataBlockOptionalPart(false);			
+				}
+			}
+		}
+		
 		
 		tablePropertyComposite1.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
 		tablePropertyComposite1.setParents(deviceConfig, null, deviceConfig.getDesktopType());
@@ -1086,30 +1418,66 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		tablePropertyComposite4.setParents(deviceConfig, null, deviceConfig.getDesktopType());
 		desktopComposite.redraw();
 		
-		if (deviceConfig.getModeStateSize() > modeStateTabFolder.getItemCount()) {
-			for (int i = modeStateTabFolder.getItemCount(); i < deviceConfig.getModeStateSize(); i++) {
-				modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-				modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-				modeStateInnerTabItem.setShowClose(true);
-				modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
-				{
-					modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-					modeStateInnerTabItem.setControl(modeStateItemComposite);
+		int modeStateCount = (deviceConfig.getModeStateType() == null) ? 0 : deviceConfig.getModeStateSize();
+		if (deviceConfig.getModeStateType() == null || (modeStateCount == 0 && (deviceConfig.getModeStateType() != null && !modeStateTabFolder.isDisposed()))) {
+			if (modeStateTabFolder != null && !modeStateTabFolder.isDisposed()) {
+				for (Control child : modeStateTabFolder.getChildren()) {
+					child.dispose();
 				}
+				modeStateTabFolder.getParent().dispose();
+			}
+			if (modeStateTabItem != null) modeStateTabItem.dispose();
+		}
+		else {
+			if (deviceConfig.getModeStateType() != null && modeStateTabItem.isDisposed()) {
+				createInitialModeStateTabItem();
+			}
+			if (deviceConfig.getModeStateType() != null && !modeStateTabItem.isDisposed()) {
+				if (modeStateCount > modeStateTabFolder.getItemCount()) {
+					for (int i = modeStateTabFolder.getItemCount(); i < deviceConfig.getModeStateSize(); i++) {
+						modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
+						modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
+						modeStateInnerTabItem.setShowClose(true);
+						modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
+						{
+							modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
+							modeStateInnerTabItem.setControl(modeStateItemComposite);
+						}
+					}
+				}
+				else if (modeStateCount < modeStateTabFolder.getItemCount()) {
+					Control[] childs = modeStateTabFolder.getChildren();
+					for (int i = modeStateCount - 1; i < childs.length; i++) {
+						((PropertyTypeComposite) childs[i]).dispose();
+					}
+				}
+				int index = 1;
+				for (Control child : modeStateTabFolder.getChildren()) {
+					((PropertyTypeComposite) child).update(deviceConfig.getModeStateProperty(index++), true, false, false);
+					((PropertyTypeComposite) child).setParents(deviceConfig, deviceConfig.getModeStateType(), null);
+				}
+				modeStateComposite.redraw();
 			}
 		}
-		else if (deviceConfig.getModeStateSize() < modeStateTabFolder.getItemCount()) {
-			Control[] childs = modeStateTabFolder.getChildren();
-			for (int i = deviceConfig.getModeStateSize()-1; i < childs.length; i++) {
-				childs[i].dispose();
-			}
-		}
+	}
 
-		int index = 1;
-		for (Control child : modeStateTabFolder.getChildren()) {
-			((PropertyTypeComposite)child).update(deviceConfig.getModeStateProperty(index++), true, false, false);
-			((PropertyTypeComposite)child).setParents(deviceConfig, deviceConfig.getModeStateType(), null);
+	/**
+	 * enable or disable data block optional properties
+	 */
+	void enableDataBlockOptionalPart(boolean enable) {
+		//dataBlockOptionalGroup.setEnabled(enable);
+		dataBlockOptionalEnableButton.setText(enable ? "disable" : "enable");
+		dataBlockCheckSumFormatLabel.setEnabled(enable);
+		dataBlockcheckSumFormatCombo.setEnabled(enable);
+		dataBlockCheckSumLabel.setEnabled(enable);
+		dataBlockCheckSumTypeCombo.setEnabled(enable);
+		dataBlockEndingLabel.setEnabled(enable);
+		dataBlockEndingText.setEnabled(enable);
+		dataBlockOptionalGroup.redraw();
+		if (!enable) {
+			deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat = null);;
+			deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType = null);
+			deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding = "0"));
 		}
-		modeStateComposite.redraw();
 	}
 }

@@ -426,4 +426,41 @@ public class StringHelper {
 		}
 	}
 
+	/**
+	 * verify the user input while typing hex input '0a0d'
+	 * @param eventText of the VerifyEvent test containing the char(s) to be verified
+	 */
+	public static boolean verifyHexAsString(String eventText) {
+		char[] chars = new char[eventText.length()];
+		eventText.getChars(0, chars.length, chars, 0);
+		for (int i = 0; i < chars.length; i++) {
+			log.log(Level.FINER, "\"" + chars[i] + "\"");
+			if (!('0' <= chars[i] && chars[i] <= '9' || 'a' == chars[i] || 'A' == chars[i] || 'b' == chars[i] || 'B' == chars[i] || 'c' == chars[i] || 'C' == chars[i] 
+			     || 'd' == chars[i] || 'D' == chars[i] || 'e' == chars[i] || 'E' == chars[i] || 'f' == chars[i] || 'F' == chars[i])) {
+					return false;
+				}
+		}
+		return true;
+	}
+
+	public static String convertHexInput(byte[] byteBuffer) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < byteBuffer.length; i++) {
+			sb.append(String.format("%02X", byteBuffer[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+	
+	public static byte[] convert2ByteArray(String twoCharsPerByte) {
+		int length = twoCharsPerByte.length()/2;
+		byte[] buffer = new byte[length];
+		twoCharsPerByte = twoCharsPerByte + "0";
+		for (int i = 0,j = 0; i < length; i++,j+=2) {
+			buffer[i] = (byte)Integer.parseInt(twoCharsPerByte.substring(j, j+2), 16);
+		}
+		return buffer;
+	}
+	
+		
+
 }

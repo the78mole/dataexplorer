@@ -8,7 +8,6 @@
 
 package osde.device;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -47,24 +46,24 @@ import javax.xml.bind.annotation.XmlType;
 public class TimeOutType {
 
     @XmlElement(name = "RTOCharDelayTime", required = true) //$NON-NLS-1$
-    protected BigInteger rtoCharDelayTime;
+    protected Integer rtoCharDelayTime;
     @XmlElement(name = "RTOExtraDelayTime", required = true) //$NON-NLS-1$
-    protected BigInteger rtoExtraDelayTime;
+    protected Integer rtoExtraDelayTime;
     @XmlElement(name = "WTOCharDelayTime", required = true) //$NON-NLS-1$
-    protected BigInteger wtoCharDelayTime;
+    protected Integer wtoCharDelayTime;
     @XmlElement(name = "WTOExtraDelayTime", required = true) //$NON-NLS-1$
-    protected BigInteger wtoExtraDelayTime;
+    protected Integer wtoExtraDelayTime;
 
     /**
      * Gets the value of the rtoCharDelayTime property.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getRTOCharDelayTime() {
-        return this.rtoCharDelayTime;
+    public Integer getRTOCharDelayTime() {
+        return this.rtoCharDelayTime != null ? this.rtoCharDelayTime : 0;
     }
 
     /**
@@ -72,10 +71,10 @@ public class TimeOutType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setRTOCharDelayTime(BigInteger value) {
+    public void setRTOCharDelayTime(Integer value) {
         this.rtoCharDelayTime = value;
     }
 
@@ -84,11 +83,11 @@ public class TimeOutType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getRTOExtraDelayTime() {
-        return this.rtoExtraDelayTime;
+    public Integer getRTOExtraDelayTime() {
+        return this.rtoExtraDelayTime != null ? this.rtoExtraDelayTime : 0;
     }
 
     /**
@@ -96,10 +95,10 @@ public class TimeOutType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setRTOExtraDelayTime(BigInteger value) {
+    public void setRTOExtraDelayTime(Integer value) {
         this.rtoExtraDelayTime = value;
     }
 
@@ -108,11 +107,11 @@ public class TimeOutType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getWTOCharDelayTime() {
-        return this.wtoCharDelayTime;
+    public Integer getWTOCharDelayTime() {
+        return this.wtoCharDelayTime != null ? this.wtoCharDelayTime : 0;
     }
 
     /**
@@ -120,10 +119,10 @@ public class TimeOutType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setWTOCharDelayTime(BigInteger value) {
+    public void setWTOCharDelayTime(Integer value) {
         this.wtoCharDelayTime = value;
     }
 
@@ -132,11 +131,11 @@ public class TimeOutType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getWTOExtraDelayTime() {
-        return this.wtoExtraDelayTime;
+    public Integer getWTOExtraDelayTime() {
+        return this.wtoExtraDelayTime != null ? this.wtoExtraDelayTime : 0;
     }
 
     /**
@@ -144,10 +143,10 @@ public class TimeOutType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setWTOExtraDelayTime(BigInteger value) {
+    public void setWTOExtraDelayTime(Integer value) {
         this.wtoExtraDelayTime = value;
     }
 
