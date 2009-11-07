@@ -37,6 +37,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -170,16 +171,51 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	CTabItem channelConfigurationTabItem;
 	Composite channleConfigComposite;
 	Label channelConfigDescriptionLabel;
+	CTabFolder channelConfigInnerTabFolder;
+	CTabItem channelConfigTabItem;
+	Composite channelConfigComposite;
+	Label channelConfigLabel;
+	CCombo channelConfigTypeCombo;
+	Text channelConfigText;
+	
+	CTabFolder measurementsTabFolder;
+	CTabItem measurementTabItem;
+	Composite measurementsComposite;
+
+	Label measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel;
+	private Label propertyDescriptionLabel;
+	private Button addMeasurementButton;
+	private Composite statisticsComposite;
+	private Text propertyDescriptionText;
+	private Text propertyValueText;
+	private Label propertyValueLabel;
+	private CCombo propertyTypeCombo;
+	private Label propertyTypeLabel;
+	private CCombo propertyNameCombo;
+	private Composite MeasurementPropertiesComposite;
+	private Label propertyNameLabel;
+	private Label label1;
+	private CTabItem measurementPropertyTabItem;
+	private CTabFolder measurementsPropertiesTabFolder;
+	private CTabItem measurementStatisticsTabItem;
+	private CTabItem measurementPropertiesTabItem;
+	private CTabFolder channelConfigMeasurementPropertiesTabFolder;
+	private Button channelConfigAddButton;
+	Text measurementNameText, measurementSymbolText, measurementUnitText;
+	Button measurementEnableButton;
+
+	
 	
 	CTabItem destopTabItem, desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4;
 	Composite desktopComposite;
 	Label destktopDescriptionLabel;	
 	CTabFolder desktopTabFolder;
-	PropertyTypeComposite tablePropertyComposite1, tablePropertyComposite2, tablePropertyComposite3, tablePropertyComposite4;
+	PropertyTypeComposite tablePropertyComposite, tablePropertyComposite2, tablePropertyComposite3, tablePropertyComposite4;
 	
 	//cross over fields
 	DeviceConfiguration deviceConfig;
 	final Settings settings;
+
 
 
 
@@ -220,7 +256,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			dialogShell.setLayout(null);
 			dialogShell.layout();
 			dialogShell.pack();			
-			dialogShell.setSize(640, 420);
+			dialogShell.setSize(640, 490);
 			dialogShell.setText("Device Properties Editor");
 			dialogShell.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif"));
 			dialogShell.addDisposeListener(new DisposeListener() {
@@ -317,7 +353,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				closeButton.setText("close");
-				closeButton.setBounds(336, 349, 250, 30);
+				closeButton.setBounds(338, 418, 250, 30);
 				closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "closeButton.widgetSelected, event="+evt);
@@ -328,7 +364,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				saveButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				saveButton.setText("save");
-				saveButton.setBounds(48, 349, 250, 30);
+				saveButton.setBounds(50, 418, 250, 30);
 				saveButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "saveButton.widgetSelected, event="+evt);
@@ -347,42 +383,42 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						deviceComposite.setLayout(null);
 						deviceTabItem.setControl(deviceComposite);
 						{
-							deviceDescriptionlabel = new Label(deviceComposite, SWT.CENTER);
+							deviceDescriptionlabel = new Label(deviceComposite, SWT.CENTER | SWT.WRAP);
 							deviceDescriptionlabel.setText("This section describes the main parameter of any device.");
-							deviceDescriptionlabel.setBounds(12, 8, 604, 38);
+							deviceDescriptionlabel.setBounds(12, 8, 604, 50);
 						}
 						{
 							deviceLabelComposite = new Composite(deviceComposite, SWT.NONE);
 							deviceLabelComposite.setLayout(null);
-							deviceLabelComposite.setBounds(24, 52, 137, 190);
+							deviceLabelComposite.setBounds(20, 70, 145, 190);
 							{
-								deviceNameLabel = new Label(deviceLabelComposite, SWT.NONE);
+								deviceNameLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								deviceNameLabel.setText("Name");
 								deviceNameLabel.setForeground(osde.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
 								deviceNameLabel.setBounds(0, 0, 137, 16);
 							}
 							{
-								manufacturerLabel = new Label(deviceLabelComposite, SWT.NONE);
+								manufacturerLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								manufacturerLabel.setText("Manufacturer");
 								manufacturerLabel.setBounds(0, 33, 137, 19);
 							}
 							{
-								manufURLabel = new Label(deviceLabelComposite, SWT.NONE);
+								manufURLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								manufURLabel.setText("Manufactorer URL");
 								manufURLabel.setBounds(0, 64, 137, 19);
 							}
 							{
-								imageFileNameLabel = new Label(deviceLabelComposite, SWT.NONE);
+								imageFileNameLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								imageFileNameLabel.setText("Image Filename");
 								imageFileNameLabel.setBounds(0, 95, 137, 19);
 							}
 							{
-								usageLabel = new Label(deviceLabelComposite, SWT.NONE);
+								usageLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								usageLabel.setText("usage");
 								usageLabel.setBounds(0, 126, 137, 19);
 							}
 							{
-								groupLabel = new Label(deviceLabelComposite, SWT.NONE);
+								groupLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								groupLabel.setText("Group ID");
 								groupLabel.setBounds(0, 157, 137, 16);
 							}
@@ -390,7 +426,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							devicePropsComposite = new Composite(deviceComposite, SWT.NONE);
 							devicePropsComposite.setLayout(null);
-							devicePropsComposite.setBounds(173, 52, 482, 177);
+							devicePropsComposite.setBounds(170, 70, 450, 190);
 							devicePropsComposite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									log.log(Level.FINEST, "devicePropsComposite.paintControl, event=" + evt);
@@ -501,9 +537,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							}
 						});
 						{
-							timeBaseDescriptionLabel = new Label(timeBaseComposite, SWT.LEFT | SWT.WRAP);
-							timeBaseDescriptionLabel.setText("Defines the time base used to display the data. A timeStep of -1 means time comes from the device data within data block and might not constant. This is a must field definition. Only the time value given as floating point value needs to be edit.");
-							timeBaseDescriptionLabel.setBounds(40, 5, 543, 54);
+							timeBaseDescriptionLabel = new Label(timeBaseComposite, SWT.CENTER | SWT.WRAP);
+							timeBaseDescriptionLabel.setText("Defines the time base used to display the data.\nA timeStep of -1 means, time comes from the device data within data block and might be not constant.");
+							timeBaseDescriptionLabel.setBounds(17, 12, 591, 71);
 						}
 						{
 							timeBaseNameLabel = new Label(timeBaseComposite, SWT.RIGHT);
@@ -573,20 +609,186 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				{
 					createDataBlockType();
 				}
-//				{
-//					channelConfigurationTabItem = new CTabItem(tabFolder, SWT.NONE);
-//					channelConfigurationTabItem.setText("Channel/Configuration");
-//					{
-//						channleConfigComposite = new Composite(tabFolder, SWT.NONE);
-//						channleConfigComposite.setLayout(null);
-//						channelConfigurationTabItem.setControl(channleConfigComposite);
-//						{
-//							channelConfigDescriptionLabel = new Label(channleConfigComposite, SWT.CENTER);
-//							channelConfigDescriptionLabel.setText("Defines miscelanious visualisation properties of the application desktop.\nProbably there are more than one measurements to be described here.");
-//							channelConfigDescriptionLabel.setBounds(5, 5, 616, 49);
-//						}
-//					}
-//				}
+				{
+					channelConfigurationTabItem = new CTabItem(tabFolder, SWT.NONE);
+					channelConfigurationTabItem.setText("Channel/Configuration");
+					{
+						channleConfigComposite = new Composite(tabFolder, SWT.NONE);
+						channleConfigComposite.setLayout(null);
+						channelConfigurationTabItem.setControl(channleConfigComposite);
+						{
+							channelConfigDescriptionLabel = new Label(channleConfigComposite, SWT.CENTER | SWT.WRAP);
+							channelConfigDescriptionLabel.setText("Defines miscelanious visualisation properties of the application desktop.\nProbably there are more than one measurements to be described here.");
+							channelConfigDescriptionLabel.setBounds(12, 5, 602, 38);
+						}
+						{
+							channelConfigInnerTabFolder = new CTabFolder(channleConfigComposite, SWT.CLOSE | SWT.BORDER);
+							channelConfigInnerTabFolder.setBounds(0, 49, 626, 285);
+							{
+								channelConfigTabItem = new CTabItem(channelConfigInnerTabFolder, SWT.NONE);
+								channelConfigTabItem.setText(" 1");
+								{
+									channelConfigComposite = new Composite(channelConfigInnerTabFolder, SWT.NONE);
+									channelConfigTabItem.setControl(channelConfigComposite);
+									channelConfigComposite.setLayout(null);
+									{
+										channelConfigTypeCombo = new CCombo(channelConfigComposite, SWT.BORDER);
+										channelConfigTypeCombo.setBounds(6, 9, 121, 19);
+									}
+									{
+										channelConfigText = new Text(channelConfigComposite, SWT.BORDER);
+										channelConfigText.setText("Outlet");
+										channelConfigText.setBounds(147, 9, 128, 19);
+									}
+									{
+										channelConfigLabel = new Label(channelConfigComposite, SWT.CENTER);
+										channelConfigLabel.setText("complete definitions before adding new");
+										channelConfigLabel.setBounds(289, 9, 279, 19);
+									}
+									{
+										measurementsTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
+										measurementsTabFolder.setBounds(0, 34, 622, 225);
+										{
+											measurementTabItem = new CTabItem(measurementsTabFolder, SWT.NONE);
+											measurementTabItem.setText(" 1");
+											{
+												measurementsComposite = new Composite(measurementsTabFolder, SWT.NONE);
+												measurementsComposite.setLayout(null);
+												measurementTabItem.setControl(measurementsComposite);
+												{
+													measurementNameLabel = new Label(measurementsComposite, SWT.RIGHT);
+													measurementNameLabel.setText("name");
+													measurementNameLabel.setBounds(10, 37, 60, 20);
+												}
+												{
+													measurementNameText = new Text(measurementsComposite, SWT.BORDER);
+													measurementNameText.setBounds(80, 37, 145, 20);
+												}
+												{
+													measurementSymbolLabel = new Label(measurementsComposite, SWT.RIGHT);
+													measurementSymbolLabel.setText("symbol");
+													measurementSymbolLabel.setBounds(10, 62, 60, 20);
+												}
+												{
+													measurementSymbolText = new Text(measurementsComposite, SWT.BORDER);
+													measurementSymbolText.setBounds(80, 62, 145, 20);
+												}
+												{
+													measurementUnitLabel = new Label(measurementsComposite, SWT.RIGHT);
+													measurementUnitLabel.setText("unit");
+													measurementUnitLabel.setBounds(10, 87, 60, 20);
+												}
+												{
+													measurementUnitText = new Text(measurementsComposite, SWT.BORDER);
+													measurementUnitText.setBounds(80, 87, 145, 20);
+												}
+												{
+													measurementEnableLabel = new Label(measurementsComposite, SWT.RIGHT);
+													measurementEnableLabel.setText("active");
+													measurementEnableLabel.setBounds(10, 112, 60, 20);
+												}
+												{
+													measurementEnableButton = new Button(measurementsComposite, SWT.CHECK);
+													measurementEnableButton.setBounds(82, 112, 145, 20);
+												}
+												{
+													channelConfigMeasurementPropertiesTabFolder = new CTabFolder(measurementsComposite, SWT.BORDER);
+													channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
+													{
+														measurementPropertiesTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
+														measurementPropertiesTabItem.setShowClose(true);
+														measurementPropertiesTabItem.setText("Properties");
+														{
+															measurementsPropertiesTabFolder = new CTabFolder(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
+															measurementPropertiesTabItem.setControl(measurementsPropertiesTabFolder);
+															{
+																measurementPropertyTabItem = new CTabItem(measurementsPropertiesTabFolder, SWT.NONE);
+																measurementPropertyTabItem.setShowClose(true);
+																measurementPropertyTabItem.setText("Property");
+																{
+																	MeasurementPropertiesComposite = new PropertyTypeComposite(measurementsPropertiesTabFolder, SWT.NONE);
+																	measurementPropertyTabItem.setControl(MeasurementPropertiesComposite);
+//																	composite1.setLayout(null);
+//																	{
+//																		propertyNameLabel = new Label(composite1, SWT.RIGHT);
+//																		propertyNameLabel.setText("name");
+//																		propertyNameLabel.setBounds(5, 5, 85, 20);
+//																	}
+//																	{
+//																		propertyNameCombo = new CCombo(composite1, SWT.BORDER);
+//																		propertyNameCombo.setBounds(100, 5, 150, 20);
+//																	}
+//																	{
+//																		propertyTypeLabel = new Label(composite1, SWT.RIGHT);
+//																		propertyTypeLabel.setText("type");
+//																		propertyTypeLabel.setBounds(5, 30, 85, 20);
+//																	}
+//																	{
+//																		propertyTypeCombo = new CCombo(composite1, SWT.BORDER);
+//																		propertyTypeCombo.setBounds(100, 30, 150, 20);
+//																	}
+//																	{
+//																		propertyValueLabel = new Label(composite1, SWT.RIGHT);
+//																		propertyValueLabel.setText("value");
+//																		propertyValueLabel.setBounds(5, 55, 85, 20);
+//																	}
+//																	{
+//																		propertyValueText = new Text(composite1, SWT.BORDER);
+//																		propertyValueText.setBounds(100, 55, 150, 20);
+//																	}
+//																	{
+//																		propertyDescriptionLabel = new Label(composite1, SWT.RIGHT);
+//																		propertyDescriptionLabel.setText("description");
+//																		propertyDescriptionLabel.setBounds(5, 80, 85, 20);
+//																	}
+//																	{
+//																		propertyDescriptionText = new Text(composite1, SWT.BORDER);
+//																		propertyDescriptionText.setText("describe the sense of the property");
+//																		propertyDescriptionText.setBounds(100, 81, 265, 48);
+//																	}
+																}
+															}
+															measurementsPropertiesTabFolder.setSelection(0);
+														}
+													}
+													{
+														measurementStatisticsTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
+														measurementStatisticsTabItem.setText("Statistics");
+														{
+															statisticsComposite = new StatisticsComposite(channelConfigMeasurementPropertiesTabFolder);
+															measurementStatisticsTabItem.setControl(statisticsComposite);
+
+														}
+													}
+													channelConfigMeasurementPropertiesTabFolder.setSelection(0);
+												}
+												{
+													label1 = new Label(measurementsComposite, SWT.NONE);
+													label1.setText("measurement");
+													label1.setBounds(10, 8, 120, 20);
+												}
+												{
+													addMeasurementButton = new Button(measurementsComposite, SWT.PUSH | SWT.CENTER);
+													addMeasurementButton.setText("+");
+													addMeasurementButton.setBounds(182, 7, 40, 20);
+												}
+											}
+										}
+										measurementsTabFolder.setSelection(0);
+									}
+									{
+										channelConfigAddButton = new Button(channelConfigComposite, SWT.PUSH | SWT.CENTER);
+										channelConfigAddButton.setText("+");
+										channelConfigAddButton.setBounds(574, 9, 42, 19);
+										channelConfigAddButton.setToolTipText("add a new channel or configuration, this will inherit all definitions from precessor");
+										channelConfigAddButton.setSize(40, 20);
+									}
+								}
+							}
+							channelConfigInnerTabFolder.setSelection(0);
+						}
+					}
+				}
 				{
 					destopTabItem = new CTabItem(tabFolder, SWT.NONE);
 					destopTabItem.setText("Application Desktop");
@@ -597,29 +799,29 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						desktopComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								log.log(Level.FINEST, "desktopComposite.paintControl, event="+evt);
-								tablePropertyComposite1.redraw();
+								tablePropertyComposite.redraw();
 								tablePropertyComposite2.redraw();
 								tablePropertyComposite3.redraw();
 								tablePropertyComposite4.redraw();
 							}
 						});
 						{
-							destktopDescriptionLabel = new Label(desktopComposite, SWT.CENTER);
-							destktopDescriptionLabel.setText("Defines miscelanious visualisation properties of the application desktop. \nIf the data table contnet should be updated and displyed, ....");
-							destktopDescriptionLabel.setBounds(5, 5, 611, 51);
+							destktopDescriptionLabel = new Label(desktopComposite, SWT.CENTER | SWT.WRAP);
+							destktopDescriptionLabel.setText("This section defines miscelanious visualisation properties of the application desktop. \nAs example showing the data table contnet or should be updated and displyed, ....");
+							destktopDescriptionLabel.setBounds(12, 5, 602, 57);
 						}
 						{
 							desktopTabFolder = new CTabFolder(desktopComposite, SWT.BORDER);
 							GridLayout appDesktopTabCompositeLayout = new GridLayout();
 							appDesktopTabCompositeLayout.makeColumnsEqualWidth = true;
 							desktopTabFolder.setLayout(appDesktopTabCompositeLayout);
-							desktopTabFolder.setBounds(165, 65, 300, 160);
+							desktopTabFolder.setBounds(165, 68, 300, 196);
 							{
 								desktopInnerTabItem1 = new CTabItem(desktopTabFolder, SWT.NONE);
 								desktopInnerTabItem1.setText("DataTable");
 								{
-									tablePropertyComposite1 = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
-									desktopInnerTabItem1.setControl(tablePropertyComposite1);
+									tablePropertyComposite = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
+									desktopInnerTabItem1.setControl(tablePropertyComposite);
 								}
 							}
 							{
@@ -654,7 +856,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					createInitialModeStateTabItem();
 				}
 				tabFolder.setSelection(0);
-				tabFolder.setBounds(0, 40, 632, 300);
+				tabFolder.setBounds(0, 45, 632, 360);
 				tabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 					public void restore(CTabFolderEvent evt) {
 						log.log(Level.FINEST, "tabFolder.restore, event="+evt);
@@ -685,6 +887,54 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			e.printStackTrace();
 		}
 	}
+
+//	/**
+//	 * 
+//	 */
+//	void createStatisticsEditor(CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
+//		statisticsComposite = new Composite(useChannelConfigMeasurementPropertiesTabFolder, SWT.V_SCROLL);
+//		statisticsComposite.setLayout(null);
+//		measurementStatisticsTabItem.setControl(statisticsComposite);
+//		{
+//			staisticsMinButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			staisticsMinButton.setText("minimum");
+//			staisticsMinButton.setBounds(10, 10, 90, 20);
+//		}
+//		{
+//			statisticsAvgButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			statisticsAvgButton.setText("average");
+//			statisticsAvgButton.setBounds(10, 35, 90, 20);
+//		}
+//		{
+//			statisticsMaxButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			statisticsMaxButton.setText("maximum");
+//			statisticsMaxButton.setBounds(10, 60, 90, 20);
+//		}
+//		{
+//			statisticsSigmaButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			statisticsSigmaButton.setText("sigma");
+//			statisticsSigmaButton.setBounds(10, 85, 90, 20);
+//		}
+//		{
+//			triggerRefOrdinalButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			triggerRefOrdinalButton.setText("triggerRefOrdinal");
+//			triggerRefOrdinalButton.setBounds(125, 10, 169, 20);
+//			triggerRefOrdinalButton.setToolTipText("references the measurement ordinal where trigger level is set in case of trigger is defined (0=VoltageReceiver;1=Voltage,2=Current, ...)");
+//		}
+//		{
+//			triggerRefOrdinalCombo = new CCombo(statisticsComposite, SWT.BORDER);
+//			triggerRefOrdinalCombo.setBounds(298, 8, 54, 20);
+//		}
+//		{
+//			sumByTriggerRefOrdinalButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
+//			sumByTriggerRefOrdinalButton.setText("sumByTriggerRefOrdinal");
+//			sumByTriggerRefOrdinalButton.setBounds(125, 30, 169, 21);
+//		}
+//		{
+//			sumByTriggerRefOrdinalCombo = new CCombo(statisticsComposite, SWT.BORDER);
+//			sumByTriggerRefOrdinalCombo.setBounds(297, 31, 54, 19);
+//		}
+//	}
 
 	/**
 	 * create a new data block type and place it right after time base
@@ -774,7 +1024,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				dataBlockOptionalGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "dataBlockOptionalGroup.paintControl, event="+evt);
-						if (deviceConfig.getDataBlockCheckSumFormat() != null && deviceConfig.getDataBlockCheckSumType() != null && deviceConfig.getDataBlockEnding() != null) {
+						if (deviceConfig != null && deviceConfig.getDataBlockCheckSumFormat() != null && deviceConfig.getDataBlockCheckSumType() != null && deviceConfig.getDataBlockEnding() != null) {
 							dataBlockOptionalEnableButton.setSelection(true);
 							dataBlockcheckSumFormatCombo.select(dataBlockcheckSumFormat == FormatType.TEXT ? 0 : 1);
 							dataBlockCheckSumTypeCombo.select(dataBlockCheckSumType == ChecksumType.XOR ? 0 : 1);
@@ -898,29 +1148,29 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 			});
 			{
-				serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER);
-				serialPortDescriptionLabel.setText("This optional field descibes the serial port configuration.\nIt can be removed.");
-				serialPortDescriptionLabel.setBounds(5, 5, 605, 50);
+				serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER | SWT.WRAP);
+				serialPortDescriptionLabel.setText("This optional section descibes the serial port configuration.\nFor devices where the data comes from file instead through serial communication, it can be removed.");
+				serialPortDescriptionLabel.setBounds(12, 6, 602, 56);
 			}
 			{
 				portNameLabel = new Label(serialPortComposite, SWT.RIGHT);
 				portNameLabel.setText("port name");
-				portNameLabel.setBounds(5, 55, 100, 20);
+				portNameLabel.setBounds(5, 74, 100, 20);
 			}
 			{
 				portNameText = new Text(serialPortComposite, SWT.BORDER);
-				portNameText.setBounds(140, 55, 180, 20);
+				portNameText.setBounds(141, 76, 180, 20);
 				portNameText.setEditable(false);
 			}
 			{
 				baudeRateLabel = new Label(serialPortComposite, SWT.RIGHT);
 				baudeRateLabel.setText("baude rate");
-				baudeRateLabel.setBounds(5, 80, 100, 20);
+				baudeRateLabel.setBounds(5, 99, 100, 20);
 			}
 			{
 				baudeRateCombo = new CCombo(serialPortComposite, SWT.BORDER);
 				baudeRateCombo.setItems(new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" });
-				baudeRateCombo.setBounds(140, 80, 180, 20);
+				baudeRateCombo.setBounds(142, 101, 180, 20);
 				baudeRateCombo.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "baudeRateCombo.widgetSelected, event=" + evt);
@@ -934,12 +1184,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				dataBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
 				dataBitsLabel.setText("data bits");
-				dataBitsLabel.setBounds(5, 105, 100, 20);
+				dataBitsLabel.setBounds(5, 124, 100, 20);
 			}
 			{
 				dataBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
 				dataBitsCombo.setItems(new String[] {"5", "6", "7", "8"});
-				dataBitsCombo.setBounds(140, 105, 180, 20);
+				dataBitsCombo.setBounds(142, 126, 180, 20);
 				dataBitsCombo.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "dataBitsCombo.widgetSelected, event="+evt);
@@ -953,12 +1203,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				stopBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
 				stopBitsLabel.setText("stop bits");
-				stopBitsLabel.setBounds(5, 130, 100, 20);
+				stopBitsLabel.setBounds(5, 149, 100, 20);
 			}
 			{
 				stopBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
 				stopBitsCombo.setItems(new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" });
-				stopBitsCombo.setBounds(140, 130, 180, 20);
+				stopBitsCombo.setBounds(142, 151, 180, 20);
 				stopBitsCombo.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "stopBitsCombo.widgetSelected, event="+evt);
@@ -972,12 +1222,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				parityLabel = new Label(serialPortComposite, SWT.RIGHT);
 				parityLabel.setText("parity");
-				parityLabel.setBounds(5, 155, 100, 20);
+				parityLabel.setBounds(5, 174, 100, 20);
 			}
 			{
 				parityCombo = new CCombo(serialPortComposite, SWT.BORDER);
 				parityCombo.setItems(new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" });
-				parityCombo.setBounds(140, 155, 180, 20);
+				parityCombo.setBounds(142, 176, 180, 20);
 				parityCombo.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "parityCombo.widgetSelected, event="+evt);
@@ -991,12 +1241,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				flowControlLabel = new Label(serialPortComposite, SWT.RIGHT);
 				flowControlLabel.setText("flow control");
-				flowControlLabel.setBounds(5, 180, 100, 20);
+				flowControlLabel.setBounds(5, 199, 100, 20);
 			}
 			{
 				flowControlCombo = new CCombo(serialPortComposite, SWT.BORDER);
 				flowControlCombo.setItems(new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" });
-				flowControlCombo.setBounds(140, 180, 180, 20);
+				flowControlCombo.setBounds(142, 201, 180, 20);
 				flowControlCombo.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "flowControlCombo.widgetSelected, event="+evt);
@@ -1010,11 +1260,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				rtsLabel = new Label(serialPortComposite, SWT.RIGHT);
 				rtsLabel.setText(" RTS");
-				rtsLabel.setBounds(5, 205, 100, 20);
+				rtsLabel.setBounds(5, 224, 100, 20);
 			}
 			{
 				isRTSButton = new Button(serialPortComposite, SWT.CHECK);
-				isRTSButton.setBounds(140, 205, 180, 20);
+				isRTSButton.setBounds(142, 224, 180, 20);
 				isRTSButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "isRTSButton.widgetSelected, event="+evt);
@@ -1028,11 +1278,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				dtrLabel = new Label(serialPortComposite, SWT.RIGHT);
 				dtrLabel.setText(" DTR");
-				dtrLabel.setBounds(5, 230, 100, 20);
+				dtrLabel.setBounds(5, 249, 100, 20);
 			}
 			{
 				isDTRButton = new Button(serialPortComposite, SWT.CHECK);
-				isDTRButton.setBounds(140, 230, 180, 20);
+				isDTRButton.setBounds(142, 249, 180, 20);
 				isDTRButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "isDTRButton.widgetSelected, event="+evt);
@@ -1046,7 +1296,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				timeOutComposite = new Composite(serialPortComposite, SWT.BORDER);
 				timeOutComposite.setLayout(null);
-				timeOutComposite.setBounds(354, 57, 250, 207);
+				timeOutComposite.setBounds(356, 78, 250, 207);
 				timeOutComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "dialogShell.paintControl, event="+evt);
@@ -1242,13 +1492,13 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 			});
 			{
-				modeStateDescriptionLabel = new Label(modeStateComposite, SWT.CENTER);
-				modeStateDescriptionLabel.setText("Defines device processing states, like 1 charge, 2, discharge, ...");
-				modeStateDescriptionLabel.setBounds(5, 5, 615, 55);
+				modeStateDescriptionLabel = new Label(modeStateComposite, SWT.LEFT);
+				modeStateDescriptionLabel.setText("This section defines device processing states, like \n  \t1. charge\n  \t2. discharge, ...");
+				modeStateDescriptionLabel.setBounds(165, 4, 449, 55);
 			}
 			{
 				modeStateTabFolder = new CTabFolder(modeStateComposite, SWT.BORDER);
-				modeStateTabFolder.setBounds(165, 65, 300, 170);
+				modeStateTabFolder.setBounds(165, 65, 300, 207);
 				modeStateTabFolder.setSelection(0);
 				{
 					modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
@@ -1276,7 +1526,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				addButton = new Button(modeStateComposite, SWT.PUSH | SWT.CENTER);
 				addButton.setText("add a new state");
-				addButton.setBounds(165, 237, 300, 30);
+				addButton.setBounds(165, 284, 300, 30);
 				addButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "addButton.widgetSelected, event="+evt);
@@ -1408,8 +1658,8 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		}
 		
 		
-		tablePropertyComposite1.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
-		tablePropertyComposite1.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		tablePropertyComposite.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
+		tablePropertyComposite.setParents(deviceConfig, null, deviceConfig.getDesktopType());
 		tablePropertyComposite2.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, true);
 		tablePropertyComposite2.setParents(deviceConfig, null, deviceConfig.getDesktopType());
 		tablePropertyComposite3.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, true);
