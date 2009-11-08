@@ -568,8 +568,8 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINER, ""+StringHelper.verifyPortInput(e.text));
-										e.doit = StringHelper.verifyPortInput(e.text);
+										log.log(Level.FINEST, ""+StringHelper.verifyPortInput(e.text.trim()));
+										e.doit = StringHelper.verifyPortInput(e.text.trim());
 									}
 								});
 								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
@@ -617,8 +617,8 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINER, ""+StringHelper.verifyPortInput(e.text));
-										e.doit = StringHelper.verifyPortInput(e.text);
+										//log.log(Level.FINEST, ""+StringHelper.verifyPortInput(e.text));
+										//e.doit = StringHelper.verifyPortInput(e.text);
 									}
 								});
 								this.serialPortWhiteList.addKeyListener(new KeyAdapter() {

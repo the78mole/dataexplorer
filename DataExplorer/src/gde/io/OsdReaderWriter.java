@@ -69,7 +69,7 @@ public class OsdReaderWriter {
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 */
-	
+
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
@@ -88,13 +88,13 @@ public class OsdReaderWriter {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
 		int headerCounter = OSDE.OSD_FORMAT_HEADER_KEYS.length+1;
-		
-		line = data_in.readUTF();	
+
+		line = data_in.readUTF();
 		line = line.substring(0, line.length()-1);
 		log.log(Level.FINE, line);
 		if (!line.startsWith(OSDE.OPEN_SERIAL_DATA_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
-		
+
 		String sVersion = line.substring(OSDE.OPEN_SERIAL_DATA_VERSION.length(), OSDE.OPEN_SERIAL_DATA_VERSION.length()+1).trim();
 		int version;
 		try {
@@ -104,7 +104,7 @@ public class OsdReaderWriter {
 			log.log(Level.SEVERE, "can not interprete red version information " + sVersion);
 			throw new NotSupportedFileFormatException(filePath);
 		}
-		
+
 		switch (version) {
 		case 1:
 		case 2: // added OBJECT_KEY to header
@@ -143,15 +143,15 @@ public class OsdReaderWriter {
 		}
 
 		return header;
-	}	
-	
+	}
+
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
 	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws NotSupportedFileFormatException 
-	 * @throws DataInconsitsentException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws DataInconsitsentException
 	 */
 	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
 		FileInputStream file_input = new FileInputStream(new File(filePath));
@@ -168,25 +168,25 @@ public class OsdReaderWriter {
 		IDevice device = OsdReaderWriter.application.getActiveDevice();
 		String line;
 		boolean isFirstRecordSetDisplayed = false;
-		
+
 		HashMap<String, String> header = getHeader(filePath);
 		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
 		String objectKey = header.get(OSDE.OBJECT_KEY) != null ? header.get(OSDE.OBJECT_KEY) : OSDE.STRING_EMPTY;
 		int numberRecordSets = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
 			log.log(Level.FINE, "skip"); //$NON-NLS-1$
-		
+
 		// record sets with it properties and records
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>();
 		for (int i=0; i<numberRecordSets; ++i) {
 			// channel/configuration :: record set name :: recordSet description :: data pointer :: properties
-			line = data_in.readUTF();	
+			line = data_in.readUTF();
 			line = line.substring(0, line.length()-1);
 			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 
-		try { // build the data structure 
-			
+		try { // build the data structure
+
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
 				recordSetName = recordSetInfo.get(OSDE.RECORD_SET_NAME);
@@ -221,7 +221,7 @@ public class OsdReaderWriter {
 					}
 				}
 				if (channel == null) { // 3.rd try channelConfiguration not found
-					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + Messages.getString(MessageIds.OSDE_MSGI0019) + Messages.getString(MessageIds.OSDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size() + 1;
 					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
@@ -255,7 +255,7 @@ public class OsdReaderWriter {
 				}
 				String [] recordKeys = recordSet.getRecordNames();
 				// check if the file content fits measurements form device properties XML which was used to create the record set
-				if (recordsProperties.length != recordKeys.length) { 
+				if (recordsProperties.length != recordKeys.length) {
 					for (int j = recordsProperties.length; j < recordKeys.length; j++) {
 						recordSet.remove(recordKeys[j]);
 					}
@@ -268,7 +268,7 @@ public class OsdReaderWriter {
 				}
 				recordSet.setDeserializedProperties(recordSetProperties);
 				recordSet.setSaved(true);
-				
+
 				channel.put(recordSetName, recordSet);
 			}
 			MenuToolBar menuToolBar = OsdReaderWriter.application.getMenuToolBar();
@@ -276,7 +276,7 @@ public class OsdReaderWriter {
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 			}
-			
+
 			String[] firstRecordSet = new String[2];
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(OSDE.CHANNEL_CONFIG_NAME);
@@ -309,7 +309,7 @@ public class OsdReaderWriter {
 					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
 				}
 			}
-			
+
 			return recordSet;
 		}
 		finally {
@@ -320,7 +320,7 @@ public class OsdReaderWriter {
 	}
 
 	/**
-	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS 
+	 * get parsed record set properties containing all data found by OSD_FORMAT_DATA_KEYS
 	 * @param recordSetProperties
 	 * @return hash map with string type data
 	 */
@@ -346,7 +346,7 @@ public class OsdReaderWriter {
 			boolean isObjectOriented = OsdReaderWriter.application.isObjectoriented();
 			int filePointer = 0;
 			try {
-				// before do anything make sure all data is loaded, if data comes from another file 
+				// before do anything make sure all data is loaded, if data comes from another file
 				activeChannel.checkAndLoadData();
 
 				// first line : header with version
@@ -396,7 +396,7 @@ public class OsdReaderWriter {
 				String[] recordSetNames = activeChannel.getRecordSetNames();
 				// prepare all record set describing data
 				for (int i = 0; i < activeChannel.size(); ++i) {
-					// channel/configuration :|: record set name :|: recordSet description :|: recordSet properties :|: all records properties :|: record size :|: data begin pointer 
+					// channel/configuration :|: record set name :|: recordSet description :|: recordSet properties :|: all records properties :|: record size :|: data begin pointer
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
@@ -416,7 +416,7 @@ public class OsdReaderWriter {
 							log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
 								+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ " filePointer = " + filePointer); //$NON-NLS-1$
-							
+
 							if (log.isLoggable(Level.FINE)) {
 								StringBuilder sb1 = new StringBuilder().append(recordSet.getName()).append(OSDE.STRING_MESSAGE_CONCAT);
 								for (String recordName : recordSet.getRecordNames()) {
@@ -429,7 +429,7 @@ public class OsdReaderWriter {
 				}
 				// prepare all record set data pointer
 				for (int i = 0; i < activeChannel.size(); ++i) {
-					// channel/configuration :: record set name :: recordSet description :: data pointer 
+					// channel/configuration :: record set name :: recordSet description :: data pointer
 					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
@@ -489,10 +489,10 @@ public class OsdReaderWriter {
 					}
 				}
 				log.log(Level.FINE, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-				
+
 				//update/write link if object oriented
 				if (isObjectOriented) {
-					OperatingSystemHelper.createFileLink(fullQualifiedFilePath, 
+					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
 							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1));
 				}
 			}
@@ -508,12 +508,12 @@ public class OsdReaderWriter {
 			OpenSerialDataExplorer.getInstance().openMessageDialogAsync(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * read record set data with given file seek pointer and record size
 	 * @param recordSet
 	 * @param filePath
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public static void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
 		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$

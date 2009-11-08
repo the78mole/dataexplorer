@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 import java.io.File;
-import java.math.BigInteger;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +36,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -56,12 +54,9 @@ import osde.device.ChecksumType;
 import osde.device.DataTypes;
 import osde.device.DesktopType;
 import osde.device.DeviceConfiguration;
-import osde.device.FlowControlType;
 import osde.device.FormatType;
 import osde.device.ObjectFactory;
-import osde.device.ParityType;
 import osde.device.PropertyType;
-import osde.device.StopBitsType;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -115,29 +110,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	boolean isDeviceUsed = false;
 	String deviceGroup = OSDE.STRING_EMPTY; //TODO define device groups
 	
-	CTabItem serialPortTabItem;
-	Composite serialPortComposite, timeOutComposite;
-	Label serialPortDescriptionLabel, timeOutDescriptionLabel;
-	Label portNameLabel, baudeRateLabel, dataBitsLabel, stopBitsLabel, parityLabel, flowControlLabel, rtsLabel, dtrLabel, timeOutLabel;
-	Text	portNameText;
-	CCombo	baudeRateCombo, dataBitsCombo, stopBitsCombo, parityCombo, flowControlCombo;
-	Button	isRTSButton, isDTRButton, timeOutButton;
-	Label	_RTOCharDelayTimeLabel, _RTOExtraDelayTimeLabel, _WTOCharDelayTimeLabel, _WTOExtraDelayTimeLabel;
-	Text	_RTOCharDelayTimeText, _RTOExtraDelayTimeText, _WTOCharDelayTimeText, _WTOExtraDelayTimeText;
-
-	String portName = OSDE.STRING_EMPTY;
-	int baudeRateIndex = 0;
-	int dataBitsIndex = 0;
-	int stopBitsIndex = 0;
-	int parityIndex = 0;
-	int flowControlIndex = 0;
-	boolean isRTS = false;
-	boolean isDTR = false;
-	boolean useTimeOut = false;
-	int RTOCharDelayTime = 0;
-	int RTOExtraDelayTime = 0;
-	int WTOCharDelayTime = 0;
-	int WTOExtraDelayTime = 0;
+	SeriaPortTypeTabItem serialPortTabItem;
 	
 	CTabItem timeBaseTabItem;
 	Composite timeBaseComposite;
@@ -169,40 +142,17 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	PropertyTypeComposite modeStateItemComposite;
 	
 	CTabItem channelConfigurationTabItem;
-	Composite channleConfigComposite;
+	Composite channelConfigComposite;
 	Label channelConfigDescriptionLabel;
 	CTabFolder channelConfigInnerTabFolder;
-	CTabItem channelConfigTabItem;
-	Composite channelConfigComposite;
-	Label channelConfigLabel;
-	CCombo channelConfigTypeCombo;
-	Text channelConfigText;
 	
-	CTabFolder measurementsTabFolder;
-	CTabItem measurementTabItem;
-	Composite measurementsComposite;
-
-	Label measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel;
-	private Label propertyDescriptionLabel;
-	private Button addMeasurementButton;
-	private Composite statisticsComposite;
-	private Text propertyDescriptionText;
-	private Text propertyValueText;
-	private Label propertyValueLabel;
-	private CCombo propertyTypeCombo;
-	private Label propertyTypeLabel;
-	private CCombo propertyNameCombo;
-	private Composite MeasurementPropertiesComposite;
-	private Label propertyNameLabel;
-	private Label label1;
-	private CTabItem measurementPropertyTabItem;
-	private CTabFolder measurementsPropertiesTabFolder;
-	private CTabItem measurementStatisticsTabItem;
-	private CTabItem measurementPropertiesTabItem;
-	private CTabFolder channelConfigMeasurementPropertiesTabFolder;
-	private Button channelConfigAddButton;
-	Text measurementNameText, measurementSymbolText, measurementUnitText;
-	Button measurementEnableButton;
+//	CTabFolder measurementsTabFolder;
+//	CTabItem measurementTabItem;
+//	Composite measurementsComposite;
+//
+//	Label measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel;
+//	Text measurementNameText, measurementSymbolText, measurementUnitText;
+//	Button measurementEnableButton;
 
 	
 	
@@ -521,7 +471,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 				}
 				{
-					createSeriaPortType();
+					serialPortTabItem = new SeriaPortTypeTabItem(tabFolder, SWT.CLOSE, 1);
 				}
 				{
 					timeBaseTabItem = new CTabItem(tabFolder, SWT.NONE);
@@ -613,177 +563,31 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					channelConfigurationTabItem = new CTabItem(tabFolder, SWT.NONE);
 					channelConfigurationTabItem.setText("Channel/Configuration");
 					{
-						channleConfigComposite = new Composite(tabFolder, SWT.NONE);
-						channleConfigComposite.setLayout(null);
-						channelConfigurationTabItem.setControl(channleConfigComposite);
+						channelConfigComposite = new Composite(tabFolder, SWT.NONE);
+						channelConfigComposite.setLayout(null);
+						channelConfigurationTabItem.setControl(channelConfigComposite);
+						channelConfigComposite.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent evt) {
+								System.out.println("channleConfigComposite.paintControl, event="+evt);
+								if (deviceConfig != null) {
+									for (int i = 1; i <= deviceConfig.getChannelCount(); i++) {
+										deviceConfig.getChannelType(1);
+										deviceConfig.getChannelType(1);
+									}
+								}
+							}
+						});
 						{
-							channelConfigDescriptionLabel = new Label(channleConfigComposite, SWT.CENTER | SWT.WRAP);
+							channelConfigDescriptionLabel = new Label(channelConfigComposite, SWT.CENTER | SWT.WRAP);
 							channelConfigDescriptionLabel.setText("Defines miscelanious visualisation properties of the application desktop.\nProbably there are more than one measurements to be described here.");
 							channelConfigDescriptionLabel.setBounds(12, 5, 602, 38);
 						}
 						{
-							channelConfigInnerTabFolder = new CTabFolder(channleConfigComposite, SWT.CLOSE | SWT.BORDER);
+							channelConfigInnerTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
 							channelConfigInnerTabFolder.setBounds(0, 49, 626, 285);
 							{
-								channelConfigTabItem = new CTabItem(channelConfigInnerTabFolder, SWT.NONE);
-								channelConfigTabItem.setText(" 1");
-								{
-									channelConfigComposite = new Composite(channelConfigInnerTabFolder, SWT.NONE);
-									channelConfigTabItem.setControl(channelConfigComposite);
-									channelConfigComposite.setLayout(null);
-									{
-										channelConfigTypeCombo = new CCombo(channelConfigComposite, SWT.BORDER);
-										channelConfigTypeCombo.setBounds(6, 9, 121, 19);
-									}
-									{
-										channelConfigText = new Text(channelConfigComposite, SWT.BORDER);
-										channelConfigText.setText("Outlet");
-										channelConfigText.setBounds(147, 9, 128, 19);
-									}
-									{
-										channelConfigLabel = new Label(channelConfigComposite, SWT.CENTER);
-										channelConfigLabel.setText("complete definitions before adding new");
-										channelConfigLabel.setBounds(289, 9, 279, 19);
-									}
-									{
-										measurementsTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
-										measurementsTabFolder.setBounds(0, 34, 622, 225);
-										{
-											measurementTabItem = new CTabItem(measurementsTabFolder, SWT.NONE);
-											measurementTabItem.setText(" 1");
-											{
-												measurementsComposite = new Composite(measurementsTabFolder, SWT.NONE);
-												measurementsComposite.setLayout(null);
-												measurementTabItem.setControl(measurementsComposite);
-												{
-													measurementNameLabel = new Label(measurementsComposite, SWT.RIGHT);
-													measurementNameLabel.setText("name");
-													measurementNameLabel.setBounds(10, 37, 60, 20);
-												}
-												{
-													measurementNameText = new Text(measurementsComposite, SWT.BORDER);
-													measurementNameText.setBounds(80, 37, 145, 20);
-												}
-												{
-													measurementSymbolLabel = new Label(measurementsComposite, SWT.RIGHT);
-													measurementSymbolLabel.setText("symbol");
-													measurementSymbolLabel.setBounds(10, 62, 60, 20);
-												}
-												{
-													measurementSymbolText = new Text(measurementsComposite, SWT.BORDER);
-													measurementSymbolText.setBounds(80, 62, 145, 20);
-												}
-												{
-													measurementUnitLabel = new Label(measurementsComposite, SWT.RIGHT);
-													measurementUnitLabel.setText("unit");
-													measurementUnitLabel.setBounds(10, 87, 60, 20);
-												}
-												{
-													measurementUnitText = new Text(measurementsComposite, SWT.BORDER);
-													measurementUnitText.setBounds(80, 87, 145, 20);
-												}
-												{
-													measurementEnableLabel = new Label(measurementsComposite, SWT.RIGHT);
-													measurementEnableLabel.setText("active");
-													measurementEnableLabel.setBounds(10, 112, 60, 20);
-												}
-												{
-													measurementEnableButton = new Button(measurementsComposite, SWT.CHECK);
-													measurementEnableButton.setBounds(82, 112, 145, 20);
-												}
-												{
-													channelConfigMeasurementPropertiesTabFolder = new CTabFolder(measurementsComposite, SWT.BORDER);
-													channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
-													{
-														measurementPropertiesTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-														measurementPropertiesTabItem.setShowClose(true);
-														measurementPropertiesTabItem.setText("Properties");
-														{
-															measurementsPropertiesTabFolder = new CTabFolder(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-															measurementPropertiesTabItem.setControl(measurementsPropertiesTabFolder);
-															{
-																measurementPropertyTabItem = new CTabItem(measurementsPropertiesTabFolder, SWT.NONE);
-																measurementPropertyTabItem.setShowClose(true);
-																measurementPropertyTabItem.setText("Property");
-																{
-																	MeasurementPropertiesComposite = new PropertyTypeComposite(measurementsPropertiesTabFolder, SWT.NONE);
-																	measurementPropertyTabItem.setControl(MeasurementPropertiesComposite);
-//																	composite1.setLayout(null);
-//																	{
-//																		propertyNameLabel = new Label(composite1, SWT.RIGHT);
-//																		propertyNameLabel.setText("name");
-//																		propertyNameLabel.setBounds(5, 5, 85, 20);
-//																	}
-//																	{
-//																		propertyNameCombo = new CCombo(composite1, SWT.BORDER);
-//																		propertyNameCombo.setBounds(100, 5, 150, 20);
-//																	}
-//																	{
-//																		propertyTypeLabel = new Label(composite1, SWT.RIGHT);
-//																		propertyTypeLabel.setText("type");
-//																		propertyTypeLabel.setBounds(5, 30, 85, 20);
-//																	}
-//																	{
-//																		propertyTypeCombo = new CCombo(composite1, SWT.BORDER);
-//																		propertyTypeCombo.setBounds(100, 30, 150, 20);
-//																	}
-//																	{
-//																		propertyValueLabel = new Label(composite1, SWT.RIGHT);
-//																		propertyValueLabel.setText("value");
-//																		propertyValueLabel.setBounds(5, 55, 85, 20);
-//																	}
-//																	{
-//																		propertyValueText = new Text(composite1, SWT.BORDER);
-//																		propertyValueText.setBounds(100, 55, 150, 20);
-//																	}
-//																	{
-//																		propertyDescriptionLabel = new Label(composite1, SWT.RIGHT);
-//																		propertyDescriptionLabel.setText("description");
-//																		propertyDescriptionLabel.setBounds(5, 80, 85, 20);
-//																	}
-//																	{
-//																		propertyDescriptionText = new Text(composite1, SWT.BORDER);
-//																		propertyDescriptionText.setText("describe the sense of the property");
-//																		propertyDescriptionText.setBounds(100, 81, 265, 48);
-//																	}
-																}
-															}
-															measurementsPropertiesTabFolder.setSelection(0);
-														}
-													}
-													{
-														measurementStatisticsTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-														measurementStatisticsTabItem.setText("Statistics");
-														{
-															statisticsComposite = new StatisticsComposite(channelConfigMeasurementPropertiesTabFolder);
-															measurementStatisticsTabItem.setControl(statisticsComposite);
-
-														}
-													}
-													channelConfigMeasurementPropertiesTabFolder.setSelection(0);
-												}
-												{
-													label1 = new Label(measurementsComposite, SWT.NONE);
-													label1.setText("measurement");
-													label1.setBounds(10, 8, 120, 20);
-												}
-												{
-													addMeasurementButton = new Button(measurementsComposite, SWT.PUSH | SWT.CENTER);
-													addMeasurementButton.setText("+");
-													addMeasurementButton.setBounds(182, 7, 40, 20);
-												}
-											}
-										}
-										measurementsTabFolder.setSelection(0);
-									}
-									{
-										channelConfigAddButton = new Button(channelConfigComposite, SWT.PUSH | SWT.CENTER);
-										channelConfigAddButton.setText("+");
-										channelConfigAddButton.setBounds(574, 9, 42, 19);
-										channelConfigAddButton.setToolTipText("add a new channel or configuration, this will inherit all definitions from precessor");
-										channelConfigAddButton.setSize(40, 20);
-									}
-								}
+								//initial channel TabItem
+								new ChannelTypeTabItem(channelConfigInnerTabFolder, 0);
 							}
 							channelConfigInnerTabFolder.setSelection(0);
 						}
@@ -887,54 +691,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			e.printStackTrace();
 		}
 	}
-
-//	/**
-//	 * 
-//	 */
-//	void createStatisticsEditor(CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
-//		statisticsComposite = new Composite(useChannelConfigMeasurementPropertiesTabFolder, SWT.V_SCROLL);
-//		statisticsComposite.setLayout(null);
-//		measurementStatisticsTabItem.setControl(statisticsComposite);
-//		{
-//			staisticsMinButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			staisticsMinButton.setText("minimum");
-//			staisticsMinButton.setBounds(10, 10, 90, 20);
-//		}
-//		{
-//			statisticsAvgButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			statisticsAvgButton.setText("average");
-//			statisticsAvgButton.setBounds(10, 35, 90, 20);
-//		}
-//		{
-//			statisticsMaxButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			statisticsMaxButton.setText("maximum");
-//			statisticsMaxButton.setBounds(10, 60, 90, 20);
-//		}
-//		{
-//			statisticsSigmaButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			statisticsSigmaButton.setText("sigma");
-//			statisticsSigmaButton.setBounds(10, 85, 90, 20);
-//		}
-//		{
-//			triggerRefOrdinalButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			triggerRefOrdinalButton.setText("triggerRefOrdinal");
-//			triggerRefOrdinalButton.setBounds(125, 10, 169, 20);
-//			triggerRefOrdinalButton.setToolTipText("references the measurement ordinal where trigger level is set in case of trigger is defined (0=VoltageReceiver;1=Voltage,2=Current, ...)");
-//		}
-//		{
-//			triggerRefOrdinalCombo = new CCombo(statisticsComposite, SWT.BORDER);
-//			triggerRefOrdinalCombo.setBounds(298, 8, 54, 20);
-//		}
-//		{
-//			sumByTriggerRefOrdinalButton = new Button(statisticsComposite, SWT.CHECK | SWT.RIGHT);
-//			sumByTriggerRefOrdinalButton.setText("sumByTriggerRefOrdinal");
-//			sumByTriggerRefOrdinalButton.setBounds(125, 30, 169, 21);
-//		}
-//		{
-//			sumByTriggerRefOrdinalCombo = new CCombo(statisticsComposite, SWT.BORDER);
-//			sumByTriggerRefOrdinalCombo.setBounds(297, 31, 54, 19);
-//		}
-//	}
 
 	/**
 	 * create a new data block type and place it right after time base
@@ -1117,363 +873,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * create a new serial port type tabulator item
-	 */
-	CTabItem createSeriaPortType() {
-		serialPortTabItem = new CTabItem(tabFolder, SWT.CLOSE, 1);
-		serialPortTabItem.setText("Serial Port");
-		serialPortTabItem.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent evt) {
-				log.log(Level.FINEST, "serialPortTabItem.widgetDisposed, event="+evt);
-				if (deviceConfig != null) {
-					deviceConfig.removeSerialPortType();
-				}
-			}
-		});
-		{
-			serialPortComposite = new Composite(tabFolder, SWT.NONE);
-			serialPortComposite.setLayout(null);
-			serialPortTabItem.setControl(serialPortComposite);
-			serialPortComposite.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINEST, "serialPortComposite.paintControl, event=" + evt);
-					portNameText.setText(portName);
-					baudeRateCombo.select(baudeRateIndex);
-					dataBitsCombo.select(dataBitsIndex);
-					stopBitsCombo.select(stopBitsIndex);
-					parityCombo.select(parityIndex);
-					flowControlCombo.select(flowControlIndex);
-					isRTSButton.setSelection(isRTS);
-					isDTRButton.setSelection(isDTR);
-				}
-			});
-			{
-				serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER | SWT.WRAP);
-				serialPortDescriptionLabel.setText("This optional section descibes the serial port configuration.\nFor devices where the data comes from file instead through serial communication, it can be removed.");
-				serialPortDescriptionLabel.setBounds(12, 6, 602, 56);
-			}
-			{
-				portNameLabel = new Label(serialPortComposite, SWT.RIGHT);
-				portNameLabel.setText("port name");
-				portNameLabel.setBounds(5, 74, 100, 20);
-			}
-			{
-				portNameText = new Text(serialPortComposite, SWT.BORDER);
-				portNameText.setBounds(141, 76, 180, 20);
-				portNameText.setEditable(false);
-			}
-			{
-				baudeRateLabel = new Label(serialPortComposite, SWT.RIGHT);
-				baudeRateLabel.setText("baude rate");
-				baudeRateLabel.setBounds(5, 99, 100, 20);
-			}
-			{
-				baudeRateCombo = new CCombo(serialPortComposite, SWT.BORDER);
-				baudeRateCombo.setItems(new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" });
-				baudeRateCombo.setBounds(142, 101, 180, 20);
-				baudeRateCombo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "baudeRateCombo.widgetSelected, event=" + evt);
-						if (deviceConfig != null) {
-							deviceConfig.setBaudeRate(new BigInteger(baudeRateCombo.getText()));
-						}
-						baudeRateIndex = baudeRateCombo.getSelectionIndex();
-					}
-				});
-			}
-			{
-				dataBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
-				dataBitsLabel.setText("data bits");
-				dataBitsLabel.setBounds(5, 124, 100, 20);
-			}
-			{
-				dataBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
-				dataBitsCombo.setItems(new String[] {"5", "6", "7", "8"});
-				dataBitsCombo.setBounds(142, 126, 180, 20);
-				dataBitsCombo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "dataBitsCombo.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setDataBits(new BigInteger(dataBitsCombo.getText()));
-						}
-						dataBitsIndex = dataBitsCombo.getSelectionIndex();
-					}
-				});
-			}
-			{
-				stopBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
-				stopBitsLabel.setText("stop bits");
-				stopBitsLabel.setBounds(5, 149, 100, 20);
-			}
-			{
-				stopBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
-				stopBitsCombo.setItems(new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" });
-				stopBitsCombo.setBounds(142, 151, 180, 20);
-				stopBitsCombo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "stopBitsCombo.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setStopBits(StopBitsType.values()[stopBitsCombo.getSelectionIndex()]);
-						}
-						stopBitsIndex = stopBitsCombo.getSelectionIndex();
-					}
-				});
-			}
-			{
-				parityLabel = new Label(serialPortComposite, SWT.RIGHT);
-				parityLabel.setText("parity");
-				parityLabel.setBounds(5, 174, 100, 20);
-			}
-			{
-				parityCombo = new CCombo(serialPortComposite, SWT.BORDER);
-				parityCombo.setItems(new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" });
-				parityCombo.setBounds(142, 176, 180, 20);
-				parityCombo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "parityCombo.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setParity(ParityType.values()[parityCombo.getSelectionIndex()]);
-						}
-						parityIndex = parityCombo.getSelectionIndex();
-					}
-				});
-			}
-			{
-				flowControlLabel = new Label(serialPortComposite, SWT.RIGHT);
-				flowControlLabel.setText("flow control");
-				flowControlLabel.setBounds(5, 199, 100, 20);
-			}
-			{
-				flowControlCombo = new CCombo(serialPortComposite, SWT.BORDER);
-				flowControlCombo.setItems(new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" });
-				flowControlCombo.setBounds(142, 201, 180, 20);
-				flowControlCombo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "flowControlCombo.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setFlowCtrlMode(FlowControlType.values()[flowControlCombo.getSelectionIndex()]);
-						}
-						flowControlIndex = flowControlCombo.getSelectionIndex();
-					}
-				});
-			}
-			{
-				rtsLabel = new Label(serialPortComposite, SWT.RIGHT);
-				rtsLabel.setText(" RTS");
-				rtsLabel.setBounds(5, 224, 100, 20);
-			}
-			{
-				isRTSButton = new Button(serialPortComposite, SWT.CHECK);
-				isRTSButton.setBounds(142, 224, 180, 20);
-				isRTSButton.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "isRTSButton.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setIsRTS(isRTSButton.getSelection());
-						}
-						isRTS = isRTSButton.getSelection();
-					}
-				});
-			}
-			{
-				dtrLabel = new Label(serialPortComposite, SWT.RIGHT);
-				dtrLabel.setText(" DTR");
-				dtrLabel.setBounds(5, 249, 100, 20);
-			}
-			{
-				isDTRButton = new Button(serialPortComposite, SWT.CHECK);
-				isDTRButton.setBounds(142, 249, 180, 20);
-				isDTRButton.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "isDTRButton.widgetSelected, event="+evt);
-						if (deviceConfig != null) {
-							deviceConfig.setIsDTR(isDTRButton.getSelection());
-						}
-						isDTR = isDTRButton.getSelection();
-					}
-				});
-			}
-			{
-				timeOutComposite = new Composite(serialPortComposite, SWT.BORDER);
-				timeOutComposite.setLayout(null);
-				timeOutComposite.setBounds(356, 78, 250, 207);
-				timeOutComposite.addPaintListener(new PaintListener() {
-					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "dialogShell.paintControl, event="+evt);
-						_RTOCharDelayTimeText.setText(""+RTOCharDelayTime);
-						_RTOExtraDelayTimeText.setText(""+RTOExtraDelayTime);
-						_WTOCharDelayTimeText.setText(""+WTOCharDelayTime);
-						_WTOExtraDelayTimeText.setText(""+WTOExtraDelayTime);
-						
-						timeOutButton.setSelection(useTimeOut);
-						if (timeOutButton.getSelection()) {
-							_RTOCharDelayTimeLabel.setEnabled(true);
-							_RTOCharDelayTimeText.setEnabled(true);
-							_RTOExtraDelayTimeLabel.setEnabled(true);
-							_RTOExtraDelayTimeText.setEnabled(true);
-							_WTOCharDelayTimeLabel.setEnabled(true);
-							_WTOCharDelayTimeText.setEnabled(true);
-							_WTOExtraDelayTimeLabel.setEnabled(true);
-							_WTOExtraDelayTimeText.setEnabled(true);
-						}
-						else {
-							_RTOCharDelayTimeLabel.setEnabled(false);
-							_RTOCharDelayTimeText.setEnabled(false);
-							_RTOExtraDelayTimeLabel.setEnabled(false);
-							_RTOExtraDelayTimeText.setEnabled(false);
-							_WTOCharDelayTimeLabel.setEnabled(false);
-							_WTOCharDelayTimeText.setEnabled(false);
-							_WTOExtraDelayTimeLabel.setEnabled(false);
-							_WTOExtraDelayTimeText.setEnabled(false);
-						}
-					}
-				});
-				{
-					timeOutLabel = new Label(timeOutComposite, SWT.RIGHT);
-					timeOutLabel.setText("specify time out");
-					timeOutLabel.setBounds(6, 58, 140, 20);
-				}
-				{
-					timeOutButton = new Button(timeOutComposite, SWT.CHECK);
-					timeOutButton.setBounds(161, 56, 70, 20);
-					timeOutButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "timeOutButton.widgetSelected, event="+evt);
-							useTimeOut = timeOutButton.getSelection();
-							if (useTimeOut) {
-								if (deviceConfig != null) {
-									RTOCharDelayTime = deviceConfig.getRTOCharDelayTime();
-									RTOExtraDelayTime = deviceConfig.getRTOExtraDelayTime();
-									WTOCharDelayTime = deviceConfig.getWTOCharDelayTime();
-									WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
-								}
-								else {
-									RTOCharDelayTime = 0;
-									RTOExtraDelayTime = 0;
-									WTOCharDelayTime = 0;
-									WTOExtraDelayTime = 0;
-								}
-							}
-							else {
-								if (deviceConfig != null) {
-									deviceConfig.removeSerialPortTimeOut();
-								}
-									RTOCharDelayTime = 0;
-									RTOExtraDelayTime = 0;
-									WTOCharDelayTime = 0;
-									WTOExtraDelayTime = 0;
-							}
-							timeOutComposite.redraw();
-						}
-					});
-				}
-				{
-					_RTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-					_RTOCharDelayTimeLabel.setText("RTOCharDelayTime");
-					_RTOCharDelayTimeLabel.setBounds(6, 88, 140, 20);
-				}
-				{
-					_RTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-					_RTOCharDelayTimeText.setBounds(162, 86, 70, 20);
-					_RTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
-						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST, "_RTOCharDelayTimeText.verifyText, event="+evt);
-							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
-						}
-					});
-					_RTOCharDelayTimeText.addKeyListener(new KeyAdapter() {
-						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "_RTOCharDelayTimeText.keyReleased, event="+evt);
-							RTOCharDelayTime = Integer.parseInt(_RTOCharDelayTimeText.getText());
-							if(deviceConfig != null) {
-								deviceConfig.setRTOCharDelayTime(RTOCharDelayTime);
-							}
-						}
-					});
-				}
-				{
-					_RTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-					_RTOExtraDelayTimeLabel.setText("RTOExtraDelayTime");
-					_RTOExtraDelayTimeLabel.setBounds(6, 118, 140, 20);
-				}
-				{
-					_RTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-					_RTOExtraDelayTimeText.setBounds(162, 116, 70, 20);
-					_RTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
-						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST, "_RTOExtraDelayTimeText.verifyText, event="+evt);
-							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
-						}
-					});
-					_RTOExtraDelayTimeText.addKeyListener(new KeyAdapter() {
-						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "_RTOExtraDelayTimeText.keyReleased, event="+evt);
-							RTOExtraDelayTime = Integer.parseInt(_RTOExtraDelayTimeText.getText());
-							if(deviceConfig != null) {
-								deviceConfig.setRTOExtraDelayTime(RTOExtraDelayTime);
-							}
-						}
-					});
-				}
-				{
-					_WTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-					_WTOCharDelayTimeLabel.setText("WTOCharDelayTime");
-					_WTOCharDelayTimeLabel.setBounds(6, 148, 140, 20);
-				}
-				{
-					_WTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-					_WTOCharDelayTimeText.setBounds(162, 146, 70, 20);
-					_WTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
-						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST, "_WRTOCharDelayTimeText.verifyText, event="+evt);
-							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
-						}
-					});
-					_WTOCharDelayTimeText.addKeyListener(new KeyAdapter() {
-						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "_WRTOCharDelayTimeText.keyReleased, event="+evt);
-							WTOCharDelayTime = Integer.parseInt(_WTOCharDelayTimeText.getText());
-							if(deviceConfig != null) {
-								deviceConfig.setWTOCharDelayTime(WTOCharDelayTime);
-							}
-						}
-					});
-				}
-				{
-					_WTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
-					_WTOExtraDelayTimeLabel.setText("WTOExtraDelayTime");
-					_WTOExtraDelayTimeLabel.setBounds(6, 178, 140, 20);
-				}
-				{
-					_WTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
-					_WTOExtraDelayTimeText.setBounds(162, 176, 70, 20);
-					_WTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
-						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST, "_WTOExtraDelayTimeText.verifyText, event="+evt);
-							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
-						}
-					});
-					_WTOExtraDelayTimeText.addKeyListener(new KeyAdapter() {
-						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "_WTOExtraDelayTimeText.keyReleased, event="+evt);
-							WTOExtraDelayTime = Integer.parseInt(_WTOExtraDelayTimeText.getText());
-							if(deviceConfig != null) {
-								deviceConfig.setWTOExtraDelayTime(WTOExtraDelayTime);
-							}
-						}
-					});
-				}
-				{
-					timeOutDescriptionLabel = new Label(timeOutComposite, SWT.WRAP);
-					timeOutDescriptionLabel.setText("Time out section describes Read and Write delay time. This delay and extra delay are only required in special purpose. ");
-					timeOutDescriptionLabel.setBounds(6, 3, 232, 52);
-				}
-			}
-		}
-		return serialPortTabItem;
-	}
-
-	/**
 	 * create a new mode state tabulator with one mode state entry
 	 */
 	void createInitialModeStateTabItem() {
@@ -1569,24 +968,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * search the index of a given string within the items of a combo box items
-	 * @param useCombo
-	 * @param searchString
-	 * @return
-	 */
-	private int getSelectionIndex(CCombo useCombo, String searchString) {
-		int searchIndex = 0;
-		for (String item : useCombo.getItems()) {
-			if (item.equals(searchString)) break;
-			++searchIndex;
-		}
-		return searchIndex;
-	}
-
-	/**
 	 * update internal variables by device properties
 	 */
 	private void update() {
+		//DeviceType begin
 		deviceName = deviceConfig.getName();
 		manufacturer = deviceConfig.getManufacturer();
 		manufacuturerURL = deviceConfig.getManufacturerURL();
@@ -1594,45 +979,26 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		isDeviceUsed = deviceConfig.isUsed();
 		deviceGroup = deviceConfig.getDeviceGroup();
 		devicePropsComposite.redraw();
+		//DeviceType end
 		
+		//SerialPortType begin
 		if (deviceConfig.getSerialPortType() == null && !serialPortTabItem.isDisposed()) {
 			serialPortTabItem.dispose();
 		}
-		else {
-			if (deviceConfig.getSerialPortType() != null && serialPortTabItem.isDisposed()) {
-				createSeriaPortType();			
-			}
-			if (deviceConfig.getSerialPortType() != null && !serialPortTabItem.isDisposed()) {
-				String tmpPortString = OSDE.IS_WINDOWS ? "COM1" : OSDE.IS_LINUX ? "/dev/ttyS0" : OSDE.IS_MAC ? "/dev/tty.usbserial" : "COMx";
-				deviceConfig.setPort(tmpPortString);
-				portName = tmpPortString;
-				baudeRateIndex = getSelectionIndex(baudeRateCombo, "" + deviceConfig.getBaudeRate());
-				dataBitsIndex = getSelectionIndex(dataBitsCombo, "" + deviceConfig.getDataBits());
-				stopBitsIndex = deviceConfig.getStopBits() - 1;
-				parityIndex = deviceConfig.getParity();
-				flowControlIndex = deviceConfig.getFlowCtrlMode();
-				isRTS = deviceConfig.isRTS();
-				isDTR = deviceConfig.isDTR();
-				
-				if(deviceConfig.getSerialPortType().getTimeOut() != null) {
-					timeOutButton.setSelection(useTimeOut = true);
-				}
-				else {
-					timeOutButton.setSelection(useTimeOut = false);
-				}
-				RTOCharDelayTime = deviceConfig.getRTOCharDelayTime();
-				RTOExtraDelayTime = deviceConfig.getRTOExtraDelayTime();
-				WTOCharDelayTime = deviceConfig.getWTOCharDelayTime();
-				WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
-				timeOutComposite.redraw();
-		
-				serialPortComposite.redraw();
-			}
+		else if (deviceConfig.getSerialPortType() != null && serialPortTabItem.isDisposed()) {
+				serialPortTabItem = new SeriaPortTypeTabItem(tabFolder, SWT.CLOSE, 1);			
 		}
+		if (deviceConfig.getSerialPortType() != null && !serialPortTabItem.isDisposed()) {
+			serialPortTabItem.setDeviceConfig(deviceConfig);
+		}
+		//SerialPortType end
 		
+		//TimeBaseType begin
 		timeStep_ms = deviceConfig.getTimeStep_ms();
 		timeBaseComposite.redraw();
+		//TimeBaseType end
 		
+		//DataBlockType begin
 		if (deviceConfig.getDataBlockType() == null && !dataBlockTabItem.isDisposed()) {
 			dataBlockTabItem.dispose();
 		}
@@ -1656,18 +1022,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 			}
 		}
+		//DataBlockType begin
 		
-		
-		tablePropertyComposite.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
-		tablePropertyComposite.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite2.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, true);
-		tablePropertyComposite2.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite3.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, true);
-		tablePropertyComposite3.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite4.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB), false, false, true);
-		tablePropertyComposite4.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		desktopComposite.redraw();
-		
+		//ModeStateType begin
 		int modeStateCount = (deviceConfig.getModeStateType() == null) ? 0 : deviceConfig.getModeStateSize();
 		if (deviceConfig.getModeStateType() == null || (modeStateCount == 0 && (deviceConfig.getModeStateType() != null && !modeStateTabFolder.isDisposed()))) {
 			if (modeStateTabFolder != null && !modeStateTabFolder.isDisposed()) {
@@ -1709,7 +1066,42 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				modeStateComposite.redraw();
 			}
 		}
-	}
+		//ModeStateType end
+
+		//ChannelType begin
+		int channelTypeCount = deviceConfig.getChannelCount();
+		int actualTabItemCount = channelConfigInnerTabFolder.getItemCount();
+		if (channelTypeCount < actualTabItemCount) {
+			for (int i = channelTypeCount; i < actualTabItemCount; i++) {
+				ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem)channelConfigInnerTabFolder.getItem(channelTypeCount);
+				channelTabItem.clean();
+				channelTabItem.dispose();
+			}
+		}
+		else if (channelTypeCount > actualTabItemCount) {
+			for (int i = actualTabItemCount; i < channelTypeCount; i++) {
+				new ChannelTypeTabItem(channelConfigInnerTabFolder, i);
+			}
+		}
+		for (int i = 0; i < channelTypeCount; i++) {
+			ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem)channelConfigInnerTabFolder.getItem(i);
+			channelTabItem.setDeviceConfig(deviceConfig);
+			channelTabItem.update();
+		}
+		//ChannelType end
+
+		//DesktopType begin
+		tablePropertyComposite.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
+		tablePropertyComposite.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		tablePropertyComposite2.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, true);
+		tablePropertyComposite2.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		tablePropertyComposite3.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, true);
+		tablePropertyComposite3.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		tablePropertyComposite4.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB), false, false, true);
+		tablePropertyComposite4.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		desktopComposite.redraw();
+		//DesktopType end
+}
 
 	/**
 	 * enable or disable data block optional properties
@@ -1724,10 +1116,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		dataBlockEndingLabel.setEnabled(enable);
 		dataBlockEndingText.setEnabled(enable);
 		dataBlockOptionalGroup.redraw();
-		if (!enable) {
-			deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat = null);;
-			deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType = null);
-			deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding = "0"));
-		}
+//		if (!enable) {
+//			deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat = null);;
+//			deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType = null);
+//			deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding = "0"));
+//		}
 	}
 }

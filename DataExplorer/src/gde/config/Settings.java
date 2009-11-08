@@ -73,14 +73,14 @@ public class Settings extends Properties {
 	private final static long		serialVersionUID						= 26031957;
 	final static Logger					log													= Logger.getLogger(Settings.class.getName());
 	final static String $CLASS_NAME = Settings.class.getName();
-	
+
 	// JAXB XML environment
 	private final Schema											schema;
 	private final JAXBContext									jc;
 	private final Unmarshaller								unmarshaller;
 	private final Marshaller									marshaller;
 	private final String											xmlBasePath;
-	
+
 	public  static final String	EMPTY												= "---"; //$NON-NLS-1$
 	public  static final String EMPTY_SIGNATURE 						= EMPTY + OSDE.STRING_SEMICOLON + EMPTY + OSDE.STRING_SEMICOLON + EMPTY;
 	private static final String	UNIX_PORT_DEV_TTY						= "/dev/tty";
@@ -168,7 +168,7 @@ public class Settings extends Properties {
 	public static final String		LOCALE_CHANGED								= "locale_changed"; //$NON-NLS-1$
 	public static final String		IS_DESKTOP_SHORTCUT_CREATED		= "is_desktop_shotcut_created"; //$NON-NLS-1$
 	public static final String		IS_APPL_REGISTERED						= "is_OSDE_registered"; //$NON-NLS-1$
-	
+
 	public final static String		GRID_DASH_STYLE								= "grid_dash_style"; //$NON-NLS-1$
 	public final static String		GRID_COMPARE_WINDOW_HOR_TYPE	= "grid_compare_horizontal_type"; //$NON-NLS-1$
 	public final static String		GRID_COMPARE_WINDOW_HOR_COLOR	= "grid_compare_horizontal_color"; //$NON-NLS-1$
@@ -180,15 +180,15 @@ public class Settings extends Properties {
 	public final static String		GRAPHICS_TEMPLATES_DIR_NAME		= "GraphicsTemplates"; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates_V04.xsd"; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= OSDE.FILE_ENDING_STAR_XML;
-	
+
 	private static Settings	instance											= null;	// singelton
 	private BufferedReader	reader;																// to read the application settings
 	private BufferedWriter	writer;																// to write the application settings
-	
+
 	private boolean 				isDevicePropertiesUpdated			= false;
 	private boolean 				isDevicePropertiesReplaced		= false;
 	private boolean 				isGraphicsTemplateUpdated			= false;
-	
+
 
 	private Rectangle				window;
 	private String					cbOrder;
@@ -214,8 +214,8 @@ public class Settings extends Properties {
 	/**
 	 * a singleton needs a static method to get the instance of this calss
 	 * @return OpenSerialDataExplorer instance
-	 * @throws JAXBException 
-	 * @throws SAXException 
+	 * @throws JAXBException
+	 * @throws SAXException
 	 */
 	public static Settings getInstance() {
 		final String $METHOD_NAME = "getInstance"; //$NON-NLS-1$
@@ -233,9 +233,9 @@ public class Settings extends Properties {
 
 	/**
 	 * singleton private constructor
-	 * @throws SAXException 
-	 * @throws JAXBException 
-	 * @throws ApplicationConfigurationException 
+	 * @throws SAXException
+	 * @throws JAXBException
+	 * @throws ApplicationConfigurationException
 	 */
 	private Settings() throws SAXException, JAXBException {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
@@ -244,17 +244,23 @@ public class Settings extends Properties {
 			this.applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer").replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			this.settingsFilePath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
 		}
-		else if (OSDE.IS_LINUX || OSDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
+		else if (OSDE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
 			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 			this.settingsFilePath = this.applHomePath  + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
 		}
+		// OPET - start - add
+		else if (OSDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + "Library" + OSDE.FILE_SEPARATOR_UNIX + "Application Support" + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.settingsFilePath = this.applHomePath  + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
+		}
+		// OPET - end
 		else {
 			log.logp(Level.WARNING, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
 			System.exit(-1);
 		}
 
 		this.load();
-		
+
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
 		String devicePropertiesTargetpath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
@@ -267,30 +273,30 @@ public class Settings extends Properties {
 			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, true);
 		}
 		// locale settings has been changed, replacement of device property files required
-		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {  
+		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
 			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, false);
 			this.isDevicePropertiesReplaced = true;
 		}
-		
+
 		String templateDirectory = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
 		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, GRAPHICS_TEMPLATES_XSD_NAME)) { // there is no old XSD version
 			FileUtils.extract(this.getClass(), GRAPHICS_TEMPLATES_XSD_NAME, PATH_RESOURCE, templateDirectory, PERMISSION_555);
 			this.isGraphicsTemplateUpdated = true;
 		}
 		checkDeviceTemplates(templateDirectory + OSDE.FILE_SEPARATOR_UNIX);
-		
+
 		FileUtils.checkDirectoryAndCreate(this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
 
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
 
-		if (this.getProperty(WINDOW_LEFT) != null && this.getProperty(WINDOW_TOP) != null 
+		if (this.getProperty(WINDOW_LEFT) != null && this.getProperty(WINDOW_TOP) != null
 				&& this.getProperty(WINDOW_WIDTH) != null && this.getProperty(WINDOW_HEIGHT) != null) {
 			this.window = new Rectangle(new Integer(this.getProperty(WINDOW_LEFT).trim()).intValue(), new Integer(this.getProperty(WINDOW_TOP).trim()).intValue(), new Integer(this.getProperty(WINDOW_WIDTH).trim()).intValue(),
 					new Integer(this.getProperty(WINDOW_HEIGHT).trim()).intValue());
 		}
 		else
 			this.window = new Rectangle(50, 50, 900, 600);
-		
+
 		// device properties context
 		this.xmlBasePath = this.getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + OSDE.FILE_SEPARATOR_UNIX;
 		this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
@@ -300,17 +306,17 @@ public class Settings extends Properties {
 		this.marshaller = this.jc.createMarshaller();
 		this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
 		this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
-		
+
 		this.setProperty(LOCALE_CHANGED, "false"); //$NON-NLS-1$
 }
 
 	/**
-	 * check existens of directory, create if required and update all 
+	 * check existens of directory, create if required and update all
 	 * @param devicePropertiesTargetpath
 	 */
 	private void updateDeviceProperties(String devicePropertiesTargetpath, boolean existCheck) {
 		final String $METHOD_NAME = "updateDeviceProperties"; //$NON-NLS-1$
-		
+
 		String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
 		log.logp(Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
 		String[] files = new File(deviceJarBasePath).list();
@@ -340,12 +346,12 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * check existens of device graphics default templates, extract if required 
+	 * check existens of device graphics default templates, extract if required
 	 * @param templateDirectoryTargetPath
 	 */
 	private void checkDeviceTemplates(String templateDirectoryTargetPath) {
 		final String $METHOD_NAME 					= "checkDeviceTemplates"; //$NON-NLS-1$
-		
+
 		String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
 		log.logp(Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
 		String[] files = new File(deviceJarBasePath).list();
@@ -358,7 +364,7 @@ public class Settings extends Properties {
 			catch (IOException e) {
 				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
-			
+
 			if (jarFile != null) {
 				log.logp(Level.FINER, Settings.$CLASS_NAME, $METHOD_NAME, "templateDirectoryTargetPath=" + templateDirectoryTargetPath); //$NON-NLS-1$
 				Enumeration<JarEntry> e=jarFile.entries();
@@ -385,7 +391,7 @@ public class Settings extends Properties {
 			this.reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.settingsFilePath), "UTF-8")); //$NON-NLS-1$
 			this.load(this.reader);
 			this.reader.close();
-			
+
 			//update file history
 			for (int i = 0; i < 10; i++) {
 				String entry = this.getProperty(FILE_HISTORY_BEGIN + i);
@@ -426,14 +432,14 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_TOP, this.window.y)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_WIDTH, this.window.width)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_HEIGHT, this.window.height)); //$NON-NLS-1$
-			
+
 			this.writer.write(String.format("%-40s \t=\t %s\n", COOLBAR_ORDER, this.cbOrder)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", COOLBAR_WRAPS, this.cbWraps)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", COOLBAR_SIZES, this.cbSizes)); //$NON-NLS-1$
-			
+
 			this.writer.write(String.format("%-40s \t=\t %s\n", RECORD_COMMENT_VISIBLE, isRecordCommentVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", GRAPHICS_HEADER_VISIBLE, isGraphicsHeaderVisible())); //$NON-NLS-1$
-			
+
 			this.writer.write(String.format("%-40s \t=\t %s\n", GRID_DASH_STYLE, getGridDashStyleAsString())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", GRID_COMPARE_WINDOW_HOR_TYPE, getGridCompareWindowHorizontalType())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", GRID_COMPARE_WINDOW_HOR_COLOR, getGridCompareWindowHorizontalColorStr())); //$NON-NLS-1$
@@ -490,7 +496,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%s\n", TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", DECIMAL_SEPARATOR, getDecimalSeparator())); //$NON-NLS-1$
-			
+
 			this.writer.write(String.format("%s\n", LOGGING_BLOCK)); // [Logging Einstellungen] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", IS_GLOBAL_LOG_LEVEL, isGlobalLogLevel())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", GLOBAL_LOG_LEVEL, getLogLevel(GLOBAL_LOG_LEVEL))); //$NON-NLS-1$
@@ -510,7 +516,7 @@ public class Settings extends Properties {
 		}
 
 	}
-	
+
 	/*
 	 * overload Properties method due to loading properties from file returns "null" instead of null
 	 * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
@@ -528,13 +534,13 @@ public class Settings extends Properties {
 	public void setWindow(Point location, Point size) {
 		this.window = new Rectangle(location.x, location.y, size.x, size.y);
 	}
-	
+
 	public void setCoolBarStates(int[] order, int[] wraps, Point[] sizes) {
 		this.cbOrder = StringHelper.intArrayToString(order);
 		this.cbWraps = StringHelper.intArrayToString(wraps);
 		this.cbSizes = StringHelper.pointArrayToString(sizes);
 	}
-	
+
 	public int[] getCoolBarOrder() {
 		int[] intOrder = StringHelper.stringToIntArray(this.getProperty(COOLBAR_ORDER, "0;1;2;3;4").trim()); //$NON-NLS-1$
 		int coolBarSize = this.getCoolBarSizes().length;
@@ -545,7 +551,7 @@ public class Settings extends Properties {
 			}
 			intOrder = StringHelper.stringToIntArray(sb.toString());
 		}
-		return intOrder;	
+		return intOrder;
 	}
 
 	public int[] getCoolBarWraps() {
@@ -555,7 +561,7 @@ public class Settings extends Properties {
 	public Point[] getCoolBarSizes() {
 		return StringHelper.stringToPointArray(OpenSerialDataExplorer.getInstance().getMenuToolBar().getCoolBarSizes());
 	}
-  
+
   public List<String> getFileHistory() {
 		return this.fileHistory;
 	}
@@ -567,7 +573,7 @@ public class Settings extends Properties {
 	public void setActiveDevice(String activeDeviceString) {
 		this.setProperty(ACTIVE_DEVICE, activeDeviceString.trim());
 	}
-	
+
 	public String getObjectListAsString() {
 		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200));
 	}
@@ -612,7 +618,7 @@ public class Settings extends Properties {
 			if (objectKey.length() > 1) tmpObjectVector.add(objectKey.trim());
 		}
 		activeObjectList = tmpObjectVector.toArray(new String[1]);
-		
+
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < activeObjectList.length; ++i) {
@@ -758,7 +764,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the global serial port 
+	 * @return the global serial port
 	 */
 	public boolean isGlobalSerialPort() {
 		return new Boolean(this.getProperty(IS_GLOBAL_PORT, "false").trim()).booleanValue(); //$NON-NLS-1$
@@ -882,7 +888,7 @@ public class Settings extends Properties {
 		String port = getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
 		return port == null ? EMPTY : port;
 	}
-	
+
 	/**
 	 * set property if during port scan a availability check should executed (disable for slow systems)
 	 */
@@ -890,7 +896,7 @@ public class Settings extends Properties {
 		setProperty(DO_PORT_AVAILABLE_TEST, OSDE.STRING_EMPTY+enabled);
 	}
 
-	
+
 	/**
 	 * get property if during port scan a availability check should executed (disable for slow systems)
 	 */
@@ -919,42 +925,42 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * query if serial port opened right after closing device selection dialog 
+	 * query if serial port opened right after closing device selection dialog
 	 */
 	public boolean isAutoOpenSerialPort() {
 		return new Boolean(this.getProperty(AUTO_OPEN_SERIAL_PORT, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
 
 	/**
-	 * query if device tool box to be opened right after closing device selection dialog 
+	 * query if device tool box to be opened right after closing device selection dialog
 	 */
 	public boolean isAutoOpenToolBox() {
 		return new Boolean(this.getProperty(AUTO_OPEN_TOOL_BOX, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * query if record set comment window is visible 
+	 * query if record set comment window is visible
 	 */
 	public boolean isRecordCommentVisible() {
 		return new Boolean(this.getProperty(RECORD_COMMENT_VISIBLE, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
 
 	/**
-	 * set property if record set comment window is visible 
+	 * set property if record set comment window is visible
 	 */
 	public void setRecordCommentVisible(boolean enabled) {
 		this.setProperty(RECORD_COMMENT_VISIBLE, OSDE.STRING_EMPTY + enabled);
 	}
 
 	/**
-	 * query if record set comment window is visible 
+	 * query if record set comment window is visible
 	 */
 	public boolean isGraphicsHeaderVisible() {
 		return new Boolean(this.getProperty(GRAPHICS_HEADER_VISIBLE, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
 
 	/**
-	 * set property if record set comment window is visible 
+	 * set property if record set comment window is visible
 	 */
 	public void setGraphicsHeaderVisible(boolean enabled) {
 		this.setProperty(GRAPHICS_HEADER_VISIBLE, OSDE.STRING_EMPTY + enabled);
@@ -968,7 +974,7 @@ public class Settings extends Properties {
 		String[] gridLineStyle = this.getProperty(GRID_DASH_STYLE, "10, 10").split(OSDE.STRING_COMMA); //$NON-NLS-1$
 		return new int[] {new Integer(gridLineStyle[0].trim()).intValue(), new Integer(gridLineStyle[1].trim()).intValue()};
 	}
-	
+
 	/**
 	 * @return actual grid line style as string integer array
 	 */
@@ -977,89 +983,89 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set the grid line style in pixel length 
+	 * set the grid line style in pixel length
 	 * @param newGridDashStyle {drawn, blank}
 	 */
 	public void setGridDaschStyle(int[] newGridDashStyle) {
 		this.setProperty(GRID_DASH_STYLE, OSDE.STRING_EMPTY + newGridDashStyle[0] + ", " + newGridDashStyle[1]); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
 	 * @return the grid horizontal type of the compare window (0=none;1=each,2=eachSecond)
 	 */
 	public int getGridCompareWindowHorizontalType() {
 		return new Integer(this.getProperty(GRID_COMPARE_WINDOW_HOR_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * set the grid horizontal type of the compare window 
+	 * set the grid horizontal type of the compare window
 	 * @param newHorizontalGridType (0=none;1=each,2=eachSecond)
 	 */
 	public void setGridCompareWindowHorizontalType(int newHorizontalGridType) {
 		this.setProperty(GRID_COMPARE_WINDOW_HOR_TYPE, OSDE.STRING_EMPTY + newHorizontalGridType);
 	}
-	
+
 	/**
 	 * @return the grid horizontal color of the compare window (r,g,b)
 	 */
 	public Color getGridCompareWindowHorizontalColor() {
 		return getColor(GRID_COMPARE_WINDOW_HOR_COLOR, "200,200,200"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid horizontal color of the compare window as string of (r,g,b)
 	 */
 	public String getGridCompareWindowHorizontalColorStr() {
 		return this.getProperty(GRID_COMPARE_WINDOW_HOR_COLOR, "200,200,200").trim(); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * set the grid horizontal color of the compare window 
+	 * set the grid horizontal color of the compare window
 	 * @param newColor (r,g,b)
 	 */
 	public void setGridCompareWindowHorizontalColor(Color newColor) {
 		String rgb = newColor.getRGB().red + OSDE.STRING_COMMA + newColor.getRGB().green + OSDE.STRING_COMMA + newColor.getRGB().blue;
 		this.setProperty(GRID_COMPARE_WINDOW_HOR_COLOR, rgb);
 	}
-	
+
 	/**
 	 * @return the grid vertical type of the compare window (0=none;1=each,2=mod60)
 	 */
 	public int getGridCompareWindowVerticalType() {
 		return new Integer(this.getProperty(GRID_COMPARE_WINDOW_VER_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * set the grid vertical type of the compare window 
+	 * set the grid vertical type of the compare window
 	 * @param newVerticalGridType (0=none;1=each,2=eachSecond)
 	 */
 	public void setGridCompareWindowVerticalType(int newVerticalGridType) {
 		this.setProperty(GRID_COMPARE_WINDOW_VER_TYPE, OSDE.STRING_EMPTY + newVerticalGridType); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window (r,g,b)
 	 */
 	public Color getGridCompareWindowVerticalColor() {
 		return getColor(GRID_COMPARE_WINDOW_VER_COLOR, "200,200,200"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
 	public String getGridCompareWindowVerticalColorStr() {
 		return this.getProperty(GRID_COMPARE_WINDOW_VER_COLOR, "200,200,200").trim(); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * set the grid vertical color of the compare window 
+	 * set the grid vertical color of the compare window
 	 * @param newColor (r,g,b)
 	 */
 	public void setGridCompareWindowVerticalColor(Color newColor) {
 		String rgb = newColor.getRGB().red + OSDE.STRING_COMMA + newColor.getRGB().green + OSDE.STRING_COMMA + newColor.getRGB().blue; //$NON-NLS-1$ //$NON-NLS-2$
 		this.setProperty(GRID_COMPARE_WINDOW_VER_COLOR, rgb);
 	}
-	
+
 	/**
 	 * set global log level
 	 */
@@ -1068,7 +1074,7 @@ public class Settings extends Properties {
     logger.setLevel(logLevel);
     logger.setUseParentHandlers(true);
 	}
-	
+
 	/**
 	 * set individual log level
 	 */
@@ -1077,7 +1083,7 @@ public class Settings extends Properties {
     logger.setLevel(logLevel);
     logger.setUseParentHandlers(true);
 	}
-	
+
 	/**
 	 * method to update the logging level
 	 */
@@ -1117,7 +1123,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return log level from the given categorie, in case of parse error fall back to Level.INFO 
+	 * @return log level from the given categorie, in case of parse error fall back to Level.INFO
 	 */
 	Level getLogLevel(String logCategorie) {
 		Level logLevel = Level.INFO;
@@ -1127,7 +1133,7 @@ public class Settings extends Properties {
 		catch (IllegalArgumentException e) {
 			// ignore and fall back to INFO
 			setProperty(logCategorie, "INFO"); //$NON-NLS-1$
-		}	
+		}
 		return logLevel;
 	}
 
@@ -1153,7 +1159,7 @@ public class Settings extends Properties {
 			log.logp(Level.WARNING, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * set device dialog behavior, application modal or application equivalent
 	 * @param enabled
@@ -1161,7 +1167,7 @@ public class Settings extends Properties {
 	public void enabelModalDeviceDialogs(boolean enabled) {
 		this.setProperty(DEVICE_DIALOG_USE_MODAL, OSDE.STRING_EMPTY + enabled);
 	}
-	
+
 	/**
 	 * query the the device dialogs behavior
 	 * @return boolean value to signal the modality of the device dialog
@@ -1169,7 +1175,7 @@ public class Settings extends Properties {
 	public boolean isDeviceDialogsModal() {
 		return new Boolean(this.getProperty(DEVICE_DIALOG_USE_MODAL, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * set device dialog behavior, always visible
 	 * @param enabled
@@ -1177,7 +1183,7 @@ public class Settings extends Properties {
 	public void enabelDeviceDialogsOnTop(boolean enabled) {
 		this.setProperty(DEVICE_DIALOG_ON_TOP, OSDE.STRING_EMPTY + enabled);
 	}
-	
+
 	/**
 	 * query the the device dialogs behavior
 	 * @return boolean value to signal the placement of the device dialog
@@ -1185,7 +1191,7 @@ public class Settings extends Properties {
 	public boolean isDeviceDialogsOnTop() {
 		return new Boolean(this.getProperty(DEVICE_DIALOG_ON_TOP, "false").trim()).booleanValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the unmarshaller
 	 */
@@ -1199,7 +1205,7 @@ public class Settings extends Properties {
 	public Marshaller getMarshaller() {
 		return this.marshaller;
 	}
-	
+
 	/**
 	 * query if locale has been changed, this will be used to copy new set of device property files to users application directory
 	 * @return
@@ -1207,7 +1213,7 @@ public class Settings extends Properties {
 	boolean getLocaleChanged() {
 		return new Boolean(this.getProperty(LOCALE_CHANGED, "false")).booleanValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * set new locale language (de,en, ..), if language has been changed set locale changed to true to indicate copy device properties
 	 * @param newLanguage
@@ -1218,7 +1224,7 @@ public class Settings extends Properties {
 			this.setProperty(LOCALE_IN_USE, newLanguage);
 		}
 	}
-	
+
 	/**
 	 * query the locale language (en, de, ...) to be used to copy set of localized device property files
 	 * if local is not supported, ENGLISH is used as default
@@ -1236,7 +1242,7 @@ public class Settings extends Properties {
 		}
 		return locale;
 	}
-	
+
 	/**
 	 * get the device dialog alpha value, 50 is a good transparency starting point
 	 * @return the alphablending value
@@ -1244,7 +1250,7 @@ public class Settings extends Properties {
 	public int getDialogAlphaValue() {
 		return new Integer(this.getProperty(ALPHA_BLENDING_VALUE, "50").trim()).intValue(); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * set a new alpha transparency value for the device dialog
 	 * @param newAlphaValue
@@ -1252,18 +1258,18 @@ public class Settings extends Properties {
 	public void setDialogAlphaValue(int newAlphaValue) {
 		this.setProperty(ALPHA_BLENDING_VALUE, OSDE.STRING_EMPTY + newAlphaValue);
 	}
-	
+
 	/**
-	 * set if alpha blending for devive dialog should be used 
+	 * set if alpha blending for devive dialog should be used
 	 * (supporting window manager is pre-req, covered by SWT)
 	 * @param enable
 	 */
 	public void setDeviceDialogAlphaEnabled(boolean enable) {
 		this.setProperty(APLHA_BLENDING_ENABLED, OSDE.STRING_EMPTY + enable);
 	}
-	
+
 	/**
-	 * query usage of alpha blending for device dialog 
+	 * query usage of alpha blending for device dialog
 	 * @return true if alphablending is enabled
 	 */
 	public boolean isDeviceDialogAlphaEnabled() {
@@ -1290,14 +1296,14 @@ public class Settings extends Properties {
 	public boolean isDevicePropertiesReplaced() {
 		return this.isDevicePropertiesReplaced;
 	}
-	
+
 	/**
 	 * query value if desktop shortcut needs to be created
 	 */
 	public boolean isDesktopShortcutCreated() {
 		return new Boolean(this.getProperty(IS_DESKTOP_SHORTCUT_CREATED, "false")); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * query value if OpenSerialDataExplorer application is registerd to operating system
 	 */
@@ -1320,7 +1326,7 @@ public class Settings extends Properties {
 	public Color getGraphicsCurveAreaBackground() {
 		return getColor(COMPARE_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1343,7 +1349,7 @@ public class Settings extends Properties {
 	public Color getCompareCurveAreaBackground() {
 		return getColor(COMPARE_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1366,7 +1372,7 @@ public class Settings extends Properties {
 	public Color getGraphicsSurroundingBackground() {
 		return getColor(GRAPHICS_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1389,7 +1395,7 @@ public class Settings extends Properties {
 	public Color getCompareSurroundingBackground() {
 		return getColor(COMPARE_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1412,7 +1418,7 @@ public class Settings extends Properties {
 	public Color getGraphicsCurvesBorderColor() {
 		return getColor(GRAPHICS_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1435,7 +1441,7 @@ public class Settings extends Properties {
 	public Color getCurveCompareBorderColor() {
 		return getColor(COMPARE_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1458,7 +1464,7 @@ public class Settings extends Properties {
 	public Color getStatisticsSurroundingAreaBackground() {
 		return getColor(STATISTICS_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1481,7 +1487,7 @@ public class Settings extends Properties {
 	public Color getStatisticsInnerAreaBackground() {
 		return getColor(STATISTICS_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1504,7 +1510,7 @@ public class Settings extends Properties {
 	public Color getAnalogSurroundingAreaBackground() {
 		return getColor(ANALOG_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1527,7 +1533,7 @@ public class Settings extends Properties {
 	public Color getAnalogInnerAreaBackground() {
 		return getColor(ANALOG_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1550,7 +1556,7 @@ public class Settings extends Properties {
 	public Color getDigitalSurroundingAreaBackground() {
 		return getColor(DIGITAL_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1573,7 +1579,7 @@ public class Settings extends Properties {
 	public Color getDigitalInnerAreaBackground() {
 		return getColor(DIGITAL_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1596,7 +1602,7 @@ public class Settings extends Properties {
 	public Color getCellVoltageSurroundingAreaBackground() {
 		return getColor(CELL_VOLTAGE_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1619,7 +1625,7 @@ public class Settings extends Properties {
 	public Color getCellVoltageInnerAreaBackground() {
 		return getColor(CELL_VOLTAGE_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1642,7 +1648,7 @@ public class Settings extends Properties {
 	public Color getFileCommentSurroundingAreaBackground() {
 		return getColor(FILE_COMMENT_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1665,7 +1671,7 @@ public class Settings extends Properties {
 	public Color getFileCommentInnerAreaBackground() {
 		return getColor(FILE_COMMENT_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1688,7 +1694,7 @@ public class Settings extends Properties {
 	public Color getObjectDescriptionSurroundingAreaBackground() {
 		return getColor(OBJECT_DESC_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
@@ -1711,7 +1717,7 @@ public class Settings extends Properties {
 	public Color getObjectDescriptionInnerAreaBackground() {
 		return getColor(OBJECT_DESC_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */

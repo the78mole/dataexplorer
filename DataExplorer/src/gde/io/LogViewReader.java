@@ -144,9 +144,7 @@ public class LogViewReader {
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
-					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) 
-						+ Messages.getString(MessageIds.OSDE_MSGI0019)
-						+ Messages.getString(MessageIds.OSDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size()+ 1;
 					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
