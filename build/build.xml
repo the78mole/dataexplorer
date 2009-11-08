@@ -4,7 +4,7 @@
 
 	<!-- Check that ant-contrib-0.6.jar is in $ANT_HOME/lib -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	<!-- Check that antelopetasks-3.2.10.jar is in $ANT_HOME/lib 
+	<!-- Check that antelopetasks-3.2.10.jar is in $ANT_HOME/lib
 	<taskdef name="stringutil" classname="ise.antelope.tasks.StringUtilTask"/>
 	<taskdef name="grep" classname="ise.antelope.tasks.Find"/>
 	<taskdef name="switch" classname="ise.antelope.tasks.SwitchTask"/>
@@ -57,14 +57,18 @@
 		<property name="output.linux64.java.ext" location="${output.linux64}/OpenSerialDataExplorer/java/ext" />
 
 		<property name="output.mac32.cocoa" location="${output.dir}/Mac_32_cocoa" />
-		<property name="output.mac32.cocoa.program" location="${output.mac32.cocoa}/OpenSerialDataExplorer" />
-		<property name="output.mac32.cocoa.program.devices" location="${output.mac32.cocoa}/OpenSerialDataExplorer/devices" />
-		<property name="output.mac32.cocoa.java.ext" location="${output.mac32.cocoa}/OpenSerialDataExplorer/java/ext" />
+		<property name="output.mac32.cocoa.bundle" location="${output.mac32.cocoa}/OpenSerialDataExplorer.app/Contents" />
+		<property name="output.mac32.cocoa.bundle.bin" location="${output.mac32.cocoa.bundle}/MacOS" />
+		<property name="output.mac32.cocoa.program" location="${output.mac32.cocoa.bundle}/Resources" />
+		<property name="output.mac32.cocoa.program.devices" location="${output.mac32.cocoa.program}/devices" />
+		<property name="output.mac32.cocoa.java.ext" location="${output.mac32.cocoa.program}/java/ext" />
 
 		<property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
-		<property name="output.mac32.carbon.program" location="${output.mac32.carbon}/OpenSerialDataExplorer" />
-		<property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon}/OpenSerialDataExplorer/devices" />
-		<property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon}/OpenSerialDataExplorer/java/ext" />
+		<property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/OpenSerialDataExplorer.app/Contents" />
+		<property name="output.mac32.carbon.bundle.bin" location="${output.mac32.carbon.bundle}/MacOS" />
+		<property name="output.mac32.carbon.program" location="${output.mac32.carbon.bundle}/Resources" />
+		<property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon.program}/devices" />
+		<property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon.program}/java/ext" />
 
 		<!-- create output directory structure -->
 		<mkdir dir="${output.dir}" />
@@ -91,11 +95,15 @@
 		<mkdir dir="${output.linux64.java.ext}" />
 
 		<mkdir dir="${output.mac32.cocoa}" />
+		<mkdir dir="${output.mac32.cocoa.bundle}" />
+		<mkdir dir="${output.mac32.cocoa.bundle.bin}" />
 		<mkdir dir="${output.mac32.cocoa.program}" />
 		<mkdir dir="${output.mac32.cocoa.program.devices}" />
 		<mkdir dir="${output.mac32.cocoa.java.ext}" />
 
 		<mkdir dir="${output.mac32.carbon}" />
+		<mkdir dir="${output.mac32.carbon.bundle}" />
+		<mkdir dir="${output.mac32.carbon.bundle.bin}" />
 		<mkdir dir="${output.mac32.carbon.program}" />
 		<mkdir dir="${output.mac32.carbon.program.devices}" />
 		<mkdir dir="${output.mac32.carbon.java.ext}" />
@@ -288,6 +296,13 @@
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<fileset file="build/misc/OpenSerialDataExplorer.icns" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
+			<fileset file="build/misc/Info.plist" />
+			<fileset file="build/misc/PkgInfo" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/OpenSerialDataExplorerMac32" />
 		</copy>
 		<copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
@@ -300,6 +315,13 @@
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<fileset file="build/misc/OpenSerialDataExplorer.icns" />
+		</copy>
+		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
+			<fileset file="build/misc/Info.plist" />
+			<fileset file="build/misc/PkgInfo" />
+		</copy>
+		<copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/OpenSerialDataExplorerMac32" />
 		</copy>
 		<copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
@@ -353,10 +375,10 @@
 		<copy todir="${output.linux64}/OpenSerialDataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
-		<copy todir="${output.mac32.cocoa}/OpenSerialDataExplorer" flatten="yes">
+		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
-		<copy todir="${output.mac32.carbon}/OpenSerialDataExplorer" flatten="yes">
+		<copy todir="${output.mac32.carbon.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
 
@@ -405,27 +427,25 @@
 			</tarfileset>
 		</tar>
 
-		<echo message="tar Mac 32 carbon files" />
-		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_carbon.tar.gz" compression="gzip">
-			<tarfileset dir="${output.mac32.carbon}" casesensitive="true" mode="755" >
-				<include name="*/OpenSerialDataExplorerMac32"/>
-			</tarfileset>
-			<tarfileset dir="${output.mac32.carbon}" casesensitive="true" >
-				<include name="**"/>
-				<exclude name="*/OpenSerialDataExplorerMac32"/>
-			</tarfileset>
-		</tar>
+		<echo message="zip Mac 32 carbon application bundle" />
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_carbon.zip">
+			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
+				<include name="**/OpenSerialDataExplorerMac32"/>
+			</zipfileset>
+			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" >
+				<exclude name="**/OpenSerialDataExplorerMac32"/>
+			</zipfileset>
+		</zip>
 
-		<echo message="tar Mac 32 cocoa files" />
-		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_cocoa.tar.gz" compression="gzip">
-			<tarfileset dir="${output.mac32.carbon}" casesensitive="true" mode="755" >
-				<include name="*/OpenSerialDataExplorerMac32"/>
-			</tarfileset>
-			<tarfileset dir="${output.mac32.carbon}" casesensitive="true" >
-				<include name="**"/>
-				<exclude name="*/OpenSerialDataExplorerMac32"/>
-			</tarfileset>
-		</tar>
+		<echo message="zip Mac 32 cocoa application bundle" />
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_cocoa.zip">
+			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
+				<include name="**/OpenSerialDataExplorerMac32"/>
+			</zipfileset>
+			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" >
+				<exclude name="**/OpenSerialDataExplorerMac32"/>
+			</zipfileset>
+		</zip>
 	</target>
 
 	<target name="backupDataFilesWindows">
