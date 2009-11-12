@@ -43,7 +43,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
 	 *  therefore it is required to give the application instance as argument
 	 */
-	public static Channels getInstance(OpenSerialDataExplorer application) {
+	public static synchronized Channels getInstance(OpenSerialDataExplorer application) {
 		if (Channels.channles == null) {
 			Channels.channles = new Channels(application, 4);
 		}
@@ -53,7 +53,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	/**
 	 *  getInstance returns the instance of this singleton
 	 */
-	public static Channels getInstance() {
+	public static synchronized Channels getInstance() {
 		if (Channels.channles == null) {
 			Channels.channles = new Channels(4);
 		}
@@ -163,7 +163,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 				
-				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET.ordinal() && this.getActiveChannel().getFileName() != null) {
+				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET && this.getActiveChannel().getFileName() != null) {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				OpenSerialDataExplorer.display.asyncExec(new Runnable() {

@@ -124,7 +124,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int														timeGridType									= TIME_GRID_NONE;
 	Vector<Integer>								timeGrid											= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
 	Color													timeGridColor									= OpenSerialDataExplorer.COLOR_GREY;
-	int														timeGridLineStyle							= new Integer(SWT.LINE_DOT);
+	int														timeGridLineStyle							= SWT.LINE_DOT;
 
 	@Deprecated
 	public static final String		HORIZONTAL_GRID_RECORD				= "RecordSet_horizontalGridRecord";							//$NON-NLS-1$
@@ -138,7 +138,7 @@ public class RecordSet extends HashMap<String, Record> {
 	int														horizontalGridType						= HORIZONTAL_GRID_NONE;
 	Vector<Integer>								horizontalGrid								= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
 	Color													horizontalGridColor						= OpenSerialDataExplorer.COLOR_GREY;
-	int														horizontalGridLineStyle				= new Integer(SWT.LINE_DASH);
+	int														horizontalGridLineStyle				= SWT.LINE_DASH;
 	int														horizontalGridRecordOrdinal		= -1;																						// recordNames[horizontalGridRecord]
 
 	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			  // voltage limits for LiXx cells, initial LiPo
@@ -1289,7 +1289,7 @@ public class RecordSet extends HashMap<String, Record> {
 		// iterate children and set min/max values
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
-			int xShift = new Double(1.0 * record.zoomSize * xPercent / 100).intValue();
+			int xShift = Double.valueOf(1.0 * record.zoomSize * xPercent / 100).intValue();
 			if (record.zoomOffset + xShift <= 0)
 				record.zoomOffset = 0;
 			else if (record.zoomOffset + record.zoomSize + xShift > record.realSize())
@@ -1542,7 +1542,7 @@ public class RecordSet extends HashMap<String, Record> {
 					RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
 					//RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
 					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.dataTable[i][0] = new Double(getTimeStep_ms() * i).intValue();					
+						RecordSet.this.dataTable[i][0] = Double.valueOf(getTimeStep_ms() * i).intValue();					
 						//RecordSet.this.dataTable[i][0] = String.format(Locale.ENGLISH, "%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
@@ -1684,7 +1684,7 @@ public class RecordSet extends HashMap<String, Record> {
 						.split(OSDE.STRING_COMMA)[2]));
 				
 			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
-			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = new Boolean(tmpValue.trim());
+			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = Boolean.valueOf(tmpValue.trim());
 			
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {

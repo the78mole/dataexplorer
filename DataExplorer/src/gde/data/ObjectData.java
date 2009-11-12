@@ -54,8 +54,8 @@ public class ObjectData {
 	String							activationDate;
 	String							status;
 	Image								image;
-	static int					imageWidth = 400;
-	static int					imageHeight = 300;
+	int									imageWidth = 400;
+	int									imageHeight = 300;
 	String							styledText;
 	StyleRange[]				styleRanges;
 	Font								font;

@@ -255,8 +255,7 @@ public class Settings extends Properties {
 		}
 		// OPET - end
 		else {
-			log.logp(Level.WARNING, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
-			System.exit(-1);
+			log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
 		}
 
 		this.load();
@@ -304,7 +303,7 @@ public class Settings extends Properties {
 		this.unmarshaller = this.jc.createUnmarshaller();
 		this.unmarshaller.setSchema(this.schema);
 		this.marshaller = this.jc.createMarshaller();
-		this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+		this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
 		this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
 
 		this.setProperty(LOCALE_CHANGED, "false"); //$NON-NLS-1$
@@ -753,21 +752,21 @@ public class Settings extends Properties {
 	 * get the usage of suggest date as leader of the to be saved filename
 	 */
 	public boolean getUsageDateAsFileNameLeader() {
-		return new Boolean(this.getProperty(USE_DATA_FILE_NAME_LEADER, "true")).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(USE_DATA_FILE_NAME_LEADER, "true")); //$NON-NLS-1$
 	}
 
 	/**
 	 * get usage of the object key within the file name
 	 */
 	public boolean getUsageObjectKeyInFileName() {
-		return new Boolean(this.getProperty(USE_OBJECT_KEY_IN_FILE_NAME, "false")).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(USE_OBJECT_KEY_IN_FILE_NAME, "false")); //$NON-NLS-1$
 	}
 
 	/**
 	 * @return the global serial port
 	 */
 	public boolean isGlobalSerialPort() {
-		return new Boolean(this.getProperty(IS_GLOBAL_PORT, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_GLOBAL_PORT, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -781,7 +780,7 @@ public class Settings extends Properties {
 	 * @return boolean value of port black list enablement
 	 */
 	public boolean isSerialPortBlackListEnabled() {
-		return new Boolean(this.getProperty(IS_PORT_BLACKLIST, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_PORT_BLACKLIST, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -821,7 +820,7 @@ public class Settings extends Properties {
 	 * @return boolean value of port white list enablement
 	 */
 	public boolean isSerialPortWhiteListEnabled() {
-		return new Boolean(this.getProperty(IS_PORT_WHITELIST, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_PORT_WHITELIST, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -871,7 +870,7 @@ public class Settings extends Properties {
 	 * @return the global log level
 	 */
 	public boolean isGlobalLogLevel() {
-		return new Boolean(this.getProperty(IS_GLOBAL_LOG_LEVEL, "true").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_GLOBAL_LOG_LEVEL, "true").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -901,7 +900,7 @@ public class Settings extends Properties {
 	 * get property if during port scan a availability check should executed (disable for slow systems)
 	 */
 	public boolean doPortAvailabilityCheck() {
-		return new Boolean(getProperty(DO_PORT_AVAILABLE_TEST, "false")).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(getProperty(DO_PORT_AVAILABLE_TEST, "false")); //$NON-NLS-1$
 	}
 
 	/**
@@ -928,21 +927,21 @@ public class Settings extends Properties {
 	 * query if serial port opened right after closing device selection dialog
 	 */
 	public boolean isAutoOpenSerialPort() {
-		return new Boolean(this.getProperty(AUTO_OPEN_SERIAL_PORT, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(AUTO_OPEN_SERIAL_PORT, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
 	 * query if device tool box to be opened right after closing device selection dialog
 	 */
 	public boolean isAutoOpenToolBox() {
-		return new Boolean(this.getProperty(AUTO_OPEN_TOOL_BOX, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(AUTO_OPEN_TOOL_BOX, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
 	 * query if record set comment window is visible
 	 */
 	public boolean isRecordCommentVisible() {
-		return new Boolean(this.getProperty(RECORD_COMMENT_VISIBLE, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(RECORD_COMMENT_VISIBLE, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -956,7 +955,7 @@ public class Settings extends Properties {
 	 * query if record set comment window is visible
 	 */
 	public boolean isGraphicsHeaderVisible() {
-		return new Boolean(this.getProperty(GRAPHICS_HEADER_VISIBLE, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(GRAPHICS_HEADER_VISIBLE, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -1173,7 +1172,7 @@ public class Settings extends Properties {
 	 * @return boolean value to signal the modality of the device dialog
 	 */
 	public boolean isDeviceDialogsModal() {
-		return new Boolean(this.getProperty(DEVICE_DIALOG_USE_MODAL, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(DEVICE_DIALOG_USE_MODAL, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -1189,7 +1188,7 @@ public class Settings extends Properties {
 	 * @return boolean value to signal the placement of the device dialog
 	 */
 	public boolean isDeviceDialogsOnTop() {
-		return new Boolean(this.getProperty(DEVICE_DIALOG_ON_TOP, "false").trim()).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(DEVICE_DIALOG_ON_TOP, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -1211,7 +1210,7 @@ public class Settings extends Properties {
 	 * @return
 	 */
 	boolean getLocaleChanged() {
-		return new Boolean(this.getProperty(LOCALE_CHANGED, "false")).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(LOCALE_CHANGED, "false")); //$NON-NLS-1$
 	}
 
 	/**
@@ -1273,7 +1272,7 @@ public class Settings extends Properties {
 	 * @return true if alphablending is enabled
 	 */
 	public boolean isDeviceDialogAlphaEnabled() {
-		return new Boolean(this.getProperty(APLHA_BLENDING_ENABLED, "false")).booleanValue(); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(APLHA_BLENDING_ENABLED, "false")); //$NON-NLS-1$
 	}
 
 	/**
@@ -1301,14 +1300,14 @@ public class Settings extends Properties {
 	 * query value if desktop shortcut needs to be created
 	 */
 	public boolean isDesktopShortcutCreated() {
-		return new Boolean(this.getProperty(IS_DESKTOP_SHORTCUT_CREATED, "false")); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_DESKTOP_SHORTCUT_CREATED, "false")); //$NON-NLS-1$
 	}
 
 	/**
 	 * query value if OpenSerialDataExplorer application is registerd to operating system
 	 */
 	public boolean isApplicationRegistered() {
-		return new Boolean(this.getProperty(IS_APPL_REGISTERED, "false")); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(IS_APPL_REGISTERED, "false")); //$NON-NLS-1$
 	}
 
 	/**

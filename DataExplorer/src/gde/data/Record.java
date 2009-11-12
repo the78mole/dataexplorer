@@ -74,7 +74,7 @@ public class Record extends Vector<Integer> {
 	Boolean							triggerIsGreater			= null;
 	Integer							triggerLevel					= null;
 	Integer							minTriggerTimeSec 		= null;
-	class TriggerRange {
+	static class TriggerRange {
 		int in  = -1;
 		int out = -1;
 		public TriggerRange(int newIn, int newOut) { this.in = newIn; this.out = newOut; }
@@ -116,7 +116,7 @@ public class Record extends Vector<Integer> {
 	boolean							isPositionLeft				= true;
 	Color								color									= OpenSerialDataExplorer.COLOR_BLACK;
 	int									lineWidth							= 1;
-	int									lineStyle							= new Integer(SWT.LINE_SOLID);
+	int									lineStyle							= SWT.LINE_SOLID;
 	boolean							isRoundOut						= false;
 	boolean							isStartpointZero			= false;
 	boolean							isStartEndDefined			= false;
@@ -260,7 +260,8 @@ public class Record extends Vector<Integer> {
 	/**
 	 * overwritten clone method used to compare curves
 	 */
-	public Record clone() {
+	public synchronized Record clone() {
+		super.clone();
 		return new Record(this);
 	}
 
@@ -439,7 +440,7 @@ public class Record extends Vector<Integer> {
 		}	
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "adding point = " + point); //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-		return this.add(new Integer(point)); // Vector add method
+		return this.add(Integer.valueOf(point)); // Vector add method
 	}
 
 	public int getOrdinal() {
@@ -637,9 +638,9 @@ public class Record extends Vector<Integer> {
 	 * while building vector of trigger range definitions as pre-requisite of avg and sigma calculation
 	 */
 	@SuppressWarnings("unchecked") // clone triggerRanges to be able to modify by time filter
-	synchronized void evaluateMinMax() {
+	 void evaluateMinMax() {
 		if (this.triggerRanges == null && this.isDisplayable && this.triggerIsGreater != null && this.triggerLevel != null) {
-			int deviceTriggerlevel = new Double(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
+			int deviceTriggerlevel = Double.valueOf(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
 			for (int i = 0; i < this.realSize(); ++i) {
 				int point = this.realGet(i);
 				if (this.triggerIsGreater) { // point value must above trigger level
@@ -699,7 +700,7 @@ public class Record extends Vector<Integer> {
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
-			int countDelta = new Double(this.minTriggerTimeSec / (this.timeStep_ms / 1000.0)).intValue();
+			int countDelta = Double.valueOf(this.minTriggerTimeSec / (this.timeStep_ms / 1000.0)).intValue();
 			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
 				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
 			}
@@ -757,7 +758,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * overwrites size method for zoom mode and not zoomed compare window
 	 */
-	public int size() {
+	public synchronized int size() {
 		int tmpSize = super.size();
 		
 		if (this.parent.isZoomMode)
@@ -788,7 +789,7 @@ public class Record extends Vector<Integer> {
 	 * overwrites vector get(int index) to enable zoom
 	 * @param index
 	 */
-	public Integer get(int index) {
+	public synchronized Integer get(int index) {
 		int size = super.size();
 		if(this.parent.isZoomMode) {
 			index = index + this.zoomOffset;
@@ -819,7 +820,7 @@ public class Record extends Vector<Integer> {
 	 * overwrites vector elementAt(int index) to enable zoom
 	 * @param index
 	 */
-	public Integer elementAt(int index) {
+	public synchronized Integer elementAt(int index) {
 		Integer value;
 		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			value = super.elementAt(index + this.zoomOffset);
@@ -1091,8 +1092,8 @@ public class Record extends Vector<Integer> {
 	 */
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
-		returnPoint.x = new Double((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
-		returnPoint.y = new Double(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		returnPoint.x = Double.valueOf((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
+		returnPoint.y = Double.valueOf(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}
 
@@ -1106,7 +1107,7 @@ public class Record extends Vector<Integer> {
 		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
 		scaledIndex = this.zoomOffset + scaledIndex >= this.realSize() ? this.realSize() - this.zoomOffset -1 : scaledIndex;
 		log.log(Level.FINER, "scaledIndex = " + scaledIndex); //$NON-NLS-1$
-		int pointY = new Double(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		int pointY = Double.valueOf(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		pointY = pointY < 0 ? 0 : pointY;
 		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height : pointY;
 		log.log(Level.FINER, "pointY = " + pointY); //$NON-NLS-1$
@@ -1228,7 +1229,7 @@ public class Record extends Vector<Integer> {
 	* @return string of time value in simple date format HH:ss:mm:SSS
 	*/
 	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(new Double((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.timeStep_ms).intValue());
+		return TimeLine.getFomatedTimeWithUnit(Double.valueOf((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.timeStep_ms).intValue());
 	}
 
 	/**
@@ -1237,7 +1238,7 @@ public class Record extends Vector<Integer> {
 	 * @return position integer value
 	 */
 	public int getPointIndexFromDisplayPoint(int xPos) {
-		return new Double(1.0 * xPos * this.zoomSize / this.parent.getDrawAreaBounds().width).intValue();
+		return Double.valueOf(1.0 * xPos * this.zoomSize / this.parent.getDrawAreaBounds().width).intValue();
 	}
 	
 	/**
@@ -1445,15 +1446,15 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(SYMBOL);
 		if (tmpValue!=null && tmpValue.length() > 0) this.symbol =  tmpValue.trim();
 		tmpValue = recordProps.get(IS_ACTIVE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isActive =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isActive =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_VISIBLE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isVisible =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isVisible =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_POSITION_LEFT);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isPositionLeft =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isPositionLeft =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
 		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
@@ -1461,11 +1462,11 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(LINE_STYLE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.lineStyle =  new Integer(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(IS_ROUND_OUT);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isRoundOut =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isRoundOut =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_START_POINT_ZERO);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isStartpointZero =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isStartpointZero =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(IS_START_END_DEFINED);
-		if (tmpValue!=null && tmpValue.length() > 0) this.isStartEndDefined =  new Boolean(tmpValue.trim()).booleanValue();
+		if (tmpValue!=null && tmpValue.length() > 0) this.isStartEndDefined =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(NUMBER_FORMAT);
 		if (tmpValue!=null && tmpValue.length() > 0) this.setNumberFormat(new Integer(tmpValue.trim()).intValue());
 		tmpValue = recordProps.get(MAX_VALUE);
@@ -1580,20 +1581,20 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the avgValue
 	 */
-	public synchronized void setAvgValue() {
+	public void setAvgValue() {
 		if (super.size() >= 2) {
 			long sum = 0;
 			for (Integer xi : this) {
 				sum += xi;
 			}
-			this.avgValue = new Long(sum / this.realSize()).intValue();
+			this.avgValue = Long.valueOf(sum / this.realSize()).intValue();
 		}
 	}
 	
 	/**
 	 * calculates the avgValue using trigger ranges
 	 */
-	public synchronized void setAvgValueTriggered() {
+	public void setAvgValueTriggered() {
 		long sum = 0;
 		int numPoints = 0;
 		StringBuilder sb = new StringBuilder();
@@ -1607,7 +1608,7 @@ public class Record extends Vector<Integer> {
 				if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 			}
 			log.log(Level.FINER, sb.toString());
-			this.avgValueTriggered = numPoints > 0 ? new Long(sum / numPoints).intValue() : 0 ;
+			this.avgValueTriggered = numPoints > 0 ? Long.valueOf(sum / numPoints).intValue() : 0 ;
 		}
 	}
 
@@ -1647,21 +1648,21 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the sigmaValue 
 	 */
-	public synchronized void setSigmaValue() {
+	public void setSigmaValue() {
 		if (super.size() >= 2) {
 			double average = this.getAvgValue() / 1000.0;
 			double sumPoweredValues = 0;
 			for (Integer xi : this) {
 				sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
 			}
-			this.sigmaValue = new Double(Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000).intValue();
+			this.sigmaValue = Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000).intValue();
 		}
 	}
 
 	/**
 	 * calculates the sigmaValue using trigger ranges
 	 */
-	public synchronized void setSigmaValueTriggered() {
+	public void setSigmaValueTriggered() {
 		double average = this.getAvgValueTriggered()/1000.0;
 		double sumPoweredDeviations = 0;
 		int numPoints = 0;
@@ -1672,7 +1673,7 @@ public class Record extends Vector<Integer> {
 					numPoints++;
 				}
 			}
-			this.sigmaValueTriggered = new Double(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
+			this.sigmaValueTriggered = Double.valueOf(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
 		}
 	}
 	
