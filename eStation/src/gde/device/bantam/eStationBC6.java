@@ -23,14 +23,13 @@ import javax.xml.bind.JAXBException;
 import osde.OSDE;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
 
 /**
  * eStation BC6 device class
  * @author Winfried Brügmann
  */
-public class eStationBC6 extends eStation implements IDevice {
+public class eStationBC6 extends eStation {
 
 	/**
 	 * constructor using properties file

@@ -21,13 +21,12 @@ import java.io.FileNotFoundException;
 import javax.xml.bind.JAXBException;
 
 import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
 
 /**
  * eStation 902 device class
  * @author Winfried Brügmann
  */
-public class eStation902 extends eStation implements IDevice {
+public class eStation902 extends eStation {
 
 	/**
 	 * constructor using properties file
