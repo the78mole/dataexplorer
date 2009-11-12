@@ -26,26 +26,31 @@ F�r den ersten Start des Programms �ber ein Kommando-Fenster(Windows) Shell(
 wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausf�hren. 
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
-OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.ini (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorerMac32 (Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.jar
-OpenSerialDataExplorer\Devices\*.jar
+OpenSerialDataExplorer.exe (Windows)
+OpenSerialDataExplorer.ini (Windows)
+OpenSerialDataExplorer (Linux)
+OpenSerialDataExplorer.xpm (Linux)
+OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorerMac32 (Mac OS)
+OpenSerialDataExplorer.icns (Mac OS)
+RXTX_Post-Install_MacOS.txt (Mac OS)
+
+Andere Programmresourcen sind:
+../OpenSerialDataExplorer.jar
+../Devices/*.jar
+../README.*
 
 Erweiterung der Java Laufzeitumgebung f�r RXTXcomm und SWT:
-OpenSerialDataExplorer\java\ext\*.jar
-OpenSerialDataExplorer\java\ext\*.LICENSE
+../java/ext/*.jar
+../java/ext/*.LICENSE
 
-Hinweis f�r Linux-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angeh�ren. In Abh�ngigkeit
+Hinweis f�r Linux- und Mac-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angeh�ren. In Abh�ngigkeit
 der verwendeten Distribution kann evtl. kein serieller Port ge�ffnet werden.
 
 Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
 %APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows)
 /home/<Benutzer>/.OpenSerialDataExplorer (Linux)
-/user/<Benutzer>/.OpenSerialDataExplorer (Mac OS)
+/user/<Benutzer>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
 angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
 
 F�r das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms

@@ -25,19 +25,24 @@ For Windows user a proper place is %ProgramFiles% for Linux user "/opt" or "/usr
 For the first execution use a command window (Windows), shell (Linux) and change into the just created OpenSerialDataExplorer
 directory and execute running Windows, OpenSerialDataExplorer.exe, running Unix, OpenSerialDataExplorer.
 
-As overview the following files are under the OpenSerialDataExplorer program directory:
-OpenSerialDataExplorer\OpenSerialDataExplorer.exe (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer.ini (Windows)
-OpenSerialDataExplorer\OpenSerialDataExplorer (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorerMac32 (Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.xpm (Linux, Mac OS)
-OpenSerialDataExplorer\OpenSerialDataExplorer.desktop (Linux)
-OpenSerialDataExplorer\OpenSerialDataExplorer.jar
-OpenSerialDataExplorer\devices\*.jar
+As overview the following files are under the OpenSerialDataExplorer program resource directory:
+OpenSerialDataExplorer.exe (Windows)
+OpenSerialDataExplorer.ini (Windows)
+OpenSerialDataExplorer (Linux)
+OpenSerialDataExplorer.xpm (Linux)
+OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorerMac32 (Mac OS)
+OpenSerialDataExplorer.icns (Mac OS)
+RXTX_Post-Install_MacOS.txt (Mac OS)
+
+Main program files are:
+../OpenSerialDataExplorer.jar
+../Devices/*.jar
+../README.*
 
 Extensions for the Java runtime RXTXcomm and SWT:
-OpenSerialDataExplorer\java\ext\*.jar
-OpenSerialDataExplorer\java\ext\*.LICENSE
+../java/ext/*.jar
+../java/ext/*.LICENSE
 
 Hint for Linux user: RxTxcomm is using the uucp locking mechanism, to enable this the user must be part of the "uucp" group. Without being part 
 of this group open an serial port might be impossible. This depends on the used distribution.
@@ -45,7 +50,7 @@ of this group open an serial port might be impossible. This depends on the used 
 During the first execution of the program the application configuration directories are created 
 %APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
 /home/<user>/.OpenSerialDataExplorer (Linux)
-/user/<user>/.OpenSerialDataExplorer (Mac OS)
+/user/<user>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
 At this place also application configuration and trace log files are located.
 
 The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file

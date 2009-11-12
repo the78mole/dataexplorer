@@ -1,0 +1,13 @@
+################################
+# RXTX Post-Installation Steps
+# Mac OS X 10.6.2 (Snow Leopard)
+################################
+
+mkdir /var/lock
+chgrp uucp /var/lock
+chmod 775 /var/lock
+
+dscl . -append /groups/_uucp GroupMembership <OSDEuser>
+dscl . -read /groups/_uucp users
+
+chmod g+w /var/spool/uucp/

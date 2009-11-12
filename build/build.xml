@@ -295,8 +295,9 @@
 		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
-			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<!-- fileset file="build/misc/OpenSerialDataExplorer.xpm" / -->
 			<fileset file="build/misc/OpenSerialDataExplorer.icns" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 		<copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
 			<fileset file="build/misc/Info.plist" />
@@ -314,8 +315,9 @@
 		<copy todir="${output.mac32.carbon.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
-			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
+			<!-- fileset file="build/misc/OpenSerialDataExplorer.xpm" / -->
 			<fileset file="build/misc/OpenSerialDataExplorer.icns" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
 			<fileset file="build/misc/Info.plist" />
