@@ -76,8 +76,6 @@ public class FileHandler {
 		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { OSDE.FILE_ENDING_STAR_CSV }, path);
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
-			String fileName = csvFileDialog.getFileName();
-			fileName = fileName.substring(0, fileName.indexOf('.'));
 
 			try {
 				char listSeparator = deviceSetting.getListSeparator();
@@ -211,8 +209,8 @@ public class FileHandler {
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(OSDE.DEVICE_NAME);
 			// check and switch device, if required
-			String activeDeviceName = this.application.getActiveDevice().getName();
-			if (!activeDeviceName.equals(fileDeviceName)) { // new device in file
+			IDevice activeDevice = this.application.getActiveDevice();
+			if (activeDevice == null || !activeDevice.getName().equals(fileDeviceName)) { // new device in file
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
 			}
 			//only switch object key, if application is object oriented
@@ -228,7 +226,7 @@ public class FileHandler {
 			String recordSetPropertys = osdHeader.get("1 "+OSDE.RECORD_SET_NAME); //$NON-NLS-1$
 			String channelConfigName = OsdReaderWriter.getRecordSetProperties(recordSetPropertys).get(OSDE.CHANNEL_CONFIG_NAME);
 			// channel/configuration type is outlet
-			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal();
+			boolean isChannelTypeOutlet = this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET;
 			if(isChannelTypeOutlet && this.channels.size() > 1) {
 				String[] splitChannel = channelConfigName.split(OSDE.STRING_BLANK);
 				int channelNumber = 1;
@@ -352,14 +350,14 @@ public class FileHandler {
 			
 			int channelNumber = new Integer(lovHeader.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
 			IDevice activeDevice = this.application.getActiveDevice();
-			String channelType = ChannelTypes.values()[activeDevice.getChannelType(channelNumber)].name();
+			String channelType = activeDevice.getChannelTypes(channelNumber).name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
 			log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
 			
 			if(channel != null 
 					&& this.channels.getActiveChannel() != null 
-					&& this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET.ordinal()
+					&& this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET
 					&& this.channels.size() > 1) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0006, new Object[] {channelConfigName}));

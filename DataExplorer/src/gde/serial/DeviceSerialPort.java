@@ -44,7 +44,6 @@ import osde.exception.TimeOutException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
-import osde.utils.StringHelper;
 import osde.utils.WindowsHelper;
 
 /**
@@ -67,8 +66,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	String																	serialPortStr			= OSDE.STRING_EMPTY;
 	Thread																	closeThread;
 	
-	static CommPortIdentifier								portId;
-	static CommPortIdentifier								saveportId;
+	CommPortIdentifier											portId;
+	CommPortIdentifier											saveportId;
 
 	InputStream															inputStream				= null;
 	OutputStream														outputStream			= null;
@@ -193,51 +192,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	}
 
 	/**
-	 * find available serial ports
-	 * @param portBlackList
-	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	@Deprecated
-	public static Vector<String> getAvailablePorts(String[] portBlackList) {
-		final String $METHOD_NAME = "getAvailablePorts"; //$NON-NLS-1$
-		String serialPortStr;
-		long startTime = new Date().getTime();
-		Enumeration<CommPortIdentifier> enumIdentifiers = CommPortIdentifier.getPortIdentifiers(); // initializes serial port
-		System.out.println("CommPortIdentifier.getPortIdentifiers() time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-		availablePorts.clear();
-		
-		// find all available serial ports
-		while (enumIdentifiers.hasMoreElements()) {
-			CommPortIdentifier commPortIdentifier = enumIdentifiers.nextElement();
-			serialPortStr = commPortIdentifier.getName();
-			if (!portBlackList.toString().contains(serialPortStr)) {
-				if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
-					try {
-						if(Settings.getInstance().doPortAvailabilityCheck()) {
-							((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
-						}
-						availablePorts.add(serialPortStr);
-						System.out.println("Found available port: " + serialPortStr); //$NON-NLS-1$
-					}
-					catch (Exception e) {
-						System.out.println("Found port, but can't open: " + serialPortStr); //$NON-NLS-1$
-					}
-				}
-			}
-		}
-		if (true) {
-			StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
-			for (String comPort : availablePorts) {
-				sb.append(comPort).append(" "); //$NON-NLS-1$
-			}
-			System.out.println(sb.toString());
-		}
-		System.out.println($CLASS_NAME + $METHOD_NAME +" time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-
-		return availablePorts;
-	}
-
-	/**
 	 * check if a configures serial port string matches actual available ports
 	 * @param newSerialPortStr
 	 * @param availableSerialPorts
@@ -260,7 +214,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws ApplicationConfigurationException
 	 * @throws SerialPortException
 	 */
-	public synchronized SerialPort open() throws ApplicationConfigurationException, SerialPortException {
+	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		final String $METHOD_NAME = "open"; //$NON-NLS-1$
 		this.xferErrors = 0;
 		// Initialize serial port
@@ -358,7 +312,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @param writeBuffer writes size of writeBuffer to output stream
 	 * @throws IOException
 	 */
-	public synchronized void write(byte[] writeBuffer) throws IOException {
+	public void write(byte[] writeBuffer) throws IOException {
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
 		int num = 0;
 		if ((num = this.inputStream.available()) != 0) {
@@ -393,7 +347,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * - activate the DATA_AVAILABLE notifier to read available data -> dataAvailable = true;
 	 * - activate the OUTPUT_BUFFER_EMPTY notifier -> dataAvailable = false;
 	 */
-	public synchronized void serialEvent(SerialPortEvent event) {
+	public void serialEvent(SerialPortEvent event) {
 		final String $METHOD_NAME = "serialEvent"; //$NON-NLS-1$
 
 		switch (event.getEventType()) {
@@ -424,7 +378,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
+	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int bytes = readBuffer.length;
@@ -485,7 +439,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
+	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int bytes = readBuffer.length;
@@ -612,7 +566,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
+	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int expectedBytes = readBuffer.length;
@@ -743,7 +697,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * function to close the serial port
 	 * this is done within a tread since the port can't close if it stays open for a long time period ??
 	 */
-	public synchronized void close() {
+	public void close() {
 		final String $METHOD_NAME = "close"; //$NON-NLS-1$
 		if (this.isConnected && DeviceSerialPort.this.serialPort != null) {
 			DeviceSerialPort.this.isConnected = false;

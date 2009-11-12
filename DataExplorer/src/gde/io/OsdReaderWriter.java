@@ -170,7 +170,7 @@ public class OsdReaderWriter {
 		boolean isFirstRecordSetDisplayed = false;
 
 		HashMap<String, String> header = getHeader(filePath);
-		String channelType = header.get(OSDE.CHANNEL_CONFIG_TYPE).trim();
+		ChannelTypes channelType = ChannelTypes.valueOf(header.get(OSDE.CHANNEL_CONFIG_TYPE).trim());
 		String objectKey = header.get(OSDE.OBJECT_KEY) != null ? header.get(OSDE.OBJECT_KEY) : OSDE.STRING_EMPTY;
 		int numberRecordSets = new Integer(header.get(OSDE.RECORD_SET_SIZE).trim()).intValue();
 		while(!data_in.readUTF().startsWith(OSDE.RECORD_SET_SIZE))
@@ -224,7 +224,7 @@ public class OsdReaderWriter {
 					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size() + 1;
-					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
+					channel = new Channel(newChannelNumber, channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 					channels.put(newChannelNumber, channel);
 					Vector<String> newChannelNames = new Vector<String>();
@@ -375,7 +375,7 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
-				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(ChannelTypes.values()[Channels.getInstance().getActiveChannel().getType()]).append(OSDE.STRING_NEW_LINE);
+				sb.append(OSDE.CHANNEL_CONFIG_TYPE).append(Channels.getInstance().getActiveChannel().getType().name()).append(OSDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
 				log.log(Level.FINE, "line lenght = " + (OSDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -473,7 +473,7 @@ public class OsdReaderWriter {
 								for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
 										Record record = recordSet.get(noneCalculationRecordNames[k]);
-										int point = new Double(device.reverseTranslateValue(record, record.realGet(j)/1000.0)*1000.0).intValue();
+										int point = Double.valueOf(device.reverseTranslateValue(record, record.realGet(j)/1000.0)*1000.0).intValue();
 										//log.log(Level.FINER, ""+point);
 										bytes[0] = (byte) ((point >>> 24) & 0xFF);
 										bytes[1] = (byte) ((point >>> 16) & 0xFF);

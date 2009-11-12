@@ -117,7 +117,7 @@ public class DeviceConfiguration {
 			
 			// store back manipulated XML
 			Marshaller marshaller = jc.createMarshaller();
-	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,  new Boolean(true));
+	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,  Boolean.valueOf(true));
 	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,  Settings.DEVICE_PROPERTIES_XSD_NAME);
 
 	    marshaller.marshal(elememt,
@@ -644,7 +644,7 @@ public class DeviceConfiguration {
 	 */
 	public boolean isTableTabRequested() {
 		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_TABLE_TAB);
-		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
 	/**
@@ -668,7 +668,7 @@ public class DeviceConfiguration {
 	 */
 	public boolean isDigitalTabRequested() {
 		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB);
-		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
 	/**
@@ -692,7 +692,7 @@ public class DeviceConfiguration {
 	 */
 	public boolean isAnalogTabRequested() {
 		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB);
-		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
 	/**
@@ -716,7 +716,7 @@ public class DeviceConfiguration {
 	 */
 	public boolean isVoltagePerCellTabRequested() {
 		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB);
-		return new Boolean(property != null ? property.getValue() : null).booleanValue(); 
+		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
 	/**
@@ -769,18 +769,31 @@ public class DeviceConfiguration {
 
 	/**
 	 * @return the channel type by given channel number 
-	 * 0 = TYPE_OUTLET, 1 = TYPE_CONFIG;
 	 */
-	public int getChannelType(int channelNumber) {
-		return this.deviceProps.getChannel().get(channelNumber - 1).getType().ordinal();
+	public ChannelType getChannelType(int channelNumber) {
+		return this.deviceProps.getChannel().get(channelNumber - 1);
+	}
+
+	/**
+	 * @return the channel types by given channel number 
+	 */
+	public ChannelTypes getChannelTypes(int channelNumber) {
+		return this.deviceProps.getChannel().get(channelNumber - 1).getType();
 	}
 	
 	/**
-	 * @return the channel type by given channel configuration key (name)
-	 * 0 = TYPE_OUTLET, 1 = TYPE_CONFIG;
+	 * @return the channel types by given channel configuration key (name)
 	 */
-	public int getChannelType(String channelConfigKey) {
-		return this.getChannel(channelConfigKey).getType().ordinal();
+	public ChannelTypes getChannelTypes(String channelConfigKey) {
+		return this.getChannel(channelConfigKey).getType();
+	}
+
+	/**
+	 * @return the channel type by given channel number 
+	 */
+	public void setChannelTypes(ChannelTypes newChannleType, int channelNumber) {
+		this.isChangePropery = true;
+		this.deviceProps.getChannel().get(channelNumber - 1).setType(newChannleType);
 	}
 	
 	/**

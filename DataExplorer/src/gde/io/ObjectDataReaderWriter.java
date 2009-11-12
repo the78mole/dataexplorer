@@ -193,7 +193,7 @@ public class ObjectDataReaderWriter {
 			System.arraycopy(buffer, 0, stringBuffer, 0, len);
 			sb.append(new String(stringBuffer));
 		}
-		new String(buffer);
+		
 		inZip.close();
 		return sb.toString();
 	}

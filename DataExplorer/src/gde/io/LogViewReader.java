@@ -100,11 +100,11 @@ public class LogViewReader {
 		
 		HashMap<String, String> header = readHeader(data_in);
 		int channelNumber = new Integer(header.get(OSDE.CHANNEL_CONFIG_NUMBER)).intValue();
-		String channelType = ChannelTypes.values()[device.getChannelType(channelNumber)].name();
+		ChannelTypes channelType = device.getChannelTypes(channelNumber);
 		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(OSDE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelName(channelNumber);
 		log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + OSDE.CHANNEL_CONFIG_TYPE + channelType + "; " + OSDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType);
+		header.put(OSDE.CHANNEL_CONFIG_TYPE, channelType.name());
 		header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfigName);
 		//header.put(OSDE.RECORD_SET_DATA_POINTER, OSDE.STRING_EMPTY+position);
 		//header.containsKey(LOV_NUM_MEASUREMENTS)
@@ -147,7 +147,7 @@ public class LogViewReader {
 					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
 					int newChannelNumber = channels.size()+ 1;
-					channel = new Channel(newChannelNumber, channelConfig, ChannelTypes.valueOf(channelType).ordinal());
+					channel = new Channel(newChannelNumber, channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 					channels.put(newChannelNumber, channel);
 					Vector<String> newChannelNames = new Vector<String>();
@@ -1635,7 +1635,6 @@ public class LogViewReader {
 			//log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
 			
 			//time format
-			config = new StringBuilder();
 			buffer = new byte[4];
 			position += data_in.read(buffer);
 			int numberChars = parse2Int(buffer);

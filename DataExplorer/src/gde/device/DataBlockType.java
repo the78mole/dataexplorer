@@ -179,7 +179,7 @@ public class DataBlockType {
      *     
      */
     public void setEnding(byte[] value) {
-        this.ending = ((byte[]) value);
+        this.ending = value;
     }
 
 }

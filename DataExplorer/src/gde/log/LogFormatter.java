@@ -71,6 +71,7 @@ public class LogFormatter extends Formatter {
 				text.append(sw.toString());
 			}
 			catch (Exception ex) {
+				//ignore
 			}
 		}
 		return text.toString();

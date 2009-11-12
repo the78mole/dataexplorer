@@ -280,7 +280,7 @@ public interface IDevice {
 	 * @param channelNumber (starts at 1)
 	 * @return the channel type
 	 */
-	public int getChannelType(int channelNumber);
+	public ChannelTypes getChannelTypes(int channelNumber);
 	
 	/**
 	 * @return the channel measurements by given channel configuration key (name)

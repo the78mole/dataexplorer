@@ -155,7 +155,7 @@ public abstract class DeviceDialog extends Dialog {
 		return this.shellAlpha;
 	}
 
-	public synchronized void setShellAlpha(int newShellAlpha) {
+	public void setShellAlpha(int newShellAlpha) {
 			if (newShellAlpha > this.shellAlpha) {
 				//System.out.println("fade-out " + this.shellAlpha);
 				for (int i = this.shellAlpha; i < 254; i+=5) {

@@ -85,7 +85,7 @@ public class CSVReaderWriter {
 				if (i == 0) header.put(OSDE.DEVICE_NAME, headerData[i].split("\\r")[0].trim());
 				if (i == 1) header.put(OSDE.CHANNEL_CONFIG_NAME, headerData[i].split(" ")[0].split("\\r")[0].trim());
 			}
-			while (!((line = reader.readLine()).contains("[") && line.contains("]"))) {
+			while (!((line = reader.readLine()) != null && line.contains("[") && line.contains("]"))) {
 				// read until Zeit [sec];Spannung [---];Höhe [---]
 				// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 			}
@@ -301,7 +301,7 @@ public class CSVReaderWriter {
 					
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 						data = dataStr[i + 1].trim().replace(',', '.');
-						points[i] = new Double(new Double(data)*1000).intValue();
+						points[i] = Double.valueOf(data).intValue()*1000;
 					}
 					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points);
 					else 				recordSet.addPoints(points);
@@ -412,7 +412,7 @@ public class CSVReaderWriter {
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())
-								sb.append(df3.format(new Double(record.get(i))/1000.0).replace('.', decimalSeparator)).append(separator);
+								sb.append(df3.format((record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 							else
 								sb.append(df3.format(device.reverseTranslateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
 					}
