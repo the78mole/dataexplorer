@@ -817,7 +817,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 										TableItem item = new TableItem(this.deviceTable, SWT.NULL);
 										item.setText(new String[] { config.getName(), config.getManufacturer(), config.getSerialPortType() != null ? config.getPort() : OSDE.STRING_MESSAGE_CONCAT });
-										if (new Boolean(config.isUsed())) {
+										if (config.isUsed()) {
 											item.setChecked(true);
 										}
 										else {
@@ -968,11 +968,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					enableSerialPortEntries(true);
 				}
 				// serial port adjustments group
-				this.baudeSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
-				this.dataBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getDataBits()).toString());
-				this.stopBitsSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getStopBits()).toString());
-				this.paritySelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getParity()).toString());
-				this.flowControlSelectLabel.setText(new Integer(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
+				this.baudeSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
+				this.dataBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getDataBits()).toString());
+				this.stopBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getStopBits()).toString());
+				this.paritySelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getParity()).toString());
+				this.flowControlSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
 				this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
 				this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
 			}
@@ -1092,9 +1092,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				DeviceSelectionDialog.log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
-				Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelType(i));
+				Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
 				// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-				channels.put(new Integer(i), newChannel);
+				channels.put(Integer.valueOf(i), newChannel);
 				// do not call channel.applyTemplate here, there are no record sets
 			}
 			channels.switchChannel(1, OSDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
@@ -1211,7 +1211,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 								OpenSerialDataExplorer.display.syncExec(new Runnable() {
 									public void run() {
-										if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
+										if (!DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
 											if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
 												DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
 												int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());

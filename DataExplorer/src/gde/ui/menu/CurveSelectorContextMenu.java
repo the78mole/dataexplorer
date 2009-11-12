@@ -100,8 +100,8 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.selectedItem != null) {
 						log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-							CurveSelectorContextMenu.this.isSyncPlaceholder = new Boolean("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
-							CurveSelectorContextMenu.this.isScaleSynced = new Boolean("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER)).booleanValue();
+							CurveSelectorContextMenu.this.isSyncPlaceholder = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER));
+							CurveSelectorContextMenu.this.isScaleSynced = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER));
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
 							if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
 								CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
@@ -1115,7 +1115,7 @@ public class CurveSelectorContextMenu {
 
 								CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
-						else if (copyFromRecordKey != null) CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
+						else CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
 					}
 				}
 			});

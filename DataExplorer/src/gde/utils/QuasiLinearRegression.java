@@ -59,7 +59,7 @@ public class QuasiLinearRegression extends CalculationThread {
 				record.clear();
 				Record recordHeight = this.recordSet.get(this.sourceRecordKey);
 				double timeStep_sec = recordHeight.getTimeStep_ms() / 1000;
-				int timeStepsPerInterval = new Double(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
+				int timeStepsPerInterval = Double.valueOf(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
 				log.log(Level.FINE, "calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
@@ -106,7 +106,7 @@ public class QuasiLinearRegression extends CalculationThread {
 					}
 					ssXY = ssXY / timeStepsPerInterval;
 
-					int slope = new Double(ssXY / ssXX / timeStep_sec / timeStep_sec).intValue();
+					int slope = Double.valueOf(ssXY / ssXX / timeStep_sec / timeStep_sec).intValue();
 					// add point over pointInterval only
 					for (int i = 0; i < pointInterval; i++) {
 						record.add(slope);

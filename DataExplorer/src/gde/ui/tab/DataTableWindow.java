@@ -165,7 +165,7 @@ public class DataTableWindow {
 				
 				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < recordEntries; i++) {
-					if (i % 20 == 0) this.application.setProgress(new Double(i * progressInterval).intValue(), threadId);
+					if (i % 20 == 0) this.application.setProgress(Double.valueOf(i * progressInterval).intValue(), threadId);
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}

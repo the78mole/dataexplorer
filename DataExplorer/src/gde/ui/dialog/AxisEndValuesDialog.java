@@ -74,7 +74,8 @@ public class AxisEndValuesDialog extends Dialog {
 			Shell shell = new Shell(display);
 			AxisEndValuesDialog inst = new AxisEndValuesDialog(shell, SWT.NULL);
 			double[] oldMinMax = {7.0, 1.0};
-			System.out.println("newMinMax = " + inst.open( oldMinMax ).toString()); //$NON-NLS-1$
+			double[] newMinMax = inst.open( oldMinMax );
+			System.out.println("newMinMax = " + newMinMax[0] + ", " + newMinMax[1]); //$NON-NLS-1$
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -244,10 +245,10 @@ public class AxisEndValuesDialog extends Dialog {
 	void generateAndSetSelectionValues(final CCombo combo, final double value, int size) {
 		int tmpSize = size + (size % 2) + 1;
 		String strDoubleValue = String.format("%.3f", value); //$NON-NLS-1$
-		int intValue = new Double(value).intValue();
+		int intValue = Double.valueOf(value).intValue();
 		String[] tmpValues = new String[tmpSize];
 		for (int i = intValue-tmpSize/2, j = tmpSize-1; i <= intValue+tmpSize/2; i++, j--) {
-			tmpValues[j] = new Integer(i).toString();
+			tmpValues[j] = Integer.valueOf(i).toString();
 		}
 		combo.setItems(tmpValues);
 		combo.setItem(10, strDoubleValue);

@@ -106,7 +106,7 @@ public class GraphicsUtils {
 		double deltaPosMini = deltaMainTickPixel / miniticks;
 
 		//draw mini ticks below first main tick
-		int yTickPositionMin = new Double(y0 - (Math.abs(minScaleValue - minValue) * height / deltaScale)).intValue(); //new Double(y0 - i * deltaMainTickPixel).intValue();
+		int yTickPositionMin = Double.valueOf(y0 - (Math.abs(minScaleValue - minValue) * height / deltaScale)).intValue(); //new Double(y0 - i * deltaMainTickPixel).intValue();
 		for (int j = 1; j < miniticks; j++) {
 			int yPosMini = yTickPositionMin + (int)(j * deltaPosMini);
 			if (yPosMini >= y0) break;
@@ -116,7 +116,7 @@ public class GraphicsUtils {
 		// draw main ticks and mini ticks
 		for (int i=0; i <= numberTicks; i++) {
 			//draw the main scale, length = 5 and gap to scale = 2
-			int yTickPosition = new Double(yTickPositionMin - i * deltaMainTickPixel).intValue();
+			int yTickPosition = Double.valueOf(yTickPositionMin - i * deltaMainTickPixel).intValue();
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 			//draw the sub scale according number of miniTicks
@@ -129,7 +129,7 @@ public class GraphicsUtils {
 			drawTextCentered(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 		}
 		//draw mini ticks above first main tick
-		int yTickPositionMax = new Double(yTickPositionMin - numberTicks * deltaMainTickPixel).intValue();
+		int yTickPositionMax = Double.valueOf(yTickPositionMin - numberTicks * deltaMainTickPixel).intValue();
 		for (int j = 1; j < miniticks; j++) {
 			int yPosMini = yTickPositionMax - (int)(j * deltaPosMini);
 			if (yPosMini < yTop-1) break;

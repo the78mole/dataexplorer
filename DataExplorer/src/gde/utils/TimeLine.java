@@ -45,7 +45,7 @@ public class TimeLine {
 	public final static int	TIME_LINE_MIN_HRS		= 4;
 	public final static int	TIME_LINE_HRS				= 5;
 
-	static String						timeLineText				= Messages.getString(MessageIds.OSDE_MSGT0267);
+	String									timeLineText				= Messages.getString(MessageIds.OSDE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
 
 	/**
@@ -60,8 +60,8 @@ public class TimeLine {
 
 		log.log(Level.FINE, "numberOfPoints = " + numberOfTimeInterval + "; timeStep_ms = " + timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
-		long totalTime_msec = new Double(timeStep_ms * numberOfTimeInterval).longValue();
-		long totalTime_sec = new Double(timeStep_ms * numberOfTimeInterval / 1000.0).longValue();
+		long totalTime_msec = Double.valueOf(timeStep_ms * numberOfTimeInterval).longValue();
+		long totalTime_sec = Double.valueOf(timeStep_ms * numberOfTimeInterval / 1000.0).longValue();
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		log.log(Level.FINE, "totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -69,47 +69,47 @@ public class TimeLine {
 
 		if (totalTime_std > 5) {
 			maxTimeNumberFormated = (int) totalTime_std;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0265);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0265);
 			format = TimeLine.TIME_LINE_HRS;
 		}
 		else if (totalTime_min > 60) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0266);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0266);
 			format = TimeLine.TIME_LINE_MIN_HRS;
 		}
 		else if (totalTime_min > 10) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0267);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0267);
 			format = TimeLine.TIME_LINE_MIN;
 		}
 		else if (totalTime_sec > 60) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0268);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0268);
 			format = TimeLine.TIME_LINE_SEC_MIN;
 		}
 		else if (totalTime_sec > 10) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else if (totalTime_sec > 1) {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
 			factor = 1000; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			TimeLine.timeLineText = Messages.getString(MessageIds.OSDE_MSGT0271);
+			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0271);
 			factor = 1;
 			format = TimeLine.TIME_LINE_MSEC;
 		}
-		log.log(Level.FINE, TimeLine.timeLineText + "  " + maxTimeNumberFormated); //$NON-NLS-1$
+		log.log(Level.FINE, timeLineText + "  " + maxTimeNumberFormated); //$NON-NLS-1$
 
 		this.isTimeLinePrepared = true;
 
-		log.log(Level.FINE, "timeLineText = " + TimeLine.timeLineText + " maxTimeNumber = " + maxTimeNumberFormated + " factor = " + factor); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return new int[] { maxTimeNumberFormated, factor, format, new Long(totalTime_msec).intValue() };
+		log.log(Level.FINE, "timeLineText = " + timeLineText + " maxTimeNumber = " + maxTimeNumberFormated + " factor = " + factor); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return new int[] { maxTimeNumberFormated, factor, format, Long.valueOf(totalTime_msec).intValue() };
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class TimeLine {
 		gc.drawLine(x0-1, y0, x0+width+1, y0);
 		log.log(Level.FINER, String.format("time line - x0=%d y0=%d - width=%d - maxNumber=%d - scaleFactor=%d", x0, y0, width, endTimeValue, timeFormat)); //$NON-NLS-1$
 
-		Point pt = gc.textExtent(TimeLine.timeLineText);
+		Point pt = gc.textExtent(timeLineText);
 		int ticklength = pt.y / 2;
 		int gap = pt.y / 3;
 		int miniTicks = 3;
@@ -147,7 +147,7 @@ public class TimeLine {
 		drawTickMarks(recordSet, gc, x0, y0, width, startTimeValue, endTimeValue, scaleFactor, timeFormat, deltaTime_ms, ticklength, miniTicks, gap);
 
 		// draw the scale description centered
-		GraphicsUtils.drawTimeLineText(TimeLine.timeLineText, (x0 + width / 2), y0 + ticklength + pt.y * 2, gc, SWT.HORIZONTAL);
+		GraphicsUtils.drawTimeLineText(timeLineText, (x0 + width / 2), y0 + ticklength + pt.y * 2, gc, SWT.HORIZONTAL);
 	}
 
 	/**
@@ -177,18 +177,18 @@ public class TimeLine {
 			switch (timeFormat) {
 			case TimeLine.TIME_LINE_SEC:
 			case TimeLine.TIME_LINE_SEC_MIN:
-				timeDelta = new Double(deltaTime_ms/1000.0);
+				timeDelta = (deltaTime_ms/1000.0);
 				break;
 			case TimeLine.TIME_LINE_MIN:
 			case TimeLine.TIME_LINE_MIN_HRS:
-				timeDelta = new Double(deltaTime_ms/60000.0);
+				timeDelta = (deltaTime_ms/60000.0);
 				break;
 			case TimeLine.TIME_LINE_HRS:
-				timeDelta = new Double(deltaTime_ms/3600000.0);
+				timeDelta = (deltaTime_ms/3600000.0);
 				break;
 			case TimeLine.TIME_LINE_MSEC:
 			default:
-				timeDelta = new Double(deltaTime_ms);
+				timeDelta =(deltaTime_ms * 1.0);
 				break;
 			}
 			
@@ -284,7 +284,7 @@ public class TimeLine {
 			for (int i = 0; i <= numberTicks; i++) { // <= end of time scale tick 
 				//draw the main scale ticks, length = 5 and gap to scale = 2
 				double xTickPosition = x0 + i * deltaTick;
-				int intXTickPosition = new Double(xTickPosition).intValue();
+				int intXTickPosition = Double.valueOf(xTickPosition).intValue();
 				if (i > 0 && isBuildGridVector) 
 					timeGrid.add(intXTickPosition);
 				gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
@@ -293,7 +293,7 @@ public class TimeLine {
 				double deltaPosMini = deltaTick / miniticks;
 				for (int j = 1; j < miniticks && i < numberTicks; j++) {
 					double xMiniTickPos = (xTickPosition + j * deltaPosMini);
-					int intMiniTickPos = new Double(xMiniTickPos).intValue();
+					int intMiniTickPos = Double.valueOf(xMiniTickPos).intValue();
 					log.log(Level.FINEST, "intXTickPosition=" + intXTickPosition + ", width=" + width); //$NON-NLS-1$ //$NON-NLS-2$
 					if (intMiniTickPos < (x0 + width)) {
 						gc.drawLine(intMiniTickPos, y0, intMiniTickPos, y0 + ticklength / 2);
@@ -332,7 +332,7 @@ public class TimeLine {
 	 * @return converted time value
 	 */
 	public static int convertTimeInFormatNumber(double time_ms, int timeFormat) {
-		long time_sec = new Double(time_ms / 1000.0).longValue();
+		long time_sec = Double.valueOf(time_ms / 1000.0).longValue();
 		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
 		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
 		log.log(Level.FINE, "time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -340,18 +340,18 @@ public class TimeLine {
 
 		switch (timeFormat) {
 		case TIME_LINE_HRS:
-			result = new Long(time_std).intValue();
+			result = Long.valueOf(time_std).intValue();
 			break;
 		case TIME_LINE_MIN_HRS:
 		case TIME_LINE_MIN:
-			result = new Long(time_min).intValue();
+			result = Long.valueOf(time_min).intValue();
 			break;
 		case TIME_LINE_SEC_MIN:
 		case TIME_LINE_SEC:
-			result = new Long(time_sec).intValue();
+			result = Long.valueOf(time_sec).intValue();
 			break;
 		default: // TIME_LINE_MSEC
-			result = new Double(time_ms).intValue();
+			result = Double.valueOf(time_ms).intValue();
 			break;
 		}
 		return result;
@@ -366,7 +366,7 @@ public class TimeLine {
 	public static String getFomatedTimeWithUnit(double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
-			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
+			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
 			milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;
@@ -374,11 +374,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d [ss:SSS]", lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%03d [ss:SSS]", lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%02d:%03d [mm:ss:SSS]", lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 			else
-				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%02d:%02d:%03d [HH:mm:ss:SSS]", lHours, lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 		}
 		return time;
 	}
@@ -400,11 +400,11 @@ public class TimeLine {
 			lMinutes %= 60;
 
 			if (lMinutes == 0 && lHours == 0)
-				time = String.format("%02d:%03d", lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%03d", lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 			else if (lHours == 0)
-				time = String.format("%02d:%02d:%03d", lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%02d:%03d", lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 			else
-				time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, new Double(milliSeconds).intValue()); //$NON-NLS-1$
+				time = String.format("%02d:%02d:%02d:%03d", lHours, lMinutes, lSeconds, Double.valueOf(milliSeconds).intValue()); //$NON-NLS-1$
 		}
 		return time;
 	}

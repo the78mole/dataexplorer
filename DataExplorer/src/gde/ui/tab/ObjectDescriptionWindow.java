@@ -152,21 +152,6 @@ public class ObjectDescriptionWindow {
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
 	}
 
-	public ObjectDescriptionWindow(CTabFolder objectDescriptionTab) {
-		this.application = null;
-		this.tabFolder = objectDescriptionTab;
-		this.settings = null;
-		this.channels = null;
-		this.tabFolder.setSize(1020, 554);
-		
-		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.imageContextMenu = new ObjectImageContextMenu();
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
-		this.innerAreaBackground = Settings.getInstance().getFileCommentInnerAreaBackground();
-		this.surroundingBackground = Settings.getInstance().getFileCommentSurroundingAreaBackground();
-	}
-	
 	public boolean isVisible() {
 		return this.objectTabItem != null && !this.objectTabItem.isDisposed() && this.objectTabItem.getControl().isVisible();
 	}

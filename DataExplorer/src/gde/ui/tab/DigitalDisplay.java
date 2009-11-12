@@ -122,9 +122,9 @@ public class DigitalDisplay extends Composite {
 									CLabel label = (CLabel) evt.widget;
 									label.setForeground(record.getColor());
 									DecimalFormat df = record.getDecimalFormat();
-									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.get(record.size() - 1) / 1000.0))));
-									DigitalDisplay.this.maxDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMaxValue()) / 1000.0)));
-									DigitalDisplay.this.minDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, new Double(record.getMinValue()) / 1000.0)));
+									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(record, (record.get(record.size() - 1) / 1000.0))));
+									DigitalDisplay.this.maxDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0))));
+									DigitalDisplay.this.minDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0))));
 								}
 						}
 					}

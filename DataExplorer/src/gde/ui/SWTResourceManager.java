@@ -195,9 +195,9 @@ public class SWTResourceManager {
 				Object lf = FontData.class.getField("data").get(fd); //$NON-NLS-1$
 				if (lf != null && lfCls != null) {
 					if (strikeout)
-						lfCls.getField("lfStrikeOut").set(lf, new Byte((byte) 1)); //$NON-NLS-1$
+						lfCls.getField("lfStrikeOut").set(lf, Byte.valueOf((byte) 1)); //$NON-NLS-1$
 					if (underline)
-						lfCls.getField("lfUnderline").set(lf, new Byte((byte) 1)); //$NON-NLS-1$
+						lfCls.getField("lfUnderline").set(lf, Byte.valueOf((byte) 1)); //$NON-NLS-1$
 				}
 			} catch (Throwable e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

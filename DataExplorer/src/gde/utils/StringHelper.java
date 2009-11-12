@@ -351,6 +351,7 @@ public class StringHelper {
 			catch (Exception e) {
 				doIt = false;
 			}
+			break;
 		case STRING:
 		default:
 			doIt = true;

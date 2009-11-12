@@ -172,13 +172,13 @@ public class StatisticsWindow {
 							if (activeRecordSet != null) {
 								String tmpDescriptionText = StatisticsWindow.this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n" //$NON-NLS-1$
 									+ activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
-								if (StatisticsWindow.this.descriptionTextLabel == null || !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel)) {
+								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}
 							else {
 								String tmpDescriptionText = OSDE.STRING_EMPTY;
-								if (StatisticsWindow.this.descriptionTextLabel == null || !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel)) {
+								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
 							}

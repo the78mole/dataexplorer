@@ -497,7 +497,7 @@ public class GraphicsComposite extends Composite {
 		gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
-		int deltaTime_ms = new Double(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
+		int deltaTime_ms = Double.valueOf(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + deltaTime_ms + " endTime = " + endTimeFormated);

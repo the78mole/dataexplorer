@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.utils;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,8 @@ import java.util.regex.Pattern;
  * To sort by starting number or alphabetically
  * @author Winfried Brügmann
  */
-public class RecordSetNameComparator implements Comparator<String> {
+public class RecordSetNameComparator implements Comparator<String>, Serializable {
+	static final long serialVersionUID = 26031957; 
 
 	public static void main(String[] args) {
 		RecordSetNameComparator rc = new RecordSetNameComparator();

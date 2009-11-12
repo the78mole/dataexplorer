@@ -275,6 +275,8 @@ public class OperatingSystemHelper {
 						log.log(Level.WARNING, "failed to register OpenSerialData MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740"); //$NON-NLS-1$
 					}
+					besr.close();
+					bisr.close();
 					rc = 0;
 				}
 				else if (OSDE.IS_LINUX) {
@@ -495,7 +497,7 @@ public class OperatingSystemHelper {
 					log.log(Level.WARNING, e.getMessage());
 				}
 			}
-			else if (OSDE.IS_LINUX) { //$NON-NLS-1$
+			else if (OSDE.IS_LINUX || OSDE.IS_MAC) { //$NON-NLS-1$
 				try {
 					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 					if (fullQualifiedLinkTargetPath.contains(OSDE.STRING_BLANK)) { // creating links with filenames containing blanks failed
@@ -524,6 +526,8 @@ public class OperatingSystemHelper {
 						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.SEVERE, msg);
 					}
+					besr.close();
+					bisr.close();
 				}
 				catch (Throwable e) {
 					log.log(Level.WARNING, e.getMessage());
@@ -567,7 +571,7 @@ public class OperatingSystemHelper {
 				}
 			}
 		}
-		else if (OSDE.IS_LINUX) {
+		else if (OSDE.IS_LINUX  || OSDE.IS_MAC) {
 			try {
 				String command = "ls -al " + filePath;  //$NON-NLS-1$
 				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
@@ -589,6 +593,8 @@ public class OperatingSystemHelper {
 					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.SEVERE, msg);
 				}
+				besr.close();
+				bisr.close();
 			} catch (Exception e) {
 				log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}

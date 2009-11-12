@@ -182,7 +182,7 @@ public class AnalogDisplay extends Composite {
 			this.textAnalogLabel.setText(recordText);
 			this.centerX = this.width / 2;
 			this.centerY = (int) (this.height * 0.75);
-			double radiusW = this.width / 2 * 0.80;
+			double radiusW = (this.width / 2 * 0.80);
 			//int radiusH = (int) (this.height / 2 * 0.90);
 			double radiusH = this.height * 0.75 - this.textHeight - 40;
 			//log.log(Level.FINE, "radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
@@ -204,14 +204,14 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setLineWidth(2);
 			for (int i = 0; i <= numberTicks; ++i) {
 				double angle = this.angleStart + i * angleSteps; // -20, 0, 20, 40, ...
-				dxr = new Double(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
-				dyr = new Double(tickRadius * Math.sin(angle * Math.PI / 180)).intValue();
-				dxtick = new Double((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
-				dytick = new Double((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
+				dxr = Double.valueOf(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
+				dyr = Double.valueOf(tickRadius * Math.sin(angle * Math.PI / 180)).intValue();
+				dxtick = Double.valueOf((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
+				dytick = Double.valueOf((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
 				this.tachoImageGC.drawLine(this.centerX - dxtick, this.centerY - dytick, this.centerX - dxr, this.centerY - dyr);
 
-				dxtext = new Double((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
-				dytext = new Double((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
+				dxtext = Double.valueOf((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
+				dytext = Double.valueOf((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
 				String valueText = this.record.getDecimalFormat().format(this.minValue + (i * deltaValue));
 				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
@@ -220,14 +220,14 @@ public class AnalogDisplay extends Composite {
 			int knobRradius = (int) (this.radius * 0.1);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
-			knobRradius = (int) (this.radius / 10 * 0.2);
+			knobRradius = Double.valueOf(this.radius / 10 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
 
 			//draw the new needle if required
 			Rectangle damageBounds = getNeedleBounds();
-			double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
+			double tmpActualValue = this.device.translateValue(this.record, (this.record.get(this.record.size() - 1) / 1000.0));
 			log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 			if (tmpActualValue != this.actualValue) {
 				this.actualValue = tmpActualValue;
@@ -260,14 +260,14 @@ public class AnalogDisplay extends Composite {
 		double angle = this.angleStart + (this.actualValue - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;
 		log.log(Level.FINE, "angle = " + angle + " actualValue = " + this.actualValue); //$NON-NLS-1$ //$NON-NLS-2$
 
-		int posXo = new Double(this.centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
-		int posYo = new Double(this.centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
-		int posXi = new Double(this.centerX - (innerRadius * Math.cos(angle * Math.PI / 180))).intValue();
-		int posYi = new Double(this.centerY - (innerRadius * Math.sin(angle * Math.PI / 180))).intValue();
-		int posX1 = new Double(this.centerX - ((needleRadius - 30) * Math.cos((angle - 3) * Math.PI / 180))).intValue();
-		int posY1 = new Double(this.centerY - ((needleRadius - 30) * Math.sin((angle - 3) * Math.PI / 180))).intValue();
-		int posX2 = new Double(this.centerX - ((needleRadius - 30) * Math.cos((angle + 3) * Math.PI / 180))).intValue();
-		int posY2 = new Double(this.centerY - ((needleRadius - 30) * Math.sin((angle + 3) * Math.PI / 180))).intValue();
+		int posXo = Double.valueOf(this.centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
+		int posYo = Double.valueOf(this.centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
+		int posXi = Double.valueOf(this.centerX - (innerRadius * Math.cos(angle * Math.PI / 180))).intValue();
+		int posYi = Double.valueOf(this.centerY - (innerRadius * Math.sin(angle * Math.PI / 180))).intValue();
+		int posX1 = Double.valueOf(this.centerX - ((needleRadius - 30) * Math.cos((angle - 3) * Math.PI / 180))).intValue();
+		int posY1 = Double.valueOf(this.centerY - ((needleRadius - 30) * Math.sin((angle - 3) * Math.PI / 180))).intValue();
+		int posX2 = Double.valueOf(this.centerX - ((needleRadius - 30) * Math.cos((angle + 3) * Math.PI / 180))).intValue();
+		int posY2 = Double.valueOf(this.centerY - ((needleRadius - 30) * Math.sin((angle + 3) * Math.PI / 180))).intValue();
 		this.needle = new int[] { posX1, posY1, posXo, posYo, posX2, posY2, posXi, posYi };
 	}
 
@@ -298,7 +298,7 @@ public class AnalogDisplay extends Composite {
 	 * - this may initiate redraw of the whole tacho if scale values are changed
 	 */
 	public void checkTachoNeedlePosition() {
-		double tmpActualValue = this.device.translateValue(this.record, new Double(this.record.get(this.record.size() - 1) / 1000.0));
+		double tmpActualValue = this.device.translateValue(this.record, (this.record.get(this.record.size() - 1) / 1000.0));
 		log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 		if (tmpActualValue != this.actualValue) {
 			Rectangle damageBounds = getNeedleBounds(); 

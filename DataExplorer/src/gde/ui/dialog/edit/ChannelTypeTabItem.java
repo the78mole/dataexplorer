@@ -16,12 +16,15 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -34,8 +37,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
+import osde.device.ChannelType;
 import osde.device.ChannelTypes;
-import osde.device.DeviceConfiguration;
 
 /**
  * class defining a CTabItem with ChannelType configuration data
@@ -45,47 +48,61 @@ public class ChannelTypeTabItem extends CTabItem {
 	final static Logger						log			= Logger.getLogger(ChannelTypeTabItem.class.getName());
 
 	Composite channelConfigComposite;
-	Button addMeasurementButton;
-	Composite statisticsComposite;
-	Composite MeasurementPropertiesComposite;
-	Label label1;
-	CTabItem measurementPropertyTabItem;
-	CTabFolder measurementsPropertiesTabFolder;
-	CTabItem measurementStatisticsTabItem;
-	CTabItem measurementPropertiesTabItem;
-	CTabFolder channelConfigMeasurementPropertiesTabFolder;
 	Button channelConfigAddButton;
 	Label channelConfigLabel;
 	CCombo channelConfigTypeCombo;
 	Text channelConfigText;
+	CTabFolder measurementsTabFolder;
+
 	
 	ChannelTypes channelConfigType = ChannelTypes.TYPE_OUTLET;
 	String channelConfigName = "Outlet";
 
 	final CTabFolder channelConfigInnerTabFolder;
 	final String tabName;
-	DeviceConfiguration deviceConfig;
+	ChannelType channelType; 
 	
 	
 	public ChannelTypeTabItem(CTabFolder parent, int index) {
-		super(parent, SWT.NONE, index);
+		super(parent, SWT.NONE);
 		channelConfigInnerTabFolder = parent;
-		tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		tabName = OSDE.STRING_BLANK + (index+1) + OSDE.STRING_BLANK;
 		initGUI();
 	}
 
 	/**
 	 * @param useDeviceConfig the deviceConfig to set
 	 */
-	public void setDeviceConfig(DeviceConfiguration useDeviceConfig) {
-		this.deviceConfig = useDeviceConfig;
+	public void setChannelType(ChannelType useChannelType) {
+		this.channelType = useChannelType;
+		this.channelConfigComposite.redraw();
+		
+		//MeasurementType begin
+		int measurementTypeCount = channelType.getMeasurement().size();
+		int actualTabItemCount = measurementsTabFolder.getItemCount();
+		if (measurementTypeCount < actualTabItemCount) {
+			for (int i = measurementTypeCount; i < actualTabItemCount; i++) {
+				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem)measurementsTabFolder.getItem(measurementTypeCount);
+				measurementTabItem.dispose();
+			}
+		}
+		else if (measurementTypeCount > actualTabItemCount) {
+			for (int i = actualTabItemCount; i < measurementTypeCount; i++) {
+				new MeasurementTypeTabItem(measurementsTabFolder, i);
+			}
+		}
+		for (int i = 0; i < measurementTypeCount; i++) {
+			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem)measurementsTabFolder.getItem(i);
+			measurementTabItem.setMeasurementType(channelType.getMeasurement().get(i));
+		}
+		//MeasurementType begin
 	}
 	
-	public ChannelTypeTabItem(CTabFolder parent, int index, DeviceConfiguration useDeviceConfig) {
-		super(parent, SWT.NONE, index);
+	public ChannelTypeTabItem(CTabFolder parent, int index, ChannelType useChannelType) {
+		super(parent, SWT.NONE);
 		channelConfigInnerTabFolder = parent;
 		tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
-		deviceConfig = useDeviceConfig;
+		this.channelType = useChannelType;
 		initGUI();
 	}
 
@@ -98,136 +115,57 @@ public class ChannelTypeTabItem extends CTabItem {
 				channelConfigComposite.setLayout(null);
 				channelConfigComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						System.out.println("channelConfigComposite.paintControl, event="+evt);
-						if (deviceConfig != null) {
-							int index = channelConfigInnerTabFolder.getSelectionIndex() + 1;
-							channelConfigType = ChannelTypes.values()[deviceConfig.getChannelType(index)];
+						log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt);
+						if (channelType != null) {
+							channelConfigType = channelType.getType();
 							channelConfigTypeCombo.select(channelConfigType.ordinal());
-							channelConfigName = deviceConfig.getChannelName(index);
+							channelConfigName = channelType.getName();
 							channelConfigText.setText(channelConfigName);
 						}
 					}
 				});
 				{
 					channelConfigTypeCombo = new CCombo(channelConfigComposite, SWT.BORDER);
-					channelConfigTypeCombo.setBounds(6, 9, 121, 19);
-					channelConfigTypeCombo.setItems(new String[] {"TYPE_OUTLET", "TYPE_CONFIG"});
+					channelConfigTypeCombo.setBounds(6, 9, 121, 20);
+					channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" });
 					channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("channelConfigTypeCombo.widgetSelected, event="+evt);
-							//TODO add your code for channelConfigTypeCombo.widgetSelected
+							log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt);
+							channelConfigType = ChannelTypes.valueOf(channelConfigTypeCombo.getText());
+							if (channelType != null) {
+								channelType.setType(channelConfigType);
+							}
 						}
 					});
 				}
 				{
 					channelConfigText = new Text(channelConfigComposite, SWT.BORDER);
 					channelConfigText.setText("Outlet");
-					channelConfigText.setBounds(147, 9, 128, 19);
+					channelConfigText.setBounds(147, 9, 128, 20);
 					channelConfigText.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent evt) {
-							System.out.println("channelConfigText.keyReleased, event="+evt);
-							//TODO add your code for channelConfigText.keyReleased
+							log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt);
+							channelConfigName = channelConfigText.getText().trim();
+							if (channelType != null) {
+								channelType.setName(channelConfigName);
+							}
 						}
 					});
 				}
 				{
 					channelConfigLabel = new Label(channelConfigComposite, SWT.CENTER);
 					channelConfigLabel.setText("complete definitions before adding new");
-					channelConfigLabel.setBounds(289, 9, 279, 19);
+					channelConfigLabel.setBounds(289, 9, 279, 20);
 				}
-//				{
-//					measurementsTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
-//					measurementsTabFolder.setBounds(0, 34, 622, 225);
-//					{
-//						measurementTabItem = new CTabItem(measurementsTabFolder, SWT.NONE);
-//						measurementTabItem.setText(" 1 ");
-//						{
-//							measurementsComposite = new Composite(measurementsTabFolder, SWT.NONE);
-//							measurementsComposite.setLayout(null);
-//							measurementTabItem.setControl(measurementsComposite);
-//							{
-//								measurementNameLabel = new Label(measurementsComposite, SWT.RIGHT);
-//								measurementNameLabel.setText("name");
-//								measurementNameLabel.setBounds(10, 37, 60, 20);
-//							}
-//							{
-//								measurementNameText = new Text(measurementsComposite, SWT.BORDER);
-//								measurementNameText.setBounds(80, 37, 145, 20);
-//							}
-//							{
-//								measurementSymbolLabel = new Label(measurementsComposite, SWT.RIGHT);
-//								measurementSymbolLabel.setText("symbol");
-//								measurementSymbolLabel.setBounds(10, 62, 60, 20);
-//							}
-//							{
-//								measurementSymbolText = new Text(measurementsComposite, SWT.BORDER);
-//								measurementSymbolText.setBounds(80, 62, 145, 20);
-//							}
-//							{
-//								measurementUnitLabel = new Label(measurementsComposite, SWT.RIGHT);
-//								measurementUnitLabel.setText("unit");
-//								measurementUnitLabel.setBounds(10, 87, 60, 20);
-//							}
-//							{
-//								measurementUnitText = new Text(measurementsComposite, SWT.BORDER);
-//								measurementUnitText.setBounds(80, 87, 145, 20);
-//							}
-//							{
-//								measurementEnableLabel = new Label(measurementsComposite, SWT.RIGHT);
-//								measurementEnableLabel.setText("active");
-//								measurementEnableLabel.setBounds(10, 112, 60, 20);
-//							}
-//							{
-//								measurementEnableButton = new Button(measurementsComposite, SWT.CHECK);
-//								measurementEnableButton.setBounds(82, 112, 145, 20);
-//							}
-//							{
-//								channelConfigMeasurementPropertiesTabFolder = new CTabFolder(measurementsComposite, SWT.BORDER);
-//								channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
-//								{
-//									measurementPropertiesTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-//									measurementPropertiesTabItem.setShowClose(true);
-//									measurementPropertiesTabItem.setText("Properties");
-//									{
-//										measurementsPropertiesTabFolder = new CTabFolder(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-//										measurementPropertiesTabItem.setControl(measurementsPropertiesTabFolder);
-//										{
-//											measurementPropertyTabItem = new CTabItem(measurementsPropertiesTabFolder, SWT.NONE);
-//											measurementPropertyTabItem.setShowClose(true);
-//											measurementPropertyTabItem.setText("Property");
-//											{
-//												MeasurementPropertiesComposite = new PropertyTypeComposite(measurementsPropertiesTabFolder, SWT.NONE);
-//												measurementPropertyTabItem.setControl(MeasurementPropertiesComposite);
-//											}
-//										}
-//										measurementsPropertiesTabFolder.setSelection(0);
-//									}
-//								}
-//								{
-//									measurementStatisticsTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-//									measurementStatisticsTabItem.setText("Statistics");
-//									{
-//										statisticsComposite = new StatisticsComposite(channelConfigMeasurementPropertiesTabFolder);
-//										measurementStatisticsTabItem.setControl(statisticsComposite);
-//
-//									}
-//								}
-//								channelConfigMeasurementPropertiesTabFolder.setSelection(0);
-//							}
-//							{
-//								label1 = new Label(measurementsComposite, SWT.NONE);
-//								label1.setText("measurement");
-//								label1.setBounds(10, 8, 120, 20);
-//							}
-//							{
-//								addMeasurementButton = new Button(measurementsComposite, SWT.PUSH | SWT.CENTER);
-//								addMeasurementButton.setText("+");
-//								addMeasurementButton.setBounds(182, 7, 40, 20);
-//							}
-//						}
-//					}
-//					measurementsTabFolder.setSelection(0);
-//				}
+				{
+					measurementsTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
+					measurementsTabFolder.setBounds(0, 35, 622, 225);
+					{
+						//create initial measurement type
+						new MeasurementTypeTabItem(measurementsTabFolder, SWT.NONE);
+					}
+					measurementsTabFolder.setSelection(0);
+				}
 				{
 					channelConfigAddButton = new Button(channelConfigComposite, SWT.PUSH | SWT.CENTER);
 					channelConfigAddButton.setText("+");
@@ -236,23 +174,26 @@ public class ChannelTypeTabItem extends CTabItem {
 					channelConfigAddButton.setSize(40, 20);
 					channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("channelConfigAddButton.widgetSelected, event="+evt);
-							//TODO add your code for channelConfigAddButton.widgetSelected
+							log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt);
+							new ChannelTypeTabItem(channelConfigInnerTabFolder, channelConfigInnerTabFolder.getItemCount());
 						}
 					});
 				}
 			}
+			this.addDisposeListener(new DisposeListener() {	
+				@Override
+				public void widgetDisposed(DisposeEvent evt) {
+					log.log(Level.FINEST, "ChannelTypeTabItem.widgetDisposed, event=" + evt);
+//				for (CTabItem tabItem : measurementsTabFolder.getItems()) {
+//				MeasurementTypeTabItem mtabItem = ((MeasurementTypeTabItem)tabItem);
+//				mtabItem.dispose();
+//			}
+					
 				}
+			});
+		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void update() {
-		this.channelConfigComposite.redraw();
-	}
-	
-	public void clean() {
-		//TODO cleanup measurements and properties
 	}
 }

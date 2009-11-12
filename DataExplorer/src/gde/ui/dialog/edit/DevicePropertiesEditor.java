@@ -64,19 +64,6 @@ import osde.ui.SWTResourceManager;
 import osde.utils.FileUtils;
 import osde.utils.StringHelper;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * Dialog class enable to edit existing and create new device property files 
  * @author Winfried Brügmann
@@ -146,13 +133,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	Label channelConfigDescriptionLabel;
 	CTabFolder channelConfigInnerTabFolder;
 	
-//	CTabFolder measurementsTabFolder;
 //	CTabItem measurementTabItem;
-//	Composite measurementsComposite;
-//
-//	Label measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel;
-//	Text measurementNameText, measurementSymbolText, measurementUnitText;
-//	Button measurementEnableButton;
 
 	
 	
@@ -165,11 +146,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	//cross over fields
 	DeviceConfiguration deviceConfig;
 	final Settings settings;
-
-
-
-
-
 
 	/**
 	* Auto-generated main method to display this 
@@ -527,6 +503,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							timeBaseTimeStepLabel = new Label(timeBaseComposite, SWT.RIGHT);
 							timeBaseTimeStepLabel.setText("time step");
+							timeBaseTimeStepLabel.setToolTipText("time step has to be defined in milli seconds, if as floating value one decimal max");
 							timeBaseTimeStepLabel.setBounds(142, 185, 150, 20);
 						}
 						{
@@ -568,11 +545,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						channelConfigurationTabItem.setControl(channelConfigComposite);
 						channelConfigComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
-								System.out.println("channleConfigComposite.paintControl, event="+evt);
+								log.log(Level.FINEST, "channleConfigComposite.paintControl, event="+evt);
 								if (deviceConfig != null) {
 									for (int i = 1; i <= deviceConfig.getChannelCount(); i++) {
-										deviceConfig.getChannelType(1);
-										deviceConfig.getChannelType(1);
+										deviceConfig.getChannelTypes(1);
+										deviceConfig.getChannelTypes(1);
 									}
 								}
 							}
@@ -1074,7 +1051,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		if (channelTypeCount < actualTabItemCount) {
 			for (int i = channelTypeCount; i < actualTabItemCount; i++) {
 				ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem)channelConfigInnerTabFolder.getItem(channelTypeCount);
-				channelTabItem.clean();
 				channelTabItem.dispose();
 			}
 		}
@@ -1085,8 +1061,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		}
 		for (int i = 0; i < channelTypeCount; i++) {
 			ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem)channelConfigInnerTabFolder.getItem(i);
-			channelTabItem.setDeviceConfig(deviceConfig);
-			channelTabItem.update();
+			channelTabItem.setChannelType(deviceConfig.getChannelType(i+1));
 		}
 		//ChannelType end
 

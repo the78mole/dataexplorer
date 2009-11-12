@@ -99,7 +99,7 @@ public class ObjectKeyScanner extends Thread {
 						break;
 					}
 				}
-				if (!isKnown && this.objectKey != null && !this.objectKeys.contains(this.objectKey)) {
+				if (!isKnown && !this.objectKeys.contains(this.objectKey)) {
 					this.objectKeys.add(this.objectKey);
 				}
 				

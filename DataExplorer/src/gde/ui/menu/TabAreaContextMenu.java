@@ -137,7 +137,7 @@ public class TabAreaContextMenu {
 			this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 
 			this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.outherAreaColorItem.setText("ändere äussere Hintergrundfarbe");
+			this.outherAreaColorItem.setText(Messages.getString(MessageIds.OSDE_MSGT0462));
 			this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -148,7 +148,7 @@ public class TabAreaContextMenu {
 				}
 			});
 			this.innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.innerAreaColorItem.setText("ändere innere Hintergrundfarbe");
+			this.innerAreaColorItem.setText(Messages.getString(MessageIds.OSDE_MSGT0463));
 			this.innerAreaColorItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -160,7 +160,7 @@ public class TabAreaContextMenu {
 			});
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.borderColorItem.setText("ändere Rahmenfarbe");
+				this.borderColorItem.setText(Messages.getString(MessageIds.OSDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "borderColorItem action performed! " + e); //$NON-NLS-1$

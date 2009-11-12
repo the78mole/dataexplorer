@@ -61,7 +61,7 @@ import osde.utils.ObjectKeyScanner;
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
-	private static final String[]	SCOPE_VALUES					= new String(Messages.getString(MessageIds.OSDE_MSGT0196)).split(OSDE.STRING_SEMICOLON);
+	final String[]								SCOPE_VALUES					= Messages.getString(MessageIds.OSDE_MSGT0196).split(OSDE.STRING_SEMICOLON);
 	StringBuffer									toolBarSizes 					= new StringBuffer();
 
 	Point													toolSize, coolSize;
@@ -360,6 +360,7 @@ public class MenuToolBar {
 					ToolItem objectSelectComboSep = new ToolItem(this.deviceObjectToolBar, SWT.SEPARATOR);
 					{
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
+						this.objectSelectComposite.setLayout(null);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
@@ -618,6 +619,7 @@ public class MenuToolBar {
 					this.scopePointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
 					{
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
+						this.scopePointsComposite.setLayout(null);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
@@ -702,6 +704,7 @@ public class MenuToolBar {
 					ToolItem channelSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
+						this.channelSelectComposite.setLayout(null);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
@@ -734,7 +737,6 @@ public class MenuToolBar {
 							int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
 							if (selectionIndex > 0) MenuToolBar.this.channelSelectCombo.select(selectionIndex - 1);
 							if (selectionIndex == 1) MenuToolBar.this.prevChannel.setEnabled(false);
-							selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
 							MenuToolBar.this.nextChannel.setEnabled(true);
 							MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 						}
@@ -767,8 +769,9 @@ public class MenuToolBar {
 				{
 					ToolItem recordSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
-						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
-						this.recordSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT);
+						this.recordSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
+						this.recordSelectComposite.setLayout(null);
+						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
@@ -810,11 +813,11 @@ public class MenuToolBar {
 							}
 						});
 						this.recordSelectCombo.setSize(this.recordSelectSize);
-						this.channelSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
+						this.recordSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
 						this.recordSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.recordSelectSize.y) / 2);
 					}
-					recordSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
-					recordSelectComboSep.setControl(this.channelSelectComposite);
+					recordSelectComboSep.setWidth(this.recordSelectComposite.getSize().x);
+					recordSelectComboSep.setControl(this.recordSelectComposite);
 				}
 				{
 					this.prevRecord = new ToolItem(this.dataToolBar, SWT.NONE);

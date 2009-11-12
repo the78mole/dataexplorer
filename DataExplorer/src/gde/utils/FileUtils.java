@@ -669,7 +669,7 @@ public class FileUtils {
 			isr = new InputStreamReader(is);
 			br = new BufferedReader(isr);
 			while ((line = br.readLine()) != null) {} // clean std out
-		
+			br.close();
 			process.waitFor(); // waits until termination
 			
 			//if (process.exitValue() == 0) {

@@ -67,8 +67,8 @@ public class CurveUtils {
 		boolean isRaw = record.getParent().isRaw();
 
 		if (yMaxValue == yMinValue && !isRaw) {
-			yMinValueDisplay = yMinValue = new Double(yMinValue - 1).intValue();
-			yMaxValueDisplay = yMaxValue = new Double(yMaxValue + 1).intValue();
+			yMinValueDisplay = yMinValue = Double.valueOf(yMinValue - 1).intValue();
+			yMaxValueDisplay = yMaxValue = Double.valueOf(yMaxValue + 1).intValue();
 		}
 		if (record.isStartEndDefined()) {
 			yMinValueDisplay = record.getMinScaleValue();
@@ -210,13 +210,13 @@ public class CurveUtils {
 		int xScale = 1;
 		if (recordSize > (width * 2)) {
 			if (isCompareSet) {
-				xScale = new Double(recordSize / (width * 2)).intValue();
+				xScale = Double.valueOf(recordSize / (width * 2)).intValue();
 				while (!(recordSize % xScale <= 5) && xScale > 1) {
 					--xScale;
 				}
 			}
 			else if (record.getParent().getXScale() == 0 || isZoomMode ) {
-				xScale = new Double(recordSize / (width * 2)).intValue();
+				xScale = Double.valueOf(recordSize / (width * 2)).intValue();
 				while (!(recordSize % xScale <= 5) && xScale > 1) {
 					--xScale;
 				}
