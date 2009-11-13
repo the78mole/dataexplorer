@@ -16,16 +16,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for DesktopType complex type.
+ * <p>Java class for StateType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="DesktopType">
+ * &lt;complexType name="StateType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="property" type="{}PropertyType" maxOccurs="4" minOccurs="0"/>
+ *         &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -35,10 +35,10 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DesktopType", propOrder = {
+@XmlType(name = "StateType", propOrder = {
     "property"
 })
-public class DesktopType {
+public class StateType {
 
     protected List<PropertyType> property;
 
