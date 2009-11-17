@@ -179,7 +179,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.clusterCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 					this.clusterCombo.setLayoutData(clusterComboLData);
 					this.clusterCombo.setItems(new String[] { "10", "20", "50", "100" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					this.clusterCombo.setText(new Integer(this.device.getDataBlockSize()).toString());
+					this.clusterCombo.setText(Integer.valueOf(this.device.getDataBlockSize()).toString());
 					this.clusterCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -366,7 +366,7 @@ public class SimulatorDialog extends DeviceDialog {
 
 							// prepare timed data gatherer thread
 							int delay = 0;
-							int period = new Double(SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize()).intValue();
+							int period = Double.valueOf(SimulatorDialog.this.device.getTimeStep_ms() * SimulatorDialog.this.device.getDataBlockSize()).intValue();
 							log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
@@ -392,7 +392,7 @@ public class SimulatorDialog extends DeviceDialog {
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
 											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
-											recordSet.setTimeStep_ms(new Double(SimulatorDialog.this.device.getTimeStep_ms()));
+											recordSet.setTimeStep_ms(Double.valueOf(SimulatorDialog.this.device.getTimeStep_ms()));
 											recordSet.setAllDisplayable();
 											SimulatorDialog.this.channel.applyTemplate(this.recordSetKey, false);
 

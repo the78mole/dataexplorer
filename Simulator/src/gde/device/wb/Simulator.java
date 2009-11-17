@@ -187,7 +187,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				for (int i = 0; i < recordEntries; i++) {
-					dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
+					dataTable[i][j+1] = Double.valueOf((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
 				}
 			}
 		}
