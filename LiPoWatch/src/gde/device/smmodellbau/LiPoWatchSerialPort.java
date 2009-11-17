@@ -89,7 +89,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
 		int numberLess4measurements = 0;
 		
-		byte[] readBuffer = new byte[DATA_LENGTH_BYTES + 2];
+		byte[] readBuffer;
 		
 		try {
 			log.log(Level.FINE, "start"); //$NON-NLS-1$
@@ -195,7 +195,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return raw byte array of received data
 	 * @throws Exception
 	 */
-	public synchronized byte[] readSingleTelegramm() throws Exception {
+	public byte[] readSingleTelegramm() throws Exception {
 		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer;
 		int length = 0;
 		
@@ -238,7 +238,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true, if data can received after the adjusted time period
 	 * @throws Exception
 	 */
-	public synchronized boolean wait4LiveData(int retrys) throws Exception {
+	public boolean wait4LiveData(int retrys) throws Exception {
 		boolean isLiveDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
@@ -268,7 +268,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return byte array with red data
 	 * @throws Exception
 	 */
-	public synchronized byte[] queryLiveData() throws Exception {
+	public byte[] queryLiveData() throws Exception {
 		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer;
 		int length = 0;
 		
@@ -312,7 +312,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true if logging is enabled
 	 * @throws Exception
 	 */
-	public synchronized boolean startLogging() throws Exception {
+	public boolean startLogging() throws Exception {
 		boolean isPortOpenedByMe = false;
 		try {
 			if (!this.isConnected()) {
@@ -340,7 +340,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true if logging is disabled
 	 * @throws Exception
 	 */
-	public synchronized boolean stopLogging() throws Exception {
+	public boolean stopLogging() throws Exception {
 		boolean isPortOpenedByMe = false;
 		try {
 			if (!this.isConnected()) {
@@ -443,7 +443,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return byte array containing the configuration information 
 	 * @throws Exception
 	 */
-	public synchronized byte[] readConfiguration() throws Exception {
+	public byte[] readConfiguration() throws Exception {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES + 2];
 		boolean isPortOpenedByMe = false;
 		try {
@@ -486,7 +486,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 * @throws TimeOutException 
 	 */
-	public synchronized boolean checkConnectionStatus() throws IOException, TimeOutException {
+	public boolean checkConnectionStatus() throws IOException, TimeOutException {
 		boolean isConnect = false;
 		int counter = 50;
 
@@ -512,7 +512,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true if device is ready to gather data telegrams
 	 * @throws Exception
 	 */
-	public synchronized boolean checkDataReady() throws Exception {
+	public boolean checkDataReady() throws Exception {
 		boolean isReady = false;
 		int counter = 50;
 
@@ -539,7 +539,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @return true if LiPoWatch signals data ready for transmission
 	 * @throws Exception
 	 */
-	public synchronized boolean waitDataReady() throws Exception {
+	public boolean waitDataReady() throws Exception {
 		boolean isReady = false;
 		
 		isReady = this.checkConnectionStatus();

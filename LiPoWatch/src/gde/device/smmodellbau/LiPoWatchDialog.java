@@ -1021,7 +1021,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		this.snLabel.setText(this.serialNumber);
 
 		//firmware version
-		this.lipoWatchVersion = String.format(Locale.ENGLISH, "v%.2f", new Double((readBuffer[11] & 0xFF) / 100)); //$NON-NLS-1$
+		this.lipoWatchVersion = String.format(Locale.ENGLISH, "v%.2f", (readBuffer[11] & 0xFF) / 100.0); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "unilogVersion = " + this.lipoWatchVersion); //$NON-NLS-1$
 		this.firmwareVersionLabel.setText(this.lipoWatchVersion);
 

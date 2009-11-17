@@ -232,7 +232,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	 * stop the timer task thread, this tops data capturing
 	 * waits for all running timers tasks are ended before return 
 	 */
-	public synchronized void stopTimerThread() {
+	public void stopTimerThread() {
 		if (this.timerTask != null) this.timerTask.cancel();
 		if (this.timer != null) this.timer.cancel();
 		this.isTimerRunning = false;

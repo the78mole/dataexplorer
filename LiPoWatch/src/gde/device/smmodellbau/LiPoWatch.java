@@ -127,7 +127,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		String recordSetInfo = new String();
+		String recordSetInfo = OSDE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(this.getChannelName(channelNumber)); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 18) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
@@ -293,7 +293,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 					double offset = record.getOffset(); // != 0 if curve has an defined offset
 					double factor = record.getFactor(); // != 1 if a unit translation is required
 					for (int i = 0; i < recordEntries; i++) {
-						dataTable[i][j + 1] = new Double(((offset + record.get(i) / 1000.0) * factor) * 1000.0).intValue();
+						dataTable[i][j + 1] = Double.valueOf(((offset + record.get(i) / 1000.0) * factor) * 1000.0).intValue();
 					}
 					break;
 				default:
