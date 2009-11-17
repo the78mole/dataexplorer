@@ -139,7 +139,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void ok(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(okStartProgram + channel[0]).byteValue();
+		command[0] = Integer.valueOf(okStartProgram + channel[0]).byteValue();
 		this.write(command);
 		
 		byte[] answer = new byte[2];
@@ -155,7 +155,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void start(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(startProgram + channel[0]).byteValue();
+		command[0] = Integer.valueOf(startProgram + channel[0]).byteValue();
 		this.write(command);
 		
 		byte[] answer = new byte[2];
@@ -171,7 +171,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void stop(byte[] channel) throws IOException, TimeOutException {
 		byte[] command = new byte[1];
-		command[0] = new Integer(stopProgram + channel[0]).byteValue();
+		command[0] = Integer.valueOf(stopProgram + channel[0]).byteValue();
 		this.write(command);
 		
 		byte[] answer = new byte[2];
@@ -189,20 +189,20 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	public synchronized void writeNewProgram(byte[] channel, int programNumber, int waitTime_days, int akkuTyp, int cellCount, int akkuCapacity, int dischargeCurrent_mA, int chargeCurrent_mA)
 			throws IOException, TimeOutException {
 		byte[] command = new byte[11];
-		command[0] = new Integer(setNewProgramm + channel[0]).byteValue();
-		command[1] = new Integer(programNumber).byteValue();
-		command[2] = new Integer(waitTime_days).byteValue();
-		command[3] = new Integer(akkuTyp).byteValue();
-		command[4] = new Integer(cellCount).byteValue();
+		command[0] = Integer.valueOf(setNewProgramm + channel[0]).byteValue();
+		command[1] = Integer.valueOf(programNumber).byteValue();
+		command[2] = Integer.valueOf(waitTime_days).byteValue();
+		command[3] = Integer.valueOf(akkuTyp).byteValue();
+		command[4] = Integer.valueOf(cellCount).byteValue();
 
-		command[5] = new Integer(((akkuCapacity >> 8) & 0xFF)).byteValue();
-		command[6] = new Integer(akkuCapacity & 0xFF).byteValue();
+		command[5] = Integer.valueOf(((akkuCapacity >> 8) & 0xFF)).byteValue();
+		command[6] = Integer.valueOf(akkuCapacity & 0xFF).byteValue();
 
-		command[7] = new Integer(((dischargeCurrent_mA >> 8) & 0xFF)).byteValue();
-		command[8] = new Integer(dischargeCurrent_mA & 0xFF).byteValue();
+		command[7] = Integer.valueOf(((dischargeCurrent_mA >> 8) & 0xFF)).byteValue();
+		command[8] = Integer.valueOf(dischargeCurrent_mA & 0xFF).byteValue();
 
-		command[9] = new Integer(((chargeCurrent_mA >> 8) & 0xFF)).byteValue();
-		command[10] = new Integer(chargeCurrent_mA & 0xFF).byteValue();
+		command[9] = Integer.valueOf(((chargeCurrent_mA >> 8) & 0xFF)).byteValue();
+		command[10] = Integer.valueOf(chargeCurrent_mA & 0xFF).byteValue();
 		this.write(command);
 		
 		byte[] answer = new byte[2];
@@ -223,11 +223,11 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 */
 	public synchronized void setMemoryNumberCycleCountSleepTime(byte[] channel, int memoryNumber, int cycleCount, int sleepTime_min) throws IOException, TimeOutException {
 		byte[] command = new byte[5];
-		command[0] = new Integer(setMomoryCycleSleep + channel[0]).byteValue();
-		command[1] = new Integer(memoryNumber).byteValue();
-		command[2] = new Integer(cycleCount).byteValue();
-		command[3] = new Integer(((sleepTime_min >> 8) & 0xFF)).byteValue();
-		command[4] = new Integer(sleepTime_min & 0xFF).byteValue();
+		command[0] = Integer.valueOf(setMomoryCycleSleep + channel[0]).byteValue();
+		command[1] = Integer.valueOf(memoryNumber).byteValue();
+		command[2] = Integer.valueOf(cycleCount).byteValue();
+		command[3] = Integer.valueOf(((sleepTime_min >> 8) & 0xFF)).byteValue();
+		command[4] = Integer.valueOf(sleepTime_min & 0xFF).byteValue();
 		this.write(command);
 		
 		byte[] answer = new byte[2];
@@ -307,8 +307,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 		if (isActive) {
 			int voltage = (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE);
-			values.put(AkkuMasterC4SerialPort.PROCESS_POWER, new Integer(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CURRENT))); // Errechnete Leistung	[mW]
-			values.put(AkkuMasterC4SerialPort.PROCESS_ENERGIE, new Integer(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
+			values.put(AkkuMasterC4SerialPort.PROCESS_POWER, Integer.valueOf(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CURRENT))); // Errechnete Leistung	[mW]
+			values.put(AkkuMasterC4SerialPort.PROCESS_ENERGIE, Integer.valueOf(voltage * (Integer) values.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY))); // Errechnete Energie	[mWh]
 		}
 
 		return values;
@@ -334,7 +334,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 		int a = readConfiguration[0];
 		int b = channel[0];
-		readConfigOfChannel[0] = new Integer(a + b).byteValue();
+		readConfigOfChannel[0] = Integer.valueOf(a + b).byteValue();
 		this.write(readConfigOfChannel);
 		
 		byte[] configuration	= new byte[14];
@@ -442,7 +442,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 		int a = readAdjustedValues[0];
 		int b = channel[0];
-		readAdjustmentsOfChannel[0] = new Integer(a + b).byteValue();
+		readAdjustmentsOfChannel[0] = Integer.valueOf(a + b).byteValue();
 		this.write(readAdjustmentsOfChannel);
 		
 		this.adjustedValues = this.read(this.adjustedValues, 2000);
@@ -484,7 +484,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 
 		int a = readMeasuredValues[0];
 		int b = channel[0];
-		readValuesOfChannel[0] = new Integer(a + b).byteValue();
+		readValuesOfChannel[0] = Integer.valueOf(a + b).byteValue();
 		this.write(readValuesOfChannel);
 		
 		byte[]	measuredValues	= new byte[16];
@@ -545,7 +545,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	 * [2] Stromvariante
 	 * [3] Frontplattenversion
 	 * @return String[] containing described values
-	 * @throws Exception 
+	 * @throws Throwable 
 	 */
 	public synchronized HashMap<String, String> getVersion() throws Exception {
 		HashMap<String, String> result = new HashMap<String, String>(4);
@@ -558,19 +558,19 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 			this.version = this.read(this.version, 2000);
 
 			// Versionsnummer der Software
-			String versionsNummer = new Integer(this.version[1]).toString();
+			String versionsNummer = Integer.valueOf(this.version[1]).toString();
 			// Versionsindex der Software
-			String versionsIndex = new Integer(this.version[2]).toString();
+			String versionsIndex = Integer.valueOf(this.version[2]).toString();
 			result.put(AkkuMasterC4SerialPort.VERSION_NUMBER, versionsNummer + "." + versionsIndex); //$NON-NLS-1$
 
 			// Datum der Software Tag
-			String day = new Integer(this.version[3]).toString();
+			String day = Integer.valueOf(this.version[3]).toString();
 			// Datum der Software Monat
-			String month = new Integer(this.version[4]).toString();
+			String month = Integer.valueOf(this.version[4]).toString();
 			int iYear = (this.version[5] & 0xFF) << 8;
 			iYear += (this.version[6] & 0xFF) << 0;
 			// Datum der Software Jahr
-			String year = new Integer(iYear).toString();
+			String year = Integer.valueOf(iYear).toString();
 			result.put(AkkuMasterC4SerialPort.VERSION_DATE, day + "." + month + "." + year); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// Stromvariante OOH = 0,5A Variante; 01 H = 2A Variante
