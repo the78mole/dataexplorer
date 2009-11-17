@@ -28,7 +28,6 @@ public class JarInspectAndExportTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.locale = new Locale(Locale.ENGLISH.getLanguage());
 
 		if (this.osname.startsWith("windows")) { //$NON-NLS-1$
 			this.applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -38,7 +37,7 @@ public class JarInspectAndExportTest extends TestCase {
 		}
 		else {
 			System.err.println(Messages.getString(MessageIds.OSDE_MSGW0001));
-			System.exit(-1);
+			return;
 		}
 		System.out.println("applHomePath = " + this.applHomePath);
 	}

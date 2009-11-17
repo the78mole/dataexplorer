@@ -113,7 +113,6 @@ public class TestSuperClass extends TestCase {
 		String[] files = file.list();
 		DeviceConfiguration devConfig;
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
-		this.activeDevices = new Vector<String>(2, 1);
 
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
@@ -264,14 +263,12 @@ public class TestSuperClass extends TestCase {
 		x0 = maxX - (maxX - spaceLeft) + 5;
 		int xMax = maxX - spaceRight;
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
-		xMax = x0 + width;
 		int verticalSpace = 3 * pt.y;// space used for time scale text and scales with description or legend
 		int spaceTop = 20;
 		int spaceBot = verticalSpace;
 		y0 = maxY - spaceBot;
 		int yMax = maxY - (maxY - spaceTop);
 		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
-		yMax = y0 - height;
 		//log.log(Level.FINE, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// draw curves for each active record
 		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
@@ -284,7 +281,6 @@ public class TestSuperClass extends TestCase {
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(width, height);
 		this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
-		this.curveAreaBounds = this.curveArea.getBounds();
 
 		// clear the image
 		this.curveAreaGC.setBackground(this.canvasGC.getBackground());
