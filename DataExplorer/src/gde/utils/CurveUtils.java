@@ -66,7 +66,7 @@ public class CurveUtils {
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
 		boolean isRaw = record.getParent().isRaw();
 
-		if (yMaxValue == yMinValue && !isRaw) {
+		if ( Math.abs(yMaxValue - yMinValue) < .0001 && !isRaw) {
 			yMinValueDisplay = yMinValue = Double.valueOf(yMinValue - 1).intValue();
 			yMaxValueDisplay = yMaxValue = Double.valueOf(yMaxValue + 1).intValue();
 		}

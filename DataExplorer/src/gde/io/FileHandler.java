@@ -262,7 +262,7 @@ public class FileHandler {
 			this.application.enableMenuActions(true);
 			this.application.updateSubHistoryMenuItem(openFilePath);
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}

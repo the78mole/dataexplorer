@@ -460,6 +460,12 @@ public class StringHelper {
 		return buffer;
 	}
 	
-		
+	public static String[] enumValues2StringArray(Object[] enumValues) {
+		Vector<String> tmpVec = new Vector<String>();
+		for (Object element : enumValues) {
+			tmpVec.add(element.toString());
+		}
+		return tmpVec.toArray(new String[0]);
+	}
 
 }

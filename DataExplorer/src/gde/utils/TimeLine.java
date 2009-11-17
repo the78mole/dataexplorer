@@ -54,7 +54,7 @@ public class TimeLine {
 	 * @param timeStep_ms
 	 * @return maxTimeNumber, scale number factor
 	 */
-	public synchronized int[] getScaleMaxTimeNumber(int numberOfTimeInterval, double timeStep_ms) {
+	public int[] getScaleMaxTimeNumber(int numberOfTimeInterval, double timeStep_ms) {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
 		int format = TimeLine.TIME_LINE_MSEC; // the time format type 
 
@@ -392,7 +392,7 @@ public class TimeLine {
 	public static String getFomatedTime(double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
-			long lSeconds = new Double(milliSeconds / 1000.0).longValue();
+			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
 			milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;

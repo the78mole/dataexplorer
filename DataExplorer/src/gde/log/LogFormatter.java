@@ -70,7 +70,7 @@ public class LogFormatter extends Formatter {
 				pw.close();
 				text.append(sw.toString());
 			}
-			catch (Exception ex) {
+			catch (Throwable ex) {
 				//ignore
 			}
 		}

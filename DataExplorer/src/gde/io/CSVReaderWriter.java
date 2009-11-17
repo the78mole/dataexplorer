@@ -241,7 +241,7 @@ public class CSVReaderWriter {
 				log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 				
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
-				while (!((line = reader.readLine()).contains("[") && line.contains("]"))) {
+				while (!(((line = reader.readLine())!= null) && line.contains("[") && line.contains("]"))) {
 					// read until Zeit [sec];Spannung [---];Höhe [---]
 					// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 				}

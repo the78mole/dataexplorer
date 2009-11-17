@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.RecordSet;
+import osde.device.MeasurementPropertyTypes;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -29,10 +30,10 @@ import osde.ui.OpenSerialDataExplorer;
 public abstract class CalculationThread extends Thread {
 	private final static Logger											log					= Logger.getLogger(CalculationThread.class.getName());
 
-	public static final String REGRESSION_TYPE 					= "regression_type"; //$NON-NLS-1$
-	public static final String REGRESSION_TYPE_LINEAR 	= "regression_type_linear"; //$NON-NLS-1$
-	public static final String REGRESSION_TYPE_CURVE 		= "regression_type_curve"; //$NON-NLS-1$
-	public static final String REGRESSION_INTERVAL_SEC 	= "regression_interval_sec"; //$NON-NLS-1$
+	public static final String REGRESSION_TYPE 					= MeasurementPropertyTypes.REGRESSION_TYPE.value();
+	public static final String REGRESSION_TYPE_LINEAR 	= MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value();
+	public static final String REGRESSION_TYPE_CURVE 		= MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value();
+	public static final String REGRESSION_INTERVAL_SEC 	= MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value();
 
 	protected RecordSet											recordSet;
 	protected String												sourceRecordKey, targetRecordKey;

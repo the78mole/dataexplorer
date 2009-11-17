@@ -1680,8 +1680,8 @@ public class LogViewReader {
 			return (((buffer[3] & 0xff) << 24) | ((buffer[2] & 0xff) << 16) | ((buffer[1] & 0xff) << 8) | (buffer[0] & 0xff));
 		case 8:
 			return (((buffer[7] & 0xff) << 56) | ((buffer[6] & 0xff) << 48) | ((buffer[5] & 0xff) << 40) | ((buffer[4] & 0xff) << 32) | ((buffer[3] & 0xff) << 24) | ((buffer[2] & 0xff) << 16) | ((buffer[1] & 0xff) << 8) | (buffer[0] & 0xff));
-		case 16:
-			return (((buffer[7] & 0xff) << 56) | ((buffer[6] & 0xff) << 48) | ((buffer[5] & 0xff) << 40) | ((buffer[4] & 0xff) << 32) | ((buffer[3] & 0xff) << 24) | ((buffer[2] & 0xff) << 16) | ((buffer[1] & 0xff) << 8) | (buffer[0] & 0xff));
+//		case 16:
+//			return (((buffer[7] & 0xff) << 56) | ((buffer[6] & 0xff) << 48) | ((buffer[5] & 0xff) << 40) | ((buffer[4] & 0xff) << 32) | ((buffer[3] & 0xff) << 24) | ((buffer[2] & 0xff) << 16) | ((buffer[1] & 0xff) << 8) | (buffer[0] & 0xff));
 		}
 	}
 

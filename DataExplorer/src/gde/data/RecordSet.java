@@ -36,6 +36,7 @@ import osde.device.IDevice;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
 import osde.device.StatisticsType;
+import osde.device.TriggerType;
 import osde.exception.DataInconsitsentException;
 import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
@@ -261,7 +262,7 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpRecord.setParent(this);
 
 			tmpRecord.statistics = this.device.getMeasurementStatistic(newChannelConfiguration, i);
-			StatisticsType.Trigger tmpTrigger = tmpRecord.statistics.getTrigger();
+			TriggerType tmpTrigger = tmpRecord.statistics.getTrigger();
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
