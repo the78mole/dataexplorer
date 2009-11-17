@@ -13,32 +13,38 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for channel_types.
+ * <p>Java class for flow_control_types.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="channel_types">
+ * &lt;simpleType name="flow_control_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="TYPE_OUTLET"/>
- *     &lt;enumeration value="TYPE_CONFIG"/>
+ *     &lt;enumeration value="FLOWCONTROL_NONE"/>
+ *     &lt;enumeration value="FLOWCONTROL_RTSCTS_IN"/>
+ *     &lt;enumeration value="FLOWCONTROL_RTSCTS_OUT"/>
+ *     &lt;enumeration value="FLOWCONTROL_XONXOFF_IN"/>
+ *     &lt;enumeration value="FLOWCONTROL_XONXOFF_OUT"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "channel_types")
+@XmlType(name = "flow_control_types")
 @XmlEnum
-public enum ChannelTypes {
+public enum FlowControlTypes {
 
-    TYPE_OUTLET,
-    TYPE_CONFIG;
+    FLOWCONTROL_NONE,
+    FLOWCONTROL_RTSCTS_IN,
+    FLOWCONTROL_RTSCTS_OUT,
+    FLOWCONTROL_XONXOFF_IN,
+    FLOWCONTROL_XONXOFF_OUT;
 
     public String value() {
         return name();
     }
 
-    public static ChannelTypes fromValue(String v) {
+    public static FlowControlTypes fromValue(String v) {
         return valueOf(v);
     }
 

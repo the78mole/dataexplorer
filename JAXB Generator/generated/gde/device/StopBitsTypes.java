@@ -13,32 +13,34 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for channel_types.
+ * <p>Java class for stop_bits_types.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="channel_types">
+ * &lt;simpleType name="stop_bits_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="TYPE_OUTLET"/>
- *     &lt;enumeration value="TYPE_CONFIG"/>
+ *     &lt;enumeration value="STOPBITS_1"/>
+ *     &lt;enumeration value="STOPBITS_2"/>
+ *     &lt;enumeration value="STOPBITS_1_5"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "channel_types")
+@XmlType(name = "stop_bits_types")
 @XmlEnum
-public enum ChannelTypes {
+public enum StopBitsTypes {
 
-    TYPE_OUTLET,
-    TYPE_CONFIG;
+    STOPBITS_1,
+    STOPBITS_2,
+    STOPBITS_1_5;
 
     public String value() {
         return name();
     }
 
-    public static ChannelTypes fromValue(String v) {
+    public static StopBitsTypes fromValue(String v) {
         return valueOf(v);
     }
 

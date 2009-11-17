@@ -13,32 +13,38 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for channel_types.
+ * <p>Java class for parity_types.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="channel_types">
+ * &lt;simpleType name="parity_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="TYPE_OUTLET"/>
- *     &lt;enumeration value="TYPE_CONFIG"/>
+ *     &lt;enumeration value="PARITY_NONE"/>
+ *     &lt;enumeration value="PARITY_ODD"/>
+ *     &lt;enumeration value="PARITY_EVEN"/>
+ *     &lt;enumeration value="PARITY_MARK"/>
+ *     &lt;enumeration value="PARITY_SPACE"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "channel_types")
+@XmlType(name = "parity_types")
 @XmlEnum
-public enum ChannelTypes {
+public enum ParityTypes {
 
-    TYPE_OUTLET,
-    TYPE_CONFIG;
+    PARITY_NONE,
+    PARITY_ODD,
+    PARITY_EVEN,
+    PARITY_MARK,
+    PARITY_SPACE;
 
     public String value() {
         return name();
     }
 
-    public static ChannelTypes fromValue(String v) {
+    public static ParityTypes fromValue(String v) {
         return valueOf(v);
     }
 

@@ -13,32 +13,32 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for channel_types.
+ * <p>Java class for checksum_types.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="channel_types">
+ * &lt;simpleType name="checksum_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="TYPE_OUTLET"/>
- *     &lt;enumeration value="TYPE_CONFIG"/>
+ *     &lt;enumeration value="XOR"/>
+ *     &lt;enumeration value="ADD"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "channel_types")
+@XmlType(name = "checksum_types")
 @XmlEnum
-public enum ChannelTypes {
+public enum ChecksumTypes {
 
-    TYPE_OUTLET,
-    TYPE_CONFIG;
+    XOR,
+    ADD;
 
     public String value() {
         return name();
     }
 
-    public static ChannelTypes fromValue(String v) {
+    public static ChecksumTypes fromValue(String v) {
         return valueOf(v);
     }
 
