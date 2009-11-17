@@ -225,7 +225,7 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
+		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
 		}
 
