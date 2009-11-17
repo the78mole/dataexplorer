@@ -72,7 +72,7 @@ public class CalculationThread extends Thread {
 			Record recordCurrent = this.recordSet.get(recordNames[1]); // 1=Strom
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
+				record.add(Double.valueOf((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
 				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
@@ -82,7 +82,7 @@ public class CalculationThread extends Thread {
 			Record recordCharge = this.recordSet.get(recordNames[2]);  // 2=Ladung
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
+				record.add(Double.valueOf((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
 				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			record.setDisplayable(true);
