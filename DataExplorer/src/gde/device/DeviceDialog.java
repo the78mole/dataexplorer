@@ -51,6 +51,8 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
 	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.OSDE_MSGW0007);
 	
+	protected final OpenSerialDataExplorer application;
+	
 	public MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
 		public void mouseEnter(MouseEvent evt) {
 			log.log(Level.FINE, "mouseEnter, event=" + evt); //$NON-NLS-1$
@@ -63,7 +65,6 @@ public abstract class DeviceDialog extends Dialog {
 			log.log(Level.FINEST, "mouseEnter, event=" + evt); //$NON-NLS-1$
 		}
 	};	
-	protected final OpenSerialDataExplorer application;
 
 	/**
 	 * constructor for the dialog, in most cases this dialog should not modal  
