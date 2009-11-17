@@ -84,7 +84,6 @@ public class PicolarioDialog extends DeviceDialog {
 	final Settings						settings;
 	final Picolario						device;
 	final PicolarioSerialPort	serialPort;
-	OpenSerialDataExplorer		application;
 	DataGathererThread				gatherThread;
 
 	/**
@@ -96,7 +95,6 @@ public class PicolarioDialog extends DeviceDialog {
 		super(parent);
 		this.device = useDevice;
 		this.serialPort = useDevice.getSerialPort();
-		this.application = OpenSerialDataExplorer.getInstance();
 		this.settings = Settings.getInstance();
 	}
 
@@ -174,7 +172,7 @@ public class PicolarioDialog extends DeviceDialog {
 								if (PicolarioDialog.this.serialPort != null) {
 									PicolarioDialog.this.setClosePossible(false);
 									int availableRecords = PicolarioDialog.this.serialPort.readNumberAvailableRecordSets();
-									PicolarioDialog.this.numberAvailable = new Integer(availableRecords).toString();
+									PicolarioDialog.this.numberAvailable = Integer.valueOf(availableRecords).toString();
 									PicolarioDialog.this.numberAvailableRecordSetsLabel.setText(PicolarioDialog.this.numberAvailable);
 									setRecordSetSelection(availableRecords, 0);
 									PicolarioDialog.this.readSingle.setEnabled(true);
@@ -400,7 +398,7 @@ public class PicolarioDialog extends DeviceDialog {
 	}
 
 	public void setAvailableRecordSets(int number) {
-		this.numberAvailableRecordSetsLabel.setText(new Integer(number).toString());
+		this.numberAvailableRecordSetsLabel.setText(Integer.valueOf(number).toString());
 	}
 
 	/**
@@ -411,7 +409,7 @@ public class PicolarioDialog extends DeviceDialog {
 	public void setRecordSetSelection(int items, int index) {
 		String[] itemNames = new String[items];
 		for (int i = 0; i < items; i++) {
-			itemNames[i] = new Integer(i + 1).toString();
+			itemNames[i] = Integer.valueOf(i + 1).toString();
 		}
 		this.recordSetSelectCombo.setItems(itemNames);
 		this.recordSetSelectCombo.select(index);
@@ -439,7 +437,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 * @param newValue
 	 */
 	public void setAlreadyRedText(final int newValue) {
-		this.redDatagrams = new Integer(newValue).toString();
+		this.redDatagrams = Integer.valueOf(newValue).toString();
 		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);

@@ -163,7 +163,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		// add voltage U = 2.5 + (byte3 - 45) * 0.0532 - no calculation take place here - refer to translateValue/reverseTranslateValue
-		points[0] = new Integer(dataBuffer[2]) * 1000;
+		points[0] = Integer.valueOf(dataBuffer[2]) * 1000;
 
 		// calculate height values and add
 		if (((dataBuffer[1] & 0x80) >> 7) == 0) // we have signed [feet]
@@ -229,9 +229,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					break;
 				case 1: //Höhe/Height
 					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-					boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 					property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-					boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+					boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 					
 					if (subtractFirst) {
 						reduction = record.getFirst()/1000.0;
@@ -252,7 +252,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 				
 				for (int i = 0; i < recordEntries; i++) {
-					dataTable[i][j+1] = new Double((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
+					dataTable[i][j+1] = Double.valueOf((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0).intValue();				
 					//dataTable[i][j+1] = df.format((offset + ((record.get(i)/1000.0) - reduction) * factor) * 1000.0);
 				}
 			}
@@ -283,9 +283,9 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 			// height calculation need special procedure
 			if (record.getOrdinal() == 1) { // 1=Höhe
 				PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-				boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+				boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 				property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-				boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+				boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 
 				try {
 					if (subtractFirst) {
@@ -332,16 +332,16 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		// height calculation need special procedure
 		if (record.getOrdinal() == 1) { // 1=Höhe
 			PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-			boolean subtractFirst = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-			boolean subtractLast = property != null ? new Boolean(property.getValue()).booleanValue() : false;
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 
 			try {
 				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000;
+					reduction = record.getFirst().intValue() / 1000.0;
 				}
 				else if (subtractLast) {
-					reduction = record.getLast().intValue() / 1000;
+					reduction = record.getLast().intValue() / (double)1000;
 				}
 			}
 			catch (Throwable e) {

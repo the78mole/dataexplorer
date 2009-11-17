@@ -240,9 +240,9 @@ public class PicolarioConfigTab extends Composite {
 						this.heightOffset.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 						final String[] heightOffsetValues = new String[] { "200", "100", "50", "0", "-50", "-100", "-150", "-200", "-250", "-300", "-400", "-500", "-750", "-1000", "-1500" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$
 						this.heightOffset.setItems(heightOffsetValues);
-						this.heightOffset.setText(new Double(this.heightOffsetValue).toString());
-						for (@SuppressWarnings("unused")String element : heightOffsetValues) { // loop only //$NON-NLS-1$
-							if (heightOffsetValues.equals(this.heightOffsetValue)) this.heightOffset.select(this.heightOffsetSelection);
+						this.heightOffset.setText(String.format("%.1f",this.heightOffsetValue));
+						for (int i = 0; i < heightOffsetValues.length; ++i) { // loop only //$NON-NLS-1$
+							if ( Math.abs(Integer.valueOf(heightOffsetValues[i]) - this.heightOffsetValue) < 0.1) this.heightOffset.select(i);
 						}
 						this.heightOffset.setBounds(184, 101, 116, OSDE.IS_LINUX ? 22 : 20);
 						this.heightOffset.addSelectionListener(new SelectionAdapter() {
@@ -449,15 +449,15 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "heightDataUnit = " + this.heightDataUnit); //$NON-NLS-1$
 	
 			property = record.getProperty(Picolario.DO_NO_ADAPTION);
-			this.doNoAdation = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doNoAdation = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doHeightAdaption = " + this.doHeightAdaption); //$NON-NLS-1$
 	
 			property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
-			this.doSubtractFirst = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doSubtractFirst = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doSubtractFirst = " + this.doSubtractFirst); //$NON-NLS-1$
 	
 			property = record.getProperty(Picolario.DO_SUBTRACT_LAST);
-			this.doSubtractLast = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doSubtractLast = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doSubtractLast = " + this.doSubtractLast); //$NON-NLS-1$
 	
 			property = record.getProperty(Picolario.DO_OFFSET_HEIGHT);
@@ -493,15 +493,15 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "heightDataUnit = " + this.heightDataUnit); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_NO_ADAPTION);
-			this.doNoAdation = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doNoAdation = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doHeightAdaption = " + this.doHeightAdaption); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_SUBTRACT_FIRST);
-			this.doSubtractFirst = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doSubtractFirst = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doSubtractFirst = " + this.doSubtractFirst); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_SUBTRACT_LAST);
-			this.doSubtractLast = new Boolean(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doSubtractLast = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doSubtractLast = " + this.doSubtractLast); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_OFFSET_HEIGHT);
@@ -509,7 +509,7 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "doOffsetHeight = " + this.doOffsetHeight); //$NON-NLS-1$
 	
 			property = measurement.getProperty(IDevice.OFFSET);
-			this.heightOffsetValue = new Double(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
+			this.heightOffsetValue = Double.valueOf(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "heightOffsetValue = " + this.heightOffsetValue); //$NON-NLS-1$
 	
 			// 2 = slope

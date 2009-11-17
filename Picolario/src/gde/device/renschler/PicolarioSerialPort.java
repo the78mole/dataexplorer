@@ -58,7 +58,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @return number of record sets available
 	 * @throws Exception 
 	 */
-	public synchronized int readNumberAvailableRecordSets() throws Exception {
+	public int readNumberAvailableRecordSets() throws Exception {
 		int recordSets = 0;
 		boolean isPortOpenedByMe = false;
 		try {
