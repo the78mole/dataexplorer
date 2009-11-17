@@ -42,9 +42,10 @@ import org.eclipse.swt.widgets.Text;
 import osde.OSDE;
 import osde.device.DataTypes;
 import osde.device.DeviceConfiguration;
-import osde.device.FlowControlType;
-import osde.device.ParityType;
-import osde.device.StopBitsType;
+import osde.device.FlowControlTypes;
+import osde.device.ParityTypes;
+import osde.device.StopBitsTypes;
+import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
 /**
@@ -83,12 +84,15 @@ public class SeriaPortTypeTabItem extends CTabItem {
 	public SeriaPortTypeTabItem(CTabFolder parent, int style, int index) {
 		super(parent, style, index);
 		tabFolder = parent;
+		System.out.println("SeriaPortTypeTabItem ");
 		initGUI();
 	}
 
 	private void initGUI() {
 		try {
+			SWTResourceManager.registerResourceUser(this);
 			this.setText("Serial Port");
+			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "this.widgetDisposed, event="+evt);
@@ -117,25 +121,30 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					serialPortDescriptionLabel = new Label(serialPortComposite, SWT.CENTER | SWT.WRAP);
 					serialPortDescriptionLabel.setText("This optional section descibes the serial port configuration.\nFor devices where the data comes from file instead through serial communication, it can be removed.");
+					serialPortDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					serialPortDescriptionLabel.setBounds(12, 6, 602, 56);
 				}
 				{
 					portNameLabel = new Label(serialPortComposite, SWT.RIGHT);
 					portNameLabel.setText("port name");
+					portNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					portNameLabel.setBounds(5, 74, 100, 20);
 				}
 				{
 					portNameText = new Text(serialPortComposite, SWT.BORDER);
 					portNameText.setBounds(141, 76, 180, 20);
+					portNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					portNameText.setEditable(false);
 				}
 				{
 					baudeRateLabel = new Label(serialPortComposite, SWT.RIGHT);
 					baudeRateLabel.setText("baude rate");
+					baudeRateLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					baudeRateLabel.setBounds(5, 99, 100, 20);
 				}
 				{
 					baudeRateCombo = new CCombo(serialPortComposite, SWT.BORDER);
+					baudeRateCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					baudeRateCombo.setItems(new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" });
 					baudeRateCombo.setBounds(142, 101, 180, 20);
 					baudeRateCombo.addSelectionListener(new SelectionAdapter() {
@@ -151,10 +160,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					dataBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
 					dataBitsLabel.setText("data bits");
+					dataBitsLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					dataBitsLabel.setBounds(5, 124, 100, 20);
 				}
 				{
 					dataBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
+					dataBitsCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					dataBitsCombo.setItems(new String[] {"5", "6", "7", "8"});
 					dataBitsCombo.setBounds(142, 126, 180, 20);
 					dataBitsCombo.addSelectionListener(new SelectionAdapter() {
@@ -170,17 +181,19 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					stopBitsLabel = new Label(serialPortComposite, SWT.RIGHT);
 					stopBitsLabel.setText("stop bits");
+					stopBitsLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					stopBitsLabel.setBounds(5, 149, 100, 20);
 				}
 				{
 					stopBitsCombo = new CCombo(serialPortComposite, SWT.BORDER);
+					stopBitsCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					stopBitsCombo.setItems(new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" });
 					stopBitsCombo.setBounds(142, 151, 180, 20);
 					stopBitsCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "stopBitsCombo.widgetSelected, event="+evt);
 							if (deviceConfig != null) {
-								deviceConfig.setStopBits(StopBitsType.values()[stopBitsCombo.getSelectionIndex()]);
+								deviceConfig.setStopBits(StopBitsTypes.values()[stopBitsCombo.getSelectionIndex()]);
 							}
 							stopBitsIndex = stopBitsCombo.getSelectionIndex();
 						}
@@ -189,17 +202,19 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					parityLabel = new Label(serialPortComposite, SWT.RIGHT);
 					parityLabel.setText("parity");
+					parityLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					parityLabel.setBounds(5, 174, 100, 20);
 				}
 				{
 					parityCombo = new CCombo(serialPortComposite, SWT.BORDER);
+					parityCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					parityCombo.setItems(new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" });
 					parityCombo.setBounds(142, 176, 180, 20);
 					parityCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "parityCombo.widgetSelected, event="+evt);
 							if (deviceConfig != null) {
-								deviceConfig.setParity(ParityType.values()[parityCombo.getSelectionIndex()]);
+								deviceConfig.setParity(ParityTypes.values()[parityCombo.getSelectionIndex()]);
 							}
 							parityIndex = parityCombo.getSelectionIndex();
 						}
@@ -208,17 +223,19 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					flowControlLabel = new Label(serialPortComposite, SWT.RIGHT);
 					flowControlLabel.setText("flow control");
+					flowControlLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					flowControlLabel.setBounds(5, 199, 100, 20);
 				}
 				{
 					flowControlCombo = new CCombo(serialPortComposite, SWT.BORDER);
+					flowControlCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					flowControlCombo.setItems(new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" });
 					flowControlCombo.setBounds(142, 201, 180, 20);
 					flowControlCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "flowControlCombo.widgetSelected, event="+evt);
 							if (deviceConfig != null) {
-								deviceConfig.setFlowCtrlMode(FlowControlType.values()[flowControlCombo.getSelectionIndex()]);
+								deviceConfig.setFlowCtrlMode(FlowControlTypes.values()[flowControlCombo.getSelectionIndex()]);
 							}
 							flowControlIndex = flowControlCombo.getSelectionIndex();
 						}
@@ -227,10 +244,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					rtsLabel = new Label(serialPortComposite, SWT.RIGHT);
 					rtsLabel.setText(" RTS");
+					rtsLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					rtsLabel.setBounds(5, 224, 100, 20);
 				}
 				{
 					isRTSButton = new Button(serialPortComposite, SWT.CHECK);
+					isRTSButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					isRTSButton.setBounds(142, 224, 180, 20);
 					isRTSButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -245,10 +264,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					dtrLabel = new Label(serialPortComposite, SWT.RIGHT);
 					dtrLabel.setText(" DTR");
+					dtrLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					dtrLabel.setBounds(5, 249, 100, 20);
 				}
 				{
 					isDTRButton = new Button(serialPortComposite, SWT.CHECK);
+					isDTRButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					isDTRButton.setBounds(142, 249, 180, 20);
 					isDTRButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -298,10 +319,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						timeOutLabel = new Label(timeOutComposite, SWT.RIGHT);
 						timeOutLabel.setText("specify time out");
+						timeOutLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						timeOutLabel.setBounds(6, 58, 140, 20);
 					}
 					{
 						timeOutButton = new Button(timeOutComposite, SWT.CHECK);
+						timeOutButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						timeOutButton.setBounds(161, 56, 70, 20);
 						timeOutButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -337,10 +360,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						_RTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
 						_RTOCharDelayTimeLabel.setText("RTOCharDelayTime");
+						_RTOCharDelayTimeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_RTOCharDelayTimeLabel.setBounds(6, 88, 140, 20);
 					}
 					{
 						_RTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+						_RTOCharDelayTimeText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_RTOCharDelayTimeText.setBounds(162, 86, 70, 20);
 						_RTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
 							public void verifyText(VerifyEvent evt) {
@@ -361,10 +386,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						_RTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
 						_RTOExtraDelayTimeLabel.setText("RTOExtraDelayTime");
+						_RTOExtraDelayTimeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_RTOExtraDelayTimeLabel.setBounds(6, 118, 140, 20);
 					}
 					{
 						_RTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+						_RTOExtraDelayTimeText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_RTOExtraDelayTimeText.setBounds(162, 116, 70, 20);
 						_RTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
 							public void verifyText(VerifyEvent evt) {
@@ -385,10 +412,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						_WTOCharDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
 						_WTOCharDelayTimeLabel.setText("WTOCharDelayTime");
+						_WTOCharDelayTimeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_WTOCharDelayTimeLabel.setBounds(6, 148, 140, 20);
 					}
 					{
 						_WTOCharDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+						_WTOCharDelayTimeText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_WTOCharDelayTimeText.setBounds(162, 146, 70, 20);
 						_WTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
 							public void verifyText(VerifyEvent evt) {
@@ -409,10 +438,12 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						_WTOExtraDelayTimeLabel = new Label(timeOutComposite, SWT.RIGHT);
 						_WTOExtraDelayTimeLabel.setText("WTOExtraDelayTime");
+						_WTOExtraDelayTimeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_WTOExtraDelayTimeLabel.setBounds(6, 178, 140, 20);
 					}
 					{
 						_WTOExtraDelayTimeText = new Text(timeOutComposite, SWT.BORDER);
+						_WTOExtraDelayTimeText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						_WTOExtraDelayTimeText.setBounds(162, 176, 70, 20);
 						_WTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
 							public void verifyText(VerifyEvent evt) {
@@ -433,6 +464,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					{
 						timeOutDescriptionLabel = new Label(timeOutComposite, SWT.WRAP);
 						timeOutDescriptionLabel.setText("Time out section describes Read and Write delay time. This delay and extra delay are only required in special purpose. ");
+						timeOutDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						timeOutDescriptionLabel.setBounds(6, 3, 232, 52);
 					}
 				}

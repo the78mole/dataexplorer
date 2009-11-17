@@ -50,11 +50,11 @@ import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.config.Settings;
-import osde.device.ChecksumType;
+import osde.device.ChecksumTypes;
 import osde.device.DataTypes;
 import osde.device.DesktopType;
 import osde.device.DeviceConfiguration;
-import osde.device.FormatType;
+import osde.device.FormatTypes;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.messages.MessageIds;
@@ -69,9 +69,10 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
-	private static final String	MODE_STATE_KEY	= "MODE_STATE_KEY";
-
 	final static Logger						log			= Logger.getLogger(DevicePropertiesEditor.class.getName());
+	public final static int				widgetFontSize 										= OSDE.IS_LINUX ? 8 : 9;
+	public final static String		widgetFontName										= OSDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";
+
 
 	Shell dialogShell;
 	
@@ -116,9 +117,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	Group dataBlockRequiredGroup, dataBlockOptionalGroup;
 	Button dataBlockOptionalEnableButton;
 	
-	FormatType dataBlockFormat = FormatType.BINARY, dataBlockcheckSumFormat = FormatType.BINARY;
+	FormatTypes dataBlockFormat = FormatTypes.BINARY, dataBlockcheckSumFormat = FormatTypes.BINARY;
 	int dataBlockSize = 30;
-	ChecksumType dataBlockCheckSumType = ChecksumType.XOR;
+	ChecksumTypes dataBlockCheckSumType = ChecksumTypes.XOR;
 	String dataBlockEnding = "0a0d";
 	
 	CTabItem modeStateTabItem, modeStateInnerTabItem;
@@ -126,22 +127,18 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	Label modeStateDescriptionLabel;
 	Button addButton;
 	CTabFolder modeStateTabFolder;
-	PropertyTypeComposite modeStateItemComposite;
+	PropertyTypeTabItem modeStateItemComposite;
 	
 	CTabItem channelConfigurationTabItem;
 	Composite channelConfigComposite;
 	Label channelConfigDescriptionLabel;
 	CTabFolder channelConfigInnerTabFolder;
 	
-//	CTabItem measurementTabItem;
-
-	
-	
-	CTabItem destopTabItem, desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4;
+	CTabItem destopTabItem;
+	PropertyTypeTabItem desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4;
 	Composite desktopComposite;
 	Label destktopDescriptionLabel;	
 	CTabFolder desktopTabFolder;
-	PropertyTypeComposite tablePropertyComposite, tablePropertyComposite2, tablePropertyComposite3, tablePropertyComposite4;
 	
 	//cross over fields
 	DeviceConfiguration deviceConfig;
@@ -199,6 +196,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				fileSelectionButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				fileSelectionButton.setText(" ... ");
+				fileSelectionButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				fileSelectionButton.setToolTipText("push, to select an existing file ");
 				fileSelectionButton.setBounds(580, 10, 30, 20);
 				fileSelectionButton.addSelectionListener(new SelectionAdapter() {
@@ -234,6 +232,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				deviceFileNameText = new Text(dialogShell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 				deviceFileNameText.setBounds(120, 9, 450, 22);
+				deviceFileNameText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				deviceFileNameText.addKeyListener(new KeyAdapter() {
 					public void keyReleased(KeyEvent evt) {
 						log.log(Level.FINEST, "deviceFileNameText.keyReleased, event="+evt);
@@ -263,7 +262,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 								}
 								update();
 							}
-							catch (Exception e) {
+							catch (Throwable e) {
 								log.log(Level.SEVERE, e.getMessage(), e);
 							}
 						}
@@ -273,12 +272,14 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				devicePropFileNamelabel = new Label(dialogShell, SWT.RIGHT);
 				devicePropFileNamelabel.setText("FileName : ");
+				devicePropFileNamelabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				devicePropFileNamelabel.setToolTipText("specify a filename to be used for device property file to edit");
 				devicePropFileNamelabel.setBounds(0, 12, 100, 16);
 			}
 			{
 				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				closeButton.setText("close");
+				closeButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				closeButton.setBounds(338, 418, 250, 30);
 				closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
@@ -290,6 +291,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				saveButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 				saveButton.setText("save");
+				saveButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				saveButton.setBounds(50, 418, 250, 30);
 				saveButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
@@ -301,9 +303,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				tabFolder = new CTabFolder(dialogShell, SWT.BORDER);
 				tabFolder.setSimple(false);
+				tabFolder.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				{
 					deviceTabItem = new CTabItem(tabFolder, SWT.NONE);
 					deviceTabItem.setText("Device");
+					deviceTabItem.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					{
 						deviceComposite = new Composite(tabFolder, SWT.NONE);
 						deviceComposite.setLayout(null);
@@ -311,6 +315,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							deviceDescriptionlabel = new Label(deviceComposite, SWT.CENTER | SWT.WRAP);
 							deviceDescriptionlabel.setText("This section describes the main parameter of any device.");
+							deviceDescriptionlabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							deviceDescriptionlabel.setBounds(12, 8, 604, 50);
 						}
 						{
@@ -320,32 +325,38 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							{
 								deviceNameLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								deviceNameLabel.setText("Name");
+								deviceNameLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								deviceNameLabel.setForeground(osde.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
 								deviceNameLabel.setBounds(0, 0, 137, 16);
 							}
 							{
 								manufacturerLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								manufacturerLabel.setText("Manufacturer");
+								manufacturerLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								manufacturerLabel.setBounds(0, 33, 137, 19);
 							}
 							{
 								manufURLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								manufURLabel.setText("Manufactorer URL");
+								manufURLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								manufURLabel.setBounds(0, 64, 137, 19);
 							}
 							{
 								imageFileNameLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								imageFileNameLabel.setText("Image Filename");
+								imageFileNameLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								imageFileNameLabel.setBounds(0, 95, 137, 19);
 							}
 							{
 								usageLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								usageLabel.setText("usage");
+								usageLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								usageLabel.setBounds(0, 126, 137, 19);
 							}
 							{
 								groupLabel = new Label(deviceLabelComposite, SWT.RIGHT);
 								groupLabel.setText("Group ID");
+								groupLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								groupLabel.setBounds(0, 157, 137, 16);
 							}
 						}
@@ -367,6 +378,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							});
 							{
 								nameText = new Text(devicePropsComposite, SWT.BORDER);
+								nameText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								nameText.setBounds(0, 0, 409, 22);
 								nameText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
@@ -377,6 +389,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								manufacturerText = new Text(devicePropsComposite, SWT.BORDER);
+								manufacturerText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								manufacturerText.setBounds(0, 32, 409, 22);
 								manufacturerText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
@@ -387,6 +400,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								manufURLText = new Text(devicePropsComposite, SWT.BORDER);
+								manufURLText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								manufURLText.setBounds(0, 64, 409, 22);
 								manufURLText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
@@ -397,6 +411,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								imageFileNameText = new Text(devicePropsComposite, SWT.BORDER);
+								imageFileNameText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								imageFileNameText.setBounds(0, 95, 409, 22);
 								imageFileNameText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
@@ -411,6 +426,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								groupSelectionCombo = new CCombo(devicePropsComposite, SWT.BORDER);
+								groupSelectionCombo.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								groupSelectionCombo.setBounds(0, 154, 409, 22);
 								groupSelectionCombo.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
@@ -428,6 +444,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							{
 								fileSelectButton = new Button(devicePropsComposite, SWT.PUSH | SWT.CENTER);
 								fileSelectButton.setText(" ... ");
+								fileSelectButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 								fileSelectButton.setBounds(415, 96, 30, 20);
 								fileSelectButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -452,6 +469,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				{
 					timeBaseTabItem = new CTabItem(tabFolder, SWT.NONE);
 					timeBaseTabItem.setText("Time Base");
+					timeBaseTabItem.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					{
 						timeBaseComposite = new Composite(tabFolder, SWT.NONE);
 						timeBaseTabItem.setControl(timeBaseComposite);
@@ -465,50 +483,59 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							timeBaseDescriptionLabel = new Label(timeBaseComposite, SWT.CENTER | SWT.WRAP);
 							timeBaseDescriptionLabel.setText("Defines the time base used to display the data.\nA timeStep of -1 means, time comes from the device data within data block and might be not constant.");
+							timeBaseDescriptionLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseDescriptionLabel.setBounds(17, 12, 591, 71);
 						}
 						{
 							timeBaseNameLabel = new Label(timeBaseComposite, SWT.RIGHT);
 							timeBaseNameLabel.setText("Name");
+							timeBaseNameLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseNameLabel.setBounds(142, 95, 150, 20);
 						}
 						{
 							timeBaseNameText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
 							timeBaseNameText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[0]);
+							timeBaseNameText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseNameText.setBounds(322, 94, 60, 20);
 							timeBaseNameText.setEditable(false);
 						}
 						{
 							timeBaseSymbolLabel = new Label(timeBaseComposite, SWT.RIGHT);
 							timeBaseSymbolLabel.setText("Symbol");
+							timeBaseSymbolLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseSymbolLabel.setBounds(142, 125, 150, 20);
 						}
 						{
 							timeBaseSymbolText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
 							timeBaseSymbolText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[1]);
+							timeBaseSymbolText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseSymbolText.setBounds(322, 124, 60, 20);
 							timeBaseSymbolText.setEditable(false);
 						}
 						{
 							timeBaseUnitLabel = new Label(timeBaseComposite, SWT.RIGHT);
 							timeBaseUnitLabel.setText("Unit");
+							timeBaseUnitLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseUnitLabel.setBounds(142, 155, 150, 20);
 						}
 						{
 							timeBaseUnitText = new Text(timeBaseComposite, SWT.CENTER | SWT.BORDER);
 							timeBaseUnitText.setText(Messages.getString(MessageIds.OSDE_MSGT0271).split(OSDE.STRING_BLANK)[3]);
+							timeBaseUnitText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseUnitText.setBounds(322, 154, 60, 20);
 							timeBaseUnitText.setEditable(false);
 						}
 						{
 							timeBaseTimeStepLabel = new Label(timeBaseComposite, SWT.RIGHT);
 							timeBaseTimeStepLabel.setText("time step");
+							timeBaseTimeStepLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseTimeStepLabel.setToolTipText("time step has to be defined in milli seconds, if as floating value one decimal max");
 							timeBaseTimeStepLabel.setBounds(142, 185, 150, 20);
 						}
 						{
 							timeBaseTimeStepText = new Text(timeBaseComposite, SWT.RIGHT | SWT.BORDER);
 							timeBaseTimeStepText.setText("1000.0");
+							timeBaseTimeStepText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							timeBaseTimeStepText.setBounds(322, 184, 60, 20);
 							timeBaseTimeStepText.addVerifyListener(new VerifyListener() {
 								public void verifyText(VerifyEvent evt) {
@@ -537,8 +564,12 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					createDataBlockType();
 				}
 				{
+					createStateTabItem();
+				}
+				{
 					channelConfigurationTabItem = new CTabItem(tabFolder, SWT.NONE);
 					channelConfigurationTabItem.setText("Channel/Configuration");
+					channelConfigurationTabItem.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					{
 						channelConfigComposite = new Composite(tabFolder, SWT.NONE);
 						channelConfigComposite.setLayout(null);
@@ -548,8 +579,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 								log.log(Level.FINEST, "channleConfigComposite.paintControl, event="+evt);
 								if (deviceConfig != null) {
 									for (int i = 1; i <= deviceConfig.getChannelCount(); i++) {
-										deviceConfig.getChannelTypes(1);
-										deviceConfig.getChannelTypes(1);
+										deviceConfig.getChannelTypes(i);
 									}
 								}
 							}
@@ -557,14 +587,16 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							channelConfigDescriptionLabel = new Label(channelConfigComposite, SWT.CENTER | SWT.WRAP);
 							channelConfigDescriptionLabel.setText("Defines miscelanious visualisation properties of the application desktop.\nProbably there are more than one measurements to be described here.");
+							channelConfigDescriptionLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							channelConfigDescriptionLabel.setBounds(12, 5, 602, 38);
 						}
 						{
-							channelConfigInnerTabFolder = new CTabFolder(channelConfigComposite, SWT.CLOSE | SWT.BORDER);
+							channelConfigInnerTabFolder = new CTabFolder(channelConfigComposite, SWT.NONE | SWT.BORDER);
+							channelConfigInnerTabFolder.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							channelConfigInnerTabFolder.setBounds(0, 49, 626, 285);
 							{
 								//initial channel TabItem
-								new ChannelTypeTabItem(channelConfigInnerTabFolder, 0);
+								new ChannelTypeTabItem(channelConfigInnerTabFolder, SWT.NONE, 0);
 							}
 							channelConfigInnerTabFolder.setSelection(0);
 						}
@@ -572,69 +604,45 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					destopTabItem = new CTabItem(tabFolder, SWT.NONE);
-					destopTabItem.setText("Application Desktop");
+					destopTabItem.setText("Desktop");
+					destopTabItem.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					{
 						desktopComposite = new Composite(tabFolder, SWT.NONE);
 						desktopComposite.setLayout(null);
 						destopTabItem.setControl(desktopComposite);
-						desktopComposite.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent evt) {
-								log.log(Level.FINEST, "desktopComposite.paintControl, event="+evt);
-								tablePropertyComposite.redraw();
-								tablePropertyComposite2.redraw();
-								tablePropertyComposite3.redraw();
-								tablePropertyComposite4.redraw();
-							}
-						});
+//						desktopComposite.addPaintListener(new PaintListener() {
+//							public void paintControl(PaintEvent evt) {
+//								log.log(Level.FINEST, "desktopComposite.paintControl, event="+evt);
+//							}
+//						});
 						{
 							destktopDescriptionLabel = new Label(desktopComposite, SWT.CENTER | SWT.WRAP);
 							destktopDescriptionLabel.setText("This section defines miscelanious visualisation properties of the application desktop. \nAs example showing the data table contnet or should be updated and displyed, ....");
+							destktopDescriptionLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							destktopDescriptionLabel.setBounds(12, 5, 602, 57);
 						}
 						{
 							desktopTabFolder = new CTabFolder(desktopComposite, SWT.BORDER);
 							GridLayout appDesktopTabCompositeLayout = new GridLayout();
 							appDesktopTabCompositeLayout.makeColumnsEqualWidth = true;
+							desktopTabFolder.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 							desktopTabFolder.setLayout(appDesktopTabCompositeLayout);
 							desktopTabFolder.setBounds(165, 68, 300, 196);
 							{
-								desktopInnerTabItem1 = new CTabItem(desktopTabFolder, SWT.NONE);
-								desktopInnerTabItem1.setText("DataTable");
-								{
-									tablePropertyComposite = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
-									desktopInnerTabItem1.setControl(tablePropertyComposite);
-								}
+								desktopInnerTabItem1 = new PropertyTypeTabItem(desktopTabFolder, SWT.NONE, "DataTable");
 							}
 							{
-								desktopInnerTabItem2 = new CTabItem(desktopTabFolder, SWT.NONE);
-								desktopInnerTabItem2.setText("Digital");
-								{
-									tablePropertyComposite2 = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
-									desktopInnerTabItem2.setControl(tablePropertyComposite2);
-								}
+								desktopInnerTabItem2 = new PropertyTypeTabItem(desktopTabFolder, SWT.NONE, "Digital");
 							}
 							{
-								desktopInnerTabItem3 = new CTabItem(desktopTabFolder, SWT.NONE);
-								desktopInnerTabItem3.setText("Analog");
-								{
-									tablePropertyComposite3 = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
-									desktopInnerTabItem3.setControl(tablePropertyComposite3);
-								}
+								desktopInnerTabItem3 = new PropertyTypeTabItem(desktopTabFolder, SWT.NONE, "Analog");
 							}
 							{
-								desktopInnerTabItem4 = new CTabItem(desktopTabFolder, SWT.NONE);
-								desktopInnerTabItem4.setText("Cellvoltage");
-								{
-									tablePropertyComposite4 = new PropertyTypeComposite(desktopTabFolder, SWT.NONE);
-									desktopInnerTabItem4.setControl(tablePropertyComposite4);
-								}
+								desktopInnerTabItem4 = new PropertyTypeTabItem(desktopTabFolder, SWT.NONE, "Cellvoltage");
 							}
 							desktopTabFolder.setSelection(0);
 						}
 					}
-				}
-				{
-					createInitialModeStateTabItem();
 				}
 				tabFolder.setSelection(0);
 				tabFolder.setBounds(0, 45, 632, 360);
@@ -647,7 +655,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						log.log(Level.FINEST, "tabFolder.close, event="+evt);
 						CTabItem tabItem = ((CTabItem)evt.item);
 						if (deviceConfig != null) {
-							if (tabItem.getText().equals("Mode State")) deviceConfig.removeModeStateType();
+							if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
 							else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
 							else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
 						}
@@ -688,27 +696,31 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				dataBlockDescriptionLabel = new Label(dataBlockComposite, SWT.CENTER);
 				dataBlockDescriptionLabel.setText("This describes the data as to be interpreted as input.\nNomally this is handeled by individual device plug-in.\nThe default values loaded here refers to TEXT input related to LogViews OpenFormat");
+				dataBlockDescriptionLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				dataBlockDescriptionLabel.setBounds(12, 5, 602, 51);
 			}
 			{
 				dataBlockRequiredGroup = new Group(dataBlockComposite, SWT.NONE);
 				dataBlockRequiredGroup.setLayout(null);
 				dataBlockRequiredGroup.setText("Required Entries");
+				dataBlockRequiredGroup.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				dataBlockRequiredGroup.setBounds(40, 80, 250, 170);
 				dataBlockRequiredGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "dataBlockRequiredGroup.paintControl, event="+evt);
-						dataBlockFormatCombo.select(dataBlockFormat == FormatType.TEXT ? 0 : 1);
+						dataBlockFormatCombo.select(dataBlockFormat == FormatTypes.TEXT ? 0 : 1);
 						dataBlockSizeText.setText(OSDE.STRING_EMPTY + dataBlockSize);
 					}
 				});
 				{
 					dataBlockFormatLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
 					dataBlockFormatLabel.setText("format");
+					dataBlockFormatLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockFormatLabel.setBounds(19, 51, 85, 16);
 				}
 				{
 					dataBlockFormatCombo = new CCombo(dataBlockRequiredGroup, SWT.BORDER);
+					dataBlockFormatCombo.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockFormatCombo.setBounds(125, 49, 84, 21);
 					dataBlockFormatCombo.setItems(new java.lang.String[]{"TEXT","BINARY"});
 					dataBlockFormatCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -716,7 +728,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					dataBlockFormatCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "dataBlockFormatCombo.widgetSelected, event="+evt);
-							dataBlockFormat = FormatType.valueOf(dataBlockFormatCombo.getText());
+							dataBlockFormat = FormatTypes.valueOf(dataBlockFormatCombo.getText());
 							if (deviceConfig != null) {
 								deviceConfig.setDataBlockFormat(dataBlockFormat);
 							}
@@ -726,11 +738,13 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				{
 					dataBlockSizeLabel = new Label(dataBlockRequiredGroup, SWT.RIGHT);
 					dataBlockSizeLabel.setText("size");
+					dataBlockSizeLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockSizeLabel.setToolTipText("define size in bytes for BINARY, or value count for TEXT format");
 					dataBlockSizeLabel.setBounds(19, 105, 85, 16);
 				}
 				{
 					dataBlockSizeText = new Text(dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
+					dataBlockSizeText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockSizeText.setBounds(127, 103, 64, 22);
 					dataBlockSizeText.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent evt) {
@@ -753,14 +767,15 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				dataBlockOptionalGroup = new Group(dataBlockComposite, SWT.NONE);
 				dataBlockOptionalGroup.setLayout(null);
 				dataBlockOptionalGroup.setText("Optional Entries");
+				dataBlockOptionalGroup.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				dataBlockOptionalGroup.setBounds(330, 80, 250, 170);
 				dataBlockOptionalGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "dataBlockOptionalGroup.paintControl, event="+evt);
 						if (deviceConfig != null && deviceConfig.getDataBlockCheckSumFormat() != null && deviceConfig.getDataBlockCheckSumType() != null && deviceConfig.getDataBlockEnding() != null) {
 							dataBlockOptionalEnableButton.setSelection(true);
-							dataBlockcheckSumFormatCombo.select(dataBlockcheckSumFormat == FormatType.TEXT ? 0 : 1);
-							dataBlockCheckSumTypeCombo.select(dataBlockCheckSumType == ChecksumType.XOR ? 0 : 1);
+							dataBlockcheckSumFormatCombo.select(dataBlockcheckSumFormat == FormatTypes.TEXT ? 0 : 1);
+							dataBlockCheckSumTypeCombo.select(dataBlockCheckSumType == ChecksumTypes.XOR ? 0 : 1);
 							dataBlockEndingText.setText(dataBlockEnding);
 						}
 						else {
@@ -771,6 +786,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				{
 					dataBlockOptionalEnableButton = new Button(dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
 					dataBlockOptionalEnableButton.setText("enable");
+					dataBlockOptionalEnableButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockOptionalEnableButton.setBounds(143, 14, 92, 20);
 					dataBlockOptionalEnableButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -782,20 +798,24 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				{
 					dataBlockCheckSumFormatLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
 					dataBlockCheckSumFormatLabel.setText("checkSum format");
+					dataBlockCheckSumFormatLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockCheckSumFormatLabel.setBounds(6, 46, 122, 20);
 				}
 				{
 					dataBlockCheckSumLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
 					dataBlockCheckSumLabel.setText("checkSum");
+					dataBlockCheckSumLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockCheckSumLabel.setBounds(6, 77, 122, 20);
 				}
 				{
 					dataBlockEndingLabel = new Label(dataBlockOptionalGroup, SWT.RIGHT);
 					dataBlockEndingLabel.setText("ending [bytes]");
+					dataBlockEndingLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockEndingLabel.setBounds(6, 111, 122, 20);
 				}
 				{
 					dataBlockcheckSumFormatCombo = new CCombo(dataBlockOptionalGroup, SWT.BORDER);
+					dataBlockcheckSumFormatCombo.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockcheckSumFormatCombo.setItems(new java.lang.String[]{"TEXT","BINARY"});
 					dataBlockcheckSumFormatCombo.setBounds(143, 44, 92, 20);
 					dataBlockcheckSumFormatCombo.setEditable(false);
@@ -803,7 +823,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					dataBlockcheckSumFormatCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "dataBlockceckSumFormatCombo.widgetSelected, event="+evt);
-							dataBlockcheckSumFormat = FormatType.valueOf(dataBlockcheckSumFormatCombo.getText());
+							dataBlockcheckSumFormat = FormatTypes.valueOf(dataBlockcheckSumFormatCombo.getText());
 							if (deviceConfig != null) {
 								deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat);
 							}
@@ -812,6 +832,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					dataBlockCheckSumTypeCombo = new CCombo(dataBlockOptionalGroup, SWT.RIGHT | SWT.BORDER);
+					dataBlockCheckSumTypeCombo.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockCheckSumTypeCombo.setItems(new String[] {"XOR", "ADD"});
 					dataBlockCheckSumTypeCombo.setBounds(143, 74, 92, 20);
 					dataBlockCheckSumTypeCombo.setEditable(false);
@@ -819,7 +840,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					dataBlockCheckSumTypeCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "dataBlockCheckSumCombo.widgetSelected, event="+evt);
-							dataBlockCheckSumType = ChecksumType.valueOf(dataBlockCheckSumTypeCombo.getText());
+							dataBlockCheckSumType = ChecksumTypes.valueOf(dataBlockCheckSumTypeCombo.getText());
 							if (deviceConfig != null) {
 								deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType);
 							}
@@ -828,6 +849,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					dataBlockEndingText = new Text(dataBlockOptionalGroup, SWT.BORDER);
+					dataBlockEndingText.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 					dataBlockEndingText.setBounds(144, 109, 61, 20);
 					dataBlockEndingText.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent evt) {
@@ -852,9 +874,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * create a new mode state tabulator with one mode state entry
 	 */
-	void createInitialModeStateTabItem() {
+	void createStateTabItem() {
 		modeStateTabItem = new CTabItem(tabFolder, SWT.CLOSE);
-		modeStateTabItem.setText("Mode State");
+		modeStateTabItem.setText("State");
+		modeStateTabItem.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 		{
 			modeStateComposite = new Composite(tabFolder, SWT.NONE);
 			modeStateComposite.setLayout(null);
@@ -862,29 +885,24 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			modeStateComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINEST, "modeStateComposite.paintControl, event="+evt);
-					for (Control child : modeStateTabFolder.getChildren()) {
-						((PropertyTypeComposite)child).redraw();
+					for (CTabItem child : modeStateTabFolder.getItems()) {
+						((PropertyTypeTabItem)child).propertyTypeComposite.redraw();
 					}
 				}
 			});
 			{
 				modeStateDescriptionLabel = new Label(modeStateComposite, SWT.LEFT);
 				modeStateDescriptionLabel.setText("This section defines device processing states, like \n  \t1. charge\n  \t2. discharge, ...");
+				modeStateDescriptionLabel.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				modeStateDescriptionLabel.setBounds(165, 4, 449, 55);
 			}
 			{
 				modeStateTabFolder = new CTabFolder(modeStateComposite, SWT.BORDER);
+				modeStateTabFolder.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				modeStateTabFolder.setBounds(165, 65, 300, 207);
 				modeStateTabFolder.setSelection(0);
 				{
-					modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-					modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-					modeStateInnerTabItem.setShowClose(true);
-					modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
-					{
-						modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-						modeStateInnerTabItem.setControl(modeStateItemComposite);
-					}
+					modeStateInnerTabItem = new PropertyTypeTabItem(modeStateTabFolder, SWT.CLOSE, "State " + modeStateTabFolder.getItemCount());
 				}
 				modeStateTabFolder.setSelection(0);
 				modeStateTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
@@ -893,7 +911,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						if (deviceConfig != null) {
 							int childIndex = Integer.parseInt(evt.item.toString().split(" |}")[2]) - 1;
 							modeStateTabFolder.getChildren()[childIndex].dispose();
-							deviceConfig.removeModeStateType(deviceConfig.getModeStateType().getProperty().get(childIndex));
+							deviceConfig.removeStateType(deviceConfig.getStateType().getProperty().get(childIndex));
 						}
 						evt.item.dispose();
 					}
@@ -902,25 +920,20 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			{
 				addButton = new Button(modeStateComposite, SWT.PUSH | SWT.CENTER);
 				addButton.setText("add a new state");
+				addButton.setFont(SWTResourceManager.getFont(widgetFontName, widgetFontSize, SWT.NORMAL, false, false));
 				addButton.setBounds(165, 284, 300, 30);
 				addButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "addButton.widgetSelected, event="+evt);
 						{
-							modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-							modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-							modeStateInnerTabItem.setShowClose(true);
-							{
-								modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-								modeStateInnerTabItem.setControl(modeStateItemComposite);
-								PropertyType property = new ObjectFactory().createPropertyType();
-								property.setName("new mode state");
-								property.setType(DataTypes.INTEGER);
-								property.setValue(OSDE.STRING_EMPTY+modeStateTabFolder.getItemCount());
-								property.setDescription("new mode state description");
-								deviceConfig.appendModeStateType(property);
-								update();
-							}
+							PropertyType property = new ObjectFactory().createPropertyType();
+							property.setName("new mode state");
+							property.setType(DataTypes.INTEGER);
+							property.setValue(OSDE.STRING_EMPTY+modeStateTabFolder.getItemCount());
+							property.setDescription("new mode state description");
+							modeStateInnerTabItem = new PropertyTypeTabItem(desktopTabFolder, SWT.CLOSE, "State " + modeStateTabFolder.getItemCount(), property);
+							deviceConfig.appendStateType(property);
+							update();
 						}
 					}
 				});
@@ -1001,9 +1014,9 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		}
 		//DataBlockType begin
 		
-		//ModeStateType begin
-		int modeStateCount = (deviceConfig.getModeStateType() == null) ? 0 : deviceConfig.getModeStateSize();
-		if (deviceConfig.getModeStateType() == null || (modeStateCount == 0 && (deviceConfig.getModeStateType() != null && !modeStateTabFolder.isDisposed()))) {
+		//StateType begin
+		int modeStateCount = (deviceConfig.getStateType() == null) ? 0 : deviceConfig.getStateSize();
+		if (deviceConfig.getStateType() == null || (modeStateCount == 0 && (deviceConfig.getStateType() != null && !modeStateTabFolder.isDisposed()))) {
 			if (modeStateTabFolder != null && !modeStateTabFolder.isDisposed()) {
 				for (Control child : modeStateTabFolder.getChildren()) {
 					child.dispose();
@@ -1013,37 +1026,29 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 			if (modeStateTabItem != null) modeStateTabItem.dispose();
 		}
 		else {
-			if (deviceConfig.getModeStateType() != null && modeStateTabItem.isDisposed()) {
-				createInitialModeStateTabItem();
+			if (deviceConfig.getStateType() != null && modeStateTabItem.isDisposed()) {
+				createStateTabItem();
 			}
-			if (deviceConfig.getModeStateType() != null && !modeStateTabItem.isDisposed()) {
+			if (deviceConfig.getStateType() != null && !modeStateTabItem.isDisposed()) {
 				if (modeStateCount > modeStateTabFolder.getItemCount()) {
-					for (int i = modeStateTabFolder.getItemCount(); i < deviceConfig.getModeStateSize(); i++) {
-						modeStateInnerTabItem = new CTabItem(modeStateTabFolder, SWT.NONE);
-						modeStateInnerTabItem.setText("ModeState " + modeStateTabFolder.getItemCount());
-						modeStateInnerTabItem.setShowClose(true);
-						modeStateInnerTabItem.setData(MODE_STATE_KEY, modeStateTabFolder.getItemCount());
-						{
-							modeStateItemComposite = new PropertyTypeComposite(modeStateTabFolder, SWT.NONE);
-							modeStateInnerTabItem.setControl(modeStateItemComposite);
-						}
+					for (int i = modeStateTabFolder.getItemCount(); i < deviceConfig.getStateSize(); i++) {
+						modeStateInnerTabItem = new PropertyTypeTabItem(modeStateTabFolder, SWT.CLOSE, "State " + modeStateTabFolder.getItemCount());
 					}
 				}
 				else if (modeStateCount < modeStateTabFolder.getItemCount()) {
-					Control[] childs = modeStateTabFolder.getChildren();
+					CTabItem[] childs = modeStateTabFolder.getItems();
 					for (int i = modeStateCount - 1; i < childs.length; i++) {
-						((PropertyTypeComposite) childs[i]).dispose();
+						((PropertyTypeTabItem) childs[i]).dispose();
 					}
 				}
 				int index = 1;
-				for (Control child : modeStateTabFolder.getChildren()) {
-					((PropertyTypeComposite) child).update(deviceConfig.getModeStateProperty(index++), true, false, false);
-					((PropertyTypeComposite) child).setParents(deviceConfig, deviceConfig.getModeStateType(), null);
+				for (CTabItem child : modeStateTabFolder.getItems()) {
+					((PropertyTypeTabItem) child).setProperty(deviceConfig.getStateProperty(index++), true, false, false, false);
 				}
 				modeStateComposite.redraw();
 			}
 		}
-		//ModeStateType end
+		//StateType end
 
 		//ChannelType begin
 		int channelTypeCount = deviceConfig.getChannelCount();
@@ -1056,24 +1061,20 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		}
 		else if (channelTypeCount > actualTabItemCount) {
 			for (int i = actualTabItemCount; i < channelTypeCount; i++) {
-				new ChannelTypeTabItem(channelConfigInnerTabFolder, i);
+				new ChannelTypeTabItem(channelConfigInnerTabFolder, SWT.CLOSE, i);
 			}
 		}
 		for (int i = 0; i < channelTypeCount; i++) {
 			ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem)channelConfigInnerTabFolder.getItem(i);
-			channelTabItem.setChannelType(deviceConfig.getChannelType(i+1));
+			channelTabItem.setChannelType(deviceConfig, deviceConfig.getChannelType(i+1), (i+1));
 		}
 		//ChannelType end
 
 		//DesktopType begin
-		tablePropertyComposite.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, true);
-		tablePropertyComposite.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite2.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, true);
-		tablePropertyComposite2.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite3.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, true);
-		tablePropertyComposite3.setParents(deviceConfig, null, deviceConfig.getDesktopType());
-		tablePropertyComposite4.update(deviceConfig.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB), false, false, true);
-		tablePropertyComposite4.setParents(deviceConfig, null, deviceConfig.getDesktopType());
+		desktopInnerTabItem1.setProperty(deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, false, true);
+		desktopInnerTabItem2.setProperty(deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, false, true);
+		desktopInnerTabItem3.setProperty(deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, false, true);
+		desktopInnerTabItem4.setProperty(deviceConfig.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB), false, false, false, true);
 		desktopComposite.redraw();
 		//DesktopType end
 }
