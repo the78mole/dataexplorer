@@ -64,7 +64,7 @@ public class DeviceConfiguration {
 	private DeviceType												device;
 	private SerialPortType										serialPort;
 	private DataBlockType											dataBlock;
-	private ModeStateType											modeState;
+	private StateType											modeState;
 	private TimeBaseType											timeBase;
 	private DesktopType												desktop;
 	private boolean														isChangePropery						= false;
@@ -146,7 +146,7 @@ public class DeviceConfiguration {
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
 		this.dataBlock = this.deviceProps.getDataBlock();
-		this.modeState = this.deviceProps.getModeState();
+		this.modeState = this.deviceProps.getState();
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
@@ -167,7 +167,7 @@ public class DeviceConfiguration {
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
 		this.dataBlock = deviceProps.dataBlock;
-		this.modeState = deviceProps.modeState;
+		this.modeState = deviceProps.state;
 		this.timeBase = deviceConfig.timeBase;	
 		this.desktop = deviceProps.desktop;
 		this.isChangePropery = deviceConfig.isChangePropery;
@@ -347,7 +347,7 @@ public class DeviceConfiguration {
 		return this.serialPort.getStopBits().ordinal()+1; // starts with 1
 	}
 
-	public void setStopBits(StopBitsType enumOrdinal) {
+	public void setStopBits(StopBitsTypes enumOrdinal) {
 		this.isChangePropery = true;
 		this.serialPort.setStopBits(enumOrdinal);
 	}
@@ -356,7 +356,7 @@ public class DeviceConfiguration {
 		return this.serialPort.getFlowControlMode().ordinal();
 	}
 
-	public void setFlowCtrlMode(FlowControlType value) {
+	public void setFlowCtrlMode(FlowControlTypes value) {
 		this.isChangePropery = true;
 		this.serialPort.setFlowControlMode(value);
 	}
@@ -365,7 +365,7 @@ public class DeviceConfiguration {
 		return this.serialPort.getParity().ordinal();
 	}
 
-	public void setParity(ParityType value) {
+	public void setParity(ParityTypes value) {
 		this.isChangePropery = true;
 		this.serialPort.setParity(value);
 	}
@@ -483,41 +483,41 @@ public class DeviceConfiguration {
 	/**
 	 * @return size of mode states
 	 */
-	public int getModeStateSize() {
+	public int getStateSize() {
 		return this.modeState.property.size();
 	}
 	
 	/**
-	 * @return actual ModeStateType
+	 * @return actual StateType
 	 */
-	public ModeStateType getModeStateType() {
-		return this.deviceProps.modeState;
+	public StateType getStateType() {
+		return this.deviceProps.state;
 	}
 	
 	/**
 	 * remove optional mode state
 	 */
-	public void removeModeStateType() {
+	public void removeStateType() {
 		this.isChangePropery = true;
-		this.modeState = this.deviceProps.modeState = null;
+		this.modeState = this.deviceProps.state = null;
 	}
 	
 	/**
 	 * append a new mode state type property
-	 * @param newModeStateProperty
+	 * @param newStateProperty
 	 */
-	public void appendModeStateType(PropertyType newModeStateProperty) {
+	public void appendStateType(PropertyType newStateProperty) {
 		this.isChangePropery = true;
-		this.deviceProps.modeState.append(newModeStateProperty);
+		this.deviceProps.state.append(newStateProperty);
 	}
 	
 	/**
 	 * remove a mode state type property
-	 * @param removeModeStateProperty
+	 * @param removeStateProperty
 	 */
-	public void removeModeStateType(PropertyType removeModeStateProperty) {
+	public void removeStateType(PropertyType removeStateProperty) {
 		this.isChangePropery = true;
-		this.deviceProps.modeState.remove(removeModeStateProperty);
+		this.deviceProps.state.remove(removeStateProperty);
 	}
 	
 	/**
@@ -525,9 +525,9 @@ public class DeviceConfiguration {
 	 * @param modeStateOrdinal
 	 * @param newName
 	 */
-	public void setModeStateName(int modeStateOrdinal, String newName) {
+	public void setStateName(int modeStateOrdinal, String newName) {
 		this.isChangePropery = true;
-		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		PropertyType tmpPoperty = this.getStateProperty(modeStateOrdinal);
 		if (tmpPoperty != null) {
 			tmpPoperty.setName(newName);
 		}
@@ -538,9 +538,9 @@ public class DeviceConfiguration {
 	 * @param modeStateOrdinal
 	 * @param newValue
 	 */
-	public void setModeStateValue(int modeStateOrdinal, String newValue) {
+	public void setStateValue(int modeStateOrdinal, String newValue) {
 		this.isChangePropery = true;
-		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		PropertyType tmpPoperty = this.getStateProperty(modeStateOrdinal);
 		if (tmpPoperty != null) {
 			tmpPoperty.setValue(StringHelper.verifyTypedInput(tmpPoperty.getType(), newValue));
 		}
@@ -551,9 +551,9 @@ public class DeviceConfiguration {
 	 * @param modeStateOrdinal
 	 * @param newDescription
 	 */
-	public void setModeStateDescription(int modeStateOrdinal, String newDescription) {
+	public void setStateDescription(int modeStateOrdinal, String newDescription) {
 		this.isChangePropery = true;
-		PropertyType tmpPoperty = this.getModeStateProperty(modeStateOrdinal);
+		PropertyType tmpPoperty = this.getStateProperty(modeStateOrdinal);
 		if (tmpPoperty != null) {
 			tmpPoperty.setDescription(newDescription);
 		}
@@ -564,7 +564,7 @@ public class DeviceConfiguration {
 	 * @param dektopType
 	 * @return property of the queried type or null if not defined
 	 */
-	public PropertyType getModeStateProperty(int modeStateOrdinal) {
+	public PropertyType getStateProperty(int modeStateOrdinal) {
 		PropertyType property = null;
 		if (this.modeState != null) {
 			List<PropertyType> properties = this.modeState.getProperty();
@@ -602,29 +602,29 @@ public class DeviceConfiguration {
 		this.dataBlock.setSize(new BigInteger(OSDE.STRING_EMPTY + newSize));
 	}
 	
-	public FormatType getDataBlockFormat() {
+	public FormatTypes getDataBlockFormat() {
 		return this.dataBlock.getFormat();
 	}
 	
-	public void setDataBlockFormat(FormatType value) {
+	public void setDataBlockFormat(FormatTypes value) {
 		this.isChangePropery = true;
 		this.dataBlock.setFormat(value);
 	}
 
-	public ChecksumType getDataBlockCheckSumType() {
+	public ChecksumTypes getDataBlockCheckSumType() {
 		return this.dataBlock.getCheckSum(); 
 	}
 
-	public void setDataBlockCheckSumType(ChecksumType value) {
+	public void setDataBlockCheckSumType(ChecksumTypes value) {
 		this.isChangePropery = true;
 		this.dataBlock.setCheckSum(value); 
 	}
 	
-	public FormatType getDataBlockCheckSumFormat() {
+	public FormatTypes getDataBlockCheckSumFormat() {
 		return this.dataBlock.getCheckSumFormat();
 	}
 	
-	public void setDataBlockCheckSumFormat(FormatType value) {
+	public void setDataBlockCheckSumFormat(FormatTypes value) {
 		this.isChangePropery = true;
 		this.dataBlock.setCheckSumFormat(value);
 	}
@@ -971,6 +971,21 @@ public class DeviceConfiguration {
 	public String[] getMeasurementNames(String channelConfigKey) {
 		StringBuilder sb = new StringBuilder();
 		ChannelType channel = this.getChannel(channelConfigKey);
+		if (channel != null) {
+			List<MeasurementType> measurement = channel.getMeasurement();
+			for (MeasurementType measurementType : measurement) {
+				sb.append(measurementType.getName()).append(OSDE.STRING_SEMICOLON);
+			}
+		}
+		return sb.toString().length()>1 ? sb.toString().split(OSDE.STRING_SEMICOLON) : new String[0];
+	}
+	
+	/**
+	 * @return the sorted measurement names
+	 */
+	public String[] getMeasurementNames(int channelConfigNumber) {
+		StringBuilder sb = new StringBuilder();
+		ChannelType channel = this.getChannel(this.getChannelName(channelConfigNumber));
 		if (channel != null) {
 			List<MeasurementType> measurement = channel.getMeasurement();
 			for (MeasurementType measurementType : measurement) {

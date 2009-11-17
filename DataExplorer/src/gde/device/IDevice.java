@@ -32,9 +32,9 @@ import osde.utils.CalculationThread;
  */
 public interface IDevice {
 	// define some global constants for data calculation 
-	public static final String 	OFFSET 		= "offset"; //$NON-NLS-1$
-	public static final String	FACTOR 		= "factor"; //$NON-NLS-1$
-	public static final String	REDUCTION = "reduction"; //$NON-NLS-1$
+	public static final String 	OFFSET 		= MeasurementPropertyTypes.OFFSET.value();
+	public static final String	FACTOR 		= MeasurementPropertyTypes.FACTOR.value();
+	public static final String	REDUCTION = MeasurementPropertyTypes.REDUCTION.value();
 	
 	/**
 	 * @return the device dialog
@@ -222,32 +222,32 @@ public interface IDevice {
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)
 	 */
-	public FormatType getDataBlockFormat();
+	public FormatTypes getDataBlockFormat();
 	
 	/**
 	 * @param set a new format type of the data block ASCII(text) or BINARY(hex)
 	 */
-	public void setDataBlockFormat(FormatType value);
+	public void setDataBlockFormat(FormatTypes value);
 	
 	/**
 	 * @return the checksum type of the data block XOR, ADD, ..
 	 */
-	public ChecksumType getDataBlockCheckSumType();
+	public ChecksumTypes getDataBlockCheckSumType();
 
 	/**
 	 * @param set a new date block size/length
 	 */
-	public void setDataBlockCheckSumType(ChecksumType value);
+	public void setDataBlockCheckSumType(ChecksumTypes value);
 	
 	/**
 	 * @return the format type of the data block checksum ASCII(text) or BINARY(hex)
 	 */
-	public FormatType getDataBlockCheckSumFormat();
+	public FormatTypes getDataBlockCheckSumFormat();
 	
 	/**
 	 * @param set a new date block checksum format type ASCII(text) or BINARY(hex)
 	 */
-	public void setDataBlockCheckSumFormat(FormatType value);
+	public void setDataBlockCheckSumFormat(FormatTypes value);
 
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)

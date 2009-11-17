@@ -53,7 +53,6 @@ public class TimeBaseType {
     protected String symbol;
     @XmlElement(required = true)
     protected String unit;
-    @XmlElement(required = true)
     protected double timeStep;
 
     /**

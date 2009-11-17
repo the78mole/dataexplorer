@@ -52,11 +52,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class DataBlockType {
 
     @XmlElement(required = true)
-    protected FormatType format;
+    protected FormatTypes format;
     @XmlElement(required = true)
     protected BigInteger size;
-    protected ChecksumType checkSum;
-    protected FormatType checkSumFormat;
+    protected ChecksumTypes checkSum;
+    protected FormatTypes checkSumFormat;
     @XmlElement(type = String.class)
     @XmlJavaTypeAdapter(HexBinaryAdapter.class)
     @XmlSchemaType(name = "hexBinary")
@@ -67,10 +67,10 @@ public class DataBlockType {
      * 
      * @return
      *     possible object is
-     *     {@link FormatType }
+     *     {@link FormatTypes }
      *     
      */
-    public FormatType getFormat() {
+    public FormatTypes getFormat() {
         return format;
     }
 
@@ -79,10 +79,10 @@ public class DataBlockType {
      * 
      * @param value
      *     allowed object is
-     *     {@link FormatType }
+     *     {@link FormatTypes }
      *     
      */
-    public void setFormat(FormatType value) {
+    public void setFormat(FormatTypes value) {
         this.format = value;
     }
 
@@ -115,10 +115,10 @@ public class DataBlockType {
      * 
      * @return
      *     possible object is
-     *     {@link ChecksumType }
+     *     {@link ChecksumTypes }
      *     
      */
-    public ChecksumType getCheckSum() {
+    public ChecksumTypes getCheckSum() {
         return checkSum;
     }
 
@@ -127,10 +127,10 @@ public class DataBlockType {
      * 
      * @param value
      *     allowed object is
-     *     {@link ChecksumType }
+     *     {@link ChecksumTypes }
      *     
      */
-    public void setCheckSum(ChecksumType value) {
+    public void setCheckSum(ChecksumTypes value) {
         this.checkSum = value;
     }
 
@@ -139,10 +139,10 @@ public class DataBlockType {
      * 
      * @return
      *     possible object is
-     *     {@link FormatType }
+     *     {@link FormatTypes }
      *     
      */
-    public FormatType getCheckSumFormat() {
+    public FormatTypes getCheckSumFormat() {
         return checkSumFormat;
     }
 
@@ -151,10 +151,10 @@ public class DataBlockType {
      * 
      * @param value
      *     allowed object is
-     *     {@link FormatType }
+     *     {@link FormatTypes }
      *     
      */
-    public void setCheckSumFormat(FormatType value) {
+    public void setCheckSumFormat(FormatTypes value) {
         this.checkSumFormat = value;
     }
 
