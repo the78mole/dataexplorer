@@ -360,7 +360,7 @@ public class UniLogDialog extends DeviceDialog {
 								public void paintControl(PaintEvent evt) {
 									UniLogDialog.log.log(Level.FINER, "configMainComosite.paintControl " + evt); //$NON-NLS-1$
 									if (UniLogDialog.this.timeIntervalPosition == -1) {
-										int selection = new Double(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue();
+										int selection = Double.valueOf(UniLogDialog.this.device.getTimeStep_ms() / 62.5).intValue();
 										switch (selection) {
 										case 1: // 1/16 sec
 											UniLogDialog.this.timeIntervalPosition = 0;
@@ -1399,7 +1399,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.memoryUsed = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 		UniLogDialog.log.log(Level.FINER, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
 
-		this.unilogVersion = String.format(Locale.ENGLISH, "v%.2f", new Double(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
+		this.unilogVersion = String.format(Locale.ENGLISH, "v%.2f", Double.valueOf(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
 		UniLogDialog.log.log(Level.FINER, "unilogVersion = " + this.unilogVersion); //$NON-NLS-1$
 		this.firmwareVersionLabel.setText(this.unilogVersion);
 

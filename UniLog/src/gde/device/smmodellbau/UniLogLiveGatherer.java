@@ -85,9 +85,9 @@ public class UniLogLiveGatherer extends Thread {
 		PropertyType property = useDevice.getMeasruementProperty(this.configKey, 6, UniLog.NUMBER_CELLS); // 6 = voltage/cell
 		int numCellValue = property != null ? new Integer(property.getValue()) : 4;
 		this.calcValues.put(UniLog.NUMBER_CELLS, (double)numCellValue);
-		property = useDevice.getMeasruementProperty(this.configKey, 8, UniLog.PROP_N_100_WATT); // 8 = efficience
+		property = useDevice.getMeasruementProperty(this.configKey, 8, UniLog.PROP_N_100_W); // 8 = efficience
 		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
-		this.calcValues.put(UniLog.PROP_N_100_WATT, (double)prop_n100W);
+		this.calcValues.put(UniLog.PROP_N_100_W, (double)prop_n100W);
 
 		if (!this.serialPort.isConnected()) {
 			UniLogLiveGatherer.this.serialPort.open();
@@ -249,7 +249,7 @@ public class UniLogLiveGatherer extends Thread {
 	 * stop the timer task thread, this tops data capturing
 	 * waits for all running timers tasks are ended before return 
 	 */
-	public synchronized void stopTimerThread() {
+	public void stopTimerThread() {
 		if (this.timerTask != null) 
 			this.timerTask.cancel();
 		if (this.timer != null) {

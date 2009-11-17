@@ -508,12 +508,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												}
 												// update propeller n100W value too, if user has changed, but not hit enter 
 												record = recordSet.get(recordSet.getRecordNames()[8]);
-												property = record.getProperty(UniLog.PROP_N_100_WATT);
+												property = record.getProperty(UniLog.PROP_N_100_W);
 												if (property != null) {
 													property.setValue(UniLogConfigTab.this.prop100WValue);
 												}
 												else {
-													record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+													record.createProperty(UniLog.PROP_N_100_W, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 												}
 
 												recordSet.setRecalculationRequired();
@@ -590,12 +590,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 											RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 											if (recordSet != null) {
 												Record record = recordSet.get(recordSet.getRecordNames()[8]);
-												PropertyType property = record.getProperty(UniLog.PROP_N_100_WATT);
+												PropertyType property = record.getProperty(UniLog.PROP_N_100_W);
 												if (property != null) {
 													property.setValue(UniLogConfigTab.this.prop100WValue);
 												}
 												else {
-													record.createProperty(UniLog.PROP_N_100_WATT, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
+													record.createProperty(UniLog.PROP_N_100_W, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 												}
 												// update number cells too, if user has changed, but not hit enter 
 												record = recordSet.get(recordSet.getRecordNames()[6]);
@@ -1241,7 +1241,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement = this.device.getMeasurement(this.configName, 7); //7=revolution
 		measurement.setActive(this.revolutionButton.getSelection());
 
-		this.device.setMeasurementPropertyValue(this.configName, 8, UniLog.PROP_N_100_WATT, DataTypes.INTEGER, this.prop100WValue);// 8=efficiency
+		this.device.setMeasurementPropertyValue(this.configName, 8, UniLog.PROP_N_100_W, DataTypes.INTEGER, this.prop100WValue);// 8=efficiency
 
 		measurement = this.device.getMeasurement(this.configName, 9); // 9=height
 		measurement.setActive(this.heightButton.getSelection());
@@ -1318,7 +1318,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			
 			this.isActiveRPM = recordSet.get(recordKeys[7]).isActive();
 			
-			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_WATT);
+			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_W);
 			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
 			
 			this.isActiveHeight = recordSet.get(recordKeys[9]).isActive();
@@ -1366,7 +1366,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			measurement = this.device.getMeasurement(this.configName, 7);
 			this.isActiveRPM = measurement.isActive();
 
-			property = this.device.getMeasruementProperty(this.configName, 8, UniLog.PROP_N_100_WATT);
+			property = this.device.getMeasruementProperty(this.configName, 8, UniLog.PROP_N_100_W);
 			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
 
 			measurement = this.device.getMeasurement(this.configName, 9);

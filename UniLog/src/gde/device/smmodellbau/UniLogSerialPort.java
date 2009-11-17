@@ -265,7 +265,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @return true if logging is enabled
 	 * @throws Exception
 	 */
-	public synchronized boolean startLogging() throws Exception {
+	public boolean startLogging() throws Exception {
 		boolean isPortOpenedByMe = false;
 		try {
 			if (!this.isConnected()) {

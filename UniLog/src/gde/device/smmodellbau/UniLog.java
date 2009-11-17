@@ -34,6 +34,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.device.MeasurementPropertyTypes;
 import osde.device.MeasurementType;
 import osde.device.PropertyType;
 import osde.device.smmodellbau.unilog.MessageIds;
@@ -109,14 +110,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		A3_FACTOR									= "a3_"+IDevice.FACTOR; //$NON-NLS-1$
 	public final static String		A3_OFFSET									= "a3_"+IDevice.OFFSET; //$NON-NLS-1$
 	
-	public final static String		NUMBER_CELLS							= "number_cells"; //$NON-NLS-1$
-	public final static String		PROP_N_100_WATT						= "prop_n100W"; //$NON-NLS-1$
+	public final static String		NUMBER_CELLS							= MeasurementPropertyTypes.NUMBER_CELLS.value();
+	public final static String		PROP_N_100_W							= MeasurementPropertyTypes.PROP_N_100_W.value();
 	
-	public final static String		IS_INVERT_CURRENT					= "is_invert_current"; //$NON-NLS-1$
+	public final static String		IS_INVERT_CURRENT					= MeasurementPropertyTypes.IS_INVERT_CURRENT.value();
 	public final static String		CURRENT_OFFSET						= IDevice.OFFSET;
 	
-	public final static String		NUMBER_MOTOR							= "number_motor"; //$NON-NLS-1$
-	public final static String		RPM2_FACTOR								= "revolution_factor"; //$NON-NLS-1$
+	public final static String		NUMBER_MOTOR							= MeasurementPropertyTypes.NUMBER_MOTOR.value();
+	public final static String		REVOLUTION_FACTOR					= MeasurementPropertyTypes.REVOLUTION_FACTOR.value();
 	public final static String		RPM_FACTOR								= IDevice.FACTOR;
 	
 	public final static String		FIRMEWARE_VERSION					= "Firmware"; //$NON-NLS-1$
@@ -182,11 +183,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		lov2osdMap.put(LOV_RPM_CHECKED, 	Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		//lov2osdMap.put(LOV_RPM_NAME, 		Record.NAME);
 		//lov2osdMap.put(LOV_RPM_UNIT, 		Record.UNIT);
-		lov2osdMap.put(LOV_RPM_OFFSET, 	IDevice.OFFSET + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
-		lov2osdMap.put(LOV_RPM_FACTOR, 	IDevice.FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
-		lov2osdMap.put(LOV_NUMBER_MOTOR, NUMBER_MOTOR); 
-		lov2osdMap.put(LOV_RPM2_FACTOR, 	RPM2_FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
-		lov2osdMap.put(LOV_N_100_W, 			PROP_N_100_WATT 	 + "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_RPM_OFFSET, 		IDevice.OFFSET 		+ "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_RPM_FACTOR, 		IDevice.FACTOR 		+ "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_NUMBER_MOTOR, 	NUMBER_MOTOR); 
+		lov2osdMap.put(LOV_RPM2_FACTOR, 	REVOLUTION_FACTOR + "=_" + "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
+		lov2osdMap.put(LOV_N_100_W, 			PROP_N_100_W			+ "=_" + "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
 	
 		lov2osdMap.put(LOV_A1_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
 		lov2osdMap.put(LOV_A2_CHECKED, 		Record.IS_ACTIVE	+ "=_" + "BOOLEAN"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -215,7 +216,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		String recordSetInfo = new String();
+		String recordSetInfo = OSDE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(this.getChannelName(channelNumber)); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 2) {// 6=votage LOV_CONFIG_DATA_KEYS_UNILOG_2
@@ -390,7 +391,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		a1Modus = a1Modus > 3 ? 3 : a1Modus;
 		tmpValue = (((dataBuffer[17] & 0xFF) << 8) + (dataBuffer[16] & 0xFF));
 		if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-		points[11] = new Integer(tmpValue * 100).intValue(); //11=a1Value
+		points[11] = Integer.valueOf(tmpValue * 100); //11=a1Value
 		if (log.isLoggable(Level.FINE)) {
 			sb.append("a1Modus = " + a1Modus).append(lineSep); //$NON-NLS-1$ //$NON-NLS-2$
 			if (a1Modus == 0)
@@ -409,11 +410,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		if (a2Modus == 0 || a2Modus == 2) {
 			tmpValue = (((dataBuffer[19] & 0xEF) << 8) + (dataBuffer[18] & 0xFF));
 			tmpValue = tmpValue > 32768 ? (tmpValue - 65536) : tmpValue;
-			points[12] = new Integer(tmpValue * 100).intValue(); //12=a2Value
+			points[12] = Integer.valueOf(tmpValue * 100); //12=a2Value
 		}
 		else if (a2Modus == 1 || a2Modus == 3) {
 			tmpValue = (((dataBuffer[19] & 0xFF) << 8) + (dataBuffer[18] & 0xFF));
-			points[12] = new Integer(tmpValue * 1000).intValue(); //12=a2Value
+			points[12] = Integer.valueOf(tmpValue * 1000); //12=a2Value
 		}
 		if (log.isLoggable(Level.FINE)) {
 			sb.append("a2Modus = " + a2Modus).append(lineSep); //$NON-NLS-1$
@@ -433,10 +434,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		tmpValue = (((dataBuffer[21] & 0xEF) << 8) + (dataBuffer[20] & 0xFF));
 		if (a3Modus == 0 || a3Modus == 1 || a3Modus == 3) {
 			if (tmpValue > 32768) tmpValue = tmpValue - 65536;
-			points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
+			points[13] = Integer.valueOf(tmpValue * 100).intValue(); //13=a3Value
 		}
 		else if (a3Modus == 2) {
-			points[13] = new Integer(tmpValue * 100).intValue(); //13=a3Value
+			points[13] = Integer.valueOf(tmpValue * 100).intValue(); //13=a3Value
 		}
 		if (log.isLoggable(Level.FINE)) {
 			sb.append("a3Modus = " + a3Modus).append(lineSep); //$NON-NLS-1$
@@ -555,7 +556,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 				
 				for (int i = 0; i < recordEntries; i++) {
-					dataTable[i][j+1] = new Double((offset + (((record.get(i)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor) * 1000.0).intValue();				
+					dataTable[i][j+1] = Double.valueOf((offset + (((record.get(i)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor) * 1000.0).intValue();				
 				}
 			}
 		}
@@ -723,7 +724,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			Record recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			recordCurrent = recordSet.get(measurements[2]); // 2=current
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
+				record.add(Double.valueOf(1.0 * recordVoltage.get(i) * recordCurrent.get(i) / 1000.0).intValue());
 				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable() && recordCurrent.isDisplayable()) {
@@ -759,7 +760,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			PropertyType property = record.getProperty(UniLog.NUMBER_CELLS);
 			int numberCells = property != null ? new Integer(property.getValue()) : 4;
 			for (int i = 0; i < recordVoltage.size(); i++) {
-				record.add(new Double(recordVoltage.get(i) / numberCells).intValue());
+				record.add(Double.valueOf(recordVoltage.get(i) / (double)numberCells).intValue());
 				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordVoltage.isDisplayable()) {
@@ -778,13 +779,13 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			property = recordRevolution.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
-			property = record.getProperty(UniLog.PROP_N_100_WATT);
+			property = record.getProperty(UniLog.PROP_N_100_W);
 			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 			for (int i = 0; i < recordRevolution.size(); i++) {
 				double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
 				//if (recordRevolution.get(i)> 100) log.log(Level.INFO, "recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
 				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
-				record.add(new Double(eta * 1000).intValue());
+				record.add(Double.valueOf(eta * 1000).intValue());
 				log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {
@@ -847,7 +848,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] getUsedPropertyKeys() {
 		return new String[] {	IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION, 
-				NUMBER_CELLS, PROP_N_100_WATT, 
+				NUMBER_CELLS, PROP_N_100_W, 
 				CalculationThread.REGRESSION_INTERVAL_SEC, CalculationThread.REGRESSION_TYPE};
 	}
 
