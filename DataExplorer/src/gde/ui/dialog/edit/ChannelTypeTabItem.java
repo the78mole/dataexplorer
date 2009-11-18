@@ -47,31 +47,29 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class ChannelTypeTabItem extends CTabItem {
-	final static Logger						log			= Logger.getLogger(ChannelTypeTabItem.class.getName());
+	final static Logger	log								= Logger.getLogger(ChannelTypeTabItem.class.getName());
 
-	Composite channelConfigComposite;
-	Button channelConfigAddButton;
-	Label channelConfigLabel;
-	CCombo channelConfigTypeCombo;
-	Text channelConfigText;
-	CTabFolder measurementsTabFolder;
+	Composite						channelConfigComposite;
+	Button							channelConfigAddButton;
+	Label								channelConfigLabel;
+	CCombo							channelConfigTypeCombo;
+	Text								channelConfigText;
+	CTabFolder					measurementsTabFolder;
 
-	
-	ChannelTypes channelConfigType = ChannelTypes.TYPE_OUTLET;
-	String channelConfigName = "Outlet";
+	ChannelTypes				channelConfigType	= ChannelTypes.TYPE_OUTLET;
+	String							channelConfigName	= "Outlet";
 
-	final CTabFolder channelConfigInnerTabFolder;
-	final String tabName;
-	DeviceConfiguration deviceConfig;
-	int channelConfigNumber;
-	ChannelType channelType; 
-	
-	
+	final CTabFolder		channelConfigInnerTabFolder;
+	final String				tabName;
+	DeviceConfiguration	deviceConfig;
+	int									channelConfigNumber;
+	ChannelType					channelType;
+
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index) {
 		super(parent, style);
-		channelConfigInnerTabFolder = parent;
-		tabName = OSDE.STRING_BLANK + (index+1) + OSDE.STRING_BLANK;
-		System.out.println("ChannelTypeTabItem " + tabName);
+		this.channelConfigInnerTabFolder = parent;
+		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem " + this.tabName);
 		initGUI();
 	}
 
@@ -80,134 +78,140 @@ public class ChannelTypeTabItem extends CTabItem {
 	 * @param useChannelType the ChannelType to set
 	 */
 	public void setChannelType(DeviceConfiguration useDeviceConfig, ChannelType useChannelType, int useChannelConfigNumber) {
-		System.out.println("ChannelTypeTabItem.setChannelType");
+		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem.setChannelType");
 		this.deviceConfig = useDeviceConfig;
 		this.channelType = useChannelType;
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.channelConfigComposite.redraw();
-		
+
 		//MeasurementType begin
-		int measurementTypeCount = channelType.getMeasurement().size();
-		int actualTabItemCount = measurementsTabFolder.getItemCount();
+		int measurementTypeCount = this.channelType.getMeasurement().size();
+		int actualTabItemCount = this.measurementsTabFolder.getItemCount();
 		if (measurementTypeCount < actualTabItemCount) {
 			for (int i = measurementTypeCount; i < actualTabItemCount; i++) {
-				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem)measurementsTabFolder.getItem(measurementTypeCount);
+				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(measurementTypeCount);
 				measurementTabItem.dispose();
 			}
 		}
 		else if (measurementTypeCount > actualTabItemCount) {
 			for (int i = actualTabItemCount; i < measurementTypeCount; i++) {
-				new MeasurementTypeTabItem(measurementsTabFolder, SWT.CLOSE, i);
+				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.CLOSE, i);
 			}
 		}
 		for (int i = 0; i < measurementTypeCount; i++) {
-			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem)measurementsTabFolder.getItem(i);
-			measurementTabItem.setMeasurementType(deviceConfig, channelType.getMeasurement().get(i), channelConfigNumber);
+			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
+			measurementTabItem.setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
 		}
 		//MeasurementType end
 	}
-	
+
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
 		super(parent, style);
-		channelConfigInnerTabFolder = parent;
-		tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		this.channelConfigInnerTabFolder = parent;
+		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
 		this.channelType = useChannelType;
 		initGUI();
 	}
 
 	private void initGUI() {
 		try {
-			this.setText(tabName);
+			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			{
-				channelConfigComposite = new Composite(channelConfigInnerTabFolder, SWT.NONE);
-				this.setControl(channelConfigComposite);
-				channelConfigComposite.setLayout(null);
-				channelConfigComposite.addPaintListener(new PaintListener() {
+				this.channelConfigComposite = new Composite(this.channelConfigInnerTabFolder, SWT.NONE);
+				this.setControl(this.channelConfigComposite);
+				this.channelConfigComposite.setLayout(null);
+				this.channelConfigComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt);
-						if (channelType != null) {
-							channelConfigType = channelType.getType();
-							channelConfigTypeCombo.select(channelConfigType.ordinal());
-							channelConfigName = channelType.getName();
-							channelConfigText.setText(channelConfigName);
+						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt);
+						if (ChannelTypeTabItem.this.channelType != null) {
+							ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
+							ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
+							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelType.getName();
+							ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
 						}
 					}
 				});
 				{
-					channelConfigTypeCombo = new CCombo(channelConfigComposite, SWT.BORDER);
-					channelConfigTypeCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					channelConfigTypeCombo.setBounds(6, 9, 121, 20);
-					channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" });
-					channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
+					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
+					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
+					this.channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" });
+					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt);
-							channelConfigType = ChannelTypes.valueOf(channelConfigTypeCombo.getText());
-							if (channelType != null) {
-								channelType.setType(channelConfigType);
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt);
+							ChannelTypeTabItem.this.channelConfigType = ChannelTypes.valueOf(ChannelTypeTabItem.this.channelConfigTypeCombo.getText());
+							if (ChannelTypeTabItem.this.channelType != null) {
+								ChannelTypeTabItem.this.channelType.setType(ChannelTypeTabItem.this.channelConfigType);
 							}
 						}
 					});
 				}
 				{
-					channelConfigText = new Text(channelConfigComposite, SWT.BORDER);
-					channelConfigText.setText("Outlet");
-					channelConfigText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					channelConfigText.setBounds(147, 9, 128, 20);
-					channelConfigText.addKeyListener(new KeyAdapter() {
+					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER);
+					this.channelConfigText.setText("Outlet");
+					this.channelConfigText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigText.setBounds(147, 9, 128, 20);
+					this.channelConfigText.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt);
-							channelConfigName = channelConfigText.getText().trim();
-							if (channelType != null) {
-								channelType.setName(channelConfigName);
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt);
+							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelConfigText.getText().trim();
+							if (ChannelTypeTabItem.this.channelType != null) {
+								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
 							}
 						}
 					});
 				}
 				{
-					channelConfigLabel = new Label(channelConfigComposite, SWT.CENTER);
-					channelConfigLabel.setText("complete definitions before adding new");
-					channelConfigLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					channelConfigLabel.setBounds(289, 9, 279, 20);
+					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
+					this.channelConfigLabel.setText("complete definitions before adding new");
+					this.channelConfigLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigLabel.setBounds(289, 9, 279, 20);
 				}
 				{
-					measurementsTabFolder = new CTabFolder(channelConfigComposite, SWT.NONE | SWT.BORDER);
-					measurementsTabFolder.setBounds(0, 35, 622, 225);
+					this.measurementsTabFolder = new CTabFolder(this.channelConfigComposite, SWT.NONE | SWT.BORDER);
+					this.measurementsTabFolder.setBounds(0, 35, 622, 225);
 					{
 						//create initial measurement type
-						new MeasurementTypeTabItem(measurementsTabFolder, SWT.NONE, 0);
+						new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, 0);
 					}
-					measurementsTabFolder.setSelection(0);
-					measurementsTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+					this.measurementsTabFolder.setSelection(0);
+					this.measurementsTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+						@Override
 						public void restore(CTabFolderEvent evt) {
-							System.out.println("measurementsTabFolder.restore, event="+evt);
-							((CTabItem)evt.item).getControl();
+							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.restore, event=" + evt);
+							((CTabItem) evt.item).getControl();
 						}
+
+						@Override
 						public void close(CTabFolderEvent evt) {
-							System.out.println("measurementsTabFolder.close, event="+evt);
-//							CTabItem tabItem = ((CTabItem)evt.item);
-//							if (deviceConfig != null) {
-//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
-//								else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
-//								else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
-//							}
-//							tabItem.dispose();
-//							if(deviceConfig != null) 
-//								update();
+							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.close, event=" + evt);
+							//							CTabItem tabItem = ((CTabItem)evt.item);
+							//							if (deviceConfig != null) {
+							//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
+							//								else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
+							//								else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
+							//							}
+							//							tabItem.dispose();
+							//							if(deviceConfig != null) 
+							//								update();
 						}
 					});
 				}
 				{
-					channelConfigAddButton = new Button(channelConfigComposite, SWT.PUSH | SWT.CENTER);
-					channelConfigAddButton.setText("+");
-					channelConfigAddButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					channelConfigAddButton.setBounds(574, 9, 42, 19);
-					channelConfigAddButton.setToolTipText("add a new channel or configuration, this will inherit all definitions from precessor");
-					channelConfigAddButton.setSize(40, 20);
-					channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
+					this.channelConfigAddButton = new Button(this.channelConfigComposite, SWT.PUSH | SWT.CENTER);
+					this.channelConfigAddButton.setText("+");
+					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
+					this.channelConfigAddButton.setToolTipText("add a new channel or configuration, this will inherit all definitions from precessor");
+					this.channelConfigAddButton.setSize(40, 20);
+					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt);
-							new ChannelTypeTabItem(channelConfigInnerTabFolder, SWT.CLOSE, channelConfigInnerTabFolder.getItemCount());
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt);
+							new ChannelTypeTabItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder, SWT.CLOSE, ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount());
 						}
 					});
 				}

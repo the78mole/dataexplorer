@@ -46,36 +46,35 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class MeasurementTypeTabItem extends CTabItem {
-	final static Logger						log			= Logger.getLogger(MeasurementTypeTabItem.class.getName());
+	final static Logger		log	= Logger.getLogger(MeasurementTypeTabItem.class.getName());
 
-	final CTabFolder measurementsTabFolder;
-	final String tabName;
-	
-	Composite measurementsComposite;
-	Label measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel, measurementCalculationLabel;
-	Text measurementNameText, measurementSymbolText, measurementUnitText;
-	Button measurementActiveButton, measurementCalculationButton;
-	CTabFolder channelConfigMeasurementPropertiesTabFolder;
-	Button addMeasurementButton;
-	Label measurementTypeLabel;
-	
-	String measurementName, measurementSymbol, measurementUnit;
-	boolean isMeasurementActive, isMeasurementCalculation;
-	
-	CTabFolder measurementsPropertiesTabFolder;
-	CTabItem measurementPropertiesTabItem;
-	StatisticsTypeTabItem statisticsTypeTabItem;
+	final CTabFolder			measurementsTabFolder;
+	final String					tabName;
 
-	DeviceConfiguration deviceConfig;
-	int channelConfigNumber;
-	MeasurementType measurementType;
-	
-	
+	Composite							measurementsComposite;
+	Label									measurementNameLabel, measurementSymbolLabel, measurementUnitLabel, measurementEnableLabel, measurementCalculationLabel;
+	Text									measurementNameText, measurementSymbolText, measurementUnitText;
+	Button								measurementActiveButton, measurementCalculationButton;
+	CTabFolder						channelConfigMeasurementPropertiesTabFolder;
+	Button								addMeasurementButton;
+	Label									measurementTypeLabel;
+
+	String								measurementName, measurementSymbol, measurementUnit;
+	boolean								isMeasurementActive, isMeasurementCalculation;
+
+	CTabFolder						measurementsPropertiesTabFolder;
+	CTabItem							measurementPropertiesTabItem;
+	StatisticsTypeTabItem	statisticsTypeTabItem;
+
+	DeviceConfiguration		deviceConfig;
+	int										channelConfigNumber;
+	MeasurementType				measurementType;
+
 	public MeasurementTypeTabItem(CTabFolder parent, int style, int index) {
 		super(parent, style, index);
-		measurementsTabFolder = parent;
-		tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
-		System.out.println("MeasurementTypeTabItem " + tabName);
+		this.measurementsTabFolder = parent;
+		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		MeasurementTypeTabItem.log.log(Level.FINE, "MeasurementTypeTabItem " + this.tabName);
 		initGUI();
 	}
 
@@ -86,50 +85,50 @@ public class MeasurementTypeTabItem extends CTabItem {
 		this.deviceConfig = useDeviceConfig;
 		this.measurementType = useMeasurementType;
 		this.channelConfigNumber = useChannelConfigNumber;
-		
-		measurementNameText.setText(measurementName = measurementType.getName());
-		measurementSymbolText.setText(measurementSymbol = measurementType.getSymbol());
-		measurementUnitText.setText(measurementUnit = measurementType.getUnit());
-		measurementActiveButton.setSelection(isMeasurementActive = measurementType.isActive());
-		measurementCalculationButton.setSelection(isMeasurementCalculation = measurementType.isCalculation());
-		measurementActiveButton.setEnabled(!isMeasurementCalculation);
-		
-		measurementsComposite.redraw();
-		
-		int propertyCount = measurementsPropertiesTabFolder != null ? measurementsPropertiesTabFolder.getItemCount() : 0;
-		int measurementPropertyCount = measurementType.getProperty().size();
+
+		this.measurementNameText.setText(this.measurementName = this.measurementType.getName());
+		this.measurementSymbolText.setText(this.measurementSymbol = this.measurementType.getSymbol());
+		this.measurementUnitText.setText(this.measurementUnit = this.measurementType.getUnit());
+		this.measurementActiveButton.setSelection(this.isMeasurementActive = this.measurementType.isActive());
+		this.measurementCalculationButton.setSelection(this.isMeasurementCalculation = this.measurementType.isCalculation());
+		this.measurementActiveButton.setEnabled(!this.isMeasurementCalculation);
+
+		this.measurementsComposite.redraw();
+
+		int propertyCount = this.measurementsPropertiesTabFolder != null ? this.measurementsPropertiesTabFolder.getItemCount() : 0;
+		int measurementPropertyCount = this.measurementType.getProperty().size();
 		if (propertyCount < measurementPropertyCount) {
 			for (int i = propertyCount; i < measurementPropertyCount; i++) {
-				new PropertyTypeTabItem(measurementsPropertiesTabFolder, SWT.CLOSE, "?");
+				new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "?");
 			}
 		}
 		else if (propertyCount > measurementPropertyCount) {
 			for (int i = measurementPropertyCount; i < propertyCount; i++) {
-				measurementsPropertiesTabFolder.getItem(0).dispose();
+				this.measurementsPropertiesTabFolder.getItem(0).dispose();
 			}
 		}
 		String[] nameComboItems = StringHelper.enumValues2StringArray(MeasurementPropertyTypes.values());
 		for (int i = 0; i < measurementPropertyCount; i++) {
-			PropertyTypeTabItem tabItem = (PropertyTypeTabItem)measurementsPropertiesTabFolder.getItem(i);
-			tabItem.setProperty(measurementType.getProperty().get(i), true, true, false, true);
+			PropertyTypeTabItem tabItem = (PropertyTypeTabItem) this.measurementsPropertiesTabFolder.getItem(i);
+			tabItem.setProperty(this.measurementType.getProperty().get(i), true, true, false, true);
 			tabItem.setNameComboItems(nameComboItems);
 		}
-		
-		if (measurementType.getStatistics() == null && statisticsTypeTabItem != null && !statisticsTypeTabItem.isDisposed()) {
-			statisticsTypeTabItem.dispose();
+
+		if (this.measurementType.getStatistics() == null && this.statisticsTypeTabItem != null && !this.statisticsTypeTabItem.isDisposed()) {
+			this.statisticsTypeTabItem.dispose();
 		}
-		else if (statisticsTypeTabItem == null || statisticsTypeTabItem.isDisposed()) {
-			statisticsTypeTabItem = new StatisticsTypeTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE | SWT.H_SCROLL, "Statistics");
+		else if (this.statisticsTypeTabItem == null || this.statisticsTypeTabItem.isDisposed()) {
+			this.statisticsTypeTabItem = new StatisticsTypeTabItem(this.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE | SWT.H_SCROLL, "Statistics");
 		}
-		if (statisticsTypeTabItem != null) {
-			statisticsTypeTabItem.setStatisticsType(deviceConfig, measurementType.getStatistics(), channelConfigNumber);
+		if (this.statisticsTypeTabItem != null) {
+			this.statisticsTypeTabItem.setStatisticsType(this.deviceConfig, this.measurementType.getStatistics(), this.channelConfigNumber);
 		}
 	}
-	
+
 	public MeasurementTypeTabItem(CTabFolder parent, int style, int index, MeasurementType useMeasurementType) {
 		super(parent, style, index);
-		measurementsTabFolder = parent;
-		tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		this.measurementsTabFolder = parent;
+		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
 		this.measurementType = useMeasurementType;
 		initGUI();
 	}
@@ -137,191 +136,204 @@ public class MeasurementTypeTabItem extends CTabItem {
 	private void initGUI() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
-			this.setText(tabName);
+			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			{
-				measurementsComposite = new Composite(measurementsTabFolder, SWT.NONE);
-				measurementsComposite.setLayout(null);
-				this.setControl(measurementsComposite);
+				this.measurementsComposite = new Composite(this.measurementsTabFolder, SWT.NONE);
+				this.measurementsComposite.setLayout(null);
+				this.setControl(this.measurementsComposite);
 				{
-					measurementTypeLabel = new Label(measurementsComposite, SWT.NONE);
-					measurementTypeLabel.setText("measurement");
-					measurementTypeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementTypeLabel.setBounds(10, 10, 120, 20);
+					this.measurementTypeLabel = new Label(this.measurementsComposite, SWT.NONE);
+					this.measurementTypeLabel.setText("measurement");
+					this.measurementTypeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementTypeLabel.setBounds(10, 10, 120, 20);
 				}
 				{
-					addMeasurementButton = new Button(measurementsComposite, SWT.PUSH | SWT.CENTER);
-					addMeasurementButton.setText("+");
-					addMeasurementButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					addMeasurementButton.setBounds(180, 10, 40, 20);
-					addMeasurementButton.addSelectionListener(new SelectionAdapter() {
+					this.addMeasurementButton = new Button(this.measurementsComposite, SWT.PUSH | SWT.CENTER);
+					this.addMeasurementButton.setText("+");
+					this.addMeasurementButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.addMeasurementButton.setBounds(180, 10, 40, 20);
+					this.addMeasurementButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "addMeasurementButton.widgetSelected, event="+evt);
-							new MeasurementTypeTabItem(measurementsTabFolder, SWT.CLOSE, measurementsTabFolder.getItemCount());
+							MeasurementTypeTabItem.log.log(Level.FINEST, "addMeasurementButton.widgetSelected, event=" + evt);
+							new MeasurementTypeTabItem(MeasurementTypeTabItem.this.measurementsTabFolder, SWT.CLOSE, MeasurementTypeTabItem.this.measurementsTabFolder.getItemCount());
 						}
 					});
 				}
 				{
-					measurementNameLabel = new Label(measurementsComposite, SWT.RIGHT);
-					measurementNameLabel.setText("name");
-					measurementNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementNameLabel.setBounds(10, 40, 60, 20);
+					this.measurementNameLabel = new Label(this.measurementsComposite, SWT.RIGHT);
+					this.measurementNameLabel.setText("name");
+					this.measurementNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementNameLabel.setBounds(10, 40, 60, 20);
 				}
 				{
-					measurementNameText = new Text(measurementsComposite, SWT.BORDER);
-					measurementNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementNameText.setBounds(80, 40, 145, 20);
-					measurementNameText.addKeyListener(new KeyAdapter() {
+					this.measurementNameText = new Text(this.measurementsComposite, SWT.BORDER);
+					this.measurementNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementNameText.setBounds(80, 40, 145, 20);
+					this.measurementNameText.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "measurementNameText.keyReleased, event="+evt);
-							measurementName = measurementNameText.getText();
-							if (measurementType != null) {
-								measurementType.setName(measurementName);
+							MeasurementTypeTabItem.log.log(Level.FINEST, "measurementNameText.keyReleased, event=" + evt);
+							MeasurementTypeTabItem.this.measurementName = MeasurementTypeTabItem.this.measurementNameText.getText();
+							if (MeasurementTypeTabItem.this.measurementType != null) {
+								MeasurementTypeTabItem.this.measurementType.setName(MeasurementTypeTabItem.this.measurementName);
 							}
 						}
 					});
 				}
 				{
-					measurementSymbolLabel = new Label(measurementsComposite, SWT.RIGHT);
-					measurementSymbolLabel.setText("symbol");
-					measurementSymbolLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementSymbolLabel.setBounds(10, 65, 60, 20);
+					this.measurementSymbolLabel = new Label(this.measurementsComposite, SWT.RIGHT);
+					this.measurementSymbolLabel.setText("symbol");
+					this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementSymbolLabel.setBounds(10, 65, 60, 20);
 				}
 				{
-					measurementSymbolText = new Text(measurementsComposite, SWT.BORDER);
-					measurementSymbolText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementSymbolText.setBounds(80, 65, 40, 20);
-					measurementSymbolText.addKeyListener(new KeyAdapter() {
+					this.measurementSymbolText = new Text(this.measurementsComposite, SWT.BORDER);
+					this.measurementSymbolText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementSymbolText.setBounds(80, 65, 40, 20);
+					this.measurementSymbolText.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "measurementSymbolText.keyReleased, event="+evt);
-							measurementSymbol = measurementSymbolText.getText();
-							if (measurementType != null) {
-								measurementType.setSymbol(measurementSymbol);
+							MeasurementTypeTabItem.log.log(Level.FINEST, "measurementSymbolText.keyReleased, event=" + evt);
+							MeasurementTypeTabItem.this.measurementSymbol = MeasurementTypeTabItem.this.measurementSymbolText.getText();
+							if (MeasurementTypeTabItem.this.measurementType != null) {
+								MeasurementTypeTabItem.this.measurementType.setSymbol(MeasurementTypeTabItem.this.measurementSymbol);
 							}
 						}
 					});
 				}
 				{
-					measurementUnitLabel = new Label(measurementsComposite, SWT.RIGHT);
-					measurementUnitLabel.setText("unit");
-					measurementUnitLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementUnitLabel.setBounds(10, 90, 60, 20);
+					this.measurementUnitLabel = new Label(this.measurementsComposite, SWT.RIGHT);
+					this.measurementUnitLabel.setText("unit");
+					this.measurementUnitLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementUnitLabel.setBounds(10, 90, 60, 20);
 				}
 				{
-					measurementUnitText = new Text(measurementsComposite, SWT.BORDER);
-					measurementUnitText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementUnitText.setBounds(80, 90, 40, 20);
-					measurementUnitText.addKeyListener(new KeyAdapter() {
+					this.measurementUnitText = new Text(this.measurementsComposite, SWT.BORDER);
+					this.measurementUnitText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementUnitText.setBounds(80, 90, 40, 20);
+					this.measurementUnitText.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "measurementUnitText.keyReleased, event="+evt);
-							measurementUnit = measurementUnitText.getText();
-							if (measurementType != null) {
-								measurementType.setUnit(measurementUnit);
+							MeasurementTypeTabItem.log.log(Level.FINEST, "measurementUnitText.keyReleased, event=" + evt);
+							MeasurementTypeTabItem.this.measurementUnit = MeasurementTypeTabItem.this.measurementUnitText.getText();
+							if (MeasurementTypeTabItem.this.measurementType != null) {
+								MeasurementTypeTabItem.this.measurementType.setUnit(MeasurementTypeTabItem.this.measurementUnit);
 							}
 						}
 					});
 				}
 				{
-					measurementEnableLabel = new Label(measurementsComposite, SWT.RIGHT);
-					measurementEnableLabel.setText("active");
-					measurementEnableLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementEnableLabel.setBounds(3, 115, 67, 20);
+					this.measurementEnableLabel = new Label(this.measurementsComposite, SWT.RIGHT);
+					this.measurementEnableLabel.setText("active");
+					this.measurementEnableLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementEnableLabel.setBounds(3, 115, 67, 20);
 				}
 				{
-					measurementActiveButton = new Button(measurementsComposite, SWT.CHECK);
-					measurementActiveButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementActiveButton.setBounds(80, 115, 145, 20);
-					measurementActiveButton.addSelectionListener(new SelectionAdapter() {
+					this.measurementActiveButton = new Button(this.measurementsComposite, SWT.CHECK);
+					this.measurementActiveButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementActiveButton.setBounds(80, 115, 145, 20);
+					this.measurementActiveButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "measurementEnableButton.widgetSelected, event="+evt);
-							isMeasurementActive = measurementActiveButton.getSelection();
-							if (measurementType != null) {
-								measurementType.setActive(isMeasurementActive);
+							MeasurementTypeTabItem.log.log(Level.FINEST, "measurementEnableButton.widgetSelected, event=" + evt);
+							MeasurementTypeTabItem.this.isMeasurementActive = MeasurementTypeTabItem.this.measurementActiveButton.getSelection();
+							if (MeasurementTypeTabItem.this.measurementType != null) {
+								MeasurementTypeTabItem.this.measurementType.setActive(MeasurementTypeTabItem.this.isMeasurementActive);
 							}
 						}
 					});
 				}
 				{
-					measurementCalculationLabel = new Label(measurementsComposite, SWT.RIGHT);
-					measurementCalculationLabel.setText("calculation");
-					measurementCalculationLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementCalculationLabel.setBounds(3, 140, 67, 20);
+					this.measurementCalculationLabel = new Label(this.measurementsComposite, SWT.RIGHT);
+					this.measurementCalculationLabel.setText("calculation");
+					this.measurementCalculationLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementCalculationLabel.setBounds(3, 140, 67, 20);
 				}
 				{
-					measurementCalculationButton = new Button(measurementsComposite, SWT.CHECK);
-					measurementCalculationButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
-					measurementCalculationButton.setBounds(80, 140, 145, 20);
-					measurementCalculationButton.addSelectionListener(new SelectionAdapter() {
+					this.measurementCalculationButton = new Button(this.measurementsComposite, SWT.CHECK);
+					this.measurementCalculationButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.measurementCalculationButton.setBounds(80, 140, 145, 20);
+					this.measurementCalculationButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "measurementCalculationButton.widgetSelected, event="+evt);
-							isMeasurementCalculation = measurementCalculationButton.getSelection();
-							if (measurementType != null) {
-								measurementType.setActive(isMeasurementCalculation);
+							MeasurementTypeTabItem.log.log(Level.FINEST, "measurementCalculationButton.widgetSelected, event=" + evt);
+							MeasurementTypeTabItem.this.isMeasurementCalculation = MeasurementTypeTabItem.this.measurementCalculationButton.getSelection();
+							if (MeasurementTypeTabItem.this.measurementType != null) {
+								MeasurementTypeTabItem.this.measurementType.setActive(MeasurementTypeTabItem.this.isMeasurementCalculation);
 							}
-							measurementActiveButton.setEnabled(!isMeasurementCalculation);
+							MeasurementTypeTabItem.this.measurementActiveButton.setEnabled(!MeasurementTypeTabItem.this.isMeasurementCalculation);
 						}
 					});
 				}
 				{
-					channelConfigMeasurementPropertiesTabFolder = new CTabFolder(measurementsComposite, SWT.BORDER);
-					channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
+					this.channelConfigMeasurementPropertiesTabFolder = new CTabFolder(this.measurementsComposite, SWT.BORDER);
+					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
 					{
-						statisticsTypeTabItem = new StatisticsTypeTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE | SWT.H_SCROLL, "Statistics");
+						this.statisticsTypeTabItem = new StatisticsTypeTabItem(this.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE | SWT.H_SCROLL, "Statistics");
 					}
 					{
-						measurementPropertiesTabItem = new CTabItem(channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE);
-						measurementPropertiesTabItem.setText("Properties");
-						measurementPropertiesTabItem.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+						this.measurementPropertiesTabItem = new CTabItem(this.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE);
+						this.measurementPropertiesTabItem.setText("Properties");
+						this.measurementPropertiesTabItem.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 						{
-							measurementsPropertiesTabFolder = new CTabFolder(channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
-							measurementPropertiesTabItem.setControl(measurementsPropertiesTabFolder);
+							this.measurementsPropertiesTabFolder = new CTabFolder(this.channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
+							this.measurementPropertiesTabItem.setControl(this.measurementsPropertiesTabFolder);
 							{
-								new PropertyTypeTabItem(measurementsPropertiesTabFolder, SWT.CLOSE, "offset", "offset", DataTypes.DOUBLE, 0.0, "offset to measurement value, applied after factor");
-								new PropertyTypeTabItem(measurementsPropertiesTabFolder, SWT.CLOSE, "factor", "factor", DataTypes.DOUBLE, 1.0, "factor to measurement value, applied after reduction");
-								new PropertyTypeTabItem(measurementsPropertiesTabFolder, SWT.CLOSE, "reduction", "reduction", DataTypes.DOUBLE, 0.0, "direct reduction to measurement value, applied before factor");
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "offset", "offset", DataTypes.DOUBLE, 0.0, "offset to measurement value, applied after factor");
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "factor", "factor", DataTypes.DOUBLE, 1.0, "factor to measurement value, applied after reduction");
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "reduction", "reduction", DataTypes.DOUBLE, 0.0,
+										"direct reduction to measurement value, applied before factor");
 							}
-							measurementsPropertiesTabFolder.setSelection(0);
-							measurementsPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+							this.measurementsPropertiesTabFolder.setSelection(0);
+							this.measurementsPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+								@Override
 								public void restore(CTabFolderEvent evt) {
-									System.out.println("measurementsPropertiesTabFolder.restore, event="+evt);
-									((CTabItem)evt.item).getControl();
+									MeasurementTypeTabItem.log.log(Level.FINE, "measurementsPropertiesTabFolder.restore, event=" + evt);
+									((CTabItem) evt.item).getControl();
 								}
+
+								@Override
 								public void close(CTabFolderEvent evt) {
-									System.out.println("measurementsPropertiesTabFolder.close, event="+evt);
-//									CTabItem tabItem = ((CTabItem)evt.item);
-//									if (deviceConfig != null) {
-//										if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
-//										else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
-//										else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
-//									}
-//									tabItem.dispose();
-//									if(deviceConfig != null) 
-//										update();
+									MeasurementTypeTabItem.log.log(Level.FINE, "measurementsPropertiesTabFolder.close, event=" + evt);
+									//									CTabItem tabItem = ((CTabItem)evt.item);
+									//									if (deviceConfig != null) {
+									//										if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
+									//										else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
+									//										else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
+									//									}
+									//									tabItem.dispose();
+									//									if(deviceConfig != null) 
+									//										update();
 								}
 							});
 						}
 					}
-					channelConfigMeasurementPropertiesTabFolder.setSelection(0);
-					channelConfigMeasurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+					this.channelConfigMeasurementPropertiesTabFolder.setSelection(0);
+					this.channelConfigMeasurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
+						@Override
 						public void restore(CTabFolderEvent evt) {
-							System.out.println("channelConfigMeasurementPropertiesTabFolder.restore, event="+evt);
-							((CTabItem)evt.item).getControl();
+							MeasurementTypeTabItem.log.log(Level.FINE, "channelConfigMeasurementPropertiesTabFolder.restore, event=" + evt);
+							((CTabItem) evt.item).getControl();
 						}
+
+						@Override
 						public void close(CTabFolderEvent evt) {
-							System.out.println("channelConfigMeasurementPropertiesTabFolder.close, event="+evt);
-//							CTabItem tabItem = ((CTabItem)evt.item);
-//							if (deviceConfig != null) {
-//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
-//								else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
-//								else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
-//							}
-//							tabItem.dispose();
-//							if(deviceConfig != null) 
-//								update();
+							MeasurementTypeTabItem.log.log(Level.FINE, "channelConfigMeasurementPropertiesTabFolder.close, event=" + evt);
+							//							CTabItem tabItem = ((CTabItem)evt.item);
+							//							if (deviceConfig != null) {
+							//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
+							//								else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
+							//								else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
+							//							}
+							//							tabItem.dispose();
+							//							if(deviceConfig != null) 
+							//								update();
 						}
 					});
 				}
-				measurementsComposite.layout();
+				this.measurementsComposite.layout();
 			}
 		}
 		catch (Exception e) {
