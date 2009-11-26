@@ -93,6 +93,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 		this.measurementCalculationButton.setSelection(this.isMeasurementCalculation = this.measurementType.isCalculation());
 		this.measurementActiveButton.setEnabled(!this.isMeasurementCalculation);
 
+		this.setText(this.tabName + this.measurementName);
 		this.measurementsComposite.redraw();
 
 		int propertyCount = this.measurementsPropertiesTabFolder != null ? this.measurementsPropertiesTabFolder.getItemCount() : 0;

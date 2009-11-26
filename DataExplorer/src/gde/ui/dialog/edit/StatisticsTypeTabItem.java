@@ -113,6 +113,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.statisticsSigmaButton.setSelection(this.statisticsSigma = this.statisticsType.isSigma());
 
 		this.measurementReferenceItems = this.deviceConfig.getMeasurementNames(this.channelConfigNumber);
+		this.triggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
+		this.sumByTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
+		this.ratioRefOrdinalCombo.setItems(this.measurementReferenceItems);
 
 		if (this.triggerType != null) {
 			this.triggerLevelButton.setSelection(true);
@@ -156,7 +159,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 		if ((this.triggerRefOrdinal = this.statisticsType.getTriggerRefOrdinal()) != null) {
 			this.isTriggerRefOrdinalButton.setSelection(true);
 			this.triggerRefOrdinalCombo.setEnabled(true);
-			this.triggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 			this.triggerRefOrdinalCombo.select(this.triggerRefOrdinal);
 		}
 		else {
@@ -168,7 +170,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.isSumByTriggerRefOrdinalButton.setSelection(true);
 			this.sumByTriggerRefOrdinalCombo.setEnabled(true);
 			this.sumTriggerText.setEnabled(true);
-			this.sumByTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 			this.sumByTriggerRefOrdinalCombo.select(this.sumByTriggerRefOrdinal);
 			this.sumTriggerText.setText(this.sumTriggerComment = this.statisticsType.getSumTriggerText());
 		}
@@ -182,7 +183,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.isRatioRefOrdinalButton.setEnabled(true);
 			this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = true);
 			this.ratioRefOrdinalCombo.setEnabled(true);
-			this.ratioRefOrdinalCombo.setItems(this.measurementReferenceItems);
 			this.ratioRefOrdinalCombo.select(this.ratioRefOrdinal);
 			this.ratioText.setEnabled(true);
 			this.ratioText.setText(this.ratioComment = this.statisticsType.getRatioText());
@@ -489,8 +489,8 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
 				this.triggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.triggerRefOrdinalCombo.setBounds(280, 80, 75, 20);
-				this.triggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				this.triggerRefOrdinalCombo.setEditable(false);
+				//this.triggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				//this.triggerRefOrdinalCombo.setEditable(false);
 				this.triggerRefOrdinalCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -570,7 +570,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.log.log(Level.FINEST, "isRatioRefOrdinalButton.widgetSelected, event=" + evt);
 						StatisticsTypeTabItem.this.isRatioRefOrdinal = StatisticsTypeTabItem.this.isRatioRefOrdinalButton.getSelection();
 						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
-						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.setItems(StatisticsTypeTabItem.this.measurementReferenceItems);
 						StatisticsTypeTabItem.this.ratioText.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
 						if (StatisticsTypeTabItem.this.statisticsType != null && !StatisticsTypeTabItem.this.isRatioRefOrdinal) {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);

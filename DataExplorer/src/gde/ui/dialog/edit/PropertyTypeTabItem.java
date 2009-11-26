@@ -201,6 +201,9 @@ public class PropertyTypeTabItem extends CTabItem {
 	 */
 	public void setProperty(PropertyType useProperty, boolean enableEditSelectName, boolean enableNameSelection, boolean enableSelectType, boolean enableValue) {
 		this.propertyType = useProperty;
+		
+		this.setText(this.tabName = this.propertyType.getName());
+
 		if (enableNameSelection) {
 			this.nameText.setVisible(false);
 			this.nameCombo.setVisible(true);
@@ -237,20 +240,16 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.propertyTypeComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					PropertyTypeTabItem.log.log(Level.FINEST, "this.paintControl, event=" + evt);
-					if (PropertyTypeTabItem.this.propertyType != null) PropertyTypeTabItem.this.setText(PropertyTypeTabItem.this.tabName = PropertyTypeTabItem.this.propertyType.getName());
-					if (PropertyTypeTabItem.this.nameText.isVisible()) {
-						if (PropertyTypeTabItem.this.propertyType == null) {
-							PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
-						}
-						else {
+					if (PropertyTypeTabItem.this.propertyType != null) {
+						if (PropertyTypeTabItem.this.nameText.isVisible()) {
 							PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
 						}
-					}
-					if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
-						PropertyTypeTabItem.this.nameCombo
-								.select(PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()).ordinal());
-					}
-					if (PropertyTypeTabItem.this.propertyType != null) {
+						else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
+							PropertyTypeTabItem.this.nameCombo.select(
+									PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName())
+									.ordinal());
+						}
+
 						if (PropertyTypeTabItem.this.propertyType.getType() != null) {
 							PropertyTypeTabItem.this.typeCombo.select(PropertyTypeTabItem.this.propertyType.getType().ordinal());
 							if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
@@ -265,12 +264,17 @@ public class PropertyTypeTabItem extends CTabItem {
 								PropertyTypeTabItem.this.valueText.setText(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.propertyType.getValue()));
 							}
 						}
-						else {
-							PropertyTypeTabItem.this.typeCombo.select(0);
-						}
+							else {
+								PropertyTypeTabItem.this.typeCombo.select(0);
+							}
+						PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
 					}
+					else {
+						PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
+						PropertyTypeTabItem.this.nameCombo.setText(OSDE.STRING_EMPTY);
+						PropertyTypeTabItem.this.descriptionText.setText(OSDE.STRING_EMPTY);
 
-					if (PropertyTypeTabItem.this.propertyType != null) PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
+					}
 				}
 			});
 			{
@@ -327,11 +331,11 @@ public class PropertyTypeTabItem extends CTabItem {
 						PropertyTypeTabItem.log.log(Level.FINEST, "nameCombo.widgetSelected, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
 							if (PropertyTypeTabItem.this.stateParent != null)
-								PropertyTypeTabItem.this.deviceConfigParent.setStateName(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.nameText.getText());
+								PropertyTypeTabItem.this.deviceConfigParent.setStateName(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.nameCombo.getText());
 							//desktop name is key and can be modified
 						}
 						else
-							PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameText.getText());
+							PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameCombo.getText().toLowerCase());
 					}
 				});
 			}

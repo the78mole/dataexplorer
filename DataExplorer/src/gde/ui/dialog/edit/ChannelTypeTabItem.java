@@ -83,6 +83,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = useChannelType;
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.channelConfigComposite.redraw();
+		this.setText(this.tabName + this.channelType.getName());
 
 		//MeasurementType begin
 		int measurementTypeCount = this.channelType.getMeasurement().size();
@@ -144,6 +145,7 @@ public class ChannelTypeTabItem extends CTabItem {
 							ChannelTypeTabItem.this.channelConfigType = ChannelTypes.valueOf(ChannelTypeTabItem.this.channelConfigTypeCombo.getText());
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setType(ChannelTypeTabItem.this.channelConfigType);
+								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
 							}
 						}
 					});
@@ -160,6 +162,8 @@ public class ChannelTypeTabItem extends CTabItem {
 							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelConfigText.getText().trim();
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
+								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
+								ChannelTypeTabItem.this.setText(ChannelTypeTabItem.this.tabName + ChannelTypeTabItem.this.channelConfigName);
 							}
 						}
 					});
