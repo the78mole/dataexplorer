@@ -57,7 +57,7 @@ public class Record extends Vector<Integer> {
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 								// used as channelConfigKey
 	String							keyName;
-	double							timeStep_ms						= 0;				// time base of measurement points
+	double							timeStep_ms						= 0;				// time base of measurement points, each record might have individual time step (compare)
 	IDevice							device;
 	final int						ordinal;	// ordinal is referencing the source position of the record relative to the initial 
 																// device measurement configuration and used to find specific properties
@@ -1029,11 +1029,11 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
-	 * qurey time step in milli seconds, this property is hold local to be independent (compare window)
-	 * @return time step in ms
+	 * query time step in mills seconds, this property is hold local to be independent (compare window)
+	 * @return time step in msec
 	 */
 	public double getTimeStep_ms() {
-		return this.timeStep_ms == 0 ? this.parent.getTimeStep_ms() : this.timeStep_ms;
+		return this.timeStep_ms <= 0 ? this.timeStep_ms = this.parent.getTimeStep_ms() : this.timeStep_ms;
 	}
 
 	/**

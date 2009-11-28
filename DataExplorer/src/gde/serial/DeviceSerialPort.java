@@ -34,6 +34,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 import osde.OSDE;
 import osde.config.Settings;
 import osde.device.DeviceConfiguration;
@@ -222,20 +224,26 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			Settings settings = Settings.getInstance();
 			this.serialPortStr = this.deviceConfig.getPort();
 			// check if a serial port is selected to be opened
-			if(availablePorts.size() == 0 || (this.serialPortStr != null && !availablePorts.contains(this.serialPortStr))) 
+			if(availablePorts.size() == 0 || (this.serialPortStr != null && !availablePorts.contains(this.serialPortStr))) {
 				listConfiguredSerialPorts(false, 
 						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
 						settings.isSerialPortWhiteListEnabled() ? settings.getSerialPortWhiteList() : new Vector<String>());
+			}
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
-				// no serial port is selected, if only one serial port is available choose this one
-				if (availablePorts.size() == 1) {
-					this.serialPortStr = availablePorts.firstElement();
-					if (settings.isGlobalSerialPort())
-						settings.setSerialPort(this.serialPortStr);
-					else
-						this.deviceConfig.setPort(this.serialPortStr);
-					
-					this.deviceConfig.storeDeviceProperties();
+				if (availablePorts.size() == 1 && (this.serialPortStr != null && !isMatchAvailablePorts(this.serialPortStr, availablePorts))) {
+					if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0010) + OSDE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
+						this.serialPortStr = availablePorts.firstElement();
+						if (settings.isGlobalSerialPort())
+							settings.setSerialPort(this.serialPortStr);
+						else {
+							this.deviceConfig.setPort(this.serialPortStr);
+							this.deviceConfig.storeDeviceProperties();
+							this.application.updateTitleBar();
+						}
+					}
+					else {
+						throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
+					}
 				}
 				else {
 					throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
@@ -312,7 +320,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @param writeBuffer writes size of writeBuffer to output stream
 	 * @throws IOException
 	 */
-	public void write(byte[] writeBuffer) throws IOException {
+	public synchronized void write(byte[] writeBuffer) throws IOException {
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
 		int num = 0;
 		if ((num = this.inputStream.available()) != 0) {
@@ -378,7 +386,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int bytes = readBuffer.length;
@@ -439,7 +447,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int bytes = readBuffer.length;
@@ -566,7 +574,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
 		int expectedBytes = readBuffer.length;
@@ -697,7 +705,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * function to close the serial port
 	 * this is done within a tread since the port can't close if it stays open for a long time period ??
 	 */
-	public void close() {
+	public synchronized void close() {
 		final String $METHOD_NAME = "close"; //$NON-NLS-1$
 		if (this.isConnected && DeviceSerialPort.this.serialPort != null) {
 			DeviceSerialPort.this.isConnected = false;
@@ -759,16 +767,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	public int getXferErrors() {
 		return this.xferErrors;
 	}
- 	
-	/**
-	 * get reference to available ports vector, this should be single instance application wide 
-	 */
-	public static Vector<String> getAvailableports() {
-		return availablePorts;
-	}
 
 	/**
-	 * @return the windowsports
+	 * @return the windows ports
 	 */
 	public static TreeMap<Integer, String> getWindowsPorts() {
 		return windowsPorts;

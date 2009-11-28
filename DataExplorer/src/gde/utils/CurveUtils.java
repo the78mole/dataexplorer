@@ -216,7 +216,7 @@ public class CurveUtils {
 				}
 			}
 			else if (record.getParent().getXScale() == 0 || isZoomMode ) {
-				xScale = Double.valueOf(recordSize / (width * 2)).intValue();
+				xScale = Double.valueOf(recordSize / (width * 2.5)).intValue();
 				while (!(recordSize % xScale <= 5) && xScale > 1) {
 					--xScale;
 				}

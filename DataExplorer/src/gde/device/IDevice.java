@@ -74,12 +74,12 @@ public interface IDevice {
 	/**
 	 * @return device group
 	 */
-	public String getDeviceGroup();
+	public DeviceTypes getDeviceGroup();
 	
 	/**
 	 * @param set a new manufacture name
 	 */
-	public void setDeviceGroup(String name);
+	public void setDeviceGroup(DeviceTypes name);
 	
 	/**
 	 * @return link to manufacturer

@@ -944,7 +944,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 			this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
 			this.deviceText.setText(this.selectedActiveDeviceConfig.getName());
-			this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup());
+			this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
 			String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.OSDE_MSGT0191);
 			this.internetLinkText.setText(link);
 

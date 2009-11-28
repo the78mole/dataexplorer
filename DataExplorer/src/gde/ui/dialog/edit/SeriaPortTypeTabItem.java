@@ -45,6 +45,8 @@ import osde.device.DeviceConfiguration;
 import osde.device.FlowControlTypes;
 import osde.device.ParityTypes;
 import osde.device.StopBitsTypes;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -90,7 +92,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 	private void initGUI() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
-			this.setText("Serial Port");
+			this.setText(Messages.getString(MessageIds.OSDE_MSGT0512));
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {

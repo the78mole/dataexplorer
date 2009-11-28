@@ -1645,6 +1645,8 @@ public class RecordSet extends HashMap<String, Record> {
 		try {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
+			
+			//updateChildRecordTimeStep();
 
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
@@ -1698,6 +1700,17 @@ public class RecordSet extends HashMap<String, Record> {
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0002) + OSDE.STRING_NEW_LINE + e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+		}
+	}
+
+	/**
+	 * update all child records with the parent time step definition
+	 */
+	void updateChildRecordTimeStep() {
+		if (this.timeStep_ms > 0) { // apply constant time step to all child records
+			for (String childRecordKey : this.keySet()) {
+				this.getRecord(childRecordKey).timeStep_ms = this.timeStep_ms;
+			}
 		}
 	}
 

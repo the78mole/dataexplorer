@@ -64,7 +64,7 @@ public class DeviceConfiguration {
 	private DeviceType												device;
 	private SerialPortType										serialPort;
 	private DataBlockType											dataBlock;
-	private StateType											modeState;
+	private StateType													state;
 	private TimeBaseType											timeBase;
 	private DesktopType												desktop;
 	private boolean														isChangePropery						= false;
@@ -146,7 +146,7 @@ public class DeviceConfiguration {
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
 		this.dataBlock = this.deviceProps.getDataBlock();
-		this.modeState = this.deviceProps.getState();
+		this.state = this.deviceProps.getState();
 		this.timeBase = this.deviceProps.getTimeBase();
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
@@ -167,7 +167,7 @@ public class DeviceConfiguration {
 		this.device = deviceConfig.device;
 		this.serialPort = deviceConfig.serialPort;	
 		this.dataBlock = deviceProps.dataBlock;
-		this.modeState = deviceProps.state;
+		this.state = deviceProps.state;
 		this.timeBase = deviceConfig.timeBase;	
 		this.desktop = deviceProps.desktop;
 		this.isChangePropery = deviceConfig.isChangePropery;
@@ -286,19 +286,20 @@ public class DeviceConfiguration {
 		this.device.setManufacturerURL(name);
 	}
 
-	public String getDeviceGroup() {
+	public DeviceTypes getDeviceGroup() {
 		return this.device.getGroup();
 	}
 
 	/**
 	 * @param set a new manufacture name
 	 */
-	public void setDeviceGroup(String name) {
+	public void setDeviceGroup(DeviceTypes name) {
+		this.isChangePropery = true;
 		this.device.setGroup(name);
 	}
 
 	public double getTimeStep_ms() {
-		return this.timeBase.getTimeStep() > 0 ? this.timeBase.getTimeStep() : 1000;
+		return this.timeBase.getTimeStep();
 	}
 
 	public void setTimeStep_ms(double newTimeStep_ms) {
@@ -484,7 +485,7 @@ public class DeviceConfiguration {
 	 * @return size of mode states
 	 */
 	public int getStateSize() {
-		return this.modeState.property.size();
+		return this.state.property.size();
 	}
 	
 	/**
@@ -499,7 +500,7 @@ public class DeviceConfiguration {
 	 */
 	public void removeStateType() {
 		this.isChangePropery = true;
-		this.modeState = this.deviceProps.state = null;
+		this.state = this.deviceProps.state = null;
 	}
 	
 	/**
@@ -566,8 +567,8 @@ public class DeviceConfiguration {
 	 */
 	public PropertyType getStateProperty(int modeStateOrdinal) {
 		PropertyType property = null;
-		if (this.modeState != null) {
-			List<PropertyType> properties = this.modeState.getProperty();
+		if (this.state != null) {
+			List<PropertyType> properties = this.state.getProperty();
 			for (PropertyType propertyType : properties) {
 				try {
 					int propertyValue = Integer.parseInt(propertyType.getValue());

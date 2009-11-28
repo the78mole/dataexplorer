@@ -40,6 +40,8 @@ import osde.OSDE;
 import osde.device.ChannelType;
 import osde.device.ChannelTypes;
 import osde.device.DeviceConfiguration;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -57,7 +59,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	CTabFolder					measurementsTabFolder;
 
 	ChannelTypes				channelConfigType	= ChannelTypes.TYPE_OUTLET;
-	String							channelConfigName	= "Outlet";
+	String							channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0525);
 
 	final CTabFolder		channelConfigInnerTabFolder;
 	final String				tabName;
@@ -69,7 +71,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
 		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
-		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem " + this.tabName);
+		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem " + this.tabName); //$NON-NLS-1$
 		initGUI();
 	}
 
@@ -78,7 +80,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	 * @param useChannelType the ChannelType to set
 	 */
 	public void setChannelType(DeviceConfiguration useDeviceConfig, ChannelType useChannelType, int useChannelConfigNumber) {
-		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem.setChannelType");
+		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem.setChannelType"); //$NON-NLS-1$
 		this.deviceConfig = useDeviceConfig;
 		this.channelType = useChannelType;
 		this.channelConfigNumber = useChannelConfigNumber;
@@ -124,7 +126,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				this.channelConfigComposite.setLayout(null);
 				this.channelConfigComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt);
+						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
 						if (ChannelTypeTabItem.this.channelType != null) {
 							ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
 							ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
@@ -137,11 +139,11 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
 					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
-					this.channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" });
+					this.channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" }); //$NON-NLS-1$ //$NON-NLS-2$
 					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt);
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ChannelTypeTabItem.this.channelConfigType = ChannelTypes.valueOf(ChannelTypeTabItem.this.channelConfigTypeCombo.getText());
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setType(ChannelTypeTabItem.this.channelConfigType);
@@ -152,13 +154,13 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER);
-					this.channelConfigText.setText("Outlet");
+					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0525));
 					this.channelConfigText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					this.channelConfigText.setBounds(147, 9, 128, 20);
 					this.channelConfigText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt);
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt); //$NON-NLS-1$
 							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelConfigText.getText().trim();
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
@@ -170,7 +172,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
-					this.channelConfigLabel.setText("complete definitions before adding new");
+					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0526));
 					this.channelConfigLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					this.channelConfigLabel.setBounds(289, 9, 279, 20);
 				}
@@ -185,13 +187,13 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.measurementsTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 						@Override
 						public void restore(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.restore, event=" + evt);
+							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.restore, event=" + evt); //$NON-NLS-1$
 							((CTabItem) evt.item).getControl();
 						}
 
 						@Override
 						public void close(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.close, event=" + evt);
+							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
 							//							CTabItem tabItem = ((CTabItem)evt.item);
 							//							if (deviceConfig != null) {
 							//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
@@ -206,15 +208,15 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigAddButton = new Button(this.channelConfigComposite, SWT.PUSH | SWT.CENTER);
-					this.channelConfigAddButton.setText("+");
+					this.channelConfigAddButton.setText("+"); //$NON-NLS-1$
 					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
-					this.channelConfigAddButton.setToolTipText("add a new channel or configuration, this will inherit all definitions from precessor");
+					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0524));
 					this.channelConfigAddButton.setSize(40, 20);
 					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt);
+							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new ChannelTypeTabItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder, SWT.CLOSE, ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount());
 						}
 					});
