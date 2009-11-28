@@ -17,7 +17,9 @@ import osde.exception.NotSupportedException;
 import osde.io.CSVReaderWriter;
 import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
+import osde.ui.OpenSerialDataExplorer;
 import osde.utils.FileUtils;
+import osde.utils.OperatingSystemHelper;
 import osde.utils.StringHelper;
 
 /**
@@ -121,45 +123,48 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(new File(tmpDir1));
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
-					System.out.println("working with : " + file);
+			String filePath = file.getAbsolutePath();
+				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
-						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
-						String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
-						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-						IDevice device = this.getInstanceOfDevice(deviceConfig);
-						this.application.setActiveDeviceWoutUI(device);
-						
-						setupDataChannels(device);
+						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
+							System.out.println("working with : " + file);
+							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
+							String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
+							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+							IDevice device = this.getInstanceOfDevice(deviceConfig);
+							this.application.setActiveDeviceWoutUI(device);
 
-						OsdReaderWriter.read(file.getAbsolutePath());
+							setupDataChannels(device);
 
-						Channel activeChannel = this.channels.getActiveChannel();
-						activeChannel.setFileName(file.getAbsolutePath());
-						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						activeChannel.setSaved(true);
-						activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
-						
-						for (String recordSetName : activeChannel.getRecordSetNames()) {
-							RecordSet recordSet = activeChannel.get(recordSetName);
-							if (recordSet != null) {
-								activeChannel.setActiveRecordSet(recordSet);
-								//device.makeInActiveDisplayable(recordSet);
-								drawCurves(recordSet, 1024, 768);
+							OsdReaderWriter.read(file.getAbsolutePath());
+
+							Channel activeChannel = this.channels.getActiveChannel();
+							activeChannel.setFileName(file.getAbsolutePath());
+							activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+							activeChannel.setSaved(true);
+							activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+
+							for (String recordSetName : activeChannel.getRecordSetNames()) {
+								RecordSet recordSet = activeChannel.get(recordSetName);
+								if (recordSet != null) {
+									activeChannel.setActiveRecordSet(recordSet);
+									//device.makeInActiveDisplayable(recordSet);
+									drawCurves(recordSet, 1024, 768);
+								}
 							}
+
+							String tmpDir2 = this.tmpDir + "Write_2_OSD" + OSDE.FILE_SEPARATOR;
+							new File(tmpDir2).mkdirs();
+							String absolutFilePath = tmpDir2 + file.getName();
+							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
+							System.out.println("writing as   : " + absolutFilePath);
+							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, false);
+
+							absolutFilePath = tmpDir2 + file.getName();
+							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
+							System.out.println("writing as   : " + absolutFilePath);
+							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true);
 						}
-
-						String tmpDir2 = this.tmpDir + "Write_2_OSD" + OSDE.FILE_SEPARATOR;
-						new File(tmpDir2).mkdirs();
-						String absolutFilePath = tmpDir2 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_abs.csv";
-						System.out.println("writing as   : " + absolutFilePath);
-						CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, false);
-
-						absolutFilePath = tmpDir2 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_raw.csv";
-						System.out.println("writing as   : " + absolutFilePath);
-						CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true);
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -197,41 +202,43 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(this.devicePath);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
-					System.out.println("working with : " + file);
+				String filePath = file.getAbsolutePath();
+				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
-						HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
-						String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
-						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-						IDevice device = this.getInstanceOfDevice(deviceConfig);
-						this.application.setActiveDeviceWoutUI(device);
-						
-						setupDataChannels(device);
+						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
+							System.out.println("working with : " + file);
+							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
+							String fileDeviceName = fileHeader.get(OSDE.DEVICE_NAME);
+							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+							IDevice device = this.getInstanceOfDevice(deviceConfig);
+							this.application.setActiveDeviceWoutUI(device);
 
-						OsdReaderWriter.read(file.getAbsolutePath());
+							setupDataChannels(device);
 
-						Channel activeChannel = this.channels.getActiveChannel();
-						activeChannel.setFileName(file.getAbsolutePath());
-						activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
-						activeChannel.setSaved(true);
-						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
-						
-						for (String recordSetName : activeChannel.getRecordSetNames()) {
-							RecordSet recordSet = activeChannel.get(recordSetName);
-							if (recordSet != null) {
-								if (!recordSet.hasDisplayableData()) 
-									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
-								activeChannel.setActiveRecordSet(recordSet);
-								//device.makeInActiveDisplayable(recordSet);
-								drawCurves(recordSet, 1024, 768);
+							OsdReaderWriter.read(file.getAbsolutePath());
+
+							Channel activeChannel = this.channels.getActiveChannel();
+							activeChannel.setFileName(file.getAbsolutePath());
+							activeChannel.setFileDescription(fileHeader.get(OSDE.FILE_COMMENT));
+							activeChannel.setSaved(true);
+							//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
+
+							for (String recordSetName : activeChannel.getRecordSetNames()) {
+								RecordSet recordSet = activeChannel.get(recordSetName);
+								if (recordSet != null) {
+									if (!recordSet.hasDisplayableData()) recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
+									activeChannel.setActiveRecordSet(recordSet);
+									//device.makeInActiveDisplayable(recordSet);
+									drawCurves(recordSet, 1024, 768);
+								}
 							}
-						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + OSDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
-						System.out.println("writing as   : " + absolutFilePath);
-						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
+							String tmpDir1 = this.tmpDir + "Write_1_OSD" + OSDE.FILE_SEPARATOR;
+							new File(tmpDir1).mkdirs();
+							String absolutFilePath = tmpDir1 + file.getName();
+							System.out.println("writing as   : " + absolutFilePath);
+							OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), OSDE.OPEN_SERIAL_DATA_VERSION_INT);
+						}
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -261,7 +268,9 @@ public class TestFileReaderWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		this.devicePath = new File("d:\\Documents\\LogView");
+		String dataPath = this.settings.getDataFilePath();
+		dataPath = dataPath.substring(0, dataPath.indexOf(OpenSerialDataExplorer.APPLICATION_NAME)) + "LogView";
+		this.devicePath = new File(dataPath);
 		//this.devicePath = new File("d:\\Documents\\LogView" + OSDE.FILE_SEPARATOR + "UniLog");
 
 		try {
@@ -288,10 +297,12 @@ public class TestFileReaderWriter extends TestSuperClass {
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 						
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
+							//System.out.println("start drawing curves : " + recordSetName);
 							RecordSet recordSet = activeChannel.get(recordSetName);
 							if (recordSet != null) {
 								if (!recordSet.hasDisplayableData()) 
 									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
+								//System.out.println("loaded FileData : " + recordSetName);
 								activeChannel.setActiveRecordSet(recordSet);
 								activeChannel.applyTemplate(recordSetName, true);
 								//device.makeInActiveDisplayable(recordSet);

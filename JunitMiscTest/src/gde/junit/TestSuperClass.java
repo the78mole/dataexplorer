@@ -202,31 +202,36 @@ public class TestSuperClass extends TestCase {
 	 * @param maxY
 	 */
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
+		// get the image and prepare GC
+		this.curveArea = SWTResourceManager.getImage(maxX, maxY);
+		GC gc = this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
+		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
+		
+		//prepare time scale
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet.get(0).size()-1, recordSet.get(0).getTimeStep_ms());
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
-		int maxTime_ms = timeScale[3];
 
-		//prepare measurement scales
+		//calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
 		for (String recordKey : recordSet.getRecordNames()) {
 			Record tmpRecord = recordSet.getRecord(recordKey);
-			if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-				//log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+				//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
 					numberCurvesRight++;
 			}
 		}
-		// correct scales and scale position according synced scales requirements
+		//correct scales and scale position according synced scales requirements
 		if (recordSet.isSyncableSynced()) {
 			for (String recordKey : recordSet.getSyncableRecords()) {
 				Record tmpRecord = recordSet.getRecord(recordKey);
-				if (tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-					//log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+					//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					if (tmpRecord.isPositionLeft())
 						numberCurvesLeft--;
 					else
@@ -238,70 +243,73 @@ public class TestSuperClass extends TestCase {
 			else
 				numberCurvesRight++;
 		}
-		// correct scales and scale position according compare set requirements
+		//correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
-			numberCurvesLeft = numberCurvesLeft > 0 ? 1 : 0;
-			numberCurvesRight = numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
+			numberCurvesLeft = 1; //numberCurvesLeft > 0 ? 1 : 0;
+			numberCurvesRight = 0; //numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
-		//log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+		//System.out.println("nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
-		int dataScaleWidth; // space used for text and scales with description or legend
-		int x0; // enable a small gap if no axis is shown
-		int width; // make the time width  the width for the curves
-		int y0;
-		int height; // make modulo 20
-		// draw x coordinate	- time scale
+		//calculate the bounds left for the curves
+		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
+		int x0, y0; // the lower left corner of the curve area
+		int xMax, yMax; // the upper right corner of the curve area
+		int width; // x coordinate width	- time scale
+		int height; // y coordinate - make modulo 10 ??
 		int startTimeFormated, endTimeFormated;
-		// Calculate the horizontal area to used for plotting graphs
-		Point pt = this.canvasGC.textExtent("000,00"); //$NON-NLS-1$
-		int horizontalGap = pt.x / 5;
+		
+		// calculate the horizontal space width to be used for the scales
+		Point pt = gc.textExtent("-000,00"); //$NON-NLS-1$
+		int horizontalGap = pt.x/5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
+		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
-		x0 = maxX - (maxX - spaceLeft) + 5;
-		int xMax = maxX - spaceRight;
+		
+		// calculate the horizontal area available for plotting graphs
+		x0 = spaceLeft + 5;// enable a small gap if no axis is shown
+		xMax = bounds.width - spaceRight - 5;
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
-		int verticalSpace = 3 * pt.y;// space used for time scale text and scales with description or legend
-		int spaceTop = 20;
-		int spaceBot = verticalSpace;
-		y0 = maxY - spaceBot;
-		int yMax = maxY - (maxY - spaceTop);
-		height = ((y0 - yMax) - (y0 - yMax) % 10) <= 0 ? 1 : (y0 - yMax) - (y0 - yMax) % 10;
-		//log.log(Level.FINE, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		// draw curves for each active record
-		recordSet.setDrawAreaBounds(new Rectangle(x0, y0 - height, width, height));
-		//log.log(Level.FINE, "curve bounds = " + x0 + " " + (y0 - height) + " " + width + " " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
-		endTimeFormated = startTimeFormated + maxTimeFormated;
-		this.timeLine.drawTimeLine(recordSet, this.canvasGC, x0, y0, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (maxTime_ms - TimeLine.convertTimeInFormatNumber(recordSet
-				.getStartTime(), TimeLine.TIME_LINE_MSEC)), OpenSerialDataExplorer.COLOR_BLACK);
-
-		// get the image and prepare GC
-		this.curveArea = SWTResourceManager.getImage(width, height);
-		this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
-
-		// clear the image
-		this.curveAreaGC.setBackground(this.canvasGC.getBackground());
-		this.curveAreaGC.fillRectangle(this.curveArea.getBounds());
-
-		// draw draw area bounding 
-		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) //$NON-NLS-1$ //$NON-NLS-2$
-			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-		else
-			this.curveAreaGC.setForeground(OpenSerialDataExplorer.COLOR_GREY);
-		this.curveAreaGC.drawLine(0, 0, width, 0);
-		this.curveAreaGC.drawLine(0, 0, 0, height - 1);
-		this.curveAreaGC.drawLine(width - 1, 0, width - 1, height - 1);
-
-		// prepare grid lines
+		
+		// calculate the vertical area available for plotting graphs
+		int gapTop = 20; // free gap on top of the curves
+		int gapBot = 3 * pt.y + 3; // space used for time scale text and scales with description or legend;
+		y0 = bounds.height - gapBot + 1;
+		yMax = gapTop;
+		height = y0 - yMax <= 11 ? 11 : y0 - yMax;
+		//yMax = y0 - height;	// recalculate due to modulo 10
+		//System.out.println("draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		// set offset values used for mouse measurement pointers
 		this.offSetX = x0;
 		this.offSetY = y0 - height;
-		int[] dash = Settings.getInstance().getGridDashStyle();
+
+		// draw curves for each active record
+		this.curveAreaBounds = new Rectangle(x0, y0 - height, width+1, height+1);
+		recordSet.setDrawAreaBounds(this.curveAreaBounds);
+		//System.out.println("curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+		
+		//gc.setBackground(this.curveAreaBackground);
+		gc.fillRectangle(this.curveAreaBounds);
+		//gc.setBackground(this.surroundingBackground);
+
+		//draw the time scale
+		int deltaTime_ms = Double.valueOf(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
+		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
+		endTimeFormated = startTimeFormated + maxTimeFormated;
+		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + deltaTime_ms + " endTime = " + endTimeFormated);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, deltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+
+		// draw draw area bounding 
+		//gc.setForeground(this.curveAreaBorderColor);
+		
+		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
+		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
+		gc.drawLine(xMax+1, yMax-1, xMax+1, y0);
 
 		// check for activated time grid
-		if (recordSet.getTimeGridType() > 0) drawTimeGrid(recordSet, this.curveAreaGC, this.offSetX, height, dash);
+		if (recordSet.getTimeGridType() > 0) 
+			drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
@@ -316,33 +324,40 @@ public class TestSuperClass extends TestCase {
 			}
 		}
 
+		//draw the scale for all synchronized records
 		if (recordSet.isSyncableSynced()) {
-			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), this.canvasGC, x0, y0, width, height, dataScaleWidth);
+			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), gc, x0, y0, width, height, dataScaleWidth);
 			recordSet.updateSyncedScaleValues();
 		}
+		
 		// draw each record using sorted record set names
-		for (String record : recordSet.getNoneCalculationRecordNames()) {
+		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
-			boolean isActualRecordEnabled = true;
-			//log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) CurveUtils.drawScale(actualRecord, this.canvasGC, x0, y0, width, height, dataScaleWidth);
+			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			//System.out.println("drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
+				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
-				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, dash);
+				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
-				//System.out.println("drawing record = " + record);
-				CurveUtils.drawCurve(actualRecord, this.curveAreaGC, 0, height, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+				//gc.drawRectangle(x0, y0-height, width, height);
+				gc.setClipping(x0-1, y0-height-1, width+2, height+2);
+				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				gc.setClipping(bounds);
 			}
 		}
 
-		this.canvasGC.drawImage(this.curveArea, this.offSetX, this.offSetY);
-
-		if (startTimeFormated != 0) { // scaled window 
+		// draw start time for zoom mode or scope mode
+		if (startTimeFormated != 0) { 
 			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
-			Point point = this.canvasGC.textExtent(strStartTime);
+			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
-			this.canvasGC.drawText(strStartTime, 10, yPosition - point.y / 2);
+			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
+			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
+			//System.out.println(strStartTime);
 		}
 	}
 
@@ -353,13 +368,13 @@ public class TestSuperClass extends TestCase {
 	 * @param height
 	 * @param dash to be used for the custom line style
 	 */
-	public void drawTimeGrid(RecordSet recordSet, GC gc, int useOffSetX, int height, int[] dash) {
+	public void drawTimeGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dash) {
 		gc.setLineWidth(1);
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getColorTimeGrid());
 		for (Integer x : recordSet.getTimeGrid()) {
-			gc.drawLine(x - useOffSetX, 0, x - useOffSetX, height - 1);
+			gc.drawLine(x - bounds.x, 0, x - bounds.x, bounds.height - 1);
 		}
 	}
 
