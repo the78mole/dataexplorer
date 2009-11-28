@@ -265,6 +265,7 @@ public class UniLogLiveGatherer extends Thread {
 	 * @param message
 	 */
 	void cleanup(final String recordSetKey, String message) {
+		boolean isErrorState =  this.isTimerRunning;
 		this.stopTimerThread();
 		if(this.isPortOpenedByLiveGatherer) 
 			this.serialPort.close(); 
@@ -274,7 +275,7 @@ public class UniLogLiveGatherer extends Thread {
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey);
 		this.device.getDialog().resetButtons();
-		if (message != null && message.length() > 5) {
+		if (message != null && message.length() > 5 && isErrorState) {
 			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 		}
 	}

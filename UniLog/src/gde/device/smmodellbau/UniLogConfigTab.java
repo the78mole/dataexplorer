@@ -404,7 +404,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "currentOffset.keyReleased, event=" + evt); //$NON-NLS-1$
 								try {
-									UniLogConfigTab.this.offsetCurrent = new Double(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')).doubleValue();
+									UniLogConfigTab.this.offsetCurrent = Double.valueOf(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')).doubleValue();
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
@@ -1409,12 +1409,14 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 */
 	public void checkUpdateAnalog() {
 		log.log(Level.FINE, "visit checkUpdateAnalog");
+		this.powerGroup.redraw();
+		this.axModusGroup.redraw();
 		if (this.channels.getActiveChannel() != null) {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 				// 2=current
-				activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setOffset(new Double(this.currentOffset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setOffset(Double.valueOf(this.currentOffset.getText().trim().replace(',', '.')));
 
 				// 11=a1Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(this.a1Button.getSelection());
@@ -1422,24 +1424,24 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(this.a1Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(this.a1Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.')));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(Double.valueOf(this.a1Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(Double.valueOf(this.a1Factor.getText().trim().replace(',', '.')));
 				// 12=a2Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setActive(this.a2Button.getSelection());
 				//activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setVisible(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(this.a2Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(this.a2Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.')));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(Double.valueOf(this.a2Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(Double.valueOf(this.a2Factor.getText().trim().replace(',', '.')));
 				// 13=a3Value
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setActive(this.a3Button.getSelection());
 				//activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setVisible(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(this.a3Button.getSelection());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.')));
-				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(new Double(this.a3Factor.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(Double.valueOf(this.a3Offset.getText().trim().replace(',', '.')));
+				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(Double.valueOf(this.a3Factor.getText().trim().replace(',', '.')));
 				activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(this.a3Text.getText().trim());
 				
 				UniLogConfigTab.this.application.updateGraphicsWindow();
