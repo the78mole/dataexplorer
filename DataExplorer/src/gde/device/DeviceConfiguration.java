@@ -467,7 +467,7 @@ public class DeviceConfiguration {
 	 * @param dektopType
 	 * @return property of the queried type or null if not defined
 	 */
-	public PropertyType getDesktopProperty(String dektopType) {
+	public PropertyType getDesktopProperty(DesktopPropertyTypes dektopType) {
 		PropertyType property = null;
 		if (this.desktop != null) {
 			List<PropertyType> properties = this.desktop.getProperty();
@@ -644,7 +644,7 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isTableTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_TABLE_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
 		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
@@ -653,9 +653,9 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setTableTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_TABLE_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopType.TYPE_TABLE_TAB, DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.TABLE_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
 			property.setValue(OSDE.STRING_EMPTY + enable);
@@ -668,7 +668,7 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isDigitalTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
 		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
@@ -677,9 +677,9 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setDigitalTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopType.TYPE_DIGITAL_TAB, DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
 			property.setValue(OSDE.STRING_EMPTY + enable);
@@ -692,7 +692,7 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isAnalogTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
 		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
@@ -701,9 +701,9 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setAnalogTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopType.TYPE_ANALOG_TAB, DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.ANALOG_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
 			property.setValue(OSDE.STRING_EMPTY + enable);
@@ -716,7 +716,7 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isVoltagePerCellTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 		return Boolean.valueOf(property != null ? property.getValue() : null); 
 	}
 	
@@ -725,9 +725,9 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setVoltagePerCellTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB);
+		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB, DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
 			property.setValue(OSDE.STRING_EMPTY + enable);
@@ -740,7 +740,7 @@ public class DeviceConfiguration {
 	 * @param dektopType
 	 * @param newDescription
 	 */
-	public void setDesktopTypeDesription(String dektopType, String newDescription) {
+	public void setDesktopTypeDesription(DesktopPropertyTypes dektopType, String newDescription) {
 		this.getDesktopProperty(dektopType).setDescription(newDescription);
 		this.isChangePropery = true;
 	}

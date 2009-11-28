@@ -53,7 +53,7 @@ import osde.OSDE;
 import osde.config.Settings;
 import osde.device.ChecksumTypes;
 import osde.device.DataTypes;
-import osde.device.DesktopType;
+import osde.device.DesktopPropertyTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceTypes;
 import osde.device.FormatTypes;
@@ -1071,10 +1071,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		//ChannelType end
 
 		//DesktopType begin
-		this.desktopInnerTabItem1.setProperty(this.deviceConfig.getDesktopProperty(DesktopType.TYPE_TABLE_TAB), false, false, false, true);
-		this.desktopInnerTabItem2.setProperty(this.deviceConfig.getDesktopProperty(DesktopType.TYPE_DIGITAL_TAB), false, false, false, true);
-		this.desktopInnerTabItem3.setProperty(this.deviceConfig.getDesktopProperty(DesktopType.TYPE_ANALOG_TAB), false, false, false, true);
-		this.desktopInnerTabItem4.setProperty(this.deviceConfig.getDesktopProperty(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB), false, false, false, true);
+		this.desktopInnerTabItem1.setProperty(this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB), false, false, false, true);
+		this.desktopInnerTabItem2.setProperty(this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB), false, false, false, true);
+		this.desktopInnerTabItem3.setProperty(this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB), false, false, false, true);
+		this.desktopInnerTabItem4.setProperty(this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB), false, false, false, true);
 		this.desktopComposite.redraw();
 		//DesktopType end
 	}

@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.device.DataTypes;
+import osde.device.DesktopPropertyTypes;
 import osde.device.DesktopType;
 import osde.device.DeviceConfiguration;
 import osde.device.MeasurementPropertyTypes;
@@ -415,13 +416,13 @@ public class PropertyTypeTabItem extends CTabItem {
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
 							// mode state type is Integer and can not be modified by combo selection
 							if (PropertyTypeTabItem.this.desktopParent != null) {
-								if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopType.TYPE_TABLE_TAB))
+								if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.TABLE_TAB))
 									PropertyTypeTabItem.this.deviceConfigParent.setTableTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopType.TYPE_DIGITAL_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.DIGITAL_TAB))
 									PropertyTypeTabItem.this.deviceConfigParent.setDigitalTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopType.TYPE_ANALOG_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.ANALOG_TAB))
 									PropertyTypeTabItem.this.deviceConfigParent.setAnalogTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopType.TYPE_VOLTAGE_PER_CELL_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB))
 									PropertyTypeTabItem.this.deviceConfigParent.setVoltagePerCellTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
 							}
 						}
@@ -442,7 +443,7 @@ public class PropertyTypeTabItem extends CTabItem {
 							if (PropertyTypeTabItem.this.stateParent != null)
 								PropertyTypeTabItem.this.deviceConfigParent.setStateDescription(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.descriptionText.getText());
 							else if (PropertyTypeTabItem.this.desktopParent != null)
-								PropertyTypeTabItem.this.deviceConfigParent.setDesktopTypeDesription(PropertyTypeTabItem.this.propertyType.getName(), PropertyTypeTabItem.this.descriptionText.getText());
+								PropertyTypeTabItem.this.deviceConfigParent.setDesktopTypeDesription(DesktopPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()), PropertyTypeTabItem.this.descriptionText.getText());
 						}
 						else
 							PropertyTypeTabItem.this.propertyType.setDescription(PropertyTypeTabItem.this.descriptionText.getText());
