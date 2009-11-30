@@ -48,10 +48,9 @@ import osde.utils.StringHelper;
  * Table display class, displays the data in table form
  * @author Winfried Brügmann
  */
-public class DataTableWindow {
+public class DataTableWindow extends CTabItem {
 	final static Logger					  log	= Logger.getLogger(DataTableWindow.class.getName());
 
-	CTabItem											table;
 	Table													dataTable;
 	TableColumn										timeColumn;
 
@@ -59,30 +58,28 @@ public class DataTableWindow {
 	final Channels								channels;
 	final CTabFolder							tabFolder;
 
-	public DataTableWindow(OpenSerialDataExplorer currenApplication, CTabFolder dataTab) {
-		this.application = currenApplication;
+	public DataTableWindow(CTabFolder dataTab, int style, int position) {
+		super(dataTab, style, position);
+		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = dataTab;
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
 	}
 
 	public void create() {
-		this.table = new CTabItem(this.tabFolder, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.table);
-		this.table.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.table.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
-		{
-			this.dataTable = new Table(this.tabFolder, SWT.BORDER);
-			this.table.setControl(this.dataTable);
-			this.dataTable.setLinesVisible(true);
-			this.dataTable.setHeaderVisible(true);
-			this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-			this.dataTable.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
-		}
+		this.dataTable = new Table(this.tabFolder, SWT.BORDER);
+		this.setControl(this.dataTable);
+		this.dataTable.setLinesVisible(true);
+		this.dataTable.setHeaderVisible(true);
+		this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.dataTable.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
 	}
 
 	/**

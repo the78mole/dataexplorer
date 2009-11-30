@@ -40,7 +40,7 @@ import osde.utils.TimeLine;
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
-public class GraphicsWindow {
+public class GraphicsWindow extends CTabItem {
 	final static Logger						log											= Logger.getLogger(GraphicsWindow.class.getName());
 
 	public static final int				TYPE_NORMAL							= 0;
@@ -48,7 +48,6 @@ public class GraphicsWindow {
 	public static final String		WINDOW_TYPE							= "window_type"; //$NON-NLS-1$
 
 	final CTabFolder							tabFolder;
-	CTabItem											graphic;
 	
 	SashForm											graphicSashForm;
 	boolean												isCurveSelectorEnabled	= true;
@@ -67,34 +66,33 @@ public class GraphicsWindow {
 	final TimeLine								timeLine								= new TimeLine();
 	final int											windowType;
 	
-	public GraphicsWindow(OpenSerialDataExplorer currentApplication, CTabFolder currentDisplayTab, int currentType, String useTabName) {
-		this.application = currentApplication;
+	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName) {
+		super(currentDisplayTab, style);
+		SWTResourceManager.registerResourceUser(this);
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
 		this.windowType = currentType;
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(this.tabName);
 	}
 
 	public void create() {
-		this.graphic = new CTabItem(this.tabFolder, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.graphic);
-		this.graphic.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.graphic.setText(this.tabName);
+		// graphicSashForm
+		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
+		this.setControl(this.graphicSashForm);
 
-		{ // graphicSashForm
-			this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
-			this.graphic.setControl(this.graphicSashForm);
-			
-			{ // curveSelector
-				this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254));			
-			} // curveSelector
-			
-			{ // graphics composite
-				this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.windowType);
-			} // graphics composite
-			
-		} // graphicSashForm
+		{ // curveSelector
+			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254));
+		} // curveSelector
+
+		{ // graphics composite
+			this.graphicsComposite = new GraphicsComposite(this.graphicSashForm, this.windowType);
+		} // graphics composite
+
+		// graphicSashForm
 	}
 
 	/**
@@ -288,5 +286,12 @@ public class GraphicsWindow {
 		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
 		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
 		this.graphicsComposite.doRedrawGraphics();
+	}
+
+	/**
+	 * @return the windowType (TYPE_NORMAL or TYPE_COMPARE)
+	 */
+	public int getWindowType() {
+		return windowType;
 	}
 }

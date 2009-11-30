@@ -205,30 +205,17 @@ public class CurveUtils {
 		log.log(Level.FINER, "recordSize = " + recordSize + " adaptXMaxValue = " + adaptXMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// calculate scale factor to fit time into draw bounds
-		double factorX = width / adaptXMaxValue;
+		double xTimeFactor = width / adaptXMaxValue;
 		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
-		int xScale = 1;
-		if (recordSize > (width * 2)) {
-			if (isCompareSet) {
-				xScale = Double.valueOf(recordSize / (width * 2)).intValue();
-				while (!(recordSize % xScale <= 5) && xScale > 1) {
-					--xScale;
-				}
-			}
-			else if (record.getParent().getXScale() == 0 || isZoomMode ) {
-				xScale = Double.valueOf(recordSize / (width * 2.5)).intValue();
-				while (!(recordSize % xScale <= 5) && xScale > 1) {
-					--xScale;
-				}
-				record.getParent().setXScale(xScale);
-			}
-			else {
-				xScale = record.getParent().getXScale();
-			}
-			log.log(Level.FINER, "factorX = " + factorX + " xScale = " + xScale + " : " + (factorX * xScale)); //$NON-NLS-1$ //$NON-NLS-2$
-			factorX = factorX * xScale;
+		int xScaleFactor = Double.valueOf(recordSize / (width * 2.2)).intValue();
+		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1;
+		while (!(recordSize % xScaleFactor <= 5) && xScaleFactor > 1) {
+			--xScaleFactor;
 		}
-		record.setDisplayScaleFactorTime(factorX);
+		log.log(Level.FINER, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
+		xTimeFactor = xTimeFactor * xScaleFactor;
+
+		record.setDisplayScaleFactorTime(xTimeFactor);
 		record.setDisplayScaleFactorValue(height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
@@ -247,7 +234,7 @@ public class CurveUtils {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
 			int drawLimit = record.getDrawLimit();
 			if (drawLimit == Integer.MAX_VALUE) { // no draw limit
-				for (int i = 0, j = 0; j <= recordSize && recordSize > 1; ++i, j = j + xScale) {
+				for (int i = 0, j = 0; j <= recordSize && recordSize > 1; ++i, j = j + xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
@@ -257,7 +244,7 @@ public class CurveUtils {
 			}
 			else { // compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
-				for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScale) {
+				for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());

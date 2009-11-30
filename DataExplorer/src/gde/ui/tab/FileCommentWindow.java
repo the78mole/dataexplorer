@@ -59,11 +59,10 @@ import osde.ui.menu.TabAreaContextMenu;
  * Class to enable a file comment
  * @author Winfried Brügmann
  */
-public class FileCommentWindow {
+public class FileCommentWindow extends CTabItem {
 
 	final static Logger						log										= Logger.getLogger(FileCommentWindow.class.getName());
 
-	CTabItem											commentTab;
 	Composite											commentMainComposite;
 	CLabel												infoLabel;
 	Text													fileCommentText;
@@ -84,10 +83,14 @@ public class FileCommentWindow {
 	 * constructor with CTabFolder parent
 	 * @param currentDisplayTab
 	 */
-	public FileCommentWindow(CTabFolder currentDisplayTab) {
+	public FileCommentWindow(CTabFolder currentDisplayTab, int style) {
+		super(currentDisplayTab, style);
 		this.displayTab = currentDisplayTab;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		SWTResourceManager.registerResourceUser(this);
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -99,102 +102,95 @@ public class FileCommentWindow {
 	 * method to create the window and register required event listener
 	 */
 	public void create() {
-		this.commentTab = new CTabItem(this.displayTab, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.commentTab);
-		this.commentTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.commentTab.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
-
+		this.commentMainComposite = new Composite(this.displayTab, SWT.NONE);
+		this.setControl(this.commentMainComposite);
+		this.commentMainComposite.setLayout(null);
+		this.commentMainComposite.setBackground(this.surroundingBackground);
+		this.commentMainComposite.setMenu(this.popupmenu);
+		this.commentMainComposite.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent evt) {
+				log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+				updateRecordSetTable();
+			}
+		});
+		this.commentMainComposite.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
+				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
 		{
-			this.commentMainComposite = new Composite(this.displayTab, SWT.NONE);
-			this.commentTab.setControl(this.commentMainComposite);
-			this.commentMainComposite.setLayout(null);
-			this.commentMainComposite.setBackground(this.surroundingBackground);
-			this.commentMainComposite.setMenu(this.popupmenu);
-			this.commentMainComposite.addPaintListener(new PaintListener() {
+			this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
+			this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
+			this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
+			this.infoLabel.setBackground(this.surroundingBackground);
+			this.infoLabel.setMenu(this.popupmenu);
+			this.infoLabel.setBounds(50, 10, 500, 26);
+			this.infoLabel.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					updateRecordSetTable();
+					log.log(Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
+					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 				}
 			});
-			this.commentMainComposite.addHelpListener(new HelpListener() {
+		}
+		{
+			this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+			this.fileCommentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.fileCommentText.setBackground(this.innerAreaBackground);
+			this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
+			this.fileCommentText.setBounds(50, 40, 500, 100);
+			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : OSDE.STRING_EMPTY);
+			this.fileCommentText.setMenu(this.popupmenu);
+			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			{
-				this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
-				this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
-				this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
-				this.infoLabel.setBackground(this.surroundingBackground);
-				this.infoLabel.setMenu(this.popupmenu);
-				this.infoLabel.setBounds(50, 10, 500, 26);
-				this.infoLabel.addPaintListener(new PaintListener() {
-					@Override
-					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
-						FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
-					}
-				});
-			}
-			{
-				this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-				this.fileCommentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-				this.fileCommentText.setBackground(this.innerAreaBackground);
-				this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
-				this.fileCommentText.setBounds(50, 40, 500, 100);
-				this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : OSDE.STRING_EMPTY);
-				this.fileCommentText.setMenu(this.popupmenu);
-				this.fileCommentText.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				this.fileCommentText.addKeyListener(new KeyAdapter() {
-					@Override
-					public void keyPressed(KeyEvent e) {
-						log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
-						FileCommentWindow.this.isFileCommentChanged = true;
-					}
-				});
-				this.fileCommentText.addFocusListener(new FocusListener() {
-					@Override
-					public void focusLost(FocusEvent evt) {
-						log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
-						setFileComment();
-					}
+			this.fileCommentText.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
+					FileCommentWindow.this.isFileCommentChanged = true;
+				}
+			});
+			this.fileCommentText.addFocusListener(new FocusListener() {
+				@Override
+				public void focusLost(FocusEvent evt) {
+					log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
+					setFileComment();
+				}
 
-					@Override
-					public void focusGained(FocusEvent evt) {
-						log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
-					}
-				});
-			}
-			{
-				this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
-				this.recordCommentTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-				this.recordCommentTable.setBounds(50, 200, 500, 100);
-				//this.table.setControl(this.dataTable);
-				this.recordCommentTable.setLinesVisible(true);
-				this.recordCommentTable.setHeaderVisible(true);
-				this.recordCommentTable.setBackground(this.innerAreaBackground);
-				this.recordCommentTable.setMenu(this.popupmenu);
-				this.recordCommentTable.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
+				@Override
+				public void focusGained(FocusEvent evt) {
+					log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
+				}
+			});
+		}
+		{
+			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
+			this.recordCommentTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.recordCommentTable.setBounds(50, 200, 500, 100);
+			//this.table.setControl(this.dataTable);
+			this.recordCommentTable.setLinesVisible(true);
+			this.recordCommentTable.setHeaderVisible(true);
+			this.recordCommentTable.setBackground(this.innerAreaBackground);
+			this.recordCommentTable.setMenu(this.popupmenu);
+			this.recordCommentTable.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 
-				this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
-				this.recordCommentTableHeader.setWidth(250);
-				this.recordCommentTableHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0242));
+			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
+			this.recordCommentTableHeader.setWidth(250);
+			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0242));
 
-				this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
-				this.recordCommentTableHeader2.setWidth(500);
-				this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.OSDE_MSGT0243));
-			}
+			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
+			this.recordCommentTableHeader2.setWidth(500);
+			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.OSDE_MSGT0243));
 		}
 	}
 

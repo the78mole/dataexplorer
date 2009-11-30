@@ -64,7 +64,7 @@ public class ObjectImageContextMenu {
 				if (imgFileDialog.getFileName().length() > 4) {
 					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
 					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + OSDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
-					ObjectImageContextMenu.this.application.getObjectDescriptionWindow().redrawImageCanvas();
+					ObjectImageContextMenu.this.application.updateObjectImage();
 				}
 			}
 		});
@@ -75,7 +75,7 @@ public class ObjectImageContextMenu {
 				ObjectImageContextMenu.log.log(Level.FINEST, "deleteItem action performed! " + e); //$NON-NLS-1$
 				ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
 				ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, null);
-				ObjectImageContextMenu.this.application.getObjectDescriptionWindow().redrawImageCanvas();
+				ObjectImageContextMenu.this.application.updateObjectImage();
 			}
 		});
 	}

@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.HelpEvent;
@@ -50,13 +49,11 @@ import osde.ui.menu.TabAreaContextMenu;
  * Display window parent of digital displays
  * @author Winfried Brügmann
  */
-public class DigitalWindow {
+public class DigitalWindow extends CTabItem {
 	final static Logger							log	= Logger.getLogger(DigitalWindow.class.getName());
 
 	Composite												digitalMainComposite;
-	CTabItem												digitalTab;
 	HashMap<String, DigitalDisplay>	displays;
-	CLabel													infoText;
 	FillLayout 											digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
@@ -72,10 +69,14 @@ public class DigitalWindow {
 	Channel													oldChannel;
 	String[] 												oldRecordsToDisplay;
 
-	public DigitalWindow(CTabFolder currentDisplayTab) {
+	public DigitalWindow(CTabFolder currentDisplayTab, int style, int position) {
+		super(currentDisplayTab, style, position);
+		SWTResourceManager.registerResourceUser(this);
 		this.displayTab = currentDisplayTab;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 			
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -85,13 +86,9 @@ public class DigitalWindow {
 	}
 
 	public void create() {
-		this.digitalTab = new CTabItem(this.displayTab, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.digitalTab);
-		this.digitalTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.digitalTab.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
 		{
 			this.digitalMainComposite = new Composite(this.displayTab, SWT.NONE);
-			this.digitalTab.setControl(this.digitalMainComposite);
+			this.setControl(this.digitalMainComposite);
 			this.digitalMainComposite.setBackground(this.surroundingBackground);
 			this.digitalMainComposite.setLayout(null);
 			this.digitalMainComposite.setMenu(this.popupmenu);
@@ -108,23 +105,7 @@ public class DigitalWindow {
 					update(false);
 				}
 			});
-			setActiveInfoText(this.info);
-			
 			this.digitalMainComposite.layout();
-		}
-	}
-
-	/**
-	 * create new info text
-	 */
-	private void setActiveInfoText(String udateInfo) {
-		if (this.infoText == null || this.infoText.isDisposed()) {
-			this.digitalMainComposite.setLayout(null);
-			this.infoText = new CLabel(this.digitalMainComposite, SWT.LEFT);
-			this.infoText.setBackground(this.surroundingBackground);
-			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.infoText.setBounds(10, 10, 200, 30);
-			this.infoText.setText(udateInfo);
 		}
 	}
 
@@ -159,8 +140,6 @@ public class DigitalWindow {
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
 				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
-					// remove the info text 
-					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// set layout 
 					this.digitalMainComposite.setLayout(this.digitalMainCompositeLayout);
 					// cleanup
@@ -190,10 +169,6 @@ public class DigitalWindow {
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}
-				}
-				if (recordSet != null && !recordSet.getDevice().isDigitalTabRequested()) {
-					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
-					else this.infoText.setText(this.info);
 				}
 			}
 			this.oldChannel = activeChannel;
@@ -228,9 +203,6 @@ public class DigitalWindow {
 	public void setSurroundingAreaBackground(Color newSurroundingBackground) {
 		this.digitalMainComposite.setBackground(newSurroundingBackground);
 		this.surroundingBackground = newSurroundingBackground;
-		if (this.infoText != null && !this.infoText.isDisposed()) {
-			this.infoText.setBackground(newSurroundingBackground);
-		}
 		this.digitalMainComposite.redraw();
 	}
 }

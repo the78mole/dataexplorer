@@ -381,14 +381,14 @@ public class MenuToolBar {
 									checkChannelForObjectKeyMissmatch(selectionIndex, MenuToolBar.this.objectSelectCombo.getText());
 									MenuToolBar.this.isObjectoriented = true;
 									
-									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
+									MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
 								}
 								else { // device oriented
 									MenuToolBar.this.editObject.setEnabled(false);
 									MenuToolBar.this.deleteObject.setEnabled(false);
 									checkChannelForObjectKeyMissmatch(selectionIndex, OSDE.STRING_EMPTY);
 									MenuToolBar.this.isObjectoriented = false;
-									MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(false);
+									MenuToolBar.this.application.setObjectDescriptionTabVisible(false);
 								}
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
@@ -450,7 +450,7 @@ public class MenuToolBar {
 										}
 										MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
 										MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
-										MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
+										MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 									}
 									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
@@ -477,7 +477,7 @@ public class MenuToolBar {
 								tmpObjects.add(tmpObject);
 							}
 							tmpObjects.add(OSDE.STRING_EMPTY);
-							MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(true);
+							MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
 							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
 							MenuToolBar.this.objectSelectCombo.setEditable(true);
@@ -514,7 +514,7 @@ public class MenuToolBar {
 								}
 								MenuToolBar.this.settings.setObjectList(tmpObjects.toArray(new String[1]), currentIndex);
 								
-								MenuToolBar.this.application.getObjectDescriptionWindow().setVisible(MenuToolBar.this.isObjectoriented);
+								MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
 							}
 							MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
@@ -1323,7 +1323,7 @@ public class MenuToolBar {
 			MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.settings.getActiveObjectIndex());
 		}
 		this.isObjectoriented = this.objectSelectCombo.getSelectionIndex() > 0;
-		this.application.getObjectDescriptionWindow().setVisible(this.isObjectoriented);
+		this.application.setObjectDescriptionTabVisible(this.isObjectoriented);
 		this.application.updateObjectDescriptionWindow();
 	}
 

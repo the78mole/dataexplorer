@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.HelpEvent;
@@ -50,13 +49,11 @@ import osde.ui.menu.TabAreaContextMenu;
  * Display window parent of analog displays
  * @author Winfried Brügmann
  */
-public class AnalogWindow {
+public class AnalogWindow extends CTabItem {
 	final static Logger							log	= Logger.getLogger(AnalogWindow.class.getName());
 
-	CTabItem												analogTab;
 	Composite												analogMainComposite;
 	HashMap<String, AnalogDisplay>	displays;
-	CLabel													infoText;
 	GridLayout 											analogMainCompositeLayout;
 	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
 
@@ -71,10 +68,14 @@ public class AnalogWindow {
 	Channel													oldChannel;
 	String[] 												oldRecordsToDisplay;
 
-	public AnalogWindow(CTabFolder currentDisplayTab) {
+	public AnalogWindow(CTabFolder currentDisplayTab, int style, int position) {
+		super(currentDisplayTab, style, position);
+		SWTResourceManager.registerResourceUser(this);
 		this.displayTab = currentDisplayTab;
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		
 		this.surroundingBackground = Settings.getInstance().getAnalogSurroundingAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -84,16 +85,12 @@ public class AnalogWindow {
 	}
 
 	public void create() {
-		this.analogTab = new CTabItem(this.displayTab, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.analogTab);
-		this.analogTab.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.analogTab.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
 		{
 			this.analogMainComposite = new Composite(this.displayTab, SWT.NONE);
 			this.analogMainCompositeLayout = new GridLayout();
 			this.analogMainCompositeLayout.makeColumnsEqualWidth = true;
 			this.analogMainCompositeLayout.numColumns = 2;
-			this.analogTab.setControl(this.analogMainComposite);
+			this.setControl(this.analogMainComposite);
 			this.analogMainComposite.setLayout(this.analogMainCompositeLayout);
 			log.log(Level.FINE, "digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
 			this.analogMainComposite.setBackground(this.surroundingBackground);
@@ -111,23 +108,7 @@ public class AnalogWindow {
 					update(false);
 				}
 			});
-			setActiveInfoText(this.info);
-			
 			this.analogMainComposite.layout();
-		}
-	}
-
-	/**
-	 * create new info text
-	 */
-	private void setActiveInfoText(String updatedInfo) {
-		if (this.infoText == null || this.infoText.isDisposed()) {
-			this.analogMainComposite.setLayout(null);
-			this.infoText = new CLabel(this.analogMainComposite, SWT.LEFT);
-			this.infoText.setBackground(this.surroundingBackground);
-			this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.infoText.setBounds(10, 10, 200, 30);
-			this.infoText.setText(updatedInfo);
 		}
 	}
 
@@ -164,8 +145,6 @@ public class AnalogWindow {
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
 				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
-					// remove the info text
-					if (!this.infoText.isDisposed()) this.infoText.dispose();
 					// set the grid layout
 					this.analogMainComposite.setLayout(this.analogMainCompositeLayout);
 					// clean possible outdated displays
@@ -195,10 +174,6 @@ public class AnalogWindow {
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}
-				}
-				if (recordSet != null && !recordSet.getDevice().isAnalogTabRequested()) {
-					if (this.infoText.isDisposed()) setActiveInfoText(this.info);
-					else this.infoText.setText(this.info);
 				}
 			}
 			this.oldChannel = activeChannel;
@@ -233,9 +208,6 @@ public class AnalogWindow {
 	public void setSurroundingAreaBackground(Color newSurroundingBackground) {
 		this.analogMainComposite.setBackground(newSurroundingBackground);
 		this.surroundingBackground = newSurroundingBackground;
-		if (this.infoText != null && !this.infoText.isDisposed()) {
-			this.infoText.setBackground(newSurroundingBackground);
-		}
 		this.analogMainComposite.redraw();
 	}
 }

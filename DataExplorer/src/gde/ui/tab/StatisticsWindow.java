@@ -46,13 +46,12 @@ import osde.utils.TimeLine;
 /**
  * class to represent statistics data according configuration in device properties XML file
  */
-public class StatisticsWindow {
+public class StatisticsWindow extends CTabItem {
 	final static Logger						log						= Logger.getLogger(StatisticsWindow.class.getName());
 
 	static final String	DELIMITER	= "!"; //$NON-NLS-1$
 	static final String	NO_VALUE	= "    ---    "; //$NON-NLS-1$
 
-	CTabItem											statistics;
 	Composite											composite;
 	Composite											filler;
 	Group													descriptionGroup;
@@ -90,32 +89,26 @@ public class StatisticsWindow {
 	final Settings								settings;
 	final CTabFolder							tabFolder;
 
-	public StatisticsWindow(OpenSerialDataExplorer currentApplication, CTabFolder currentDisplayTab) {
-		this.application = currentApplication;
+	public StatisticsWindow(CTabFolder currentDisplayTab, int style) {
+		super(currentDisplayTab, style);
+		SWTResourceManager.registerResourceUser(this);
+		this.application = OpenSerialDataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
+		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 		
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
 		this.innerAreaBackground = this.settings.getStatisticsInnerAreaBackground();
 		this.surroundingBackground = this.settings.getStatisticsSurroundingAreaBackground();
 	}
 
 	public void create() {
-		this.statistics = new CTabItem(this.tabFolder, SWT.NONE);
-		this.statistics.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.statistics.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
-		SWTResourceManager.registerResourceUser(this.statistics);
-		
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
-		
-		initGUI();
-	}
-
-	private void initGUI() {
 		try {
 			this.composite = new Composite(this.tabFolder, SWT.NONE);
-			this.statistics.setControl(this.composite);
+			this.setControl(this.composite);
 			this.composite.setLayout(null);
 			this.composite.setBackground(this.surroundingBackground);
 			this.composite.setMenu(this.popupmenu);			
