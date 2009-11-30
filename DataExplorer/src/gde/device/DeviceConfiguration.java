@@ -472,7 +472,7 @@ public class DeviceConfiguration {
 		if (this.desktop != null) {
 			List<PropertyType> properties = this.desktop.getProperty();
 			for (PropertyType propertyType : properties) {
-				if (propertyType.getName().equals(dektopType)) {
+				if (propertyType.getName().equals(dektopType.value())) {
 					property = propertyType;
 					break;
 				}
