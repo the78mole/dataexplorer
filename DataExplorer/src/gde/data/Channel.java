@@ -480,15 +480,15 @@ public class Channel extends HashMap<String, RecordSet> {
 			if (recordSet.isRecalculation)
 				recordSet.checkAllDisplayable(); // updates graphics window
 			
+			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			this.application.updateGraphicsWindow();
-			this.application.getMenuToolBar().updateRecordSetSelectCombo();
+			this.application.updateStatisticsData();
+			this.application.updateDataTable(recordSetKey);
 			this.application.updateDigitalWindow();
 			this.application.updateAnalogWindow();
 			this.application.updateCellVoltageWindow();
 			this.application.updateFileCommentWindow();
-			this.application.updateStatisticsData();
-			this.application.updateDataTable(recordSetKey);
 		}
 	}
 
