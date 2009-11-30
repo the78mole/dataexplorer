@@ -692,7 +692,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											DeviceSelectionDialog.log.log(Level.FINEST, "tableTabButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setTableTabRequested(DeviceSelectionDialog.this.tableTabButton.getSelection());
-										}
+											DeviceSelectionDialog.this.application.setDataTableTabItemVisible(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isTableTabRequested());
+}
 									});
 								}
 								{
@@ -706,6 +707,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											DeviceSelectionDialog.log.log(Level.FINEST, "digitalTabButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setDigitalTabRequested(DeviceSelectionDialog.this.digitalTabButton.getSelection());
+											DeviceSelectionDialog.this.application.setDigitalTabItemVisible(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isDigitalTabRequested());
 										}
 									});
 								}
@@ -720,6 +722,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											DeviceSelectionDialog.log.log(Level.FINEST, "analogTabButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setAnalogTabRequested(DeviceSelectionDialog.this.analogTabButton.getSelection());
+											DeviceSelectionDialog.this.application.setAnalogTabItemVisible(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isAnalogTabRequested());
 										}
 									});
 								}
@@ -734,6 +737,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											DeviceSelectionDialog.log.log(Level.FINEST, "cellVoltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setVoltagePerCellTabRequested(DeviceSelectionDialog.this.voltagePerCellButton.getSelection());
+											DeviceSelectionDialog.this.application.setCellVoltageTabItemVisible(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
 										}
 									});
 								}
