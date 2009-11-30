@@ -205,10 +205,7 @@ public class GathererThread extends Thread {
 								//GathererThread.this.application.updateDataTable(this.recordSetKey);
 								GathererThread.this.application.updateDigitalWindowChilds();
 								GathererThread.this.application.updateAnalogWindowChilds();
-								log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "numberBatteryCells = " + GathererThread.this.numberBatteryCells); //$NON-NLS-1$
-								if (GathererThread.this.numberBatteryCells > 0) {
-									GathererThread.this.application.updateCellVoltageChilds();
-								}
+								GathererThread.this.application.updateCellVoltageChilds();
 							}
 						});
 					}
