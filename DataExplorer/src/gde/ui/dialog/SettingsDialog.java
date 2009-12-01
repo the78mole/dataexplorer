@@ -123,12 +123,13 @@ public class SettingsDialog extends Dialog {
 	Group																fileOpenSaveDialogGroup;
 	Group																objectKeyGroup;
 	Button															scanObjectKeysButton;
+	Button															cleanObjectReferecesButton;
 	Button															removeMimeAssocButton;
 	Group																miscDiagGroup;
 	Button															resourceConsumptionButton;
 	Button															assocMimeTypeButton;
 	Button															removeLauncherButton;
-	Button															createLauncerButton;
+	Button															createLauncherButton;
 	Composite														osMiscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
@@ -691,14 +692,14 @@ public class SettingsDialog extends Dialog {
 							this.desktopLauncher.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
 							this.desktopLauncher.setText(Messages.getString(MessageIds.OSDE_MSGT0362));
 							{
-								this.createLauncerButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
-								this.createLauncerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
-								this.createLauncerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
+								this.createLauncherButton = new Button(this.desktopLauncher, SWT.PUSH | SWT.CENTER);
+								this.createLauncherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.createLauncherButton.setText(Messages.getString(MessageIds.OSDE_MSGT0363));
 								RowData createLauncerButtonLData = new RowData();
 								createLauncerButtonLData.width = 180;
 								createLauncerButtonLData.height = 30;
-								this.createLauncerButton.setLayoutData(createLauncerButtonLData);
-								this.createLauncerButton.addSelectionListener(new SelectionAdapter() {
+								this.createLauncherButton.setLayoutData(createLauncerButtonLData);
+								this.createLauncherButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "createLauncerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -721,6 +722,10 @@ public class SettingsDialog extends Dialog {
 										OperatingSystemHelper.removeDesktopLink();
 									}
 								});
+							}
+							if (OSDE.IS_MAC) {
+								this.createLauncherButton.setEnabled(false);
+								this.removeLauncherButton.setEnabled(false);
 							}
 						}
 						{
@@ -765,13 +770,17 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							if (OSDE.IS_MAC) {
+								this.assocMimeTypeButton.setEnabled(false);
+								this.removeMimeAssocButton.setEnabled(false);
+							}
 						}
 						{
 							this.objectKeyGroup = new Group(this.osMiscComposite, SWT.NONE);
 							RowLayout objectKeyGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							objectKeyGroupLayout.center = true;
 							objectKeyGroupLayout.marginTop = 30;
-							objectKeyGroupLayout.marginWidth = 90;
+							objectKeyGroupLayout.marginWidth = 40;
 							objectKeyGroupLayout.spacing = 40;
 							this.objectKeyGroup.setLayout(objectKeyGroupLayout);
 							this.objectKeyGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
@@ -782,7 +791,7 @@ public class SettingsDialog extends Dialog {
 								this.scanObjectKeysButton.setText(Messages.getString(MessageIds.OSDE_MSGT0207));
 								this.scanObjectKeysButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0208, new Object[] { this.settings.getDataFilePath() }));
 								RowData scanObjectKeysButtonLData = new RowData();
-								scanObjectKeysButtonLData.width = 300;
+								scanObjectKeysButtonLData.width = 180;
 								scanObjectKeysButtonLData.height = 30;
 								this.scanObjectKeysButton.setLayoutData(scanObjectKeysButtonLData);
 								this.scanObjectKeysButton.addSelectionListener(new SelectionAdapter() {
@@ -807,6 +816,32 @@ public class SettingsDialog extends Dialog {
 													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0034));
 												else
 													SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.OSDE_MSGI0034));
+											}
+										}.start();
+									}
+								});
+							}
+							{
+								this.cleanObjectReferecesButton = new Button(this.objectKeyGroup, SWT.PUSH | SWT.CENTER);
+								this.cleanObjectReferecesButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.cleanObjectReferecesButton.setText(Messages.getString(MessageIds.OSDE_MSGT0220));
+								this.cleanObjectReferecesButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0221, new Object[] { this.settings.getDataFilePath() }));
+								RowData cleanObjectReferecesButtonLData = new RowData();
+								cleanObjectReferecesButtonLData.width = 180;
+								cleanObjectReferecesButtonLData.height = 30;
+								this.cleanObjectReferecesButton.setLayoutData(cleanObjectReferecesButtonLData);
+								this.cleanObjectReferecesButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "cleanObjectReferecesButton.widgetSelected, event=" + evt);
+										new Thread() {
+											@Override
+											public void run() {
+												ObjectKeyScanner.cleanFileLinks();
+												if (getParent().isDisposed())
+													SettingsDialog.this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0039));
+												else
+													SettingsDialog.this.application.openMessageDialogAsync(getParent(), Messages.getString(MessageIds.OSDE_MSGI0039));
 											}
 										}.start();
 									}

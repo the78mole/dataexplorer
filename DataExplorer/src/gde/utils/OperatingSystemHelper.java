@@ -606,5 +606,4 @@ public class OperatingSystemHelper {
 		log.log(Level.FINE, ret);
 		return ret;
 	}
-
 }

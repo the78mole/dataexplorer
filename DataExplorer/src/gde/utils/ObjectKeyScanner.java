@@ -86,7 +86,7 @@ public class ObjectKeyScanner extends Thread {
 		try {
 			String objectKeyDirPath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + this.objectKey;
 
-			if (this.objectKey.length() > 1) {
+			if (this.objectKey.length() > 1) { // use exact defined object key
 				//check directory and cleanup if already exist 
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
 				
@@ -130,7 +130,7 @@ public class ObjectKeyScanner extends Thread {
 					}
 				}
 			}
-			else {
+			else { // search for all available keys
 				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				this.objectKeys.clear();
@@ -217,10 +217,37 @@ public class ObjectKeyScanner extends Thread {
 	}
 
 	/**
-	 * 
 	 * @return object key list found during scan
 	 */
 	public String[] getObjectList() {
 		return this.objectKeys.toArray(new String[0]);
+	}
+	
+	/**
+	 * deletes all file links under standard data directory
+	 * this is the reverse operation of the run() method creating such file links
+	 */
+	public static void cleanFileLinks() {	
+		try {
+			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()));
+			for (File file : files) {
+				try {
+					String actualFilePath = file.getAbsolutePath();
+					if (actualFilePath.endsWith(OSDE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
+						log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
+						file.delete();
+					}
+				}
+				catch (IOException e) {
+					log.log(Level.WARNING, file.getAbsolutePath(), e);
+				}
+				catch (Throwable t) {
+					log.log(Level.WARNING, t.getLocalizedMessage(), t);
+				}
+			}
+		}
+		catch (FileNotFoundException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
 	}
 }

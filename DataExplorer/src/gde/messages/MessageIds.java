@@ -134,6 +134,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGI0036 = "OSDE_MSGI0036";
 	public final static String	OSDE_MSGI0037 = "OSDE_MSGI0037";
 	public final static String	OSDE_MSGI0038 = "OSDE_MSGI0038";
+	public final static String	OSDE_MSGI0039 = "OSDE_MSGI0039";
 	public final static String	OSDE_MSGT0000 = "OSDE_MSGT0000";
 	public final static String	OSDE_MSGT0001 = "OSDE_MSGT0001";
 	public final static String	OSDE_MSGT0002 = "OSDE_MSGT0002";
@@ -347,6 +348,8 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0213 = "OSDE_MSGT0213";
 	public final static String	OSDE_MSGT0214 = "OSDE_MSGT0214";
 	public final static String	OSDE_MSGT0215 = "OSDE_MSGT0215";
+	public final static String	OSDE_MSGT0220 = "OSDE_MSGT0220";
+	public final static String	OSDE_MSGT0221 = "OSDE_MSGT0221";
 	public final static String	OSDE_MSGT0230 = "OSDE_MSGT0230";
 	public final static String	OSDE_MSGT0231 = "OSDE_MSGT0231";
 	public final static String	OSDE_MSGT0232 = "OSDE_MSGT0232";
