@@ -561,14 +561,11 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0499 = "OSDE_MSGT0499";
 	public final static String	OSDE_MSGT0500 = "OSDE_MSGT0500";
 	public final static String	OSDE_MSGT0501 = "OSDE_MSGT0501";
+	public final static String	OSDE_MSGT0502 = "OSDE_MSGT0502";
 	public final static String	OSDE_MSGT0503 = "OSDE_MSGT0503";
 	public final static String	OSDE_MSGT0504 = "OSDE_MSGT0504";
 	public final static String	OSDE_MSGT0505 = "OSDE_MSGT0505";
 	public final static String	OSDE_MSGT0506 = "OSDE_MSGT0506";
-	public final static String	OSDE_MSGT0507 = "OSDE_MSGT0507";
-	public final static String	OSDE_MSGT0508 = "OSDE_MSGT0508";
-	public final static String	OSDE_MSGT0509 = "OSDE_MSGT0509";
-	public final static String	OSDE_MSGT0510 = "OSDE_MSGT0510";
 	public final static String	OSDE_MSGT0512 = "OSDE_MSGT0512";
 	public final static String	OSDE_MSGT0515 = "OSDE_MSGT0515";
 	public final static String	OSDE_MSGT0516 = "OSDE_MSGT0516";

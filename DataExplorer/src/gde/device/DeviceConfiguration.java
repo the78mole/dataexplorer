@@ -595,12 +595,12 @@ public class DeviceConfiguration {
 	}
 	
 	public int getDataBlockSize() {
-		return this.dataBlock != null ? this.dataBlock.getSize().intValue() : -1;
+		return this.dataBlock != null ? this.dataBlock.getSize() : -1;
 	}
 
-	public void setDataBlockSize(int newSize) {
+	public void setDataBlockSize(Integer newSize) {
 		this.isChangePropery = true;
-		this.dataBlock.setSize(new BigInteger(OSDE.STRING_EMPTY + newSize));
+		this.dataBlock.setSize(newSize);
 	}
 	
 	public FormatTypes getDataBlockFormat() {

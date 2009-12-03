@@ -330,7 +330,7 @@ public class StringHelper {
 		switch (useType) {
 		case INTEGER:
 			try {
-				Integer.parseInt(eventText);
+				Integer.parseInt(eventText.replace("", "0").trim());
 			}
 			catch (Exception e) {
 				doIt = false;
@@ -338,7 +338,7 @@ public class StringHelper {
 			break;
 		case DOUBLE:
 			try {
-				Double.parseDouble(eventText.replace(',', '.'));
+				Integer.parseInt(eventText.replace(",", "").replace(".", "").replace("", "0").trim());
 			}
 			catch (Exception e) {
 				doIt = false;

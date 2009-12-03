@@ -37,6 +37,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -70,12 +73,10 @@ import osde.utils.StringHelper;
  * Dialog class enable to edit existing and create new device property files 
  * @author Winfried Brügmann
  */
-public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
+public class DevicePropertiesEditor extends Composite {
 	final static Logger					log												= Logger.getLogger(DevicePropertiesEditor.class.getName());
 	public final static int			widgetFontSize						= OSDE.IS_LINUX ? 8 : 9;
 	public final static String	widgetFontName						= OSDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif"; //$NON-NLS-1$ //$NON-NLS-2$
-
-	Shell												dialogShell;
 
 	CTabFolder									tabFolder;
 	Label												devicePropFileNamelabel;
@@ -120,8 +121,10 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 
 	FormatTypes									dataBlockFormat						= FormatTypes.BINARY, dataBlockcheckSumFormat = FormatTypes.BINARY;
 	int													dataBlockSize							= 30;
-	ChecksumTypes								dataBlockCheckSumType			= ChecksumTypes.XOR;
-	String											dataBlockEnding						= "0a0d"; //$NON-NLS-1$
+	ChecksumTypes								dataBlockCheckSumType			= ChecksumTypes.ADD;
+	String											dataBlockEnding						= "0a0d";
+	boolean											isDataBlockOptionalGroupEnabled = false;
+
 
 	CTabItem										modeStateTabItem, modeStateInnerTabItem;
 	Composite										modeStateComposite;
@@ -138,7 +141,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	CTabItem										destopTabItem;
 	PropertyTypeTabItem					desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4;
 	Composite										desktopComposite;
-	Label												destktopDescriptionLabel;
+	Label												desktopDescriptionLabel;
 	CTabFolder									desktopTabFolder;
 
 	//cross over fields
@@ -152,9 +155,24 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	public static void main(String[] args) {
 		try {
 			Display display = Display.getDefault();
-			Shell shell = new Shell(display);
-			DevicePropertiesEditor inst = new DevicePropertiesEditor(shell, SWT.NULL);
+			Rectangle displayBounds = display.getBounds();
+			Shell shell = new Shell(display, SWT.DIALOG_TRIM | SWT.MIN | SWT.APPLICATION_MODAL);
+			DevicePropertiesEditor inst = new DevicePropertiesEditor(shell, SWT.NONE);
 			inst.open();
+			Point size = inst.getSize();
+			shell.setLayout(new FillLayout());
+			shell.setText(Messages.getString(MessageIds.OSDE_MSGT0465));
+			shell.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
+			shell.setLocation(displayBounds.x < 0 ? -50-size.x : displayBounds.width+displayBounds.x-size.x-50, displayBounds.height-size.y-50);
+			shell.layout();
+			Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
+			shell.setSize(shellBounds.width, shellBounds.height);
+			shell.setMinimumSize(shellBounds.width, shellBounds.height);
+			shell.open();
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -168,42 +186,36 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 
 	public void open() {
 		try {
-			Shell parent = getParent();
-			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-			SWTResourceManager.registerResourceUser(this.dialogShell);
-			this.dialogShell.setLayout(null);
-			this.dialogShell.layout();
-			this.dialogShell.pack();
-			this.dialogShell.setSize(640, 490);
-			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0465));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
-			this.dialogShell.addDisposeListener(new DisposeListener() {
+			SWTResourceManager.registerResourceUser(this);
+			this.setLayout(null);
+			this.setSize(640, 460);
+			this.getShell().addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					DevicePropertiesEditor.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
 						String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
-						if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.dialogShell, msg) == SWT.YES) {
+						if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
 							DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
 						}
 					}
 				}
 			});
 			{
-				this.fileSelectionButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.fileSelectionButton = new Button(this, SWT.PUSH | SWT.CENTER);
 				this.fileSelectionButton.setText(" ... "); //$NON-NLS-1$
 				this.fileSelectionButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
-				this.fileSelectionButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0478));
+				this.fileSelectionButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0484));
 				this.fileSelectionButton.setBounds(580, 10, 30, 20);
 				this.fileSelectionButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "fileSelectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
 							String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
-							if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.dialogShell, msg) == SWT.YES) {
+							if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
 								DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
 							}
 						}
-						FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.dialogShell);
+						FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.getShell());
 						fileSelectionDialog.setFilterPath(getDevicesPath());
 						fileSelectionDialog.setText(Messages.getString(MessageIds.OSDE_MSGT0479));
 						fileSelectionDialog.setFilterExtensions(new String[] { OSDE.FILE_ENDING_STAR_XML });
@@ -225,7 +237,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				});
 			}
 			{
-				this.deviceFileNameText = new Text(this.dialogShell, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
+				this.deviceFileNameText = new Text(this, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 				this.deviceFileNameText.setBounds(120, 9, 450, 22);
 				this.deviceFileNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				this.deviceFileNameText.addKeyListener(new KeyAdapter() {
@@ -243,11 +255,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 								DevicePropertiesEditor.log.log(Level.INFO, "devicePropertiesFileName = " + DevicePropertiesEditor.this.devicePropertiesFileName); //$NON-NLS-1$
 
 								if (!(new File(getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName)).exists()) {
-									MessageBox okCancelMessageDialog = new MessageBox(DevicePropertiesEditor.this.dialogShell, SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
+									MessageBox okCancelMessageDialog = new MessageBox(DevicePropertiesEditor.this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
 									okCancelMessageDialog.setText(Messages.getString(MessageIds.OSDE_MSGT0465));
 									okCancelMessageDialog.setMessage(Messages.getString(MessageIds.OSDE_MSGE0003) + DevicePropertiesEditor.this.devicePropertiesFileName + Messages.getString(MessageIds.OSDE_MSGT0481));
 									if (SWT.OK == okCancelMessageDialog.open()) {
-										if (FileUtils.extract(this.getClass(), "DeviceSample_" + DevicePropertiesEditor.this.settings.getLocale() + Settings.DEVICE_PROPERTIES_XSD_VERSION, DevicePropertiesEditor.this.devicePropertiesFileName,//$NON-NLS-1$
+										if (FileUtils.extract(this.getClass(), "DeviceSample_" + DevicePropertiesEditor.this.settings.getLocale() + Settings.DEVICE_PROPERTIES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XML, DevicePropertiesEditor.this.devicePropertiesFileName,//$NON-NLS-1$
 												"resource/", getDevicesPath(), "555")) { //$NON-NLS-1$ //$NON-NLS-2$
 											DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
 										}
@@ -266,26 +278,26 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				});
 			}
 			{
-				this.devicePropFileNamelabel = new Label(this.dialogShell, SWT.RIGHT);
+				this.devicePropFileNamelabel = new Label(this, SWT.RIGHT);
 				this.devicePropFileNamelabel.setText(Messages.getString(MessageIds.OSDE_MSGT0483));
 				this.devicePropFileNamelabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				this.devicePropFileNamelabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0484));
 				this.devicePropFileNamelabel.setBounds(0, 12, 100, 16);
 			}
 			{
-				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.closeButton = new Button(this, SWT.PUSH | SWT.CENTER);
 				this.closeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0485));
 				this.closeButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				this.closeButton.setBounds(338, 418, 250, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-						DevicePropertiesEditor.this.dialogShell.dispose();
+						DevicePropertiesEditor.this.getShell().dispose();
 					}
 				});
 			}
 			{
-				this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+				this.saveButton = new Button(this, SWT.PUSH | SWT.CENTER);
 				this.saveButton.setText(Messages.getString(MessageIds.OSDE_MSGT0486));
 				this.saveButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				this.saveButton.setBounds(50, 418, 250, 30);
@@ -297,7 +309,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				});
 			}
 			{
-				this.tabFolder = new CTabFolder(this.dialogShell, SWT.BORDER);
+				this.tabFolder = new CTabFolder(this, SWT.BORDER);
 				this.tabFolder.setSimple(false);
 				this.tabFolder.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				{
@@ -419,6 +431,14 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							{
 								this.usageButton = new Button(this.devicePropsComposite, SWT.CHECK);
 								this.usageButton.setBounds(3, 126, 159, 22);
+								this.usageButton.addSelectionListener(new SelectionAdapter() {
+									public void widgetSelected(SelectionEvent evt) {
+										DevicePropertiesEditor.log.log(Level.FINEST, "usageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (DevicePropertiesEditor.this.deviceConfig != null) {
+											DevicePropertiesEditor.this.deviceConfig.setUsed(DevicePropertiesEditor.this.isDeviceUsed = usageButton.getSelection());
+										}
+									}
+								});
 							}
 							{
 								this.groupSelectionCombo = new CCombo(this.devicePropsComposite, SWT.BORDER);
@@ -428,27 +448,33 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 								this.groupSelectionCombo.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "groupSelectionCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-										DevicePropertiesEditor.this.deviceConfig.setDeviceGroup(DevicePropertiesEditor.this.deviceGroup = DeviceTypes.valueOf(DevicePropertiesEditor.this.groupSelectionCombo.getText()));
+										if (DevicePropertiesEditor.this.deviceConfig != null) {
+											DevicePropertiesEditor.this.deviceConfig.setDeviceGroup(DevicePropertiesEditor.this.deviceGroup = DeviceTypes.valueOf(DevicePropertiesEditor.this.groupSelectionCombo.getText()));
+										}
 									}
 								});
 							}
 							{
 								this.fileSelectButton = new Button(this.devicePropsComposite, SWT.PUSH | SWT.CENTER);
 								this.fileSelectButton.setText(" ... "); //$NON-NLS-1$
+								this.fileSelectButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0502));
 								this.fileSelectButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.fileSelectButton.setBounds(415, 96, 30, 20);
 								this.fileSelectButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
-										FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.dialogShell);
+										FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.getShell());
 										fileSelectionDialog.setText("OpenSerialDataExplorer Device Image File"); //$NON-NLS-1$
 										fileSelectionDialog.setFilterPath(getDevicesPath());
 										fileSelectionDialog.setFilterExtensions(new String[] { OSDE.FILE_ENDING_STAR_JPG, OSDE.FILE_ENDING_STAR_GIF, OSDE.FILE_ENDING_STAR_PNG });
 										fileSelectionDialog.setFilterNames(new String[] { Messages.getString(MessageIds.OSDE_MSGT0215), Messages.getString(MessageIds.OSDE_MSGT0214), Messages.getString(MessageIds.OSDE_MSGT0213) });
 										fileSelectionDialog.open();
 										DevicePropertiesEditor.this.imageFileName = fileSelectionDialog.getFileName();
-										DevicePropertiesEditor.log.log(Level.INFO, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
-										if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.imageFileName != null && DevicePropertiesEditor.this.imageFileName.length() > 5 ) {
-											DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
+										if (DevicePropertiesEditor.this.imageFileName != null && DevicePropertiesEditor.this.imageFileName.length() > 5) {
+											DevicePropertiesEditor.this.imageFileNameText.setText(DevicePropertiesEditor.this.imageFileName);
+											DevicePropertiesEditor.log.log(Level.INFO, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
+											if (DevicePropertiesEditor.this.deviceConfig != null) {
+												DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
+											}
 										}
 									}
 								});
@@ -610,11 +636,11 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						//							}
 						//						});
 						{
-							this.destktopDescriptionLabel = new Label(this.desktopComposite, SWT.CENTER | SWT.WRAP);
-							this.destktopDescriptionLabel
+							this.desktopDescriptionLabel = new Label(this.desktopComposite, SWT.CENTER | SWT.WRAP);
+							this.desktopDescriptionLabel
 									.setText(Messages.getString(MessageIds.OSDE_MSGT0506));
-							this.destktopDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
-							this.destktopDescriptionLabel.setBounds(12, 5, 602, 57);
+							this.desktopDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
+							this.desktopDescriptionLabel.setBounds(12, 5, 602, 57);
 						}
 						{
 							this.desktopTabFolder = new CTabFolder(this.desktopComposite, SWT.BORDER);
@@ -622,18 +648,18 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 							appDesktopTabCompositeLayout.makeColumnsEqualWidth = true;
 							this.desktopTabFolder.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.desktopTabFolder.setLayout(appDesktopTabCompositeLayout);
-							this.desktopTabFolder.setBounds(165, 68, 300, 196);
+							this.desktopTabFolder.setBounds(135, 68, 360, 196);
 							{
-								this.desktopInnerTabItem1 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, Messages.getString(MessageIds.OSDE_MSGT0507));
+								this.desktopInnerTabItem1 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.TABLE_TAB.value());
 							}
 							{
-								this.desktopInnerTabItem2 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, Messages.getString(MessageIds.OSDE_MSGT0508));
+								this.desktopInnerTabItem2 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.DIGITAL_TAB.value());
 							}
 							{
-								this.desktopInnerTabItem3 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, Messages.getString(MessageIds.OSDE_MSGT0509));
+								this.desktopInnerTabItem3 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.ANALOG_TAB.value());
 							}
 							{
-								this.desktopInnerTabItem4 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, Messages.getString(MessageIds.OSDE_MSGT0510));
+								this.desktopInnerTabItem4 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value());
 							}
 							this.desktopTabFolder.setSelection(0);
 						}
@@ -661,12 +687,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 						if (DevicePropertiesEditor.this.deviceConfig != null) update();
 					}
 				});
-			}
-			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
-			this.dialogShell.open();
-			Display display = this.dialogShell.getDisplay();
-			while (!this.dialogShell.isDisposed()) {
-				if (!display.readAndDispatch()) display.sleep();
 			}
 		}
 		catch (Exception e) {
@@ -770,16 +790,16 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				this.dataBlockOptionalGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockOptionalGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumFormat() != null
-								&& DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumType() != null && DevicePropertiesEditor.this.deviceConfig.getDataBlockEnding() != null) {
-							DevicePropertiesEditor.this.dataBlockOptionalEnableButton.setSelection(true);
+//						if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumFormat() != null
+//								&& DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumType() != null && DevicePropertiesEditor.this.deviceConfig.getDataBlockEnding() != null) {
+							DevicePropertiesEditor.this.dataBlockOptionalEnableButton.setSelection(isDataBlockOptionalGroupEnabled);
 							DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.select(DevicePropertiesEditor.this.dataBlockcheckSumFormat == FormatTypes.TEXT ? 0 : 1);
 							DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.select(DevicePropertiesEditor.this.dataBlockCheckSumType == ChecksumTypes.XOR ? 0 : 1);
 							DevicePropertiesEditor.this.dataBlockEndingText.setText(DevicePropertiesEditor.this.dataBlockEnding);
-						}
-						else {
-							DevicePropertiesEditor.this.dataBlockOptionalEnableButton.setSelection(false);
-						}
+//						}
+//						else {
+//							DevicePropertiesEditor.this.dataBlockOptionalEnableButton.setSelection(false);
+//						}
 					}
 				});
 				{
@@ -790,7 +810,20 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					this.dataBlockOptionalEnableButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockOptionalEnableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							enableDataBlockOptionalPart(DevicePropertiesEditor.this.dataBlockOptionalEnableButton.getSelection());
+							DevicePropertiesEditor.this.isDataBlockOptionalGroupEnabled = DevicePropertiesEditor.this.dataBlockOptionalEnableButton.getSelection();
+							enableDataBlockOptionalPart(DevicePropertiesEditor.this.isDataBlockOptionalGroupEnabled);
+							if (deviceConfig != null) {
+								if (DevicePropertiesEditor.this.isDataBlockOptionalGroupEnabled) {
+									deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat);
+									deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType);
+									deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding));
+								}
+								else {
+									deviceConfig.setDataBlockCheckSumFormat(null);
+									deviceConfig.setDataBlockCheckSumType(null);
+									deviceConfig.setDataBlockEnding(null);
+								}
+							}
 						}
 					});
 				}
@@ -799,18 +832,21 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					this.dataBlockCheckSumFormatLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0466));
 					this.dataBlockCheckSumFormatLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 					this.dataBlockCheckSumFormatLabel.setBounds(6, 46, 122, 20);
+					this.dataBlockCheckSumFormatLabel.setEnabled(false);
 				}
 				{
 					this.dataBlockCheckSumLabel = new Label(this.dataBlockOptionalGroup, SWT.RIGHT);
 					this.dataBlockCheckSumLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0467));
 					this.dataBlockCheckSumLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 					this.dataBlockCheckSumLabel.setBounds(6, 77, 122, 20);
+					this.dataBlockCheckSumLabel.setEnabled(false);
 				}
 				{
 					this.dataBlockEndingLabel = new Label(this.dataBlockOptionalGroup, SWT.RIGHT);
 					this.dataBlockEndingLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0468));
 					this.dataBlockEndingLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 					this.dataBlockEndingLabel.setBounds(6, 111, 122, 20);
+					this.dataBlockEndingLabel.setEnabled(false);
 				}
 				{
 					this.dataBlockcheckSumFormatCombo = new CCombo(this.dataBlockOptionalGroup, SWT.BORDER);
@@ -818,6 +854,8 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					this.dataBlockcheckSumFormatCombo.setItems(new java.lang.String[] { "TEXT", "BINARY" });
 					this.dataBlockcheckSumFormatCombo.setBounds(143, 44, 92, 20);
 					this.dataBlockcheckSumFormatCombo.setEditable(false);
+					this.dataBlockcheckSumFormatCombo.setEnabled(false);
+					this.dataBlockcheckSumFormatCombo.select(1);
 					this.dataBlockcheckSumFormatCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 					this.dataBlockcheckSumFormatCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -835,6 +873,8 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					this.dataBlockCheckSumTypeCombo.setItems(new String[] { "XOR", "ADD" }); //$NON-NLS-1$ //$NON-NLS-2$
 					this.dataBlockCheckSumTypeCombo.setBounds(143, 74, 92, 20);
 					this.dataBlockCheckSumTypeCombo.setEditable(false);
+					this.dataBlockCheckSumTypeCombo.setEnabled(false);
+					this.dataBlockCheckSumTypeCombo.select(1);
 					this.dataBlockCheckSumTypeCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 					this.dataBlockCheckSumTypeCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -850,6 +890,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 					this.dataBlockEndingText = new Text(this.dataBlockOptionalGroup, SWT.BORDER);
 					this.dataBlockEndingText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 					this.dataBlockEndingText.setBounds(144, 109, 61, 20);
+					this.dataBlockEndingText.setEnabled(false);
 					this.dataBlockEndingText.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent evt) {
 							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockEndingText.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -960,7 +1001,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * update internal variables by device properties
 	 */
-	private void update() {
+	public void update() {
 		//DeviceType begin
 		this.deviceName = this.deviceConfig.getName();
 		this.manufacturer = this.deviceConfig.getManufacturer();
@@ -989,19 +1030,20 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		//TimeBaseType end
 
 		//DataBlockType begin
-		if (this.deviceConfig.getDataBlockType() == null && !this.dataBlockTabItem.isDisposed()) {
+		if (this.deviceConfig.getDataBlockType() == null && this.dataBlockTabItem != null && !this.dataBlockTabItem.isDisposed()) {
 			this.dataBlockTabItem.dispose();
 		}
 		else {
-			if (this.deviceConfig.getDataBlockType() != null && this.dataBlockTabItem.isDisposed()) {
-				createDataBlockType();
-			}
-			if (this.deviceConfig.getDataBlockType() != null && !this.dataBlockTabItem.isDisposed()) {
+			if (this.deviceConfig.getDataBlockType() != null) {
+				if ( this.dataBlockTabItem != null && this.dataBlockTabItem.isDisposed()) {
+					createDataBlockType();
+				}
 				this.dataBlockFormat = this.deviceConfig.getDataBlockFormat();
 				this.dataBlockSize = this.deviceConfig.getDataBlockSize();
 				this.dataBlockRequiredGroup.redraw();
 
 				if (this.deviceConfig.getDataBlockCheckSumFormat() != null && this.deviceConfig.getDataBlockCheckSumType() != null && this.deviceConfig.getDataBlockEnding() != null) {
+					this.isDataBlockOptionalGroupEnabled = true;
 					this.dataBlockcheckSumFormat = this.deviceConfig.getDataBlockCheckSumFormat();
 					this.dataBlockCheckSumType = this.deviceConfig.getDataBlockCheckSumType();
 					this.dataBlockEnding = StringHelper.convertHexInput(this.deviceConfig.getDataBlockEnding());
@@ -1012,7 +1054,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 				}
 			}
 		}
-		//DataBlockType begin
+		//DataBlockType end
 
 		//StateType begin
 		int modeStateCount = (this.deviceConfig.getStateType() == null) ? 0 : this.deviceConfig.getStateSize();
@@ -1083,7 +1125,6 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 	 * enable or disable data block optional properties
 	 */
 	void enableDataBlockOptionalPart(boolean enable) {
-		//dataBlockOptionalGroup.setEnabled(enable);
 		this.dataBlockOptionalEnableButton.setText(enable ? Messages.getString(MessageIds.OSDE_MSGT0477) : Messages.getString(MessageIds.OSDE_MSGT0478));
 		this.dataBlockCheckSumFormatLabel.setEnabled(enable);
 		this.dataBlockcheckSumFormatCombo.setEnabled(enable);
@@ -1091,11 +1132,7 @@ public class DevicePropertiesEditor extends org.eclipse.swt.widgets.Dialog {
 		this.dataBlockCheckSumTypeCombo.setEnabled(enable);
 		this.dataBlockEndingLabel.setEnabled(enable);
 		this.dataBlockEndingText.setEnabled(enable);
-		this.dataBlockOptionalGroup.redraw();
-		//		if (!enable) {
-		//			deviceConfig.setDataBlockCheckSumFormat(dataBlockcheckSumFormat = null);;
-		//			deviceConfig.setDataBlockCheckSumType(dataBlockCheckSumType = null);
-		//			deviceConfig.setDataBlockEnding(StringHelper.convert2ByteArray(dataBlockEnding = "0"));
-		//		}
+		if (enable) 
+			this.dataBlockOptionalGroup.redraw();
 	}
 }

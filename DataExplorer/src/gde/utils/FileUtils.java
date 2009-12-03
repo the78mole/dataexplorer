@@ -341,7 +341,8 @@ public class FileUtils {
 	 * @param targetDirectory
 	 * @param permissionsUNIX
 	 */
-	public static void extract(Class<?> runtimeInstance, String fileName, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
+	public static boolean extract(Class<?> runtimeInstance, String fileName, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
+		boolean isExtracted = false;
 		// normalize input directorys
 		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + OSDE.FILE_SEPARATOR_UNIX;
@@ -364,6 +365,8 @@ public class FileUtils {
 					os.close ();
 					is.close ();
 					setAccessPermission(fileName, permissionsUNIX);
+					
+					isExtracted = true;
 				}
 			}
 		} 
@@ -376,6 +379,7 @@ public class FileUtils {
 				if (is != null) is.close ();
 			} catch (IOException e1) {}
 		}
+		return isExtracted;
 	}
 
 	/**

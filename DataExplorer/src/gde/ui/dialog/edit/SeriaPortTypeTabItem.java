@@ -342,10 +342,14 @@ public class SeriaPortTypeTabItem extends CTabItem {
 								SeriaPortTypeTabItem.this.useTimeOut = SeriaPortTypeTabItem.this.timeOutButton.getSelection();
 								if (SeriaPortTypeTabItem.this.useTimeOut) {
 									if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-										SeriaPortTypeTabItem.this.RTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOCharDelayTime();
-										SeriaPortTypeTabItem.this.RTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOExtraDelayTime();
-										SeriaPortTypeTabItem.this.WTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOCharDelayTime();
-										SeriaPortTypeTabItem.this.WTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOExtraDelayTime();
+										SeriaPortTypeTabItem.this.deviceConfig.setRTOCharDelayTime(
+												SeriaPortTypeTabItem.this.RTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOCharDelayTime());
+										SeriaPortTypeTabItem.this.deviceConfig.setRTOExtraDelayTime(
+												SeriaPortTypeTabItem.this.RTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getRTOExtraDelayTime());
+										SeriaPortTypeTabItem.this.deviceConfig.setWTOCharDelayTime(
+												SeriaPortTypeTabItem.this.WTOCharDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOCharDelayTime());
+										SeriaPortTypeTabItem.this.deviceConfig.setWTOExtraDelayTime(
+												SeriaPortTypeTabItem.this.WTOExtraDelayTime = SeriaPortTypeTabItem.this.deviceConfig.getWTOExtraDelayTime());
 									}
 									else {
 										SeriaPortTypeTabItem.this.RTOCharDelayTime = 0;

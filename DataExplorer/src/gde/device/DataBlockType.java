@@ -8,7 +8,6 @@
 
 package osde.device;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -56,7 +55,7 @@ public class DataBlockType {
     @XmlElement(required = true)
     protected FormatTypes format;
     @XmlElement(required = true)
-    protected BigInteger size;
+    protected Integer size;
     protected ChecksumTypes checkSum;
     protected FormatTypes checkSumFormat;
     @XmlElement(type = String.class)
@@ -94,10 +93,10 @@ public class DataBlockType {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public BigInteger getSize() {
+    public Integer getSize() {
         return size;
     }
 
@@ -106,10 +105,10 @@ public class DataBlockType {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link Integer }
      *     
      */
-    public void setSize(BigInteger value) {
+    public void setSize(Integer value) {
         this.size = value;
     }
 

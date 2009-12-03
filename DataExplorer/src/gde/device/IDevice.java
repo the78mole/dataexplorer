@@ -217,7 +217,7 @@ public interface IDevice {
 	/**
 	 * @param set a new date block size/length
 	 */
-	public void setDataBlockSize(int newSize);
+	public void setDataBlockSize(Integer newSize);
 	
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)
