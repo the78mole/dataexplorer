@@ -1646,7 +1646,7 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
 			
-			//updateChildRecordTimeStep();
+			updateChildRecordTimeStep();
 
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();

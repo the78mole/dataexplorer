@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -84,6 +85,8 @@ public class DevicePropertiesEditor extends Composite {
 	Button											fileSelectionButton, saveButton, closeButton;
 
 	CTabItem										deviceTabItem;
+	Menu												devicePopupMenu;
+	ContextMenu									deviceContextMenu;
 	Composite										deviceComposite;
 	Label												deviceDescriptionlabel;
 	Label												deviceNameLabel, manufacturerLabel, manufURLabel, imageFileNameLabel, usageLabel, groupLabel;
@@ -312,6 +315,8 @@ public class DevicePropertiesEditor extends Composite {
 				this.tabFolder = new CTabFolder(this, SWT.BORDER);
 				this.tabFolder.setSimple(false);
 				this.tabFolder.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
+				this.devicePopupMenu = new Menu(this.getShell(), SWT.POP_UP);
+				(this.deviceContextMenu = new ContextMenu(this.devicePopupMenu, this.deviceTabItem)).create();
 				{
 					this.deviceTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 					this.deviceTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0487));
@@ -320,58 +325,68 @@ public class DevicePropertiesEditor extends Composite {
 						this.deviceComposite = new Composite(this.tabFolder, SWT.NONE);
 						this.deviceComposite.setLayout(null);
 						this.deviceTabItem.setControl(this.deviceComposite);
+						this.deviceComposite.setMenu(this.devicePopupMenu);
 						{
 							this.deviceDescriptionlabel = new Label(this.deviceComposite, SWT.CENTER | SWT.WRAP);
 							this.deviceDescriptionlabel.setText(Messages.getString(MessageIds.OSDE_MSGT0488));
 							this.deviceDescriptionlabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.deviceDescriptionlabel.setBounds(12, 8, 604, 50);
+							this.deviceDescriptionlabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.deviceLabelComposite = new Composite(this.deviceComposite, SWT.NONE);
 							this.deviceLabelComposite.setLayout(null);
 							this.deviceLabelComposite.setBounds(20, 70, 145, 190);
+							this.deviceLabelComposite.setMenu(this.devicePopupMenu);
 							{
 								this.deviceNameLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.deviceNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0489));
 								this.deviceNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.deviceNameLabel.setForeground(osde.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
 								this.deviceNameLabel.setBounds(0, 0, 137, 16);
+								this.deviceNameLabel.setMenu(this.devicePopupMenu);
 							}
 							{
 								this.manufacturerLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.manufacturerLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0490));
 								this.manufacturerLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.manufacturerLabel.setBounds(0, 33, 137, 19);
+								this.manufacturerLabel.setMenu(this.devicePopupMenu);
 							}
 							{
 								this.manufURLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.manufURLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0491));
 								this.manufURLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.manufURLabel.setBounds(0, 64, 137, 19);
+								this.manufURLabel.setMenu(this.devicePopupMenu);
 							}
 							{
 								this.imageFileNameLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.imageFileNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0492));
 								this.imageFileNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.imageFileNameLabel.setBounds(0, 95, 137, 19);
+								this.imageFileNameLabel.setMenu(this.devicePopupMenu);
 							}
 							{
 								this.usageLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.usageLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0493));
 								this.usageLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.usageLabel.setBounds(0, 126, 137, 19);
+								this.usageLabel.setMenu(this.devicePopupMenu);
 							}
 							{
 								this.groupLabel = new Label(this.deviceLabelComposite, SWT.RIGHT);
 								this.groupLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0494));
 								this.groupLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.groupLabel.setBounds(0, 157, 137, 16);
+								this.groupLabel.setMenu(this.devicePopupMenu);
 							}
 						}
 						{
 							this.devicePropsComposite = new Composite(this.deviceComposite, SWT.NONE);
 							this.devicePropsComposite.setLayout(null);
 							this.devicePropsComposite.setBounds(170, 70, 450, 190);
+							this.devicePropsComposite.setMenu(this.devicePopupMenu);
 							this.devicePropsComposite.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									DevicePropertiesEditor.log.log(Level.FINEST, "devicePropsComposite.paintControl, event=" + evt); //$NON-NLS-1$
@@ -388,6 +403,7 @@ public class DevicePropertiesEditor extends Composite {
 								this.nameText = new Text(this.devicePropsComposite, SWT.BORDER);
 								this.nameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.nameText.setBounds(0, 0, 409, 22);
+								this.nameText.setMenu(this.devicePopupMenu);
 								this.nameText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -399,6 +415,7 @@ public class DevicePropertiesEditor extends Composite {
 								this.manufacturerText = new Text(this.devicePropsComposite, SWT.BORDER);
 								this.manufacturerText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.manufacturerText.setBounds(0, 32, 409, 22);
+								this.manufacturerText.setMenu(this.devicePopupMenu);
 								this.manufacturerText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "manufacturerText.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -410,6 +427,7 @@ public class DevicePropertiesEditor extends Composite {
 								this.manufURLText = new Text(this.devicePropsComposite, SWT.BORDER);
 								this.manufURLText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.manufURLText.setBounds(0, 64, 409, 22);
+								this.manufURLText.setMenu(this.devicePopupMenu);
 								this.manufURLText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "manufURLText.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -421,6 +439,7 @@ public class DevicePropertiesEditor extends Composite {
 								this.imageFileNameText = new Text(this.devicePropsComposite, SWT.BORDER);
 								this.imageFileNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.imageFileNameText.setBounds(0, 95, 409, 22);
+								this.imageFileNameText.setMenu(this.devicePopupMenu);
 								this.imageFileNameText.addKeyListener(new KeyAdapter() {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "imageFileNameText.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -431,6 +450,7 @@ public class DevicePropertiesEditor extends Composite {
 							{
 								this.usageButton = new Button(this.devicePropsComposite, SWT.CHECK);
 								this.usageButton.setBounds(3, 126, 159, 22);
+								this.usageButton.setMenu(this.devicePopupMenu);
 								this.usageButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "usageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -445,6 +465,7 @@ public class DevicePropertiesEditor extends Composite {
 								this.groupSelectionCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 								this.groupSelectionCombo.setItems(StringHelper.enumValues2StringArray(DeviceTypes.values()));
 								this.groupSelectionCombo.setBounds(0, 154, 409, 22);
+								this.groupSelectionCombo.setMenu(this.devicePopupMenu);
 								this.groupSelectionCombo.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "groupSelectionCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -493,6 +514,7 @@ public class DevicePropertiesEditor extends Composite {
 						this.timeBaseComposite = new Composite(this.tabFolder, SWT.NONE);
 						this.timeBaseTabItem.setControl(this.timeBaseComposite);
 						this.timeBaseComposite.setLayout(null);
+						this.timeBaseComposite.setMenu(this.devicePopupMenu);
 						this.timeBaseComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								DevicePropertiesEditor.log.log(Level.FINEST, "timeBaseComposite.paintControl, event=" + evt); //$NON-NLS-1$
@@ -501,16 +523,17 @@ public class DevicePropertiesEditor extends Composite {
 						});
 						{
 							this.timeBaseDescriptionLabel = new Label(this.timeBaseComposite, SWT.CENTER | SWT.WRAP);
-							this.timeBaseDescriptionLabel
-									.setText(Messages.getString(MessageIds.OSDE_MSGT0496));
+							this.timeBaseDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0496));
 							this.timeBaseDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseDescriptionLabel.setBounds(17, 12, 591, 71);
+							this.timeBaseDescriptionLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseNameLabel = new Label(this.timeBaseComposite, SWT.RIGHT);
 							this.timeBaseNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0497));
 							this.timeBaseNameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseNameLabel.setBounds(142, 95, 150, 20);
+							this.timeBaseNameLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseNameText = new Text(this.timeBaseComposite, SWT.CENTER | SWT.BORDER);
@@ -518,12 +541,14 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseNameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseNameText.setBounds(322, 94, 60, 20);
 							this.timeBaseNameText.setEditable(false);
+							this.timeBaseNameText.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseSymbolLabel = new Label(this.timeBaseComposite, SWT.RIGHT);
 							this.timeBaseSymbolLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0498));
 							this.timeBaseSymbolLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseSymbolLabel.setBounds(142, 125, 150, 20);
+							this.timeBaseSymbolLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseSymbolText = new Text(this.timeBaseComposite, SWT.CENTER | SWT.BORDER);
@@ -531,12 +556,14 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseSymbolText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseSymbolText.setBounds(322, 124, 60, 20);
 							this.timeBaseSymbolText.setEditable(false);
+							this.timeBaseSymbolText.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseUnitLabel = new Label(this.timeBaseComposite, SWT.RIGHT);
 							this.timeBaseUnitLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0499));
 							this.timeBaseUnitLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseUnitLabel.setBounds(142, 155, 150, 20);
+							this.timeBaseUnitLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseUnitText = new Text(this.timeBaseComposite, SWT.CENTER | SWT.BORDER);
@@ -544,6 +571,7 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseUnitText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseUnitText.setBounds(322, 154, 60, 20);
 							this.timeBaseUnitText.setEditable(false);
+							this.timeBaseUnitText.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseTimeStepLabel = new Label(this.timeBaseComposite, SWT.RIGHT);
@@ -551,12 +579,14 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseTimeStepLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseTimeStepLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0501));
 							this.timeBaseTimeStepLabel.setBounds(142, 185, 150, 20);
+							this.timeBaseTimeStepLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.timeBaseTimeStepText = new Text(this.timeBaseComposite, SWT.RIGHT | SWT.BORDER);
 							this.timeBaseTimeStepText.setText("1000.0"); //$NON-NLS-1$
 							this.timeBaseTimeStepText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.timeBaseTimeStepText.setBounds(322, 184, 60, 20);
+							this.timeBaseTimeStepText.setMenu(this.devicePopupMenu);
 							this.timeBaseTimeStepText.addVerifyListener(new VerifyListener() {
 								public void verifyText(VerifyEvent evt) {
 									DevicePropertiesEditor.log.log(Level.FINEST, "timeBaseTimeStepText.verifyText, event=" + evt); //$NON-NLS-1$
@@ -593,6 +623,7 @@ public class DevicePropertiesEditor extends Composite {
 						this.channelConfigComposite = new Composite(this.tabFolder, SWT.NONE);
 						this.channelConfigComposite.setLayout(null);
 						this.channelConfigurationTabItem.setControl(this.channelConfigComposite);
+						this.channelConfigComposite.setMenu(this.devicePopupMenu);
 						this.channelConfigComposite.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								DevicePropertiesEditor.log.log(Level.FINEST, "channleConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
@@ -605,15 +636,16 @@ public class DevicePropertiesEditor extends Composite {
 						});
 						{
 							this.channelConfigDescriptionLabel = new Label(this.channelConfigComposite, SWT.CENTER | SWT.WRAP);
-							this.channelConfigDescriptionLabel
-									.setText(Messages.getString(MessageIds.OSDE_MSGT0504));
+							this.channelConfigDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0504));
 							this.channelConfigDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.channelConfigDescriptionLabel.setBounds(12, 5, 602, 38);
+							this.channelConfigDescriptionLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.channelConfigInnerTabFolder = new CTabFolder(this.channelConfigComposite, SWT.NONE | SWT.BORDER);
 							this.channelConfigInnerTabFolder.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.channelConfigInnerTabFolder.setBounds(0, 49, 626, 285);
+							this.channelConfigInnerTabFolder.setMenu(this.devicePopupMenu);
 							{
 								//initial channel TabItem
 								new ChannelTypeTabItem(this.channelConfigInnerTabFolder, SWT.NONE, 0);
@@ -630,6 +662,7 @@ public class DevicePropertiesEditor extends Composite {
 						this.desktopComposite = new Composite(this.tabFolder, SWT.NONE);
 						this.desktopComposite.setLayout(null);
 						this.destopTabItem.setControl(this.desktopComposite);
+						this.desktopComposite.setMenu(this.devicePopupMenu);
 						//						desktopComposite.addPaintListener(new PaintListener() {
 						//							public void paintControl(PaintEvent evt) {
 						//								log.log(Level.FINEST, "desktopComposite.paintControl, event="+evt);
@@ -637,10 +670,10 @@ public class DevicePropertiesEditor extends Composite {
 						//						});
 						{
 							this.desktopDescriptionLabel = new Label(this.desktopComposite, SWT.CENTER | SWT.WRAP);
-							this.desktopDescriptionLabel
-									.setText(Messages.getString(MessageIds.OSDE_MSGT0506));
+							this.desktopDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0506));
 							this.desktopDescriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 							this.desktopDescriptionLabel.setBounds(12, 5, 602, 57);
+							this.desktopDescriptionLabel.setMenu(this.devicePopupMenu);
 						}
 						{
 							this.desktopTabFolder = new CTabFolder(this.desktopComposite, SWT.BORDER);
@@ -949,7 +982,8 @@ public class DevicePropertiesEditor extends Composite {
 					public void close(CTabFolderEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "modeStateTabFolder.close, event=" + evt); //$NON-NLS-1$
 						if (DevicePropertiesEditor.this.deviceConfig != null) {
-							int childIndex = Integer.parseInt(evt.item.toString().split(" |}")[2]) - 1;
+							PropertyTypeTabItem tmpTabItem = (PropertyTypeTabItem)evt.item;
+							int childIndex = DevicePropertiesEditor.this.deviceConfig.getStateType().getProperty().indexOf(tmpTabItem.propertyType);
 							DevicePropertiesEditor.this.modeStateTabFolder.getChildren()[childIndex].dispose();
 							DevicePropertiesEditor.this.deviceConfig.removeStateType(DevicePropertiesEditor.this.deviceConfig.getStateType().getProperty().get(childIndex));
 						}
