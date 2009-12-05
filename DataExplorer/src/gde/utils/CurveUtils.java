@@ -200,7 +200,8 @@ public class CurveUtils {
 		// get the data points size
 		int recordSize = record.size();
 
-		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation 
+		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
+		log.log(Level.FINE, "record TimeStep_ms = " + record.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 		double adaptXMaxValue = (1.0 * (recordSize - 1) * record.getTimeStep_ms());
 		log.log(Level.FINER, "recordSize = " + recordSize + " adaptXMaxValue = " + adaptXMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 

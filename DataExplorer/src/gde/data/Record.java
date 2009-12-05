@@ -692,7 +692,7 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.getTimeStep_ms()) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.getTimeStep_ms()) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -700,7 +700,7 @@ public class Record extends Vector<Integer> {
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
-			int countDelta = Double.valueOf(this.minTriggerTimeSec / (this.timeStep_ms / 1000.0)).intValue();
+			int countDelta = Double.valueOf(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
 			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
 				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
 			}
@@ -708,7 +708,7 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.timeStep_ms) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.timeStep_ms) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.getTimeStep_ms()) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.getTimeStep_ms()) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -1033,7 +1033,7 @@ public class Record extends Vector<Integer> {
 	 * @return time step in msec
 	 */
 	public double getTimeStep_ms() {
-		return this.timeStep_ms <= 0 ? this.timeStep_ms = this.parent.getTimeStep_ms() : this.timeStep_ms;
+		return this.timeStep_ms <= 0 ? this.parent.getTimeStep_ms() : this.timeStep_ms;
 	}
 
 	/**
@@ -1092,7 +1092,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
 		Point returnPoint = new Point(0,0);
-		returnPoint.x = Double.valueOf((xDisplayOffset + (this.timeStep_ms * index) * this.displayScaleFactorTime)).intValue();
+		returnPoint.x = Double.valueOf((xDisplayOffset + (this.getTimeStep_ms() * index) * this.displayScaleFactorTime)).intValue();
 		returnPoint.y = Double.valueOf(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		return returnPoint;
 	}
@@ -1229,7 +1229,7 @@ public class Record extends Vector<Integer> {
 	* @return string of time value in simple date format HH:ss:mm:SSS
 	*/
 	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(Double.valueOf((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.timeStep_ms).intValue());
+		return TimeLine.getFomatedTimeWithUnit(Double.valueOf((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.getTimeStep_ms()).intValue());
 	}
 
 	/**
