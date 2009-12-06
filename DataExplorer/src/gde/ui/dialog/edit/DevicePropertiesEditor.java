@@ -316,7 +316,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.tabFolder.setSimple(false);
 				this.tabFolder.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL, false, false));
 				this.devicePopupMenu = new Menu(this.getShell(), SWT.POP_UP);
-				(this.deviceContextMenu = new ContextMenu(this.devicePopupMenu, this.deviceTabItem)).create();
+				(this.deviceContextMenu = new ContextMenu(this.devicePopupMenu, this.tabFolder)).create();
 				{
 					this.deviceTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 					this.deviceTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT0487));

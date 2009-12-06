@@ -20,17 +20,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
-import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-
-import osde.messages.MessageIds;
-import osde.messages.Messages;
 
 /**
  * Class to represent the context menu to enable adding different tab items
@@ -40,47 +37,56 @@ public class ContextMenu {
 	final static Logger					log												= Logger.getLogger(ContextMenu.class.getName());
 
 	final Menu		 menu;
-	final CTabItem parentTabItem;
+	final CTabFolder parentTabFolder;
 	
-	MenuItem curveSelectionItem, displayGraphicsHeaderItem;
+	MenuItem addSerialPortTypeMenuItem, addDataBlockTypeMenuItem, addStateTypeMenuItem;
 
-	public ContextMenu(Menu useMenu, CTabItem parent) {
+	public ContextMenu(Menu useMenu, CTabFolder parent) {
 		menu = useMenu;
-		parentTabItem = parent;
+		parentTabFolder = parent;
 	}	
 
 	public void create() {
 		menu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {
-				//				int tabSelectionIndex = application.getTabSelectionIndex();
-				//				if (tabSelectionIndex == 0) {
-				//					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
-				//					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
-				//					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
-				//				}
+				log.log(Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
+				for (CTabItem tabItem : parentTabFolder.getItems()) {
+//					if (tabItem instanceof SeriaPortTypeTabItem) {
+//						addSerialPortTypeMenuItem.setEnabled(false);
+//					}
+				}
 			}
 
 			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
-		this.curveSelectionItem = new MenuItem(menu, SWT.CHECK);
-		this.curveSelectionItem.setText(Messages.getString(MessageIds.OSDE_MSGT0040));
-		this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
+		this.addSerialPortTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addSerialPortTypeMenuItem.setText("add SerialPortType");
+		this.addSerialPortTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
-				boolean selection = curveSelectionItem.getSelection();
+				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				boolean selection = addSerialPortTypeMenuItem.getSelection();
 			}
 		});
-		this.displayGraphicsHeaderItem = new MenuItem(menu, SWT.CHECK);
-		this.displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.OSDE_MSGT0041));
-		this.displayGraphicsHeaderItem.addListener(SWT.Selection, new Listener() {
+		this.addDataBlockTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addDataBlockTypeMenuItem.setText("add DataBlockType");
+		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
-				boolean selection = displayGraphicsHeaderItem.getSelection();
+				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				boolean selection = addDataBlockTypeMenuItem.getSelection();
 			}
 		});
+		this.addStateTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addStateTypeMenuItem.setText("add StateType");
+		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				log.log(Level.FINEST, "addStateTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				boolean selection = addStateTypeMenuItem.getSelection();
+			}
+		});
+		new MenuItem(menu, SWT.SEPARATOR);
 	}
 
 }
