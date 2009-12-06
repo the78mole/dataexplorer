@@ -161,7 +161,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	}
 
 	public boolean isVisible() {
-		return this != null && !this.isDisposed() && this.getControl().isVisible();
+		return this != null && !this.isDisposed() && this.getControl() != null && this.getControl().isVisible();
 	}
 
 	/**

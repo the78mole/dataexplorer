@@ -500,15 +500,8 @@ public class OperatingSystemHelper {
 			else if (OSDE.IS_LINUX || OSDE.IS_MAC) { //$NON-NLS-1$
 				try {
 					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-					if (fullQualifiedLinkTargetPath.contains(OSDE.STRING_BLANK)) { // creating links with filenames containing blanks failed
-						if (FileUtils.checkFileExist(fullQualifiedLinkTargetPath)) {
-							File file = new File(fullQualifiedLinkTargetPath);
-							fullQualifiedLinkTargetPath = fullQualifiedLinkTargetPath.replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
-							file.renameTo(new File(fullQualifiedLinkTargetPath));
-						}
-					}
 					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
-					String command = "ln -s " + fullQualifiedLinkTargetPath + OSDE.STRING_BLANK + fullQualifiedLinkPath;  //$NON-NLS-1$
+					String command = "ln -s '" + fullQualifiedLinkTargetPath + "' '" + fullQualifiedLinkPath +"'";  //$NON-NLS-1$
 					log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 
 					Process process = new ProcessBuilder("ln", "-s", fullQualifiedLinkTargetPath, fullQualifiedLinkPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
