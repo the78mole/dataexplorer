@@ -500,7 +500,7 @@ public class OperatingSystemHelper {
 			else if (OSDE.IS_LINUX || OSDE.IS_MAC) { //$NON-NLS-1$
 				try {
 					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_BLANK, OSDE.STRING_UNDER_BAR);
+					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
 					String command = "ln -s '" + fullQualifiedLinkTargetPath + "' '" + fullQualifiedLinkPath +"'";  //$NON-NLS-1$
 					log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 

@@ -210,10 +210,11 @@ public class CurveUtils {
 		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
 		int xScaleFactor = Double.valueOf(recordSize / (width * 2.2)).intValue();
 		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1;
-		while (!(recordSize % xScaleFactor <= 5) && xScaleFactor > 1) {
+		while (xScaleFactor % 2 == 0 && xScaleFactor > 1) {
 			--xScaleFactor;
 		}
-		log.log(Level.FINER, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
+		//xScaleFactor+=2;
+		log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
 		xTimeFactor = xTimeFactor * xScaleFactor;
 
 		record.setDisplayScaleFactorTime(xTimeFactor);
