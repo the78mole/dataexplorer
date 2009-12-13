@@ -26,6 +26,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
@@ -53,6 +55,7 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.xml.sax.SAXParseException;
 
 import osde.OSDE;
 import osde.config.Settings;
@@ -188,8 +191,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.deviceConfigurations.put(keyString, devConfig);
 				}
 			}
+			catch (JAXBException e) {
+				DeviceSelectionDialog.log.log(Level.WARNING, e.getMessage(), e);
+				if (e.getLinkedException() instanceof SAXParseException) {
+					SAXParseException spe = (SAXParseException) e.getLinkedException();
+					OSDE.setInitError(Messages.getString(MessageIds.OSDE_MSGW0038, new String[] { spe.getSystemId().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK), spe.getLocalizedMessage() }));
+				}
+			}
 			catch (Exception e) {
-				// ignore exception, but write to std out
 				DeviceSelectionDialog.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
