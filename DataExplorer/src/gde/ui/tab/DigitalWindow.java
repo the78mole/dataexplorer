@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -128,7 +129,8 @@ public class DigitalWindow extends CTabItem {
 	 */
 	public void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
+		if (activeChannel != null && this.digitalMainComposite.isVisible()) {
+			log.log(Level.FINE, OSDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {

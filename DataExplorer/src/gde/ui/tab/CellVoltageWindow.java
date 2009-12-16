@@ -397,12 +397,12 @@ public class CellVoltageWindow extends CTabItem {
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
-				this.displays.get(i).redraw();
+				this.displays.get(i).voltagePaintControl();
 				log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		else {
-			update(false);
+		else if (this.coverComposite.isVisible()) {
+			updateAndResize();
 		}
 	}
 
@@ -471,13 +471,13 @@ public class CellVoltageWindow extends CTabItem {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && recordSet.isSyncableDisplayableRecords(false) && this.coverComposite.isVisible()) {
 				int cellCount = this.voltageAvg = 0;
 				String[] activeRecordKeys = recordSet.getSyncableRecords().toArray(new String[0]);
 				for (String recordKey : activeRecordKeys) {
 					Record record = recordSet.get(recordKey);
 					int index = record.getName().length();
-					//log.log(Level.FINER, "record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
+					//log.log(Level.INFO, "record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
 					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
 					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a property to flag as single cell voltage
 						if (record.getLast() >= 0) { // last value is current value
@@ -555,7 +555,7 @@ public class CellVoltageWindow extends CTabItem {
 	void updateAndResize() {
 		updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
-		log.log(Level.FINER, "mainSize = " + mainSize.toString());
+		log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		if (this.voltageVector.size() > 0) {
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
@@ -570,7 +570,7 @@ public class CellVoltageWindow extends CTabItem {
 			CellVoltageWindow.this.coverComposite.setSize(0, 0);
 			clearVoltageAndCapacity();
 		}
-		update(true);
+		update(false);
 	}
 
 	/**

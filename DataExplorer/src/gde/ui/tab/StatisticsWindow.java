@@ -207,7 +207,7 @@ public class StatisticsWindow extends CTabItem {
 					@Override
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
-						updateStatisticsData();
+						updateStatisticsData(false);
 					}
 				});
 				{
@@ -258,13 +258,13 @@ public class StatisticsWindow extends CTabItem {
 	/**
 	 * update statistics window display data
 	 */
-	public void updateStatisticsData() {
+	public synchronized void updateStatisticsData(boolean forceUpdate) {
 		log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && !activeRecordSet.equals(oldRecordSet)) {
+			if (activeRecordSet != null && (forceUpdate || !activeRecordSet.equals(oldRecordSet))) {
 				// cleanup old data table
 				this.dataTable.removeAll();
 				
@@ -402,7 +402,6 @@ public class StatisticsWindow extends CTabItem {
 				catch (RuntimeException e) {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
-				this.oldRecordSet = activeRecordSet;
 				
 				// set items (rows) of data table
 				TableItem row;
@@ -412,8 +411,12 @@ public class StatisticsWindow extends CTabItem {
 					row = new TableItem(this.dataTable, SWT.NONE);
 					row.setText(itemsText.split(DELIMITER));
 				}
+				if (!activeRecordSet.equals(oldRecordSet)) {
+					this.descriptionGroup.redraw();
+				}
+				this.oldRecordSet = activeRecordSet;
 			}
-			else if (activeRecordSet == null){
+			else if (activeRecordSet == null) { 
 				if (oldRecordSet != null && this.tabelItemText.size() > 0) {
 					// cleanup old data table
 					this.dataTable.removeAll();
@@ -431,7 +434,6 @@ public class StatisticsWindow extends CTabItem {
 			this.oldRecordSet = null;
 		}
 		adaptTableSize();
-		this.descriptionGroup.redraw();
 	}
 
 	/**

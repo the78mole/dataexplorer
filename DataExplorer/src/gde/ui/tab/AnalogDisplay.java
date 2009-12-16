@@ -16,6 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
+import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -155,8 +156,10 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
 
 			// get min max values and check if this has been changed
-			double tmpMinValue = this.device.translateValue(this.record, this.record.getMinValue() / 1000.0);
-			double tmpMaxValue = this.device.translateValue(this.record, this.record.getMaxValue() / 1000.0);
+			double tmpMinValue = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getMinValue() : this.record.getMinValue();
+			tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
+			double tmpMaxValue = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getMaxValue() : this.record.getMaxValue();
+			tmpMaxValue = this.device.translateValue(this.record, tmpMaxValue / 1000.0);
 			double deltaScale = tmpMaxValue - tmpMinValue;
 			tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
 			tmpMaxValue = MathUtils.roundUp(tmpMaxValue, deltaScale);
@@ -202,6 +205,7 @@ public class AnalogDisplay extends Composite {
 			int tickRadius = this.radius + 2;
 			int dxr, dxtick, dyr, dytick, dxtext, dytext;
 			this.tachoImageGC.setLineWidth(2);
+			DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
 			for (int i = 0; i <= numberTicks; ++i) {
 				double angle = this.angleStart + i * angleSteps; // -20, 0, 20, 40, ...
 				dxr = Double.valueOf(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();
@@ -212,7 +216,8 @@ public class AnalogDisplay extends Composite {
 
 				dxtext = Double.valueOf((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytext = Double.valueOf((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
-				String valueText = this.record.getDecimalFormat().format(this.minValue + (i * deltaValue));
+				String valueText = df.format(this.minValue + (i * deltaValue));
+				log.log(Level.FINE, "value = " + valueText);
 				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
 			// center knob

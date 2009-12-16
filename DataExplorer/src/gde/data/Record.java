@@ -429,7 +429,7 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public boolean add(int point) {
+	public synchronized boolean add(Integer point) {
 		final String $METHOD_NAME = "add"; //$NON-NLS-1$
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
@@ -438,9 +438,9 @@ public class Record extends Vector<Integer> {
 			if 			(point > this.maxValue) this.maxValue = point;
 			else if (point < this.minValue) this.minValue = point;
 		}	
-		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "adding point = " + point); //$NON-NLS-1$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-		return this.add(Integer.valueOf(point)); // Vector add method
+		return super.add(point);
 	}
 
 	public int getOrdinal() {
@@ -638,7 +638,7 @@ public class Record extends Vector<Integer> {
 	 * while building vector of trigger range definitions as pre-requisite of avg and sigma calculation
 	 */
 	@SuppressWarnings("unchecked") // clone triggerRanges to be able to modify by time filter
-	 void evaluateMinMax() {
+	 synchronized void evaluateMinMax() {
 		if (this.triggerRanges == null && this.isDisplayable && this.triggerIsGreater != null && this.triggerLevel != null) {
 			int deviceTriggerlevel = Double.valueOf(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
 			for (int i = 0; i < this.realSize(); ++i) {
@@ -743,7 +743,7 @@ public class Record extends Vector<Integer> {
 		return this.minValueTriggered;
 	}
 	
-	void setMinMaxValueTriggered() {
+	synchronized void setMinMaxValueTriggered() {
 		if (this.triggerRanges != null) {
 			for (TriggerRange range : this.triggerRanges) {
 				for (int i = range.in; i < range.out; i++) {
@@ -1045,7 +1045,7 @@ public class Record extends Vector<Integer> {
 	}
 
 	public DecimalFormat getDecimalFormat() {
-		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual delta
+		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
 		return this.df;
 	}
 
@@ -1581,7 +1581,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the avgValue
 	 */
-	public void setAvgValue() {
+	public synchronized void setAvgValue() {
 		if (super.size() >= 2) {
 			long sum = 0;
 			for (Integer xi : this) {
@@ -1594,7 +1594,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the avgValue using trigger ranges
 	 */
-	public void setAvgValueTriggered() {
+	public synchronized void setAvgValueTriggered() {
 		long sum = 0;
 		int numPoints = 0;
 		StringBuilder sb = new StringBuilder();
@@ -1648,7 +1648,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the sigmaValue 
 	 */
-	public void setSigmaValue() {
+	public synchronized void setSigmaValue() {
 		if (super.size() >= 2) {
 			double average = this.getAvgValue() / 1000.0;
 			double sumPoweredValues = 0;
@@ -1662,7 +1662,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculates the sigmaValue using trigger ranges
 	 */
-	public void setSigmaValueTriggered() {
+	public synchronized void setSigmaValueTriggered() {
 		double average = this.getAvgValueTriggered()/1000.0;
 		double sumPoweredDeviations = 0;
 		int numPoints = 0;
