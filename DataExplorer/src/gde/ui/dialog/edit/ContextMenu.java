@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import osde.messages.MessageIds;
+import osde.messages.Messages;
+
 /**
  * Class to represent the context menu to enable adding different tab items
  * @author Winfried Brügmann
@@ -51,10 +54,19 @@ public class ContextMenu {
 			@Override
 			public void menuShown(MenuEvent e) {
 				log.log(Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
+				addSerialPortTypeMenuItem.setEnabled(true);
+				addDataBlockTypeMenuItem.setEnabled(true);
+				addStateTypeMenuItem.setEnabled(true);
 				for (CTabItem tabItem : parentTabFolder.getItems()) {
-//					if (tabItem instanceof SeriaPortTypeTabItem) {
-//						addSerialPortTypeMenuItem.setEnabled(false);
-//					}
+					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0512))) {
+						addSerialPortTypeMenuItem.setEnabled(false);
+					}
+					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0515))) {
+						addDataBlockTypeMenuItem.setEnabled(false);
+					}
+					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0470))) {
+						addStateTypeMenuItem.setEnabled(false);
+					}
 				}
 			}
 
@@ -62,28 +74,28 @@ public class ContextMenu {
 			public void menuHidden(MenuEvent e) {
 			}
 		});
-		this.addSerialPortTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addSerialPortTypeMenuItem = new MenuItem(menu, SWT.PUSH);
 		this.addSerialPortTypeMenuItem.setText("add SerialPortType");
 		this.addSerialPortTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
-				boolean selection = addSerialPortTypeMenuItem.getSelection();
+				DevicePropertiesEditor.getInstance().createSerialPortTabItem();
 			}
 		});
-		this.addDataBlockTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addDataBlockTypeMenuItem = new MenuItem(menu, SWT.PUSH);
 		this.addDataBlockTypeMenuItem.setText("add DataBlockType");
 		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
-				boolean selection = addDataBlockTypeMenuItem.getSelection();
+				DevicePropertiesEditor.getInstance().createDataBlockType();
 			}
 		});
-		this.addStateTypeMenuItem = new MenuItem(menu, SWT.CHECK);
+		this.addStateTypeMenuItem = new MenuItem(menu, SWT.PUSH);
 		this.addStateTypeMenuItem.setText("add StateType");
 		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "addStateTypeMenuItem action performed! " + e); //$NON-NLS-1$
-				boolean selection = addStateTypeMenuItem.getSelection();
+				DevicePropertiesEditor.getInstance().createStateTabItem();
 			}
 		});
 		new MenuItem(menu, SWT.SEPARATOR);

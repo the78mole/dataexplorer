@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
-import osde.device.DataTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.MeasurementPropertyTypes;
 import osde.device.MeasurementType;
@@ -111,7 +110,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 		String[] nameComboItems = StringHelper.enumValues2StringArray(MeasurementPropertyTypes.values());
 		for (int i = 0; i < measurementPropertyCount; i++) {
 			PropertyTypeTabItem tabItem = (PropertyTypeTabItem) this.measurementsPropertiesTabFolder.getItem(i);
-			tabItem.setProperty(this.measurementType.getProperty().get(i), true, true, false, true);
+			tabItem.setProperty(this.deviceConfig, this.measurementType.getProperty().get(i), true, true, false, true);
 			tabItem.setNameComboItems(nameComboItems);
 		}
 
@@ -282,10 +281,14 @@ public class MeasurementTypeTabItem extends CTabItem {
 							this.measurementsPropertiesTabFolder = new CTabFolder(this.channelConfigMeasurementPropertiesTabFolder, SWT.NONE);
 							this.measurementPropertiesTabItem.setControl(this.measurementsPropertiesTabFolder);
 							{
-								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "offset", "offset", DataTypes.DOUBLE, 0.0, "offset to measurement value, applied after factor");
-								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "factor", "factor", DataTypes.DOUBLE, 1.0, "factor to measurement value, applied after reduction");
-								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "reduction", "reduction", DataTypes.DOUBLE, 0.0,
-										"direct reduction to measurement value, applied before factor");
+								//PropertyTypeTabItem tabItem = 
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder,	SWT.CLOSE, "offset");
+										//, "offset", DataTypes.DOUBLE, 0.0, "offset to measurement value, applied after factor");
+								//tabItem.setProperty(this.measurementType.getProperty().get(i), true, true, false, true);
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "factor"); 
+								//, "factor", DataTypes.DOUBLE, 1.0, "factor to measurement value, applied after reduction");
+								new PropertyTypeTabItem(this.measurementsPropertiesTabFolder, SWT.CLOSE, "reduction");
+								//, "reduction", DataTypes.DOUBLE, 0.0,	"direct reduction to measurement value, applied before factor");
 							}
 							this.measurementsPropertiesTabFolder.setSelection(0);
 							this.measurementsPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {

@@ -31,22 +31,19 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.device.DataTypes;
 import osde.device.DesktopPropertyTypes;
-import osde.device.DesktopType;
 import osde.device.DeviceConfiguration;
 import osde.device.MeasurementPropertyTypes;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
-import osde.device.StateType;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
@@ -69,8 +66,10 @@ public class PropertyTypeTabItem extends CTabItem {
 	VerifyListener			valueVerifyListener;
 
 	DeviceConfiguration	deviceConfigParent;
-	StateType						stateParent;
-	DesktopType					desktopParent;
+	boolean							isStateType; 				//1000
+	boolean							isDesktopType; 			//0001
+	boolean 						isMeasurementType; 	//1101
+	boolean 						isUnspecifiedType; 	//1111
 	PropertyType				propertyType;
 
 	final CTabFolder		parentTabFolder;
@@ -85,32 +84,32 @@ public class PropertyTypeTabItem extends CTabItem {
 	//		desktopParent = newDesktopParent;
 	//	}
 
-	/**
-	* Auto-generated main method to display this 
-	* org.eclipse.swt.widgets.Composite inside a new Shell.
-	*/
-	public static void main(String[] args) {
-		showGUI();
-	}
-
-	/**
-	* Auto-generated method to display this 
-	* org.eclipse.swt.widgets.Composite inside a new Shell.
-	*/
-	public static void showGUI() {
-		Display display = Display.getDefault();
-		Shell shell = new Shell(display);
-		CTabFolder instTabFolder = new CTabFolder(shell, SWT.NULL);
-		new PropertyTypeTabItem(instTabFolder, SWT.NULL, "Prop 1", "offset", DataTypes.INTEGER, "25", "The offest value is added to actual measurement value");
-		instTabFolder.setSize(300, 200);
-		shell.setLayout(new FillLayout());
-		shell.layout();
-
-		shell.open();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) display.sleep();
-		}
-	}
+//	/**
+//	* Auto-generated main method to display this 
+//	* org.eclipse.swt.widgets.Composite inside a new Shell.
+//	*/
+//	public static void main(String[] args) {
+//		showGUI();
+//	}
+//
+//	/**
+//	* Auto-generated method to display this 
+//	* org.eclipse.swt.widgets.Composite inside a new Shell.
+//	*/
+//	public static void showGUI() {
+//		Display display = Display.getDefault();
+//		Shell shell = new Shell(display);
+//		CTabFolder instTabFolder = new CTabFolder(shell, SWT.NULL);
+//		new PropertyTypeTabItem(instTabFolder, SWT.NULL, "Prop 1", "offset", DataTypes.INTEGER, "25", "The offest value is added to actual measurement value");
+//		instTabFolder.setSize(300, 200);
+//		shell.setLayout(new FillLayout());
+//		shell.layout();
+//
+//		shell.open();
+//		while (!shell.isDisposed()) {
+//			if (!display.readAndDispatch()) display.sleep();
+//		}
+//	}
 
 	/**
 	 * constructor without any variables input
@@ -124,84 +123,102 @@ public class PropertyTypeTabItem extends CTabItem {
 		this.parentTabFolder = parent;
 		this.tabName = useTabName;
 		PropertyTypeTabItem.log.log(Level.FINE, "PropertyTypeTabItem " + this.tabName);
-		initGUI();
-	}
-
-	/**
-	 * constructor with header text and all available input parameter, 
-	 * if some parameter might not be filled use OSDE.STRING_EMPTY
-	 * @param parent
-	 * @param style
-	 * @param useHeader
-	 * @param useName
-	 * @param useType
-	 * @param useValue
-	 * @param useDescription
-	 */
-	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, Object useValue, String useDescription) {
-		super(parent, style);
-		this.tabName = useTabName;
-
-		this.parentTabFolder = parent;
+		
 		this.propertyType = new ObjectFactory().createPropertyType();
-		this.propertyType.setName(useName);
-		this.propertyType.setType(useType);
-		this.propertyType.setValue(useValue);
-		this.propertyType.setDescription(useDescription);
+		this.propertyType.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
+		this.propertyType.setType(DataTypes.INTEGER);
+		this.propertyType.setValue(OSDE.STRING_EMPTY + 0);
+		this.propertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0474));
+
 		initGUI();
 	}
+
+//	/**
+//	 * constructor with header text and all available input parameter, 
+//	 * if some parameter might not be filled use OSDE.STRING_EMPTY
+//	 * @param parent
+//	 * @param style
+//	 * @param useHeader
+//	 * @param useName
+//	 * @param useType
+//	 * @param useValue
+//	 * @param useDescription
+//	 */
+//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, Object useValue, String useDescription) {
+//		super(parent, style);
+//		this.tabName = useTabName;
+//
+//		this.parentTabFolder = parent;
+//		this.propertyType = new ObjectFactory().createPropertyType();
+//		this.propertyType.setName(useName);
+//		this.propertyType.setType(useType);
+//		this.propertyType.setValue(useValue);
+//		this.propertyType.setDescription(useDescription);
+//		initGUI();
+//	}
+
+//	/**
+//	 * constructor with header text and all available input parameter excluding the value, 
+//	 * if some parameter might not be filled use OSDE.STRING_EMPTY
+//	 * @param parent
+//	 * @param style
+//	 * @param useHeader
+//	 * @param useName
+//	 * @param useType
+//	 * @param useDescription
+//	 */
+//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, String useDescription) {
+//		super(parent, style);
+//		this.parentTabFolder = parent;
+//		this.tabName = useTabName;
+//
+//		this.propertyType = new ObjectFactory().createPropertyType();
+//		this.propertyType.setName(useName);
+//		this.propertyType.setType(useType);
+//		this.propertyType.setDescription(useDescription);
+//		initGUI();
+//	}
+
+//	/**
+//	 * constructor with header text and all available input parameter from given property 
+//	 * @param parent
+//	 * @param style
+//	 * @param useHeader
+//	 * @param useProperty of PropertyType
+//	 */
+//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, PropertyType useProperty) {
+//		super(parent, style);
+//		this.parentTabFolder = parent;
+//		this.tabName = useTabName;
+//
+//		this.propertyType = useProperty;
+//		initGUI();
+//	}
 
 	/**
-	 * constructor with header text and all available input parameter excluding the value, 
-	 * if some parameter might not be filled use OSDE.STRING_EMPTY
-	 * @param parent
-	 * @param style
-	 * @param useHeader
-	 * @param useName
-	 * @param useType
-	 * @param useDescription
+	 * method to set values of the name selection combo for cases where this names are constant
 	 */
-	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, String useDescription) {
-		super(parent, style);
-		this.parentTabFolder = parent;
-		this.tabName = useTabName;
-
-		this.propertyType = new ObjectFactory().createPropertyType();
-		this.propertyType.setName(useName);
-		this.propertyType.setType(useType);
-		this.propertyType.setDescription(useDescription);
-		initGUI();
-	}
-
-	/**
-	 * constructor with header text and all available input parameter from given property 
-	 * @param parent
-	 * @param style
-	 * @param useHeader
-	 * @param useProperty of PropertyType
-	 */
-	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, PropertyType useProperty) {
-		super(parent, style);
-		this.parentTabFolder = parent;
-		this.tabName = useTabName;
-
-		this.propertyType = useProperty;
-		initGUI();
-	}
-
 	public void setNameComboItems(String[] items) {
 		this.nameCombo.setItems(items);
 	}
 
 	/**
 	 * update the tab item internal widgets by property content
+	 * @param useDeviceConfig of DeviceConfiguration
 	 * @param useProperty of PropertyType
 	 * @param enableEditSelectName 
 	 * @param enableSelectType 
 	 * @param enableValue
 	 */
-	public void setProperty(PropertyType useProperty, boolean enableEditSelectName, boolean enableNameSelection, boolean enableSelectType, boolean enableValue) {
+	public void setProperty(DeviceConfiguration useDeviceConfig, PropertyType useProperty, boolean enableEditSelectName, boolean enableNameSelection, boolean enableSelectType, boolean enableValue) {
+		this.deviceConfigParent = useDeviceConfig;
 		this.propertyType = useProperty;
+		
+		isStateType = enableEditSelectName && !enableNameSelection && !enableSelectType && !enableValue; 				//1000
+		isDesktopType = !enableEditSelectName && !enableNameSelection && !enableSelectType && enableValue; 			//0001
+		isMeasurementType = enableEditSelectName && enableNameSelection && !enableSelectType && enableValue; 	//1101
+		isUnspecifiedType = enableEditSelectName && enableNameSelection && enableSelectType && enableValue; 	//1111
+
 		
 		this.setText(this.tabName = this.propertyType.getName());
 
@@ -311,12 +328,16 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
-							if (PropertyTypeTabItem.this.stateParent != null)
+							if (isStateType) {
 								PropertyTypeTabItem.this.deviceConfigParent.setStateName(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.nameText.getText());
-							//desktop name is key and can be modified
+								//DesktopType name is key and can not be modified
+								//MeasurementTypeProperty name is key and can be selected factor, offset, reduction
+							}
 						}
-						else
+						else {
 							PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameText.getText());
+						}
+						PropertyTypeTabItem.this.setText(tabName = PropertyTypeTabItem.this.nameText.getText());
 					}
 				});
 			}
@@ -331,8 +352,9 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void widgetSelected(SelectionEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "nameCombo.widgetSelected, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
-							if (PropertyTypeTabItem.this.stateParent != null)
-								PropertyTypeTabItem.this.deviceConfigParent.setStateName(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.nameCombo.getText());
+							if (isMeasurementType)
+								PropertyTypeTabItem.this.deviceConfigParent.setMeasurementName("test", Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.nameCombo.getText());
+							//TODO 
 							//desktop name is key and can be modified
 						}
 						else
@@ -389,6 +411,7 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.keyReleased, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
+							//TODO
 							// mode state type is Integer and can not be modified
 							// desktop state type is Boolean and can be modified as text
 						}
@@ -415,14 +438,14 @@ public class PropertyTypeTabItem extends CTabItem {
 						PropertyTypeTabItem.log.log(Level.FINEST, "valueCombo.widgetSelected, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
 							// mode state type is Integer and can not be modified by combo selection
-							if (PropertyTypeTabItem.this.desktopParent != null) {
-								if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.TABLE_TAB))
+							if (isDesktopType) {
+								if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.TABLE_TAB.value()))
 									PropertyTypeTabItem.this.deviceConfigParent.setTableTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.DIGITAL_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.DIGITAL_TAB.value()))
 									PropertyTypeTabItem.this.deviceConfigParent.setDigitalTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.ANALOG_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.ANALOG_TAB.value()))
 									PropertyTypeTabItem.this.deviceConfigParent.setAnalogTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
-								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB))
+								else if (PropertyTypeTabItem.this.propertyType.getName().equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value()))
 									PropertyTypeTabItem.this.deviceConfigParent.setVoltagePerCellTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
 							}
 						}
@@ -440,9 +463,13 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt);
 						if (PropertyTypeTabItem.this.deviceConfigParent != null) {
-							if (PropertyTypeTabItem.this.stateParent != null)
+							if (isStateType)
 								PropertyTypeTabItem.this.deviceConfigParent.setStateDescription(Integer.parseInt(PropertyTypeTabItem.this.propertyType.getValue()), PropertyTypeTabItem.this.descriptionText.getText());
-							else if (PropertyTypeTabItem.this.desktopParent != null)
+							else if (isDesktopType)
+								PropertyTypeTabItem.this.deviceConfigParent.setDesktopTypeDesription(DesktopPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()), PropertyTypeTabItem.this.descriptionText.getText());
+							else if (isMeasurementType)
+								PropertyTypeTabItem.this.deviceConfigParent.setDesktopTypeDesription(DesktopPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()), PropertyTypeTabItem.this.descriptionText.getText());
+							else //isUnspecifiedType TODO
 								PropertyTypeTabItem.this.deviceConfigParent.setDesktopTypeDesription(DesktopPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()), PropertyTypeTabItem.this.descriptionText.getText());
 						}
 						else

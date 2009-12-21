@@ -482,6 +482,16 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * set the desktop type value
+	 * @param dektopType
+	 * @param newValue
+	 */
+	public void setDesktopTypeValue(DesktopPropertyTypes desktopType, Boolean newValue) {
+			this.getDesktopProperty(desktopType).setValue(newValue);
+			this.isChangePropery = true;
+	}
+	
+	/**
 	 * @return size of mode states
 	 */
 	public int getStateSize() {
@@ -509,6 +519,9 @@ public class DeviceConfiguration {
 	 */
 	public void appendStateType(PropertyType newStateProperty) {
 		this.isChangePropery = true;
+		if (this.deviceProps.state == null) {
+			this.deviceProps.state = new ObjectFactory().createStateType();
+		}
 		this.deviceProps.state.append(newStateProperty);
 	}
 	
@@ -737,11 +750,11 @@ public class DeviceConfiguration {
 	
 	/**
 	 * set a new desktop type description
-	 * @param dektopType
+	 * @param desktopType
 	 * @param newDescription
 	 */
-	public void setDesktopTypeDesription(DesktopPropertyTypes dektopType, String newDescription) {
-		this.getDesktopProperty(dektopType).setDescription(newDescription);
+	public void setDesktopTypeDesription(DesktopPropertyTypes desktopType, String newDescription) {
+		this.getDesktopProperty(desktopType).setDescription(newDescription);
 		this.isChangePropery = true;
 	}
 	
