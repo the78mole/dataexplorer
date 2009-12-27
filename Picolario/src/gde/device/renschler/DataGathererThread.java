@@ -89,7 +89,7 @@ public class DataGathererThread extends Thread {
 				RecordSet recordSet = channel.get(recordSetKey);
 
 				byte[] dataBuffer = new byte[recordSet.size()];
-				int[] points = new int[this.device.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+				int[] points = new int[this.device.getNumberOfMeasurements(1)];
 				
 				for (byte[] reveivedBuffer : data) { // 31 or x*3 + 1
 					for (int i = 0; i < reveivedBuffer.length/3; ++i) {  // three bytes per datapoint
