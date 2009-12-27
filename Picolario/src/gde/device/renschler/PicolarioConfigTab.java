@@ -440,6 +440,7 @@ public class PicolarioConfigTab extends Composite {
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;
+		int channelConfigNumber = Channels.getInstance().getActiveChannel().getOrdinal();
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // load all data from record set
 			String[] recordKeys = recordSet.getRecordNames();
@@ -487,7 +488,7 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "slopeTimeSelection = " + this.slopeTimeSelection); //$NON-NLS-1$
 		}
 		else {		
-			measurement = this.device.getMeasurement(this.configName, 1);// 1 = height
+			measurement = this.device.getMeasurement(channelConfigNumber, 1);// 1 = height
 	
 			this.heightDataUnit = measurement.getUnit();
 			log.log(Level.FINER, "heightDataUnit = " + this.heightDataUnit); //$NON-NLS-1$
@@ -513,7 +514,7 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "heightOffsetValue = " + this.heightOffsetValue); //$NON-NLS-1$
 	
 			// 2 = slope
-			measurement = this.device.getMeasurement(this.configName, 2);
+			measurement = this.device.getMeasurement(channelConfigNumber, 2);
 			this.slopeDataUnit = measurement.getUnit();
 			log.log(Level.FINER, "slopeDataUnit = " + this.slopeDataUnit); //$NON-NLS-1$
 	
