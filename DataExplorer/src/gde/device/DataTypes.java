@@ -63,11 +63,11 @@ public enum DataTypes {
         throw new IllegalArgumentException(v);
     }
 
-    public static String[] valuesAsStingArray() {
-    	StringBuilder sb = new StringBuilder();
-    	for (DataTypes element : DataTypes.values()) {
-    		sb.append(element.value).append(OSDE.STRING_SEMICOLON);
-			}
-    	return sb.toString().split(OSDE.STRING_SEMICOLON);
-     }
+	public static String[] valuesAsStingArray() {
+		StringBuilder sb = new StringBuilder();
+		for (DataTypes element : DataTypes.values()) {
+			sb.append(element.value).append(OSDE.STRING_SEMICOLON);
+		}
+		return sb.toString().split(OSDE.STRING_SEMICOLON);
+	}
 }

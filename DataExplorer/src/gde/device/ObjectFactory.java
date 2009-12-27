@@ -153,14 +153,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MeasurementPropertyType }
-     * 
-     */
-    public MeasurementPropertyType createMeasurementPropertyType() {
-        return new MeasurementPropertyType();
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DevicePropertiesType }{@code >}}
      * 
      */

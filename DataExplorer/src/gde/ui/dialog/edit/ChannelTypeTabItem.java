@@ -40,6 +40,8 @@ import osde.OSDE;
 import osde.device.ChannelType;
 import osde.device.ChannelTypes;
 import osde.device.DeviceConfiguration;
+import osde.device.MeasurementType;
+import osde.device.ObjectFactory;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
@@ -92,20 +94,32 @@ public class ChannelTypeTabItem extends CTabItem {
 		int actualTabItemCount = this.measurementsTabFolder.getItemCount();
 		if (measurementTypeCount < actualTabItemCount) {
 			for (int i = measurementTypeCount; i < actualTabItemCount; i++) {
-				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(measurementTypeCount);
-				measurementTabItem.dispose();
+				MeasurementTypeTabItem tmpMeasurementTypeTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(measurementTypeCount);
+				if (tmpMeasurementTypeTabItem.measurementPropertiesTabFolder != null) { // dispose PropertyTypes
+					for (CTabItem tmpPropertyTypeTabItem : tmpMeasurementTypeTabItem.measurementPropertiesTabFolder.getItems()) {
+						((PropertyTypeTabItem) tmpPropertyTypeTabItem).dispose();
+					}
+					tmpMeasurementTypeTabItem.measurementPropertiesTabItem.dispose();
+				}
+				if (tmpMeasurementTypeTabItem.statisticsTypeTabItem != null) { // dispose StatisticsType
+					tmpMeasurementTypeTabItem.statisticsTypeTabItem.dispose();
+				}
+				tmpMeasurementTypeTabItem.dispose();
 			}
 		}
 		else if (measurementTypeCount > actualTabItemCount) {
 			for (int i = actualTabItemCount; i < measurementTypeCount; i++) {
-				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.CLOSE, i);
+				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, i);
 			}
 		}
+		this.measurementsTabFolder.getItem(measurementTypeCount-1).setShowClose(true);
 		for (int i = 0; i < measurementTypeCount; i++) {
 			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
 			measurementTabItem.setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
 		}
 		//MeasurementType end
+		
+		this.channelConfigInnerTabFolder.setSelection(0);
 	}
 
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
@@ -115,9 +129,59 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = useChannelType;
 		initGUI();
 	}
+	
+	public synchronized ChannelTypeTabItem clone() {
+		return new ChannelTypeTabItem(this);
+	}
+	
+	/**
+	 * copy constructor
+	 * @param copyFrom
+	 */
+	private ChannelTypeTabItem(ChannelTypeTabItem copyFrom) {
+		super(copyFrom.channelConfigInnerTabFolder, SWT.CLOSE);
+		this.channelConfigInnerTabFolder = copyFrom.channelConfigInnerTabFolder;
+		this.deviceConfig = copyFrom.deviceConfig;
+		this.channelConfigNumber = this.channelConfigInnerTabFolder.getItemCount();
+		this.channelType = new ObjectFactory().createChannelType();
+		this.channelConfigType	= copyFrom.channelConfigType;
+		this.channelConfigName	= copyFrom.channelConfigName;
+		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : "newConguration");
+		this.channelType.setType(this.channelConfigType);
+		this.tabName = OSDE.STRING_BLANK + this.channelConfigNumber + OSDE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : OSDE.STRING_EMPTY) ;
+		initGUI();
+		
+		//MeasurementType begin - fix number tab items
+		int measurementTypeCount =copyFrom.channelType.getMeasurement().size();
+		int actualTabItemCount = this.measurementsTabFolder.getItemCount();
+		if (measurementTypeCount < actualTabItemCount) {
+			for (int i = measurementTypeCount; i < actualTabItemCount; i++) {
+				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(measurementTypeCount);
+				measurementTabItem.dispose();
+			}
+		}
+		else if (measurementTypeCount > actualTabItemCount) {
+			for (int i = actualTabItemCount; i < measurementTypeCount; i++) {
+				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, i);
+			}
+		}
+		this.measurementsTabFolder.getItem(measurementTypeCount-1).setShowClose(true);
+		//MeasurementType end
+		if (this.deviceConfig != null) {
+			this.deviceConfig.addChannelType(this.channelType);
+			//copy existing measurements
+			for (int i = 0; i < copyFrom.channelType.getMeasurement().size(); ++i) {
+				MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
+				MeasurementType tmpMeasurementType = copyFrom.channelType.getMeasurement().get(i).clone();
+				measurementTabItem.setMeasurementType(this.deviceConfig, tmpMeasurementType, this.channelConfigNumber);
+				this.channelType.getMeasurement().add(tmpMeasurementType);
+			}	
+		}			
+	}
 
 	private void initGUI() {
 		try {
+			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			{
@@ -127,11 +191,13 @@ public class ChannelTypeTabItem extends CTabItem {
 				this.channelConfigComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
-						if (ChannelTypeTabItem.this.channelType != null) {
-							ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
-							ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
-							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelType.getName();
-							ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
+						if (ChannelTypeTabItem.this.channelConfigComposite.isVisible()) {
+							if (ChannelTypeTabItem.this.channelType != null) {
+								ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
+								ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
+								ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelType.getName();
+								ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
+							}
 						}
 					}
 				});
@@ -194,15 +260,16 @@ public class ChannelTypeTabItem extends CTabItem {
 						@Override
 						public void close(CTabFolderEvent evt) {
 							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
-							//							CTabItem tabItem = ((CTabItem)evt.item);
-							//							if (deviceConfig != null) {
-							//								if (tabItem.getText().equals("State")) deviceConfig.removeStateType();
-							//								else if (tabItem.getText().equals("Serial Port")) deviceConfig.removeSerialPortType();
-							//								else if (tabItem.getText().equals("Data Block")) deviceConfig.removeDataBlockType();
-							//							}
-							//							tabItem.dispose();
-							//							if(deviceConfig != null) 
-							//								update();
+							MeasurementTypeTabItem tabItem = ((MeasurementTypeTabItem) evt.item);
+							if (deviceConfig != null) {
+								deviceConfig.removeMeasurementFromChannel(ChannelTypeTabItem.this.channelConfigNumber, tabItem.measurementType);
+							}
+							ChannelTypeTabItem.this.measurementsTabFolder.setSelection(measurementsTabFolder.getSelectionIndex() - 1);
+							tabItem.dispose();
+							
+							int itemCount = measurementsTabFolder.getItemCount();
+							if (itemCount > 1)
+								ChannelTypeTabItem.this.measurementsTabFolder.getItem(itemCount-1).setShowClose(true);
 						}
 					});
 				}
@@ -217,7 +284,8 @@ public class ChannelTypeTabItem extends CTabItem {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							new ChannelTypeTabItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder, SWT.CLOSE, ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount());
+							ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount()-1).setShowClose(false);
+							ChannelTypeTabItem.this.clone();
 						}
 					});
 				}

@@ -8,6 +8,8 @@
 package osde.device;
 
 
+import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -49,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "StatisticsType", propOrder = { "trigger" })
 public class StatisticsType {
 
-    protected TriggerType trigger;
+  protected TriggerType trigger;
 	@XmlAttribute(required = true)
 	protected boolean									min;
 	@XmlAttribute(required = true)
@@ -78,6 +80,41 @@ public class StatisticsType {
 	protected String									ratioText;
 
 	/**
+	 * default constructor
+	 */
+	public StatisticsType() {
+	}
+
+	/**
+	 * copy constructor
+	 * @param statistics
+	 */
+	private StatisticsType(StatisticsType statistics) {
+	  this.trigger = statistics.trigger;
+		this.min = statistics.min;
+		this.max = statistics.max;
+		this.avg = statistics.avg;
+		this.sigma = statistics.sigma;
+		this.triggerRefOrdinal = statistics.triggerRefOrdinal;
+		this.sumByTriggerRefOrdinal = statistics.sumByTriggerRefOrdinal;
+		this.sumTriggerText = statistics.sumTriggerText;
+		this.countByTrigger = statistics.countByTrigger;
+		this.countTriggerText = statistics.countTriggerText;
+		this.comment = statistics.comment;
+		this.sumTriggerTimeText = statistics.sumTriggerTimeText;
+		this.ratioRefOrdinal = statistics.ratioRefOrdinal;
+		this.ratioText = statistics.ratioText;
+	}
+
+	/**
+	 * clone method - calls the private copy constructor
+	 */
+	@Override
+	public StatisticsType clone() {
+		return new StatisticsType(this);
+	}
+
+	/**
 	 * Gets the value of the trigger property.
 	 * 
 	 * @return
@@ -99,6 +136,18 @@ public class StatisticsType {
 	 */
 	public void setTrigger(TriggerType value) {
 		this.trigger = value;
+	}
+
+	/**
+	 * Gets the value of the trigger property.
+	 * 
+	 * @return
+	 *     possible object is
+     *     {@link TriggerType }
+	 *     
+	 */
+    public void removeTrigger() {
+		this.trigger = null;
 	}
 
 	/**

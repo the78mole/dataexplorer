@@ -82,6 +82,7 @@ public class ContextMenu {
 				DevicePropertiesEditor.getInstance().createSerialPortTabItem();
 			}
 		});
+		new MenuItem(menu, SWT.SEPARATOR);
 		this.addDataBlockTypeMenuItem = new MenuItem(menu, SWT.PUSH);
 		this.addDataBlockTypeMenuItem.setText("add DataBlockType");
 		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
@@ -90,6 +91,7 @@ public class ContextMenu {
 				DevicePropertiesEditor.getInstance().createDataBlockType();
 			}
 		});
+		new MenuItem(menu, SWT.SEPARATOR);
 		this.addStateTypeMenuItem = new MenuItem(menu, SWT.PUSH);
 		this.addStateTypeMenuItem.setText("add StateType");
 		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
@@ -98,7 +100,6 @@ public class ContextMenu {
 				DevicePropertiesEditor.getInstance().createStateTabItem();
 			}
 		});
-		new MenuItem(menu, SWT.SEPARATOR);
 	}
 
 }

@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+import osde.OSDE;
+
 
 /**
  * <p>Java class for measurement_property_types.
@@ -65,7 +67,9 @@ public enum MeasurementPropertyTypes {
     @XmlEnumValue("number_motor")
     NUMBER_MOTOR("number_motor"),
     @XmlEnumValue("revolution_factor")
-    REVOLUTION_FACTOR("revolution_factor");
+    REVOLUTION_FACTOR("revolution_factor"),
+    @XmlEnumValue("none_specified")
+    NONE_SPECIFIED("none_specified");
     private final String value;
 
     MeasurementPropertyTypes(String v) {
@@ -84,5 +88,24 @@ public enum MeasurementPropertyTypes {
         }
         throw new IllegalArgumentException(v);
     }
+    
+  	public static String[] valuesAsStingArray() {
+  		StringBuilder sb = new StringBuilder();
+  		for (MeasurementPropertyTypes element : MeasurementPropertyTypes.values()) {
+  			if(element.equals(NONE_SPECIFIED)) continue;
+  			sb.append(element.value).append(OSDE.STRING_SEMICOLON);
+  		}
+  		return sb.toString().split(OSDE.STRING_SEMICOLON);
+  	}
 
+  	public static boolean isNoneSpecified(String checkName) {
+  		boolean isNoneSpecified = true;
+  		for (String element : MeasurementPropertyTypes.valuesAsStingArray()) {
+  			if(element.equals(checkName)) {
+  				isNoneSpecified = false;
+  				break;
+  			}
+  		}
+  		return isNoneSpecified;
+  	}
 }
