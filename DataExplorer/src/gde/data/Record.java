@@ -634,6 +634,16 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
+	 * @return the minTriggerTimeSec
+	 */
+	public Integer getMinTriggerTimeSec() {
+		if (this.minTriggerTimeSec == null) {
+			this.minTriggerTimeSec = this.parent.get(this.statistics.getTriggerRefOrdinal().intValue()).getMinTriggerTimeSec();
+		}
+		return this.minTriggerTimeSec;
+	}
+
+	/**
 	 * evaluate min and max value within range according trigger configuration
 	 * while building vector of trigger range definitions as pre-requisite of avg and sigma calculation
 	 */
@@ -700,7 +710,7 @@ public class Record extends Vector<Integer> {
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
-			int countDelta = Double.valueOf(this.minTriggerTimeSec / (this.getTimeStep_ms() / 1000.0)).intValue();
+			int countDelta = Double.valueOf(this.getMinTriggerTimeSec() / (this.getTimeStep_ms() / 1000.0)).intValue();
 			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
 				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
 			}

@@ -341,9 +341,11 @@ public class StatisticsWindow extends CTabItem {
 								sb.append(NO_VALUE);
 							sb.append(DELIMITER);
 
-							// counted trigger events fullfilling the level and time constrains 
-							if (measurementStatistics.isCountByTrigger() != null) sb.append(measurementStatistics.getCountTriggerText()).append(" = ") //$NON-NLS-1$
-									.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append(" "); //$NON-NLS-1$
+							// counted trigger events fulfilling the level and time constrains 
+							if (measurementStatistics.isCountByTrigger() != null) {
+								sb.append(measurementStatistics.getCountTriggerText()).append(" = ") //$NON-NLS-1$
+								.append(record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0).append("; "); //$NON-NLS-1$
+							}
 
 							// evaluate sum value within trigger range
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
@@ -354,14 +356,14 @@ public class StatisticsWindow extends CTabItem {
 									else {
 										if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 											sb.append(String.format("%.1f", record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0));
-											sb.append(" [").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											sb.append(" [").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 									}
 								}
 
 								// append ratio text + ratio value
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-									sb.append("  ").append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
+									sb.append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
 									Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
 									StatisticsType referencedStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), measurementStatistics.getRatioRefOrdinal());
 
@@ -370,13 +372,13 @@ public class StatisticsWindow extends CTabItem {
 											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValue() / 1000.0)
 													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else if (referencedStatistics.isMax()) {
 											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValue() / 1000.0)
 													/ (record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
+											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 									}
 								}
