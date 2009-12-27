@@ -49,7 +49,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 	
 	String												name;							// 1 : Ausgang
-	int														ordinal;
+	final int											ordinal;
 	final ChannelTypes						type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;					// graphics template holds view configuration
 	RecordSet											activeRecordSet;
@@ -89,6 +89,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public Channel(int channelNumber, String channelName, ChannelTypes channelType, RecordSet newRecordSet) {
 		super(1);
+		this.ordinal = channelNumber;
 		this.name = OSDE.STRING_BLANK + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channelName;
 		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);

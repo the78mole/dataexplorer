@@ -338,7 +338,10 @@ public class StringHelper {
 			break;
 		case DOUBLE:
 			try {
-				Integer.parseInt(eventText.replace(",", "").replace(".", "").replace("", "0").trim());
+				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".")) 
+					doIt = true;
+				else
+					Double.parseDouble(eventText.replace(",", ".").trim());
 			}
 			catch (Exception e) {
 				doIt = false;

@@ -61,13 +61,23 @@ public class SWTResourceManager {
 	
 	static int accessCounter = 0;
 
-	private static HashMap<String, Object> resources = new HashMap<String, Object>();
+	static HashMap<String, Object> resources = new HashMap<String, Object>();
+	static HashMap<String, Integer> widgets = new HashMap<String, Integer>();
 	static Vector<Widget> users = new Vector<Widget>();
-	private static SWTResourceManager instance = new SWTResourceManager();
+	static SWTResourceManager instance = new SWTResourceManager();
 
 	private static DisposeListener disposeListener = new DisposeListener() {
 		public void widgetDisposed(DisposeEvent e) {
 			users.remove(e.getSource());
+			if (widgets.get(e.getSource().getClass().getSimpleName()) != null) {
+				int newCount = widgets.get(e.getSource().getClass().getSimpleName())-1;
+				if (newCount > 0) {
+					widgets.put(e.getSource().getClass().getSimpleName(), (widgets.get(e.getSource().getClass().getSimpleName()) - 1));
+				}
+				else {
+					widgets.remove(e.getSource().getClass().getSimpleName());
+				}
+			}
 			if (users.size() == 0)
 				dispose();
 		}
@@ -87,6 +97,12 @@ public class SWTResourceManager {
 		if (users.contains(widget))
 			return;
 		users.add(widget);
+		if (widgets.get(widget.getClass().getSimpleName()) == null) {
+			widgets.put(widget.getClass().getSimpleName(), 1);
+		}
+		else {
+			widgets.put(widget.getClass().getSimpleName(), (widgets.get(widget.getClass().getSimpleName())+1));
+		}
 		widget.addDisposeListener(disposeListener);
 	}
 	
@@ -115,7 +131,10 @@ public class SWTResourceManager {
 				 ++numCursor;
 			}
 		}
-		log.log(Level.INFO, numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors");
+		log.log(Level.INFO, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors");
+		for (String key : widgets.keySet()) {
+			log.log(Level.INFO, key + " " + widgets.get(key));
+		}
 
 	}
 
