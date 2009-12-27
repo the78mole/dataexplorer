@@ -217,7 +217,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		String recordSetInfo = OSDE.STRING_EMPTY;
-		for (int j = 0; j < this.getNumberOfMeasurements(this.getChannelName(channelNumber)); j++) {
+		for (int j = 0; j < this.getNumberOfMeasurements(channelNumber); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 2) {// 6=votage LOV_CONFIG_DATA_KEYS_UNILOG_2
 				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_2);
@@ -302,7 +302,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		int timeStep_ms = 0;		
 		int size = this.getLovDataByteSize();
 		byte[] readBuffer = new byte[size];
-		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		int[] points = new int[this.getNumberOfMeasurements(1)];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
