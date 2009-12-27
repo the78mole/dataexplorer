@@ -135,7 +135,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int lovDataSize = this.getLovDataByteSize();
 		byte[] convertDataBuffer = new byte[14 + 16];
-		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		int[] points = new int[this.getNumberOfMeasurements(1)];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
