@@ -135,7 +135,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		int lovDataSize = this.getLovDataByteSize();
 		int deviceDataBufferSize = 8;
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
-		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigName())];
+		int[] points = new int[this.getNumberOfMeasurements(1)];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
