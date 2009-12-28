@@ -24,6 +24,8 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -55,42 +57,44 @@ import osde.utils.StringHelper;
 public class StatisticsTypeTabItem extends CTabItem {
 	final static Logger	log	= Logger.getLogger(StatisticsTypeTabItem.class.getName());
 
-	final MeasurementTypeTabItem		measurementTypeTabItem;
-	final CTabFolder		channelConfigMeasurementPropertiesTabFolder;
-	final String				tabName;
-	Menu 								popupMenu;
+	final MeasurementTypeTabItem	measurementTypeTabItem;
+	final CTabFolder							channelConfigMeasurementPropertiesTabFolder;
+	final String									tabName;
 
-	ScrolledComposite		scrolledComposite;
-	Composite						statisticsComposite;
-	CCombo							triggerLevelCombo;
-	Label								triggerLevelLabel;
-	CCombo							sumByTriggerRefOrdinalCombo;
-	Button							isSumByTriggerRefOrdinalButton;
-	Button							countByTriggerButton;
-	Text								sumTriggerText;
-	Button							isRatioRefOrdinalButton;
-	Text								triggerCommentText;
-	CCombo							minTimeSecCombo;
-	Label								minTimeSecLabel;
-	Button							isGreaterButton;
-	Button							triggerLevelButton;
-	Text								ratioText;
-	CCombo							ratioRefOrdinalCombo;
-	Text								countTriggerText;
-	CCombo							triggerRefOrdinalCombo;
-	Button							isTriggerRefOrdinalButton;
-	Button							statisticsSigmaButton;
-	Button							statisticsMaxButton;
-	Button							statisticsAvgButton;
-	Button							statisticsMinButton;
+	Menu													popupMenu;
+	MeasurementContextmenu				contextMenu;
 
-	Boolean							statisticsMin, statisticsMax, statisticsAvg, statisticsSigma;
-	String							triggerComment, sumTriggerComment, countTriggerComment, ratioComment;
-	Boolean							isGreater, isCountByTrigger, isRatioRefOrdinal;
-	Integer							triggerLevel, minTimeSec, ratioRefOrdinal;
-	Integer							triggerRefOrdinal, sumByTriggerRefOrdinal; // must be equal !!!
-	boolean 						isSomeTriggerDefined = false;
-	String[]						measurementReferenceItems;
+	ScrolledComposite							scrolledComposite;
+	Composite											statisticsComposite;
+	CCombo												triggerLevelCombo;
+	Label													triggerLevelLabel;
+	CCombo												sumByTriggerRefOrdinalCombo;
+	Button												isSumByTriggerRefOrdinalButton;
+	Button												countByTriggerButton;
+	Text													sumTriggerText;
+	Button												isRatioRefOrdinalButton;
+	Text													triggerCommentText;
+	CCombo												minTimeSecCombo;
+	Label													minTimeSecLabel;
+	Button												isGreaterButton;
+	Button												triggerLevelButton;
+	Text													ratioText;
+	CCombo												ratioRefOrdinalCombo;
+	Text													countTriggerText;
+	CCombo												triggerRefOrdinalCombo;
+	Button												isTriggerRefOrdinalButton;
+	Button												statisticsSigmaButton;
+	Button												statisticsMaxButton;
+	Button												statisticsAvgButton;
+	Button												statisticsMinButton;
+
+	Boolean												statisticsMin, statisticsMax, statisticsAvg, statisticsSigma;
+	String												triggerComment, sumTriggerComment, countTriggerComment, ratioComment;
+	Boolean												isGreater, isCountByTrigger, isRatioRefOrdinal;
+	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
+	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;	// must be equal !!!
+	boolean												isSomeTriggerDefined	= false;
+	String[]											measurementReferenceItems;
 
 	DeviceConfiguration	deviceConfig;
 	int									channelConfigNumber;
@@ -102,7 +106,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.channelConfigMeasurementPropertiesTabFolder = parent;
 		this.measurementTypeTabItem = useMeasurementTypeTabItem;
 		this.tabName = name;
-		StatisticsTypeTabItem.log.log(Level.FINE, "StatisticsTypeTabItem " + name);
+
 		initGUI();
 	}
 
@@ -118,16 +122,18 @@ public class StatisticsTypeTabItem extends CTabItem {
 		super(copyFrom.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE);
 		this.channelConfigMeasurementPropertiesTabFolder = copyFrom.channelConfigMeasurementPropertiesTabFolder;
 		this.measurementTypeTabItem = copyFrom.measurementTypeTabItem;
+		this.tabName = copyFrom.tabName;
+
 		this.statisticsMin = copyFrom.statisticsMin;
 		this.statisticsMax = copyFrom.statisticsMax;
 		this.statisticsAvg = copyFrom.statisticsAvg;
 		this.statisticsSigma = copyFrom.statisticsSigma;
 		
-//		this.triggerLevel = copyFrom.triggerLevel;
-//		this.triggerComment = copyFrom.triggerComment;
-//		this.isGreater = copyFrom.isGreater;
-//		this.minTimeSec = copyFrom.minTimeSec;
-
+		//do not copy trigger attributes, only one trigger permitted per channel/configuration measurements
+		//this.triggerLevel = copyFrom.triggerLevel;
+		//this.triggerComment = copyFrom.triggerComment;
+		//this.isGreater = copyFrom.isGreater;
+		//this.minTimeSec = copyFrom.minTimeSec;
 		this.isCountByTrigger = copyFrom.isCountByTrigger;
 		this.countTriggerComment = copyFrom.countTriggerComment;
 
@@ -140,7 +146,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 		
 		this.deviceConfig = copyFrom.deviceConfig;
 		this.channelConfigNumber = copyFrom.channelConfigNumber;	
-		this.tabName = copyFrom.tabName;
 		
 		initGUI();
 	}
@@ -346,17 +351,20 @@ public class StatisticsTypeTabItem extends CTabItem {
 	private void initGUI() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
-			this.popupMenu = new Menu(this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
-			new MeasurementContextmenu(this.popupMenu, this.measurementTypeTabItem, this.measurementTypeTabItem.channelConfigMeasurementPropertiesTabFolder).create();
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 			this.scrolledComposite = new ScrolledComposite(this.channelConfigMeasurementPropertiesTabFolder, SWT.H_SCROLL);
 			this.setControl(this.scrolledComposite);
+			this.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent disposeevent) {
+					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent);
+					StatisticsTypeTabItem.this.enableContextMenu(false);
+				}
+			});
 			this.statisticsComposite = new Composite(this.scrolledComposite, SWT.NONE);
 			this.statisticsComposite.setLayout(null);
-			this.statisticsComposite.setMenu(this.popupMenu);
 			this.statisticsComposite.addPaintListener(new PaintListener() {
-				
 				@Override
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINEST, "statisticsComposite.paintControl, event=" + evt);
@@ -394,6 +402,8 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.ratioRefOrdinal != null);
 						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);
 						StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.ratioComment);
+						
+						StatisticsTypeTabItem.this.enableContextMenu(true);
 					}
 				}
 			});
@@ -402,7 +412,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsMinButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.statisticsMinButton.setText("minimum");
 				this.statisticsMinButton.setBounds(10, 5, 90, 20);
-				this.statisticsMinButton.setMenu(this.popupMenu);
 				this.statisticsMinButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -420,7 +429,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsAvgButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.statisticsAvgButton.setText("average");
 				this.statisticsAvgButton.setBounds(10, 30, 90, 20);
-				this.statisticsAvgButton.setMenu(this.popupMenu);
 				this.statisticsAvgButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -438,7 +446,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsMaxButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.statisticsMaxButton.setText("maximum");
 				this.statisticsMaxButton.setBounds(10, 55, 90, 20);
-				this.statisticsMaxButton.setMenu(this.popupMenu);
 				this.statisticsMaxButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -456,7 +463,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsSigmaButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.statisticsSigmaButton.setText("sigma");
 				this.statisticsSigmaButton.setBounds(10, 80, 90, 20);
-				this.statisticsSigmaButton.setMenu(this.popupMenu);
 				this.statisticsSigmaButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -475,7 +481,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelButton.setText("trigger");
 				this.triggerLevelButton.setBounds(125, 5, 60, 20);
 				this.triggerLevelButton.setToolTipText("describes the value level where statistics calculation is active (4000[unit*10E-3] == 4[unit])");
-				this.triggerLevelButton.setMenu(this.popupMenu);
 				this.triggerLevelButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -549,7 +554,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.triggerLevelLabel.setText("unit*10E-3");
 				this.triggerLevelLabel.setBounds(212, 5, 64, 20);
-				this.triggerLevelLabel.setMenu(this.popupMenu);
 			}
 			{
 				this.triggerLevelCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
@@ -609,7 +613,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isGreaterButton.setText("isGreater");
 				this.isGreaterButton.setBounds(125, 30, 75, 20);
 				this.isGreaterButton.setToolTipText("true means all values above trigger level will be counted, this is the default");
-				this.isGreaterButton.setMenu(this.popupMenu);
 				this.isGreaterButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -627,7 +630,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.minTimeSecLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.minTimeSecLabel.setText("minTimeSec");
 				this.minTimeSecLabel.setBounds(200, 32, 75, 20);
-				this.minTimeSecLabel.setMenu(this.popupMenu);
 			}
 			{
 				this.minTimeSecCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
@@ -671,7 +673,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.countByTriggerButton.setText("countByTrigger");
 				this.countByTriggerButton.setBounds(125, 55, 170, 20);
 				this.countByTriggerButton.setToolTipText("counts the number of events trigger level becomes active at specified trigger type");
-				this.countByTriggerButton.setMenu(this.popupMenu);
 				this.countByTriggerButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -716,7 +717,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isTriggerRefOrdinalButton.setText("triggerRef");
 				this.isTriggerRefOrdinalButton.setBounds(125, 80, 118, 20);
 				this.isTriggerRefOrdinalButton.setToolTipText("References the measurement ordinal where trigger level is set.\nAll statistics values are calculated only with values where the trigger is active.\nA defined trigger is prerequisite.");
-				this.isTriggerRefOrdinalButton.setMenu(this.popupMenu);
 				this.isTriggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -739,7 +739,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isSumByTriggerRefOrdinalButton.setText("sumByTriggerRef");
 				this.isSumByTriggerRefOrdinalButton.setBounds(125, 105, 118, 20);
 				this.isSumByTriggerRefOrdinalButton.setToolTipText("Calculates sum of values where the referenced trigger becomes active.\nA defined trigger is prerequisite.");
-				this.isSumByTriggerRefOrdinalButton.setMenu(this.popupMenu);
 				this.isSumByTriggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -794,7 +793,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isRatioRefOrdinalButton.setText("ratioRef");
 				this.isRatioRefOrdinalButton.setBounds(125, 130, 118, 20);
 				this.isRatioRefOrdinalButton.setToolTipText("Measurement ordinal to calculate the ratio of referenced avg or max value to sumByTriggerRef.");
-				this.isRatioRefOrdinalButton.setMenu(this.popupMenu);
 				this.isRatioRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -851,6 +849,37 @@ public class StatisticsTypeTabItem extends CTabItem {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * enable the context menu to create missing tab items
+	 * @param enable
+	 */
+	public void enableContextMenu(boolean enable) {
+		if (enable && (this.popupMenu == null || this.contextMenu == null)) {
+			this.popupMenu = new Menu(this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
+			//this.popupMenu = SWTResourceManager.getMenu("MeasurementContextmenu", this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
+			this.contextMenu = new MeasurementContextmenu(this.popupMenu, this.measurementTypeTabItem, this.channelConfigMeasurementPropertiesTabFolder);
+			this.contextMenu.create();
+		}
+		else if (this.popupMenu != null) {
+			this.popupMenu.dispose();
+			this.popupMenu = null;
+			this.contextMenu = null;
+		}
+		this.statisticsComposite.setMenu(this.popupMenu);
+		this.statisticsMinButton.setMenu(this.popupMenu);
+		this.statisticsAvgButton.setMenu(this.popupMenu);
+		this.statisticsMaxButton.setMenu(this.popupMenu);
+		this.statisticsSigmaButton.setMenu(this.popupMenu);
+		this.triggerLevelButton.setMenu(this.popupMenu);
+		this.triggerLevelLabel.setMenu(this.popupMenu);
+		this.isGreaterButton.setMenu(this.popupMenu);
+		this.minTimeSecLabel.setMenu(this.popupMenu);
+		this.countByTriggerButton.setMenu(this.popupMenu);
+		this.isTriggerRefOrdinalButton.setMenu(this.popupMenu);
+		this.isSumByTriggerRefOrdinalButton.setMenu(this.popupMenu);
+		this.isRatioRefOrdinalButton.setMenu(this.popupMenu);
 	}
 
 	/**

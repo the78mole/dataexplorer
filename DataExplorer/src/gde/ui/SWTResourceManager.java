@@ -37,6 +37,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 import osde.OSDE;
@@ -80,6 +82,8 @@ public class SWTResourceManager {
 			}
 			if (users.size() == 0)
 				dispose();
+			
+			//listResourceStatus(); // debug resource housekeeping
 		}
 	};
 
@@ -115,7 +119,7 @@ public class SWTResourceManager {
 	public static void listResourceStatus() {
 		Iterator<String> it = resources.keySet().iterator();
 		log.log(Level.INFO, "number collected resources = " + resources.size());
-		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0;
+		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0, numMenu = 0;
 		while (it.hasNext()) {
 			Object resource = resources.get(it.next());
 			if (resource instanceof Font) {
@@ -130,11 +134,16 @@ public class SWTResourceManager {
 			else if (resource instanceof Cursor) {
 				 ++numCursor;
 			}
+			else if (resource instanceof Menu) {
+				 ++numMenu;
+			}
 		}
-		log.log(Level.INFO, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors");
+		log.log(Level.INFO, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors " + numMenu +  " menus ");
+		StringBuffer sb = new StringBuffer();
 		for (String key : widgets.keySet()) {
-			log.log(Level.INFO, key + " " + widgets.get(key));
+			sb.append(key).append(OSDE.STRING_BLANK).append(widgets.get(key)).append(OSDE.STRING_COMMA);
 		}
+		log.log(Level.INFO, sb.toString());
 
 	}
 
@@ -154,6 +163,36 @@ public class SWTResourceManager {
 		resources.clear();
 	}
 	
+
+	/**
+	 * use this method to debug context menu resource housekeeping, place a breakpoint at dispose implementation line
+	 * p.e. this.popupMenu = SWTResourceManager.getMenu("MeasurementContextMenu", this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
+	 * @param implClassName
+	 * @param shell
+	 * @param style
+	 * @return
+	 */
+	public static Menu getMenu(final String implClassName, Shell shell, int style) {
+		String name = "MENU:" + implClassName; //$NON-NLS-1$
+		if (resources.containsKey(name) && !((Menu)resources.get(name)).isDisposed()) 
+			return (Menu) resources.get(name);
+		if(resources.containsKey(name) && ((Menu)resources.get(name)).isDisposed())
+			log.log(Level.INFO, "menu isDisposed = " + implClassName); //$NON-NLS-1$
+		
+		Menu menu = new Menu(shell, style);
+		menu.addDisposeListener(new DisposeListener() {	
+			@Override
+			public void widgetDisposed(DisposeEvent disposeevent) {
+				log.log(Level.INFO, "menu.widgetDisposed " + implClassName); //$NON-NLS-1$
+				resources.remove(implClassName);
+			}
+		});
+		resources.put(implClassName, menu);
+		
+		log.log(Level.FINE, "new menu created for " + implClassName); //$NON-NLS-1$
+		return menu;
+	}
+
 	public static Font getFont(FontData fd) {
 		return getFont(fd.getName(), fd.getHeight(), fd.getStyle(), false, false);
 	}

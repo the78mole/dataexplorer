@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.SWTResourceManager;
 
 /**
  * Class to represent the context menu to enable adding different tab items
@@ -50,6 +51,7 @@ public class ContextMenu {
 	}	
 
 	public void create() {
+		SWTResourceManager.registerResourceUser(this.menu);
 		menu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {

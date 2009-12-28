@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
 import osde.device.MeasurementPropertyTypes;
+import osde.ui.SWTResourceManager;
 
 /**
  * Class to represent the context menu to enable adding statistics and property tab items to measurement
@@ -60,6 +61,7 @@ public class MeasurementContextmenu {
 	}	
 
 	public void create() {
+		SWTResourceManager.registerResourceUser(this.menu);
 		menu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {

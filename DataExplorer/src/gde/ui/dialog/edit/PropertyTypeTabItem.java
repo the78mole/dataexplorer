@@ -23,6 +23,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -33,6 +35,7 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
@@ -53,78 +56,45 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class PropertyTypeTabItem extends CTabItem {
-	final static Logger	log	= Logger.getLogger(PropertyTypeTabItem.class.getName());
+	final static Logger						log	= Logger.getLogger(PropertyTypeTabItem.class.getName());
 
-	Composite						propertyTypeComposite;
-	Label								nameLabel;
-	Label								typeLabel;
-	Label								valueLabel;
-	Label								descriptionLabel;
-	Text								nameText, valueText, descriptionText;
-	CCombo							typeCombo, valueCombo, nameCombo;
-	KeyAdapter					valueKeyListener;
-	VerifyListener			valueVerifyListener;
+	final CTabFolder							parentTabFolder;
+	final MeasurementTypeTabItem	measurementTypeTabItem;
 
-	DeviceConfiguration	deviceConfig;
-	boolean							isStateType; 								//1000
-	boolean							isValueOnlyEnabledType;			//0001
-	boolean							isNameSelectionEnabledType;	//01**
-	boolean							isTypeSelectionEnabledType;	//0*1*
+	Composite								propertyTypeComposite;
+	Label										nameLabel;
+	Label										typeLabel;
+	Label										valueLabel;
+	Label										descriptionLabel;
+	Text										nameText, valueText, descriptionText;
+	CCombo									typeCombo, valueCombo, nameCombo;
+	KeyAdapter							valueKeyListener;
+	VerifyListener					valueVerifyListener;
 
-	PropertyType				propertyType;
+	DeviceConfiguration			deviceConfig;
+	boolean									isStateType;									//1000
+	boolean									isValueOnlyEnabledType;				//0001
+	boolean									isNameSelectionEnabledType;		//01**
+	boolean									isTypeSelectionEnabledType;		//0*1*
 
-	final CTabFolder		parentTabFolder;
-	String							tabName;
-
-	//	/**
-	//	 * set device configuration and type parent
-	//	 */
-	//	public void setParents(DeviceConfiguration newDeviceConfigParent, ModeStateType newModeStateParent, DesktopType newDesktopParent) {
-	//		deviceConfigParent = newDeviceConfigParent;
-	//		stateParent = newModeStateParent;
-	//		desktopParent = newDesktopParent;
-	//	}
-
-//	/**
-//	* Auto-generated main method to display this 
-//	* org.eclipse.swt.widgets.Composite inside a new Shell.
-//	*/
-//	public static void main(String[] args) {
-//		showGUI();
-//	}
-//
-//	/**
-//	* Auto-generated method to display this 
-//	* org.eclipse.swt.widgets.Composite inside a new Shell.
-//	*/
-//	public static void showGUI() {
-//		Display display = Display.getDefault();
-//		Shell shell = new Shell(display);
-//		CTabFolder instTabFolder = new CTabFolder(shell, SWT.NULL);
-//		new PropertyTypeTabItem(instTabFolder, SWT.NULL, "Prop 1", "offset", DataTypes.DOUBLE, "25", "The offset value is added to actual measurement value");
-//		instTabFolder.setSize(300, 200);
-//		shell.setLayout(new FillLayout());
-//		shell.layout();
-//
-//		shell.open();
-//		while (!shell.isDisposed()) {
-//			if (!display.readAndDispatch()) display.sleep();
-//		}
-//	}
+	Menu										popupMenu;
+	MeasurementContextmenu	contextMenu;
+	String									tabName;
+	PropertyType						propertyType;
 
 	/**
 	 * constructor without any variables input
 	 * to display default values a call of update(PropertyType) is required
-	 * @param parent
+	 * @param parent must be a CTabFolder
 	 * @param style
-	 * @param useHeader
+	 * @param useTabName
+	 * @param useMeasurementTypeTabItem2CreatePopupMenu != null signal a popup menu should be initialized
 	 */
-	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName) {
+	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, MeasurementTypeTabItem	useMeasurementTypeTabItem2CreatePopupMenu) {
 		super(parent, style);
 		this.parentTabFolder = parent;
 		this.tabName = useTabName;
-		PropertyTypeTabItem.log.log(Level.FINE, "PropertyTypeTabItem " + this.tabName);
-		
+		this.measurementTypeTabItem = useMeasurementTypeTabItem2CreatePopupMenu;
 		this.propertyType = new ObjectFactory().createPropertyType();
 		this.propertyType.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
 		this.propertyType.setType(DataTypes.INTEGER);
@@ -134,67 +104,28 @@ public class PropertyTypeTabItem extends CTabItem {
 		initGUI();
 	}
 
-//	/**
-//	 * constructor with header text and all available input parameter, 
-//	 * if some parameter might not be filled use OSDE.STRING_EMPTY
-//	 * @param parent
-//	 * @param style
-//	 * @param useHeader
-//	 * @param useName
-//	 * @param useType
-//	 * @param useValue
-//	 * @param useDescription
-//	 */
-//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, Object useValue, String useDescription) {
-//		super(parent, style);
-//		this.tabName = useTabName;
-//
-//		this.parentTabFolder = parent;
-//		this.propertyType = new ObjectFactory().createPropertyType();
-//		this.propertyType.setName(useName);
-//		this.propertyType.setType(useType);
-//		this.propertyType.setValue(useValue);
-//		this.propertyType.setDescription(useDescription);
-//		initGUI();
-//	}
-
-//	/**
-//	 * constructor with header text and all available input parameter excluding the value, 
-//	 * if some parameter might not be filled use OSDE.STRING_EMPTY
-//	 * @param parent
-//	 * @param style
-//	 * @param useHeader
-//	 * @param useName
-//	 * @param useType
-//	 * @param useDescription
-//	 */
-//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, String useName, DataTypes useType, String useDescription) {
-//		super(parent, style);
-//		this.parentTabFolder = parent;
-//		this.tabName = useTabName;
-//
-//		this.propertyType = new ObjectFactory().createPropertyType();
-//		this.propertyType.setName(useName);
-//		this.propertyType.setType(useType);
-//		this.propertyType.setDescription(useDescription);
-//		initGUI();
-//	}
-
-//	/**
-//	 * constructor with header text and all available input parameter from given property 
-//	 * @param parent
-//	 * @param style
-//	 * @param useHeader
-//	 * @param useProperty of PropertyType
-//	 */
-//	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, PropertyType useProperty) {
-//		super(parent, style);
-//		this.parentTabFolder = parent;
-//		this.tabName = useTabName;
-//
-//		this.propertyType = useProperty;
-//		initGUI();
-//	}
+	/**
+	 * enable the context menu to create missing tab items
+	 * @param enable
+	 */
+	void enableContextMenu(boolean enable) {
+		if (enable && this.measurementTypeTabItem != null) {
+			this.popupMenu = new Menu(this.measurementTypeTabItem.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
+			//this.popupMenu = SWTResourceManager.getMenu("MeasurementContextmenu", this.measurementTypeTabItem.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
+			this.contextMenu = new MeasurementContextmenu(this.popupMenu, this.measurementTypeTabItem, this.measurementTypeTabItem.channelConfigMeasurementPropertiesTabFolder);
+			this.contextMenu.create();
+		}
+		else if (this.popupMenu != null) {
+			this.popupMenu.dispose();
+			this.popupMenu = null;
+			this.contextMenu = null;
+		}
+		this.propertyTypeComposite.setMenu(this.popupMenu);
+		this.nameLabel.setMenu(this.popupMenu);
+		this.typeLabel.setMenu(this.popupMenu);
+		this.valueLabel.setMenu(this.popupMenu);
+		this.descriptionLabel.setMenu(this.popupMenu);
+	}
 
 	/**
 	 * method to set values of the name selection combo for cases where this names are constant
@@ -287,6 +218,13 @@ public class PropertyTypeTabItem extends CTabItem {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+			this.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent disposeevent) {
+					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent);
+					PropertyTypeTabItem.this.enableContextMenu(false);
+				}
+			});
 			this.propertyTypeComposite = new Composite(this.parentTabFolder, SWT.NONE);
 			this.setControl(this.propertyTypeComposite);
 			this.propertyTypeComposite.setLayout(null);
@@ -294,39 +232,42 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.propertyTypeComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					PropertyTypeTabItem.log.log(Level.FINEST, "this.paintControl, event=" + evt);
-					if (PropertyTypeTabItem.this.propertyType != null) {
-						if (PropertyTypeTabItem.this.nameText.isVisible()) {
-							PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
-						}
-						else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
-							PropertyTypeTabItem.this.nameCombo.select(
-									PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName()).ordinal());
-						}
+					if (PropertyTypeTabItem.this.propertyTypeComposite.isVisible()) {
+						if (PropertyTypeTabItem.this.propertyType != null) {
+							if (PropertyTypeTabItem.this.nameText.isVisible()) {
+								PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
+							}
+							else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
+								PropertyTypeTabItem.this.nameCombo.select(PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName())
+										.ordinal());
+							}
 
-						if (PropertyTypeTabItem.this.propertyType.getType() != null) {
-							PropertyTypeTabItem.this.typeCombo.select(PropertyTypeTabItem.this.propertyType.getType().ordinal());
-							if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
-								PropertyTypeTabItem.this.valueText.setVisible(false);
-								PropertyTypeTabItem.this.valueCombo.setVisible(true);
-								int selectionIndex = PropertyTypeTabItem.this.propertyType.getValue().equals(PropertyTypeTabItem.this.valueCombo.getItems()[0]) ? 0 : 1;
-								PropertyTypeTabItem.this.valueCombo.select(selectionIndex);
+							if (PropertyTypeTabItem.this.propertyType.getType() != null) {
+								PropertyTypeTabItem.this.typeCombo.select(PropertyTypeTabItem.this.propertyType.getType().ordinal());
+								if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
+									PropertyTypeTabItem.this.valueText.setVisible(false);
+									PropertyTypeTabItem.this.valueCombo.setVisible(true);
+									int selectionIndex = PropertyTypeTabItem.this.propertyType.getValue().equals(PropertyTypeTabItem.this.valueCombo.getItems()[0]) ? 0 : 1;
+									PropertyTypeTabItem.this.valueCombo.select(selectionIndex);
+								}
+								else {
+									PropertyTypeTabItem.this.valueText.setVisible(true);
+									PropertyTypeTabItem.this.valueCombo.setVisible(false);
+									PropertyTypeTabItem.this.valueText.setText(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.propertyType.getValue()));
+								}
 							}
-							else {
-								PropertyTypeTabItem.this.valueText.setVisible(true);
-								PropertyTypeTabItem.this.valueCombo.setVisible(false);
-								PropertyTypeTabItem.this.valueText.setText(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.propertyType.getValue()));
-							}
-						}
 							else {
 								PropertyTypeTabItem.this.typeCombo.select(0);
 							}
-						PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
-					}
-					else {
-						PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
-						PropertyTypeTabItem.this.nameCombo.setText(OSDE.STRING_EMPTY);
-						PropertyTypeTabItem.this.descriptionText.setText(OSDE.STRING_EMPTY);
+							PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
+						}
+						else {
+							PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
+							PropertyTypeTabItem.this.nameCombo.setText(OSDE.STRING_EMPTY);
+							PropertyTypeTabItem.this.descriptionText.setText(OSDE.STRING_EMPTY);
 
+						}
+						PropertyTypeTabItem.this.enableContextMenu(true);
 					}
 				}
 			});
@@ -372,8 +313,6 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.nameCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
 				this.nameCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
 				this.nameCombo.setBounds(90, 10, 200, 20);
-				//nameCombo.setEditable(false);
-				//nameCombo.setEnabled(false);
 				this.nameCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
