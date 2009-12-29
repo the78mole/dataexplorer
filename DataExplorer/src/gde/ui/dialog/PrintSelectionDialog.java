@@ -163,7 +163,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					this.statisticsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
-					this.statisticsButton.setText(Messages.getString(MessageIds.OSDE_MSGT0454));
+					this.statisticsButton.setText(Messages.getString(MessageIds.OSDE_MSGT0350));
 					this.statisticsButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0459));
 					this.statisticsButton.setImage(SWTResourceManager.getImage("osde/resource/Statistics.gif")); //$NON-NLS-1$
 					this.statisticsButton.setSelection(true);

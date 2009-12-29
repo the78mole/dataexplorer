@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import osde.OSDE;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -115,7 +116,7 @@ public class SelectorComposite extends Composite {
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
 			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
-			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
@@ -128,7 +129,7 @@ public class SelectorComposite extends Composite {
 		}
 		{
 			this.curveSelectorTable = new Table(this, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
-			this.curveSelectorTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.curveSelectorTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
 			curveTableLData.width = 82;

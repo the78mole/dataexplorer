@@ -32,6 +32,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
+import osde.OSDE;
+
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages
  * @author Winfried Brügmann
@@ -135,7 +137,7 @@ public class StatusBar {
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
-				this.msgLabel.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), ((OpenSerialDataExplorer)this.statusComposite.getParent()).getWidgetFontSize(), SWT.NORMAL));
+				this.msgLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 		}
 	}

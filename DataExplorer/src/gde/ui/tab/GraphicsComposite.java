@@ -297,7 +297,7 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize()+1, SWT.NORMAL));
+			this.recordSetComment.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(this.surroundingBackground); 
 			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
@@ -354,7 +354,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+		this.canvasImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
 		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 
@@ -1468,7 +1468,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
-					this.canvasImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.canvasImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 

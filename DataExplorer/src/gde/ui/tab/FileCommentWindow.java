@@ -136,7 +136,7 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-			this.fileCommentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.fileCommentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.fileCommentText.setBackground(this.innerAreaBackground);
 			this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
 			this.fileCommentText.setBounds(50, 40, 500, 100);
@@ -170,7 +170,7 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
-			this.recordCommentTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.recordCommentTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.recordCommentTable.setBounds(50, 200, 500, 100);
 			//this.table.setControl(this.dataTable);
 			this.recordCommentTable.setLinesVisible(true);

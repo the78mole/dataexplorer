@@ -303,7 +303,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeLabel = new CLabel(this.objectTypeComposite, SWT.NONE);
 					this.objectTypeLabel.setBackground(this.surroundingBackground);
 					this.objectTypeLabel.setMenu(this.popupmenu);
-					this.objectTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.objectTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
 					RowData cLabel1LData1 = new RowData();
 					cLabel1LData1.width = 140;
@@ -315,7 +315,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeText = new Text(this.objectTypeComposite, SWT.BORDER);
 					this.objectTypeText.setBackground(this.innerAreaBackground);
 					this.objectTypeText.setMenu(this.popupmenu);
-					this.objectTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.objectTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeText.setEditable(true);
 					RowData cLabel2LData = new RowData();
 					cLabel2LData.width = 240;
@@ -346,7 +346,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				{
 					this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
 					this.dateLabel.setMenu(this.popupmenu);
-					this.dateLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.dateLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateLabelLData = new RowData();
 					dateLabelLData.width = 140;
 					dateLabelLData.height = 22;
@@ -358,7 +358,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				}
 				{
 					this.dateText = new Text(this.dateComposite, SWT.BORDER);
-					this.dateText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.dateText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateTextLData = new RowData();
 					dateTextLData.width = OSDE.IS_LINUX ? 116 : 118;
 					dateTextLData.height = 18;
@@ -392,7 +392,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
 					this.statusLabel.setBackground(this.surroundingBackground);
 					this.statusLabel.setMenu(this.popupmenu);
-					this.statusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.statusLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData statusLabelLData = new RowData();
 					statusLabelLData.width = 140;
 					statusLabelLData.height = 22;
@@ -402,7 +402,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				}
 				{
 					this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
-					this.statusText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.statusText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(OSDE.STRING_SEMICOLON));
 					this.statusText.setBackground(this.innerAreaBackground);
 					this.statusText.setMenu(this.popupmenu);
@@ -519,7 +519,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 								this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 								this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 								this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 								this.fontSizeSelectCombo.select(3);
 								this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0201));
@@ -706,7 +706,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					FormLayout styledTextLayout = new FormLayout();
 					this.styledText.setLayout(styledTextLayout);
 					this.styledText.setEditable(true);
-					this.styledText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.styledText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.styledText.setHorizontalIndex(2);
 					this.styledText.setTopIndex(1);
 					FormData styledTextLData = new FormData();

@@ -143,7 +143,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup = new Group(this.composite, SWT.NONE);
 				this.descriptionGroup.setLayout(null);
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
-				this.descriptionGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+				this.descriptionGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
 				this.descriptionGroup.setBackground(this.innerAreaBackground);
 				this.descriptionGroup.setMenu(this.popupmenu);			
@@ -180,7 +180,7 @@ public class StatisticsWindow extends CTabItem {
 				});
 				{
 					this.descriptionTextLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
-					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
 					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
@@ -192,7 +192,7 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
 				this.dataTable.setLinesVisible(!this.isWindows);
 				this.dataTable.setHeaderVisible(true);
-				this.dataTable.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+				this.dataTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				this.dataTable.setBackground(this.innerAreaBackground);
 				this.dataTable.setMenu(this.popupmenu);			

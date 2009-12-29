@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -198,7 +199,7 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setLineWidth(4);
 			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
 			this.tachoImageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.tachoImageGC.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.tachoImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			int numberTicks = 10; //new Double(maxValue - minValue).intValue();
 			double deltaValue = (this.maxValue - this.minValue) / numberTicks;
 			double angleSteps = this.angleDelta * 1.0 / numberTicks;
