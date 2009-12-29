@@ -157,7 +157,7 @@ public class AkkuMasterChannelTab {
 	public void addChannelTab(CTabFolder tabFolder) {
 		{
 			this.channelTab = new CTabItem(tabFolder, SWT.NONE);
-			this.channelTab.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+			this.channelTab.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.channelTab.setText(this.name);
 			{ // begin channel composite
 				this.channelComposite = new Composite(tabFolder, SWT.NONE);
@@ -185,14 +185,14 @@ public class AkkuMasterChannelTab {
 					});
 					{
 						this.captureOnlyText = new Text(this.captureOnlyGroup, SWT.MULTI | SWT.WRAP);
-						this.captureOnlyText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.captureOnlyText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.captureOnlyText.setText(Messages.getString(MessageIds.OSDE_MSGT1173));
 						this.captureOnlyText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 						this.captureOnlyText.setBounds(51, 40, 315, 37);
 					}
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
-						this.captureOnlyButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+						this.captureOnlyButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 						this.captureOnlyButton.setText(Messages.getString(MessageIds.OSDE_MSGT1174)); 
 						this.captureOnlyButton.setBounds(12, 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
@@ -235,7 +235,7 @@ public class AkkuMasterChannelTab {
 						this.programmButton = new Button(this.programGroup, SWT.RADIO | SWT.LEFT);
 						this.programmButton.setText(Messages.getString(MessageIds.OSDE_MSGT1175));
 						this.programmButton.setBounds(12, 15, 295, 21);
-						this.programmButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+						this.programmButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 						this.programmButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -262,7 +262,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.akkuGroup = new Group(this.programGroup, SWT.NONE);
 						this.akkuGroup.setLayout(null);
-						this.akkuGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.akkuGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.akkuGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1176));
 						this.akkuGroup.setBounds(15, 40, 369, 67);
 						this.akkuGroup.addPaintListener(new PaintListener() {
@@ -275,7 +275,7 @@ public class AkkuMasterChannelTab {
 						});
 						{
 							this.capacityText = new Text(this.akkuGroup, SWT.NONE);
-							this.capacityText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.capacityText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.capacityText.setBounds(12, 20, 105, 18);
 							this.capacityText.setText(Messages.getString(MessageIds.OSDE_MSGT1177));
 							this.capacityText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
@@ -283,7 +283,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.capacityMilliAh = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.capacityMilliAh.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.capacityMilliAh.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.capacityMilliAh.setItems(this.aCapacity);
 							this.capacityMilliAh.setText(this.aCapacity[5]);
 							this.capacityMilliAh.setBounds(12, 40, 105, OSDE.IS_LINUX ? 22 : 20);
@@ -297,7 +297,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.countCellsText = new Text(this.akkuGroup, SWT.NONE);
-							this.countCellsText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.countCellsText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.countCellsText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.countCellsText.setBounds(130, 20, 105, 18);
 							this.countCellsText.setText(Messages.getString(MessageIds.OSDE_MSGT1178));
@@ -305,7 +305,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.countCells = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.countCells.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.countCells.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.countCells.setBounds(130, 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.countCells.setItems(this.aCellCount);
 							this.countCells.setText(this.aCellCount[3]);
@@ -321,7 +321,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.akkuTypeText = new Text(this.akkuGroup, SWT.NONE);
-							this.akkuTypeText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.akkuTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.akkuTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.akkuTypeText.setBounds(255, 20, 105, 18);
 							this.akkuTypeText.setText(Messages.getString(MessageIds.OSDE_MSGT1179));
@@ -331,7 +331,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.akkuType = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.akkuType.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.akkuType.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.akkuType.setBounds(255, 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.akkuType.setItems(this.aAkkuTyp);
 							this.akkuType.setText(this.aAkkuTyp[0]);
@@ -348,7 +348,7 @@ public class AkkuMasterChannelTab {
 					}
 					{
 						this.programTypeGroup = new Group(this.programGroup, SWT.NONE);
-						this.programTypeGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.programTypeGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.programTypeGroup.setBounds(15, 110, 369, 123);
 						this.programTypeGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1180));
 						this.programTypeGroup.setLayout(null);
@@ -363,14 +363,14 @@ public class AkkuMasterChannelTab {
 						});
 						{
 							this.programText = new Text(this.programTypeGroup, SWT.NONE);
-							this.programText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.programText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.programText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.programText.setBounds(130, 20, 105, 18);
 							this.programText.setText(Messages.getString(MessageIds.OSDE_MSGT1181)); 
 						}
 						{
 							this.program = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.program.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.program.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.program.setBounds(12, 40, 347, OSDE.IS_LINUX ? 22 : 20);
 							this.program.setItems(this.aProgramm);
 							this.program.select(2);
@@ -385,7 +385,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.chargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
-							this.chargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.chargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.chargeCurrentText.setBounds(12, 70, 105, 18);
 							this.chargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1182));
@@ -393,7 +393,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.chargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.chargeCurrent.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.chargeCurrent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargeCurrent.setBounds(12, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.chargeCurrent.setItems(this.aChargeCurrent_mA);
 							this.chargeCurrent.setText(this.aChargeCurrent_mA[5]);
@@ -406,7 +406,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.dischargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
-							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.dischargeCurrentText.setBounds(130, 70, 105, 18);
 							this.dischargeCurrentText.setDragDetect(false);
@@ -416,7 +416,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.dischargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.dischargeCurrent.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.dischargeCurrent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dischargeCurrent.setBounds(130, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.dischargeCurrent.setItems(this.aDischargeCurrent_mA);
 							this.dischargeCurrent.setText(this.aDischargeCurrent_mA[5]);
@@ -429,7 +429,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.memoryNumberText = new Text(this.programTypeGroup, SWT.NONE);
-							this.memoryNumberText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.memoryNumberText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.memoryNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.memoryNumberText.setBounds(255, 70, 105, 18);
 							this.memoryNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1184)); 
@@ -437,7 +437,7 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.memoryNumberCombo = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.memoryNumberCombo.setBounds(255, 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 							this.memoryNumberCombo.select(1);
@@ -458,7 +458,7 @@ public class AkkuMasterChannelTab {
 					this.startDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.startDataGatheringButton.setBounds(12, 360, 190, 28);
 					this.startDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0277));
-					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.startDataGatheringButton.setSelection(this.isCollectData);
 					this.startDataGatheringButton.setEnabled(false);
 					this.startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
@@ -655,7 +655,7 @@ public class AkkuMasterChannelTab {
 					this.stopDataGatheringButton.setBounds(225, 360, 190, 28);
 					this.stopDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
 					this.stopDataGatheringButton.setEnabled(false);
-					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.BOLD));
+					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.stopDataGatheringButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "stopAuzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
