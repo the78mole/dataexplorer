@@ -651,6 +651,24 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		this.dataBlock.setEnding(value);
 	}
+	
+	public String getDataBlockPreferredDataLocation() {
+		return this.dataBlock.getPreferredDataLocation();
+	}
+
+	public void setDataBlockPreferredDataLocation(String value) {
+		this.isChangePropery = true;
+		this.dataBlock.setPreferredDataLocation(value);
+	}
+	
+	public String getDataBlockPreferredFileExtention() {
+		return this.dataBlock.getPreferredFileExtention();
+	}
+
+	public void setDataBlockPreferredFileExtention(String value) {
+		this.isChangePropery = true;
+		this.dataBlock.setPreferredFileExtention(value);
+	}
 
 	/**
 	 * query if the table tab should be updated

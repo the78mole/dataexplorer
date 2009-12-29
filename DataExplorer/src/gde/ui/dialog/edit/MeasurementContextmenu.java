@@ -84,7 +84,7 @@ public class MeasurementContextmenu {
 			}
 		});
 		this.addStatisticsTypeMenuItem = new MenuItem(menu, SWT.PUSH);
-		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0531));
+		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0533));
 		this.addStatisticsTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "addStatisticsTypeMenuItem action performed! " + e); //$NON-NLS-1$
@@ -93,7 +93,7 @@ public class MeasurementContextmenu {
 		});
 		new MenuItem(menu, SWT.SEPARATOR);
 		this.addPropertyTypeMenuItem = new MenuItem(menu, SWT.CASCADE);
-		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0532)); 
+		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0534)); 
 		this.addPropertyTypeMenu = new Menu(this.addPropertyTypeMenuItem);
 		this.addPropertyTypeMenuItem.setMenu(this.addPropertyTypeMenu);
 		this.addPropertyTypeMenu.addMenuListener(new MenuListener() {

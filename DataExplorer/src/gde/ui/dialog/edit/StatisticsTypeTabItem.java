@@ -413,7 +413,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				}
 			});
 			{
-				this.statisticsMinButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.RIGHT);
+				this.statisticsMinButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.statisticsMinButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.statisticsMinButton.setText(Messages.getString(MessageIds.OSDE_MSGT0556));
 				this.statisticsMinButton.setBounds(10, 5, 90, 20);
@@ -430,7 +430,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			{
-				this.statisticsAvgButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.RIGHT);
+				this.statisticsAvgButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.statisticsAvgButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.statisticsAvgButton.setText(Messages.getString(MessageIds.OSDE_MSGT0557));
 				this.statisticsAvgButton.setBounds(10, 30, 90, 20);
@@ -447,7 +447,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			{
-				this.statisticsMaxButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.RIGHT);
+				this.statisticsMaxButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.statisticsMaxButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.statisticsMaxButton.setText(Messages.getString(MessageIds.OSDE_MSGT0558));
 				this.statisticsMaxButton.setBounds(10, 55, 90, 20);
@@ -464,7 +464,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			{
-				this.statisticsSigmaButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.RIGHT);
+				this.statisticsSigmaButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.statisticsSigmaButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.statisticsSigmaButton.setText(Messages.getString(MessageIds.OSDE_MSGT0559));
 				this.statisticsSigmaButton.setBounds(10, 80, 90, 20);
@@ -484,7 +484,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.triggerLevelButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.triggerLevelButton.setText(Messages.getString(MessageIds.OSDE_MSGT0560));
-				this.triggerLevelButton.setBounds(125, 5, 60, 20);
+				this.triggerLevelButton.setBounds(125, 5, 63, 20);
 				this.triggerLevelButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0555));
 				this.triggerLevelButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -559,7 +559,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.triggerLevelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0561));
 				this.triggerLevelLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0562));
-				this.triggerLevelLabel.setBounds(212, 5, 64, 20);
+				this.triggerLevelLabel.setBounds(190, 7, 85, 20);
 			}
 			{
 				this.triggerLevelCombo = new CCombo(this.statisticsComposite, SWT.BORDER);

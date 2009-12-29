@@ -541,8 +541,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0472 = "OSDE_MSGT0472";
 	public final static String	OSDE_MSGT0473 = "OSDE_MSGT0473";
 	public final static String	OSDE_MSGT0474 = "OSDE_MSGT0474";
-	public final static String	OSDE_MSGT0477 = "OSDE_MSGT0477";
-	public final static String	OSDE_MSGT0478 = "OSDE_MSGT0478";
+	public final static String	OSDE_MSGT0475 = "OSDE_MSGT0475";
 	public final static String	OSDE_MSGT0479 = "OSDE_MSGT0479";
 	public final static String	OSDE_MSGT0480 = "OSDE_MSGT0480";
 	public final static String	OSDE_MSGT0481 = "OSDE_MSGT0481";
@@ -571,6 +570,8 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0505 = "OSDE_MSGT0505";
 	public final static String	OSDE_MSGT0506 = "OSDE_MSGT0506";
 	public final static String	OSDE_MSGT0507 = "OSDE_MSGT0507";
+	public final static String	OSDE_MSGT0508 = "OSDE_MSGT0508";
+	public final static String	OSDE_MSGT0509 = "OSDE_MSGT0509";
 	public final static String	OSDE_MSGT0510 = "OSDE_MSGT0510";
 	public final static String	OSDE_MSGT0512 = "OSDE_MSGT0512";
 	public final static String	OSDE_MSGT0513 = "OSDE_MSGT0513";
@@ -583,8 +584,8 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0520 = "OSDE_MSGT0520";
 	public final static String	OSDE_MSGT0521 = "OSDE_MSGT0521";
 	public final static String	OSDE_MSGT0522 = "OSDE_MSGT0522";
+	public final static String	OSDE_MSGT0523 = "OSDE_MSGT0523";
 	public final static String	OSDE_MSGT0524 = "OSDE_MSGT0524";
-	public final static String	OSDE_MSGT0525 = "OSDE_MSGT0525";
 	public final static String	OSDE_MSGT0526 = "OSDE_MSGT0526";
 	public final static String	OSDE_MSGT0527 = "OSDE_MSGT0527";
 	public final static String	OSDE_MSGT0528 = "OSDE_MSGT0528";
@@ -592,6 +593,8 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0530 = "OSDE_MSGT0530";
 	public final static String	OSDE_MSGT0531 = "OSDE_MSGT0531";
 	public final static String	OSDE_MSGT0532 = "OSDE_MSGT0532";
+	public final static String	OSDE_MSGT0533 = "OSDE_MSGT0533";
+	public final static String	OSDE_MSGT0534 = "OSDE_MSGT0534";
 	public final static String	OSDE_MSGT0535 = "OSDE_MSGT0535";
 	public final static String	OSDE_MSGT0536 = "OSDE_MSGT0536";
 	public final static String	OSDE_MSGT0537 = "OSDE_MSGT0537";
@@ -605,6 +608,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0545 = "OSDE_MSGT0545";
 	public final static String	OSDE_MSGT0546 = "OSDE_MSGT0546";
 	public final static String	OSDE_MSGT0547 = "OSDE_MSGT0547";
+	public final static String	OSDE_MSGT0548 = "OSDE_MSGT0548";
 	public final static String	OSDE_MSGT0549 = "OSDE_MSGT0549";
 	public final static String	OSDE_MSGT0550 = "OSDE_MSGT0550";
 	public final static String	OSDE_MSGT0551 = "OSDE_MSGT0551";

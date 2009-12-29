@@ -61,7 +61,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	CTabFolder					measurementsTabFolder;
 
 	ChannelTypes				channelConfigType	= ChannelTypes.TYPE_OUTLET;
-	String							channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0525);
+	String							channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0527);
 
 	final CTabFolder		channelConfigInnerTabFolder;
 	final String				tabName;
@@ -221,7 +221,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER);
-					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0525));
+					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0527));
 					this.channelConfigText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigText.setBounds(147, 9, 128, 20);
 					this.channelConfigText.addKeyListener(new KeyAdapter() {
@@ -239,7 +239,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
-					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0526));
+					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0528));
 					this.channelConfigLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigLabel.setBounds(289, 9, 279, 20);
 				}
@@ -286,7 +286,7 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigAddButton.setText(OSDE.STRING_PLUS);
 					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
-					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0524));
+					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0526));
 					this.channelConfigAddButton.setSize(40, 20);
 					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
 						@Override
