@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import osde.OSDE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
@@ -201,7 +202,7 @@ public class VC800Dialog extends DeviceDialog {
 						infoTextLData.top = new FormAttachment(0, 1000, 12);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
 						this.infoText = new Text(this.boundsComposite, SWT.WRAP | SWT.MULTI );
-						this.infoText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.infoText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1521));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -214,7 +215,7 @@ public class VC800Dialog extends DeviceDialog {
 						startCollectDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						startCollectDataButtonLData.right = new FormAttachment(1000, 1000, -180);
 						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.startCollectDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.startCollectDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
 						this.startCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
@@ -255,7 +256,7 @@ public class VC800Dialog extends DeviceDialog {
 						stopColletDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						stopColletDataButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
 						this.stopCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 						this.stopCollectDataButton.setEnabled(false);
@@ -278,7 +279,7 @@ public class VC800Dialog extends DeviceDialog {
 						configGroupLData.top = new FormAttachment(0, 1000, 155);
 						configGroupLData.right = new FormAttachment(1000, 1000, -12);
 						this.configGroup = new Group(this.boundsComposite, SWT.NONE);
-						this.configGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.configGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.configGroup.setLayout(configGroupLayout);
 						this.configGroup.setLayoutData(configGroupLData);
@@ -304,12 +305,12 @@ public class VC800Dialog extends DeviceDialog {
 							this.labelComposite.setLayoutData(composite1LData);
 							{
 								this.inputTypeLabel = new CLabel(this.labelComposite, SWT.NONE);
-								this.inputTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.inputTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.inputTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1530));
 							}
 							{
 								this.batteryLabel = new CLabel(this.labelComposite, SWT.NONE);
-								this.batteryLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.batteryLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.batteryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1531));
 							}
 						}
@@ -323,12 +324,12 @@ public class VC800Dialog extends DeviceDialog {
 							this.dataComposite.setLayout(composite3Layout);
 							{
 								this.inputTypeUnit = new CLabel(this.dataComposite, SWT.NONE);
-								this.inputTypeUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.inputTypeUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.inputTypeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1532));
 							}
 							{
 								this.batteryCondition = new CLabel(this.dataComposite, SWT.NONE);
-								this.batteryCondition.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.batteryCondition.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.batteryCondition.setText(this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						}
@@ -341,7 +342,7 @@ public class VC800Dialog extends DeviceDialog {
 						closeButtonLData.left = new FormAttachment(0, 1000, 12);
 						closeButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.closeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
