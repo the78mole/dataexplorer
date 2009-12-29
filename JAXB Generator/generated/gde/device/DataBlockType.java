@@ -236,7 +236,6 @@ public class DataBlockType {
         this.preferredFileExtention = value;
         if (!this.preferredFileExtention.startsWith("*.")) this.preferredFileExtention = "*." + this.preferredFileExtention; 
         else if (!this.preferredFileExtention.startsWith("*")) this.preferredFileExtention = "*" + this.preferredFileExtention; 
-        
     }
 
 }
