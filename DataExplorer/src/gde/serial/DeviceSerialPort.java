@@ -77,7 +77,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	// event handling does not work reliable
 	//boolean																	dataAvailable			= false;
 
-  //public static final int STOPBITS_1 = 1;
+	public static final String[]	STRING_ARRAY_FLOW_CONTROL	= new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" }; //$NON-NLS-1$
+	public static final String[]	STRING_ARRAY_PARITY				= new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" }; //$NON-NLS-1$
+	public static final String[]	STRING_ARRAY_STOP_BITS		= new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" }; //$NON-NLS-1$
+	public static final String[]	STRING_ARRAY_DATA_BITS		= new String[] { "DATABITS_5", "DATABITS_6", "DATABITS_7", "DATABITS_8" }; //$NON-NLS-1$
+	public static final String[]	STRING_ARRAY_BAUDE_RATES	= new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" }; //$NON-NLS-1$
+
+ //public static final int STOPBITS_1 = 1;
   //public static final int STOPBITS_2 = 2;
   //public static final int STOPBITS_1_5 = 3;
 

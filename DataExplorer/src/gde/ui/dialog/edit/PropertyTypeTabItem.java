@@ -170,7 +170,7 @@ public class PropertyTypeTabItem extends CTabItem {
 		if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 			this.valueText.setVisible(false);
 			this.valueCombo.setVisible(true);		
-			PropertyTypeTabItem.this.valueCombo.select(propertyType.getValue().equals("true") ? 0 : 1);
+			PropertyTypeTabItem.this.valueCombo.select(propertyType.getValue().equals(OSDE.STRING_TRUE) ? 0 : 1);
 		}
 		else {
 			this.valueCombo.setVisible(false);
@@ -217,11 +217,11 @@ public class PropertyTypeTabItem extends CTabItem {
 		try {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
-			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+			this.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
-					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent);
+					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					PropertyTypeTabItem.this.enableContextMenu(false);
 				}
 			});
@@ -231,7 +231,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.propertyTypeComposite.setSize(300, 160);
 			this.propertyTypeComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					PropertyTypeTabItem.log.log(Level.FINEST, "this.paintControl, event=" + evt);
+					PropertyTypeTabItem.log.log(Level.FINEST, "this.paintControl, event=" + evt); //$NON-NLS-1$
 					if (PropertyTypeTabItem.this.propertyTypeComposite.isVisible()) {
 						if (PropertyTypeTabItem.this.propertyType != null) {
 							if (PropertyTypeTabItem.this.nameText.isVisible()) {
@@ -273,36 +273,36 @@ public class PropertyTypeTabItem extends CTabItem {
 			});
 			{
 				this.nameLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.nameLabel.setText("name");
-				this.nameLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.nameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0549));
+				this.nameLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameLabel.setBounds(5, 12, 80, 20);
 			}
 			{
 				this.typeLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.typeLabel.setText("type");
-				this.typeLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.typeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0552));
+				this.typeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.typeLabel.setBounds(5, 38, 80, 20);
 			}
 			{
 				this.valueLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.valueLabel.setText("value");
-				this.valueLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.valueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0553));
+				this.valueLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueLabel.setBounds(5, 65, 80, 20);
 			}
 			{
 				this.descriptionLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.descriptionLabel.setText("description");
-				this.descriptionLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.descriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0554));
+				this.descriptionLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionLabel.setBounds(5, 92, 80, 20);
 			}
 			{
 				this.nameText = new Text(this.propertyTypeComposite, SWT.BORDER);
-				this.nameText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.nameText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameText.setBounds(90, 10, 200, 20);
 				this.nameText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 						PropertyTypeTabItem.this.setText(tabName = PropertyTypeTabItem.this.nameText.getText());
@@ -311,32 +311,32 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.nameCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.nameCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.nameCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameCombo.setBounds(90, 10, 200, 20);
 				this.nameCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "nameCombo.widgetSelected, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "nameCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameCombo.getText().toLowerCase());
 					}
 				});
 			}
 			{
 				this.typeCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.typeCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.typeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.typeCombo.setItems(DataTypes.valuesAsStingArray());
 				this.typeCombo.setBounds(90, 37, 120, 20);
 				this.typeCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "typeCombo.widgetSelected, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "typeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setType(DataTypes.fromValue(PropertyTypeTabItem.this.typeCombo.getText()));
 						if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 							PropertyTypeTabItem.this.valueText.setVisible(false);
 							PropertyTypeTabItem.this.valueCombo.setVisible(true);
 							PropertyTypeTabItem.this.propertyType.setValue(StringHelper.verifyTypedString(DataTypes.BOOLEAN, PropertyTypeTabItem.this.valueCombo.getText()));
 							if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
-							PropertyTypeTabItem.this.valueCombo.select(valueCombo.getText().equals("true") ? 0 : 1);
+							PropertyTypeTabItem.this.valueCombo.select(valueCombo.getText().equals(OSDE.STRING_TRUE) ? 0 : 1);
 						}
 						else {
 							PropertyTypeTabItem.this.valueText.setVisible(true);
@@ -345,7 +345,7 @@ public class PropertyTypeTabItem extends CTabItem {
 								PropertyTypeTabItem.this.propertyType.setValue(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.valueText.getText()));
 							}
 							catch (Exception e) {
-								PropertyTypeTabItem.this.propertyType.setValue("0");
+								PropertyTypeTabItem.this.propertyType.setValue("0"); //$NON-NLS-1$
 							}
 							PropertyTypeTabItem.this.valueText.setText(PropertyTypeTabItem.this.propertyType.getValue());
 						}
@@ -354,33 +354,33 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.valueText = new Text(this.propertyTypeComposite, SWT.BORDER);
-				this.valueText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.valueText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueText.setBounds(90, 65, 120, 20);
 				this.valueText.addKeyListener(this.valueKeyListener = new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.keyReleased, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 					}
 				});
 				this.valueText.addVerifyListener(this.valueVerifyListener = new VerifyListener() {
 					public void verifyText(VerifyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.verifyText, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.verifyText, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.log.log(Level.FINE, evt.text);
 						evt.doit = PropertyTypeTabItem.this.propertyType.getType() == null ? true : StringHelper.verifyTypedInput(PropertyTypeTabItem.this.propertyType.getType(), evt.text);
 					}
 				});
 				this.valueCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.valueCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.valueCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueCombo.setBounds(90, 65, 120, 20);
 				this.valueCombo.setEditable(false);
 				this.valueCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
-				this.valueCombo.setItems(new String[] { "true", "false" });
+				this.valueCombo.setItems(OSDE.STRING_ARRAY_TRUE_FALSE);
 				this.valueCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueCombo.widgetSelected, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "valueCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (PropertyTypeTabItem.this.deviceConfig != null) {
 							// mode state type is Integer and can not be modified by combo selection
 							
@@ -409,12 +409,12 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.descriptionText = new Text(this.propertyTypeComposite, SWT.LEFT | SWT.WRAP | SWT.BORDER);
-				this.descriptionText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+				this.descriptionText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionText.setBounds(90, 92, 200, 55);
 				this.descriptionText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt);
+						PropertyTypeTabItem.log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setDescription(PropertyTypeTabItem.this.descriptionText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 					}

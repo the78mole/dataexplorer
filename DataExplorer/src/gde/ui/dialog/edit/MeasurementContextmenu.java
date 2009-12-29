@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 
 import osde.device.MeasurementPropertyTypes;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -69,7 +71,7 @@ public class MeasurementContextmenu {
 				addStatisticsTypeMenuItem.setEnabled(true);
 				addPropertyTypeMenuItem.setEnabled(true);
 				for (CTabItem tabItem : channelConfigMeasurementPropertiesTabFolder.getItems()) {
-					if (tabItem.getText().equals("Statistics")) {
+					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0350))) {
 						addStatisticsTypeMenuItem.setEnabled(false);
 					}
 				}
@@ -82,7 +84,7 @@ public class MeasurementContextmenu {
 			}
 		});
 		this.addStatisticsTypeMenuItem = new MenuItem(menu, SWT.PUSH);
-		this.addStatisticsTypeMenuItem.setText("add StatisticsType");
+		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0531));
 		this.addStatisticsTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "addStatisticsTypeMenuItem action performed! " + e); //$NON-NLS-1$
@@ -91,7 +93,7 @@ public class MeasurementContextmenu {
 		});
 		new MenuItem(menu, SWT.SEPARATOR);
 		this.addPropertyTypeMenuItem = new MenuItem(menu, SWT.CASCADE);
-		this.addPropertyTypeMenuItem.setText("add PropertyType");
+		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0532)); 
 		this.addPropertyTypeMenu = new Menu(this.addPropertyTypeMenuItem);
 		this.addPropertyTypeMenuItem.setMenu(this.addPropertyTypeMenu);
 		this.addPropertyTypeMenu.addMenuListener(new MenuListener() {
@@ -149,8 +151,8 @@ public class MeasurementContextmenu {
 								break;
 							case NONE_SPECIFIED:
 								MessageBox mb = new MessageBox(menu.getShell(), SWT.OK);
-								mb.setText("Warning");
-								mb.setMessage("The existing none_specified measurement PropertyType must be renamed before another none_specified PropertyItem can be created!");
+								mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540)); 
+								mb.setMessage(Messages.getString(MessageIds.OSDE_MSGW0541));
 								mb.open();
 								break;
 							}

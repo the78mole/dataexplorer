@@ -117,6 +117,7 @@ public class ChannelTypeTabItem extends CTabItem {
 			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
 			measurementTabItem.setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
 		}
+		((MeasurementTypeTabItem)this.measurementsTabFolder.getSelection()).enableContextMenu(true);
 		//MeasurementType end
 		
 		this.channelConfigInnerTabFolder.setSelection(0);
@@ -146,7 +147,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = new ObjectFactory().createChannelType();
 		this.channelConfigType	= copyFrom.channelConfigType;
 		this.channelConfigName	= copyFrom.channelConfigName;
-		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : "newConguration");
+		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : Messages.getString(MessageIds.OSDE_MSGT0507));
 		this.channelType.setType(this.channelConfigType);
 		this.tabName = OSDE.STRING_BLANK + this.channelConfigNumber + OSDE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : OSDE.STRING_EMPTY) ;
 		initGUI();
@@ -183,7 +184,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		try {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
-			this.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+			this.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			{
 				this.channelConfigComposite = new Composite(this.channelConfigInnerTabFolder, SWT.NONE);
 				this.setControl(this.channelConfigComposite);
@@ -203,7 +204,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				});
 				{
 					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
-					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
 					this.channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" }); //$NON-NLS-1$ //$NON-NLS-2$
 					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -221,7 +222,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				{
 					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER);
 					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0525));
-					this.channelConfigText.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigText.setBounds(147, 9, 128, 20);
 					this.channelConfigText.addKeyListener(new KeyAdapter() {
 						@Override
@@ -239,7 +240,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				{
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
 					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0526));
-					this.channelConfigLabel.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigLabel.setBounds(289, 9, 279, 20);
 				}
 				{
@@ -253,13 +254,13 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.measurementsTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 						@Override
 						public void restore(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.restore, event=" + evt); //$NON-NLS-1$
+							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.restore, event=" + evt); //$NON-NLS-1$
 							((CTabItem) evt.item).getControl();
 						}
 
 						@Override
 						public void close(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINE, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
+							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
 							MeasurementTypeTabItem tabItem = ((MeasurementTypeTabItem) evt.item);
 							if (deviceConfig != null) {
 								deviceConfig.removeMeasurementFromChannel(ChannelTypeTabItem.this.channelConfigNumber, tabItem.measurementType);
@@ -272,11 +273,18 @@ public class ChannelTypeTabItem extends CTabItem {
 								ChannelTypeTabItem.this.measurementsTabFolder.getItem(itemCount-1).setShowClose(true);
 						}
 					});
+					this.measurementsTabFolder.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
+							((MeasurementTypeTabItem)ChannelTypeTabItem.this.measurementsTabFolder.getSelection()).enableContextMenu(true);;
+						}
+					});
 				}
 				{
 					this.channelConfigAddButton = new Button(this.channelConfigComposite, SWT.PUSH | SWT.CENTER);
-					this.channelConfigAddButton.setText("+"); //$NON-NLS-1$
-					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(DevicePropertiesEditor.widgetFontName, DevicePropertiesEditor.widgetFontSize, SWT.NORMAL));
+					this.channelConfigAddButton.setText(OSDE.STRING_PLUS);
+					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
 					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0524));
 					this.channelConfigAddButton.setSize(40, 20);
