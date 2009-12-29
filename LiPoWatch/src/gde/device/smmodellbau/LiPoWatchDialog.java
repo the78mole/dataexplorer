@@ -266,7 +266,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					this.mainTabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					{
 						this.configTabItem = new CTabItem(this.mainTabFolder, SWT.NONE);
-						this.configTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+						this.configTabItem.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.configTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1608));
 						{
 							this.configMainComosite = new Composite(this.mainTabFolder, SWT.NONE);
@@ -293,52 +293,52 @@ public class LiPoWatchDialog extends DeviceDialog {
 							});
 							{
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
-								this.statusGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.statusGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.statusGroup.setLayout(null);
 								this.statusGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1610));
 								this.statusGroup.setBounds(12, 4, 473, 45);
 								this.statusGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.serialNumberText = new CLabel(this.statusGroup, SWT.NONE);
-									this.serialNumberText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.serialNumberText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.serialNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1611));
 									this.serialNumberText.setBounds(6, 17, 40, 22);
 									this.serialNumberText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1612));
 								}
 								{
 									this.snLabel = new CLabel(this.statusGroup, SWT.CENTER | SWT.EMBEDDED);
-									this.snLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.snLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.snLabel.setBounds(46, 17, 65, 22);
 									this.snLabel.setText(this.serialNumber);
 								}
 								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
-									this.firmwareText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.firmwareText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.firmwareText.setText(Messages.getString(MessageIds.OSDE_MSGT1613));
 									this.firmwareText.setBounds(115, 17, 70, 22);
 									this.firmwareText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1614));
 								}
 								{
 									this.firmwareVersionLabel = new CLabel(this.statusGroup, SWT.NONE);
-									this.firmwareVersionLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.firmwareVersionLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.firmwareVersionLabel.setBounds(185, 17, 69, 22);
 									this.firmwareVersionLabel.setText(this.lipoWatchVersion);
 								}
 								{
 									this.memoryUsageText = new CLabel(this.statusGroup, SWT.NONE);
-									this.memoryUsageText.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.memoryUsageText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryUsageText.setText(Messages.getString(MessageIds.OSDE_MSGT1615));
 									this.memoryUsageText.setBounds(255, 17, 124, 22);
 								}
 								{
 									this.memUsagePercent = new CLabel(this.statusGroup, SWT.RIGHT);
-									this.memUsagePercent.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.memUsagePercent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memUsagePercent.setBounds(380, 17, 59, 22);
 									this.memUsagePercent.setText(this.memoryUsedPercent);
 								}
 								{
 									this.memUsageUnit = new CLabel(this.statusGroup, SWT.NONE);
-									this.memUsageUnit.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.memUsageUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memUsageUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1616));
 									this.memUsageUnit.setBounds(442, 17, 26, 22);
 								}
@@ -346,13 +346,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 							{
 								this.autoStartGroup = new Group(this.configMainComosite, SWT.NONE);
-								this.autoStartGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.autoStartGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.autoStartGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1617));
 								this.autoStartGroup.setBounds(12, 136, 232, 107);
 								this.autoStartGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.voltageDropTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.RIGHT);
-									this.voltageDropTriggerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.voltageDropTriggerButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltageDropTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1618));
 									this.voltageDropTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1619));
 									this.voltageDropTriggerButton.setSelection(this.isAutoStartVoltageDrop);
@@ -373,7 +373,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.timeTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.RIGHT);
-									this.timeTriggerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.timeTriggerButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.timeTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1620));
 									this.timeTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1621));
 									this.timeTriggerButton.setSelection(this.isAutStartRx);
@@ -393,7 +393,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
-									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.timeTriggerCombo.setBounds(159, 52, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.timeTriggerCombo.setItems(new String[] { " 15", " 20", " 25", " 30", " 60", " 90" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 									this.timeTriggerCombo.select(3);
@@ -429,7 +429,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.impulseTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.RIGHT);
-									this.impulseTriggerButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.impulseTriggerButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.impulseTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1622));
 									this.impulseTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1623));
 									this.impulseTriggerButton.setSelection(this.isAutoStartTime);
@@ -449,7 +449,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.impulseTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
-									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.impulseTriggerCombo.setBounds(159, 78, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
 									this.impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -467,14 +467,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 							} // end autoStartGroup
 							{
 								this.dataRateGroup = new Group(this.configMainComosite, SWT.NONE);
-								this.dataRateGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.dataRateGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.dataRateGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1624));
 								this.dataRateGroup.setBounds(14, 89, 232, 45);
 								this.dataRateGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1625));
 								this.dataRateGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
-									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.timeIntervalCombo.setItems(LiPoWatchDialog.TIME_INTERVAL);
 									this.timeIntervalCombo.setBounds(49, 17, 133, OSDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
@@ -493,7 +493,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 							} // end dataRateGroup
 							{
 								this.readConfigButton = new Button(this.configMainComosite, SWT.PUSH | SWT.CENTER);
-								this.readConfigButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.readConfigButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.readConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1627));
 								this.readConfigButton.setBounds(135, 56, 232, 30);
 								this.readConfigButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1628));
@@ -514,7 +514,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 							}
 							{
 								this.storeConfigButton = new Button(this.configMainComosite, SWT.PUSH | SWT.CENTER);
-								this.storeConfigButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.storeConfigButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.storeConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1629));
 								this.storeConfigButton.setBounds(135, 249, 229, 30);
 								this.storeConfigButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1630));
@@ -541,34 +541,34 @@ public class LiPoWatchDialog extends DeviceDialog {
 							}
 							{
 								this.impuleRegulationGroup = new Group(this.configMainComosite, SWT.NONE);
-								this.impuleRegulationGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.impuleRegulationGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.impuleRegulationGroup.setLayout(null);
 								this.impuleRegulationGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1631));
 								this.impuleRegulationGroup.setBounds(252, 136, 232, 107);
 								this.impuleRegulationGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.regulationTypeLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
-									this.regulationTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.regulationTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.regulationTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1632));
 									this.regulationTypeLabel.setBounds(14, 21, 110, 20);
 									this.regulationTypeLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1633));
 								}
 								{
 									this.voltageLimitLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
-									this.voltageLimitLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.voltageLimitLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltageLimitLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1634));
 									this.voltageLimitLabel.setBounds(14, 49, 110, 20);
 									this.voltageLimitLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1635));
 								}
 								{
 									this.cellTypeLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
-									this.cellTypeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.cellTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.cellTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1636));
 									this.cellTypeLabel.setBounds(14, 75, 110, 20);
 								}
 								{
 									this.regulationTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER | SWT.CENTER);
-									this.regulationTypeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.regulationTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.regulationTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1637).split(OSDE.STRING_SEMICOLON));
 									this.regulationTypeCombo.setBounds(134, 23, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.regulationTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -582,7 +582,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.voltageLevelRegulationCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
-									this.voltageLevelRegulationCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.voltageLevelRegulationCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltageLevelRegulationCombo.setItems(LiPoWatchDialog.CELL_VOLTAGE_LIMITS);
 									this.voltageLevelRegulationCombo.setBounds(134, 51, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.voltageLevelRegulationCombo.addSelectionListener(new SelectionAdapter() {
@@ -596,7 +596,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.cellTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
-									this.cellTypeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.cellTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.cellTypeCombo.setBounds(134, 77, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.cellTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1640).split(OSDE.STRING_SEMICOLON));
 									this.cellTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -611,7 +611,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 							} // end impuleRegulationGroup
 							{
 								this.measurementTypeGroup = new Group(this.configMainComosite, SWT.NONE);
-								this.measurementTypeGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+								this.measurementTypeGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.measurementTypeGroup.setLayout(null);
 								this.measurementTypeGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1642));
 								this.measurementTypeGroup.setBounds(252, 89, 232, 45);
@@ -619,14 +619,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.measurementTypeGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.measurementModusLabel = new CLabel(this.measurementTypeGroup, SWT.RIGHT);
-									this.measurementModusLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.measurementModusLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.measurementModusLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1644));
 									this.measurementModusLabel.setBounds(14, 17, 72, 20);
 									this.measurementModusLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1643));
 								}
 								{
 									this.measurementModusCombo = new CCombo(this.measurementTypeGroup, SWT.BORDER);
-									this.measurementModusCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.measurementModusCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.measurementModusCombo.setBounds(96, 17, 104, OSDE.IS_LINUX ? 22 : 20);
 									this.measurementModusCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1646).split(OSDE.STRING_SEMICOLON));
 									this.measurementModusCombo.addSelectionListener(new SelectionAdapter() {
@@ -642,7 +642,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 						}
 						{
 							this.dataTabItem = new CTabItem(this.mainTabFolder, SWT.NONE);
-							this.dataTabItem.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+							this.dataTabItem.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dataTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1648));
 							this.dataTabItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1649));
 							{
@@ -652,13 +652,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.dataMainComposite.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.dataReadGroup = new Group(this.dataMainComposite, SWT.NONE);
-									this.dataReadGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.dataReadGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.dataReadGroup.setBounds(12, 12, 241, 263);
 									this.dataReadGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1650));
 									this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 									{
 										this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
-										this.readDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.readDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.readDataButton.setText(Messages.getString(MessageIds.OSDE_MSGT1651));
 										this.readDataButton.setBounds(11, 24, 218, 30);
 										this.readDataButton.setEnabled(true);
@@ -689,49 +689,49 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.dataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.dataSetLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.dataSetLabel.setBounds(5, 74, 165, 20);
 										this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1653));
 									}
 									{
 										this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.redDataSetLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.redDataSetLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.redDataSetLabel.setBounds(175, 74, 55, 20);
 										this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.actualDataSetNumberLabel.setBounds(5, 96, 190, 20);
 										this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1654));
 									}
 									{
 										this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.actualDataSetNumber.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.actualDataSetNumber.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.actualDataSetNumber.setBounds(200, 96, 30, 20);
 										this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.readDataErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.readDataErrorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.readDataErrorLabel.setBounds(5, 118, 190, 20);
 										this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1655));
 									}
 									{
 										this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.numberReadErrorLabel.setBounds(200, 118, 30, 20);
 										this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.readLess4Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.readLess4Label.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.readLess4Label.setBounds(5, 140, 190, 20);
 										this.readLess4Label.setText(Messages.getString(MessageIds.OSDE_MSGT1659));
 									}
 									{
 										this.numberLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
-										this.numberLess4Label.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.numberLess4Label.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.numberLess4Label.setBounds(200, 140, 30, 20);
 										this.numberLess4Label.setText("0"); //$NON-NLS-1$
 									}
@@ -743,7 +743,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										this.stopReadDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
-										this.stopReadDataButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.stopReadDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.stopReadDataButton.setBounds(11, 222, 218, 30);
 										this.stopReadDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
 										this.stopReadDataButton.setEnabled(false);
@@ -762,13 +762,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.liveDataCaptureGroup = new Group(this.dataMainComposite, SWT.NONE);
-									this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.liveDataCaptureGroup.setBounds(259, 12, 228, 164);
 									this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1657));
 									this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 									{
 										this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
-										this.startLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.startLiveGatherButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1658));
 										this.startLiveGatherButton.setBounds(12, 24, 202, 30);
 										this.startLiveGatherButton.setEnabled(true);
@@ -809,13 +809,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 										});
 										{
 											this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
-											this.loggingGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+											this.loggingGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 											this.loggingGroup.setBounds(12, 56, 202, 63);
 											this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1660));
 											this.loggingGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 											{
 												this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
-												this.startLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+												this.startLoggingButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.startLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1661));
 												this.startLoggingButton.setBounds(12, 21, 70, 30);
 												this.startLoggingButton.setEnabled(true);
@@ -840,7 +840,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 											}
 											{
 												this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
-												this.stopLoggingButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+												this.stopLoggingButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.stopLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1663));
 												this.stopLoggingButton.setBounds(94, 21, 82, 30);
 												this.stopLoggingButton.setEnabled(false);
@@ -870,7 +870,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										this.stopLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
-										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.stopLiveGatherButton.setBounds(12, 126, 202, 30);
 										this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1665));
 										this.stopLiveGatherButton.setEnabled(false);
@@ -907,14 +907,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 								}
 								{
 									this.clearMemoryGroup = new Group(this.dataMainComposite, SWT.NONE);
-									this.clearMemoryGroup.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+									this.clearMemoryGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.clearMemoryGroup.setLayout(null);
 									this.clearMemoryGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1667));
 									this.clearMemoryGroup.setBounds(261, 178, 226, 97);
 									this.clearMemoryGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 									{
 										this.clearMemoryButton = new Button(this.clearMemoryGroup, SWT.PUSH | SWT.CENTER);
-										this.clearMemoryButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.clearMemoryButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryButton.setText(Messages.getString(MessageIds.OSDE_MSGT1668));
 										this.clearMemoryButton.setBounds(12, 56, 202, 31);
 										this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1603));
@@ -938,7 +938,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									}
 									{
 										this.clearMemoryLabel = new CLabel(this.clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
-										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1604));
 										this.clearMemoryLabel.setBounds(12, 16, 202, 40);
 									}
@@ -949,7 +949,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					}
 
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.closeButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.closeButton.setText(Messages.getString(MessageIds.OSDE_MSGT1605));
 					this.closeButton.setBounds(110, 318, 280, 31);
 					this.closeButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1606));
