@@ -154,7 +154,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeResultLabelLData.left = new FormAttachment(0, 1000, 213);
 					timeResultLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeResultLabel = new CLabel(this.dialogShell, SWT.NONE);
-					this.timeResultLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.timeResultLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeResultLabel.setLayoutData(timeResultLabelLData);
 					this.timeResultLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1050));
 				}
@@ -165,7 +165,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timesLabelLData.left = new FormAttachment(0, 1000, 106);
 					timesLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timesLabel = new CLabel(this.dialogShell, SWT.NONE);
-					this.timesLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.timesLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timesLabel.setLayoutData(timesLabelLData);
 					this.timesLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1051));
 				}
@@ -176,7 +176,7 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterComboLData.left = new FormAttachment(0, 1000, 125);
 					clusterComboLData.top = new FormAttachment(0, 1000, 138);
 					this.clusterCombo = new CCombo(this.dialogShell, SWT.BORDER);
-					this.clusterCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.clusterCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.clusterCombo.setLayoutData(clusterComboLData);
 					this.clusterCombo.setItems(new String[] { "10", "20", "50", "100" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					this.clusterCombo.setText(Integer.valueOf(this.device.getDataBlockSize()).toString());
@@ -196,7 +196,7 @@ public class SimulatorDialog extends DeviceDialog {
 					clusterLabelLData.left = new FormAttachment(0, 1000, 125);
 					clusterLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.clusterLabel = new CLabel(this.dialogShell, SWT.NONE);
-					this.clusterLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.clusterLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.clusterLabel.setLayoutData(clusterLabelLData);
 					this.clusterLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1052));
 				}
@@ -207,7 +207,7 @@ public class SimulatorDialog extends DeviceDialog {
 					currentLabelLData.left = new FormAttachment(0, 1000, 29);
 					currentLabelLData.top = new FormAttachment(0, 1000, 221);
 					this.currentLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.EMBEDDED);
-					this.currentLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.currentLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentLabel.setLayoutData(currentLabelLData);
 					this.currentLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1053));
 				}
@@ -218,7 +218,7 @@ public class SimulatorDialog extends DeviceDialog {
 					currentComboLData.left = new FormAttachment(0, 1000, 29);
 					currentComboLData.top = new FormAttachment(0, 1000, 244);
 					this.currentCombo = new CCombo(this.dialogShell, SWT.BORDER);
-					this.currentCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.currentCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentCombo.setLayoutData(currentComboLData);
 					this.currentCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.currentCombo.addSelectionListener(new SelectionAdapter() {
@@ -236,7 +236,7 @@ public class SimulatorDialog extends DeviceDialog {
 					voltageLabelLData.left = new FormAttachment(0, 1000, 29);
 					voltageLabelLData.top = new FormAttachment(0, 1000, 167);
 					this.voltageLabel = new CLabel(this.dialogShell, SWT.NONE);
-					this.voltageLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.voltageLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageLabel.setLayoutData(voltageLabelLData);
 					this.voltageLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1054));
 				}
@@ -247,7 +247,7 @@ public class SimulatorDialog extends DeviceDialog {
 					voltageComboLData.left = new FormAttachment(0, 1000, 29);
 					voltageComboLData.top = new FormAttachment(0, 1000, 198);
 					this.voltageCombo = new CCombo(this.dialogShell, SWT.BORDER);
-					this.voltageCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.voltageCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageCombo.setLayoutData(voltageComboLData);
 					this.voltageCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
@@ -264,7 +264,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeLabelLData.left = new FormAttachment(0, 1000, 29);
 					timeLabelLData.top = new FormAttachment(0, 1000, 111);
 					this.timeLabel = new CLabel(this.dialogShell, SWT.NONE);
-					this.timeLabel.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.timeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeLabel.setLayoutData(timeLabelLData);
 					this.timeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1055));
 				}
@@ -275,7 +275,7 @@ public class SimulatorDialog extends DeviceDialog {
 					timeComboLData.left = new FormAttachment(0, 1000, 29);
 					timeComboLData.top = new FormAttachment(0, 1000, 138);
 					this.timeCombo = new CCombo(this.dialogShell, SWT.BORDER);
-					this.timeCombo.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.timeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeCombo.setLayoutData(timeComboLData);
 					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
 					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms())); //$NON-NLS-1$
@@ -325,7 +325,7 @@ public class SimulatorDialog extends DeviceDialog {
 					descriptionLData.left = new FormAttachment(0, 1000, 26);
 					descriptionLData.top = new FormAttachment(0, 1000, 49);
 					this.description = new Text(this.dialogShell, SWT.CENTER | SWT.WRAP);
-					this.description.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.description.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.description.setLayoutData(descriptionLData);
 					this.description.setText(Messages.getString(MessageIds.OSDE_MSGT1056));
 					this.description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -353,7 +353,7 @@ public class SimulatorDialog extends DeviceDialog {
 					startButtonLData.left = new FormAttachment(0, 1000, 29);
 					startButtonLData.top = new FormAttachment(0, 1000, 296);
 					this.startButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.startButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.startButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.startButton.setLayoutData(startButtonLData);
 					this.startButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
@@ -452,7 +452,7 @@ public class SimulatorDialog extends DeviceDialog {
 					okButtonLData.left = new FormAttachment(0, 1000, 180);
 					okButtonLData.top = new FormAttachment(0, 1000, 296);
 					this.stopButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					this.stopButton.setFont(SWTResourceManager.getFont(this.application, this.application.getWidgetFontSize(), SWT.NORMAL));
+					this.stopButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopButton.setLayoutData(okButtonLData);
 					this.stopButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 					this.stopButton.setEnabled(false);
