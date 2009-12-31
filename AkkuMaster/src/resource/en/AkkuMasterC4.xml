@@ -28,7 +28,7 @@
         <format>BINARY</format>
         <size>-37</size>
     </DataBlock>
-    <Channel type="TYPE_OUTLET" name="Outlet">
+    <Channel type="TYPE_OUTLET" name="Outlet 1">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -63,7 +63,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet">
+    <Channel type="TYPE_OUTLET" name="Outlet 2">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -98,7 +98,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet">
+    <Channel type="TYPE_OUTLET" name="Outlet 3">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
@@ -133,7 +133,7 @@
 			<statistics min="true" max="true" avg="false" sigma="false"/>
         </Measurement>
     </Channel>
-    <Channel type="TYPE_OUTLET" name="Outlet">
+    <Channel type="TYPE_OUTLET" name="Outlet 4">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
