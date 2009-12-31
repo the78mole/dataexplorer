@@ -42,7 +42,7 @@ public interface IDevice {
 	public DeviceDialog getDialog();
 	
 	/**
-	 * @return the device serial port
+	 * @return the device serial port (optional)
 	 */
 	public DeviceSerialPort getSerialPort();
 		
@@ -100,7 +100,7 @@ public interface IDevice {
 	 * @param set a new image filename(.jpg|.gif|.png)
 	 */
 	public void setImageFileName(String newImageFileName);
-	
+
 	/**
 	 * query if the table tab should be updated
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
@@ -258,6 +258,26 @@ public interface IDevice {
 	 * @param set a new date block ending (single byte, new line, ...) as byte array
 	 */
 	public void setDataBlockEnding(byte[] value);
+
+	/**
+	 * @return the preferred specified data location as full qualified path
+	 */
+	public String getDataBlockPreferredDataLocation();
+
+	/**
+	 * @param set a new full qualified data path location
+	 */
+	public void setDataBlockPreferredDataLocation(String value);
+	
+	/**
+	 * @return the preferred file extension used in file selection dialog
+	 */
+	public String getDataBlockPreferredFileExtention();
+
+	/**
+	 * @param set a new file extension if other than *.csv should be used
+	 */
+	public void setDataBlockPreferredFileExtention(String value);
 	
 	/**
 	 * @return the channel count

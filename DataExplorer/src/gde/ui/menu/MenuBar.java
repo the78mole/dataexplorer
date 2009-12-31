@@ -16,6 +16,9 @@
 ****************************************************************************************/
 package osde.ui.menu;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,6 +53,7 @@ import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.dialog.PrintSelectionDialog;
 import osde.ui.tab.GraphicsComposite;
+import osde.utils.OperatingSystemHelper;
 
 /**
  * menu bar implementation class for the OpenSerialDataExplorer
@@ -86,6 +90,7 @@ public class MenuBar {
 	MenuItem											printMenuItem;
 	MenuItem											exitMenuItem;
 	MenuItem											preferencesFileMenuItem;
+	MenuItem											devicePropertyFileEditMenuItem;
 	Menu													exportMenu;
 	MenuItem											exportFileMenuItem;
 	MenuItem											csvImportMenuItem1, csvImportMenuItem2;
@@ -271,6 +276,74 @@ public class MenuBar {
 							}
 							else
 								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
+						}
+					});
+				}
+				{
+					new MenuItem(this.fileMenu, SWT.SEPARATOR);
+				}
+				{
+					this.devicePropertyFileEditMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0212));
+					this.devicePropertyFileEditMenuItem.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
+					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							Thread editorThread = new Thread() {
+								public void run() {
+									Process process = null;
+									BufferedReader bisr = null;
+									BufferedReader besr = null;
+									try {
+										String javaexec = System.getProperty("sun.boot.library.path").replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + "/javaw";
+										String devicePropertyFile = application.getActiveDevice().getName() + OSDE.FILE_ENDING_DOT_XML;
+										String classpath = (OperatingSystemHelper.getClasspathAsString() + OSDE.getDevicesClasspathAsString()).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+										String command = javaexec + " -classpath '" + classpath + "' osde.ui.dialog.edit.DevicePropertiesEditor '" + devicePropertyFile + "'";  //$NON-NLS-1$ //$NON-NLS-2$
+										log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+
+										process = new ProcessBuilder(javaexec, "-classpath", classpath, "osde.ui.dialog.edit.DevicePropertiesEditor", devicePropertyFile).start(); //$NON-NLS-1$ //$NON-NLS-2$
+										process.waitFor();
+										bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+										besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+										String line;
+										while ((line = bisr.readLine()) != null) {
+											log.log(Level.FINE, "std.out = " + line); //$NON-NLS-1$
+										}
+										while ((line = besr.readLine()) != null) {
+											log.log(Level.FINE, "std.err = " + line); //$NON-NLS-1$
+										}
+										if (process.exitValue() != 0) {
+											String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-2$
+											log.log(Level.SEVERE, msg);
+										}
+									}
+									catch (Throwable e) {
+										log.log(Level.WARNING, e.getMessage());
+									}
+									finally {
+										if (process != null) {
+											try {
+												process.getInputStream().close();
+												process.getOutputStream().close();
+												process.getErrorStream().close();
+											}
+											catch (IOException e) {
+												// ignore
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
+											try {
+												if (besr != null) besr.close();
+												if (bisr != null) bisr.close();
+											}
+											catch (IOException e) {
+												// ignore
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
+										}
+									}
+								}
+							};
+							editorThread.start();
 						}
 					});
 				}

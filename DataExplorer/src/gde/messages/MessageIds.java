@@ -350,6 +350,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0209 = "OSDE_MSGT0209";
 	public final static String	OSDE_MSGT0210 = "OSDE_MSGT0210";
 	public final static String	OSDE_MSGT0211 = "OSDE_MSGT0211";
+	public final static String	OSDE_MSGT0212 = "OSDE_MSGT0212";
 	public final static String	OSDE_MSGT0213 = "OSDE_MSGT0213";
 	public final static String	OSDE_MSGT0214 = "OSDE_MSGT0214";
 	public final static String	OSDE_MSGT0215 = "OSDE_MSGT0215";

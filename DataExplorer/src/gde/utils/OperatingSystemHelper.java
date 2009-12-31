@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -598,5 +599,43 @@ public class OperatingSystemHelper {
 		}
 		log.log(Level.FINE, ret);
 		return ret;
+	}
+	
+	/**
+	 * print the actual class loader of Java VM
+	 */
+	public static String getClasspathAsString() {
+
+    //Get the System Classloader
+    ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
+
+    //Get the URLs
+    URL[] urls = ((URLClassLoader)sysClassLoader).getURLs();
+
+    StringBuilder sb = new StringBuilder();
+    String pathSeparator = System.getProperty("path.separator");
+    for(URL url : urls) {
+        sb.append(url.getFile()).append(pathSeparator);
+    }  
+    return sb.toString();
+	}
+	
+	/**
+	 * print the actual class loader of Java VM
+	 */
+	public static void printClassLoader() {
+
+    //Get the System Classloader
+    ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
+
+    //Get the URLs
+    URL[] urls = ((URLClassLoader)sysClassLoader).getURLs();
+
+    StringBuilder sb = new StringBuilder().append("SystemClassLoader = ");
+    String pathSeparator = System.getProperty("path.separator");
+    for(URL url : urls) {
+        sb.append(url.getFile()).append(pathSeparator);
+    }  
+    log.log(Level.INFO, sb.toString());
 	}
 }
