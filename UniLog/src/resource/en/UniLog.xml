@@ -28,6 +28,7 @@
         <format>BINARY</format>
         <size>24</size>
         <checkSum>XOR</checkSum>
+        <checkSumFormat>BINARY</checkSumFormat>
     </DataBlock>
     <Channel type="TYPE_CONFIG" name="Height">
         <Measurement>
