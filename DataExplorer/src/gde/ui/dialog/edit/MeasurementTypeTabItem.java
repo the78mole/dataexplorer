@@ -185,10 +185,10 @@ public class MeasurementTypeTabItem extends CTabItem {
 		if (this.measurementType.getStatistics() == null && this.statisticsTypeTabItem != null && !this.statisticsTypeTabItem.isDisposed()) {
 			this.statisticsTypeTabItem.dispose();
 		}
-		else if (this.statisticsTypeTabItem == null || this.statisticsTypeTabItem.isDisposed()) {
+		else if (this.measurementType.getStatistics() != null && (this.statisticsTypeTabItem == null || this.statisticsTypeTabItem.isDisposed())) {
 			this.statisticsTypeTabItem = createStatisticsTabItem();
 		}
-		if (this.statisticsTypeTabItem != null && !this.statisticsTypeTabItem.isDisposed()) {
+		if (this.measurementType.getStatistics() != null && this.statisticsTypeTabItem != null && !this.statisticsTypeTabItem.isDisposed()) {
 			this.statisticsTypeTabItem.setStatisticsType(this.deviceConfig, this.measurementType.getStatistics(), this.channelConfigNumber);
 		}
 		//end statistics

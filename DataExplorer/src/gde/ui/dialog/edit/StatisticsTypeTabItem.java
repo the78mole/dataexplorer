@@ -751,9 +751,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 					public void widgetSelected(SelectionEvent evt) {
 						StatisticsTypeTabItem.log.log(Level.FINEST, "isSumByTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.getSelection()) {
-							StatisticsTypeTabItem.this.sumByTriggerRefOrdinal = StatisticsTypeTabItem.this.getTriggerReferenceOrdinal();
+							StatisticsTypeTabItem.this.triggerRefOrdinal = StatisticsTypeTabItem.this.sumByTriggerRefOrdinal = StatisticsTypeTabItem.this.getTriggerReferenceOrdinal();
 							if (StatisticsTypeTabItem.this.statisticsType != null) {
-								StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal);
+								StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
 								StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 							}
 							StatisticsTypeTabItem.this.sumTriggerText.setEnabled(true);
@@ -808,8 +808,13 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
 						StatisticsTypeTabItem.this.ratioText.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
 						if (StatisticsTypeTabItem.this.statisticsType != null && !StatisticsTypeTabItem.this.isRatioRefOrdinal) {
+							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(StatisticsTypeTabItem.this.ratioRefOrdinalCombo.getSelectionIndex());
+							StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioText.getText());
+							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+						}
+						else {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
-							StatisticsTypeTabItem.this.ratioText.setText(OSDE.STRING_EMPTY);
+							StatisticsTypeTabItem.this.ratioText.setText(null);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 						}
 					}
