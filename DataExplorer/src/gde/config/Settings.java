@@ -328,7 +328,7 @@ public class Settings extends Properties {
 				jarFile = new JarFile(deviceJarBasePath + OSDE.FILE_SEPARATOR_UNIX + jarFileName);
 				plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 			}
-			catch (IOException e) {
+			catch (Throwable e) {
 				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			if (jarFile != null) {

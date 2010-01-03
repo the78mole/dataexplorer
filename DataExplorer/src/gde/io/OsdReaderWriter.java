@@ -223,18 +223,17 @@ public class OsdReaderWriter {
 				if (channel == null) { // 3.rd try channelConfiguration not found
 					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
-					int newChannelNumber = channels.size() + 1;
-					channel = new Channel(newChannelNumber, channelConfig, channelType);
+					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-					channels.put(newChannelNumber, channel);
+					channels.put(channel.getNumber(), channel);
 					Vector<String> newChannelNames = new Vector<String>();
 					for (String channelConfigKey : channels.getChannelNames()) {
 						newChannelNames.add(channelConfigKey);
 					}
-					newChannelNames.add(newChannelNumber + " : " + channelConfig); //$NON-NLS-1$
+					newChannelNames.add(channel.getNumber() + " : " + channelConfig); //$NON-NLS-1$
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
-				channels.setActiveChannelNumber(channel.getOrdinal());
+				channels.setActiveChannelNumber(channel.getNumber());
 				channel.setObjectKey(objectKey);
 				// "3 : Motor"
 				channelConfig = channelConfig.contains(OSDE.STRING_COLON) ? channelConfig.split(OSDE.STRING_COLON)[1].trim() : channelConfig.trim();
@@ -403,7 +402,7 @@ public class OsdReaderWriter {
 						if (recordSet != null) {
 							sbs[i] = new StringBuilder();
 							sbs[i].append(OSDE.RECORD_SET_NAME).append(recordSet.getName()).append(OSDE.DATA_DELIMITER)
-								.append(OSDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getOrdinal()).append(OSDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
+								.append(OSDE.CHANNEL_CONFIG_NAME).append(recordSetChannel.getNumber()).append(OSDE.STRING_BLANK_COLON_BLANK).append(recordSet.getChannelConfigName()).append(OSDE.DATA_DELIMITER)
 								.append(OSDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(OSDE.DATA_DELIMITER)
 								.append(OSDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(OSDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name

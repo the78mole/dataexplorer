@@ -1374,6 +1374,13 @@ public class RecordSet extends HashMap<String, Record> {
 		log.log(Level.FINE, "configuredDisplayable = " + newConfiguredDisplayableNumber); //$NON-NLS-1$
 		this.configuredDisplayable = newConfiguredDisplayableNumber;
 	}
+	
+	/**
+	 * @return the channe/configuration number
+	 */
+	public int getChannelNumber() {
+		return this.parent.number;
+	}
 
 	/**
 	 * @return the channel (or) configuration name

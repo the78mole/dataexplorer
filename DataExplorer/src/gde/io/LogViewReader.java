@@ -146,15 +146,14 @@ public class LogViewReader {
 				if (channel == null) { // channelConfiguration not found
 					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
 					OpenSerialDataExplorer.getInstance().openMessageDialogAsync(msg);
-					int newChannelNumber = channels.size()+ 1;
-					channel = new Channel(newChannelNumber, channelConfig, channelType);
+					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-					channels.put(newChannelNumber, channel);
+					channels.put(channel.getNumber(), channel);
 					Vector<String> newChannelNames = new Vector<String>();
 					for(String channelConfigKey : channels.getChannelNames()) {
 						newChannelNames.add(channelConfigKey);
 					}
-					newChannelNames.add(newChannelNumber + " : " + channelConfig);
+					newChannelNames.add(channel.getNumber() + OSDE.STRING_BLANK_COLON_BLANK + channelConfig);
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
 				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfig, true, true);

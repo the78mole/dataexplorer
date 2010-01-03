@@ -49,7 +49,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 	
 	String												name;							// 1 : Ausgang
-	final int											ordinal;
+	final int											number;
 	final ChannelTypes						type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;					// graphics template holds view configuration
 	RecordSet											activeRecordSet;
@@ -58,6 +58,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	String												fileDescription		= StringHelper.getDate();
 	boolean												isSaved = false;
 	final OpenSerialDataExplorer	application;
+	final Channels								parent;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 	
 	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0400);
@@ -66,16 +67,17 @@ public class Channel extends HashMap<String, RecordSet> {
 
 
 	/**
-	 * constructor, where channelNumber is used to calculate the name of the channel 1: Ausgang
-	 * @param channelNumber 1 -> " 1 : Ausgang"
+	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name
+	 * @param channelConfigName channelNumber 1 -> " 1 : Ausgang 1"
 	 */
-	public Channel(int channelNumber, String channelName, ChannelTypes channelType) {
+	public Channel(String channelConfigName, ChannelTypes channelType) {
 		super(1);
-		this.name = OSDE.STRING_BLANK + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channelName;
-		this.ordinal = channelNumber;
+		this.application = OpenSerialDataExplorer.getInstance();
+		this.parent = Channels.getInstance(this.application);
+		this.number = this.parent.size() + 1;
+		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + channelConfigName;
 		this.type = channelType;
 		
-		this.application = OpenSerialDataExplorer.getInstance();
 		String templateFileName = this.application.getActiveDevice().getName() + OSDE.STRING_UNDER_BAR + this.name.split(OSDE.STRING_COLON)[0].trim();
 		this.template = new GraphicsTemplate(templateFileName);
 		this.fileDescription = OpenSerialDataExplorer.getInstance().isObjectoriented() 
@@ -83,18 +85,20 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
-	 * Constructor, where channelNumber is used to calculate the name of the channel K1: type
-	 * @param channelNumber
+	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name and a new record set will be added asap
+	 * @param channelConfigName
+	 * @param channelType
 	 * @param newRecordSet
 	 */
-	public Channel(int channelNumber, String channelName, ChannelTypes channelType, RecordSet newRecordSet) {
+	public Channel(String channelConfigName, ChannelTypes channelType, RecordSet newRecordSet) {
 		super(1);
-		this.ordinal = channelNumber;
-		this.name = OSDE.STRING_BLANK + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channelName;
+		this.application = OpenSerialDataExplorer.getInstance();
+		this.parent = Channels.getInstance(this.application);
+		this.number = this.parent.size() + 1;
+		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + channelConfigName;
 		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);
 
-		this.application = OpenSerialDataExplorer.getInstance();
 		String templateFileName = this.application.getActiveDevice().getName() + OSDE.STRING_UNDER_BAR + this.name.split(OSDE.STRING_COLON)[0];
 		this.template = new GraphicsTemplate(templateFileName);
 		this.fileDescription = OpenSerialDataExplorer.getInstance().isObjectoriented() 
@@ -611,8 +615,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	/**
 	 * @return the channel/config number
 	 */
-	public int getOrdinal() {
-		return this.ordinal;
+	public int getNumber() {
+		return this.number;
 	}
 
 	public String getObjectKey() {
