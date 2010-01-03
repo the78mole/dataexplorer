@@ -1111,7 +1111,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
 				DeviceSelectionDialog.log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
-				Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
+				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
 				// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 				channels.put(Integer.valueOf(i), newChannel);
 				// do not call channel.applyTemplate here, there are no record sets
@@ -1127,7 +1127,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	@SuppressWarnings("unchecked")
 	public IDevice getInstanceOfDevice() {
 		IDevice newInst = null;
-		String selectedDeviceName = this.selectedActiveDeviceConfig.getName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = "osde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {

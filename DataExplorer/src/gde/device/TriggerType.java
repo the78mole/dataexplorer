@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "triggerType")
+@XmlType(name = "TriggerType")
 public class TriggerType {
 
     @XmlAttribute(required = true)

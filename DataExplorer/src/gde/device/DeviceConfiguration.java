@@ -189,6 +189,13 @@ public class DeviceConfiguration {
 			this.isChangePropery = false;
 		}
 	}
+	
+	/**
+	 * get the active device configuration
+	 */
+	public DeviceConfiguration getDeviceConfiguration() {
+		return this;
+	}
 
 	/**
 	 * @return the device
@@ -236,7 +243,14 @@ public class DeviceConfiguration {
 	 * @return the device name
 	 */
 	public String getName() {
-		return this.device.getName();
+		return this.device.getName().getValue();
+	}
+
+	/**
+	 * @return the device name
+	 */
+	public String getDeviceImplName() {
+		return this.device.getName().getImplementation() == null ? this.device.getName().getValue() : this.device.getName().getImplementation();
 	}
 
 	/**
@@ -244,7 +258,7 @@ public class DeviceConfiguration {
 	 */
 	public void setName(String newDeviceName) {
 		this.isChangePropery = true;
-		this.device.setName(newDeviceName);
+		this.device.getName().setValue(newDeviceName);
 	}
 
 	/**
@@ -607,49 +621,106 @@ public class DeviceConfiguration {
 		this.dataBlock = this.deviceProps.dataBlock = null;
 	}
 	
+	public void addDataBlockType() {
+		this.isChangePropery = true;
+		this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
+	}
+	
 	public int getDataBlockSize() {
-		return this.dataBlock != null ? this.dataBlock.getSize() : -1;
+		return this.dataBlock != null && this.dataBlock.getFormat() != null ? this.dataBlock.getFormat().getSize() : -1;
 	}
 
 	public void setDataBlockSize(Integer newSize) {
 		this.isChangePropery = true;
-		this.dataBlock.setSize(newSize);
+		if (this.dataBlock == null) {
+			this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
+			if (this.dataBlock.getFormat() == null) {
+				this.dataBlock.format = new DataBlockType.Format();
+			}
+		}
+		this.dataBlock.getFormat().setSize(newSize);
 	}
 	
 	public FormatTypes getDataBlockFormat() {
-		return this.dataBlock.getFormat();
+		return this.dataBlock.getFormat() == null ? null : this.dataBlock.getFormat().getType();
 	}
 	
 	public void setDataBlockFormat(FormatTypes value) {
 		this.isChangePropery = true;
-		this.dataBlock.setFormat(value);
+		if (this.dataBlock == null) {
+			this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
+			if (this.dataBlock.getFormat() == null) {
+				this.dataBlock.format = new DataBlockType.Format();
+			}
+		}
+		this.dataBlock.getFormat().setType(value);
 	}
 
+	public boolean isDataBlockCheckSumDefined() {
+		return this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
+	}
+	
 	public ChecksumTypes getDataBlockCheckSumType() {
-		return this.dataBlock.getCheckSum(); 
+		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getType(); 
 	}
 
 	public void setDataBlockCheckSumType(ChecksumTypes value) {
 		this.isChangePropery = true;
-		this.dataBlock.setCheckSum(value); 
+		if (value == null)
+			this.dataBlock.setCheckSum(null);
+		else {
+			if (this.dataBlock.getCheckSum() == null) this.dataBlock.setCheckSum(new DataBlockType.CheckSum());
+			this.dataBlock.getCheckSum().setType(value); 
+		}
 	}
 	
 	public FormatTypes getDataBlockCheckSumFormat() {
-		return this.dataBlock.getCheckSumFormat();
+		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getFormat();
 	}
 	
 	public void setDataBlockCheckSumFormat(FormatTypes value) {
 		this.isChangePropery = true;
-		this.dataBlock.setCheckSumFormat(value);
+		if (value == null)
+			this.dataBlock.setCheckSum(null);
+		else {
+			if (this.dataBlock.getCheckSum() == null) this.dataBlock.setCheckSum(new DataBlockType.CheckSum());
+			this.dataBlock.getCheckSum().setFormat(value);
+		}
+	}
+	
+	public boolean isDataBlockEndingDefined() {
+		return this.dataBlock.getFormat().ending != null;
 	}
 
 	public byte[] getDataBlockEnding() {
-		return this.dataBlock.getEnding();
+		return this.dataBlock.getFormat().getEnding();
 	}
 
 	public void setDataBlockEnding(byte[] value) {
 		this.isChangePropery = true;
-		this.dataBlock.setEnding(value);
+		this.dataBlock.getFormat().setEnding(value);
+	}
+
+	public CommaSeparatorTypes getDataBlockSeparator() {
+		return this.dataBlock.getFormat().getSeparator();
+	}
+
+	public void setDataBlockSeparator(CommaSeparatorTypes value) {
+		this.isChangePropery = true;
+		this.dataBlock.getFormat().setSeparator(value);
+	}
+
+	public boolean isDataBlockDecimalSeparatorDefined() {
+		return this.dataBlock.getFormat().decimalSeparator != null;
+	}
+	
+	public DecimalSeparatorTypes getDataBlockDecimalSeparator() {
+		return this.dataBlock.getFormat().getDecimalSeparator();
+	}
+
+	public void setDataBlockDecimalSeparator(DecimalSeparatorTypes value) {
+		this.isChangePropery = true;
+		this.dataBlock.getFormat().setDecimalSeparator(value);
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
@@ -661,13 +732,26 @@ public class DeviceConfiguration {
 		this.dataBlock.setPreferredDataLocation(value);
 	}
 	
+	public boolean isDataBlockPreferredFileExtentionDefined() {
+		return this.dataBlock.preferredFileExtention != null;
+	}
+	
 	public String getDataBlockPreferredFileExtention() {
 		return this.dataBlock.getPreferredFileExtention();
 	}
 
 	public void setDataBlockPreferredFileExtention(String value) {
-		this.isChangePropery = true;
-		this.dataBlock.setPreferredFileExtention(value);
+		boolean isValidExt = this.isChangePropery = true;
+		if (value != null) {
+			isValidExt = (value = value.replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_STAR, OSDE.STRING_EMPTY).replace(OSDE.STRING_DOT, OSDE.STRING_EMPTY).trim()).length() >= 1;
+			if (!isValidExt) {
+				this.dataBlock.setPreferredFileExtention(null);
+			}
+			else {
+				value = "*." + value;
+			}
+		} 
+		this.dataBlock.setPreferredFileExtention(value != null && isValidExt ? value : this.dataBlock.getPreferredFileExtention());
 	}
 
 	/**
@@ -1381,8 +1465,8 @@ public class DeviceConfiguration {
 	 */
 	public void configureSerialPortMenu(int useIconSet) {
 		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
-		application.getMenuBar().setSerialPortIconSet(useIconSet);
-		application.getMenuToolBar().setSerialPortIconSet(useIconSet);
+		if (application.getMenuBar() != null)	application.getMenuBar().setSerialPortIconSet(useIconSet);
+		if (application.getMenuToolBar() != null)	application.getMenuToolBar().setSerialPortIconSet(useIconSet);
 	}
 
 	/**

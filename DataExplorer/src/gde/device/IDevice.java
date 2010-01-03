@@ -37,6 +37,11 @@ public interface IDevice {
 	public static final String	REDUCTION = MeasurementPropertyTypes.REDUCTION.value();
 	
 	/**
+	 * get the active device configuration for manipulation purpose
+	 */
+	public DeviceConfiguration getDeviceConfiguration();
+
+	/**
 	 * @return the device dialog
 	 */
 	public DeviceDialog getDialog();

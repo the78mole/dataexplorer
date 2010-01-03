@@ -37,16 +37,26 @@ import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 
 import osde.OSDE;
 import osde.exception.ApplicationConfigurationException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
+import osde.ui.dialog.edit.DevicePropertiesEditor;
 
 /**
  * Utility class with helpers around file and directory handling
@@ -531,6 +541,121 @@ public class FileUtils {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * updates an jar file with additional content
+	 * @param deviceJarPath
+	 * @param tmpDeviceJarPath
+	 * @param addJarEntryName
+	 * @param deviceImage
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, Image deviceImage, Shell messageBoxShell) throws IOException, FileNotFoundException {
+		JarInputStream in = new JarInputStream(new FileInputStream(deviceJarPath));
+		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), new JarFile(deviceJarPath).getManifest());
+
+		JarEntry inEntry;
+		byte[] buf = new byte[1024];
+		int len = 0;
+
+		//copy content to tmpDeviceJarPath
+		while ((inEntry = in.getNextJarEntry()) != null) {
+			log.log(Level.INFO, "inEntry = " + inEntry.getName());
+			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) {
+				out.putNextEntry(new JarEntry(inEntry));
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+				out.closeEntry();
+			}
+			in.closeEntry();
+		}
+		in.close();
+
+		//add new entry as image file
+		JarEntry jarAddEntry = new JarEntry(addJarEntryName);
+		out.putNextEntry(jarAddEntry);
+		ImageLoader imageLoader = new ImageLoader();
+		imageLoader.data = new ImageData[] { deviceImage.getImageData() };
+		imageLoader.save(out, SWT.IMAGE_JPEG);
+		out.closeEntry();
+		out.close();
+
+		rename(deviceJarPath, tmpDeviceJarPath);
+		
+		if (tmpDeviceJarPath != null) {
+			File tmpFile = new File(tmpDeviceJarPath);
+			if (tmpFile.exists() && DevicePropertiesEditor.onExitRenameJar != null) {
+				DevicePropertiesEditor.onExitRenameJar.add(deviceJarPath + "2" + tmpDeviceJarPath);
+				MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
+				mBox.setText(OSDE.OSDE_NAME_LONG);
+				mBox.setMessage("The file " + deviceJarPath + " could not be updated with new content.\nTo enable the update the application needs to be re-started soon.");
+				mBox.open();
+			}
+		}
+	}
+
+	/**
+	 * run on exit a thread/process to rename files while the JVM shuts down
+	 */
+	public static void runOnExitRenamer() {
+		if (DevicePropertiesEditor.onExitRenameJar != null && DevicePropertiesEditor.onExitRenameJar.size() > 0) {
+			Thread onExitThread = new Thread() {
+				public void run() {
+						for (String job : DevicePropertiesEditor.onExitRenameJar) {
+							//log.log(Level.INFO, "onExitRenameJar.job = " + job);
+							String deviceJarPath = job.split("2")[0];
+							String tmpDeviceJarPath = job.split("2")[1];
+							try {
+								String javaexec = System.getProperty("java.home").replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + "/bin/java";
+								String classpath = OperatingSystemHelper.getClasspathAsString().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+								String command = javaexec + " -classpath '" + classpath + "' osde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'";  //$NON-NLS-1$ //$NON-NLS-2$
+								log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+
+								//new ProcessBuilder(java -classpath OpenSerialDataExplorer.jar osde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
+								new ProcessBuilder(javaexec, "-classpath", classpath, "osde.utils.FileUtils", deviceJarPath, tmpDeviceJarPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+							catch (Throwable e) {
+								log.log(Level.WARNING, e.getMessage());
+							}
+						}
+				}
+			};
+			onExitThread.start();
+		}
+	}
+	
+	/**
+	 * small java based file re-namer
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			if (args.length < 2 || args[0].equals(args[1])) {
+				System.out.println("Usage: java -classpath OpenSerialDataExplorer.jar osde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName");
+			}
+			Thread.sleep(1000);
+			rename(args[0].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX), args[1].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * rename a file while deleting the source file name and rename target to source
+	 * @param sourceFullQualifiedFileName
+	 * @param targetFullQualifiedFileName
+	 */
+	public static void rename(String sourceFullQualifiedFileName, String targetFullQualifiedFileName) {
+		if (!new File(sourceFullQualifiedFileName).delete()) {
+			log.log(Level.WARNING, "could not delete jar file " + sourceFullQualifiedFileName);
+		}
+		else if (!new File(targetFullQualifiedFileName).renameTo(new File(sourceFullQualifiedFileName))) {
+			log.log(Level.WARNING, "could not rename jar file " + targetFullQualifiedFileName + " to " + sourceFullQualifiedFileName);
 		}
 	}
 

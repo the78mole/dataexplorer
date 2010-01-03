@@ -330,7 +330,8 @@ public class StringHelper {
 		switch (useType) {
 		case INTEGER:
 			try {
-				Integer.parseInt(eventText.replace("", "0").trim());
+				if (eventText.equals(OSDE.STRING_EMPTY)) eventText = "0";
+				Integer.parseInt(eventText.trim());
 			}
 			catch (Exception e) {
 				doIt = false;
@@ -338,7 +339,7 @@ public class StringHelper {
 			break;
 		case DOUBLE:
 			try {
-				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".")) 
+				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".") || eventText.equals("")) 
 					doIt = true;
 				else
 					Double.parseDouble(eventText.replace(",", ".").trim());
@@ -445,6 +446,11 @@ public class StringHelper {
 		return true;
 	}
 
+	/**
+	 * convert a hexadecimal input byte array into string
+	 * @param byteBuffer
+	 * @return
+	 */
 	public static String convertHexInput(byte[] byteBuffer) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < byteBuffer.length; i++) {
@@ -453,6 +459,11 @@ public class StringHelper {
 		return sb.toString();
 	}
 	
+	/**
+	 * convert a string two char per byte input into byte array 
+	 * @param twoCharsPerByte
+	 * @return
+	 */
 	public static byte[] convert2ByteArray(String twoCharsPerByte) {
 		int length = twoCharsPerByte.length()/2;
 		byte[] buffer = new byte[length];
@@ -463,6 +474,11 @@ public class StringHelper {
 		return buffer;
 	}
 	
+	/**
+	 * build a sting array from enumeration (combo.setItems(String[]))
+	 * @param enumValues
+	 * @return
+	 */
 	public static String[] enumValues2StringArray(Object[] enumValues) {
 		Vector<String> tmpVec = new Vector<String>();
 		for (Object element : enumValues) {
