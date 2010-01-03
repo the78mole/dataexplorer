@@ -25,8 +25,7 @@
         <timeStep>10000</timeStep>
     </TimeBase>
     <DataBlock>
-        <format>BINARY</format>
-        <size>-37</size>
+        <format type="BINARY" size="-37"/>
     </DataBlock>
     <Channel type="TYPE_OUTLET" name="Outlet 1">
         <Measurement>
