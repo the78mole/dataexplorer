@@ -14,10 +14,9 @@
         <unit>ms</unit>
         <timeStep>5</timeStep>
     </TimeBase>
-	<DataBlock>
-		<format>BINARY</format>
-		<size>50</size>
-	</DataBlock>
+    <DataBlock>
+        <format size="100" type="BINARY"/>
+    </DataBlock>
     <Channel type="TYPE_CONFIG" name="Sinus">
         <Measurement>
             <name>Spannung</name>
