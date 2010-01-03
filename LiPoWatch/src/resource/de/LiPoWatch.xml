@@ -25,10 +25,8 @@
         <timeStep>500</timeStep>
     </TimeBase>
     <DataBlock>
-        <format>BINARY</format>
-        <size>-76</size>
-        <checkSum>XOR</checkSum>
-        <checkSumFormat>BINARY</checkSumFormat>
+        <format type="BINARY" size="-76"/>
+		<checkSum type="XOR" format="BINARY"/>
     </DataBlock>
     <Channel type="TYPE_OUTLET" name="Konfiguration">
         <Measurement>
