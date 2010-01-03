@@ -25,10 +25,8 @@
         <timeStep>250</timeStep>
     </TimeBase>
     <DataBlock>
-        <format>BINARY</format>
-        <size>24</size>
-        <checkSum>XOR</checkSum>
-        <checkSumFormat>BINARY</checkSumFormat>
+        <format type="BINARY" size="24"/>
+		<checkSum type="XOR" format="BINARY"/>
     </DataBlock>
     <Channel type="TYPE_CONFIG" name="Height">
         <Measurement>
