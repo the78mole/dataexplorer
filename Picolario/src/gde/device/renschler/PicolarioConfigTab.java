@@ -440,7 +440,7 @@ public class PicolarioConfigTab extends Composite {
 		MeasurementType measurement;
 		PropertyType property = null;
 		Record record = null;
-		int channelConfigNumber = Channels.getInstance().getActiveChannel().getOrdinal();
+		int channelConfigNumber = Channels.getInstance().getActiveChannel().getNumber();
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // load all data from record set
 			String[] recordKeys = recordSet.getRecordNames();
