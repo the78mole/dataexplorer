@@ -47,8 +47,7 @@ public class GathererThread extends Thread {
 	final VC800Dialog					dialog;
 	final Channels						channels;
 	final Channel							channel;
-	final Integer							channelNumber;
-	final String							configKey;
+	final int									channelNumber;
 	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isSwitchedRecordSet					= false;
@@ -65,16 +64,15 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, VC800 useDevice, VC800SerialPort useSerialPort, String channelName, VC800Dialog useDialog)
+	public GathererThread(OpenSerialDataExplorer currentApplication, VC800 useDevice, VC800SerialPort useSerialPort, int channelConfigNumber, VC800Dialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
 		this.serialPort = useSerialPort;
 		this.channels = Channels.getInstance();
-		this.channelNumber = new Integer(channelName.trim().split(":")[0].trim()); //$NON-NLS-1$
+		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.configKey = channelName.trim().split(":")[1].trim(); //$NON-NLS-1$
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -90,7 +88,7 @@ public class GathererThread extends Thread {
 		final int FILTER_TIME_DELTA_MS = 200; // definition of the time delta in msec
 
 		RecordSet recordSet = null, oldRecordSet = null;
-		int[] points = new int[this.device.getMeasurementNames(this.configKey).length];
+		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		final HashMap<String, String>	configData = this.dialog.getConfigData();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
@@ -151,7 +149,7 @@ public class GathererThread extends Thread {
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), getName().trim(), true, false));
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);

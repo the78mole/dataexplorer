@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Text;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.exception.ApplicationConfigurationException;
@@ -224,9 +225,9 @@ public class VC800Dialog extends DeviceDialog {
 								VC800Dialog.log.log(Level.FINEST, "startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (!VC800Dialog.this.serialPort.isConnected()) {
 									try {
-										if (Channels.getInstance().getActiveChannel() != null) {
-											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
-											VC800Dialog.this.dataGatherThread = new GathererThread(VC800Dialog.this.application, VC800Dialog.this.device, VC800Dialog.this.serialPort, channelConfigKey, VC800Dialog.this);
+										Channel activChannel = Channels.getInstance().getActiveChannel();
+										if (activChannel != null) {
+											VC800Dialog.this.dataGatherThread = new GathererThread(VC800Dialog.this.application, VC800Dialog.this.device, VC800Dialog.this.serialPort, activChannel.getNumber(), VC800Dialog.this);
 											try {
 												VC800Dialog.this.dataGatherThread.start();
 											}
