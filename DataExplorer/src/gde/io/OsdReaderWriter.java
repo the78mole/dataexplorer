@@ -200,7 +200,7 @@ public class OsdReaderWriter {
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
 						channel = channels.get(new Integer(channelConfig.substring(channelConfig.length()-1)));
-						channelConfig = channel.getConfigKey();
+						channelConfig = channel.getChannelConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
 					}
 					catch (NumberFormatException e) {
@@ -213,7 +213,7 @@ public class OsdReaderWriter {
 				if (channel == null) { // 2.nd try channelConfiguration not found
 					try { // try to get channel startsWith configuration name
 						channel = channels.get(channels.getChannelNumber(channelConfig.split(" ")[0]));
-						channelConfig = channel.getConfigKey();
+						channelConfig = channel.getChannelConfigKey();
 						recordSetInfo.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
 					}
 					catch (NullPointerException e) {
@@ -240,7 +240,7 @@ public class OsdReaderWriter {
 				// "Motor 3"
 				channelConfig = channelConfig.contains(OSDE.STRING_BLANK) ? channelConfig.split(OSDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
-				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfig, true, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);
 

@@ -163,12 +163,12 @@ public class CSVReaderWriter {
 		String channelConfig = header.get(OSDE.CHANNEL_CONFIG_NAME);
 		int channelNumber = channels.getChannelNumber(channelConfig);
 		if (channelConfig != null 
-				&& !channels.getActiveChannel().getConfigKey().equals(channelConfig) 
+				&& !channels.getActiveChannel().getChannelConfigKey().equals(channelConfig) 
 				&& channelNumber >= 1 && channelNumber <= deviceConfig.getChannelCount() ) {
 			channels.setActiveChannelNumber(channelNumber);
 		}
 		else { // unknown channel configuration using active one
-			channelConfig = channels.getActiveChannel().getConfigKey();
+			channelConfig = channels.getActiveChannel().getChannelConfigKey();
 			channels.setActiveChannelNumber(channels.getActiveChannelNumber());
 		}
 		header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
@@ -178,7 +178,7 @@ public class CSVReaderWriter {
 		int match = 0; // check match of the measurement units, relevant for absolute csv data only
 		StringBuilder unitCompare = new StringBuilder().append(lineSep);
 		for (int i = 1; i < headerLineArray.length; i++) {
-			String expectUnit = deviceConfig.getMeasurementUnit(channelConfig, (i - 1));
+			String expectUnit = deviceConfig.getMeasurementUnit(channelNumber, (i - 1));
 			String[] inHeaderMeasurement = headerLineArray[i].trim().split("\\[|]"); //$NON-NLS-1$
 			String inMeasurement = inHeaderMeasurement.length >= 1 ? inHeaderMeasurement[0].trim() : Settings.EMPTY;
 			String inUnit = inHeaderMeasurement.length == 2 ? inHeaderMeasurement[1].trim() : Settings.EMPTY;
@@ -220,13 +220,14 @@ public class CSVReaderWriter {
 		Channel activeChannel = null;
 
 		try {
-			activeChannel = channels.getActiveChannel();
+			HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(separator, filePath);
+			activeChannel = channels.get(channels.getChannelNumber(fileHeader.get(OSDE.CHANNEL_CONFIG_NAME)));
+			activeChannel = activeChannel == null ? channels.getActiveChannel() : activeChannel;
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0134) + filePath);
 				int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
 
-				HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(separator, filePath);
 				// check for device name and channel or configuration in first line
 				if (!application.getActiveDevice().getName().equals(fileHeader.get(OSDE.DEVICE_NAME))) {
 					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.OSDE_MSGW0013, new Object[] {fileHeader.get(OSDE.DEVICE_NAME)})); // mismatch device name 
@@ -246,21 +247,20 @@ public class CSVReaderWriter {
 					// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 				}
 
-				String fileChannelConfig = fileHeader.get(OSDE.CHANNEL_CONFIG_NAME);
 				if (application.getStatusBar() != null) {
-					channels.switchChannel(channels.getActiveChannelNumber(), OSDE.STRING_EMPTY);
+					channels.switchChannel(activeChannel.getNumber(), OSDE.STRING_EMPTY);
 					application.getMenuToolBar().updateChannelSelector();
 					activeChannel = channels.getActiveChannel();
 				}
 				
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-				String[] recordNames = device.getMeasurementNames(fileChannelConfig);
+				String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
 				String[] recordSymbols = new String[recordNames.length];
 				String[] recordUnits = new String[recordNames.length];
 				String[] tmpRecordNames	=	fileHeader.get(OSDE.CSV_DATA_HEADER_MEASUREMENTS).split(OSDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(OSDE.CSV_DATA_HEADER_UNITS).split(OSDE.STRING_SEMICOLON);
 				for (int i=0, j=0; i < recordNames.length; i++) {
-					MeasurementType measurement = device.getMeasurement(fileChannelConfig, i);
+					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
 					if (isRaw) {
 						if (!measurement.isCalculation()) {
 							recordNames[i] = recordNames[i].equals(tmpRecordNames[j]) ? recordNames[i] : tmpRecordNames[j];
@@ -279,7 +279,7 @@ public class CSVReaderWriter {
 						recordUnits[i] = measurement.getUnit().equals(tmpRecordUnits[i]) ? measurement.getUnit() : tmpRecordUnits[i];
 					}
 				}
-				recordSet = RecordSet.createRecordSet(recordSetName, device, fileChannelConfig, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
 				recordSetName = recordSet.getName(); // cut length
 				
 				// make all records displayable while absolute data
@@ -375,7 +375,7 @@ public class CSVReaderWriter {
 			// write the measurements signature
 			String[] recordNames = recordSet.getRecordNames();
 			for (int i = 0; i < recordNames.length; i++) {
-				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigName(), i);
+				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
 				Record record = recordSet.get(recordNames[i]);
 				log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 				if (isRaw) {
@@ -408,7 +408,7 @@ public class CSVReaderWriter {
 					if (record == null)
 						throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0005, new Object[]{recordNames[j], recordSet.getChannelConfigName()}));
 
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigName(), j);
+					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (record.getParent().isRaw())

@@ -156,7 +156,7 @@ public class LogViewReader {
 					newChannelNames.add(channel.getNumber() + OSDE.STRING_BLANK_COLON_BLANK + channelConfig);
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
-				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfig, true, true);
+				recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 				//apply record sets properties
 				recordSet.setRecordSetDescription(recordSetComment);
 				recordSet.setDeserializedProperties(recordSetProperties);

@@ -308,9 +308,23 @@ public interface IDevice {
 	public ChannelTypes getChannelTypes(int channelNumber);
 	
 	/**
+	 * @return the channel measurements by given channel configuration number
+	 */
+	public List<MeasurementType> getChannelMeasuremts(int channelConfigNumber);
+	
+	/**
 	 * @return the channel measurements by given channel configuration key (name)
 	 */
+	@Deprecated
 	public List<MeasurementType> getChannelMeasuremts(String channelConfigKey);
+
+	/**
+	 * get the properties from a channel/configuration and record key name 
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return list of properties according measurement
+	 */
+	public List<PropertyType> getProperties(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * get the properties from a channel/configuration and record key name 
@@ -318,12 +332,27 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return list of properties according measurement
 	 */
+	@Deprecated
 	public List<PropertyType> getProperties(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * @return the number (size) of measurements of a channel, assume existing channels have different number of measurements
+	 */
+	public int getNumberOfMeasurements(int channelConfigNumber);
 
 	/**
 	 * @return the number of measurements of a channel, assume channels have different number of measurements
 	 */
+	@Deprecated
 	public int getNumberOfMeasurements(String channelConfigKey);
+	
+	/**
+	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return PropertyType object
+	 */
+	public MeasurementType getMeasurement(int channelConfigNumber, int measurementOrdinal);
 	
 	/**
 	 * get the measurement to get/set measurement specific parameter/properties (voltage, current, height, slope, ..)
@@ -331,12 +360,27 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return PropertyType object
 	 */
+	@Deprecated
 	public MeasurementType getMeasurement(String channelConfigKey, int measurementOrdinal);
 	
 	/**
 	 * @return the sorted measurement names
 	 */
+	public String[] getMeasurementNames(int channelConfigNumber);
+	
+	/**
+	 * @return the sorted measurement names
+	 */
+	@Deprecated
 	public String[] getMeasurementNames(String channelConfigKey);
+
+	/**
+	 * set new name of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param name
+	 */
+	public void setMeasurementName(int channelConfigNumber, int measurementOrdinal, String name);
 
 	/**
 	 * set new name of specified measurement
@@ -344,7 +388,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @param name
 	 */
+	@Deprecated
 	public void setMeasurementName(String channelConfigKey, int measurementOrdinal, String name);
+
+	/**
+	 * method to query the unit of measurement data unit by a given record key
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return dataUnit as string
+	 */
+	public String getMeasurementUnit(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * method to query the unit of measurement data unit by a given record key
@@ -352,7 +405,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return dataUnit as string
 	 */
+	@Deprecated
 	public String getMeasurementUnit(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * method to set the unit of measurement by a given measurement key
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param unit
+	 */
+	public void setMeasurementUnit(int channelConfigNumber, int measurementOrdinal, String unit);
 
 	/**
 	 * method to set the unit of measurement by a given measurement key
@@ -360,14 +422,31 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @param unit
 	 */
+	@Deprecated
 	public void setMeasurementUnit(String channelConfigKey, int measurementOrdinal, String unit);
+
+	/**
+	 * get the symbol of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 */
+	public String getMeasurementSymbol(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * get the symbol of specified measurement
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
 	 */
+	@Deprecated
 	public String getMeasurementSymbol(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * set new symbol of specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param symbol
+	 */
+	public void setMeasurementSymbol(int channelConfigNumber, int measurementOrdinal, String symbol);
 
 	/**
 	 * set new symbol of specified measurement
@@ -375,7 +454,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @param symbol
 	 */
+	@Deprecated
 	public void setMeasurementSymbol(String channelConfigKey, int measurementOrdinal, String symbol);
+	
+	/**
+	 * get the statistics type of the specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return statistics, if statistics does not exist return null
+	 */
+	public StatisticsType getMeasurementStatistic(int channelConfigNumber, int measurementOrdinal);
 	
 	/**
 	 * get the statistics type of the specified measurement
@@ -383,7 +471,17 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return statistics, if statistics does not exist return null
 	 */
+	@Deprecated
 	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param propertyKey
+	 * @return PropertyType object
+	 */
+	public PropertyType getMeasruementProperty(int channelConfigNumber, int measurementOrdinal, String propertyKey);
 
 	/**
 	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
@@ -392,7 +490,16 @@ public interface IDevice {
 	 * @param propertyKey
 	 * @return PropertyType object
 	 */
+	@Deprecated
 	public PropertyType getMeasruementProperty(String channelConfigKey, int measurementOrdinal, String propertyKey);
+
+	/**
+	 * get the offset value of the specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return the offset, if property does not exist return 0.0 as default value
+	 */
+	public double getMeasurementOffset(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * get the offset value of the specified measurement
@@ -400,7 +507,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
+	@Deprecated
 	public double getMeasurementOffset(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * set new value for offset at the specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param offset the offset to set
+	 */
+	public void setMeasurementOffset(int channelConfigNumber, int measurementOrdinal, double offset);
 
 	/**
 	 * set new value for offset at the specified measurement
@@ -408,7 +524,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @param offset the offset to set
 	 */
+	@Deprecated
 	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset);
+
+	/**
+	 * get the factor value of the specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @return the factor, if property does not exist return 1.0 as default value
+	 */
+	public double getMeasurementFactor(int channelConfigNumber, int measurementOrdinal);
 
 	/**
 	 * get the factor value of the specified measurement
@@ -416,7 +541,16 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
+	@Deprecated
 	public double getMeasurementFactor(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * set new value for factor at the specified measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param factor the offset to set
+	 */
+	public void setMeasurementFactor(int channelConfigNumber, int measurementOrdinal, double factor);
 
 	/**
 	 * set new value for factor at the specified measurement
@@ -424,7 +558,17 @@ public interface IDevice {
 	 * @param measurementOrdinal
 	 * @param factor the offset to set
 	 */
+	@Deprecated
 	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor);
+
+	/**
+	 * get a property of specified measurement, the data type must be known - data conversion is up to implementation
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param propertyKey
+	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
+	 */
+	public Object getMeasurementPropertyValue(int channelConfigNumber, int measurementOrdinal, String propertyKey);
 
 	/**
 	 * get a property of specified measurement, the data type must be known - data conversion is up to implementation
@@ -433,7 +577,19 @@ public interface IDevice {
 	 * @param propertyKey
 	 * @return the property from measurement defined by key, if property does not exist return 1 as default value
 	 */
+	@Deprecated
 	public Object getMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey);
+
+	/**
+	 * set new property value of specified measurement, if the property does not exist it will be created
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param propertyKey
+	 * @param type of DataTypes
+	 * @param value
+	 */
+	public void setMeasurementPropertyValue(int channelConfigNumber, int measurementOrdinal, String propertyKey, DataTypes type, Object value);
+
 	/**
 	 * set new property value of specified measurement, if the property does not exist it will be created
 	 * @param channelConfigKey
@@ -442,6 +598,7 @@ public interface IDevice {
 	 * @param type of DataTypes
 	 * @param value
 	 */
+	@Deprecated
 	public void setMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey, DataTypes type, Object value);
 	
 	/**

@@ -48,10 +48,11 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final long							serialVersionUID	= 26031957;
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 	
-	String												name;							// 1 : Ausgang
-	final int											number;
-	final ChannelTypes						type;							// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
-	GraphicsTemplate							template;					// graphics template holds view configuration
+	final int											number;							// 1
+	String												channelConfigName;	// Ausgang
+	String												name;								// 1 : Ausgang
+	final ChannelTypes						type;								// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
+	GraphicsTemplate							template;						// graphics template holds view configuration
 	RecordSet											activeRecordSet;
 	String												objectKey	= OSDE.STRING_EMPTY;
 	String 												fileName;
@@ -68,14 +69,15 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name
-	 * @param channelConfigName channelNumber 1 -> " 1 : Ausgang 1"
+	 * @param useChannelConfigName channelNumber 1 -> " 1 : Ausgang 1"
 	 */
-	public Channel(String channelConfigName, ChannelTypes channelType) {
+	public Channel(String useChannelConfigName, ChannelTypes channelType) {
 		super(1);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.parent = Channels.getInstance(this.application);
 		this.number = this.parent.size() + 1;
-		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + channelConfigName;
+		this.channelConfigName = useChannelConfigName;
+		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + useChannelConfigName;
 		this.type = channelType;
 		
 		String templateFileName = this.application.getActiveDevice().getName() + OSDE.STRING_UNDER_BAR + this.name.split(OSDE.STRING_COLON)[0].trim();
@@ -86,16 +88,17 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name and a new record set will be added asap
-	 * @param channelConfigName
+	 * @param useChannelConfigName
 	 * @param channelType
 	 * @param newRecordSet
 	 */
-	public Channel(String channelConfigName, ChannelTypes channelType, RecordSet newRecordSet) {
+	public Channel(String useChannelConfigName, ChannelTypes channelType, RecordSet newRecordSet) {
 		super(1);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.parent = Channels.getInstance(this.application);
 		this.number = this.parent.size() + 1;
-		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + channelConfigName;
+		this.channelConfigName = useChannelConfigName;
+		this.name = OSDE.STRING_BLANK + this.number + OSDE.STRING_BLANK_COLON_BLANK + useChannelConfigName;
 		this.type = channelType;
 		this.put(newRecordSet.getName(), newRecordSet);
 
@@ -219,8 +222,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * get the name of the channel to be used as configuration key " 1: Ausgang" -> "Ausgang"
 	 * @return String
 	 */
-	public String getConfigKey() {
-		return this.name.split(OSDE.STRING_COLON)[1].trim();
+	public String getChannelConfigKey() {
+		return this.channelConfigName;
 	}
 
 	/**

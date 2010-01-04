@@ -292,7 +292,7 @@ public class StatisticsWindow extends CTabItem {
 						Record record = activeRecordSet.get(recordName);
 						DecimalFormat df = record.getDecimalFormat();
 						IDevice device = activeRecordSet.getDevice();
-						StatisticsType measurementStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), activeRecordSet.get(recordName).getOrdinal());
+						StatisticsType measurementStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), activeRecordSet.get(recordName).getOrdinal());
 						if (measurementStatistics != null) {
 							sb = new StringBuilder();
 							int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);
@@ -365,7 +365,7 @@ public class StatisticsWindow extends CTabItem {
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 									sb.append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
 									Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
-									StatisticsType referencedStatistics = device.getMeasurementStatistic(record.getChannelConfigKey(), measurementStatistics.getRatioRefOrdinal());
+									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
 
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
 										if (referencedStatistics.isAvg()) {

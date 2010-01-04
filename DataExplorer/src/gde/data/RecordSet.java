@@ -61,7 +61,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 	String												name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final Channel									parent;
-	final String									channelConfigName;
+	//final String									channelConfigName;
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																// records/measurements which are active or inactive
@@ -166,19 +166,18 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
-	 * @param newChannelName the channel name or configuration name
+	 * @param channelNumber the channel number to be used
 	 * @param newName for the records like "1) Laden" 
 	 * @param measurementNames array of the device supported measurement names
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
+	public RecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, double newTimeStep_ms, boolean isRawValue, boolean isFromFileValue) {
 		super(measurementNames.length);
 		this.channels = Channels.getInstance();
 		this.device = useDevice;
-		this.parent = this.channels.get(this.channels.getChannelNumber(newChannelName));
-		this.channelConfigName = newChannelName;
+		this.parent = this.channels.get(channelNumber);
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeStep_ms;
@@ -203,7 +202,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.channels = null;
 		this.device = useDevice;
 		this.parent = null;
-		this.channelConfigName = newChannelName;
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = new String[0];
 		this.timeStep_ms = newTimeStep_ms;
@@ -215,9 +213,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * copy constructor - used to copy a record set to another channel/configuration, 
 	 * where the configuration coming from the device properties file
 	 * @param recordSet
-	 * @param newChannelConfiguration
+	 * @param channelConfigurationNumber
 	 */
-	private RecordSet(RecordSet recordSet, String newChannelConfiguration) {
+	private RecordSet(RecordSet recordSet, int channelConfigurationNumber) {
 		super(recordSet); // hashmap
 
 		this.device = recordSet.device; // this is a reference
@@ -225,7 +223,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
-		this.channelConfigName = newChannelConfiguration;
 
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
@@ -236,7 +233,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 			log.log(Level.FINER, "oldRecordNames = "+ sb.toString()); //$NON-NLS-1$
 		}
-		String[] newRecordNames = this.device.getMeasurementNames(newChannelConfiguration);
+		String[] newRecordNames = this.device.getMeasurementNames(channelConfigurationNumber);
 		if(log.isLoggable(Level.FINER)) {
 			StringBuilder sb = new StringBuilder();
 			for (String string : newRecordNames) {
@@ -258,10 +255,9 @@ public class RecordSet extends HashMap<String, Record> {
 		// update child records to new channel or configuration key and to the new parent
 		for (int i = 0; i < this.recordNames.length; ++i) {
 			Record tmpRecord = this.get(this.recordNames[i]);
-			tmpRecord.setChannelConfigKey(newChannelConfiguration);
 			tmpRecord.setParent(this);
 
-			tmpRecord.statistics = this.device.getMeasurementStatistic(newChannelConfiguration, i);
+			tmpRecord.statistics = this.device.getMeasurementStatistic(channelConfigurationNumber, i);
 			TriggerType tmpTrigger = tmpRecord.statistics.getTrigger();
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
@@ -271,7 +267,7 @@ public class RecordSet extends HashMap<String, Record> {
 			if (recordSet.get(this.recordNames[i]) != null)
 				tmpRecord.setProperties(recordSet.get(this.recordNames[i]).getProperties());
 			else
-				tmpRecord.setProperties(this.device.getProperties(newChannelConfiguration, i));
+				tmpRecord.setProperties(this.device.getProperties(channelConfigurationNumber, i));
 		}
 
 		this.timeStep_ms = recordSet.timeStep_ms;
@@ -312,10 +308,10 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * clone method used to move record sets to other configuration or channel
-	 * @param newChannelConfiguration 
+	 * @param channelConfiguationNumber 
 	 */
-	public RecordSet clone(String newChannelConfiguration) {
-		return new RecordSet(this, newChannelConfiguration);
+	public RecordSet clone(int channelConfiguationNumber) {
+		return new RecordSet(this, channelConfiguationNumber);
 	}
 
 	/**
@@ -332,7 +328,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
-		this.channelConfigName = recordSet.channelConfigName;
 
 		if (recordSet.isSyncableChecked) {
 			String syncRecordName = recordSet.getSyncableName();
@@ -690,10 +685,10 @@ public class RecordSet extends HashMap<String, Record> {
 	public String[] getNoneCalculationRecordNames() {
 		if (this.noneCalculationRecords.length == 0) {
 			Vector<String> tmpCalculationRecords = new Vector<String>();
-			String[] deviceMeasurements = this.device.getMeasurementNames(this.channelConfigName);
+			String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
 			// record names may not match device measurements, but device measurements might be more then existing records
 			for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) { 
-				MeasurementType measurement = this.device.getMeasurement(this.channelConfigName, i);
+				MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
 				if (!measurement.isCalculation()) { // active or inactive 
 					tmpCalculationRecords.add(this.recordNames[i]);
 				}
@@ -729,27 +724,26 @@ public class RecordSet extends HashMap<String, Record> {
 	 * which are loaded from device properties file
 	 * @param recordSetName the name of the record set
 	 * @param device the instance of the device 
-	 * @param channelKey (name of the outlet or configuration)
+	 * @param channelNumber (name of the outlet or configuration)
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, String channelKey, boolean isRaw, boolean isFromFile) {
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelNumber, boolean isRaw, boolean isFromFile) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-		String[] recordNames = device.getMeasurementNames(channelKey);
+		String[] recordNames = device.getMeasurementNames(channelNumber);
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			channelKey = Channels.getInstance().getChannelNames()[0].split(OSDE.STRING_COLON)[1].trim();
-			recordNames = device.getMeasurementNames(channelKey);
+			recordNames = device.getMeasurementNames(1);
 		}
 		String [] recordSymbols = new String[recordNames.length];
 		String [] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelKey, i);
+			MeasurementType measurement = device.getMeasurement(channelNumber, i);
 			recordSymbols[i] = measurement.getSymbol();
 			recordUnits[i] = measurement.getUnit();
 		}			
-		return createRecordSet(recordSetName, device, channelKey, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
+		return createRecordSet(recordSetName, device, channelNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
 	}
 
 	/**
@@ -757,7 +751,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * active status as well as statistics and properties are used from device properties
 	 * @param recordSetName the name of the record set
 	 * @param device the instance of the device 
-	 * @param channelKey (name of the outlet or configuration)
+	 * @param channelConfigNumber (name of the outlet or configuration)
 	 * @param recordNames array of names to be used for created records
  	 * @param recordSymbols array of symbols to be used for created records
 	 * @param recordUnits array of units to be used for created records
@@ -766,12 +760,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, String channelKey, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms, boolean isRaw, boolean isFromFile) {
-		RecordSet newRecordSet = new RecordSet(device, channelKey, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double timeStep_ms, boolean isRaw, boolean isFromFile) {
+		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - " , newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelKey, i);
+			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 			tmpRecord.setColorDefaultsAndPosition(i);
 			tmpRecord.timeStep_ms = timeStep_ms;
@@ -1378,7 +1372,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @return the channe/configuration number
 	 */
-	public int getChannelNumber() {
+	public int getChannelConfigNumber() {
 		return this.parent.number;
 	}
 
@@ -1386,7 +1380,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the channel (or) configuration name
 	 */
 	public String getChannelConfigName() {
-		return this.channelConfigName;
+		return this.parent.channelConfigName;
 	}
 
 	/**
@@ -1596,8 +1590,8 @@ public class RecordSet extends HashMap<String, Record> {
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
 		this.setTableDataCalculated(false);
-		for (int i = 0; i < this.device.getMeasurementNames(this.channelConfigName).length && i < this.getRecordNames().length; ++i) {
-			if (this.device.getMeasurement(this.channelConfigName, i).isCalculation()) {
+		for (int i = 0; i < this.device.getMeasurementNames(this.parent.number).length && i < this.getRecordNames().length; ++i) {
+			if (this.device.getMeasurement(this.parent.number, i).isCalculation()) {
 				this.get(i).resetMinMax();
 			}
 			this.get(i).resetStatiticCalculationBase();
@@ -1779,7 +1773,7 @@ public class RecordSet extends HashMap<String, Record> {
 					&& i > 0 
 					&& !this.recordNames[i].contains("..") //$NON-NLS-1$ CellVoltage 1..2
 					&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
-					&& this.device.getMeasurement(this.channelConfigName, i - 1).getUnit().equals(this.device.getMeasurement(this.channelConfigName, i).getUnit())) {
+					&& this.device.getMeasurement(this.parent.number, i - 1).getUnit().equals(this.device.getMeasurement(this.parent.number, i).getUnit())) {
 				if (this.potentialSyncableRecords.isEmpty()) {
 					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
 				}
@@ -1812,7 +1806,7 @@ public class RecordSet extends HashMap<String, Record> {
 				String syncRecName = this.getSyncableName();
 				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
 				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
-				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.channelConfigName, this.get(this.syncableRecords.firstElement()).ordinal));
+				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.parent.number, this.get(this.syncableRecords.firstElement()).ordinal));
 				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
 				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
 				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());

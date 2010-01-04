@@ -239,7 +239,7 @@ public class FileHandler {
 				// at this point we have a channel/config ordinal
 				Channel channel = this.channels.get(channelNumber);
 				if (channel.size() > 0) { // check for records to be exchanged
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channel.getConfigKey()})); 
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelNumber + OSDE.STRING_BLANK_COLON_BLANK + channel.getChannelConfigKey()})); 
 					if (answer != SWT.OK) 
 						return;				
 				}

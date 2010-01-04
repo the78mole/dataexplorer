@@ -237,7 +237,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
 				if (availablePorts.size() == 1 && (this.serialPortStr != null && !isMatchAvailablePorts(this.serialPortStr, availablePorts))) {
-					if (SWT.YES == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0010) + OSDE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
+					if (SWT.YES == this.application.openYesNoMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0010) + OSDE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
 						this.serialPortStr = availablePorts.firstElement();
 						if (settings.isGlobalSerialPort())
 							settings.setSerialPort(this.serialPortStr);

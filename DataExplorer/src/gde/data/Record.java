@@ -531,7 +531,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementFactor(this.getChannelConfigKey(), this.ordinal);
+				value = this.getDevice().getMeasurementFactor(this.parent.parent.number, this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
@@ -554,7 +554,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementOffset(this.getChannelConfigKey(), this.ordinal);
+				value = this.getDevice().getMeasurementOffset(this.parent.parent.number, this.ordinal);
 			}
 			catch (RuntimeException e) {
 				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
@@ -577,7 +577,7 @@ public class Record extends Vector<Integer> {
 			value = new Double(property.getValue()).doubleValue();
 		else {
 			try {
-				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.getChannelConfigKey(), this.ordinal, IDevice.REDUCTION);
+				String strValue = (String)this.getDevice().getMeasurementPropertyValue(this.parent.parent.number, this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = new Double(strValue.trim().replace(',', '.')).doubleValue();
 			}
 			catch (RuntimeException e) {
