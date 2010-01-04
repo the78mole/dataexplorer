@@ -75,8 +75,8 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.channel = this.channels.get(this.channelNumber);
 		this.configKey = this.device.getChannelName(this.channelNumber);
 
-		this.calcValues.put(LiPoWatch.A1_FACTOR, useDevice.getMeasurementFactor(this.configKey, 11)); // 11 = A1
-		this.calcValues.put(LiPoWatch.A1_OFFSET, useDevice.getMeasurementOffset(this.configKey, 11));
+		this.calcValues.put(LiPoWatch.A1_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 11)); // 11 = A1
+		this.calcValues.put(LiPoWatch.A1_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 11));
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -105,7 +105,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 
-		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.device.getChannelName(this.channelNumber), true, false));
+		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
 		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateInitialRecordSetComment(recordSet);
