@@ -49,7 +49,6 @@ public class UniLogLiveGatherer extends Thread {
 	final Channels					channels;
 	final Channel						channel;
 	final Integer						channelNumber;
-	final String						configKey;
 	final int								timeStep_ms;
 	Timer										timer;
 	TimerTask								timerTask;
@@ -66,26 +65,25 @@ public class UniLogLiveGatherer extends Thread {
 	/**
 	 * @throws Exception 
 	 */
-	public UniLogLiveGatherer(OpenSerialDataExplorer currentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, String channelName, UniLogDialog useDialog) throws Exception {
+	public UniLogLiveGatherer(OpenSerialDataExplorer currentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, int channelConfigNumber, UniLogDialog useDialog) throws Exception {
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
 		this.dialog = useDialog;
 		this.channels = Channels.getInstance();
-		this.channelNumber = new Integer(channelName.trim().split(":")[0].trim()); //$NON-NLS-1$
+		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.configKey = channelName.trim().split(":")[1].trim(); //$NON-NLS-1$
 
-		this.calcValues.put(UniLog.A1_FACTOR, useDevice.getMeasurementFactor(this.configKey, 11)); // 11 = A1
-		this.calcValues.put(UniLog.A1_OFFSET, useDevice.getMeasurementOffset(this.configKey, 11));
-		this.calcValues.put(UniLog.A2_FACTOR, useDevice.getMeasurementFactor(this.configKey, 12)); // 12 = A2
-		this.calcValues.put(UniLog.A2_OFFSET, useDevice.getMeasurementOffset(this.configKey, 12));
-		this.calcValues.put(UniLog.A3_FACTOR, useDevice.getMeasurementFactor(this.configKey, 13)); // 13 = A3
-		this.calcValues.put(UniLog.A3_OFFSET, useDevice.getMeasurementOffset(this.configKey, 13));
-		PropertyType property = useDevice.getMeasruementProperty(this.configKey, 6, UniLog.NUMBER_CELLS); // 6 = voltage/cell
+		this.calcValues.put(UniLog.A1_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 11)); // 11 = A1
+		this.calcValues.put(UniLog.A1_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 11));
+		this.calcValues.put(UniLog.A2_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 12)); // 12 = A2
+		this.calcValues.put(UniLog.A2_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 12));
+		this.calcValues.put(UniLog.A3_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 13)); // 13 = A3
+		this.calcValues.put(UniLog.A3_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 13));
+		PropertyType property = useDevice.getMeasruementProperty(this.channelNumber, 6, UniLog.NUMBER_CELLS); // 6 = voltage/cell
 		int numCellValue = property != null ? new Integer(property.getValue()) : 4;
 		this.calcValues.put(UniLog.NUMBER_CELLS, (double)numCellValue);
-		property = useDevice.getMeasruementProperty(this.configKey, 8, UniLog.PROP_N_100_W); // 8 = efficience
+		property = useDevice.getMeasruementProperty(this.channelNumber, 8, UniLog.PROP_N_100_W); // 8 = efficience
 		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 		this.calcValues.put(UniLog.PROP_N_100_W, (double)prop_n100W);
 
@@ -117,7 +115,7 @@ public class UniLogLiveGatherer extends Thread {
 		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 
-		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.device.getChannelName(this.channelNumber), true, false));
+		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
 		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateInitialRecordSetComment(recordSet);
@@ -156,7 +154,7 @@ public class UniLogLiveGatherer extends Thread {
 
 							// switch the active record set if the current record set is child of active channel
 							if (!UniLogLiveGatherer.this.isSwitchedRecordSet && UniLogLiveGatherer.this.channel.getName().equals(UniLogLiveGatherer.this.channels.getActiveChannel().getName())) {
-								UniLogLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
+								UniLogLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigNumber());
 								UniLogLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
 								UniLogLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
 								UniLogLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);

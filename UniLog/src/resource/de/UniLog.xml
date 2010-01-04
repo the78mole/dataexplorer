@@ -22,7 +22,7 @@
         <name>Zeit</name>
         <symbol>t</symbol>
         <unit>ms</unit>
-        <timeStep>250</timeStep>
+        <timeStep>-1</timeStep>
     </TimeBase>
     <DataBlock>
         <format type="BINARY" size="24"/>

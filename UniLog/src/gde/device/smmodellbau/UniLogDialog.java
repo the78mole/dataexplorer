@@ -1138,7 +1138,7 @@ public class UniLogDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											UniLogDialog.log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
-												String channelName = " " + (UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1) + " : " + UniLogDialog.this.useConfigCombo.getText(); //$NON-NLS-1$ //$NON-NLS-2$
+												int channelNumber = UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1;
 												UniLogDialog.this.readAdjustmentButton.setEnabled(false);
 												UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
 												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
@@ -1150,7 +1150,7 @@ public class UniLogDialog extends DeviceDialog {
 												UniLogDialog.this.clearMemoryButton.setEnabled(false);
 												UniLogDialog.this.closeButton.setEnabled(false);
 												setClosePossible(false);
-												UniLogDialog.this.liveThread = new UniLogLiveGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelName, UniLogDialog.this);
+												UniLogDialog.this.liveThread = new UniLogLiveGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelNumber, UniLogDialog.this);
 												try {
 													UniLogDialog.this.liveThread.start();
 												}
@@ -1335,8 +1335,8 @@ public class UniLogDialog extends DeviceDialog {
 										int answer = UniLogDialog.this.application.openYesNoMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1302));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
-											UniLogDialog.log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
+											UniLogDialog.log.log(Level.FINE, "move record set " + recordSetKey + " to channel/configuration " + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+											channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(channelNumber));
 											activeChannel.remove(recordSetKey);
 											channels.switchChannel(channelNumber, recordSetKey);
 											switch (channelNumber) {

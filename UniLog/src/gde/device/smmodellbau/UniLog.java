@@ -628,17 +628,17 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
-		String channelConfigKey = recordSet.getChannelConfigName();
+		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		Record record;
 		MeasurementType measurement;
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		String[] measurementNames = this.getMeasurementNames(channelConfigKey);
+		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordNames.length; ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(recordNames[i]);		
-			measurement = this.getMeasurement(channelConfigKey, i);
+			measurement = this.getMeasurement(channelConfigNumber, i);
 			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
@@ -906,7 +906,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param configKey
 	 */
-	public void updateMeasurementByAnalogModi(byte[] dataBuffer, final String configKey) {
+	public void updateMeasurementByAnalogModi(byte[] dataBuffer, final int channelConfigKey) {
 		log.log(Level.FINE, "visit updateMeasurementByAnalogModi");
 		// a1Modus -> 0==Temperature, 1==Millivolt, 2=Speed 250, 3=Speed 400
 		int a1Modus = (dataBuffer[7] & 0xF0) >> 4; // 11110000
@@ -928,15 +928,15 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINE, sb.toString());
 		}
 		
-		MeasurementType measurement = this.getMeasurement(configKey, 11); // 11=A1
+		MeasurementType measurement = this.getMeasurement(channelConfigKey, 11); // 11=A1
 		measurement.setName(UniLogDialog.A1_MODUS_NAMES[a1Modus].trim());
 		measurement.setUnit(UniLogDialog.A1_MODUS_UNITS[a1Modus].trim());
 
-		measurement = this.getMeasurement(configKey, 12); // 12=A2
+		measurement = this.getMeasurement(channelConfigKey, 12); // 12=A2
 		measurement.setName(UniLogDialog.A2_MODUS_NAMES[a2Modus].trim());
 		measurement.setUnit(UniLogDialog.A2_MODUS_UNITS[a2Modus].trim());
 		
-		measurement = this.getMeasurement(configKey, 13); // 13=A3
+		measurement = this.getMeasurement(channelConfigKey, 13); // 13=A3
 		measurement.setName(UniLogDialog.A3_MODUS_NAMES[a3Modus].trim());
 		measurement.setUnit(UniLogDialog.A3_MODUS_UNITS[a3Modus].trim());
 	}

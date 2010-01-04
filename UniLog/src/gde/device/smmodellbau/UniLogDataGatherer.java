@@ -107,9 +107,9 @@ public class UniLogDataGatherer extends Thread {
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 				
 				// check analog modus and update channel/configuration
-				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
+				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.channelNumber);
 				
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), this.configKey, true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 				log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
