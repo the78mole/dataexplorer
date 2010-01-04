@@ -235,7 +235,7 @@ public class PicolarioDialog extends DeviceDialog {
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
 									log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(configKey.split(":")[1].trim())); //$NON-NLS-1$
+									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(channelNumber)); //$NON-NLS-1$
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
 									PicolarioDialog.this.getDialogShell().redraw();

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -89,7 +90,8 @@ public class PicolarioConfigTab extends Composite {
 
 	final Picolario								device;																																			// get device specific things, get serial port, ...
 	final OpenSerialDataExplorer	application;
-	String												configName;																																	// tabName
+	final String									configName;																																	// tabName
+	final int											configNumber;																																// tabOrdinal + 1 
 
 	/**
 	 * panel tab describing a configuration
@@ -97,10 +99,11 @@ public class PicolarioConfigTab extends Composite {
 	 * @param useDevice
 	 * @param tabName
 	 */
-	public PicolarioConfigTab(Composite parent, Picolario useDevice, String tabName) {
+	public PicolarioConfigTab(CTabFolder parent, Picolario useDevice, String tabName) {
 		super(parent, SWT.NONE);
 		this.device = useDevice;
 		this.configName = tabName;
+		this.configNumber = parent.getItemCount() + 1;
 		this.application = OpenSerialDataExplorer.getInstance();
 		initEditable();
 		initGUI();
@@ -405,15 +408,15 @@ public class PicolarioConfigTab extends Composite {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "makePersitentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								// 1 = height
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 1, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doNoAdation);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 1, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractFirst);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 1, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doSubtractLast);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 1, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doOffsetHeight);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 1, IDevice.OFFSET, DataTypes.DOUBLE, PicolarioConfigTab.this.heightOffsetValue);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 1, Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doNoAdation);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 1, Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractFirst);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 1, Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doSubtractLast);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 1, Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN,	PicolarioConfigTab.this.doOffsetHeight);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 1, IDevice.OFFSET, DataTypes.DOUBLE, PicolarioConfigTab.this.heightOffsetValue);
 
 								// 2 = slope
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 2, CalculationThread.REGRESSION_TYPE, DataTypes.STRING,	PicolarioConfigTab.this.slopeTypeSelection);
-								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configName, 2, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, PicolarioConfigTab.this.slopeTimeSelection);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 2, CalculationThread.REGRESSION_TYPE, DataTypes.STRING,	PicolarioConfigTab.this.slopeTypeSelection);
+								PicolarioConfigTab.this.device.setMeasurementPropertyValue(PicolarioConfigTab.this.configNumber, 2, CalculationThread.REGRESSION_INTERVAL_SEC, DataTypes.INTEGER, PicolarioConfigTab.this.slopeTimeSelection);
 								
 								PicolarioConfigTab.this.device.setChangePropery(true);
 								PicolarioConfigTab.this.device.storeDeviceProperties();
@@ -518,14 +521,14 @@ public class PicolarioConfigTab extends Composite {
 			this.slopeDataUnit = measurement.getUnit();
 			log.log(Level.FINER, "slopeDataUnit = " + this.slopeDataUnit); //$NON-NLS-1$
 	
-			PropertyType typeSelection = this.device.getMeasruementProperty(this.configName, 2, CalculationThread.REGRESSION_TYPE);
+			PropertyType typeSelection = this.device.getMeasruementProperty(channelConfigNumber, 2, CalculationThread.REGRESSION_TYPE);
 			if (typeSelection == null)
 				this.slopeTypeSelection = CalculationThread.REGRESSION_TYPE_CURVE;
 			else
 				this.slopeTypeSelection = typeSelection.getValue(); // CalculationThread.REGRESSION_TYPE_*
 			log.log(Level.FINER, "slopeTypeSelection = " + this.slopeTypeSelection); //$NON-NLS-1$
 	
-			PropertyType timeSelection = this.device.getMeasruementProperty(this.configName, 2, CalculationThread.REGRESSION_INTERVAL_SEC);
+			PropertyType timeSelection = this.device.getMeasruementProperty(channelConfigNumber, 2, CalculationThread.REGRESSION_INTERVAL_SEC);
 			if (timeSelection == null)
 				this.slopeTimeSelection = 4;
 			else

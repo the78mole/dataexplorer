@@ -302,7 +302,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 			// slope calculation needs height factor for calculation
 			else if (record.getOrdinal() == 2) { // 2=slope
-				factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
+				factor = this.getMeasurementFactor(record.getParent().getChannelConfigNumber(), 1); // 1=height
 			}
 
 			newValue = offset + (value - reduction) * factor;
@@ -351,7 +351,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 		// slope calculation needs height factor for calculation
 		else if (record.getOrdinal() == 2) { // 2=slope
-			factor = this.getMeasurementFactor(record.getParent().getChannelConfigName(), 1); // 1=height
+			factor = this.getMeasurementFactor(record.getParent().getChannelConfigNumber(), 1); // 1=height
 		}
 
 		double newValue = (value - offset) / factor + reduction;
