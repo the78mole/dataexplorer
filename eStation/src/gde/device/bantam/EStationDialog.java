@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.messages.Messages;
@@ -241,9 +242,9 @@ public class EStationDialog extends DeviceDialog {
 								EStationDialog.log.log(Level.FINEST, "startCollectDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (!EStationDialog.this.serialPort.isConnected()) {
 									try {
-										if (Channels.getInstance().getActiveChannel() != null) {
-											String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
-											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, channelConfigKey, EStationDialog.this);
+										Channel activChannel = Channels.getInstance().getActiveChannel();
+										if (activChannel != null) {
+											EStationDialog.this.dataGatherThread = new GathererThread(EStationDialog.this.application, EStationDialog.this.device, EStationDialog.this.serialPort, activChannel.getNumber(), EStationDialog.this);
 											try {
 												EStationDialog.this.dataGatherThread.start();
 											}

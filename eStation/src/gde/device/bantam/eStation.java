@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -572,9 +573,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
-					if (Channels.getInstance().getActiveChannel() != null) {
-						String channelConfigKey = Channels.getInstance().getActiveChannel().getName();
-						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, channelConfigKey, this.getDialog());
+					Channel activChannel = Channels.getInstance().getActiveChannel();
+					if (activChannel != null) {
+						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber(), this.getDialog());
 						try {
 							this.getDialog().dataGatherThread.start();
 						}

@@ -49,8 +49,7 @@ public class GathererThread extends Thread {
 	final EStationDialog			dialog;
 	final Channels						channels;
 	final Channel							channel;
-	final Integer							channelNumber;
-	final String							configKey;
+	final int									channelNumber;
 	
 	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
@@ -65,16 +64,15 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, String channelName, EStationDialog useDialog)
+	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, int channelConfigNumber, EStationDialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
 		this.serialPort = useSerialPort;
 		this.channels = Channels.getInstance();
-		this.channelNumber = new Integer(channelName.trim().split(":")[0].trim()); //$NON-NLS-1$
+		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.configKey = channelName.trim().split(":")[1].trim(); //$NON-NLS-1$
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -87,7 +85,7 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		RecordSet recordSet = null;
-		int[] points = new int[this.device.getMeasurementNames(this.configKey).length];
+		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		int waitTime_ms = 0; // dry time
 		boolean isProgrammExecuting = false;
 		boolean isConfigUpdated = false;
@@ -167,7 +165,7 @@ public class GathererThread extends Thread {
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), getName().trim(), true, false));
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
