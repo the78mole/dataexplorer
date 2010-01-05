@@ -237,12 +237,12 @@ public interface IDevice {
 	/**
 	 * @return the checksum type of the data block XOR, ADD, ..
 	 */
-	public ChecksumTypes getDataBlockCheckSumType();
+	public CheckSumTypes getDataBlockCheckSumType();
 
 	/**
 	 * @param set a new date block size/length
 	 */
-	public void setDataBlockCheckSumType(ChecksumTypes value);
+	public void setDataBlockCheckSumType(CheckSumTypes value);
 	
 	/**
 	 * @return the format type of the data block checksum ASCII(text) or BINARY(hex)
@@ -253,6 +253,17 @@ public interface IDevice {
 	 * @param set a new date block checksum format type ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockCheckSumFormat(FormatTypes value);
+
+	/**
+	 * @return the data block value separator as CommaSeparatorTypes
+	 */
+	public CommaSeparatorTypes getDataBlockSeparator();
+
+	/**
+	 * set the data block value separator as CommaSeparatorTypes
+	 * @param value
+	 */
+	public void setDataBlockSeparator(CommaSeparatorTypes value);
 
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)
@@ -283,6 +294,11 @@ public interface IDevice {
 	 * @param set a new file extension if other than *.csv should be used
 	 */
 	public void setDataBlockPreferredFileExtention(String value);
+
+	/**
+	 * @return actual StateType
+	 */
+	public StateType getStateType();
 	
 	/**
 	 * @return the channel count
@@ -713,6 +729,8 @@ public interface IDevice {
 	
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
+	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort(); 
 	

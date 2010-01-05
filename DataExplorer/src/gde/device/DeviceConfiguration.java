@@ -660,11 +660,11 @@ public class DeviceConfiguration {
 		return this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
 	}
 	
-	public ChecksumTypes getDataBlockCheckSumType() {
+	public CheckSumTypes getDataBlockCheckSumType() {
 		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getType(); 
 	}
 
-	public void setDataBlockCheckSumType(ChecksumTypes value) {
+	public void setDataBlockCheckSumType(CheckSumTypes value) {
 		this.isChangePropery = true;
 		if (value == null)
 			this.dataBlock.setCheckSum(null);
@@ -708,19 +708,6 @@ public class DeviceConfiguration {
 	public void setDataBlockSeparator(CommaSeparatorTypes value) {
 		this.isChangePropery = true;
 		this.dataBlock.getFormat().setSeparator(value);
-	}
-
-	public boolean isDataBlockDecimalSeparatorDefined() {
-		return this.dataBlock.getFormat().decimalSeparator != null;
-	}
-	
-	public DecimalSeparatorTypes getDataBlockDecimalSeparator() {
-		return this.dataBlock.getFormat().getDecimalSeparator();
-	}
-
-	public void setDataBlockDecimalSeparator(DecimalSeparatorTypes value) {
-		this.isChangePropery = true;
-		this.dataBlock.getFormat().setDecimalSeparator(value);
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
