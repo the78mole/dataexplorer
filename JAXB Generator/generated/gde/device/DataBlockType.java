@@ -160,8 +160,6 @@ public class DataBlockType {
       if (preferredFileExtention == null) {
         return "*.csv";
       }
-      if (!this.preferredFileExtention.startsWith("*.")) this.preferredFileExtention = "*." + this.preferredFileExtention; 
-      else if (!this.preferredFileExtention.startsWith("*")) this.preferredFileExtention = "*" + this.preferredFileExtention; 
       return preferredFileExtention;
     }
 
@@ -216,9 +214,8 @@ public class DataBlockType {
         public FormatTypes getFormat() {
             if (format == null) {
                 return FormatTypes.BINARY;
-            } else {
-                return format;
             }
+            return format;
         }
 
         /**
@@ -244,9 +241,8 @@ public class DataBlockType {
         public CheckSumTypes getType() {
             if (type == null) {
                 return CheckSumTypes.XOR;
-            } else {
-                return type;
             }
+            return type;
         }
 
         /**
@@ -358,9 +354,8 @@ public class DataBlockType {
         public CommaSeparatorTypes getSeparator() {
             if (separator == null) {
                 return CommaSeparatorTypes.SEMICOLON;
-            } else {
-                return separator;
             }
+            return separator;
         }
 
         /**
@@ -386,9 +381,8 @@ public class DataBlockType {
         public byte[] getEnding() {
             if (ending == null) {
                 return new HexBinaryAdapter().unmarshal("0a0d");
-            } else {
-                return ending;
-            }
+            }    
+            return ending;
         }
 
         /**
@@ -400,7 +394,7 @@ public class DataBlockType {
          *     
          */
         public void setEnding(byte[] value) {
-            this.ending = ((byte[]) value);
+            this.ending = (value);
         }
 
     }
