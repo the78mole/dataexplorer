@@ -121,7 +121,7 @@ public class PropertyType {
      *     
      */
     public void setValue(Object newValue) {
-        this.value = "" + newValue; //$NON-NLS-1$
+        this.value = (OSDE.STRING_EMPTY + newValue).trim();
     }
 
     /**
@@ -169,7 +169,7 @@ public class PropertyType {
      *     
      */
     public void setDescription(String newValue) {
-        this.description = newValue;
+        this.description = newValue.trim().equals(OSDE.STRING_EMPTY) ? null : newValue.trim();
     }
 
 }

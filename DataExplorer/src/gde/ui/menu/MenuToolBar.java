@@ -675,11 +675,13 @@ public class MenuToolBar {
 							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
 							if(activeDevice != null) {
 								activeDevice.openCloseSerialPort();
-								if (activeDevice.getSerialPort().isConnected()) {
-									MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
-								}
-								else {
-									MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+								if (activeDevice.getSerialPort() != null) {
+									if (activeDevice.getSerialPort().isConnected()) {
+										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
+									}
+									else {
+										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+									}
 								}
 							}
 						}
@@ -1132,6 +1134,21 @@ public class MenuToolBar {
 	public void setPortConnected(final boolean isPortOpen) {
 		if (!this.application.isDisposed()) {
 			switch (this.iconSet) {
+			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
+			default:
+				if (isPortOpen) {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
+				}
+				else {
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+				}
+				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isPortOpen) {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1146,19 +1163,18 @@ public class MenuToolBar {
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
 				}
 				break;
-			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
-			default:
+			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0067));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0069));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0066));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0068));
 				}
 				break;
 			}

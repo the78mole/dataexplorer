@@ -57,7 +57,8 @@ public class Record extends Vector<Integer> {
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 								// used as channelConfigKey
 	String							keyName;
-	double							timeStep_ms						= 0;				// time base of measurement points, each record might have individual time step (compare)
+	double							timeStep_ms						= 0;				
+	Vector<Double>			timeSteps_ms					= null; // time base of measurement points, each record might have individual time step (compare)
 	IDevice							device;
 	final int						ordinal;	// ordinal is referencing the source position of the record relative to the initial 
 																// device measurement configuration and used to find specific properties
@@ -1036,6 +1037,14 @@ public class Record extends Vector<Integer> {
 	 */
 	public double getMinScaleValue() {
 		return this.parent.isZoomMode ? this.minZoomScaleValue : this.minScaleValue;
+	}
+
+	/** 
+	 * query time step in mills seconds, this property is hold local to be independent (compare window)
+	 * @return time step in msec
+	 */
+	public double getTime_ms(int index) {
+		return this.timeSteps_ms == null ? this.parent.getTimeStep_ms(index) : this.timeSteps_ms.get(index);
 	}
 
 	/** 

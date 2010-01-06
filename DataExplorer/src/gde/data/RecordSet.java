@@ -61,11 +61,11 @@ public class RecordSet extends HashMap<String, Record> {
 
 	String												name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final Channel									parent;
-	//final String									channelConfigName;
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
-	String[]											noneCalculationRecords 				= new String[0];																// records/measurements which are active or inactive
-	double												timeStep_ms										= 0;																						//Zeitbasis der Messpunkte
+	String[]											noneCalculationRecords 				= new String[0];																//records/measurements which are active or inactive
+	double												timeStep_ms										= -1;																						//time base of measurement point, if const. > 0 else time steps are located in timeSteps_ms
+	Vector<Double>								timeSteps_ms									= new Vector<Double>(1,1);											//time_in_ms for each measurement point
 	String												description										= OSDE.STRING_EMPTY;
 	boolean												isSaved												= false;																				//indicates if the record set is saved to file
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
@@ -472,7 +472,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
-		if (points.length == this.noneCalculationRecords.length) {
+		if (points.length == this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
 			}
@@ -550,8 +550,26 @@ public class RecordSet extends HashMap<String, Record> {
 		//return this.dataTable[index];
 	}
 
+	/**
+	 * @return the const. time step in msec
+	 */
 	public double getTimeStep_ms() {
 		return this.timeStep_ms;
+	}
+
+	/**
+	 * @return the timeSteps_ms
+	 */
+	public double getTimeStep_ms(int index) {
+		return this.timeSteps_ms.elementAt(index);
+	}
+
+	/**
+	 * add a new time step to the time steps vector
+	 * @param timeValue
+	 */
+	public void addTimeStep_ms(double timeValue) {
+		this.timeSteps_ms.add(timeValue);
 	}
 
 	/**

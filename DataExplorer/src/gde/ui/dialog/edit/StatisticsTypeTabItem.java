@@ -814,7 +814,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						}
 						else {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
-							StatisticsTypeTabItem.this.ratioText.setText(null);
+							StatisticsTypeTabItem.this.ratioText.setText(OSDE.STRING_EMPTY);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 						}
 					}

@@ -133,6 +133,19 @@ public class Checksum {
 	}
 
 	/**
+	 * calculate OR bit operation
+	 * @param a byte array to compute
+	 * @return 8-bit result
+	 */
+	public static int OR(int[] a, int offset, int length) {
+		int value = a[offset];
+		for (int i = 1; i < length - 1; i++) {
+			value = value | a[i];
+		}
+		return value;
+	}
+
+	/**
 	 * calculate XOR bit operation
 	 * @param b byte array to compute
 	 * @return 8-bit result
@@ -146,6 +159,19 @@ public class Checksum {
 	}
 
 	/**
+	 * calculate XOR bit operation
+	 * @param a integer array to compute
+	 * @return integer result
+	 */
+	public static int XOR(int[] a, int offset, int length) {
+		int value = a[offset];
+		for (int i = offset+1; i < length - 1; i++) {
+			value = value ^ a[i];
+		}
+		return value;
+	}
+
+	/**
 	 * calculate AND bit operation
 	 * @param b byte array to compute
 	 * @return 8-bit result
@@ -156,6 +182,19 @@ public class Checksum {
 			value = value & b[i];
 		}
 		return (byte) value;
+	}
+
+	/**
+	 * calculate AND bit operation
+	 * @param a integer array to compute
+	 * @return integer result
+	 */
+	public static int AND(int[] a, int offset, int length) {
+		int value = a[offset];
+		for (int i = offset+1; i < length; i++) {
+			value = value & a[i];
+		}
+		return value;
 	}
 	
 	/**
@@ -182,6 +221,20 @@ public class Checksum {
 		int value = b[start] & 0xFF;
 		for (int i = start+1; i <= len; i++) {
 			value = value  + (b[i] & 0xFF);
+		}
+		return value;
+	}
+
+	/**
+	 * calculate ADD operation
+	 * @param a integer array to compute
+	 * @param length length of checksum if part of the byte array
+	 * @return integer result
+	 */
+	public static long ADD(int[] a, int offset, int length) {
+		long value = a[offset];
+		for (int i = offset+1; i <= length; i++) {
+			value = value  + a[i];
 		}
 		return value;
 	}

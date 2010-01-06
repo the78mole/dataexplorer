@@ -792,6 +792,17 @@ public class MenuBar {
 	public void setPortConnected(final boolean isOpenStatus) {
 		if (!this.application.isDisposed()) {
 			switch (this.iconSet) {
+			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
+			default:
+				if (isOpenStatus) {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048)); //$NON-NLS-1$
+				}
+				else {
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049)); //$NON-NLS-1$
+				}
+				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isOpenStatus) {
 					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/RectangleHotRed.gif")); //$NON-NLS-1$
@@ -802,15 +813,14 @@ public class MenuBar {
 					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0070)); //$NON-NLS-1$
 				}
 				break;
-			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
-			default:
+			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 				if (isOpenStatus) {
-					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotGreen.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0048)); //$NON-NLS-1$
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/RectangleHotRed.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0219)); //$NON-NLS-1$
 				}
 				else {
-					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/BulletHotRed.gif")); //$NON-NLS-1$
-					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0049)); //$NON-NLS-1$
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/TriangleGreen.gif")); //$NON-NLS-1$
+					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0218)); //$NON-NLS-1$
 				}
 				break;
 			}

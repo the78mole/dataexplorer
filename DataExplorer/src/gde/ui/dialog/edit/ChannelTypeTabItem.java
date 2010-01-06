@@ -45,6 +45,7 @@ import osde.device.ObjectFactory;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
+import osde.utils.StringHelper;
 
 /**
  * class defining a CTabItem with ChannelType configuration data
@@ -206,7 +207,7 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
 					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
-					this.channelConfigTypeCombo.setItems(new String[] { "TYPE_OUTLET", "TYPE_CONFIG" }); //$NON-NLS-1$ //$NON-NLS-2$
+					this.channelConfigTypeCombo.setItems(StringHelper.enumValues2StringArray(ChannelTypes.values()));
 					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

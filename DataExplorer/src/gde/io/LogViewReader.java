@@ -71,6 +71,8 @@ public class LogViewReader {
 		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
 		deviceMap.put("pichler p60", "PichlerP60"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech datavarioduo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 

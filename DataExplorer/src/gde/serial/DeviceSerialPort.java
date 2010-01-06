@@ -105,6 +105,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	
 	public static final int ICON_SET_OPEN_CLOSE = 0;
 	public static final int ICON_SET_START_STOP = 1;
+	public static final int ICON_SET_IMPORT_CLOSE = 2;
 
 
 	public DeviceSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {

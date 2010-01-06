@@ -69,10 +69,9 @@ import org.xml.sax.SAXParseException;
 
 import osde.OSDE;
 import osde.config.Settings;
-import osde.device.ChecksumTypes;
+import osde.device.CheckSumTypes;
 import osde.device.CommaSeparatorTypes;
 import osde.device.DataTypes;
-import osde.device.DecimalSeparatorTypes;
 import osde.device.DesktopPropertyTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceTypes;
@@ -141,18 +140,16 @@ public class DevicePropertiesEditor extends Composite {
 	Composite										dataBlockComposite;
 	Label												dataBlockDescriptionLabel;
 	Label												dataBlockFormatLabel, dataBlockSizeLabel, dataBlockSeparatorLabel, dataBlockCheckSumTypeLabel;
-	Button 											dataBlockEndingButton, dataBlockDecimalSeparatorButton, dataBlockCheckSumFormatButton, preferredDataLocationButton, preferredFileExtensionButton;
-	CCombo											dataBlockEndingCombo, dataBlockDecimalSeparatorCombo, dataBlockFormatCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo, dataBlockSeparatorCombo;
+	Button 											dataBlockEndingButton, dataBlockCheckSumFormatButton, preferredDataLocationButton, preferredFileExtensionButton;
+	CCombo											dataBlockEndingCombo, dataBlockFormatCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo, dataBlockSeparatorCombo;
 	Text												dataBlockSizeText, preferredDataLocationText, preferredFileExtensionText;
 	Group												dataBlockRequiredGroup, dataBlockOptionalGroup;
 
 	FormatTypes									dataBlockFormat						= FormatTypes.BINARY, dataBlockcheckSumFormat = FormatTypes.BINARY;
 	int													dataBlockSize							= 30;
 	CommaSeparatorTypes					dataBlockSeparator 	= CommaSeparatorTypes.SEMICOLON;
-	DecimalSeparatorTypes				dataBlockDecimalSeparator = DecimalSeparatorTypes.DOT;
-	ChecksumTypes								dataBlockCheckSumType			= ChecksumTypes.ADD;
+	CheckSumTypes								dataBlockCheckSumType			= CheckSumTypes.ADD;
 	String											dataBlockEnding						= "0a0d"; //$NON-NLS-1$
-	boolean isDataBlockOptionalDecimalSeparatorEnabled = false;
 	boolean											isDataBlockOptionalChecksumEnabled = false;
 	boolean											isDataBlockOptionalEndingEnabled = false;
 	boolean											isDataBlockOptionalDataLocationEnabled = false;
@@ -299,7 +296,7 @@ public class DevicePropertiesEditor extends Composite {
 			logHandler.setLevel(Level.ALL);
 		}
 		// set logging levels
-		Logger logger = Logger.getLogger("osde.ui.dialog.edit");
+		Logger logger = Logger.getLogger("osde.ui.dialog.edit"); //$NON-NLS-1$
     logger.setLevel(Level.INFO);
     logger.setUseParentHandlers(true);
 	}
@@ -594,7 +591,7 @@ public class DevicePropertiesEditor extends Composite {
 										fileSelectionDialog.setFilterNames(new String[] { Messages.getString(MessageIds.OSDE_MSGT0215), Messages.getString(MessageIds.OSDE_MSGT0214), Messages.getString(MessageIds.OSDE_MSGT0213) });
 										fileSelectionDialog.open();
 										DevicePropertiesEditor.this.imageFileName = fileSelectionDialog.getFileName();
-										String fullQualifiedImageSourceName = fileSelectionDialog.getFilterPath()+"/"+DevicePropertiesEditor.this.imageFileName;
+										String fullQualifiedImageSourceName = fileSelectionDialog.getFilterPath()+OSDE.FILE_SEPARATOR_UNIX+DevicePropertiesEditor.this.imageFileName;
 										if (DevicePropertiesEditor.this.imageFileName != null && DevicePropertiesEditor.this.imageFileName.length() > 5) {
 											DevicePropertiesEditor.this.imageFileNameText.setText(DevicePropertiesEditor.this.imageFileName);
 											DevicePropertiesEditor.log.log(Level.INFO, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
@@ -604,10 +601,10 @@ public class DevicePropertiesEditor extends Composite {
 												boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
 												String deviceImplName = DevicePropertiesEditor.this.deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
 												if (isStartedWithinEclipse) {
-													log.log(Level.INFO, "started within Eclipse");
+													log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
 													String basPath = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-													String fullQualifiedImageTargetName = basPath.substring(0, basPath.indexOf("OpenSerialDataExplorer"))+deviceImplName+"/src/resource/" + DevicePropertiesEditor.this.imageFileName;
-													log.log(Level.INFO, "fullQualifiedImageTargetName = " + fullQualifiedImageTargetName);
+													String fullQualifiedImageTargetName = basPath.substring(0, basPath.indexOf(OSDE.OSDE_NAME_LONG))+deviceImplName+"/src/resource/" + DevicePropertiesEditor.this.imageFileName; //$NON-NLS-1$
+													log.log(Level.INFO, "fullQualifiedImageTargetName = " + fullQualifiedImageTargetName); //$NON-NLS-1$
 													ImageLoader imageLoader = new ImageLoader();
 													imageLoader.data = new ImageData[] { deviceImage.getImageData() };
 													try {
@@ -620,10 +617,10 @@ public class DevicePropertiesEditor extends Composite {
 												else 
 												{
 													if (OpenSerialDataExplorer.application != null) { // started within OSDE
-														log.log(Level.INFO, "started within OpenSerialDataExplorer");
+														log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
 													}
 													else { // started outside OSDE
-														log.log(Level.INFO, "started outside OpenSerialDataExplorer");
+														log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
 														try {
 															Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
 														}
@@ -636,7 +633,7 @@ public class DevicePropertiesEditor extends Composite {
 													try {
 														{
 															IDevice newInst = null;
-															String className = "osde.device." + DevicePropertiesEditor.this.deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + deviceImplName; //$NON-NLS-1$
+															String className = "osde.device." + DevicePropertiesEditor.this.deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
 															log.log(Level.INFO, "loading Class " + className); //$NON-NLS-1$
 															ClassLoader loader = Thread.currentThread().getContextClassLoader();
 															Class c = loader.loadClass(className);
@@ -651,12 +648,12 @@ public class DevicePropertiesEditor extends Composite {
 														}
 														//Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
 																	
-														if (isStartedWithinEclipse) {
-															deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
-														}
+														//if (isStartedWithinEclipse) {
+														//	deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
+														//}
 														tmpDeviceJarPath = deviceJarPath.substring(0, deviceJarPath.lastIndexOf(OSDE.STRING_DOT)) + OSDE.FILE_ENDING_DOT_TMP;
-														String addJarEntryName = "resource/" + DevicePropertiesEditor.this.imageFileName;
-														log.log(Level.INFO, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath);
+														String addJarEntryName = "resource/" + DevicePropertiesEditor.this.imageFileName; //$NON-NLS-1$
+														log.log(Level.INFO, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 														FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
 													}
@@ -1068,7 +1065,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockFormatCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 					this.dataBlockFormatCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockFormatCombo.setBounds(90, 50, 80, 20);
-					this.dataBlockFormatCombo.setItems(OSDE.STRING_ARRAY_TEXT_BINARY);
+					this.dataBlockFormatCombo.setItems(StringHelper.enumValues2StringArray(FormatTypes.values()));
 					this.dataBlockFormatCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 					this.dataBlockFormatCombo.setLayout(null);
 					this.dataBlockFormatCombo.addSelectionListener(new SelectionAdapter() {
@@ -1116,7 +1113,7 @@ public class DevicePropertiesEditor extends Composite {
 				}
 				{
 					this.dataBlockSeparatorLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
-					this.dataBlockSeparatorLabel.setText("Separator");
+					this.dataBlockSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0476));
 					this.dataBlockSeparatorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0329));
 					this.dataBlockSeparatorLabel.setBounds(5, 110, 80, 20);
@@ -1148,10 +1145,6 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockOptionalGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockOptionalGroup.paintControl, event=" + evt); //$NON-NLS-1$
-						DevicePropertiesEditor.this.dataBlockDecimalSeparatorButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled);
-						DevicePropertiesEditor.this.dataBlockDecimalSeparatorCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled);
-						DevicePropertiesEditor.this.dataBlockDecimalSeparatorCombo.select(DevicePropertiesEditor.this.dataBlockDecimalSeparator.ordinal());
-						
 						DevicePropertiesEditor.this.dataBlockEndingButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalEndingEnabled);
 						DevicePropertiesEditor.this.dataBlockEndingCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalEndingEnabled);
 						DevicePropertiesEditor.this.dataBlockEndingCombo.setText(DevicePropertiesEditor.this.dataBlockEnding);
@@ -1160,7 +1153,7 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
 						DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.select(DevicePropertiesEditor.this.dataBlockcheckSumFormat == FormatTypes.TEXT ? 0 : 1);
 						DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
-						DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.select(DevicePropertiesEditor.this.dataBlockCheckSumType == ChecksumTypes.XOR ? 0 : 1);
+						DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.select(DevicePropertiesEditor.this.dataBlockCheckSumType == CheckSumTypes.XOR ? 0 : 1);
 
 						DevicePropertiesEditor.this.preferredDataLocationButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled);
 						DevicePropertiesEditor.this.preferredDataLocationText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled);
@@ -1171,52 +1164,11 @@ public class DevicePropertiesEditor extends Composite {
 					}
 				});
 				{
-					this.dataBlockDecimalSeparatorButton = new Button(this.dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
-					this.dataBlockDecimalSeparatorButton.setText("Decimal separator");
-					this.dataBlockDecimalSeparatorButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0327));
-					this.dataBlockDecimalSeparatorButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockDecimalSeparatorButton.setBounds(10, 20, 120, 20);
-					this.dataBlockDecimalSeparatorButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockDecimalSeparatorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled = DevicePropertiesEditor.this.dataBlockDecimalSeparatorButton.getSelection();
-							DevicePropertiesEditor.this.dataBlockDecimalSeparatorCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled);
-							if (deviceConfig != null) {
-								if (DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled) {
-									deviceConfig.setDataBlockDecimalSeparator(DecimalSeparatorTypes.fromValue(DevicePropertiesEditor.this.dataBlockDecimalSeparatorCombo.getText()));
-								}
-								else {
-									deviceConfig.setDataBlockDecimalSeparator(null);
-								}
-							}
-						}
-					});
-				}
-				{
-					this.dataBlockDecimalSeparatorCombo = new CCombo(this.dataBlockOptionalGroup, SWT.BORDER);
-					this.dataBlockDecimalSeparatorCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD, false, false));
-					this.dataBlockDecimalSeparatorCombo.setBounds(140, 20, 40, 20);
-					this.dataBlockDecimalSeparatorCombo.setItems(DecimalSeparatorTypes.valuesAsStingArray());
-					this.dataBlockDecimalSeparatorCombo.select(0);
-					this.dataBlockDecimalSeparatorCombo.setEnabled(false);
-					this.dataBlockDecimalSeparatorCombo.setEditable(false);
-					this.dataBlockDecimalSeparatorCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					this.dataBlockDecimalSeparatorCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockceckSumFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.this.dataBlockDecimalSeparator = DecimalSeparatorTypes.fromValue(DevicePropertiesEditor.this.dataBlockDecimalSeparatorCombo.getText());
-							if (DevicePropertiesEditor.this.deviceConfig != null) {
-								DevicePropertiesEditor.this.deviceConfig.setDataBlockDecimalSeparator(DevicePropertiesEditor.this.dataBlockDecimalSeparator);
-							}
-						}
-					});
-				}
-				{
 					this.dataBlockEndingButton = new Button(this.dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
 					this.dataBlockEndingButton.setText(Messages.getString(MessageIds.OSDE_MSGT0468));
 					this.dataBlockEndingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0475));
 					this.dataBlockEndingButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockEndingButton.setBounds(10, 50, 120, 20);
+					this.dataBlockEndingButton.setBounds(10, 30, 120, 20);
 					this.dataBlockEndingButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockEndingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -1236,7 +1188,7 @@ public class DevicePropertiesEditor extends Composite {
 				{
 					this.dataBlockEndingCombo = new CCombo(this.dataBlockOptionalGroup, SWT.BORDER);
 					this.dataBlockEndingCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockEndingCombo.setBounds(140, 50, 60, 20);
+					this.dataBlockEndingCombo.setBounds(140, 30, 60, 20);
 					this.dataBlockEndingCombo.setItems(LineEndingTypes.valuesAsStingArray());
 					this.dataBlockEndingCombo.setEnabled(false);
 					this.dataBlockEndingCombo.addKeyListener(new KeyAdapter() {
@@ -1259,7 +1211,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockCheckSumFormatButton = new Button(this.dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
 					this.dataBlockCheckSumFormatButton.setText(Messages.getString(MessageIds.OSDE_MSGT0466));
 					this.dataBlockCheckSumFormatButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockCheckSumFormatButton.setBounds(10, 90, 120, 20);
+					this.dataBlockCheckSumFormatButton.setBounds(10, 80, 120, 20);
 					this.dataBlockCheckSumFormatButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockCheckSumFormatButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -1281,8 +1233,8 @@ public class DevicePropertiesEditor extends Composite {
 				{
 					this.dataBlockcheckSumFormatCombo = new CCombo(this.dataBlockOptionalGroup, SWT.BORDER);
 					this.dataBlockcheckSumFormatCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockcheckSumFormatCombo.setItems(OSDE.STRING_ARRAY_TEXT_BINARY);
-					this.dataBlockcheckSumFormatCombo.setBounds(140, 90, 90, 20);
+					this.dataBlockcheckSumFormatCombo.setItems(StringHelper.enumValues2StringArray(FormatTypes.values()));
+					this.dataBlockcheckSumFormatCombo.setBounds(140, 80, 90, 20);
 					this.dataBlockcheckSumFormatCombo.setEditable(false);
 					this.dataBlockcheckSumFormatCombo.setEnabled(false);
 					this.dataBlockcheckSumFormatCombo.select(1);
@@ -1301,13 +1253,13 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockCheckSumTypeLabel = new Label(this.dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
 					this.dataBlockCheckSumTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0467));
 					this.dataBlockCheckSumTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockCheckSumTypeLabel.setBounds(10, 115, 120, 20);
+					this.dataBlockCheckSumTypeLabel.setBounds(10, 105, 120, 20);
 				}
 				{
 					this.dataBlockCheckSumTypeCombo = new CCombo(this.dataBlockOptionalGroup, SWT.RIGHT | SWT.BORDER);
 					this.dataBlockCheckSumTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockCheckSumTypeCombo.setItems(OSDE.STRING_ARRAY_CHECKSUM_TYPE);
-					this.dataBlockCheckSumTypeCombo.setBounds(140, 115, 90, 20);
+					this.dataBlockCheckSumTypeCombo.setItems(StringHelper.enumValues2StringArray(CheckSumTypes.values()));
+					this.dataBlockCheckSumTypeCombo.setBounds(140, 105, 90, 20);
 					this.dataBlockCheckSumTypeCombo.setEditable(false);
 					this.dataBlockCheckSumTypeCombo.setEnabled(false);
 					this.dataBlockCheckSumTypeCombo.select(1);
@@ -1315,7 +1267,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockCheckSumTypeCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							DevicePropertiesEditor.log.log(Level.FINEST, "dataBlockCheckSumCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.this.dataBlockCheckSumType = ChecksumTypes.valueOf(DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.getText());
+							DevicePropertiesEditor.this.dataBlockCheckSumType = CheckSumTypes.valueOf(DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockCheckSumType(DevicePropertiesEditor.this.dataBlockCheckSumType);
 							}
@@ -1451,24 +1403,18 @@ public class DevicePropertiesEditor extends Composite {
 				this.stateTabFolder.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 				this.stateTabFolder.setBounds(165, 65, 300, 207);
 				{
-						PropertyType property = new ObjectFactory().createPropertyType();
-						property.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
-						property.setType(DataTypes.INTEGER);
-						property.setValue(OSDE.STRING_EMPTY + DevicePropertiesEditor.this.stateTabFolder.getItemCount()+1);
-						property.setDescription(Messages.getString(MessageIds.OSDE_MSGT0474));
-						new PropertyTypeTabItem(DevicePropertiesEditor.this.stateTabFolder, SWT.CLOSE, Messages.getString(MessageIds.OSDE_MSGT0470), null);
+						createStateTypeProperty();
 				}
 				this.stateTabFolder.setSelection(0);
 				this.stateTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 					public void close(CTabFolderEvent evt) {
-						DevicePropertiesEditor.log.log(Level.FINEST, "modeStateTabFolder.close, event=" + evt); //$NON-NLS-1$
+						DevicePropertiesEditor.log.log(Level.FINEST, "stateTabFolder.close, event=" + evt); //$NON-NLS-1$
+						PropertyTypeTabItem tmpTabItem = (PropertyTypeTabItem)evt.item;
 						if (DevicePropertiesEditor.this.deviceConfig != null) {
-							PropertyTypeTabItem tmpTabItem = (PropertyTypeTabItem)evt.item;
 							int childIndex = DevicePropertiesEditor.this.deviceConfig.getStateType().getProperty().indexOf(tmpTabItem.propertyType);
-							DevicePropertiesEditor.this.stateTabFolder.getChildren()[childIndex].dispose();
 							DevicePropertiesEditor.this.deviceConfig.removeStateType(DevicePropertiesEditor.this.deviceConfig.getStateType().getProperty().get(childIndex));
 						}
-						evt.item.dispose();
+						tmpTabItem.dispose();
 					}
 				});
 			}
@@ -1481,23 +1427,31 @@ public class DevicePropertiesEditor extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "addButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						{
-							PropertyType property = new ObjectFactory().createPropertyType();
-							property.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
-							property.setType(DataTypes.INTEGER);
-							property.setValue(OSDE.STRING_EMPTY + (DevicePropertiesEditor.this.stateTabFolder.getItemCount()+1));
-							property.setDescription(Messages.getString(MessageIds.OSDE_MSGT0474));
-							PropertyTypeTabItem tmpPropertyTypeTabItem = new PropertyTypeTabItem(DevicePropertiesEditor.this.stateTabFolder, SWT.CLOSE, Messages.getString(MessageIds.OSDE_MSGT0470), null);
-							if (DevicePropertiesEditor.this.deviceConfig != null) {
-								DevicePropertiesEditor.this.deviceConfig.appendStateType(property);
-							}
-							boolean isNoneSpecified = MeasurementPropertyTypes.isNoneSpecified(property.getName());
-							tmpPropertyTypeTabItem.setProperty(deviceConfig, property, isNoneSpecified, isNoneSpecified ? MeasurementPropertyTypes.valuesAsStingArray() : null, isNoneSpecified ? DataTypes.valuesAsStingArray() : null, false);
+							createStateTypeProperty();
 							DevicePropertiesEditor.this.stateTabFolder.setSelection(DevicePropertiesEditor.this.stateTabFolder.getItemCount()-1);
 						}
 					}
 				});
 			}
 		}
+	}
+
+	/**
+	 * creates a new state type property and display it as a PropertyTabItem
+	 * appends the PropertyType to device configuration XML if necessary
+	 */
+	private void createStateTypeProperty() {
+		PropertyType property = new ObjectFactory().createPropertyType();
+		property.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
+		property.setType(DataTypes.INTEGER);
+		property.setValue(OSDE.STRING_EMPTY + (this.stateTabFolder.getItemCount()+1));
+		property.setDescription(Messages.getString(MessageIds.OSDE_MSGT0474));
+		PropertyTypeTabItem tmpPropertyTypeTabItem = new PropertyTypeTabItem(DevicePropertiesEditor.this.stateTabFolder, SWT.CLOSE, Messages.getString(MessageIds.OSDE_MSGT0470), null);
+		if (this.deviceConfig != null) {
+			this.deviceConfig.appendStateType(property);
+		}
+		boolean isNoneSpecified = MeasurementPropertyTypes.isNoneSpecified(property.getName());
+		tmpPropertyTypeTabItem.setProperty(deviceConfig, property, isNoneSpecified, isNoneSpecified ? MeasurementPropertyTypes.valuesAsStingArray() : null, isNoneSpecified ? DataTypes.valuesAsStingArray() : null, false);
 	}
 
 	/**
@@ -1515,7 +1469,7 @@ public class DevicePropertiesEditor extends Composite {
 		String osname = System.getProperty("os.name", OSDE.STRING_EMPTY).toLowerCase(); //$NON-NLS-1$
 		String applHomePath = OSDE.STRING_EMPTY;
 		if (osname.startsWith("windows")) { //$NON-NLS-1$
-			applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer" + OSDE.FILE_SEPARATOR_UNIX).replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + OSDE.OSDE_NAME_LONG + OSDE.FILE_SEPARATOR_UNIX).replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else if (osname.startsWith("linux") || osname.startsWith("mac")) { //$NON-NLS-1$ //$NON-NLS-2$
 			applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1572,9 +1526,6 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockSize = DevicePropertiesEditor.this.deviceConfig.getDataBlockSize();
 						DevicePropertiesEditor.this.dataBlockSeparator = DevicePropertiesEditor.this.deviceConfig.getDataBlockSeparator();
 						DevicePropertiesEditor.this.dataBlockRequiredGroup.redraw();
-
-						DevicePropertiesEditor.this.dataBlockDecimalSeparator = DevicePropertiesEditor.this.deviceConfig.getDataBlockDecimalSeparator();
-						DevicePropertiesEditor.this.isDataBlockOptionalDecimalSeparatorEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockDecimalSeparatorDefined();
 
 						DevicePropertiesEditor.this.dataBlockEnding = StringHelper.convertHexInput(DevicePropertiesEditor.this.deviceConfig.getDataBlockEnding());
 						DevicePropertiesEditor.this.isDataBlockOptionalEndingEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockEndingDefined();

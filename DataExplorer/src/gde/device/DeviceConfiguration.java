@@ -536,7 +536,7 @@ public class DeviceConfiguration {
 		if (this.deviceProps.state == null) {
 			this.deviceProps.state = new ObjectFactory().createStateType();
 		}
-		this.deviceProps.state.append(newStateProperty);
+		this.deviceProps.state.getProperty().add(newStateProperty);
 	}
 	
 	/**
