@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="CSV2SerialDataAdapter" default="compile">
+
+	<property name="build.properties" location="../build/build.properties" />
+
+	<property file="${build.properties}" />
+
+	<!-- this is to have nice message about used build.properties file -->
+	<available property="build.properties.exists" file="${build.properties}" />
+	<echo message="Building using ${build.properties}" />
+	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+	<echo message="using build.os.shortname = ${build.os.shortname}" />
+
+	<property name="module.output" location="build/classes"/>
+
+	<path id="compile.classpath">
+		<pathelement location="../OpenSerialDataExplorer/build/OpenSerialDataExplorer.jar" />
+		<pathelement location="../build/lib/RXTXcomm.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
+	</path>
+
+	<target name="compile" description="compile the project">
+		<property name="include.debug.info" value="no" />
+		<mkdir dir="${module.output}" />
+		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8">
+			<src path="src" />
+		</javac>
+	</target>
+
+	<target name="package" depends="compile">
+		<echo message="Building using ${os.name} ${os.arch}" />
+		<tstamp>
+		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+		<manifest file="src/META-INF/MANIFEST.MF">
+    		<attribute name="Implementation-Version" value="${version.num}"/>
+			<attribute name="Created-By" value="${user.name}"/>
+			<attribute name="Built-Date" value="${TODAY}"/> 
+    		<attribute name="Bundle-Version" value="${version.num}"/>
+    		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
+    		<attribute name="Bundle-Description" value="Implemntation for comma separated value serial data adapter"/>
+    		<attribute name="Export-Service" value="osde.device.wb.CSV2SerialDataAdapter"/>
+    	</manifest>
+	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
+	       	<fileset dir="${module.output}" includes="**/*.class"/>
+	    	<fileset dir="src" includes="**/*.xml"/>
+	    	<fileset dir="src" includes="**/*.jpg"/>
+	    	<fileset dir="src" includes="**/*.gif"/>
+	    	<fileset dir="src" includes="**/*.png"/>
+	    	<fileset dir="src" includes="**/*.properties"/>
+	    	<fileset dir="src" includes="**/*.html"/>
+	    	<fileset dir="src" includes="**/*.css"/>
+	    </jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+</project>
