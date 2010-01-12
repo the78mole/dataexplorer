@@ -50,7 +50,7 @@ import osde.utils.CellVoltageValues;
 import osde.utils.StringHelper;
 
 /**
- * DeviceRecords class holds all the data records for the configured measurement
+ * RecordSet class holds all the data records for the configured measurement of a device
  * @author Winfried Brügmann
  */
 public class RecordSet extends HashMap<String, Record> {
@@ -59,13 +59,13 @@ public class RecordSet extends HashMap<String, Record> {
 	final static Logger						log														= Logger.getLogger(RecordSet.class.getName());
 	final DecimalFormat						df														= new DecimalFormat("0.000");										//$NON-NLS-1$
 
+	TimeSteps											timeStep_ms;
+
 	String												name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	final Channel									parent;
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																//records/measurements which are active or inactive
-	double												timeStep_ms										= -1;																						//time base of measurement point, if const. > 0 else time steps are located in timeSteps_ms
-	Vector<Double>								timeSteps_ms									= new Vector<Double>(1,1);											//time_in_ms for each measurement point
 	String												description										= OSDE.STRING_EMPTY;
 	boolean												isSaved												= false;																				//indicates if the record set is saved to file
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
@@ -180,7 +180,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.parent = this.channels.get(channelNumber);
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = measurementNames.clone();
-		this.timeStep_ms = newTimeStep_ms;
+		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
@@ -204,7 +204,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.parent = null;
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = new String[0];
-		this.timeStep_ms = newTimeStep_ms;
+		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.isRaw = true;
 		this.isCompareSet = true;
 	}
@@ -270,7 +270,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setProperties(this.device.getProperties(channelConfigurationNumber, i));
 		}
 
-		this.timeStep_ms = recordSet.timeStep_ms;
+		this.timeStep_ms = recordSet.timeStep_ms.clone();
 		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
@@ -433,7 +433,18 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
+		this.addPoints(points, this.getTimeStep_ms()); // device has constant time step between measurement points
+	}
+
+	/**
+	 * method to add a series of points to the associated records
+	 * @param points as int[], where the length must fit records.size()
+	 * @param time_ms
+	 * @throws DataInconsitsentException 
+	 */
+	public synchronized void addPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
+		this.timeStep_ms.add(time_ms);
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
@@ -468,10 +479,22 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
+	 * @param time_ms
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
+		addNoneCalculationRecordsPoints(points, this.getTimeStep_ms()); // device has constant time step between measurement points
+	}
+
+	/**
+	 * method to add a series of points to none calculation records (records active or inactive)
+	 * @param points as int[], where the length must fit records.size()
+	 * @param time_ms
+	 * @throws DataInconsitsentException 
+	 */
+	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
+		this.timeStep_ms.add(time_ms);
 		if (points.length == this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
@@ -551,17 +574,33 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the const. time step in msec
+	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
+	 * For devices with none constant time step between measurement points it returns the average value.
+	 * Do not use for calculation, use for logging purpose only.
 	 */
 	public double getTimeStep_ms() {
-		return this.timeStep_ms;
+		return this.timeStep_ms.getTimeStep_ms();
+	}
+
+	/**
+	 * @return the isConstant true if time step is a constant value between measurement points
+	 */
+	public boolean isTimeStepConstant() {
+		return this.timeStep_ms.isConstant;
 	}
 
 	/**
 	 * @return the timeSteps_ms
 	 */
-	public double getTimeStep_ms(int index) {
-		return this.timeSteps_ms.elementAt(index);
+	public double getTime_ms(int index) {
+		return this.timeStep_ms.getTime_ms(index);
+	}
+
+	/**
+	 * @return the time information for index given
+	 */
+	public int getTime(int index) {
+		return this.timeStep_ms.get(index);
 	}
 
 	/**
@@ -569,9 +608,37 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param timeValue
 	 */
 	public void addTimeStep_ms(double timeValue) {
-		this.timeSteps_ms.add(timeValue);
+		this.timeStep_ms.add(timeValue);
+	}
+	
+	/**
+	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
+	 */
+	public double getMaxTime_ms() {
+		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.getMaxTime_ms();
 	}
 
+	/**
+	 * Find the indexes in this time vector where the given time value is placed
+	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
+	 * only in case where the given time matches an existing entry both indexes are equal.
+	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
+	 * @param time_ms
+	 * @return
+	 */
+	public int[] findBoundingIndexes(double time_ms) {
+		return this.timeStep_ms.findBoundingIndexes(time_ms);
+	}
+
+	/**
+	 * find the index closest to given time in msec
+	 * @param time_ms
+	 * @return
+	 */
+	public int findBestIndex(double time_ms) {
+		return this.timeStep_ms.findBestIndex(time_ms);
+	}
+	
 	/**
 	 * method to get the sorted record names as array
 	 * sorted according list in the device configuration (XML) file
@@ -722,7 +789,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public void clear() {
 		super.clear();
 		this.recordNames = new String[0];
-		this.timeStep_ms = 0;
+		this.timeStep_ms.clear();
 		this.maxSize = 0;
 		this.maxValue = -20000;
 		this.minValue = 20000;
@@ -782,11 +849,13 @@ public class RecordSet extends HashMap<String, Record> {
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, recordSetName, recordNames, timeStep_ms, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - " , newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
+		newRecordSet.timeStep_ms = new TimeSteps(device.getTimeStep_ms());
+
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 			tmpRecord.setColorDefaultsAndPosition(i);
-			tmpRecord.timeStep_ms = timeStep_ms;
+			//TODO tmpRecord.timeStep_ms = new TimeSteps(timeStep_ms);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}
@@ -899,10 +968,24 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
+	 * Set the time step in msec for record sets of devices with constant time step with a positive value.
+	 * A negative value signals none-constant time steps for this record set.
+	 * This method has to be called BEFORE adding data points and will set the time step if called the first time only, 
+	 * if timeStep_ms needs to be changed for some reason use setNewTimeStep_ms
 	 * @param newTimeStep_ms the timeStep_ms to set
 	 */
-	public void setTimeStep_ms(double newTimeStep_ms) {
-		this.timeStep_ms = newTimeStep_ms;
+	@Deprecated
+	public void setTimeStep_ms(double newTimeStep_ms) {		
+		this.timeStep_ms = this.timeStep_ms == null || this.timeStep_ms.size() == 0 ? new TimeSteps(newTimeStep_ms) : this.timeStep_ms;
+	}
+
+	/**
+	 * Set the time step in msec for record sets of devices with constant time step with a positive value.
+	 * A negative value signals none-constant time steps for this record set.
+	 * @param newTimeStep_ms the timeStep_ms to set
+	 */
+	public void setNewTimeStep_ms(double newTimeStep_ms) {		
+		this.timeStep_ms = new TimeSteps(newTimeStep_ms);
 	}
 
 	/**
@@ -957,9 +1040,19 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * check if all records from this record set are displayable, starts calcualation if not
+	 * check if all records from this record set are displayable, starts calculation if required by calling makeInActiveDisplayable()
 	 */
 	public void checkAllDisplayable() {
+		for (String recordName : this.keySet()) {
+			Record record = this.get(recordName);
+			record.zoomOffset = 0;
+//			record.zoomSize = record.realSize();
+			record.zoomTimeOffset = 0.0;
+			record.drawTimeWidth = this.getMaxTime_ms();
+			//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
+			record.minZoomScaleValue	= record.minScaleValue;
+			record.maxZoomScaleValue	= record.maxScaleValue;
+		}
 		this.application.getActiveDevice().makeInActiveDisplayable(this);
 		this.isRecalculation = false;
 		
@@ -1192,14 +1285,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
 	public void setZoomMode(boolean zoomModeEnabled) {
-		if (!this.isZoomMode) {
+		if (!zoomModeEnabled) {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				// iterate children and reset min/max values
-				for (int i = 0; i < this.recordNames.length; i++) {
-					Record record = this.get(i);
+				for (String recordName : this.keySet()) {
+					Record record = this.get(recordName);
 					record.zoomOffset = 0;
-					record.zoomSize = this.get(i).realSize();
+//					record.zoomSize = record.realSize();
+					record.zoomTimeOffset = 0.0;
+					record.drawTimeWidth = this.getMaxTime_ms();
+					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 					record.minZoomScaleValue	= record.minScaleValue;
 					record.maxZoomScaleValue	= record.maxScaleValue;
 				}
@@ -1283,10 +1379,10 @@ public class RecordSet extends HashMap<String, Record> {
 	public double getStartTime() {
 		double startTime = 0;
 		if (this.isZoomMode) {
-			startTime = this.get(0).zoomOffset * this.get(0).timeStep_ms;
+			startTime = this.get(0).zoomTimeOffset;
 		}
 		else if (this.isScopeMode) {
-			startTime = this.scopeModeOffset * this.timeStep_ms;
+			startTime = this.timeStep_ms.getTime_ms(this.scopeModeOffset);
 		}
 		return startTime;
 	}
@@ -1302,13 +1398,21 @@ public class RecordSet extends HashMap<String, Record> {
 		// iterate children and set min/max values
 		for (String recordKey : this.recordNames) {
 			Record record = this.get(recordKey);
-			int xShift = Double.valueOf(1.0 * record.zoomSize * xPercent / 100).intValue();
-			if (record.zoomOffset + xShift <= 0)
+			double xShift_ms = record.drawTimeWidth * xPercent / 100;
+			if (record.zoomTimeOffset + xShift_ms <= 0) {
 				record.zoomOffset = 0;
-			else if (record.zoomOffset + record.zoomSize + xShift > record.realSize())
-				record.zoomOffset = record.realSize() - record.zoomSize;
-			else
-				record.zoomOffset = record.zoomOffset + xShift;
+				record.zoomTimeOffset = 0.0;
+			}
+			else if (record.zoomTimeOffset + record.drawTimeWidth + xShift_ms > record.getMaxTime_ms()) {
+				record.zoomTimeOffset = record.getMaxTime_ms() - record.drawTimeWidth;
+				record.zoomOffset = this.findBestIndex(record.zoomTimeOffset);
+				//record.zoomSize = this.findBestIndex(record.zoomTimeOffset+record.drawTimeWidth) - record.zoomOffset;
+			}
+			else {
+				record.zoomTimeOffset = record.zoomTimeOffset + xShift_ms;
+				record.zoomOffset = this.findBestIndex(record.zoomTimeOffset);
+				//record.zoomSize = this.findBestIndex(record.zoomTimeOffset+record.drawTimeWidth) - record.zoomOffset;
+			}
 			
 			double yShift = (record.getMaxScaleValue() - record.getMinScaleValue()) * yPercent / 100;
 			record.minZoomScaleValue = record.getMinScaleValue() + yShift;
@@ -1562,7 +1666,7 @@ public class RecordSet extends HashMap<String, Record> {
 					RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
 					//RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
 					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.dataTable[i][0] = Double.valueOf(getTimeStep_ms() * i).intValue();					
+						RecordSet.this.dataTable[i][0] = (int)RecordSet.this.timeStep_ms.getTime_ms(i);					
 						//RecordSet.this.dataTable[i][0] = String.format(Locale.ENGLISH, "%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
@@ -1630,7 +1734,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms).append(Record.DELIMITER);
+		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.getTimeStep_ms()).append(Record.DELIMITER);
 
 		sb.append(TIME_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
@@ -1663,10 +1767,8 @@ public class RecordSet extends HashMap<String, Record> {
 		String tmpValue = null;
 		try {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
-			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new Double(tmpValue.trim()).doubleValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new TimeSteps(Double.parseDouble(tmpValue.trim()));
 			
-			updateChildRecordTimeStep();
-
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_LINE_STYLE);
@@ -1723,23 +1825,12 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * update all child records with the parent time step definition
-	 */
-	void updateChildRecordTimeStep() {
-		if (this.timeStep_ms > 0) { // apply constant time step to all child records
-			for (String childRecordKey : this.keySet()) {
-				this.getRecord(childRecordKey).timeStep_ms = this.timeStep_ms;
-			}
-		}
-	}
-
-	/**
 	 * query if the record set is zoomed and the zoomed data extract starts at first data point
 	 * @return true if zoom is active and starts at left edge of curve
 	 */
 	public boolean isCutLeftEdgeEnabled() {
 		try {
-			return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (this.get(0).zoomOffset == 0);
+			return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
 		}
 		catch (Exception e) {
 			return false;
@@ -1758,7 +1849,7 @@ public class RecordSet extends HashMap<String, Record> {
 		catch (Exception e) {
 			return false;
 		}
-		return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (tmpRecord.zoomOffset + tmpRecord.zoomSize >= tmpRecord.realSize() - 1);
+		return this.application.isRecordSetVisible(GraphicsWindow.TYPE_NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
 	}
 
 	/**

@@ -271,9 +271,9 @@ public interface IDevice {
 	public byte[] getDataBlockEnding();
 
 	/**
-	 * @param set a new date block ending (single byte, new line, ...) as byte array
+	 * @param set a new date block ending as LineEndingTypes.XY.value
 	 */
-	public void setDataBlockEnding(byte[] value);
+	public void setDataBlockEnding(String value);
 
 	/**
 	 * @return the preferred specified data location as full qualified path

@@ -31,6 +31,9 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -186,10 +189,11 @@ public class ChannelTypeTabItem extends CTabItem {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			FormData fd;
 			{
 				this.channelConfigComposite = new Composite(this.channelConfigInnerTabFolder, SWT.NONE);
 				this.setControl(this.channelConfigComposite);
-				this.channelConfigComposite.setLayout(null);
+				this.channelConfigComposite.setLayout(new FormLayout());
 				this.channelConfigComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
@@ -206,7 +210,13 @@ public class ChannelTypeTabItem extends CTabItem {
 				{
 					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
 					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
+					//this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
+					fd = new FormData();
+			    fd.left = new FormAttachment(0, 1000, 9);
+			    fd.top = new FormAttachment(0, 1000, 7);
+			    fd.width = 120;
+			    fd.height = 18;
+			    this.channelConfigTypeCombo.setLayoutData(fd);
 					this.channelConfigTypeCombo.setItems(StringHelper.enumValues2StringArray(ChannelTypes.values()));
 					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -221,10 +231,16 @@ public class ChannelTypeTabItem extends CTabItem {
 					});
 				}
 				{
-					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER);
+					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER | SWT.LEFT);
 					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0527));
 					this.channelConfigText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.channelConfigText.setBounds(147, 9, 128, 20);
+					//this.channelConfigText.setBounds(147, 9, 128, 20);
+					fd = new FormData();
+			    fd.left = new FormAttachment(0, 1000, 150);
+			    fd.top = new FormAttachment(0, 1000, 7);
+			    fd.width = 130;
+			    fd.height = 16;
+			    this.channelConfigText.setLayoutData(fd);
 					this.channelConfigText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -242,11 +258,23 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
 					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0528));
 					this.channelConfigLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.channelConfigLabel.setBounds(289, 9, 279, 20);
+					//this.channelConfigLabel.setBounds(289, 9, 279, 20);
+					fd = new FormData();
+			    fd.top = new FormAttachment(0, 1000, 9);
+			    fd.right = new FormAttachment(1000, 1000, -60);
+			    fd.width = 280;
+			    fd.height = 18;
+			    this.channelConfigLabel.setLayoutData(fd);
 				}
 				{
 					this.measurementsTabFolder = new CTabFolder(this.channelConfigComposite, SWT.NONE | SWT.BORDER);
-					this.measurementsTabFolder.setBounds(0, 35, 622, 225);
+					//this.measurementsTabFolder.setBounds(0, 35, 622, 225);
+					fd = new FormData();
+			    fd.top = new FormAttachment(0, 1000, 35);
+			    fd.left = new FormAttachment(0, 1000, 0);
+			    fd.right = new FormAttachment(1000, 1000, 0);
+			    fd.bottom = new FormAttachment(1000, 1000, 0);
+			    this.measurementsTabFolder.setLayoutData(fd);
 					{
 						//create initial measurement type
 						new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, 0);
@@ -287,6 +315,12 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigAddButton.setText(OSDE.STRING_PLUS);
 					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
+					fd = new FormData();
+			    fd.top = new FormAttachment(0, 1000, 7);
+			    fd.width = 42;
+			    fd.height = 20;
+			    fd.right = new FormAttachment(1000, 1000, -10);
+			    this.channelConfigAddButton.setLayoutData(fd);
 					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0526));
 					this.channelConfigAddButton.setSize(40, 20);
 					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {

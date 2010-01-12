@@ -291,7 +291,8 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
-				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length  * recordDataSize);
+				int numberRecordAndTimeStamp = recordSet.isTimeStepConstant() ? recordSet.getNoneCalculationRecordNames().length : recordSet.getNoneCalculationRecordNames().length + 1;
+				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, OSDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp  * recordDataSize);
 				if (recordSetName.equals(firstRecordSet[1])) {
 					long startTime = new Date().getTime();
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
@@ -412,7 +413,7 @@ public class OsdReaderWriter {
 							sbs[i].append(OSDE.DATA_DELIMITER).append(OSDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(OSDE.DATA_DELIMITER); //$NON-NLS-1$
 							filePointer += OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 							filePointer += OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
-							log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
+							log.log(Level.INFO, "line lenght = " //$NON-NLS-1$
 								+ (OSDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + OSDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + OSDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ " filePointer = " + filePointer); //$NON-NLS-1$
 
@@ -438,8 +439,11 @@ public class OsdReaderWriter {
 							log.log(Level.FINE, sbs[i].toString());
 							//data_out.writeInt(sbs[i].length());
 							data_out.writeUTF(sbs[i].toString());
-							filePointer += (recordSet.getNoneCalculationRecordNames().length * OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true));
-							log.log(Level.FINE, "filePointer = " + filePointer); //$NON-NLS-1$
+							int dataSizeRecord = OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true);
+							int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
+							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
+							filePointer += (recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp);
+							log.log(Level.INFO, (recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp) + " filePointer = " + filePointer); //$NON-NLS-1$
 						}
 					}
 				}
@@ -452,10 +456,24 @@ public class OsdReaderWriter {
 						if (recordSet != null) {
 							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), application.getStatusBar() != null);
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
-							byte[] buffer = new byte[OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true) * noneCalculationRecordNames.length];
+							int dataSizeRecord = OSDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true);
+							int dataSizeRecords = dataSizeRecord * noneCalculationRecordNames.length;
+							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
+							byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 							byte[] bytes = new byte[OSDE.SIZE_BYTES_INTEGER];
+							if (!recordSet.isTimeStepConstant()) {
+								for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j, l += OSDE.SIZE_BYTES_INTEGER) {
+										int timeStamp = recordSet.getTime(j);
+										//log.log(Level.FINER, ""+point);
+										bytes[0] = (byte) ((timeStamp >>> 24) & 0xFF);
+										bytes[1] = (byte) ((timeStamp >>> 16) & 0xFF);
+										bytes[2] = (byte) ((timeStamp >>> 8) & 0xFF);
+										bytes[3] = (byte) ((timeStamp >>> 0) & 0xFF);
+										System.arraycopy(bytes, 0, buffer, l, OSDE.SIZE_BYTES_INTEGER);
+								}
+							}
 							if (recordSet.isRaw()) {
-								for (int j = 0, l = 0; j < recordSet.getRecordDataSize(true); ++j) {
+								for (int j = 0, l = dataSizeRecord; j < recordSet.getRecordDataSize(true); ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
 										int point = recordSet.get(noneCalculationRecordNames[k]).realGet(j);
 										//log.log(Level.FINER, ""+point);
@@ -521,8 +539,10 @@ public class OsdReaderWriter {
 			int recordFileDataSize = recordSet.getFileDataSize();
 			random_in.seek(recordSetFileDataPointer);
 			long startTime = new Date().getTime();
-			int deviceDataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-			byte[] buffer = new byte[deviceDataBufferSize * recordFileDataSize];
+			int dataSizeRecord = OSDE.SIZE_BYTES_INTEGER * recordFileDataSize;
+			int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
+			int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
+			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 			random_in.readFully(buffer);
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));

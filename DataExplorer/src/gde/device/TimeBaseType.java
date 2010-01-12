@@ -141,7 +141,7 @@ public class TimeBaseType {
      */
     public void setTimeStep(double value) {
     	if (value % 1 == 0) this.timeStep = Double.parseDouble(String.format(Locale.ENGLISH, "%.0f", value)); //$NON-NLS-1$
-    	else								this.timeStep = Double.parseDouble(String.format(Locale.ENGLISH, "%.2f", value)); //$NON-NLS-1$  
+    	else								this.timeStep = Double.parseDouble(String.format(Locale.ENGLISH, "%.1f", value)); //$NON-NLS-1$  
     }
 
 }

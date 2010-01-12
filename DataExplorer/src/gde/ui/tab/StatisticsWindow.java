@@ -282,9 +282,11 @@ public class StatisticsWindow extends CTabItem {
 					sb.append(Messages.getString(MessageIds.OSDE_MSGT0359)).append(DELIMITER);
 					sb.append("     0      ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
-					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTimeStep_ms() * activeRecordSet.getRecordDataSize(true))).append(" ").append(DELIMITER); //$NON-NLS-1$
+					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTime_ms(activeRecordSet.getRecordDataSize(true)-1))).append(" ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
-					sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTimeStep_ms())).append(Messages.getString(MessageIds.OSDE_MSGT0361)); //$NON-NLS-1$
+					if (activeRecordSet.isTimeStepConstant()) {
+						sb.append(Messages.getString(MessageIds.OSDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.OSDE_MSGT0361)); //$NON-NLS-1$
+					}
 					this.tabelItemText.add(sb.toString());
 
 					for (String recordName : displayableRecords) {
@@ -388,9 +390,9 @@ public class StatisticsWindow extends CTabItem {
 							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1) sb.append("(").append(measurementStatistics.getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 
 							// append trigger + comment
-							if (measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1) {
+							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
 								sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-								this.tabelItemText.set(0, this.tabelItemText.get(0) + ", " + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
+								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : OSDE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
 							}
 
 							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;

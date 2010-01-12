@@ -264,6 +264,14 @@ public class DeviceConfiguration {
 	/**
 	 * @return the device name
 	 */
+	public void setDeviceImplName(String newDeviceImplClass) {
+		this.isChangePropery = true;
+		this.device.getName().setImplementation(newDeviceImplClass);
+	}
+
+	/**
+	 * @return the device name
+	 */
 	public String getImageFileName() {
 		return this.device.getImage();
 	}
@@ -696,9 +704,13 @@ public class DeviceConfiguration {
 		return this.dataBlock.getFormat().getEnding();
 	}
 
-	public void setDataBlockEnding(byte[] value) {
+	public String getDataBlockEndingLineEndingType() {
+		return LineEndingTypes.valueFrom(this.dataBlock.getFormat().getEnding());
+	}
+
+	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
-		this.dataBlock.getFormat().setEnding(value);
+		this.dataBlock.getFormat().setEnding(LineEndingTypes.bytesFromValue(value));
 	}
 
 	public CommaSeparatorTypes getDataBlockSeparator() {

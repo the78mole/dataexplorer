@@ -240,7 +240,7 @@ public class SWTResourceManager {
 		return getFont(name, size, style, false, false);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("rawtypes") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
 		String fontName = name + OSDE.STRING_DASH + size + OSDE.STRING_DASH + style + OSDE.STRING_DASH + strikeout + OSDE.STRING_DASH + underline;
 		if (resources.containsKey(fontName)) {

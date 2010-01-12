@@ -392,7 +392,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigMeasurementPropertiesTabFolder = new CTabFolder(this.measurementsComposite, SWT.BORDER);
-					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379, 199);
+					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379+45, 199+30);
 					//this.channelConfigMeasurementPropertiesTabFolder.setMenu(this.popupMenu);
 					{
 						createStatisticsTabItem();

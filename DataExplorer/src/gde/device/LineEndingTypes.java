@@ -67,4 +67,25 @@ public enum LineEndingTypes {
   		}
   		return sb.toString().split(OSDE.STRING_DASH);
   	}
+  	
+    public static byte[] bytesFromValue(String v) {
+    	byte[] bytes = new byte[] {0x0D, 0x0A};
+    	switch (LineEndingTypes.fromValue(v)) {
+			case CRLF:
+				return bytes = new byte[] {0x0D, 0x0A};
+			case CR:
+				return bytes = new byte[] {0x0D};
+			case LF:
+				return bytes = new byte[] {0x0A};
+			}
+    	return bytes;
+  }
+  	
+	public static String valueFrom(byte[] bytes) {
+		String value = LineEndingTypes.CRLF.value;
+		if (bytes[0] == 0x0A)																									value = LineEndingTypes.LF.value;
+		else if (bytes[0] == 0x0D && bytes.length > 1 && bytes[1] == 0x0A)		value = LineEndingTypes.CRLF.value;
+		else if (bytes[0] == 0x0D && bytes.length == 1)												value = LineEndingTypes.CR.value;
+		return value;
+	}
 }

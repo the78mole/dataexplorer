@@ -275,8 +275,9 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
-							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
-									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
+							if (MenuToolBar.this.application.getActiveDevice() == null 
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() == null)
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() != null && !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected())) {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
@@ -312,8 +313,9 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
-							if (MenuToolBar.this.application.getActiveDevice() == null || MenuToolBar.this.application.getActiveDevice().getSerialPort() != null
-									&& !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected()) {
+							if (MenuToolBar.this.application.getActiveDevice() == null 
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() == null)
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() != null && !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected())) {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {

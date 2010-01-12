@@ -36,11 +36,11 @@ import osde.OSDE;
 public enum CommaSeparatorTypes {
 
     @XmlEnumValue("semicolon")
-    SEMICOLON(";"),
+    SEMICOLON(";"), //$NON-NLS-1$
     @XmlEnumValue("comma")
-    COMMA(","),
+    COMMA(","), //$NON-NLS-1$
     @XmlEnumValue("colon")
-    COLON(":");
+    COLON(":"); //$NON-NLS-1$
     private final String value;
 
     CommaSeparatorTypes(String v) {
@@ -53,7 +53,7 @@ public enum CommaSeparatorTypes {
 
     public static CommaSeparatorTypes fromValue(String v) {
         for (CommaSeparatorTypes c: CommaSeparatorTypes.values()) {
-            if (c.value.equals(v)) {
+            if (c.value.equals(v.trim())) {
                 return c;
             }
         }
@@ -63,7 +63,7 @@ public enum CommaSeparatorTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (CommaSeparatorTypes element : CommaSeparatorTypes.values()) {
-  			sb.append(element.value).append(OSDE.STRING_DASH);
+  			sb.append("  ").append(element.value).append(OSDE.STRING_DASH);  //$NON-NLS-1$
   		}
   		return sb.toString().split(OSDE.STRING_DASH);
   	}

@@ -66,8 +66,8 @@ public class GraphicsWindow extends CTabItem {
 	final TimeLine								timeLine								= new TimeLine();
 	final int											windowType;
 	
-	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName) {
-		super(currentDisplayTab, style);
+	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
+		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.application = OpenSerialDataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;

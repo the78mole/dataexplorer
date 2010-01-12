@@ -197,18 +197,18 @@ public class CurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		// get the data points size
-		int recordSize = record.size();
+		// get the data points size to be drawn
+		int displayableSize = record.getNumberPoints();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
-		log.log(Level.FINE, "record TimeStep_ms = " + record.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
-		double adaptXMaxValue = (1.0 * (recordSize - 1) * record.getTimeStep_ms());
-		log.log(Level.FINER, "recordSize = " + recordSize + " adaptXMaxValue = " + adaptXMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "record TimeStep_ms = " + record.getTime_ms(1)); //$NON-NLS-1$
+		double displayableTime_ms = record.getTimeWidth_ms();
+		log.log(Level.FINER, "recordSize = " + displayableSize + " adaptXMaxValue = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
-		// calculate scale factor to fit time into draw bounds
-		double xTimeFactor = width / adaptXMaxValue;
-		// calculate xScale for curves with much to many data points -it makes no sense to draw all the small lines on the same part of the screen
-		int xScaleFactor = Double.valueOf(recordSize / (width * 2.2)).intValue();
+		// calculate scale factor to fit time into draw bounds display pixel based
+		double xTimeFactor = width / displayableTime_ms;
+		// calculate xScale for curves with much to many data points, it makes no sense to draw all the small lines on the same part of the screen
+		int xScaleFactor = Double.valueOf(displayableSize / (width * 2.2)).intValue();
 		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1;
 		while (xScaleFactor % 2 == 0 && xScaleFactor > 1) {
 			--xScaleFactor;
@@ -216,7 +216,7 @@ public class CurveUtils {
 		//xScaleFactor+=2;
 		log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
 		xTimeFactor = xTimeFactor * xScaleFactor;
-
+		
 		record.setDisplayScaleFactorTime(xTimeFactor);
 		record.setDisplayScaleFactorValue(height);
 
@@ -225,7 +225,8 @@ public class CurveUtils {
 
 		try {
 			// calculate start point of the curve, which is the first oldPoint
-			oldPoint = record.getDisplayPoint(0, 0, x0, y0);
+			//oldPoint = record.getDisplayPoint(0, 0, x0, y0);
+			oldPoint = record.getDisplayEndPoint(0, x0);
 			if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
@@ -236,7 +237,8 @@ public class CurveUtils {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
 			int drawLimit = record.getDrawLimit();
 			if (drawLimit == Integer.MAX_VALUE) { // no draw limit
-				for (int i = 0, j = 0; j <= recordSize && recordSize > 1; ++i, j = j + xScaleFactor) {
+				for (int i = 0, j = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
+					//log.log(Level.INFO, "i = " + i + " j = " + j);
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
@@ -246,7 +248,7 @@ public class CurveUtils {
 			}
 			else { // compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
-				for (int i = 0, j = 0; j < recordSize && recordSize > 1; ++i, j = j + xScaleFactor) {
+				for (int i = 0, j = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
@@ -256,6 +258,9 @@ public class CurveUtils {
 					oldPoint = newPoint; // remember the last draw point for next drawLine operation
 				}
 			}
+			
+			newPoint = record.getDisplayEndPoint(width, x0);
+			gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$

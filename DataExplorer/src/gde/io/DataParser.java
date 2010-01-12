@@ -35,7 +35,7 @@ public class DataParser {
 
 	int									recordNumber;
 	int									state;
-	long								time;
+	int									time_ms;
 	int[]								values;
 	int									checkSum;
 
@@ -51,26 +51,27 @@ public class DataParser {
 
 	public void parse(String inputLine) throws DataInconsitsentException, NumberFormatException {
 		try {
+			if(!inputLine.startsWith("$")) throw new DataInconsitsentException("fehlendes '$' am Anfang der Zeile!");
 			this.values = new int[this.size];
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			log.log(Level.FINER, "parser inputLine = " + inputLine);
 			String strValue = strValues[0].trim().substring(1);
-			this.recordNumber = Integer.valueOf(strValue);
+			this.recordNumber = Integer.parseInt(strValue);
 			
 			strValue = strValues[1].trim();
-			this.state = Integer.valueOf(strValue);
+			this.state = Integer.parseInt(strValue);
 
 			strValue = strValues[2].trim();
-			time = Long.valueOf(strValue) * 1000; // Seconds * 1000 = msec
+			time_ms = Integer.parseInt(strValue) * 1000; // Seconds * 1000 = msec
 			
 			for (int i = 0; i < this.size; i++) { 
 				strValue = strValues[i+3].trim();
 				try {
-					long tmpValue = Integer.valueOf(strValue);
+					long tmpValue = Integer.parseInt(strValue);
 					if (tmpValue > Integer.MAX_VALUE/1000 || tmpValue < Integer.MIN_VALUE/1000)
-						this.values[i] = Integer.valueOf(strValue);
+						this.values[i] = Integer.parseInt(strValue);
 					else
-						this.values[i] = Integer.valueOf(strValue)*1000;
+						this.values[i] = Integer.parseInt(strValue)*1000;
 				}
 				catch (NumberFormatException e) {
 					this.values[i] = 0;
@@ -78,7 +79,7 @@ public class DataParser {
 			}
 
 			strValue = strValues[this.values.length].trim();
-			int checkSum = Integer.valueOf(strValue);
+			int checkSum = Integer.parseInt(strValue);
 			boolean isValid = true;
 			if (checkSumType != null) {
 				switch (checkSumType) {
@@ -125,8 +126,8 @@ public class DataParser {
 	/**
 	 * @return the time
 	 */
-	public long getTime() {
-		return time;
+	public long getTime_ms() {
+		return time_ms;
 	}
 
 	/**

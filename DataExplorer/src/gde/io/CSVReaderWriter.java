@@ -308,7 +308,7 @@ public class CSVReaderWriter {
 				}
 
 				// set time base in msec
-				recordSet.setTimeStep_ms(timeStep_ms);
+				//recordSet.setTimeStep_ms(timeStep_ms);
 				log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				recordSet.setSaved(true);
 
@@ -401,7 +401,7 @@ public class CSVReaderWriter {
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				// add time entry
-				sb.append((df3.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
+				sb.append((df3.format((recordSet.getTime_ms(i) / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);

@@ -380,7 +380,7 @@ public class DataBlockType {
          */
         public byte[] getEnding() {
             if (ending == null) {
-                return new HexBinaryAdapter().unmarshal("0a0d");
+                return new HexBinaryAdapter().unmarshal("0D0A");
             }    
             return ending;
         }

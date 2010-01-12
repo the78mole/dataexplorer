@@ -163,12 +163,12 @@ public class LogViewReader {
 				recordSet.setRecordSetDescription(recordSetComment);
 				recordSet.setDeserializedProperties(recordSetProperties);
 				recordSet.setSaved(true);
-				try {
-					recordSet.setTimeStep_ms(new Double(recordSetInfo.get(RecordSet.TIME_STEP_MS).trim()).doubleValue());
-				}
-				catch (NumberFormatException e) { 
-					//ignore and use OSDE value }
-				}
+//				try {
+//					recordSet.setTimeStep_ms(new Double(recordSetInfo.get(RecordSet.TIME_STEP_MS).trim()).doubleValue());
+//				}
+//				catch (NumberFormatException e) { 
+//					//ignore and use OSDE value }
+//				}
 				//recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
 
 				//apply record sets records properties

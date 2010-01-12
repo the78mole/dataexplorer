@@ -465,14 +465,19 @@ public class FileUtils {
 		InputStream is = null;
 		FileOutputStream os = null;
 		try {
-			is = jarFile.getInputStream(ze);
-			os = new FileOutputStream(targetDirectory + fileName);
-			while ((read = is.read(buffer)) != -1) {
-				os.write(buffer, 0, read);
+			if (ze != null) {
+				is = jarFile.getInputStream(ze);
+				os = new FileOutputStream(targetDirectory + fileName);
+				while ((read = is.read(buffer)) != -1) {
+					os.write(buffer, 0, read);
+				}
+				os.close();
+				is.close();
+				setAccessPermission(fileName, unixPermissions);
 			}
-			os.close();
-			is.close();
-			setAccessPermission(fileName, unixPermissions);
+			else { 
+				log.log(Level.WARNING, jarSourceDirectory + fileName + " does not exist!");
+			}
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

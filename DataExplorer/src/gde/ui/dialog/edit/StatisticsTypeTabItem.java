@@ -75,6 +75,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	Label													triggerLevelLabel;
 	CCombo												sumByTriggerRefOrdinalCombo;
 	Button												isSumByTriggerRefOrdinalButton;
+	Button												sumTriggerTimeButton;
 	Button												countByTriggerButton;
 	Text													sumTriggerText;
 	Button												isRatioRefOrdinalButton;
@@ -85,17 +86,18 @@ public class StatisticsTypeTabItem extends CTabItem {
 	Button												triggerLevelButton;
 	Text													ratioText;
 	CCombo												ratioRefOrdinalCombo;
-	Text													countTriggerText;
+	Text													sumTriggerTimeText;
+	Text													countByTriggerText;
 	CCombo												triggerRefOrdinalCombo;
-	Button												isTriggerRefOrdinalButton;
+	Button												triggerRefOrdinalButton;
 	Button												statisticsSigmaButton;
 	Button												statisticsMaxButton;
 	Button												statisticsAvgButton;
 	Button												statisticsMinButton;
 
 	Boolean												statisticsMin, statisticsMax, statisticsAvg, statisticsSigma;
-	String												triggerComment, sumTriggerComment, countTriggerComment, ratioComment;
-	Boolean												isGreater, isCountByTrigger, isRatioRefOrdinal;
+	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment;
+	Boolean												isGreater, isSumTriggerTime, isCountByTrigger, isRatioRefOrdinal;
 	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
 	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;	// must be equal !!!
 	boolean												isSomeTriggerDefined	= false;
@@ -140,7 +142,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 		//this.isGreater = copyFrom.isGreater;
 		//this.minTimeSec = copyFrom.minTimeSec;
 		this.isCountByTrigger = copyFrom.isCountByTrigger;
-		this.countTriggerComment = copyFrom.countTriggerComment;
+		this.countByTriggerComment = copyFrom.countByTriggerComment;
 
 		this.triggerRefOrdinal = copyFrom.triggerRefOrdinal;
 		this.sumByTriggerRefOrdinal = copyFrom.sumByTriggerRefOrdinal;
@@ -211,8 +213,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.deviceConfig.setChangePropery(true);
 		}
 		
+		this.sumTriggerTimeButton.setEnabled(isTriggerDefined);
 		this.countByTriggerButton.setEnabled(isTriggerDefined);
-		this.isTriggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
+		this.triggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.isSumByTriggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.sumTriggerText.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.isRatioRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
@@ -220,21 +223,34 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.ratioText.setEnabled(isTriggerDefined && this.triggerType == null);
 
 		if (isTriggerDefined) {
-			if ((this.isCountByTrigger = this.statisticsType.isCountByTrigger()) != null) {
-				this.countByTriggerButton.setSelection(this.isCountByTrigger);
-				if (this.isCountByTrigger) {
-					this.countTriggerText.setEnabled(true);
-					this.countTriggerText.setText(this.countTriggerComment = this.statisticsType.getCountTriggerText() == null ? OSDE.STRING_EMPTY : this.statisticsType.getCountTriggerText());
+			if (this.isSumTriggerTime = (this.statisticsType.getSumTriggerTimeText() != null)) {
+				this.countByTriggerButton.setSelection(this.isSumTriggerTime);
+				if (this.isSumTriggerTime) {
+					this.sumTriggerTimeText.setEnabled(true);
+					this.sumTriggerTimeText.setText(this.sumTriggerTimeComment = this.statisticsType.getSumTriggerTimeText() == null ? OSDE.STRING_EMPTY : this.statisticsType.getSumTriggerTimeText());
 				}
 				else {
-					this.countTriggerText.setEnabled(false);
+					this.sumTriggerTimeText.setEnabled(false);
 				}
 			}
 			else {
-				this.countTriggerText.setEnabled(false);
+				this.countByTriggerText.setEnabled(false);
+			}
+			if ((this.isCountByTrigger = this.statisticsType.isCountByTrigger()) != null) {
+				this.countByTriggerButton.setSelection(this.isCountByTrigger);
+				if (this.isCountByTrigger) {
+					this.countByTriggerText.setEnabled(true);
+					this.countByTriggerText.setText(this.countByTriggerComment = this.statisticsType.getCountTriggerText() == null ? OSDE.STRING_EMPTY : this.statisticsType.getCountTriggerText());
+				}
+				else {
+					this.countByTriggerText.setEnabled(false);
+				}
+			}
+			else {
+				this.countByTriggerText.setEnabled(false);
 			}
 			if ((this.triggerRefOrdinal = this.statisticsType.getTriggerRefOrdinal()) != null) {
-				this.isTriggerRefOrdinalButton.setSelection(true);
+				this.triggerRefOrdinalButton.setSelection(true);
 				//this.triggerRefOrdinalCombo.setEnabled(true);
 				this.triggerRefOrdinalCombo.select(this.triggerRefOrdinal);
 			}
@@ -275,9 +291,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.deviceConfig.setChangePropery(true);
 			}
 			this.countByTriggerButton.setSelection(false);
-			this.countTriggerText.setEnabled(false);
-			this.countTriggerText.setText(OSDE.STRING_EMPTY);
-			this.countTriggerComment = null;
+			this.countByTriggerText.setEnabled(false);
+			this.countByTriggerText.setText(OSDE.STRING_EMPTY);
+			this.countByTriggerComment = null;
 			if (this.statisticsType.getCountTriggerText() != null) {
 				this.statisticsType.setCountTriggerText(null);
 				this.deviceConfig.setChangePropery(true);
@@ -288,7 +304,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsType.setTriggerRefOrdinal(null);
 				this.deviceConfig.setChangePropery(true);
 			}
-			this.isTriggerRefOrdinalButton.setSelection(false);
+			this.triggerRefOrdinalButton.setSelection(false);
 			this.triggerRefOrdinalCombo.select(0);
 
 			this.sumByTriggerRefOrdinal = null;
@@ -395,9 +411,11 @@ public class StatisticsTypeTabItem extends CTabItem {
 							StatisticsTypeTabItem.this.minTimeSecCombo
 									.select((StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec = 1 : StatisticsTypeTabItem.this.minTimeSec) - 1);
 						}
+						StatisticsTypeTabItem.this.sumTriggerTimeButton.setSelection(StatisticsTypeTabItem.this.isSumTriggerTime == null ? false : StatisticsTypeTabItem.this.isSumTriggerTime);
+						StatisticsTypeTabItem.this.sumTriggerTimeText.setText(StatisticsTypeTabItem.this.sumTriggerTimeComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerTimeComment);
 						StatisticsTypeTabItem.this.countByTriggerButton.setSelection(StatisticsTypeTabItem.this.isCountByTrigger == null ? false : StatisticsTypeTabItem.this.isCountByTrigger);
-						StatisticsTypeTabItem.this.countTriggerText.setText(StatisticsTypeTabItem.this.countTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.countTriggerComment);
-						StatisticsTypeTabItem.this.isTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
+						StatisticsTypeTabItem.this.countByTriggerText.setText(StatisticsTypeTabItem.this.countByTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.countByTriggerComment);
+						StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
 						StatisticsTypeTabItem.this.triggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.triggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
 								: StatisticsTypeTabItem.this.triggerRefOrdinal);
 						StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
@@ -501,7 +519,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 									StatisticsTypeTabItem.this.triggerType.setIsGreater(StatisticsTypeTabItem.this.isGreater == null ? (StatisticsTypeTabItem.this.isGreater=true) : StatisticsTypeTabItem.this.isGreater);
 									StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec=1 : StatisticsTypeTabItem.this.minTimeSec);
 									StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
-									StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countTriggerComment);
+									StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
 									
 									StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(null);
@@ -512,7 +530,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 									StatisticsTypeTabItem.this.statisticsComposite.redraw();
 								}
 								
-								StatisticsTypeTabItem.this.isTriggerRefOrdinalButton.setEnabled(false);
+								StatisticsTypeTabItem.this.triggerRefOrdinalButton.setEnabled(false);
 								StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setEnabled(false);
 								StatisticsTypeTabItem.this.sumTriggerText.setEnabled(false);
 								StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setEnabled(false);
@@ -538,10 +556,12 @@ public class StatisticsTypeTabItem extends CTabItem {
 								StatisticsTypeTabItem.this.isGreaterButton.setEnabled(false);
 								StatisticsTypeTabItem.this.minTimeSecLabel.setEnabled(false);
 								StatisticsTypeTabItem.this.minTimeSecCombo.setEnabled(false);
+								StatisticsTypeTabItem.this.sumTriggerTimeButton.setEnabled(false);
+								StatisticsTypeTabItem.this.sumTriggerTimeText.setEnabled(false);
 								StatisticsTypeTabItem.this.countByTriggerButton.setEnabled(false);
-								StatisticsTypeTabItem.this.countTriggerText.setEnabled(false);
+								StatisticsTypeTabItem.this.countByTriggerText.setEnabled(false);
 
-								StatisticsTypeTabItem.this.isTriggerRefOrdinalButton.setEnabled(true);
+								StatisticsTypeTabItem.this.triggerRefOrdinalButton.setEnabled(true);
 								StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setEnabled(true);
 								StatisticsTypeTabItem.this.sumTriggerText.setEnabled(true);
 								StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setEnabled(true);
@@ -675,17 +695,52 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			{
+				this.sumTriggerTimeButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
+				this.sumTriggerTimeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.sumTriggerTimeButton.setText(Messages.getString(MessageIds.OSDE_MSGT0511));
+				this.sumTriggerTimeButton.setBounds(125, 55, 170, 20);
+				this.sumTriggerTimeButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0525));
+				this.sumTriggerTimeButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						StatisticsTypeTabItem.log.log(Level.FINEST, "sumTriggerTimeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						StatisticsTypeTabItem.this.isSumTriggerTime = StatisticsTypeTabItem.this.sumTriggerTimeButton.getSelection();
+						StatisticsTypeTabItem.this.sumTriggerTimeText.setEnabled(StatisticsTypeTabItem.this.isSumTriggerTime);
+						if (StatisticsTypeTabItem.this.statisticsType != null) {
+							StatisticsTypeTabItem.this.statisticsType.setSumTriggerTimeText(StatisticsTypeTabItem.this.isSumTriggerTime ? StatisticsTypeTabItem.this.sumTriggerTimeComment : null);
+							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+						}
+					}
+				});
+			}
+			{
+				this.sumTriggerTimeText = new Text(this.statisticsComposite, SWT.BORDER);
+				this.sumTriggerTimeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.sumTriggerTimeText.setBounds(360, 55, 325, 20);
+				this.sumTriggerTimeText.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent evt) {
+						StatisticsTypeTabItem.log.log(Level.FINEST, "sumTriggerTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
+						StatisticsTypeTabItem.this.sumTriggerTimeComment = StatisticsTypeTabItem.this.sumTriggerTimeText.getText().trim();
+						if (StatisticsTypeTabItem.this.statisticsType != null) {
+							StatisticsTypeTabItem.this.statisticsType.setSumTriggerTimeText(StatisticsTypeTabItem.this.sumTriggerTimeComment);
+							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+						}
+					}
+				});
+			}
+			{
 				this.countByTriggerButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.countByTriggerButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.countByTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT0567));
-				this.countByTriggerButton.setBounds(125, 55, 170, 20);
+				this.countByTriggerButton.setBounds(125, 80, 170, 20);
 				this.countByTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0568));
 				this.countByTriggerButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						StatisticsTypeTabItem.log.log(Level.FINEST, "countByTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.isCountByTrigger = StatisticsTypeTabItem.this.countByTriggerButton.getSelection() == false ? null : true;
-						StatisticsTypeTabItem.this.countTriggerText.setEnabled(StatisticsTypeTabItem.this.isCountByTrigger != null);
+						StatisticsTypeTabItem.this.countByTriggerText.setEnabled(StatisticsTypeTabItem.this.isCountByTrigger != null);
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
@@ -694,7 +749,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 							}
 							else {
 								if (statisticsType.getTrigger() == null) {
-									StatisticsTypeTabItem.this.isTriggerRefOrdinalButton.setSelection(true);
+									StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(true);
 									handleTriggerRefOrdinalSelectionEvent();
 								}
 							}
@@ -703,28 +758,28 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			{
-				this.countTriggerText = new Text(this.statisticsComposite, SWT.BORDER);
-				this.countTriggerText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.countTriggerText.setBounds(360, 55, 325, 20);
-				this.countTriggerText.addKeyListener(new KeyAdapter() {
+				this.countByTriggerText = new Text(this.statisticsComposite, SWT.BORDER);
+				this.countByTriggerText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.countByTriggerText.setBounds(360, 80, 325, 20);
+				this.countByTriggerText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "countTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
-						StatisticsTypeTabItem.this.countTriggerComment = StatisticsTypeTabItem.this.countTriggerText.getText();
+						StatisticsTypeTabItem.log.log(Level.FINEST, "countByTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
+						StatisticsTypeTabItem.this.countByTriggerComment = StatisticsTypeTabItem.this.countByTriggerText.getText().trim();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
-							StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countTriggerComment);
+							StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 						}
 					}
 				});
 			}
 			{
-				this.isTriggerRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
-				this.isTriggerRefOrdinalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.isTriggerRefOrdinalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0569));
-				this.isTriggerRefOrdinalButton.setBounds(125, 80, 118, 20);
-				this.isTriggerRefOrdinalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0570));
-				this.isTriggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
+				this.triggerRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
+				this.triggerRefOrdinalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.triggerRefOrdinalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0569));
+				this.triggerRefOrdinalButton.setBounds(125, 105, 118, 20);
+				this.triggerRefOrdinalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0570));
+				this.triggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						StatisticsTypeTabItem.log.log(Level.FINEST, "isTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -735,7 +790,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			{
 				this.triggerRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
 				this.triggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.triggerRefOrdinalCombo.setBounds(245, 80, 110, 20);
+				this.triggerRefOrdinalCombo.setBounds(245, 105, 110, 20);
 				this.triggerRefOrdinalCombo.setEnabled(false);
 				this.triggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				this.triggerRefOrdinalCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -744,7 +799,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isSumByTriggerRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.isSumByTriggerRefOrdinalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.isSumByTriggerRefOrdinalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0571));
-				this.isSumByTriggerRefOrdinalButton.setBounds(125, 105, 118, 20);
+				this.isSumByTriggerRefOrdinalButton.setBounds(125, 130, 118, 20);
 				this.isSumByTriggerRefOrdinalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0572));
 				this.isSumByTriggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -772,7 +827,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			{
 				this.sumByTriggerRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
 				this.sumByTriggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.sumByTriggerRefOrdinalCombo.setBounds(245, 105, 110, 20);
+				this.sumByTriggerRefOrdinalCombo.setBounds(245, 130, 110, 20);
 				this.sumByTriggerRefOrdinalCombo.setEnabled(false);
 				this.sumByTriggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				this.sumByTriggerRefOrdinalCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -780,7 +835,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			{
 				this.sumTriggerText = new Text(this.statisticsComposite, SWT.BORDER);
 				this.sumTriggerText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.sumTriggerText.setBounds(360, 105, 325, 20);
+				this.sumTriggerText.setBounds(360, 130, 325, 20);
 				this.sumTriggerText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0573));
 				this.sumTriggerText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -798,7 +853,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isRatioRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.isRatioRefOrdinalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.isRatioRefOrdinalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0574));
-				this.isRatioRefOrdinalButton.setBounds(125, 130, 118, 20);
+				this.isRatioRefOrdinalButton.setBounds(125, 155, 118, 20);
 				this.isRatioRefOrdinalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0575));
 				this.isRatioRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -823,7 +878,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			{
 				this.ratioRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
 				this.ratioRefOrdinalCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.ratioRefOrdinalCombo.setBounds(245, 130, 110, 20);
+				this.ratioRefOrdinalCombo.setBounds(245, 155, 110, 20);
 				this.ratioRefOrdinalCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -839,7 +894,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			{
 				this.ratioText = new Text(this.statisticsComposite, SWT.BORDER);
 				this.ratioText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.ratioText.setBounds(360, 130, 325, 20);
+				this.ratioText.setBounds(360, 155, 325, 20);
 				this.ratioText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0576));
 				this.ratioText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -854,7 +909,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				});
 			}
 			this.scrolledComposite.setContent(this.statisticsComposite);
-			this.statisticsComposite.setSize(700, 160);
+			this.statisticsComposite.setSize(700, 185);
 			this.statisticsComposite.layout();
 
 		}
@@ -889,7 +944,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.isGreaterButton.setMenu(this.popupMenu);
 		this.minTimeSecLabel.setMenu(this.popupMenu);
 		this.countByTriggerButton.setMenu(this.popupMenu);
-		this.isTriggerRefOrdinalButton.setMenu(this.popupMenu);
+		this.triggerRefOrdinalButton.setMenu(this.popupMenu);
 		this.isSumByTriggerRefOrdinalButton.setMenu(this.popupMenu);
 		this.isRatioRefOrdinalButton.setMenu(this.popupMenu);
 	}
@@ -899,7 +954,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	 * If trigger of this measurement is not defined a reference to the measurement defining the trigger is required
 	 */
 	private void handleTriggerRefOrdinalSelectionEvent() {
-		if (StatisticsTypeTabItem.this.isTriggerRefOrdinalButton.getSelection()) {
+		if (StatisticsTypeTabItem.this.triggerRefOrdinalButton.getSelection()) {
 			//StatisticsTypeTabItem.this.triggerRefOrdinalCombo.setEnabled(true);
 			StatisticsTypeTabItem.this.triggerRefOrdinal = StatisticsTypeTabItem.this.getTriggerReferenceOrdinal();
 			if (StatisticsTypeTabItem.this.statisticsType != null) {

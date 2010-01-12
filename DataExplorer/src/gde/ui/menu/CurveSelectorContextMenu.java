@@ -1036,6 +1036,7 @@ public class CurveSelectorContextMenu {
 			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.this.application.createCompareWindowTabItem(); // if ot already exist
 					String copyFromRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
 					RecordSet copyFromRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 					if (copyFromRecordSet != null && copyFromRecordKey != null) {
@@ -1062,16 +1063,16 @@ public class CurveSelectorContextMenu {
 									compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
 								}
 								// check if the new added record exceeds the existing one in time or set draw limit and fill
-								double maxRecordTime_ms = (compareSet.getMaxSize()-1)*compareSet.getTimeStep_ms();
+								double maxRecordTime_ms = compareSet.getTime_ms(compareSet.getMaxSize()-1);
 								int tmpRecordIntervals = compareSet.get(newRecordkey).realSize()-1;
-								double tmpTimeStep_ms = compareSet.get(newRecordkey).getTimeStep_ms();
-								if ((tmpRecordIntervals * tmpTimeStep_ms) > maxRecordTime_ms) {
+								double tempRecordMaxTime_ms = newRecord.getTime_ms(tmpRecordIntervals);
+								if (tempRecordMaxTime_ms > maxRecordTime_ms) {
 										compareSet.setMaxSize(tmpRecordIntervals+1);
-										compareSet.setTimeStep_ms(tmpTimeStep_ms);
-										maxRecordTime_ms = tmpRecordIntervals * tmpTimeStep_ms;
+										compareSet.setTimeStep_ms(newRecord.getTimeStep_ms());
+										maxRecordTime_ms = tempRecordMaxTime_ms;
 										log.log(Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
 										
-										// new added record exceed existing, existing needs drwa limit to be updated and to be filled
+										// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
 										for (String tmpRecordKey : compareSet.keySet()) {
 											if (!newRecordkey.equals(tmpRecordKey)) {
 												Record tmpRecord = compareSet.get(tmpRecordKey);
@@ -1085,7 +1086,7 @@ public class CurveSelectorContextMenu {
 											}
 										}
 								}
-								else { // new record is shorter and needs to be filled and the draw limit to set
+								else { // new record is shorter and needs to be padded and the draw limit to set
 									int oldSize = newRecord.realSize();
 									newRecord.setDrawLimit(newRecord.realSize());
 									for (int i = 0; i < (int)(maxRecordTime_ms/newRecord.getTimeStep_ms()) - oldSize; i++) {

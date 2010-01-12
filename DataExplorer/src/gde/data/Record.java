@@ -57,8 +57,7 @@ public class Record extends Vector<Integer> {
 	// this variables are used to make a record selfcontained within compare set
 	String							channelConfigKey; 								// used as channelConfigKey
 	String							keyName;
-	double							timeStep_ms						= 0;				
-	Vector<Double>			timeSteps_ms					= null; // time base of measurement points, each record might have individual time step (compare)
+	TimeSteps						timeStep_ms           = null; // timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
 	IDevice							device;
 	final int						ordinal;	// ordinal is referencing the source position of the record relative to the initial 
 																// device measurement configuration and used to find specific properties
@@ -144,7 +143,9 @@ public class Record extends Vector<Integer> {
 	
 	int 								drawLimit							= Integer.MAX_VALUE;		// above this limit the record will not be drawn (compareSet with different records) 
 	int									zoomOffset			= 0;													// number of measurements point until zoom area begins
-	int									zoomSize				= 0;													// number of measurements point of the zoom area width
+//	int									zoomSize				= 0;													// number of measurements point of the zoom area width
+	double							zoomTimeOffset	= 0;		// time where the zoom area begins
+	double							drawTimeWidth		= 0;		// all or zoomed area time width
 	double							maxZoomScaleValue			= this.maxScaleValue;
 	double							minZoomScaleValue			= this.minScaleValue;
 	int									numberScaleTicks			= 0;
@@ -227,7 +228,7 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
-		this.timeStep_ms = record.timeStep_ms;
+		this.timeStep_ms = record.timeStep_ms == null ? record.parent.timeStep_ms == null ? null : record.parent.timeStep_ms.clone() : record.timeStep_ms.clone();
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -249,12 +250,10 @@ public class Record extends Vector<Integer> {
 		this.isStartEndDefined = record.isStartEndDefined;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
-		this.zoomOffset = 0;
-		this.zoomSize = record.realSize();
+		this.drawTimeWidth = record.getMaxTime_ms();
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
-		this.timeStep_ms = record.timeStep_ms;
 		this.device = record.device; // reference to device	
 	}
 
@@ -287,7 +286,7 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
-		this.timeStep_ms = record.timeStep_ms;
+		this.timeStep_ms = record.timeStep_ms == null ? null : record.timeStep_ms.clone();
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -321,8 +320,8 @@ public class Record extends Vector<Integer> {
 		this.isStartpointZero = record.isStartpointZero;
 		this.maxScaleValue = this.maxValue;
 		this.minScaleValue = this.minValue;
-		this.zoomOffset = 0;
-		this.zoomSize = record.realSize();
+		
+		this.drawTimeWidth = record.getMaxTime_ms();
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
@@ -703,7 +702,7 @@ public class Record extends Vector<Integer> {
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.getTimeStep_ms()) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.getTimeStep_ms()) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -711,15 +710,14 @@ public class Record extends Vector<Integer> {
 		}
 		if (this.triggerRanges != null) {
 			// evaluate trigger ranges to meet minTimeSec requirement 
-			int countDelta = Double.valueOf(this.getMinTriggerTimeSec() / (this.getTimeStep_ms() / 1000.0)).intValue();
 			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
-				if ((range.out - range.in) < countDelta) this.triggerRanges.remove(range);
+				if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec()*1000) this.triggerRanges.remove(range);
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(range.in*this.getTimeStep_ms()) + "), " + range.out + "(" + TimeLine.getFomatedTime(range.out*this.getTimeStep_ms()) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 			else
@@ -767,18 +765,18 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * overwrites size method for zoom mode and not zoomed compare window
+	 * return the 'best fit' number of measurement points in dependency of zoomMode or scopeMode
 	 */
-	public synchronized int size() {
-		int tmpSize = super.size();
+  public synchronized int getNumberPoints() {
+		int tmpSize = elementCount;
 		
-		if (this.parent.isZoomMode)
-			tmpSize = this.zoomSize;
+		if (this.parent.isZoomMode) // record -> recordSet.isZoomMode
+			tmpSize = this.findBestIndex(this.zoomTimeOffset + this.drawTimeWidth) - this.findBestIndex(this.zoomTimeOffset);
 		else if (this.parent.isScopeMode)
 			tmpSize = this.parent.scopeModeSize;
 		
 		return tmpSize;
-	}
+  }
 	
 	/**
 	 * time calculation needs always the real size of the record
@@ -800,14 +798,16 @@ public class Record extends Vector<Integer> {
 	 * overwrites vector get(int index) to enable zoom
 	 * @param index
 	 */
+	@Override
 	public synchronized Integer get(int index) {
-		int size = super.size();
-		if(this.parent.isZoomMode) {
-			index = index + this.zoomOffset;
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
-		}
-		else if(this.parent.isScopeMode) {
+		int size = elementCount;
+//		if(this.parent.isZoomMode) {
+//			index = index + this.zoomOffset;
+//			index = index > (size-1) ? (size-1) : index;
+//			index = index < 0 ? 0 : index;
+//		}
+//		else 
+			if(this.parent.isScopeMode) {
 			index = index + this.parent.scopeModeOffset;
 			index = index > (size-1) ? (size-1) : index;
 			index = index < 0 ? 0 : index;
@@ -827,19 +827,19 @@ public class Record extends Vector<Integer> {
 		return super.size() != 0 ? super.get(index) : 0;
 	}
 
-	/**
-	 * overwrites vector elementAt(int index) to enable zoom
-	 * @param index
-	 */
-	public synchronized Integer elementAt(int index) {
-		Integer value;
-		if(this.parent.isZoomMode || this.parent.isScopeMode)
-			value = super.elementAt(index + this.zoomOffset);
-		else
-			value = super.elementAt(index);
-		
-		return value;
-	}
+//	/**
+//	 * overwrites vector elementAt(int index) to enable zoom
+//	 * @param index
+//	 */
+//	public synchronized Integer elementAt(int index) {
+//		Integer value;
+//		if(this.parent.isZoomMode || this.parent.isScopeMode)
+//			value = super.elementAt(index + this.zoomOffset);
+//		else
+//			value = super.elementAt(index);
+//		
+//		return value;
+//	}
 	
 	public boolean isPositionLeft() {
 		return this.isPositionLeft;
@@ -1040,19 +1040,20 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
-	 * query time step in mills seconds, this property is hold local to be independent (compare window)
+	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
 	public double getTime_ms(int index) {
-		return this.timeSteps_ms == null ? this.parent.getTimeStep_ms(index) : this.timeSteps_ms.get(index);
+		return this.timeStep_ms == null ? this.parent.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
 	}
 
 	/** 
 	 * query time step in mills seconds, this property is hold local to be independent (compare window)
 	 * @return time step in msec
 	 */
+	@Deprecated
 	public double getTimeStep_ms() {
-		return this.timeStep_ms <= 0 ? this.parent.getTimeStep_ms() : this.timeStep_ms;
+		return this.timeStep_ms == null ? this.parent.getTimeStep_ms() : this.timeStep_ms.getTimeStep_ms();
 	}
 
 	/**
@@ -1060,9 +1061,68 @@ public class Record extends Vector<Integer> {
 	 * @param timeStep_ms the timeStep_ms to set
 	 */
 	void setTimeStep_ms(double newTimeStep_ms) {
-		this.timeStep_ms = newTimeStep_ms;
+		this.timeStep_ms = new TimeSteps(newTimeStep_ms);
+	}
+	
+	/**
+	 * @return the maximum time of this record, which should correspondence to the last entry in timeSteps
+	 */
+	public double getMaxTime_ms() {
+		return this.timeStep_ms == null ? this.parent.getMaxTime_ms() : this.timeStep_ms.getMaxTime_ms();
 	}
 
+	/**
+	 * Find the indexes in this time vector where the given time value is placed
+	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
+	 * only in case where the given time matches an existing entry both indexes are equal.
+	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
+	 * @param time_ms
+	 * @return
+	 */
+	public int[] findBoundingIndexes(double time_ms) {
+		return this.timeStep_ms == null ? this.parent.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
+	}
+
+	/**
+	 * find the index closest to given time in msec
+	 * @param time_ms
+	 * @return
+	 */
+	public int findBestIndex(double time_ms) {
+		return this.timeStep_ms == null ? this.parent.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
+	}
+
+	/**
+	 * @return the zoomTimeOffset
+	 */
+	public double getZoomTimeOffset() {
+		return this.zoomTimeOffset;
+	}
+
+	/**
+	 * @return the time in msec representing the segment to be displayed, without zooming this is the maximum time represented by the last data point time
+	 */
+	public double getTimeWidth_ms() {
+		return this.drawTimeWidth;
+	}
+
+	/**
+	 * @param zoomTimeOffset the zoomTimeOffset to set
+	 */
+	public void setZoomTimeOffset(double newZoomTimeOffset) {
+			this.zoomTimeOffset = newZoomTimeOffset;
+	}
+
+	/**
+	 * @param drawTimeWidth the potential time width to be drawn
+	 */
+	public void setDrawTimeWidth(double newDrawTimeWidth) {
+			this.drawTimeWidth = newDrawTimeWidth;
+	}
+	
+	/**
+	 * @return the decimal format used by this record
+	 */
 	public DecimalFormat getDecimalFormat() {
 		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
 		return this.df;
@@ -1092,28 +1152,56 @@ public class Record extends Vector<Integer> {
 		
 		return this.device;
 	}
-
+	
 	/**
-	 * set the device as fallback for data point calculation, this property is hold local to be independent
-	 * @param device the device to set
+	 * method to query time and value for display at a given index
+	 * @param index
+	 * @param scaledMeasurementPointIndex (may differ from index if display width < measurement size)
+	 * @param xDisplayOffset
+	 * @param yDisplayOffset
+	 * @return point time, value
 	 */
-	void setDevice(IDevice useDevice) {
-		this.device = useDevice;
+	public Point getDisplayPoint(int index, int scaledMeasurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
+		return new Point(
+				xDisplayOffset + Double.valueOf((this.getTime_ms(index+this.zoomOffset) - this.zoomTimeOffset) * this.displayScaleFactorTime).intValue(), 
+				yDisplayOffset - Double.valueOf(((this.get(scaledMeasurementPointIndex+this.zoomOffset) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue());
 	}
 	
 	/**
 	 * method to query time and value for display at a given index
 	 * @param index
-	 * @param scaledIndex (may differ from index if display width << number of points)
 	 * @param xDisplayOffset
-	 * @param yDisplayOffset
 	 * @return point time, value
 	 */
-	public Point getDisplayPoint(int index, int scaledIndex, int xDisplayOffset, int yDisplayOffset) {
-		Point returnPoint = new Point(0,0);
-		returnPoint.x = Double.valueOf((xDisplayOffset + (this.getTimeStep_ms() * index) * this.displayScaleFactorTime)).intValue();
-		returnPoint.y = Double.valueOf(yDisplayOffset - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
-		return returnPoint;
+	public Point getDisplayEndPoint(int index, int xDisplayOffset) {
+		return new Point((xDisplayOffset + index), this.parent.drawAreaBounds.y + getVerticalDisplayPointValue(index, this.parent.drawAreaBounds));
+	}
+
+	/**
+	* get the time in msec at given horizontal display position
+	* @param xPos of the display point
+	* @return time value in msec
+	*/
+	public double getHorizontalDisplayPointTime_ms(int xPos) {
+		return this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
+	}
+
+	/**
+	* get the formatted time with unit at given position
+	* @param xPos of the display point
+	* @return string of time value in simple date format HH:ss:mm:SSS
+	*/
+	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
+		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos) + this.zoomTimeOffset); 
+	}
+
+	/**
+	 * calculate best fit index in data vector from given display point relative to the (zoomed) display width
+	 * @param xPos
+	 * @return position integer value
+	 */
+	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
+		return this.parent.timeStep_ms.findBestIndex(getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos));
 	}
 
 	/**
@@ -1122,24 +1210,33 @@ public class Record extends Vector<Integer> {
 	 * @param drawAreaBounds
 	 * @return displays yPos in pixel
 	 */
-	public int getDisplayPointDataValue(int xPos, Rectangle drawAreaBounds) {
-		int scaledIndex = this.size() * xPos / drawAreaBounds.width;
-		scaledIndex = this.zoomOffset + scaledIndex >= this.realSize() ? this.realSize() - this.zoomOffset -1 : scaledIndex;
-		log.log(Level.FINER, "scaledIndex = " + scaledIndex); //$NON-NLS-1$
-		int pointY = Double.valueOf(drawAreaBounds.height - ((this.get(scaledIndex) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
-		pointY = pointY < 0 ? 0 : pointY;
-		pointY = pointY >= drawAreaBounds.height ? drawAreaBounds.height : pointY;
-		log.log(Level.FINER, "pointY = " + pointY); //$NON-NLS-1$
-		return pointY;
+	public int getVerticalDisplayPointValue(int xPos, Rectangle drawAreaBounds) {
+		int pointPosY = 0;
+		double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset;
+		int[] indexs = this.findBoundingIndexes(tmpTimeValue);
+		if (indexs[0] == indexs[1]) {
+			pointPosY = Double.valueOf(drawAreaBounds.height - ((this.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		}
+		else {
+			int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
+			double deltaTimeIndex01 = this.parent.getTime_ms(indexs[1]) - this.parent.getTime_ms(indexs[0]);
+			double xPosDeltaTime2Index0 = tmpTimeValue - this.parent.getTime_ms(indexs[0]);
+			log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			pointPosY = Double.valueOf(drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+		}
+		log.log(Level.FINER, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		//check yPos out of range, the graph might not visible within this area
+		return pointPosY > drawAreaBounds.height ? drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
 	}
 	
 	/**
-	 * get the value corresponding the display point (needs translate)
+	 * get the formatted scale value corresponding the vertical display point
 	 * @param yPos
 	 * @param drawAreaBounds
 	 * @return formated value
 	 */
-	public String getDisplayPointValueString(int yPos, Rectangle drawAreaBounds) {
+	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
 		if(this.parent.isZoomMode)
 			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
@@ -1150,12 +1247,12 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * get the value corresponding the display point (needs translate)
+	 * get the scale value corresponding the vertical display point
 	 * @param yPos
 	 * @param drawAreaBounds
 	 * @return formated value
 	 */
-	public double getDisplayPointValue(int yPos, Rectangle drawAreaBounds) {
+	public double getVerticalDisplayPointScaleValue(int yPos, Rectangle drawAreaBounds) {
 		double value;
 		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			value = this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * yPos) / drawAreaBounds.height;
@@ -1166,12 +1263,12 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * get the value corresponding the display point (needs translate)
+	 * get the value corresponding the display point
 	 * @param deltaPos
 	 * @param drawAreaBounds
 	 * @return formated value
 	 */
-	public String getDisplayDeltaValue(int deltaPos, Rectangle drawAreaBounds) {
+	public String getVerticalDisplayDeltaAsFormattedValue(int deltaPos, Rectangle drawAreaBounds) {
 		String textValue;
 		if(this.parent.isZoomMode || this.parent.isScopeMode)
 			textValue = this.df.format(new Double((this.maxZoomScaleValue - this.minZoomScaleValue) * deltaPos / drawAreaBounds.height));
@@ -1194,7 +1291,9 @@ public class Record extends Vector<Integer> {
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
-		double timeDelta = 1.0 * points.x * this.size() / (drawAreaBounds.width-1) * this.getTimeStep_ms() / 1000; //sec
+		//double timeDelta = (1.0 * points.x * this.size() - 1) / drawAreaBounds.width * this.getTimeStep_ms() / 1000; //sec
+		//this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
+		double timeDelta = this.drawTimeWidth * points.x / drawAreaBounds.width / 1000; //sec
 		log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
@@ -1204,62 +1303,16 @@ public class Record extends Vector<Integer> {
 	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
 	 */
 	public void setZoomBounds(Rectangle zoomBounds) {
-		int size = super.size();
-		this.zoomOffset = this.getPointIndexFromDisplayPoint(zoomBounds.x) + this.zoomOffset;
-		this.zoomSize = this.getPointIndexFromDisplayPoint(zoomBounds.width);
-		this.zoomSize = this.zoomOffset + this.zoomSize > size ? size - this.zoomOffset : this.zoomSize;
-		this.minZoomScaleValue = this.getDisplayPointValue(zoomBounds.y, this.parent.drawAreaBounds);
-		this.maxZoomScaleValue = this.getDisplayPointValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
+		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.zoomTimeOffset;
+		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
+		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
+		//this.zoomSize = this.findBestIndex(this.zoomTimeOffset+this.drawTimeWidth) - this.zoomOffset;
+		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
+
+		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
+		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
 	}
 
-	/**
-	 * set the zoom size to record set to enable to display only the last size point
-	 * recordZoomOffset must be calculated each graphics refresh
-	 * @param newZoomSize number of points shown
-	 */
-	public void setZoomSize(int newZoomSize) {
-		this.zoomSize = newZoomSize;
-		this.parent.isScopeMode = true;
-	}
-	
-	/**
-	 * query actual recordZoomOffset
-	 * @return recordZoomOffset
-	 */
-	public int getZoomOffset() {
-		return this.zoomOffset;
-	}
-	
-	/**
-	 * set a new recordZoomOffset
-	 * @param newRecordZoomOffset
-	 */
-	public void setZoomOffset(int newRecordZoomOffset) {
-		this.zoomOffset = newRecordZoomOffset;
-	}
-
-	public int getZoomSize() {
-		return this.zoomSize;
-	}
-
-	/**
-	* get the formatted time at given position
-	* @param xPos of the display point
-	* @return string of time value in simple date format HH:ss:mm:SSS
-	*/
-	public String getDisplayPointTime(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(Double.valueOf((this.getPointIndexFromDisplayPoint(xPos) + this.zoomOffset) * this.getTimeStep_ms()).intValue());
-	}
-
-	/**
-	 * calculate index in data vector from given display point
-	 * @param xPos
-	 * @return position integer value
-	 */
-	public int getPointIndexFromDisplayPoint(int xPos) {
-		return Double.valueOf(1.0 * xPos * this.zoomSize / this.parent.getDrawAreaBounds().width).intValue();
-	}
-	
 	/**
 	 * @return the displayScaleFactorTime
 	 */
@@ -1772,7 +1825,7 @@ public class Record extends Vector<Integer> {
 		double sum = 0;
 		if (this.triggerRanges != null) {
 			for (TriggerRange range : this.triggerRanges) {
-				sum += (range.out - range.in) * this.getTimeStep_ms();
+				sum += (this.getTime_ms(range.out) - this.getTime_ms(range.in));
 			}
 		}
 		return TimeLine.getFomatedTimeWithUnit(sum);
@@ -1830,16 +1883,16 @@ public class Record extends Vector<Integer> {
 	 * get the curve index until the curve will be drawn (for compare set with different time length curves)
 	 * @return the drawLimit
 	 */
-	public int getDrawLimit() {
-		return this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
+	public int getDrawLimit() { //TODO
+		return this.drawLimit; //this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
 	}
 
 	/**
 	 * set the curve index until the curve will be drawn
-	 * @param drawLimit the drawLimit to set
+	 * @param newDrawLimit the drawLimit to set
 	 */
-	public void setDrawLimit(int drawLimit) {
-		this.drawLimit = drawLimit;
+	public void setDrawLimit(int newDrawLimit) {
+		this.drawLimit = newDrawLimit;
 	}
 
 	/**

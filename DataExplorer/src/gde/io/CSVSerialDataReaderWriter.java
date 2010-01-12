@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,8 +34,6 @@ import osde.exception.DataInconsitsentException;
 import osde.exception.DataTypeException;
 import osde.exception.MissMatchDeviceException;
 import osde.exception.NotSupportedFileFormatException;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -109,6 +106,19 @@ public class CSVSerialDataReaderWriter {
 
 					//detect states where a new record set has to be created
 					if (recordSet == null || !recordSet.getName().endsWith(recordSetNameExtend) || lastRecordNumber != data.recordNumber) {
+						
+						if (recordSet != null) { // apply something to previous record set
+							//check reasonable size of data points
+							if (recordSet.get(0).realSize() < 3) {
+								activeChannel.remove(recordSetName);
+								log.log(Level.WARNING, "remove record set with < 3 data points");
+								application.openMessageDialog("remove record set with < 3 data points");
+
+							}
+							else
+								recordSet.checkAllDisplayable(); // raw import needs calculation of passive records
+						}
+						//prepare new record set now
 						lastRecordNumber = data.recordNumber;
 						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
@@ -122,18 +132,18 @@ public class CSVSerialDataReaderWriter {
 								recordSet.get(recordKey).setDisplayable(true); // all data available 
 							}
 						}
+						//recordSet.setTimeStep_ms(device.getTimeStep_ms()); // set -1 for none constant time step between measurement points
+						activeChannel.put(recordSetName, recordSet);
+						activeChannel.applyTemplate(recordSetName, true);
 					}
-					recordSet.addTimeStep_ms(data.time);
 
 					if (isRaw)
-						recordSet.addNoneCalculationRecordsPoints(data.values);
+						recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
 					else
-						recordSet.addPoints(data.values);
+						recordSet.addPoints(data.values, data.time_ms);
 				}
 
-				activeChannel.put(recordSetName, recordSet);
 				activeChannel.setActiveRecordSet(recordSetName);
-				activeChannel.applyTemplate(recordSetName, true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 
@@ -141,17 +151,23 @@ public class CSVSerialDataReaderWriter {
 				reader = null;
 			}
 		}
-		catch (UnsupportedEncodingException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new UnsupportedEncodingException(Messages.getString(MessageIds.OSDE_MSGW0010));
-		}
 		catch (FileNotFoundException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new FileNotFoundException(Messages.getString(MessageIds.OSDE_MSGW0011, new Object[] {filePath}));
+			log.log(Level.WARNING, e.getMessage(), e);
+			application.openMessageDialog(e.getMessage());
 		}
 		catch (IOException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new IOException(Messages.getString(MessageIds.OSDE_MSGW0012, new Object[] {filePath}));
+			log.log(Level.WARNING, e.getMessage(), e);
+			application.openMessageDialog(e.getMessage());
+		}
+		catch (NumberFormatException e) {
+			String msg = e.getMessage() + " line number " + lineNumber;
+			log.log(Level.WARNING, msg, e);
+			application.openMessageDialog(msg);
+		}
+		catch (DataInconsitsentException e) {
+			String msg = e.getMessage() + " line number " + lineNumber;
+			log.log(Level.WARNING, msg, e);
+			application.openMessageDialog(msg);
 		}
 		finally {
 			if (application.getStatusBar() != null) {
