@@ -125,6 +125,7 @@
 		<ant antfile="build.xml" target="clean" dir="VC800" />
 		<ant antfile="build.xml" target="clean" dir="LiPoWatch" />
 		<ant antfile="build.xml" target="clean" dir="Pichler" />
+		<ant antfile="build.xml" target="clean" dir="CSV2SerialDataAdapter" />
 		<ant antfile="build.xml" target="clean" dir="DataVario" />
 		<!-- add new device here -->
 	</target>
@@ -211,6 +212,7 @@
 		<ant antfile="build.xml" target="package" dir="VC800" />
 		<ant antfile="build.xml" target="package" dir="LiPoWatch" />
 		<ant antfile="build.xml" target="package" dir="Pichler" />
+		<ant antfile="build.xml" target="package" dir="CSV2SerialDataAdapter" />
 		<ant antfile="build.xml" target="package" dir="DataVario" />
 		<!-- add new device here -->
 	</target>
@@ -225,6 +227,7 @@
 			<include name="VC800/build/*.jar" />
 			<include name="LiPoWatch/build/*.jar" />
 			<include name="Pichler/build/*.jar" />
+			<include name="CSV2SerialDataAdapter/build/*.jar" />
 			<include name="DataVario/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
