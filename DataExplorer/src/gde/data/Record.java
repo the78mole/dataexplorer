@@ -142,9 +142,8 @@ public class Record extends Vector<Integer> {
 	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	
 	double							drawLimit_ms					= Integer.MAX_VALUE;		// above this limit the record will not be drawn (compareSet with different records) 
-	int									zoomOffset			= 0;													// number of measurements point until zoom area begins
-//int									zoomSize				= 0;													// number of measurements point of the zoom area width
 	double							zoomTimeOffset	= 0;		// time where the zoom area begins
+	int									zoomOffset			= 0;		// number of measurements point until zoom area begins approximation only
 	double							drawTimeWidth		= 0;		// all or zoomed area time width
 	double							maxZoomScaleValue			= this.maxScaleValue;
 	double							minZoomScaleValue			= this.minScaleValue;
@@ -224,6 +223,7 @@ public class Record extends Vector<Integer> {
 	private Record(Record record) {
 		super(record);
 		log.log(Level.FINE, record.name + " Record(Record)"); //$NON-NLS-1$
+		this.parent = record.parent;
 		this.ordinal = record.ordinal;
 		this.name = record.name;
 		this.symbol = record.symbol;
@@ -267,10 +267,14 @@ public class Record extends Vector<Integer> {
 
 	/**
 	 * clone method used to move records to other configuration, where measurement signature does not match the source
+	 * called within RecordSet.clone(newChannelConfiguration) only!
 	 */
 	public Record clone(String newName) {
 		Record newRecord = new Record(this);
 		newRecord.name = newName;
+		if (newRecord.parent.timeStep_ms != null) { //record.clone() have copied timeSteps where the parent record set 
+			newRecord.timeStep_ms = null; // route to parent timeSteps
+		}
 		return newRecord;
 	}
 
@@ -286,7 +290,6 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
-		this.timeStep_ms = record.timeStep_ms == null ? record.parent.timeStep_ms.clone() : record.timeStep_ms.clone();
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -298,6 +301,7 @@ public class Record extends Vector<Integer> {
 		this.minValue = 0;
 		this.clear();
 		this.trimToSize();
+		
 		if (isFromBegin) { //TODO timeSteps ?
 			for (int i = dataIndex; i < record.realSize(); i++) {
 				this.add(record.get(i).intValue());
@@ -308,6 +312,17 @@ public class Record extends Vector<Integer> {
 				this.add(record.get(i).intValue());
 			}
 		}
+		
+		if (record.timeStep_ms != null && !record.timeStep_ms.isConstant) { //time step vector must be updated as well
+			this.timeStep_ms = record.timeStep_ms.clone(dataIndex, isFromBegin);
+		}
+		else if (record.timeStep_ms != null && record.timeStep_ms.isConstant) { 
+			this.timeStep_ms = record.timeStep_ms.clone();
+		}
+		else {
+			this.timeStep_ms = null; //refer to parent time steps
+		}
+
 		this.drawTimeWidth = record.drawTimeWidth; 
 		
 		this.df = (DecimalFormat) record.df.clone();
@@ -335,7 +350,7 @@ public class Record extends Vector<Integer> {
 	 * - if isFromBegin == false, the given index represents the last data point index of the records.
 	 * @param dataIndex
 	 * @param isFromBegin
-	 * @return new dreated record
+	 * @return new created record
 	 */
 	public Record clone(int dataIndex, boolean isFromBegin) {
 		return new Record(this, dataIndex, isFromBegin);
@@ -1219,7 +1234,7 @@ public class Record extends Vector<Integer> {
 	 * @return position integer value
 	 */
 	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
-		return this.parent.timeStep_ms.findBestIndex(getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos));
+		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos));
 	}
 
 	/**
@@ -1324,7 +1339,6 @@ public class Record extends Vector<Integer> {
 		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.zoomTimeOffset;
 		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
-		//this.zoomSize = this.findBestIndex(this.zoomTimeOffset+this.drawTimeWidth) - this.zoomOffset;
 		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
@@ -1901,8 +1915,8 @@ public class Record extends Vector<Integer> {
 	 * get the curve index until the curve will be drawn (for compare set with different time length curves)
 	 * @return the drawLimit
 	 */
-	public double getCompareSetDrawLimit_ms() { //TODO
-		return this.drawLimit_ms; //this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
+	public double getCompareSetDrawLimit_ms() {
+		return this.drawLimit_ms;
 	}
 
 	/**

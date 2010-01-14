@@ -44,14 +44,47 @@ public class TimeSteps extends Vector<Integer> {
 	/**
 	 * copy constructor
 	 */
-	public TimeSteps(TimeSteps toBeClonedTimeSteps) {
+	private TimeSteps(TimeSteps toBeClonedTimeSteps) {
   	super(toBeClonedTimeSteps);
   	this.isConstant = toBeClonedTimeSteps.isConstant;
 	}
 	
+	/**
+	 * copy constructor with cutting edges
+	 */
+	private TimeSteps(TimeSteps toBeClonedTimeSteps, int index, boolean isFromBegin) {
+  	//super(toBeClonedTimeSteps);
+  	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
+			if (isFromBegin) {
+				int cutOffVal = toBeClonedTimeSteps.get(index);
+				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
+					this.add(toBeClonedTimeSteps.get(i) - cutOffVal);
+				}
+			}
+			else {
+				for (int i = 0; i < toBeClonedTimeSteps.elementCount - index; i++) {
+					this.add(toBeClonedTimeSteps.get(i));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * overwritten clone method
+	 */
 	public synchronized TimeSteps clone() {
   	return new TimeSteps(this);
   }
+	
+	/**
+	 * clone method re-writes time steps
+	 * - if isFromBegin == true, the given index is the index where the record starts after this operation
+	 * - if isFromBegin == false, the given index represents the last data point index of the records.
+	 */
+	public synchronized TimeSteps clone(int index, boolean isFromBegin) {
+  	return new TimeSteps(this, index, isFromBegin);
+  }
+	
 
  	/**
 	 * query the delta time in msec between two index positions
@@ -157,13 +190,13 @@ public class TimeSteps extends Vector<Integer> {
 			index = (position - index) > 0.5 ? index : index + 1;
 		}
 		else {
-			index = (int) (time_ms / this.lastElement() / elementCount / 10);
+			index = (int) (time_ms / (this.lastElement() / (this.elementCount-1) / 10) / 2);
 			int value = Double.valueOf(time_ms * 10.0).intValue();
 			for (; index < elementCount; index++) {
 				if (value <= this.get(index))
 					break;
 			}
-			if (index+1 <= elementCount-1 && value > (this.get(index+1) + this.get(index))/2) 
+			if (index+1 <= this.elementCount-1 && value > (this.get(index+1) + this.get(index))/2) 
 				index = index + 1;
 		}
 			

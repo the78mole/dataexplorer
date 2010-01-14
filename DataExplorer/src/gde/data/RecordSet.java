@@ -346,7 +346,17 @@ public class RecordSet extends HashMap<String, Record> {
 			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
 		}
 
-		this.timeStep_ms = recordSet.timeStep_ms;
+		if (recordSet.timeStep_ms != null && !recordSet.timeStep_ms.isConstant) { //time step vector must be updated as well
+			this.timeStep_ms = recordSet.timeStep_ms.clone(dataIndex, isFromBegin);
+		}
+		else if (recordSet.timeStep_ms != null && recordSet.timeStep_ms.isConstant) { 
+			this.timeStep_ms = recordSet.timeStep_ms.clone();
+		}
+		else {
+			this.timeStep_ms = null;
+		}
+
+		
 		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
@@ -639,7 +649,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param time_ms
 	 * @return
 	 */
-	public int findBestIndex(double time_ms) {
+	public int findBestIndex(double time_ms) { //TODO index <= this.elementCount-1 ? index : this.elementCount-1;
 		return this.timeStep_ms.findBestIndex(time_ms);
 	}
 	
@@ -1050,10 +1060,8 @@ public class RecordSet extends HashMap<String, Record> {
 		for (String recordName : this.keySet()) {
 			Record record = this.get(recordName);
 			record.zoomOffset = 0;
-//			record.zoomSize = record.realSize();
 			record.zoomTimeOffset = 0.0;
 			record.drawTimeWidth = this.getMaxTime_ms();
-			//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 			record.minZoomScaleValue	= record.minScaleValue;
 			record.maxZoomScaleValue	= record.maxScaleValue;
 		}
@@ -1313,7 +1321,6 @@ public class RecordSet extends HashMap<String, Record> {
 				for (String recordName : this.keySet()) {
 					Record record = this.get(recordName);
 					record.zoomOffset = 0;
-//					record.zoomSize = record.realSize();
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
 					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
@@ -1426,13 +1433,11 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 			else if (record.zoomTimeOffset + record.drawTimeWidth + xShift_ms > record.getMaxTime_ms()) {
 				record.zoomTimeOffset = record.getMaxTime_ms() - record.drawTimeWidth;
-				record.zoomOffset = this.findBestIndex(record.zoomTimeOffset);
-				//record.zoomSize = this.findBestIndex(record.zoomTimeOffset+record.drawTimeWidth) - record.zoomOffset;
+				record.zoomOffset = record.findBestIndex(record.zoomTimeOffset);
 			}
 			else {
 				record.zoomTimeOffset = record.zoomTimeOffset + xShift_ms;
-				record.zoomOffset = this.findBestIndex(record.zoomTimeOffset);
-				//record.zoomSize = this.findBestIndex(record.zoomTimeOffset+record.drawTimeWidth) - record.zoomOffset;
+				record.zoomOffset = record.findBestIndex(record.zoomTimeOffset);
 			}
 			
 			double yShift = (record.getMaxScaleValue() - record.getMinScaleValue()) * yPercent / 100;

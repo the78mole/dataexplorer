@@ -1081,8 +1081,10 @@ public class CurveSelectorContextMenu {
 												|| tmpRecord.getCompareSetDrawLimit_ms() < newRecordMaxTime_ms) {
 											double avgTimeStep_ms = tmpRecord.getAverageTimeStep_ms();
 											int steps = (int) ((maxRecordTime_ms - tmpRecord.getCompareSetDrawLimit_ms()) / avgTimeStep_ms);
+											int value = tmpRecord.lastElement();
+											double timeStep = newRecord.getLastTime_ms();
 											for (int i = 0; i < steps; i++) {
-												tmpRecord.add(0, tmpRecord.getLastTime_ms() + avgTimeStep_ms);
+												tmpRecord.add(value, timeStep += avgTimeStep_ms);
 											}
 											tmpRecord.setDrawTimeWidth(newRecordMaxTime_ms);
 										}
@@ -1092,8 +1094,10 @@ public class CurveSelectorContextMenu {
 							else { // new record is shorter and needs to be padded and the draw limit to set
 								double avgTimeStep_ms = newRecord.getAverageTimeStep_ms();
 								int steps = (int) ((maxRecordTime_ms - newRecordMaxTime_ms) / avgTimeStep_ms);
+								int value = newRecord.lastElement();
+								double timeStep = newRecord.getLastTime_ms();
 								for (int i = 0; i < steps; i++) {
-									newRecord.add(0, newRecord.getLastTime_ms() + avgTimeStep_ms);
+									newRecord.add(value, timeStep += avgTimeStep_ms);
 								}
 								newRecord.setDrawTimeWidth(maxRecordTime_ms);
 							}
@@ -1120,7 +1124,11 @@ public class CurveSelectorContextMenu {
 
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
-						else CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
+						else 
+							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
+						
+						//TODO check, why this is required before zoom operation ?
+						CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 					}
 				}
 			});

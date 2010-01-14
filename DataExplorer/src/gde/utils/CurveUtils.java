@@ -249,7 +249,7 @@ public class CurveUtils {
 			}
 			else { // compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
-				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms());
+				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms()) - record.findBestIndex(record.getZoomTimeOffset());
 				int j = 0;
 				for (int i = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
 					// get the point to be drawn

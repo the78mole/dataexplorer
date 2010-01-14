@@ -473,7 +473,7 @@ public class OsdReaderWriter {
 								}
 							}
 							if (recordSet.isRaw()) {
-								for (int j = 0, l = dataSizeRecord; j < recordSet.getRecordDataSize(true); ++j) {
+								for (int j = 0, l = recordSet.isTimeStepConstant() ? 0 : dataSizeRecord; j < recordSet.getRecordDataSize(true); ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += OSDE.SIZE_BYTES_INTEGER) {
 										int point = recordSet.get(noneCalculationRecordNames[k]).realGet(j);
 										//log.log(Level.FINER, ""+point);
