@@ -1044,77 +1044,81 @@ public class CurveSelectorContextMenu {
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
 							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
-								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] {copyFromRecordKey + OSDE.STRING_MESSAGE_CONCAT +	compareSet.getFirstRecordName()}));
+								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] { copyFromRecordKey + OSDE.STRING_MESSAGE_CONCAT
+										+ compareSet.getFirstRecordName() }));
 								return;
 							}
-								// while adding a new curve to compare set - reset the zoom mode
-								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
+							// while adding a new curve to compare set - reset the zoom mode
+							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 
-								String newRecordkey = copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();							
-								Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
-								newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
-								newRecord.setVisible(true); // if a non visible record added
+							String newRecordkey = copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();
+							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
+							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
+							newRecord.setVisible(true); // if a non visible record added
 
-								if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
-									compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
-									compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
-									compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
-									compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-									compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
-								}
-								// check if the new added record exceeds the existing one in time or set draw limit and fill
-								double maxRecordTime_ms = compareSet.getTime_ms(compareSet.getMaxSize()-1);
-								int tmpRecordIntervals = compareSet.get(newRecordkey).realSize()-1;
-								double tempRecordMaxTime_ms = newRecord.getTime_ms(tmpRecordIntervals);
-								if (tempRecordMaxTime_ms > maxRecordTime_ms) {
-										compareSet.setMaxSize(tmpRecordIntervals+1);
-										compareSet.setTimeStep_ms(newRecord.getTimeStep_ms());
-										maxRecordTime_ms = tempRecordMaxTime_ms;
-										log.log(Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
-										
-										// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
-										for (String tmpRecordKey : compareSet.keySet()) {
-											if (!newRecordkey.equals(tmpRecordKey)) {
-												Record tmpRecord = compareSet.get(tmpRecordKey);
-												int oldSize = tmpRecord.realSize();
-												if(tmpRecord.getDrawLimit() == Integer.MAX_VALUE) { // draw linit untouched
-													tmpRecord.setDrawLimit(oldSize);
-												}
-												for (int i = 0; i < (int)(maxRecordTime_ms/tmpRecord.getTimeStep_ms()) - oldSize; i++) {
-													tmpRecord.add(0);
-												}
+							if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
+								compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
+								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
+								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
+								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
+								compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
+							}
+							// check if the new added record exceeds the existing one in time or set draw limit and pad with dummy points
+							double maxRecordTime_ms = compareSet.getCompareSetMaxScaleTime_ms();
+							double newRecordMaxTime_ms = newRecord.getMaxTime_ms();
+							newRecord.setCompareSetDrawLimit_ms(newRecordMaxTime_ms);
+
+							if (newRecordMaxTime_ms > maxRecordTime_ms) {
+								compareSet.setCompareSetMaxScaleTime_ms(newRecordMaxTime_ms);
+								maxRecordTime_ms = newRecordMaxTime_ms;
+								log.log(Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
+
+								// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
+								for (String tmpRecordKey : compareSet.keySet()) {
+									if (!newRecordkey.equals(tmpRecordKey)) {
+										Record tmpRecord = compareSet.get(tmpRecordKey);
+										if (tmpRecord.getCompareSetDrawLimit_ms() == Integer.MAX_VALUE // draw linit untouched
+												|| tmpRecord.getCompareSetDrawLimit_ms() < newRecordMaxTime_ms) {
+											double avgTimeStep_ms = tmpRecord.getAverageTimeStep_ms();
+											int steps = (int) ((maxRecordTime_ms - tmpRecord.getCompareSetDrawLimit_ms()) / avgTimeStep_ms);
+											for (int i = 0; i < steps; i++) {
+												tmpRecord.add(0, tmpRecord.getLastTime_ms() + avgTimeStep_ms);
 											}
+											tmpRecord.setDrawTimeWidth(newRecordMaxTime_ms);
 										}
-								}
-								else { // new record is shorter and needs to be padded and the draw limit to set
-									int oldSize = newRecord.realSize();
-									newRecord.setDrawLimit(newRecord.realSize());
-									for (int i = 0; i < (int)(maxRecordTime_ms/newRecord.getTimeStep_ms()) - oldSize; i++) {
-										newRecord.add(0);
 									}
 								}
-
-								double oldMinValue = compareSet.getMinValue();
-								double oldMaxValue = compareSet.getMaxValue();
-								log.log(Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
-								for (String recordKey : compareSet.getRecordNames()) {
-									double newMinValue = compareSet.get(recordKey).getMinScaleValue();
-									double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
-									log.log(Level.FINE, String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
-
-									if (newMinValue < oldMinValue) {
-										compareSet.setMinValue(newMinValue); // store new min value into record set
-									}
-									oldMinValue = compareSet.getMinValue();
-									if (newMaxValue > oldMaxValue) {
-										compareSet.setMaxValue(newMaxValue); // store new max value into record set
-									}
+							}
+							else { // new record is shorter and needs to be padded and the draw limit to set
+								double avgTimeStep_ms = newRecord.getAverageTimeStep_ms();
+								int steps = (int) ((maxRecordTime_ms - newRecordMaxTime_ms) / avgTimeStep_ms);
+								for (int i = 0; i < steps; i++) {
+									newRecord.add(0, newRecord.getLastTime_ms() + avgTimeStep_ms);
 								}
-								for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
-									compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
-								}
+								newRecord.setDrawTimeWidth(maxRecordTime_ms);
+							}
 
-								CurveSelectorContextMenu.this.application.updateCompareWindow();
+							double oldMinValue = compareSet.getMinValue();
+							double oldMaxValue = compareSet.getMaxValue();
+							log.log(Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
+							for (String recordKey : compareSet.getRecordNames()) {
+								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
+								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
+								log.log(Level.FINE, String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
+
+								if (newMinValue < oldMinValue) {
+									compareSet.setMinValue(newMinValue); // store new min value into record set
+								}
+								oldMinValue = compareSet.getMinValue();
+								if (newMaxValue > oldMaxValue) {
+									compareSet.setMaxValue(newMaxValue); // store new max value into record set
+								}
+							}
+							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
+								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
+							}
+
+							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 						else CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
 					}

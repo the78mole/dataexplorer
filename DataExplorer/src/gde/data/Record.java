@@ -141,9 +141,9 @@ public class Record extends Vector<Integer> {
 	int									avgValueTriggered			= Integer.MIN_VALUE;		 			// avarage value (avg = sum(xi)/n)
 	int									sigmaValueTriggered		= Integer.MIN_VALUE;		 			// sigma value of data, according a set trigger level if any
 	
-	int 								drawLimit							= Integer.MAX_VALUE;		// above this limit the record will not be drawn (compareSet with different records) 
+	double							drawLimit_ms					= Integer.MAX_VALUE;		// above this limit the record will not be drawn (compareSet with different records) 
 	int									zoomOffset			= 0;													// number of measurements point until zoom area begins
-//	int									zoomSize				= 0;													// number of measurements point of the zoom area width
+//int									zoomSize				= 0;													// number of measurements point of the zoom area width
 	double							zoomTimeOffset	= 0;		// time where the zoom area begins
 	double							drawTimeWidth		= 0;		// all or zoomed area time width
 	double							maxZoomScaleValue			= this.maxScaleValue;
@@ -228,7 +228,8 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
-		this.timeStep_ms = record.timeStep_ms == null ? record.parent.timeStep_ms == null ? null : record.parent.timeStep_ms.clone() : record.timeStep_ms.clone();
+		this.timeStep_ms = record.timeStep_ms == null ? record.parent.timeStep_ms.clone() : record.timeStep_ms.clone();
+		this.drawTimeWidth = record.drawTimeWidth;
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -250,7 +251,6 @@ public class Record extends Vector<Integer> {
 		this.isStartEndDefined = record.isStartEndDefined;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
-		this.drawTimeWidth = record.getMaxTime_ms();
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
@@ -286,7 +286,7 @@ public class Record extends Vector<Integer> {
 		this.name = record.name;
 		this.symbol = record.symbol;
 		this.unit = record.unit;
-		this.timeStep_ms = record.timeStep_ms == null ? null : record.timeStep_ms.clone();
+		this.timeStep_ms = record.timeStep_ms == null ? record.parent.timeStep_ms.clone() : record.timeStep_ms.clone();
 		this.isActive = record.isActive;
 		this.isDisplayable = record.isDisplayable;
 		this.statistics = record.statistics;
@@ -298,7 +298,7 @@ public class Record extends Vector<Integer> {
 		this.minValue = 0;
 		this.clear();
 		this.trimToSize();
-		if (isFromBegin) {
+		if (isFromBegin) { //TODO timeSteps ?
 			for (int i = dataIndex; i < record.realSize(); i++) {
 				this.add(record.get(i).intValue());
 			}
@@ -308,6 +308,7 @@ public class Record extends Vector<Integer> {
 				this.add(record.get(i).intValue());
 			}
 		}
+		this.drawTimeWidth = record.drawTimeWidth; 
 		
 		this.df = (DecimalFormat) record.df.clone();
 		this.numberFormat = record.numberFormat;
@@ -423,6 +424,15 @@ public class Record extends Vector<Integer> {
 		else {
 			this.setPositionLeft(false); // position right
 		}
+	}
+	
+	/**
+	 * add a data point to the record data, checks for minimum and maximum to define display range
+	 * @param point
+	 */
+	public synchronized boolean add(Integer point, double timeStep_ms) {
+		if (this.timeStep_ms != null) this.timeStep_ms.add(timeStep_ms);
+		return this.add(point);
 	}
 	
 	/**
@@ -1048,12 +1058,19 @@ public class Record extends Vector<Integer> {
 	}
 
 	/** 
+	 * query time step time in mills seconds at index
+	 * @return time step in msec
+	 */
+	public double getLastTime_ms() {
+		return this.timeStep_ms == null ? this.parent.timeStep_ms.lastElement()/10.0 : this.timeStep_ms.lastElement()/10.0;
+	}
+
+	/** 
 	 * query time step in mills seconds, this property is hold local to be independent (compare window)
 	 * @return time step in msec
 	 */
-	@Deprecated
-	public double getTimeStep_ms() {
-		return this.timeStep_ms == null ? this.parent.getTimeStep_ms() : this.timeStep_ms.getTimeStep_ms();
+	public double getAverageTimeStep_ms() {
+		return this.timeStep_ms == null ? this.parent.getAverageTimeStep_ms() : this.timeStep_ms.getAverageTimeStep_ms();
 	}
 
 	/**
@@ -1068,7 +1085,7 @@ public class Record extends Vector<Integer> {
 	 * @return the maximum time of this record, which should correspondence to the last entry in timeSteps
 	 */
 	public double getMaxTime_ms() {
-		return this.timeStep_ms == null ? this.parent.getMaxTime_ms() : this.timeStep_ms.getMaxTime_ms();
+		return this.timeStep_ms == null ? this.parent.getMaxTime_ms() : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms()*(this.elementCount-1) : this.timeStep_ms.getMaxTime_ms();
 	}
 
 	/**
@@ -1089,7 +1106,8 @@ public class Record extends Vector<Integer> {
 	 * @return
 	 */
 	public int findBestIndex(double time_ms) {
-		return this.timeStep_ms == null ? this.parent.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
+		int index = this.timeStep_ms == null ? this.parent.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
+		return index <= this.elementCount-1 ? index : this.elementCount-1;
 	}
 
 	/**
@@ -1219,8 +1237,8 @@ public class Record extends Vector<Integer> {
 		}
 		else {
 			int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
-			double deltaTimeIndex01 = this.parent.getTime_ms(indexs[1]) - this.parent.getTime_ms(indexs[0]);
-			double xPosDeltaTime2Index0 = tmpTimeValue - this.parent.getTime_ms(indexs[0]);
+			double deltaTimeIndex01 = this.getTime_ms(indexs[1]) - this.getTime_ms(indexs[0]);
+			double xPosDeltaTime2Index0 = tmpTimeValue - this.getTime_ms(indexs[0]);
 			log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			pointPosY = Double.valueOf(drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		}
@@ -1883,16 +1901,16 @@ public class Record extends Vector<Integer> {
 	 * get the curve index until the curve will be drawn (for compare set with different time length curves)
 	 * @return the drawLimit
 	 */
-	public int getDrawLimit() { //TODO
-		return this.drawLimit; //this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
+	public double getCompareSetDrawLimit_ms() { //TODO
+		return this.drawLimit_ms; //this.parent.isZoomMode ? this.drawLimit - this.zoomOffset : drawLimit;
 	}
 
 	/**
 	 * set the curve index until the curve will be drawn
 	 * @param newDrawLimit the drawLimit to set
 	 */
-	public void setDrawLimit(int newDrawLimit) {
-		this.drawLimit = newDrawLimit;
+	public void setCompareSetDrawLimit_ms(double newDrawLimit) {
+		this.drawLimit_ms = newDrawLimit;
 	}
 
 	/**

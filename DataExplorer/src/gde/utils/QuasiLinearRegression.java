@@ -58,7 +58,7 @@ public class QuasiLinearRegression extends CalculationThread {
 			if (record != null && !this.threadStop) {
 				record.clear();
 				Record recordHeight = this.recordSet.get(this.sourceRecordKey);
-				double timeStep_sec = recordHeight.getTimeStep_ms() / 1000;
+				double timeStep_sec = recordHeight.getAverageTimeStep_ms() / 1000;  //TODO enable for variable time steps
 				int timeStepsPerInterval = Double.valueOf(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
 				int pointsPerInterval = timeStepsPerInterval + 1;
 				log.log(Level.FINE, "calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$

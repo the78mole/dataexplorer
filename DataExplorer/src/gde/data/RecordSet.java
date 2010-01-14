@@ -96,7 +96,9 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
-	int														maxSize												= 0;																						//number of data point * time step = total time
+//	int														maxSize												= 0;								//number of data point * time step = total time
+	double												maxTime												= 0.0;							//compare set -> each record will have its own timeSteps_ms, 
+																																									//so the biggest record in view point of time will define the time scale
 	double												maxValue											= Integer.MIN_VALUE;
 	double												minValue											= Integer.MAX_VALUE;														//min max value
 
@@ -283,7 +285,8 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.isCompareSet = recordSet.isCompareSet;
 
-		this.maxSize = recordSet.maxSize;
+//		this.maxSize = recordSet.maxSize;
+		this.maxTime = recordSet.maxTime;
 		this.maxValue = recordSet.maxValue;
 		this.minValue = recordSet.minValue;
 
@@ -356,7 +359,8 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.isCompareSet = recordSet.isCompareSet;
 
-		this.maxSize = recordSet.maxSize;
+//		this.maxSize = recordSet.maxSize;
+		this.maxTime = recordSet.maxTime;
 		this.maxValue = recordSet.maxValue;
 		this.minValue = recordSet.minValue;
 
@@ -433,7 +437,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
-		this.addPoints(points, this.getTimeStep_ms()); // device has constant time step between measurement points
+		this.addPoints(points, this.getAverageTimeStep_ms()); // device has constant time step between measurement points
 	}
 
 	/**
@@ -483,7 +487,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
-		addNoneCalculationRecordsPoints(points, this.getTimeStep_ms()); // device has constant time step between measurement points
+		addNoneCalculationRecordsPoints(points, this.getAverageTimeStep_ms()); // device has constant time step between measurement points
 	}
 
 	/**
@@ -578,8 +582,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * For devices with none constant time step between measurement points it returns the average value.
 	 * Do not use for calculation, use for logging purpose only.
 	 */
-	public double getTimeStep_ms() {
-		return this.timeStep_ms.getTimeStep_ms();
+	public double getAverageTimeStep_ms() {
+		return this.timeStep_ms != null ? this.timeStep_ms.getAverageTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getAverageTimeStep_ms() : 1;
 	}
 
 	/**
@@ -615,7 +619,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
 	 */
 	public double getMaxTime_ms() {
-		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.getMaxTime_ms();
+		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * this.get(0).realSize() : this.timeStep_ms.getMaxTime_ms();
 	}
 
 	/**
@@ -789,8 +793,9 @@ public class RecordSet extends HashMap<String, Record> {
 	public void clear() {
 		super.clear();
 		this.recordNames = new String[0];
-		this.timeStep_ms.clear();
-		this.maxSize = 0;
+		this.timeStep_ms = null;
+//		this.maxSize = 0;
+		this.maxTime = 0.0;
 		this.maxValue = -20000;
 		this.minValue = 20000;
 		this.resetZoomAndMeasurement();
@@ -974,7 +979,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * if timeStep_ms needs to be changed for some reason use setNewTimeStep_ms
 	 * @param newTimeStep_ms the timeStep_ms to set
 	 */
-	@Deprecated
 	public void setTimeStep_ms(double newTimeStep_ms) {		
 		this.timeStep_ms = this.timeStep_ms == null || this.timeStep_ms.size() == 0 ? new TimeSteps(newTimeStep_ms) : this.timeStep_ms;
 	}
@@ -1148,19 +1152,36 @@ public class RecordSet extends HashMap<String, Record> {
 		return size;
 	}
 
+//	/**
+//	 * set maximum size of data points of a compare set
+//	 * @param newMaxSize the maxSize to set
+//	 */
+//	@Deprecated
+//	public void setMaxSize(int newMaxSize) {
+//		this.maxSize = newMaxSize;
+//	}
+//
+//	/**
+//	 * get maximum size of data points of a compare set
+//	 */
+//	@Deprecated
+//	public int getMaxSize() {
+//		return this.maxSize;
+//	}
+
 	/**
-	 * set maximum size of data points of a compare set
-	 * @param newMaxSize the maxSize to set
+	 * set maximum time in msec relating to the record defining the time scale of a compare set
+	 * @param newMaxTime the maxSize to set
 	 */
-	public void setMaxSize(int newMaxSize) {
-		this.maxSize = newMaxSize;
+	public void setCompareSetMaxScaleTime_ms(double newMaxTime) {
+		this.maxTime = newMaxTime;
 	}
 
 	/**
-	 * get maximum size of data points of a compare set
+	 * get maximum time in msec relating to the record defining the time scale of a compare set
 	 */
-	public int getMaxSize() {
-		return this.maxSize;
+	public double getCompareSetMaxScaleTime_ms() {
+		return this.maxTime;
 	}
 
 	/**
@@ -1294,7 +1315,7 @@ public class RecordSet extends HashMap<String, Record> {
 					record.zoomOffset = 0;
 //					record.zoomSize = record.realSize();
 					record.zoomTimeOffset = 0.0;
-					record.drawTimeWidth = this.getMaxTime_ms();
+					record.drawTimeWidth = record.getMaxTime_ms();
 					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 					record.minZoomScaleValue	= record.minScaleValue;
 					record.maxZoomScaleValue	= record.maxScaleValue;
@@ -1734,7 +1755,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.getTimeStep_ms()).append(Record.DELIMITER);
+		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.getAverageTimeStep_ms()).append(Record.DELIMITER);
 
 		sb.append(TIME_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);

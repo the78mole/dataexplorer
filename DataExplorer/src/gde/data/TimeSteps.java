@@ -38,7 +38,7 @@ public class TimeSteps extends Vector<Integer> {
 	public TimeSteps(double newTimeStep_ms) {
 		super(1, 1);
 		if (this.isConstant = newTimeStep_ms > 0) 
-			this.add(newTimeStep_ms);
+			super.add((int) (newTimeStep_ms * 10));
 	}
 	
 	/**
@@ -78,14 +78,14 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return
 	 */
 	public synchronized boolean add(double value) {
-		return super.add((int) (value * 10));
+		return this.isConstant ? true : super.add((int) (value * 10));
 	}
 	
 	/**
 	 * @return the const. time step in msec
 	 */
-	public double getTimeStep_ms() {
-		return this.isConstant ? this.getTime_ms(1) : this.lastElement()/(elementCount-1);
+	public double getAverageTimeStep_ms() {
+		return this.isConstant ? this.getTime_ms(1) : this.lastElement()/(elementCount-1)/10.0; 
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class TimeSteps extends Vector<Integer> {
 	public double getMaxTime_ms() {
 		double maxTime = 0.0;
 		if (isConstant) {
-			maxTime = this.get(0)*elementCount/10.0;
+			maxTime = this.get(0)/10.0; 
 		}
 		else {
 			maxTime = this.lastElement()/10.0;
@@ -155,7 +155,6 @@ public class TimeSteps extends Vector<Integer> {
 			position = time_ms / (this.get(0)/10.0);
 			index = (int) position;
 			index = (position - index) > 0.5 ? index : index + 1;
-			index = index <= elementCount-1 ? index : elementCount-1;
 		}
 		else {
 			index = (int) (time_ms / this.lastElement() / elementCount / 10);

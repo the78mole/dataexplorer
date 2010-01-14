@@ -500,7 +500,7 @@ public class GraphicsComposite extends Composite {
 		gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
-		log.log(Level.FINE, "time step record 0 = " + recordSet.getTimeStep_ms());
+		log.log(Level.FINE, "time step record 0 = " + recordSet.getAverageTimeStep_ms());
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);

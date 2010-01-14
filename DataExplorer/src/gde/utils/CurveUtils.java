@@ -224,8 +224,8 @@ public class CurveUtils {
 		Point newPoint, oldPoint = new Point(0, 0);
 
 		try {
-			// calculate start point of the curve, which is the first oldPoint
-			//oldPoint = record.getDisplayPoint(0, 0, x0, y0);
+			//calculate start point of the curve, which is the first oldPoint
+			//draw the first point with possible interpolated values if it does not match a measurement point at time value
 			oldPoint = record.getDisplayEndPoint(0, x0);
 			if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(oldPoint.toString());
 		}
@@ -235,32 +235,37 @@ public class CurveUtils {
 
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-			int drawLimit = record.getDrawLimit();
-			if (drawLimit == Integer.MAX_VALUE) { // no draw limit
+			if (!record.getParent().isCompareSet()) { 
 				for (int i = 0, j = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
-					//log.log(Level.INFO, "i = " + i + " j = " + j);
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 					oldPoint = newPoint; // remember the last draw point for next drawLine operation
 				}
+				//draw the last point with possible interpolated values if it does not match a measurement point at time value
+				newPoint = record.getDisplayEndPoint(width, x0);
+				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			}
 			else { // compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
-				for (int i = 0, j = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
+				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms());
+				int j = 0;
+				for (int i = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(i, j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
-					if (j < drawLimit) {
+					if (j <= drawLimit) {
 						gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 					}
-					oldPoint = newPoint; // remember the last draw point for next drawLine operation
+					oldPoint = newPoint; //remember the last draw point for next drawLine operation, if point above, do nothing
+				}
+				if (j <= drawLimit) {
+					//draw the last point with possible interpolated values if it does not match a measurement point at time value
+					newPoint = record.getDisplayEndPoint(width, x0);
+					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 			}
-			
-			newPoint = record.getDisplayEndPoint(width, x0);
-			gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
