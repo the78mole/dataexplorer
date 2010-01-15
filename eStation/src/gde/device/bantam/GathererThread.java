@@ -196,16 +196,12 @@ public class GathererThread extends Thread {
 					}
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
-							public void run() {
-								GathererThread.this.application.updateGraphicsWindow();
-								GathererThread.this.application.updateStatisticsData();
-								//GathererThread.this.application.updateDataTable(this.recordSetKey);
-								GathererThread.this.application.updateDigitalWindowChilds();
-								GathererThread.this.application.updateAnalogWindowChilds();
-								GathererThread.this.application.updateCellVoltageChilds();
-							}
-						});
+						GathererThread.this.application.updateGraphicsWindow();
+						GathererThread.this.application.updateStatisticsData();
+						//GathererThread.this.application.updateDataTable(this.recordSetKey);
+						GathererThread.this.application.updateDigitalWindowChilds();
+						GathererThread.this.application.updateAnalogWindowChilds();
+						GathererThread.this.application.updateCellVoltageChilds();
 					}
 					
 					//switch off single cell voltage lines if no cell voltages is available
