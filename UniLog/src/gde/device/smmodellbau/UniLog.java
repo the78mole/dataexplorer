@@ -704,7 +704,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record.setDisplayable(false);
 			record.clear();
 			Record recordCurrent = recordSet.get(measurements[2]); // 2=current
-			double timeStep_ms = recordCurrent.getTimeStep_ms(); // timeStep_ms
+			double timeStep_ms = recordCurrent.getAverageTimeStep_ms(); // timeStep_ms
 			Double capacity = 0.0;
 			for (int i = 0; i < recordCurrent.size(); i++) {
 				capacity = i > 0 ? capacity + ((recordCurrent.get(i) * timeStep_ms) / 3600) : 0.0;
@@ -739,7 +739,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record.clear();
 			recordVoltage = recordSet.get(measurements[1]); // 1=voltage
 			recordCurrent = recordSet.get(measurements[2]); // 2=current
-			timeStep_ms = recordVoltage.getTimeStep_ms(); // timeStep_ms
+			timeStep_ms = recordVoltage.getAverageTimeStep_ms(); // timeStep_ms
 			Double power = 0.0;
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				power = i > 0 ? power + ((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * (timeStep_ms / 3600.0)) : 0.0;
