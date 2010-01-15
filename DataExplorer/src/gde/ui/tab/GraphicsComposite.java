@@ -19,7 +19,7 @@ package osde.ui.tab;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -500,7 +500,7 @@ public class GraphicsComposite extends Composite {
 		gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
-		log.log(Level.FINE, "time step record 0 = " + recordSet.getAverageTimeStep_ms());
+		log.log(Level.FINE, "average time step record 0 = " + recordSet.getAverageTimeStep_ms());
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
@@ -566,7 +566,7 @@ public class GraphicsComposite extends Composite {
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 			log.log(Level.FINER, strStartTime);
 		}
-		log.log(Level.FINE, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
+		log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
 	}
 
 	/**
@@ -1306,7 +1306,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isRightCutMode) {
 					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
-						//TODO recordSet = recordSet.clone(recordSet.get(0).getZoomOffset() + recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), false);
+						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), false);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
 						this.application.getMenuToolBar().addRecordSetName(recordSet.getName());

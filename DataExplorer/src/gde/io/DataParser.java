@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.device.CheckSumTypes;
-import osde.exception.DataInconsitsentException;
+import osde.exception.DevicePropertiesInconsistenceException;
 import osde.utils.Checksum;
 
 /**
@@ -49,12 +49,16 @@ public class DataParser {
 		this.size = useDataSize;
 	}
 
-	public void parse(String inputLine) throws DataInconsitsentException, NumberFormatException {
+	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, NumberFormatException {
 		try {
-			if(!inputLine.startsWith("$")) throw new DataInconsitsentException("fehlendes '$' am Anfang der Zeile!");
+			if(!inputLine.startsWith("$")) throw new DevicePropertiesInconsistenceException("fehlendes '$' am Anfang der Zeile!");
+			if(!inputLine.contains(separator)) throw new DevicePropertiesInconsistenceException(inputLine + "\nDefined separator\"" + separator + "\" not contained in data line!");
+			
 			this.values = new int[this.size];
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			log.log(Level.FINER, "parser inputLine = " + inputLine);
+			if (strValues.length-4 != this.size)  throw new DevicePropertiesInconsistenceException(inputLine + "\nAnzahl der definierten Messwerte passt nicht zur Gerätekonfigurationsdatei\nDas verwendete Separatorzeichen könnte auch an einigen Stellen falsch sein!");
+			
 			String strValue = strValues[0].trim().substring(1);
 			this.recordNumber = Integer.parseInt(strValue);
 			
@@ -98,7 +102,7 @@ public class DataParser {
 				}
 			}
 			if (!isValid) {
-				DataInconsitsentException e = new DataInconsitsentException("Checksum error: actual value = " + strValue);
+				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException("Checksum error: actual value = " + strValue);
 				log.log(Level.WARNING, e.getMessage(), e);
 				throw e;
 			}

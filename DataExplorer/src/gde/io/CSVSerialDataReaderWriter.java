@@ -32,6 +32,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
 import osde.exception.DataTypeException;
+import osde.exception.DevicePropertiesInconsistenceException;
 import osde.exception.MissMatchDeviceException;
 import osde.exception.NotSupportedFileFormatException;
 import osde.ui.OpenSerialDataExplorer;
@@ -101,8 +102,14 @@ public class CSVSerialDataReaderWriter {
 					++lineNumber;
 					data.parse(line);
 
-					if (device.getStateType() == null) throw new DataInconsitsentException("no state defined");
-					recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
+					if (device.getStateType() == null) 
+						throw new DataInconsitsentException("no state defined");
+					try {
+						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
+					}
+					catch (Exception e) {
+						throw new DevicePropertiesInconsistenceException("Device state " + data.state + " in " + filePath + " is not defined in " + device.getPropertiesFileName());
+					}
 
 					//detect states where a new record set has to be created
 					if (recordSet == null || !recordSet.getName().endsWith(recordSetNameExtend) || lastRecordNumber != data.recordNumber) {
@@ -159,13 +166,8 @@ public class CSVSerialDataReaderWriter {
 			log.log(Level.WARNING, e.getMessage(), e);
 			application.openMessageDialog(e.getMessage());
 		}
-		catch (NumberFormatException e) {
-			String msg = e.getMessage() + " line number " + lineNumber;
-			log.log(Level.WARNING, msg, e);
-			application.openMessageDialog(msg);
-		}
-		catch (DataInconsitsentException e) {
-			String msg = e.getMessage() + " line number " + lineNumber;
+		catch (Exception e) {
+			String msg = e.getMessage() + " line number " + lineNumber + ", please correct!";
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 		}

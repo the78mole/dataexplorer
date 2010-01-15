@@ -130,7 +130,7 @@ public class Settings extends Properties {
 	private final static String		LOG_PATH											= "Logs"; //$NON-NLS-1$
 	private final static String		LOG_FILE											= "trace.log"; //$NON-NLS-1$
 	private final static String		SERIAL_LOG_FILE								= "serial.log"; //$NON-NLS-1$
-	public final static String[]	LOGGING_LEVEL									= new String[] { "SEVERE", "WARNING", "INFO", "FINE", "FINER", "FINEST" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+	public final static String[]	LOGGING_LEVEL									= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	public final static String		ACTIVE_DEVICE									= "active_device"; //$NON-NLS-1$
 	public final static String		OBJECT_LIST										= "object_list"; //$NON-NLS-1$

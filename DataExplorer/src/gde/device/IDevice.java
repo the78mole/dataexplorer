@@ -40,6 +40,11 @@ public interface IDevice {
 	 * get the active device configuration for manipulation purpose
 	 */
 	public DeviceConfiguration getDeviceConfiguration();
+	
+	/**
+	 * get the active device configuration file name
+	 */
+	public String getPropertiesFileName();
 
 	/**
 	 * @return the device dialog

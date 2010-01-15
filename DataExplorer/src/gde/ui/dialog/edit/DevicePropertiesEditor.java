@@ -116,7 +116,7 @@ public class DevicePropertiesEditor extends Composite {
 	Composite										deviceComposite;
 	Label												deviceDescriptionlabel;
 	Label												deviceNameLabel, deviceImplementationLabel, manufacturerLabel, manufURLabel, imageFileNameLabel, usageLabel, groupLabel;
-	Button 											implementationButton;
+	Button 											deviceImplementationButton;
 	Text												nameText, deviceImplementationText, manufacturerText, manufURLText, imageFileNameText;
 	Button											usageButton, fileSelectButton;
 	CCombo											groupSelectionCombo;
@@ -542,6 +542,7 @@ public class DevicePropertiesEditor extends Composite {
 									if (DevicePropertiesEditor.this.deviceComposite.isVisible()) {
 										DevicePropertiesEditor.this.deviceFileNameText.setText(DevicePropertiesEditor.this.devicePropertiesFileName);
 										DevicePropertiesEditor.this.nameText.setText(DevicePropertiesEditor.this.deviceName);
+										DevicePropertiesEditor.this.deviceImplementationButton.setSelection(DevicePropertiesEditor.this.isDeviceImplementaionClass);
 										DevicePropertiesEditor.this.deviceImplementationText.setText(DevicePropertiesEditor.this.deviceImplementationClass);
 										DevicePropertiesEditor.this.deviceImplementationText.setEnabled(DevicePropertiesEditor.this.isDeviceImplementaionClass);
 										DevicePropertiesEditor.this.deviceImplementationLabel.setEnabled(DevicePropertiesEditor.this.isDeviceImplementaionClass);
@@ -565,15 +566,15 @@ public class DevicePropertiesEditor extends Composite {
 								});
 							}
 							{
-								this.implementationButton = new Button(this.devicePropsComposite, SWT.CHECK );
-								this.implementationButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-								this.implementationButton.setForeground(osde.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
-								this.implementationButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0478));
-								this.implementationButton.setBounds(0, 30, 22, 22);
-								this.implementationButton.addSelectionListener(new SelectionAdapter() {
+								this.deviceImplementationButton = new Button(this.devicePropsComposite, SWT.CHECK );
+								this.deviceImplementationButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+								this.deviceImplementationButton.setForeground(osde.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
+								this.deviceImplementationButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0478));
+								this.deviceImplementationButton.setBounds(0, 30, 22, 22);
+								this.deviceImplementationButton.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "implementationButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										DevicePropertiesEditor.this.isDeviceImplementaionClass = DevicePropertiesEditor.this.implementationButton.getSelection();
+										DevicePropertiesEditor.this.isDeviceImplementaionClass = DevicePropertiesEditor.this.deviceImplementationButton.getSelection();
 										DevicePropertiesEditor.this.deviceImplementationLabel.setEnabled(DevicePropertiesEditor.this.isDeviceImplementaionClass);
 										DevicePropertiesEditor.this.deviceImplementationText.setEnabled(DevicePropertiesEditor.this.isDeviceImplementaionClass);
 										if (DevicePropertiesEditor.this.deviceConfig != null) {

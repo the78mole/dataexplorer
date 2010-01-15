@@ -17,6 +17,7 @@
 package osde.data;
 
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,15 +59,16 @@ public class TimeSteps extends Vector<Integer> {
 			if (isFromBegin) {
 				int cutOffVal = toBeClonedTimeSteps.get(index);
 				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
-					this.add(toBeClonedTimeSteps.get(i) - cutOffVal);
+					super.add(toBeClonedTimeSteps.get(i) - cutOffVal);
 				}
 			}
 			else {
-				for (int i = 0; i < toBeClonedTimeSteps.elementCount - index; i++) {
+				for (int i = 0; i < index; i++) {
 					this.add(toBeClonedTimeSteps.get(i));
 				}
 			}
 		}
+  	log.log(Level.INFO, this.toString());
 	}
 	
 	/**
@@ -161,15 +163,16 @@ public class TimeSteps extends Vector<Integer> {
 		}
 		else {
 			int value = Double.valueOf(time_ms * 10.0).intValue();
-			for (; index2 < elementCount; index2++) {
+			for (; index2 < elementCount-1; index2++) {
 				if (value == get(index2)) {
 					index1 = index2;
 					break;
 				}
-				else if (value <= get(index2)) {
+				else if (value < get(index2)) {
 					index1 = index2 - 1;
 					break;
 				}
+				index1 = index2+1;
 			}
 		}
 		//log.log(Level.INFO, index1 + " - " + index2);

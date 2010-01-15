@@ -48,6 +48,7 @@ import osde.ui.tab.GraphicsWindow;
 import osde.utils.CalculationThread;
 import osde.utils.CellVoltageValues;
 import osde.utils.StringHelper;
+import osde.utils.TimeLine;
 
 /**
  * RecordSet class holds all the data records for the configured measurement of a device
@@ -593,7 +594,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * Do not use for calculation, use for logging purpose only.
 	 */
 	public double getAverageTimeStep_ms() {
-		return this.timeStep_ms != null ? this.timeStep_ms.getAverageTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getAverageTimeStep_ms() : 1;
+		return this.timeStep_ms != null ? this.timeStep_ms.getAverageTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getAverageTimeStep_ms() : -1.0;
 	}
 
 	/**
@@ -649,7 +650,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param time_ms
 	 * @return
 	 */
-	public int findBestIndex(double time_ms) { //TODO index <= this.elementCount-1 ? index : this.elementCount-1;
+	public int findBestIndex(double time_ms) {
 		return this.timeStep_ms.findBestIndex(time_ms);
 	}
 	
@@ -870,7 +871,6 @@ public class RecordSet extends HashMap<String, Record> {
 			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5);
 			tmpRecord.setColorDefaultsAndPosition(i);
-			//TODO tmpRecord.timeStep_ms = new TimeSteps(timeStep_ms);
 			newRecordSet.put(recordNames[i], tmpRecord);
 			log.log(Level.FINER, "added record for " + recordNames[i]); //$NON-NLS-1$
 		}
@@ -1326,6 +1326,7 @@ public class RecordSet extends HashMap<String, Record> {
 					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 					record.minZoomScaleValue	= record.minScaleValue;
 					record.maxZoomScaleValue	= record.maxScaleValue;
+					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth));
 				}
 			}
 		}
@@ -1363,7 +1364,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
 		// iterate children 
-		for (String recordKey : this.recordNames) {
+		for (String recordKey : this.keySet()) {
 			this.get(recordKey).setZoomBounds(newDisplayZoomBounds);
 		}
 	}
@@ -1760,7 +1761,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.getAverageTimeStep_ms()).append(Record.DELIMITER);
+		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.isConstant ? this.getAverageTimeStep_ms() : -1).append(Record.DELIMITER);
 
 		sb.append(TIME_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
@@ -2002,6 +2003,8 @@ public class RecordSet extends HashMap<String, Record> {
 		if (syncPlaceholderRecord != null) {
 			syncPlaceholderRecord.setMinMax(this.syncMin, this.syncMax);
 			syncPlaceholderRecord.setScopeMinMax(this.syncMin, this.syncMax);
+			syncPlaceholderRecord.minDisplayValue = syncPlaceholderRecord.minZoomScaleValue = this.syncMin / 1000.0;
+			syncPlaceholderRecord.maxDisplayValue = syncPlaceholderRecord.maxZoomScaleValue = this.syncMax / 1000.0;
 
 			// update referenced record to enable drawing of curve, set min/max
 			for (String syncableRecordKey : this.syncableRecords) {

@@ -393,7 +393,7 @@ public class MenuToolBar {
 									MenuToolBar.this.application.setObjectDescriptionTabVisible(false);
 								}
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
-								MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
+								//MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
 								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
@@ -1248,7 +1248,7 @@ public class MenuToolBar {
 	public int getScopeModeLevelValue() {
 		int sizeLastPoints = -1;
 		try {
-			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText().trim()) + 1;
+			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText().trim());
 		}
 		catch (NumberFormatException e) {
 			// ignore and return -1

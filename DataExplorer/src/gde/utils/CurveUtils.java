@@ -198,12 +198,12 @@ public class CurveUtils {
 		gc.setLineStyle(record.getLineStyle());
 
 		// get the data points size to be drawn
-		int displayableSize = record.getNumberPoints();
+		int displayableSize = record.size();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
-		log.log(Level.FINE, "record TimeStep_ms = " + record.getTime_ms(1)); //$NON-NLS-1$
+		log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
 		double displayableTime_ms = record.getTimeWidth_ms();
-		log.log(Level.FINER, "recordSize = " + displayableSize + " adaptXMaxValue = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// calculate scale factor to fit time into draw bounds display pixel based
 		double xTimeFactor = width / displayableTime_ms;

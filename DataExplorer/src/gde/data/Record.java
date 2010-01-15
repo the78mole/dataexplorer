@@ -302,7 +302,7 @@ public class Record extends Vector<Integer> {
 		this.clear();
 		this.trimToSize();
 		
-		if (isFromBegin) { //TODO timeSteps ?
+		if (isFromBegin) { 
 			for (int i = dataIndex; i < record.realSize(); i++) {
 				this.add(record.get(i).intValue());
 			}
@@ -323,7 +323,7 @@ public class Record extends Vector<Integer> {
 			this.timeStep_ms = null; //refer to parent time steps
 		}
 
-		this.drawTimeWidth = record.drawTimeWidth; 
+		this.drawTimeWidth = this.getMaxTime_ms(); 
 		
 		this.df = (DecimalFormat) record.df.clone();
 		this.numberFormat = record.numberFormat;
@@ -792,7 +792,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * return the 'best fit' number of measurement points in dependency of zoomMode or scopeMode
 	 */
-  public synchronized int getNumberPoints() {
+  public synchronized int size() {
 		int tmpSize = elementCount;
 		
 		if (this.parent.isZoomMode) // record -> recordSet.isZoomMode
@@ -816,7 +816,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	public Integer getLast() {
-		return super.get(super.size()-1);
+		return super.get(this.elementCount-1);
 	}
 
 	/**
@@ -1128,6 +1128,13 @@ public class Record extends Vector<Integer> {
 	/**
 	 * @return the zoomTimeOffset
 	 */
+	public int getZoomOffset() {
+		return this.zoomOffset;
+	}
+	
+	/**
+	 * @return the zoomTimeOffset
+	 */
 	public double getZoomTimeOffset() {
 		return this.zoomTimeOffset;
 	}
@@ -1136,7 +1143,16 @@ public class Record extends Vector<Integer> {
 	 * @return the time in msec representing the segment to be displayed, without zooming this is the maximum time represented by the last data point time
 	 */
 	public double getTimeWidth_ms() {
-		return this.drawTimeWidth;
+		if(this.parent.isScopeMode) {
+			this.drawTimeWidth = this.timeStep_ms != null ? (this.timeStep_ms.isConstant ? this.timeStep_ms.get(0)*(this.parent.scopeModeSize)/10.0 : this.timeStep_ms.lastElement()/10.0)
+					: (this.parent.timeStep_ms.isConstant ? this.parent.timeStep_ms.get(0)*(this.parent.scopeModeSize)/10.0 : this.parent.timeStep_ms.lastElement()/10.0);
+		}
+		else if (!this.parent.isZoomMode) {
+			this.drawTimeWidth = this.parent.isZoomMode ? this.drawTimeWidth 
+				: this.timeStep_ms != null ? (this.timeStep_ms.isConstant ? this.timeStep_ms.get(0)*(this.elementCount-1)/10.0 : this.timeStep_ms.lastElement()/10.0) 
+						: (this.parent.timeStep_ms.isConstant ? this.parent.timeStep_ms.get(0)*(this.elementCount-1)/10.0 : this.parent.timeStep_ms.lastElement()/10.0);
+		}
+		return this.drawTimeWidth;  // for this.parent.isZoomMode=true the width was calculated while setting the zoom bounds
 	}
 
 	/**
@@ -1225,7 +1241,7 @@ public class Record extends Vector<Integer> {
 	* @return string of time value in simple date format HH:ss:mm:SSS
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos) + this.zoomTimeOffset); 
+		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset); 
 	}
 
 	/**
@@ -1234,7 +1250,7 @@ public class Record extends Vector<Integer> {
 	 * @return position integer value
 	 */
 	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
-		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos <= this.parent.drawAreaBounds.width ? xPos+1 : xPos));
+		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset);
 	}
 
 	/**
@@ -1343,6 +1359,7 @@ public class Record extends Vector<Integer> {
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
+		log.log(Level.INFO, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
