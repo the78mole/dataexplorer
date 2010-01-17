@@ -17,7 +17,7 @@
 package osde.data;
 
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 /**
@@ -95,6 +95,15 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return delta time in msec
 	 */
 	public double getDeltaTime(int indexStart, int indexEnd) {
+		if (indexStart < 0) {
+			log.log(Level.WARNING, "indexStart < 0 " + indexStart);
+			indexStart = 0;
+		}
+		if (indexEnd > this.elementCount - 1) {
+			log.log(Level.WARNING, "indexEnd > this.elementCount - 1 " + indexEnd);
+			indexEnd = this.elementCount - 1;
+		}
+		indexEnd = indexEnd > this.elementCount - 1 ? this.elementCount - 1 : indexEnd;
 		return (this.get(indexEnd) - this.get(indexStart)) / 10.0;
 	}
 
@@ -104,7 +113,7 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return
 	 */
 	public double getTime_ms(int index) {
-		return this.isConstant ? (index == 0 ? 0.0 : this.get(0)/10.0*index) : (index < 0 ? this.firstElement() : index > elementCount ? this.lastElement()/10.0 : this.get(index)/10.0);
+		return this.isConstant ? (index == 0 ? 0.0 : this.get(0)/10.0*index) : (index < 0 ? this.firstElement() : index > elementCount-1 ? this.lastElement()/10.0 : this.get(index)/10.0);
 	}
 
 	/**
@@ -120,7 +129,7 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return the const. time step in msec
 	 */
 	public double getAverageTimeStep_ms() {
-		return this.isConstant ? this.getTime_ms(1) : this.lastElement()/(elementCount-1)/10.0; 
+		return this.isConstant ? this.getTime_ms(1) : this.elementCount > 2 ? this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0; 
 	}
 
 	/**
@@ -156,23 +165,25 @@ public class TimeSteps extends Vector<Integer> {
 	public int[] findBoundingIndexes(double time_ms) {
 		//log.log(Level.INFO, "time_ms = " + time_ms);
 		int index1 = 0, index2 = 0;
-		if (isConstant) {
-			double position = time_ms / (this.get(0)/10.0);
-			index1 = (int) position;
-			index2 = (position - index1) < 0.0001 ? index1 : index1 + 1;
-		}
-		else {
-			int value = Double.valueOf(time_ms * 10.0).intValue();
-			for (; index2 < elementCount-1; index2++) {
-				if (value == get(index2)) {
-					index1 = index2;
-					break;
+		if (time_ms > 0) {
+			if (isConstant) {
+				double position = time_ms / (this.get(0) / 10.0);
+				index1 = (int) position;
+				index2 = (int) (position + 0.5);
+			}
+			else {
+				int value = Double.valueOf(time_ms * 10.0).intValue();
+				for (; index2 < elementCount - 1; index2++) {
+					if (value == get(index2)) {
+						index1 = index2;
+						break;
+					}
+					else if (value < get(index2)) {
+						index1 = index2 - 1;
+						break;
+					}
+					index1 = index2 + 1;
 				}
-				else if (value < get(index2)) {
-					index1 = index2 - 1;
-					break;
-				}
-				index1 = index2+1;
 			}
 		}
 		//log.log(Level.INFO, index1 + " - " + index2);
@@ -186,23 +197,22 @@ public class TimeSteps extends Vector<Integer> {
 	 */
 	public int findBestIndex(double time_ms) {
 		int index = 0;
-		double position = 0.0;
-		if (isConstant) {
-			position = time_ms / (this.get(0)/10.0);
-			index = (int) position;
-			index = (position - index) > 0.5 ? index : index + 1;
-		}
-		else {
-			index = (int) (time_ms / (this.lastElement() / (this.elementCount-1) / 10) / 2);
-			int value = Double.valueOf(time_ms * 10.0).intValue();
-			for (; index < elementCount; index++) {
-				if (value <= this.get(index))
-					break;
+		if (time_ms > 0) {
+			double position = 0.0;
+			if (this.isConstant) {
+				position = time_ms / (this.get(0) / 10.0);
+				index = (int) (position + 0.5);
 			}
-			if (index+1 <= this.elementCount-1 && value > (this.get(index+1) + this.get(index))/2) 
-				index = index + 1;
+			else {
+				index = (int) (time_ms / (this.lastElement() / (this.elementCount - 1) / 10) / 2);
+				int value = Double.valueOf(time_ms * 10.0).intValue();
+				for (; index < elementCount; index++) {
+					if (value <= this.get(index)) break;
+				}
+				if (index + 1 <= this.elementCount - 1 && value > (this.get(index + 1) + this.get(index)) / 2) index = index + 1;
+			}
 		}
-			
+		//log.log(Level.INFO, "index=" + index);
 		return index;
 	}
 }

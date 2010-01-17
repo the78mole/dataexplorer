@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -630,7 +630,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
 	 */
 	public double getMaxTime_ms() {
-		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * this.get(0).realSize() : this.timeStep_ms.getMaxTime_ms();
+		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).realSize()-1) : this.timeStep_ms.getMaxTime_ms();
 	}
 
 	/**
@@ -1160,23 +1160,6 @@ public class RecordSet extends HashMap<String, Record> {
 		return size;
 	}
 
-//	/**
-//	 * set maximum size of data points of a compare set
-//	 * @param newMaxSize the maxSize to set
-//	 */
-//	@Deprecated
-//	public void setMaxSize(int newMaxSize) {
-//		this.maxSize = newMaxSize;
-//	}
-//
-//	/**
-//	 * get maximum size of data points of a compare set
-//	 */
-//	@Deprecated
-//	public int getMaxSize() {
-//		return this.maxSize;
-//	}
-
 	/**
 	 * set maximum time in msec relating to the record defining the time scale of a compare set
 	 * @param newMaxTime the maxSize to set
@@ -1380,6 +1363,13 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
+	 * query if the record set is in scope mode
+	 */
+	public boolean isScopeMode() {
+		return this.isScopeMode;
+	}
+	
+	/**
 	 * query actual scope mode offset in record points
 	 * @return scopeModeOffset
 	 */
@@ -1411,7 +1401,7 @@ public class RecordSet extends HashMap<String, Record> {
 			startTime = this.get(0).zoomTimeOffset;
 		}
 		else if (this.isScopeMode) {
-			startTime = this.timeStep_ms.getTime_ms(this.scopeModeOffset);
+			startTime = this.timeStep_ms.getTime_ms(this.scopeModeOffset+1);
 		}
 		return startTime;
 	}
@@ -1697,7 +1687,7 @@ public class RecordSet extends HashMap<String, Record> {
 						//RecordSet.this.dataTable[i][0] = String.format(Locale.ENGLISH, "%.3f", (getTimeStep_ms() * i));
 					}
 					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
-					log.log(Level.FINE, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.TIME, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 					
 					setTableDataCalculated(true);
 					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$

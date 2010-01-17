@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -826,12 +826,12 @@ public class Record extends Vector<Integer> {
 	@Override
 	public synchronized Integer get(int index) {
 		int size = elementCount;
-//		if(this.parent.isZoomMode) {
-//			index = index + this.zoomOffset;
-//			index = index > (size-1) ? (size-1) : index;
-//			index = index < 0 ? 0 : index;
-//		}
-//		else 
+		if(this.parent.isZoomMode) {
+			index = index + this.zoomOffset;
+			index = index > (size-1) ? (size-1) : index;
+			index = index < 0 ? 0 : index;
+		}
+		else 
 			if(this.parent.isScopeMode) {
 			index = index + this.parent.scopeModeOffset;
 			index = index > (size-1) ? (size-1) : index;
@@ -841,6 +841,7 @@ public class Record extends Vector<Integer> {
 			index = index > (size-1) ? (size-1) : index;
 			index = index < 0 ? 0 : index;
 		}
+		//log.log(Level.INFO, "index=" + index);
 		return size != 0 ? super.get(index) : 0;
 	}
 
@@ -1069,7 +1070,15 @@ public class Record extends Vector<Integer> {
 	 * @return time step in msec
 	 */
 	public double getTime_ms(int index) {
-		return this.timeStep_ms == null ? this.parent.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
+		if(this.parent.isZoomMode) {
+			return (this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index+this.zoomOffset) : this.timeStep_ms.getTime_ms(index+this.zoomOffset)) - this.zoomTimeOffset;
+		}
+		else if (this.parent.isScopeMode) {
+			return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index+this.parent.scopeModeOffset) - this.parent.timeStep_ms.getTime_ms(this.parent.scopeModeOffset) 
+					: this.timeStep_ms.getTime_ms(index+this.parent.scopeModeOffset) - this.timeStep_ms.getTime_ms(this.parent.scopeModeOffset);
+		}
+		else 
+			return this.timeStep_ms == null ? this.parent.timeStep_ms.getTime_ms(index) : this.timeStep_ms.getTime_ms(index);
 	}
 
 	/** 
@@ -1112,7 +1121,10 @@ public class Record extends Vector<Integer> {
 	 * @return
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
-		return this.timeStep_ms == null ? this.parent.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
+		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
+		indexs[0] = indexs[0] > this.elementCount-1 ? this.elementCount-1 : indexs[0];
+		indexs[1] = indexs[1] > this.elementCount-1 ? this.elementCount-1 : indexs[1];
+		return indexs;
 	}
 
 	/**
@@ -1121,8 +1133,8 @@ public class Record extends Vector<Integer> {
 	 * @return
 	 */
 	public int findBestIndex(double time_ms) {
-		int index = this.timeStep_ms == null ? this.parent.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
-		return index <= this.elementCount-1 ? index : this.elementCount-1;
+		int index = this.timeStep_ms == null ? this.parent.timeStep_ms.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
+		return index > this.elementCount-1 ? this.elementCount-1 : index;
 	}
 
 	/**
@@ -1138,19 +1150,45 @@ public class Record extends Vector<Integer> {
 	public double getZoomTimeOffset() {
 		return this.zoomTimeOffset;
 	}
+	
+	/**
+	 * @return the zoomTimeOffset
+	 */
+	public double getDrawTimeOffset_ms() {
+		double timeOffset_ms = 0;
+		if (this.parent.isScopeMode) {
+			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || this.parent.timeStep_ms.isConstant) {
+				timeOffset_ms = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount-1-this.parent.scopeModeSize) / 10.0;
+			}
+			else {
+				timeOffset_ms = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(this.elementCount-1-this.parent.scopeModeSize) : this.parent.timeStep_ms.getTime_ms(this.elementCount-1-this.parent.scopeModeSize);
+			}
+		}
+		else if(this.parent.isZoomMode) {
+			timeOffset_ms = this.zoomTimeOffset;
+		}
+		return timeOffset_ms;
+	}
 
 	/**
 	 * @return the time in msec representing the segment to be displayed, without zooming this is the maximum time represented by the last data point time
 	 */
-	public double getTimeWidth_ms() {
+	public double getDrawTimeWidth_ms() {
 		if(this.parent.isScopeMode) {
-			this.drawTimeWidth = this.timeStep_ms != null ? (this.timeStep_ms.isConstant ? this.timeStep_ms.get(0)*(this.parent.scopeModeSize)/10.0 : this.timeStep_ms.lastElement()/10.0)
-					: (this.parent.timeStep_ms.isConstant ? this.parent.timeStep_ms.get(0)*(this.parent.scopeModeSize)/10.0 : this.parent.timeStep_ms.lastElement()/10.0);
+			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
+				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * this.parent.scopeModeSize / 10.0;
+			}
+			else {
+				this.drawTimeWidth = this.timeStep_ms != null ? this.timeStep_ms.getDeltaTime(this.elementCount-1-this.parent.scopeModeSize, this.elementCount-1) : this.parent.timeStep_ms.getDeltaTime(this.elementCount-1-this.parent.scopeModeSize, this.elementCount-1);
+			}
 		}
-		else if (!this.parent.isZoomMode) {
-			this.drawTimeWidth = this.parent.isZoomMode ? this.drawTimeWidth 
-				: this.timeStep_ms != null ? (this.timeStep_ms.isConstant ? this.timeStep_ms.get(0)*(this.elementCount-1)/10.0 : this.timeStep_ms.lastElement()/10.0) 
-						: (this.parent.timeStep_ms.isConstant ? this.parent.timeStep_ms.get(0)*(this.elementCount-1)/10.0 : this.parent.timeStep_ms.lastElement()/10.0);
+		else if (!this.parent.isZoomMode) { // normal not manipulated view
+			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
+				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount-1) / 10.0;
+			}
+			else {
+				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.lastElement() : this.parent.timeStep_ms.lastElement()) / 10.0;
+			}
 		}
 		return this.drawTimeWidth;  // for this.parent.isZoomMode=true the width was calculated while setting the zoom bounds
 	}
@@ -1204,26 +1242,25 @@ public class Record extends Vector<Integer> {
 	
 	/**
 	 * method to query time and value for display at a given index
-	 * @param index
-	 * @param scaledMeasurementPointIndex (may differ from index if display width < measurement size)
+	 * @param measurementPointIndex (differs from index if display width != measurement size)
 	 * @param xDisplayOffset
 	 * @param yDisplayOffset
 	 * @return point time, value
 	 */
-	public Point getDisplayPoint(int index, int scaledMeasurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
+	public Point getDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
+		//log.log(Level.INFO, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue()) + ")");
 		return new Point(
-				xDisplayOffset + Double.valueOf((this.getTime_ms(index+this.zoomOffset) - this.zoomTimeOffset) * this.displayScaleFactorTime).intValue(), 
-				yDisplayOffset - Double.valueOf(((this.get(scaledMeasurementPointIndex+this.zoomOffset) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue());
+				xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
+				yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue());
 	}
 	
 	/**
-	 * method to query time and value for display at a given index
-	 * @param index
-	 * @param xDisplayOffset
+	 * method to query x,y position of a display at a given horizontal display index 
+	 * @param xPos
 	 * @return point time, value
 	 */
-	public Point getDisplayEndPoint(int index, int xDisplayOffset) {
-		return new Point((xDisplayOffset + index), this.parent.drawAreaBounds.y + getVerticalDisplayPointValue(index, this.parent.drawAreaBounds));
+	public Point getDisplayEndPoint(int xPos) {
+		return new Point(this.parent.drawAreaBounds.x + xPos, this.parent.drawAreaBounds.y + getVerticalDisplayPointValue(xPos));
 	}
 
 	/**
@@ -1241,7 +1278,7 @@ public class Record extends Vector<Integer> {
 	* @return string of time value in simple date format HH:ss:mm:SSS
 	*/
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
-		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset); 
+		return TimeLine.getFomatedTimeWithUnit(this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms()); 
 	}
 
 	/**
@@ -1250,33 +1287,36 @@ public class Record extends Vector<Integer> {
 	 * @return position integer value
 	 */
 	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
-		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset);
+		return this.findBestIndex(getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms());
 	}
 
 	/**
 	 * query data value (not translated in device units) from a display position point 
 	 * @param xPos
-	 * @param drawAreaBounds
 	 * @return displays yPos in pixel
 	 */
-	public int getVerticalDisplayPointValue(int xPos, Rectangle drawAreaBounds) {
+	public int getVerticalDisplayPointValue(int xPos) {
 		int pointPosY = 0;
-		double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.zoomTimeOffset;
+		double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
 		int[] indexs = this.findBoundingIndexes(tmpTimeValue);
 		if (indexs[0] == indexs[1]) {
-			pointPosY = Double.valueOf(drawAreaBounds.height - ((this.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+			pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
 		}
 		else {
 			int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
-			double deltaTimeIndex01 = this.getTime_ms(indexs[1]) - this.getTime_ms(indexs[0]);
-			double xPosDeltaTime2Index0 = tmpTimeValue - this.getTime_ms(indexs[0]);
+			double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+			double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
 			log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			pointPosY = Double.valueOf(drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+			pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 		}
-		log.log(Level.FINER, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		//check yPos out of range, the graph might not visible within this area
-		return pointPosY > drawAreaBounds.height ? drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
+//		if(pointPosY > this.parent.drawAreaBounds.height) 
+//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
+//		if(pointPosY < 0) 
+//			log.log(Level.WARNING, "pointPosY < 0");
+		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
 	}
 	
 	/**
@@ -1333,16 +1373,16 @@ public class Record extends Vector<Integer> {
 	 * @param drawAreaBounds
 	 * @return string of value
 	 */
-	public String getSlopeValue(Point points, Rectangle drawAreaBounds) {
+	public String getSlopeValue(Point points) {
 		log.log(Level.FINE, OSDE.STRING_EMPTY + points.toString());
 		double measureDelta;
 		if(this.parent.isZoomMode)
-			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / drawAreaBounds.height;
+			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
 		else
-			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / drawAreaBounds.height;
+			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / this.parent.drawAreaBounds.height;
 		//double timeDelta = (1.0 * points.x * this.size() - 1) / drawAreaBounds.width * this.getTimeStep_ms() / 1000; //sec
 		//this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
-		double timeDelta = this.drawTimeWidth * points.x / drawAreaBounds.width / 1000; //sec
+		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
 		log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
@@ -1352,14 +1392,14 @@ public class Record extends Vector<Integer> {
 	 * @param zoomBounds - where the start point offset is x,y and the area is width, height
 	 */
 	public void setZoomBounds(Rectangle zoomBounds) {
-		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.zoomTimeOffset;
+		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.getDrawTimeOffset_ms();
 		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
-		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
+		log.log(Level.INFO, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
-		log.log(Level.INFO, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -1389,7 +1429,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		log.log(Level.FINER, String.format(Locale.ENGLISH, "displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
+		log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
 
