@@ -37,7 +37,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 
@@ -223,7 +223,7 @@ public class Settings extends Properties {
 		if (Settings.instance == null) {
 			try {
 				Settings.instance = new Settings();
-				log.logp(Level.INFO, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -373,7 +373,7 @@ public class Settings extends Properties {
             if (entryName.startsWith(PATH_RESOURCE_TEMPLATE) && entryName.endsWith(OSDE.FILE_ENDING_DOT_XML)) {
             	String defaultTemplateName = entryName.substring(PATH_RESOURCE_TEMPLATE.length());
   						if (!FileUtils.checkFileExist(templateDirectoryTargetPath + defaultTemplateName))		{
-    						log.logp(Level.INFO, Settings.$CLASS_NAME, $METHOD_NAME, "jarFile=" + jarFile.getName() + "; defaultTemplateName=" + entryName); //$NON-NLS-1$ //$NON-NLS-2$
+    						log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "jarFile=" + jarFile.getName() + "; defaultTemplateName=" + entryName); //$NON-NLS-1$ //$NON-NLS-2$
   							FileUtils.extract(jarFile, defaultTemplateName, PATH_RESOURCE_TEMPLATE, templateDirectoryTargetPath, PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$
   						}
             }
@@ -1069,7 +1069,7 @@ public class Settings extends Properties {
 	/**
 	 * set global log level
 	 */
-	public void setGlobalLogLevel(Level logLevel) {
+	public void setGlobalLogLevel(java.util.logging.Level logLevel) {
 		Logger logger = Logger.getLogger(OSDE.STRING_EMPTY);
     logger.setLevel(logLevel);
     logger.setUseParentHandlers(true);
@@ -1078,7 +1078,7 @@ public class Settings extends Properties {
 	/**
 	 * set individual log level
 	 */
-	public void setIndividualLogLevel(String packageName, Level logLevel) {
+	public void setIndividualLogLevel(String packageName, java.util.logging.Level logLevel) {
 		Logger logger = Logger.getLogger(packageName);
     logger.setLevel(logLevel);
     logger.setUseParentHandlers(true);
@@ -1089,7 +1089,7 @@ public class Settings extends Properties {
 	 */
 	public void updateLogLevel() {
 		if (isGlobalLogLevel()) {
-			Level globalLogLevel = Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "INFO").trim()); //$NON-NLS-1$
+			java.util.logging.Level globalLogLevel = Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim()); //$NON-NLS-1$
 			setIndividualLogLevel("osde.ui", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("osde.data", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("osde.config", globalLogLevel); //$NON-NLS-1$
@@ -1106,7 +1106,7 @@ public class Settings extends Properties {
 			classbasedLogger.clear();
 		}
 		else {
-			setGlobalLogLevel(Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "INFO").trim())); //$NON-NLS-1$
+			setGlobalLogLevel(Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim())); //$NON-NLS-1$
 			setIndividualLogLevel("osde.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("osde.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("osde.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
@@ -1123,21 +1123,21 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return log level from the given categorie, in case of parse error fall back to Level.INFO
+	 * @return log level from the given categorie, in case of parse error fall back to Level.WARNING
 	 */
-	Level getLogLevel(String logCategorie) {
-		Level logLevel = Level.INFO;
+	java.util.logging.Level getLogLevel(String logCategorie) {
+		java.util.logging.Level logLevel = Level.WARNING;
 		try {
-			logLevel = Level.parse(getProperty(logCategorie, "INFO").trim()); //$NON-NLS-1$
+			logLevel = Level.parse(getProperty(logCategorie, "WARNING").trim()); //$NON-NLS-1$
 		}
 		catch (IllegalArgumentException e) {
-			// ignore and fall back to INFO
-			setProperty(logCategorie, "INFO"); //$NON-NLS-1$
+			// ignore and fall back to WARNING
+			setProperty(logCategorie, "WARNING"); //$NON-NLS-1$
 		}
 		return logLevel;
 	}
 
-	private void setLevelSerialIO(Level logLevel) {
+	private void setLevelSerialIO(java.util.logging.Level logLevel) {
 		final String $METHOD_NAME = "setLevelSerialIO"; //$NON-NLS-1$
 		try {
 			Logger logger = Logger.getLogger("osde.serial.DeviceSerialPort"); //$NON-NLS-1$
@@ -1145,7 +1145,7 @@ public class Settings extends Properties {
 				logger.removeHandler(handler);
 			}
 			logger.setLevel(logLevel);
-			if (logLevel.intValue() < Level.parse("INFO").intValue()) { //$NON-NLS-1$
+			if (logLevel.intValue() < Level.parse("WARNING").intValue()) { //$NON-NLS-1$
 				logger.setUseParentHandlers(false);
 				Handler fh = new FileHandler(this.getSerialLogFilePath(), 15000000, 3);
 				fh.setFormatter(new LogFormatter());

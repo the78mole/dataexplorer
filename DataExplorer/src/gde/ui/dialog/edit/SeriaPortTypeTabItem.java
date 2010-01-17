@@ -17,7 +17,7 @@
 package osde.ui.dialog.edit;
 
 import java.math.BigInteger;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;

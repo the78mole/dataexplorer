@@ -16,7 +16,7 @@
 ****************************************************************************************/
 package osde.io;
 
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.device.CheckSumTypes;

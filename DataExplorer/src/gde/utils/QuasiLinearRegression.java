@@ -16,7 +16,7 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channels;

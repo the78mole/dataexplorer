@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -220,9 +220,9 @@ public class LogViewReader {
 					long startTime = new Date().getTime();
 					log.log(Level.FINE, "data buffer size = " + buffer.length); //$NON-NLS-1$
 					data_in.readFully(buffer);
-					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
-					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 					device.updateVisibilityStatus(recordSet);
 					if (application.getMenuToolBar() != null) {
 						channel.applyTemplate(recordSet.getName(), true);
@@ -277,7 +277,7 @@ public class LogViewReader {
 			random_in.close();
 			
 			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
-			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			
 			device.updateVisibilityStatus(recordSet);
 			if (application.getMenuToolBar() != null) {

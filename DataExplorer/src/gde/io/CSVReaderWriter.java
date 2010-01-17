@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -426,7 +426,7 @@ public class CSVReaderWriter {
 				log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			}
 			sb = null;
-			log.log(Level.FINE, "CSV file = " + filePath + " erfolgreich geschieben"  //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.TIME, "CSV file = " + filePath + " erfolgreich geschieben"  //$NON-NLS-1$ //$NON-NLS-2$
 					+ "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$
 
 			writer.flush();

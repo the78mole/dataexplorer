@@ -16,7 +16,7 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -165,7 +165,7 @@ public class DataTableWindow extends CTabItem {
 					item = new TableItem(this.dataTable, SWT.RIGHT);
 					item.setText(recordSet.getDataTableRow(i));
 				}
-				log.log(Level.FINE, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
+				log.log(Level.TIME, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
 			}
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);

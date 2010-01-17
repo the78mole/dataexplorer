@@ -18,7 +18,7 @@ package osde.ui.tab;
 
 import java.io.File;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;

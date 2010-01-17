@@ -19,7 +19,7 @@ package osde.ui.dialog;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 

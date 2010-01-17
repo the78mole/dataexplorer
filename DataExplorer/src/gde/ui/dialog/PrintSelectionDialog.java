@@ -31,7 +31,7 @@ import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;

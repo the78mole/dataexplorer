@@ -18,7 +18,7 @@ package osde.utils;
 
 import java.util.Date;
 import java.util.TreeMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.messages.MessageIds;

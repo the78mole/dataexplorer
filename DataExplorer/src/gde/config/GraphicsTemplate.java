@@ -21,7 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;

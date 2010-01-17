@@ -40,7 +40,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 

@@ -16,7 +16,7 @@
 ****************************************************************************************/
 package osde.utils;
 
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -197,26 +197,24 @@ public class CurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		// get the data points size to be drawn
+		// get the number of data points size to be drawn
 		int displayableSize = record.size();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
 		log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
-		double displayableTime_ms = record.getTimeWidth_ms();
+		double displayableTime_ms = record.getDrawTimeWidth_ms();
 		log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
-		// calculate scale factor to fit time into draw bounds display pixel based
-		double xTimeFactor = width / displayableTime_ms;
 		// calculate xScale for curves with much to many data points, it makes no sense to draw all the small lines on the same part of the screen
 		int xScaleFactor = Double.valueOf(displayableSize / (width * 2.2)).intValue();
-		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1;
-		while (xScaleFactor % 2 == 0 && xScaleFactor > 1) {
+		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1; //check for curves with less points than draw area width
+		while (displayableSize % xScaleFactor > 3 && xScaleFactor > 1) {
 			--xScaleFactor;
 		}
 		//xScaleFactor+=2;
-		log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$
-		xTimeFactor = xTimeFactor * xScaleFactor;
-		
+		// calculate scale factor to fit time into draw bounds display pixel based
+		double xTimeFactor = width / displayableTime_ms; // * (xScaleFactor - 0.44);
+		log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$		
 		record.setDisplayScaleFactorTime(xTimeFactor);
 		record.setDisplayScaleFactorValue(height);
 
@@ -226,7 +224,8 @@ public class CurveUtils {
 		try {
 			//calculate start point of the curve, which is the first oldPoint
 			//draw the first point with possible interpolated values if it does not match a measurement point at time value
-			oldPoint = record.getDisplayEndPoint(0, x0);
+			//oldPoint = record.getParent().isScopeMode() ? record.getDisplayPoint(0, x0, y0) : record.getDisplayEndPoint(0, x0);
+			oldPoint = record.getDisplayEndPoint(0);
 			if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
@@ -235,25 +234,25 @@ public class CurveUtils {
 
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-			if (!record.getParent().isCompareSet()) { 
-				for (int i = 0, j = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
+			if (!record.getParent().isCompareSet()) {
+				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
-					newPoint = record.getDisplayPoint(i, j, x0, y0);
+					newPoint = record.getDisplayPoint(j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 					oldPoint = newPoint; // remember the last draw point for next drawLine operation
 				}
 				//draw the last point with possible interpolated values if it does not match a measurement point at time value
-				newPoint = record.getDisplayEndPoint(width, x0);
+				newPoint = record.getDisplayEndPoint(width);
 				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			}
 			else { // compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
 				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms()) - record.findBestIndex(record.getZoomTimeOffset());
 				int j = 0;
-				for (int i = 0; j < displayableSize && displayableSize > 1; ++i, j = j + xScaleFactor) {
+				for (; j < displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
-					newPoint = record.getDisplayPoint(i, j, x0, y0);
+					newPoint = record.getDisplayPoint(j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(OSDE.LINE_SEPARATOR).append(newPoint.toString());
 					if (j <= drawLimit) {
 						gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
@@ -262,7 +261,7 @@ public class CurveUtils {
 				}
 				if (j <= drawLimit) {
 					//draw the last point with possible interpolated values if it does not match a measurement point at time value
-					newPoint = record.getDisplayEndPoint(width, x0);
+					newPoint = record.getDisplayEndPoint(width);
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 			}

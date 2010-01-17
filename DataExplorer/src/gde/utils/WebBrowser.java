@@ -18,7 +18,7 @@ package osde.utils;
 
 import java.io.IOException;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;

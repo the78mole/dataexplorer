@@ -17,7 +17,7 @@
 package osde.ui.tab;
 
 import java.util.HashMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -117,10 +117,13 @@ public class DigitalWindow extends CTabItem {
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
-			for (String recordKey : activeRecordKeys) {
-				DigitalDisplay display = this.displays.get(recordKey);
-				if (display != null) display.getDigitalLabel().redraw();
-			}
+			if (activeRecordKeys.length != this.displays.size())
+				this.update(false);
+			else
+				for (String recordKey : activeRecordKeys) {
+					DigitalDisplay display = this.displays.get(recordKey);
+					if (display != null) display.getDigitalLabel().redraw();
+				}
 		}
 	}
 

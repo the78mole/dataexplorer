@@ -18,7 +18,7 @@ package osde.utils;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;

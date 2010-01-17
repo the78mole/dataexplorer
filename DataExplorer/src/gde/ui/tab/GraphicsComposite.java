@@ -413,7 +413,7 @@ public class GraphicsComposite extends Composite {
 		}
 		
 		//prepare time scale
-		double totalDisplayDeltaTime_ms = recordSet.get(0).getTimeWidth_ms();
+		double totalDisplayDeltaTime_ms = recordSet.get(0).getDrawTimeWidth_ms();
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(totalDisplayDeltaTime_ms);
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
@@ -474,17 +474,16 @@ public class GraphicsComposite extends Composite {
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 		
 		// calculate the horizontal area available for plotting graphs
-		x0 = spaceLeft + 5;// enable a small gap if no axis is shown
-		xMax = bounds.width - spaceRight - 5;
+		int gapSide = 10; // free gap left or right side of the curves
+		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide/2 : gapSide);// enable a small gap if no axis is shown
+		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide/2 : gapSide);
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 		
 		// calculate the vertical area available for plotting graphs
-		int gapTop = 20; // free gap on top of the curves
-		int gapBot = 3 * pt.y + 3; // space used for time scale text and scales with description or legend;
-		y0 = bounds.height - gapBot + 1;
-		yMax = gapTop;
-		height = y0 - yMax <= 11 ? 11 : y0 - yMax;
-		//yMax = y0 - height;	// recalculate due to modulo 10
+		yMax = 10; // free gap on top of the curves
+		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
+		y0 = bounds.height - yMax - gapBot;
+		height = y0 - yMax; // recalculate due to modulo 10 ??
 		log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// set offset values used for mouse measurement pointers
 		this.offSetX = x0;
@@ -665,7 +664,7 @@ public class GraphicsComposite extends Composite {
 		if (recordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
 			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure, this.curveAreaBounds);
+			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 			log.log(Level.FINE, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -678,7 +677,7 @@ public class GraphicsComposite extends Composite {
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure, this.curveAreaBounds);
+			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 
 			// measure position
 			drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
@@ -686,7 +685,7 @@ public class GraphicsComposite extends Composite {
 
 			// delta position
 			this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
-			this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta, this.curveAreaBounds);
+			this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
@@ -698,7 +697,7 @@ public class GraphicsComposite extends Composite {
 
 			this.application.setStatusMessage(
 					Messages.getString(MessageIds.OSDE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
-					record.getUnit(), record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds), record.getUnit() }
+					record.getUnit(), record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 			));
 		}
 	}
@@ -1062,14 +1061,14 @@ public class GraphicsComposite extends Composite {
 							// clear old measure lines
 							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure, this.curveAreaBounds);
+							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 
 							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								// clear old delta measure lines
 								eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 								//no change don't needs to be calculated, but the calculation limits to bounds
-								this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta, this.curveAreaBounds);
+								this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 								eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 								
 								//clean obsolete rectangle of connecting line
@@ -1084,7 +1083,7 @@ public class GraphicsComposite extends Composite {
 							// all obsolete lines are cleaned up now draw new position marker
 							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure, this.curveAreaBounds);
+							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 							
 							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
@@ -1093,7 +1092,7 @@ public class GraphicsComposite extends Composite {
 								}
 								this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
 										new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
-										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds), record.getUnit() }
+										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 								)); 
 							}
 							else {
@@ -1108,13 +1107,13 @@ public class GraphicsComposite extends Composite {
 							// clear old delta measure lines
 							eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure, this.curveAreaBounds);
+							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 							eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
 
 							// clear old measure lines
 							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta, this.curveAreaBounds);
+							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 							
 							//clean obsolete rectangle of connecting line
@@ -1130,7 +1129,7 @@ public class GraphicsComposite extends Composite {
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 							this.canvasGC.setLineStyle(SWT.LINE_DASH);
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta, this.curveAreaBounds);
+							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
 							
 							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
@@ -1141,7 +1140,7 @@ public class GraphicsComposite extends Composite {
 
 							this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
 									new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
-									record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta), this.curveAreaBounds), record.getUnit() }
+									record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 							));
 						}
 						else if (this.isPanMouse) {

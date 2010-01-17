@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -291,14 +291,14 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
-				int numberRecordAndTimeStamp = recordSet.isTimeStepConstant() ? recordSet.getNoneCalculationRecordNames().length : recordSet.getNoneCalculationRecordNames().length + 1;
+				int numberRecordAndTimeStamp = recordSet.getNoneCalculationRecordNames().length + (recordSet.isTimeStepConstant() ? 0 : 1);
 				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, OSDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp  * recordDataSize);
 				if (recordSetName.equals(firstRecordSet[1])) {
 					long startTime = new Date().getTime();
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
-					log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
@@ -506,7 +506,7 @@ public class OsdReaderWriter {
 						}
 					}
 				}
-				log.log(Level.FINE, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.log(Level.TIME, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
 				//update/write link if object oriented
 				if (isObjectOriented) {
@@ -546,7 +546,7 @@ public class OsdReaderWriter {
 			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 			random_in.readFully(buffer);
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
-			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

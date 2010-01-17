@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -202,7 +202,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				DeviceSelectionDialog.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
-		DeviceSelectionDialog.log.log(Level.FINE, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		DeviceSelectionDialog.log.log(Level.TIME, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 

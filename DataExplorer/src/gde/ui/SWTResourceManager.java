@@ -19,7 +19,7 @@ package osde.ui;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
