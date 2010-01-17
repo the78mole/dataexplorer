@@ -17,7 +17,6 @@
 package osde.device.bantam;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channel;
@@ -28,8 +27,10 @@ import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
+import osde.log.Level;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
+import osde.utils.TimeLine;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -92,13 +93,13 @@ public class GathererThread extends Thread {
 		HashMap<String, String> configData = new HashMap<String, String>();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
-		long sumCycleTime = 0;
-		long deltaTime = 0;
+		//long sumCycleTime = 0;
+		//long deltaTime = 0;
 		long measurementCount = 0;
 		boolean isCycleMode = false;
 		int dryTimeCycleCount = 0; // number of discharge/charge cycle NiXx cells only 
-		double newTimeStep_ms = 0;
-		StringBuilder sb = new StringBuilder();
+		//double newTimeStep_ms = 0;
+		//StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
 
 		this.isCollectDataStopped = false;
@@ -112,36 +113,37 @@ public class GathererThread extends Thread {
 				dataBuffer = this.serialPort.getData();
 
 				// calculate time step average to enable adjustment
-				if (isProgrammExecuting && recordSet != null) {
-					++measurementCount;
-					tmpCycleTime = System.nanoTime()/1000000; 
-					deltaTime = startCycleTime > 0 ? tmpCycleTime - startCycleTime : TIME_STEP_DEFAULT;
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
-					log.logp(Level.FINEST, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
-							(newTimeStep_ms - FILTER_TIME_DELTA_MS)));
-					if ((deltaTime < newTimeStep_ms + FILTER_TIME_DELTA_MS && deltaTime > newTimeStep_ms - FILTER_TIME_DELTA_MS) || newTimeStep_ms == 0) { // delta ~ 10 %
-						if (log.isLoggable(Level.FINER)) {
-							sb.append(", ").append(deltaTime); //$NON-NLS-1$
-						}
-						sumCycleTime += deltaTime;
-					}
-					else {
-						log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
-						sumCycleTime += newTimeStep_ms > 0 ? newTimeStep_ms : TIME_STEP_DEFAULT; // use average value instead
-					}
-					if (measurementCount % 10 == 0) {
-						log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "calculate newTimeStep_ms, sumCycleTime = " + sumCycleTime + " measurementCount = " + measurementCount); //$NON-NLS-1$
-						newTimeStep_ms = sumCycleTime / measurementCount;
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = "+newTimeStep_ms); //$NON-NLS-1$
-						//this.device.setTimeStep_ms(newTimeStep_ms);
-						recordSet.setTimeStep_ms(newTimeStep_ms);
-						if (log.isLoggable(Level.FINER)) {
-							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
-							sb = new StringBuilder();
-						}
-					}
-				}
-				startCycleTime = tmpCycleTime;
+				//if (isProgrammExecuting && recordSet != null) {
+				//	++measurementCount;
+					//tmpCycleTime = System.nanoTime()/1000000; 
+					//startCycleTime > 0 ? tmpCycleTime - startCycleTime : TIME_STEP_DEFAULT;
+//					deltaTime = 
+//					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
+//					log.logp(Level.FINEST, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
+//							(newTimeStep_ms - FILTER_TIME_DELTA_MS)));
+//					if ((deltaTime < newTimeStep_ms + FILTER_TIME_DELTA_MS && deltaTime > newTimeStep_ms - FILTER_TIME_DELTA_MS) || newTimeStep_ms == 0) { // delta ~ 10 %
+//						if (log.isLoggable(Level.FINER)) {
+//							sb.append(", ").append(deltaTime); //$NON-NLS-1$
+//						}
+//						sumCycleTime += deltaTime;
+//					}
+//					else {
+//						log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
+//						sumCycleTime += newTimeStep_ms > 0 ? newTimeStep_ms : TIME_STEP_DEFAULT; // use average value instead
+//					}
+//					if (measurementCount % 10 == 0) {
+//						log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "calculate newTimeStep_ms, sumCycleTime = " + sumCycleTime + " measurementCount = " + measurementCount); //$NON-NLS-1$
+//						newTimeStep_ms = sumCycleTime / measurementCount;
+//						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = "+newTimeStep_ms); //$NON-NLS-1$
+//						//this.device.setTimeStep_ms(newTimeStep_ms);
+//						recordSet.setTimeStep_ms(newTimeStep_ms);
+//						if (log.isLoggable(Level.FINER)) {
+//							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
+//							sb = new StringBuilder();
+//						}
+//					}
+				//}
+				//startCycleTime = tmpCycleTime;
 
 				// check if device is ready for data capturing, discharge or charge allowed only
 				// else wait for 180 seconds max. for actions
@@ -172,7 +174,7 @@ public class GathererThread extends Thread {
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setTableDisplayable(false); // suppress table calc + display 
 						recordSet.setAllDisplayable();
-						recordSet.setTimeStep_ms(TIME_STEP_DEFAULT);
+						//recordSet.addTimeStep_ms(0.0);
 						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
@@ -183,7 +185,12 @@ public class GathererThread extends Thread {
 
 					// prepare the data for adding to record set
 					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+					tmpCycleTime = System.nanoTime()/1000000;
+					if (measurementCount++ == 0) {
+						startCycleTime = tmpCycleTime;
+					}
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 					
 					this.numberBatteryCells = 0; //this.device.getNumberOfLithiumXCells(dataBuffer);
 					String[] recordKeys = recordSet.getRecordNames();
@@ -220,7 +227,7 @@ public class GathererThread extends Thread {
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
 						isProgrammExecuting = false;
-						sumCycleTime = measurementCount = 0;
+						measurementCount = 0;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1408));

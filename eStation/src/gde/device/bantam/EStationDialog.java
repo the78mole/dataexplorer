@@ -17,7 +17,7 @@
 package osde.device.bantam;
 
 import java.util.HashMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
