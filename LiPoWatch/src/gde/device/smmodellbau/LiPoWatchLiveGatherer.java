@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import osde.data.Channel;
