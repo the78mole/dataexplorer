@@ -18,7 +18,7 @@ package osde.device.wb;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
