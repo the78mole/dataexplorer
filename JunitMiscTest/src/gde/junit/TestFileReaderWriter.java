@@ -67,7 +67,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						int channelConfigNumber = this.channels.getChannelNumber(fileHeader.get(OSDE.CHANNEL_CONFIG_NAME));
 						if (channelConfigNumber > device.getChannelCount()){
 							channelConfigNumber = 1;
-							fileHeader.put(OSDE.CHANNEL_CONFIG_NAME, this.channels.get(1).getConfigKey());
+							fileHeader.put(OSDE.CHANNEL_CONFIG_NAME, this.channels.get(1).getChannelConfigKey());
 						}
 						this.channels.setActiveChannelNumber(channelConfigNumber);
 						Channel activeChannel = this.channels.getActiveChannel();

@@ -143,7 +143,7 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * calculates the new class name for the device
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
 		String selectedDeviceName = selectedActiveDeviceConfig.getName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
@@ -186,7 +186,7 @@ public class TestSuperClass extends TestCase {
 			String[] channelNames = new String[activeDevice.getChannelCount()];
 			// buildup new structure  - set up the channels
 			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
-				Channel newChannel = new Channel(i, activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
+				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
 				this.channels.put(i, newChannel);
 				channelNames[i - 1] = i + " : " + activeDevice.getChannelName(i);
 			}
@@ -208,7 +208,8 @@ public class TestSuperClass extends TestCase {
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
 		
 		//prepare time scale
-		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(recordSet.get(0).size()-1, recordSet.get(0).getTimeStep_ms());
+		double totalDisplayDeltaTime_ms = recordSet.get(0).getDrawTimeWidth_ms();
+		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(totalDisplayDeltaTime_ms);
 		int maxTimeFormated = timeScale[0];
 		int scaleFactor = timeScale[1];
 		int timeFormat = timeScale[2];
@@ -268,16 +269,16 @@ public class TestSuperClass extends TestCase {
 		int spaceRight = numberCurvesRight * dataScaleWidth;
 		
 		// calculate the horizontal area available for plotting graphs
-		x0 = spaceLeft + 5;// enable a small gap if no axis is shown
-		xMax = bounds.width - spaceRight - 5;
+		int gapSide = 10; // free gap left or right side of the curves
+		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide/2 : gapSide);// enable a small gap if no axis is shown
+		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide/2 : gapSide);
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 		
 		// calculate the vertical area available for plotting graphs
-		int gapTop = 20; // free gap on top of the curves
-		int gapBot = 3 * pt.y + 3; // space used for time scale text and scales with description or legend;
+		yMax = 10; // free gap on top of the curves
+		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - gapBot + 1;
-		yMax = gapTop;
-		height = y0 - yMax <= 11 ? 11 : y0 - yMax;
+		height = y0 - yMax; // recalculate due to modulo 10 ??
 		//yMax = y0 - height;	// recalculate due to modulo 10
 		//System.out.println("draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// set offset values used for mouse measurement pointers
@@ -285,7 +286,7 @@ public class TestSuperClass extends TestCase {
 		this.offSetY = y0 - height;
 
 		// draw curves for each active record
-		this.curveAreaBounds = new Rectangle(x0, y0 - height, width+1, height+1);
+		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 		recordSet.setDrawAreaBounds(this.curveAreaBounds);
 		//System.out.println("curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 		
@@ -294,11 +295,10 @@ public class TestSuperClass extends TestCase {
 		//gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
-		int deltaTime_ms = Double.valueOf(recordSet.get(0).getTimeStep_ms() * (recordSet.get(0).size() - 1)).intValue();	
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + deltaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, deltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		//gc.setForeground(this.curveAreaBorderColor);
