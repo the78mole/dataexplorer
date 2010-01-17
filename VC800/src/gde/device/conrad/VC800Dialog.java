@@ -18,7 +18,7 @@ package osde.device.conrad;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
+import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
