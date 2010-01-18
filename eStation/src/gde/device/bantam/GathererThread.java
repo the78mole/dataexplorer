@@ -112,39 +112,6 @@ public class GathererThread extends Thread {
 				// get data from device
 				dataBuffer = this.serialPort.getData();
 
-				// calculate time step average to enable adjustment
-				//if (isProgrammExecuting && recordSet != null) {
-				//	++measurementCount;
-					//tmpCycleTime = System.nanoTime()/1000000; 
-					//startCycleTime > 0 ? tmpCycleTime - startCycleTime : TIME_STEP_DEFAULT;
-//					deltaTime = 
-//					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
-//					log.logp(Level.FINEST, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
-//							(newTimeStep_ms - FILTER_TIME_DELTA_MS)));
-//					if ((deltaTime < newTimeStep_ms + FILTER_TIME_DELTA_MS && deltaTime > newTimeStep_ms - FILTER_TIME_DELTA_MS) || newTimeStep_ms == 0) { // delta ~ 10 %
-//						if (log.isLoggable(Level.FINER)) {
-//							sb.append(", ").append(deltaTime); //$NON-NLS-1$
-//						}
-//						sumCycleTime += deltaTime;
-//					}
-//					else {
-//						log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
-//						sumCycleTime += newTimeStep_ms > 0 ? newTimeStep_ms : TIME_STEP_DEFAULT; // use average value instead
-//					}
-//					if (measurementCount % 10 == 0) {
-//						log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "calculate newTimeStep_ms, sumCycleTime = " + sumCycleTime + " measurementCount = " + measurementCount); //$NON-NLS-1$
-//						newTimeStep_ms = sumCycleTime / measurementCount;
-//						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = "+newTimeStep_ms); //$NON-NLS-1$
-//						//this.device.setTimeStep_ms(newTimeStep_ms);
-//						recordSet.setTimeStep_ms(newTimeStep_ms);
-//						if (log.isLoggable(Level.FINER)) {
-//							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
-//							sb = new StringBuilder();
-//						}
-//					}
-				//}
-				//startCycleTime = tmpCycleTime;
-
 				// check if device is ready for data capturing, discharge or charge allowed only
 				// else wait for 180 seconds max. for actions
 				String processName = this.device.USAGE_MODE[this.device.getProcessingMode(dataBuffer)];
@@ -202,7 +169,7 @@ public class GathererThread extends Thread {
 						}
 					}
 
-					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateGraphicsWindow();
 						GathererThread.this.application.updateStatisticsData();
 						//GathererThread.this.application.updateDataTable(this.recordSetKey);
