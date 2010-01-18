@@ -233,7 +233,7 @@ public class AnalogDisplay extends Composite {
 
 			//draw the new needle if required
 			Rectangle damageBounds = getNeedleBounds();
-			double tmpActualValue = this.device.translateValue(this.record, (this.record.get(this.record.size() - 1) / 1000.0));
+			double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
 			log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 			if (tmpActualValue != this.actualValue) {
 				this.actualValue = tmpActualValue;
@@ -304,7 +304,7 @@ public class AnalogDisplay extends Composite {
 	 * - this may initiate redraw of the whole tacho if scale values are changed
 	 */
 	public void checkTachoNeedlePosition() {
-		double tmpActualValue = this.device.translateValue(this.record, (this.record.get(this.record.size() - 1) / 1000.0));
+		double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
 		log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 		if (tmpActualValue != this.actualValue) {
 			Rectangle damageBounds = getNeedleBounds(); 

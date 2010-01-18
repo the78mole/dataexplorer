@@ -129,7 +129,13 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return the const. time step in msec
 	 */
 	public double getAverageTimeStep_ms() {
-		return this.isConstant ? this.getTime_ms(1) : this.elementCount > 2 ? this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0; 
+		try {
+			return this.isConstant ? this.getTime_ms(1) : this.elementCount > 2 ? this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0;
+		}
+		catch (Exception e) {
+			// a redraw event where the record set has no records 
+			return 0.0;
+		} 
 	}
 
 	/**
