@@ -348,7 +348,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	 */
 	private boolean isSomeTriggerDefined() {
 		for (int i = 0; this.deviceConfig != null && i < this.deviceConfig.getMeasurementNames(this.channelConfigNumber).length; i++) {
-			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
+			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i) != null && this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
 				return true;
 			}
 		}
@@ -362,7 +362,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	 */
 	private int getTriggerReferenceOrdinal() {
 		for (int i = 0; this.deviceConfig != null && i < this.deviceConfig.getMeasurementNames(this.channelConfigNumber).length; i++) {
-			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
+			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i)!= null && this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
 				return i;
 			}
 		}

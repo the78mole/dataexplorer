@@ -261,7 +261,9 @@ public class RecordSet extends HashMap<String, Record> {
 			tmpRecord.setParent(this);
 
 			tmpRecord.statistics = this.device.getMeasurementStatistic(channelConfigurationNumber, i);
-			TriggerType tmpTrigger = tmpRecord.statistics.getTrigger();
+			if (tmpRecord.statistics == null)
+				System.out.println();
+			TriggerType tmpTrigger = tmpRecord.statistics != null ? tmpRecord.statistics.getTrigger() : null;
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
@@ -428,7 +430,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 
 		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable;
-		log.log(Level.FINE, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.TIME, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return displayableRecordEntries >= targetDisplayable;
 	}

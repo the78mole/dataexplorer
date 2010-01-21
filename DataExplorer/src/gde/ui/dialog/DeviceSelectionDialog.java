@@ -166,7 +166,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 		this.activeDevices = new Vector<String>(2, 1);
 
-		long startTime = new Date().getTime();
+		//wait until schema is setup
+		while (this.settings.isXsdThreadAlive()) {
+			try {
+				Thread.sleep(5);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
+		}
+		
+		//long startTime = new Date().getTime();
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
 				// loop through all device properties XML and check if device used
@@ -202,7 +212,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				DeviceSelectionDialog.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
-		DeviceSelectionDialog.log.log(Level.TIME, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		DeviceSelectionDialog.log.log(Level.TIME, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime)));
 		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 
@@ -872,19 +882,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * 
 	 */
 	private void updateDeviceSelectionTable() {
-		this.deviceTable.removeAll();
+		if (!this.isDisposed()) {
+			this.deviceTable.removeAll();
+			for (String deviceKey : this.deviceConfigurations.keySet()) {
+				DeviceSelectionDialog.log.log(Level.FINE, deviceKey);
+				DeviceConfiguration config = this.deviceConfigurations.get(deviceKey);
 
-		for (String deviceKey : this.deviceConfigurations.keySet()) {
-			DeviceSelectionDialog.log.log(Level.FINE, deviceKey);
-			DeviceConfiguration config = this.deviceConfigurations.get(deviceKey);
-
-			TableItem item = new TableItem(this.deviceTable, SWT.NULL);
-			item.setText(new String[] { config.getName(), config.getManufacturer(), config.getSerialPortType() != null ? config.getPort() : OSDE.STRING_MESSAGE_CONCAT });
-			if (config.isUsed()) {
-				item.setChecked(true);
-			}
-			else {
-				item.setChecked(false);
+				TableItem item = new TableItem(this.deviceTable, SWT.NULL);
+				item.setText(new String[] { config.getName(), config.getManufacturer(), config.getSerialPortType() != null ? config.getPort() : OSDE.STRING_MESSAGE_CONCAT });
+				if (config.isUsed()) {
+					item.setChecked(true);
+				}
+				else {
+					item.setChecked(false);
+				}
 			}
 		}
 	}
@@ -893,126 +904,126 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * update entries according configuration, this is called whenever a new device is selected
 	 */
 	void updateDialogEntries() {
-		// device selection
-		DeviceSelectionDialog.log.log(Level.FINE, "active devices " + this.activeDevices.toString()); //$NON-NLS-1$
-		String[] list = this.activeDevices.toArray(new String[this.activeDevices.size()]);
-		Arrays.sort(list); // this sorts the list but not the vector
-		//get sorted devices list and activeDevices array in sync
-		this.activeDevices.removeAllElements();
-		for (String device : list) {
-			this.activeDevices.add(device);
-		}
+		if (!this.isDisposed()) {
+			// device selection
+			DeviceSelectionDialog.log.log(Level.FINE, "active devices " + this.activeDevices.toString()); //$NON-NLS-1$
+			String[] list = this.activeDevices.toArray(new String[this.activeDevices.size()]);
+			Arrays.sort(list); // this sorts the list but not the vector
+			//get sorted devices list and activeDevices array in sync
+			this.activeDevices.removeAllElements();
+			for (String device : list) {
+				this.activeDevices.add(device);
+			}
+			if (list.length > 0) {
+				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? this.activeDevices.firstElement() : this.selectedActiveDeviceConfig.getName();
+				this.deviceSelectCombo.setItems(list);
+				this.deviceSelectCombo.setVisibleItemCount(this.activeDevices.size() + 1);
+				this.deviceSelectCombo.select(this.activeDevices.indexOf(this.activeDeviceName));
+				DeviceSelectionDialog.log.log(Level.FINE, this.activeDeviceName + OSDE.STRING_MESSAGE_CONCAT + this.activeDevices.indexOf(this.activeDeviceName));
 
-		if (list.length > 0) {
-			this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? this.activeDevices.firstElement() : this.selectedActiveDeviceConfig.getName();
-			this.deviceSelectCombo.setItems(list);
-			this.deviceSelectCombo.setVisibleItemCount(this.activeDevices.size() + 1);
-			this.deviceSelectCombo.select(this.activeDevices.indexOf(this.activeDeviceName));
-			DeviceSelectionDialog.log.log(Level.FINE, this.activeDeviceName + OSDE.STRING_MESSAGE_CONCAT + this.activeDevices.indexOf(this.activeDeviceName));
+				this.deviceSlider.setMaximum(this.activeDevices.size());
+				this.deviceSlider.setSelection(this.activeDevices.indexOf(this.activeDeviceName));
+				DeviceSelectionDialog.log.log(Level.FINE, "activeDevices.size() " + this.activeDevices.size()); //$NON-NLS-1$
+				if (this.activeDevices.size() > 1)
+					this.application.enableDeviceSwitchButtons(true);
+				else
+					this.application.enableDeviceSwitchButtons(false);
 
-			this.deviceSlider.setMaximum(this.activeDevices.size());
-			this.deviceSlider.setSelection(this.activeDevices.indexOf(this.activeDeviceName));
-			DeviceSelectionDialog.log.log(Level.FINE, "activeDevices.size() " + this.activeDevices.size()); //$NON-NLS-1$
-			if (this.activeDevices.size() > 1)
-				this.application.enableDeviceSwitchButtons(true);
-			else
-				this.application.enableDeviceSwitchButtons(false);
+				this.selectedActiveDeviceConfig = this.deviceConfigurations.get(this.activeDeviceName);
+			}
+			else { // no active device
+				this.selectedActiveDeviceConfig = null;
+				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? OSDE.STRING_EMPTY : this.selectedActiveDeviceConfig.getName();
+				this.deviceSelectCombo.setItems(new String[] { Messages.getString(MessageIds.OSDE_MSGT0190) });
+				this.deviceSelectCombo.setVisibleItemCount(1);
+				this.deviceSelectCombo.select(0);
+				DeviceSelectionDialog.log.log(Level.FINE, "no active device"); //$NON-NLS-1$
 
-			this.selectedActiveDeviceConfig = this.deviceConfigurations.get(this.activeDeviceName);
-		}
-		else { // no active device
-			this.selectedActiveDeviceConfig = null;
-			this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? OSDE.STRING_EMPTY : this.selectedActiveDeviceConfig.getName();
-			this.deviceSelectCombo.setItems(new String[] { Messages.getString(MessageIds.OSDE_MSGT0190) });
-			this.deviceSelectCombo.setVisibleItemCount(1);
-			this.deviceSelectCombo.select(0);
-			DeviceSelectionDialog.log.log(Level.FINE, "no active device"); //$NON-NLS-1$
+				this.deviceSlider.setMaximum(1);
+				this.deviceSlider.setIncrement(0);
+				this.deviceSlider.setSelection(0);
+				DeviceSelectionDialog.log.log(Level.FINE, "activeDevices.size() = 0"); //$NON-NLS-1$
+				this.application.updateTitleBar(this.application.getObjectKey(), Settings.EMPTY, Settings.EMPTY);
+			}
+			// update all serial Port settings
+			if (this.selectedActiveDeviceConfig == null) {
+				DeviceSelectionDialog.log.log(Level.FINE, "activeDeviceConfig == null -> no device selected as active"); //$NON-NLS-1$
+				this.application.setActiveDevice(null);
+				this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
 
-			this.deviceSlider.setMaximum(1);
-			this.deviceSlider.setIncrement(0);
-			this.deviceSlider.setSelection(0);
-			DeviceSelectionDialog.log.log(Level.FINE, "activeDevices.size() = 0"); //$NON-NLS-1$
-			this.application.updateTitleBar(this.application.getObjectKey(), Settings.EMPTY, Settings.EMPTY);
-		}
+				this.manufacturerName.setText(Settings.EMPTY);
+				this.deviceText.setText(Settings.EMPTY);
+				this.deviceTypeText.setText(Settings.EMPTY);
+				this.internetLinkText.setText(Settings.EMPTY);
 
-		// update all serial Port settings
-		if (this.selectedActiveDeviceConfig == null) {
-			DeviceSelectionDialog.log.log(Level.FINE, "activeDeviceConfig == null -> no device selected as active"); //$NON-NLS-1$
-			this.application.setActiveDevice(null);
-			this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
+				this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
+				this.portSelectCombo.select(0);
 
-			this.manufacturerName.setText(Settings.EMPTY);
-			this.deviceText.setText(Settings.EMPTY);
-			this.deviceTypeText.setText(Settings.EMPTY);
-			this.internetLinkText.setText(Settings.EMPTY);
-
-			this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
-			this.portSelectCombo.select(0);
-
-			// com port adjustments group
-			this.baudeSelectLabel.setText("0"); //$NON-NLS-1$
-			this.dataBitsSelectLabel.setText("0"); //$NON-NLS-1$
-			this.stopBitsSelectLabel.setText("0"); //$NON-NLS-1$
-			this.paritySelectLabel.setText("0"); //$NON-NLS-1$
-			this.flowControlSelectLabel.setText("0"); //$NON-NLS-1$
-			this.dtrCheckBox.setSelection(false);
-			this.rtsCheckBox.setSelection(false);
-		}
-		else {
-			IDevice selectedDevice = getInstanceOfDevice();
-			if (selectedDevice != null) {
-				log.log(Level.FINE, this.settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
-				this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage(selectedDevice, "resource/" + this.selectedActiveDeviceConfig.getImageFileName()));
-				this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
-				this.deviceText.setText(this.selectedActiveDeviceConfig.getName());
-				this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
-				String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.OSDE_MSGT0191);
-				this.internetLinkText.setText(link);
-				if (this.availablePorts != null && this.availablePorts.size() > 0) {
-					this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
-					int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
-					if (index > -1) {
-						this.portSelectCombo.select(index);
+				// com port adjustments group
+				this.baudeSelectLabel.setText("0"); //$NON-NLS-1$
+				this.dataBitsSelectLabel.setText("0"); //$NON-NLS-1$
+				this.stopBitsSelectLabel.setText("0"); //$NON-NLS-1$
+				this.paritySelectLabel.setText("0"); //$NON-NLS-1$
+				this.flowControlSelectLabel.setText("0"); //$NON-NLS-1$
+				this.dtrCheckBox.setSelection(false);
+				this.rtsCheckBox.setSelection(false);
+			}
+			else {
+				IDevice selectedDevice = getInstanceOfDevice();
+				if (selectedDevice != null) {
+					log.log(Level.FINE, this.settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
+					this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage(selectedDevice, "resource/" + this.selectedActiveDeviceConfig.getImageFileName()));
+					this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
+					this.deviceText.setText(this.selectedActiveDeviceConfig.getName());
+					this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
+					String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.OSDE_MSGT0191);
+					this.internetLinkText.setText(link);
+					if (this.availablePorts != null && this.availablePorts.size() > 0) {
+						this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
+						int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
+						if (index > -1) {
+							this.portSelectCombo.select(index);
+						}
+						else {
+							this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+						}
 					}
 					else {
-						this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+						this.portSelectCombo.setItems(new String[0]);
+						this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 					}
-				}
-				else {
-					this.portSelectCombo.setItems(new String[0]);
-					this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
-				}
-				if (this.deviceConfigurations.get(activeDeviceName).getSerialPortType() != null) {
-					if (!this.serialPortSelectionGroup.getEnabled() || !this.portSettingsGroup.getEnabled()) {
-						enableSerialPortEntries(true);
+					if (this.deviceConfigurations.get(activeDeviceName).getSerialPortType() != null) {
+						if (!this.serialPortSelectionGroup.getEnabled() || !this.portSettingsGroup.getEnabled()) {
+							enableSerialPortEntries(true);
+						}
+						// serial port adjustments group
+						this.baudeSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
+						this.dataBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getDataBits()).toString());
+						this.stopBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getStopBits()).toString());
+						this.paritySelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getParity()).toString());
+						this.flowControlSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
+						this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
+						this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
 					}
-					// serial port adjustments group
-					this.baudeSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
-					this.dataBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getDataBits()).toString());
-					this.stopBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getStopBits()).toString());
-					this.paritySelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getParity()).toString());
-					this.flowControlSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
-					this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
-					this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
-				}
-				else {
-					if (this.serialPortSelectionGroup.getEnabled() || this.portSettingsGroup.getEnabled()) {
-						enableSerialPortEntries(false);
+					else {
+						if (this.serialPortSelectionGroup.getEnabled() || this.portSettingsGroup.getEnabled()) {
+							enableSerialPortEntries(false);
+						}
+						this.baudeSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+						this.dataBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+						this.stopBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+						this.paritySelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+						this.flowControlSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
+						this.dtrCheckBox.setSelection(false);
+						this.rtsCheckBox.setSelection(false);
 					}
-					this.baudeSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
-					this.dataBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
-					this.stopBitsSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
-					this.paritySelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
-					this.flowControlSelectLabel.setText(OSDE.STRING_MESSAGE_CONCAT);
-					this.dtrCheckBox.setSelection(false);
-					this.rtsCheckBox.setSelection(false);
+					this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
+					//			this.serialPortSelectionGroup.redraw();
+					//			this.portSettingsGroup.redraw();
 				}
-				this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
-				//			this.serialPortSelectionGroup.redraw();
-				//			this.portSettingsGroup.redraw();
 			}
+			this.desktopTabsGroup.redraw();
 		}
-		this.desktopTabsGroup.redraw();
 	}
 
 	/**
@@ -1135,7 +1146,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		IDevice newInst = null;
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = "osde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+		String className = selectedDeviceName.contains(OSDE.STRING_DOT) ? selectedDeviceName  // full qualified
+				: "osde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
 			//String className = "osde.device.DefaultDeviceDialog";
 			DeviceSelectionDialog.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -1295,6 +1307,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return the dialogShell visible status
 	 */
 	public boolean isDisposed() {
-		return dialogShell.isDisposed();
+		return dialogShell != null && dialogShell.isDisposed();
 	}
 }

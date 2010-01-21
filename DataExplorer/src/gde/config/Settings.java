@@ -37,7 +37,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import osde.log.Level;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
 
@@ -56,6 +55,7 @@ import org.xml.sax.SAXException;
 
 import osde.OSDE;
 import osde.exception.ApplicationConfigurationException;
+import osde.log.Level;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -75,11 +75,12 @@ public class Settings extends Properties {
 	final static String $CLASS_NAME = Settings.class.getName();
 
 	// JAXB XML environment
-	private final Schema											schema;
-	private final JAXBContext									jc;
-	private final Unmarshaller								unmarshaller;
-	private final Marshaller									marshaller;
-	private final String											xmlBasePath;
+	private Schema											schema;
+	private JAXBContext									jc;
+	private Unmarshaller								unmarshaller;
+	private Marshaller									marshaller;
+	private String											xmlBasePath;
+	private Thread 											xsdThread;
 
 	public  static final String	EMPTY												= "---"; //$NON-NLS-1$
 	public  static final String EMPTY_SIGNATURE 						= EMPTY + OSDE.STRING_SEMICOLON + EMPTY + OSDE.STRING_SEMICOLON + EMPTY;
@@ -259,6 +260,28 @@ public class Settings extends Properties {
 			log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
 		}
 
+		this.xmlBasePath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + OSDE.FILE_SEPARATOR_UNIX;
+		xsdThread = new Thread() {
+			public void run() {
+				final String $METHOD_NAME = "xsdThread.run()";
+				// device properties context
+				try {
+					Settings.this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(Settings.this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
+					Settings.this.jc = JAXBContext.newInstance("osde.device"); //$NON-NLS-1$
+					Settings.this.unmarshaller = Settings.this.jc.createUnmarshaller();
+					Settings.this.unmarshaller.setSchema(Settings.this.schema);
+					Settings.this.marshaller = Settings.this.jc.createMarshaller();
+					Settings.this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
+					Settings.this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
+					log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$		
+				}
+				catch (Exception e) {
+					log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				}
+			}
+		};
+		xsdThread.start();
+		
 		this.load();
 
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
@@ -297,18 +320,8 @@ public class Settings extends Properties {
 		else
 			this.window = new Rectangle(50, 50, 900, 600);
 
-		// device properties context
-		this.xmlBasePath = this.getApplHomePath() + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + OSDE.FILE_SEPARATOR_UNIX;
-		this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
-		this.jc = JAXBContext.newInstance("osde.device"); //$NON-NLS-1$
-		this.unmarshaller = this.jc.createUnmarshaller();
-		this.unmarshaller.setSchema(this.schema);
-		this.marshaller = this.jc.createMarshaller();
-		this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
-		this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
-
 		this.setProperty(LOCALE_CHANGED, "false"); //$NON-NLS-1$
-}
+	}
 
 	/**
 	 * check existens of directory, create if required and update all
@@ -1734,5 +1747,12 @@ public class Settings extends Properties {
 		int g = new Integer(color.split(OSDE.STRING_COMMA)[1].trim()).intValue();
 		int b = new Integer(color.split(OSDE.STRING_COMMA)[2].trim()).intValue();
 		return SWTResourceManager.getColor(r, g, b);
+	}
+
+	/**
+	 * @return true if the xsdThread is alive
+	 */
+	public boolean isXsdThreadAlive() {
+		return xsdThread != null ? xsdThread.isAlive() : true ;
 	}
 }
