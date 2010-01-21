@@ -278,4 +278,12 @@ public abstract class DeviceDialog extends Dialog {
 			setShellAlpha(getShellAlpha());
 		}
 	}
+	
+	/**
+	 * switch a save button to enabled state or vice versa
+	 * @param enable
+	 */
+	public void enableSaveButton(boolean enable) {
+		//noop - whenever a dialog has a save button relating to device property changes it must implement this method 
+	}
 }

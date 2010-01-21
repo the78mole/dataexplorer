@@ -11,6 +11,8 @@ package osde.device;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
+import osde.OSDE;
+
 
 /**
  * <p>Java class for format_type.
@@ -42,4 +44,11 @@ public enum FormatTypes {
         return valueOf(v);
     }
 
+  	public static String[] valuesAsStingArray() {
+  		StringBuilder sb = new StringBuilder();
+  		for (FormatTypes element : FormatTypes.values()) {
+  			sb.append(element).append(OSDE.STRING_DASH);
+  		}
+  		return sb.toString().split(OSDE.STRING_DASH);
+  	}
 }

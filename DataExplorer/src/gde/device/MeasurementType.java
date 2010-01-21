@@ -75,7 +75,7 @@ public class MeasurementType {
 		this.symbol = measurement.symbol;
 		this.unit = measurement.unit;
 		this.active = measurement.active;
-		this.statistics = measurement.statistics.clone();
+		this.statistics = measurement.statistics != null ? measurement.statistics.clone() : null;
 		if (measurement.property != null) {
 			this.property = new ArrayList<PropertyType>();
 			for (PropertyType tmpProperty : this.property) {

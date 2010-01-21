@@ -45,6 +45,11 @@ public interface IDevice {
 	 * get the active device configuration file name
 	 */
 	public String getPropertiesFileName();
+	
+	/**
+	 * @return true if a device property was changed
+	 */
+	public boolean isChangePropery();
 
 	/**
 	 * @return the device dialog
@@ -258,7 +263,17 @@ public interface IDevice {
 	 * @param set a new date block checksum format type ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockCheckSumFormat(FormatTypes value);
-
+	
+	/**
+	 * @param value set the time unit as defined in TimeUnitTypes, msec --> timeUnitFactor = 1; sec --> timeUnitFactor = 1000
+	 */
+	public void setDataBlockTimeUnit(TimeUnitTypes value);
+	
+	/**
+	 * @return query the time factor, needed for CVS 2 serial data parser, time steps are internal used in msec. 
+	 */
+	public int getDataBlockTimeUnitFactor();
+	
 	/**
 	 * @return the data block value separator as CommaSeparatorTypes
 	 */
@@ -383,6 +398,14 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public MeasurementType getMeasurement(String channelConfigKey, int measurementOrdinal);
+
+	/**
+	 * set active status of an measurement
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param isActive
+	 */
+	public void setMeasurementActive(int channelConfigNumber, int measurementOrdinal, boolean isActive);
 	
 	/**
 	 * @return the sorted measurement names

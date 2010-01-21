@@ -710,7 +710,23 @@ public class DeviceConfiguration {
 
 	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
-		this.dataBlock.getFormat().setEnding(LineEndingTypes.bytesFromValue(value));
+		if (value == null)
+			this.dataBlock.getFormat().setEnding(null);
+		else
+			this.dataBlock.getFormat().setEnding(LineEndingTypes.bytesFromValue(value));
+	}
+
+	public TimeUnitTypes getDataBlockTimeUnit() {
+		return this.dataBlock.getFormat().getTimeUnit();
+	}
+
+	public void setDataBlockTimeUnit(TimeUnitTypes value) {
+		this.isChangePropery = true;
+		this.dataBlock.getFormat().setTimeUnit(value);
+	}
+
+	public int getDataBlockTimeUnitFactor() {
+		return this.dataBlock.getFormat().getTimeUnit() == null ? 1000 : this.dataBlock.getFormat().getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
 	}
 
 	public CommaSeparatorTypes getDataBlockSeparator() {
