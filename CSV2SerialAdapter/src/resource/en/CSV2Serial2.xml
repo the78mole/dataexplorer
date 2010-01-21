@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V08.xsd">
     <Device>
-        <name implementation="CSV2SerialDataAdapter">CSV2Serial2</name>
-        <manufacturer>OSDE</manufacturer>
+        <name implementation="CSV2SerialAdapter">CSV2Serial2</name>
+        <manufacturer>WB</manufacturer>
         <manufacturerURL>http://www.bruegmaenner.de/OpenSerialDataExplorer</manufacturerURL>
-        <group>logger</group>
-        <image>CSV2SerialDataAdapter.png</image>
+        <group>multimeter</group>
+        <image>CSV2SerialAdapter.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>
@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format ending="0A0D" separator="semicolon" size="13" type="TEXT"/>
+        <format ending="0D0A" separator="semicolon" timeUnit="msec" size="1" type="TEXT"/>
         <preferredDataLocation>d:\Documents\Person\OpenSerialDataExplorer\CSV2SerialDataAdapter</preferredDataLocation>
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
@@ -29,6 +29,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Faktor * input value" type="Double" value="0.001" name="factor"/>
         </Measurement>
     </Channel>
     <Desktop>
