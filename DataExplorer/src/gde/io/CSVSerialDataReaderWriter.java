@@ -17,6 +17,8 @@
 package osde.io;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class CSVSerialDataReaderWriter {
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 */
-	public static RecordSet read(String filePath, IDevice device, String recordSetNameExtend, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
+	public static RecordSet read(String filePath, IDevice device, String recordSetNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		String line = OSDE.STRING_STAR;
 		RecordSet recordSet = null;
@@ -74,14 +76,16 @@ public class CSVSerialDataReaderWriter {
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 
 		try {
-			activeChannel = channels.getActiveChannel();
+			if (channelConfigNumber == null)
+				activeChannel = channels.getActiveChannel();
+			else
+				activeChannel = channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) application.setStatusMessage("Reading serial text data input from: " + filePath);
 				activeChannelConfigNumber = activeChannel.getNumber();
 				
 				
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 
 				if (application.getStatusBar() != null) {
 					channels.switchChannel(activeChannel.getNumber(), OSDE.STRING_EMPTY);
@@ -96,8 +100,24 @@ public class CSVSerialDataReaderWriter {
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(Level.INFO, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); 
-				DataParser data = new DataParser(device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
-		
+				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException("Konfigurationsfehler in " + filePath + "\nAnzahl der definierten Messwerte passt nicht zur Datenblockgröße!\nDas verwendete Separatorzeichen könnte auch an einigen Stellen falsch sein!");
+				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
+
+				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
+				byte[] buffer = new byte[1024];
+				byte[] lineEnding = device.getDataBlockEnding();
+				boolean lineEndingOcurred = false;
+				int chars = binReader.read(buffer);
+				for (int i = 0; i < chars; i++) {
+					if (buffer[i] == lineEnding[0] && i < chars-lineEnding.length-1 && buffer[i+lineEnding.length+1] != '$'
+						&& (lineEnding.length > 1 ? buffer[i+1] == lineEnding[1] : true)) {
+						lineEndingOcurred = true;
+					}
+				}
+				binReader.close();
+				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException("Defined line ending does not occur in first " + chars + " characters of " + filePath);
+
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$			
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
 					data.parse(line);
@@ -151,6 +171,7 @@ public class CSVSerialDataReaderWriter {
 				}
 
 				activeChannel.setActiveRecordSet(recordSetName);
+				device.updateVisibilityStatus(activeChannel.get(recordSetName));
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 

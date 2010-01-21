@@ -39,11 +39,13 @@ public class DataParser {
 	int[]								values;
 	int									checkSum;
 
+	final int						timeFactor;
 	final String				separator;
 	final CheckSumTypes	checkSumType;
 	final int						size;
 
-	public DataParser(String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
+	public DataParser(int useTimeFactor, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
+		this.timeFactor = useTimeFactor;
 		this.separator = useSeparator;
 		this.checkSumType = useCheckSumType;
 		this.size = useDataSize;
@@ -66,7 +68,7 @@ public class DataParser {
 			this.state = Integer.parseInt(strValue);
 
 			strValue = strValues[2].trim();
-			time_ms = Integer.parseInt(strValue) * 1000; // Seconds * 1000 = msec
+			time_ms = Integer.parseInt(strValue) * this.timeFactor; // Seconds * 1000 = msec
 			
 			for (int i = 0; i < this.size; i++) { 
 				strValue = strValues[i+3].trim();
