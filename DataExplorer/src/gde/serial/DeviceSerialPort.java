@@ -77,10 +77,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	// event handling does not work reliable
 	//boolean																	dataAvailable			= false;
 
-	public static final String[]	STRING_ARRAY_FLOW_CONTROL	= new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" }; //$NON-NLS-1$
-	public static final String[]	STRING_ARRAY_PARITY				= new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" }; //$NON-NLS-1$
-	public static final String[]	STRING_ARRAY_STOP_BITS		= new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" }; //$NON-NLS-1$
-	public static final String[]	STRING_ARRAY_DATA_BITS		= new String[] { "DATABITS_5", "DATABITS_6", "DATABITS_7", "DATABITS_8" }; //$NON-NLS-1$
+//	public static final String[]	STRING_ARRAY_FLOW_CONTROL	= new String[] { "FLOWCONTROL_NONE", "FLOWCONTROL_RTSCTS_IN", "FLOWCONTROL_RTSCTS_OUT", "FLOWCONTROL_XONXOFF_IN", "FLOWCONTROL_XONXOFF_OUT" }; //$NON-NLS-1$
+//	public static final String[]	STRING_ARRAY_PARITY				= new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" }; //$NON-NLS-1$
+//	public static final String[]	STRING_ARRAY_STOP_BITS		= new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" }; //$NON-NLS-1$
+//	public static final String[]	STRING_ARRAY_DATA_BITS		= new String[] { "DATABITS_5", "DATABITS_6", "DATABITS_7", "DATABITS_8" }; //$NON-NLS-1$
 	public static final String[]	STRING_ARRAY_BAUDE_RATES	= new String[] { "2400", "4800", "7200", "9600", "14400", "28800", "38400", "57600", "115200" }; //$NON-NLS-1$
 
  //public static final int STOPBITS_1 = 1;
@@ -256,15 +256,15 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
 				}
 			}
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, String.format("serialPortString = %s; baudeRate = %d; dataBits = %d; stopBits = %d; parity = %d; flowControlMode = %d; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, String.format("serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
 			
 			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
 			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 10000); //$NON-NLS-1$
 			// set port parameters
 			this.serialPort.setInputBufferSize(2048);
 			this.serialPort.setOutputBufferSize(2048);
-			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity());
-			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode());
+			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal()+5, this.deviceConfig.getStopBits().ordinal()+1, this.deviceConfig.getParity().ordinal());
+			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode().ordinal());
 			this.serialPort.setRTS(this.deviceConfig.isRTS());
 			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
