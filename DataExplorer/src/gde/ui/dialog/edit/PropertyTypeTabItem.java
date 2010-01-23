@@ -82,6 +82,8 @@ public class PropertyTypeTabItem extends CTabItem {
 	String									tabName;
 	PropertyType						propertyType;
 
+	final DevicePropertiesEditor propsEditor;
+
 	/**
 	 * constructor without any variables input
 	 * to display default values a call of update(PropertyType) is required
@@ -93,6 +95,7 @@ public class PropertyTypeTabItem extends CTabItem {
 	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, MeasurementTypeTabItem	useMeasurementTypeTabItem2CreatePopupMenu) {
 		super(parent, style);
 		this.parentTabFolder = parent;
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.tabName = useTabName;
 		this.measurementTypeTabItem = useMeasurementTypeTabItem2CreatePopupMenu;
 		this.propertyType = new ObjectFactory().createPropertyType();
@@ -304,7 +307,10 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameText.getText());
-						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+						if (PropertyTypeTabItem.this.deviceConfig != null) {
+							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+							PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
 						PropertyTypeTabItem.this.setText(tabName = PropertyTypeTabItem.this.nameText.getText());
 					}
 				});
@@ -335,7 +341,10 @@ public class PropertyTypeTabItem extends CTabItem {
 							PropertyTypeTabItem.this.valueText.setVisible(false);
 							PropertyTypeTabItem.this.valueCombo.setVisible(true);
 							PropertyTypeTabItem.this.propertyType.setValue(StringHelper.verifyTypedString(DataTypes.BOOLEAN, PropertyTypeTabItem.this.valueCombo.getText()));
-							if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+							if (PropertyTypeTabItem.this.deviceConfig != null) {
+								PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+								PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+							}
 							PropertyTypeTabItem.this.valueCombo.select(valueCombo.getText().equals(OSDE.STRING_TRUE) ? 0 : 1);
 						}
 						else {
@@ -361,7 +370,10 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueText.getText());
-						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+						if (PropertyTypeTabItem.this.deviceConfig != null) {
+							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+							PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
 					}
 				});
 				this.valueText.addVerifyListener(this.valueVerifyListener = new VerifyListener() {
@@ -403,7 +415,10 @@ public class PropertyTypeTabItem extends CTabItem {
 						else {
 							PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueCombo.getText());
 						}
-						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+						if (PropertyTypeTabItem.this.deviceConfig != null) {
+							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+							PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
 					}
 				});
 			}
@@ -416,7 +431,10 @@ public class PropertyTypeTabItem extends CTabItem {
 					public void keyReleased(KeyEvent evt) {
 						PropertyTypeTabItem.log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setDescription(PropertyTypeTabItem.this.descriptionText.getText());
-						if (PropertyTypeTabItem.this.deviceConfig != null) PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+						if (PropertyTypeTabItem.this.deviceConfig != null) {
+							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+							PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
 					}
 				});
 			}

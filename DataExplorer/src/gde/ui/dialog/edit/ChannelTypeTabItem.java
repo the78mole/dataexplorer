@@ -68,6 +68,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	String							channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0527);
 
 	final CTabFolder		channelConfigInnerTabFolder;
+	final DevicePropertiesEditor propsEditor;
 	final String				tabName;
 	DeviceConfiguration	deviceConfig;
 	int									channelConfigNumber;
@@ -76,6 +77,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index) {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
 		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem " + this.tabName); //$NON-NLS-1$
 		initGUI();
@@ -130,6 +132,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
 		this.channelType = useChannelType;
 		initGUI();
@@ -145,6 +148,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	 */
 	private ChannelTypeTabItem(ChannelTypeTabItem copyFrom) {
 		super(copyFrom.channelConfigInnerTabFolder, SWT.CLOSE);
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.channelConfigInnerTabFolder = copyFrom.channelConfigInnerTabFolder;
 		this.deviceConfig = copyFrom.deviceConfig;
 		this.channelConfigNumber = this.channelConfigInnerTabFolder.getItemCount();
@@ -226,6 +230,7 @@ public class ChannelTypeTabItem extends CTabItem {
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setType(ChannelTypeTabItem.this.channelConfigType);
 								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
+								ChannelTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 						}
 					});
@@ -249,6 +254,7 @@ public class ChannelTypeTabItem extends CTabItem {
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
 								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
+								ChannelTypeTabItem.this.propsEditor.enableSaveButton(true);
 								ChannelTypeTabItem.this.setText(ChannelTypeTabItem.this.tabName + ChannelTypeTabItem.this.channelConfigName);
 							}
 						}

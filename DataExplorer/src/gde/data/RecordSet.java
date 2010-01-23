@@ -1318,10 +1318,8 @@ public class RecordSet extends HashMap<String, Record> {
 		else {
 			for (String recordName : this.keySet()) {
 				Record record = this.get(recordName);
-				log.log(Level.WARNING, "record.minZoomScaleValue = " + record.minZoomScaleValue + " record.maxZoomScaleValue = " + record.maxZoomScaleValue);
 				record.minZoomScaleValue = record.minScaleValue;
 				record.maxZoomScaleValue = record.maxScaleValue;
-				log.log(Level.WARNING, "record.minZoomScaleValue = " + record.minZoomScaleValue + " record.maxZoomScaleValue = " + record.maxZoomScaleValue);
 			}
 		}
 		this.isZoomMode = zoomModeEnabled;

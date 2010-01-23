@@ -65,6 +65,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	final MeasurementTypeTabItem	measurementTypeTabItem;
 	final CTabFolder							channelConfigMeasurementPropertiesTabFolder;
 	final String									tabName;
+	final DevicePropertiesEditor 	propsEditor;
 
 	Menu													popupMenu;
 	MeasurementContextmenu				contextMenu;
@@ -77,7 +78,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	Button												isSumByTriggerRefOrdinalButton;
 	Button												sumTriggerTimeButton;
 	Button												countByTriggerButton;
-	Text													sumTriggerText;
+	Text													triggerRefOrdinalText, sumTriggerText;
 	Button												isRatioRefOrdinalButton;
 	Text													triggerCommentText;
 	CCombo												minTimeSecCombo;
@@ -96,7 +97,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	Button												statisticsMinButton;
 
 	Boolean												statisticsMin, statisticsMax, statisticsAvg, statisticsSigma;
-	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment;
+	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment, triggerRefOrdinalComment;
 	Boolean												isGreater, isSumTriggerTime, isCountByTrigger, isRatioRefOrdinal;
 	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
 	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;	// must be equal !!!
@@ -111,6 +112,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	public StatisticsTypeTabItem(CTabFolder parent, int style, String name, MeasurementTypeTabItem useMeasurementTypeTabItem) {
 		super(parent, style);
 		this.channelConfigMeasurementPropertiesTabFolder = parent;
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.measurementTypeTabItem = useMeasurementTypeTabItem;
 		this.tabName = name;
 
@@ -127,6 +129,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	 */
 	private StatisticsTypeTabItem(StatisticsTypeTabItem copyFrom) {
 		super(copyFrom.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE);
+		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.channelConfigMeasurementPropertiesTabFolder = copyFrom.channelConfigMeasurementPropertiesTabFolder;
 		this.measurementTypeTabItem = copyFrom.measurementTypeTabItem;
 		this.tabName = copyFrom.tabName;
@@ -211,11 +214,13 @@ public class StatisticsTypeTabItem extends CTabItem {
 		else if (this.statisticsType != null && this.statisticsType.getTrigger() != null){
 			this.statisticsType.removeTrigger();
 			this.deviceConfig.setChangePropery(true);
+			this.propsEditor.enableSaveButton(true);
 		}
 		
 		this.sumTriggerTimeButton.setEnabled(isTriggerDefined);
 		this.countByTriggerButton.setEnabled(isTriggerDefined);
 		this.triggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
+		this.triggerRefOrdinalText.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.isSumByTriggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.sumTriggerText.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.isRatioRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
@@ -251,7 +256,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			}
 			if ((this.triggerRefOrdinal = this.statisticsType.getTriggerRefOrdinal()) != null) {
 				this.triggerRefOrdinalButton.setSelection(true);
-				//this.triggerRefOrdinalCombo.setEnabled(true);
+				this.triggerRefOrdinalText.setText(this.triggerRefOrdinalComment = this.statisticsType.getComment() == null ? OSDE.STRING_EMPTY : this.statisticsType.getComment());
 				this.triggerRefOrdinalCombo.select(this.triggerRefOrdinal);
 			}
 			else {
@@ -289,6 +294,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.isCountByTrigger() != null) {
 				this.statisticsType.setCountByTrigger(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.countByTriggerButton.setSelection(false);
 			this.countByTriggerText.setEnabled(false);
@@ -297,12 +303,14 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.getCountTriggerText() != null) {
 				this.statisticsType.setCountTriggerText(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 
 			this.triggerRefOrdinal = null;
 			if (this.statisticsType.getTriggerRefOrdinal() != null) {
 				this.statisticsType.setTriggerRefOrdinal(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.triggerRefOrdinalButton.setSelection(false);
 			this.triggerRefOrdinalCombo.select(0);
@@ -311,6 +319,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.getSumByTriggerRefOrdinal() != null) {
 				this.statisticsType.setSumByTriggerRefOrdinal(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.isSumByTriggerRefOrdinalButton.setSelection(false);
 			this.sumByTriggerRefOrdinalCombo.select(0);
@@ -318,6 +327,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.getSumTriggerText() != null) {
 				this.statisticsType.setSumTriggerText(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.sumTriggerText.setEnabled(false);
 			this.sumTriggerText.setText(OSDE.STRING_EMPTY);
@@ -326,6 +336,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.getRatioRefOrdinal() != null) {
 				this.statisticsType.setRatioRefOrdinal(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.isRatioRefOrdinalButton.setEnabled(false);
 			this.isRatioRefOrdinalButton.setSelection(false);
@@ -335,6 +346,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (this.statisticsType.getRatioText() != null) {
 				this.statisticsType.setRatioText(null);
 				this.deviceConfig.setChangePropery(true);
+				this.propsEditor.enableSaveButton(true);
 			}
 			this.ratioText.setEnabled(false);
 			this.ratioText.setText(OSDE.STRING_EMPTY);
@@ -418,6 +430,8 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
 						StatisticsTypeTabItem.this.triggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.triggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
 								: StatisticsTypeTabItem.this.triggerRefOrdinal);
+						StatisticsTypeTabItem.this.triggerRefOrdinalText.setText(StatisticsTypeTabItem.this.triggerRefOrdinalComment != null ? StatisticsTypeTabItem.this.triggerRefOrdinalComment 
+								: OSDE.STRING_EMPTY);
 						StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
 						StatisticsTypeTabItem.this.sumByTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
 								: StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
@@ -443,6 +457,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setMin(StatisticsTypeTabItem.this.statisticsMin);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -460,6 +475,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setAvg(StatisticsTypeTabItem.this.statisticsAvg);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -477,6 +493,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setMax(StatisticsTypeTabItem.this.statisticsMax);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -494,6 +511,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSigma(StatisticsTypeTabItem.this.statisticsSigma);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -513,6 +531,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								if (StatisticsTypeTabItem.this.statisticsType.getTrigger() == null) {
 									StatisticsTypeTabItem.this.statisticsType.setTrigger(StatisticsTypeTabItem.this.triggerType = new ObjectFactory().createTriggerType());
 									StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+									StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 									
 									StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel == null ? StatisticsTypeTabItem.this.triggerLevel=0 : StatisticsTypeTabItem.this.triggerLevel);
 									StatisticsTypeTabItem.this.triggerType.setComment(StatisticsTypeTabItem.this.triggerComment);
@@ -531,6 +550,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								}
 								
 								StatisticsTypeTabItem.this.triggerRefOrdinalButton.setEnabled(false);
+								StatisticsTypeTabItem.this.triggerRefOrdinalText.setEnabled(false);
 								StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setEnabled(false);
 								StatisticsTypeTabItem.this.sumTriggerText.setEnabled(false);
 								StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setEnabled(false);
@@ -542,6 +562,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								StatisticsTypeTabItem.this.triggerType = null;
 								StatisticsTypeTabItem.this.triggerLevel = null;
 								StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+								StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 
 								StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
 								StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal);
@@ -562,6 +583,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								StatisticsTypeTabItem.this.countByTriggerText.setEnabled(false);
 
 								StatisticsTypeTabItem.this.triggerRefOrdinalButton.setEnabled(true);
+								StatisticsTypeTabItem.this.triggerRefOrdinalText.setEnabled(true);
 								StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setEnabled(true);
 								StatisticsTypeTabItem.this.sumTriggerText.setEnabled(true);
 								StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setEnabled(true);
@@ -595,6 +617,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -606,6 +629,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -629,6 +653,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setComment(StatisticsTypeTabItem.this.triggerComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -647,6 +672,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setIsGreater(StatisticsTypeTabItem.this.isGreater);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -672,6 +698,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -683,6 +710,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -709,6 +737,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSumTriggerTimeText(StatisticsTypeTabItem.this.isSumTriggerTime ? StatisticsTypeTabItem.this.sumTriggerTimeComment : null);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -725,6 +754,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSumTriggerTimeText(StatisticsTypeTabItem.this.sumTriggerTimeComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -743,7 +773,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.countByTriggerText.setEnabled(StatisticsTypeTabItem.this.isCountByTrigger != null);
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
+							StatisticsTypeTabItem.this.triggerRefOrdinalText.setEnabled(StatisticsTypeTabItem.this.countByTriggerButton.getSelection());
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 							if (StatisticsTypeTabItem.this.isCountByTrigger == null) {
 								StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(null);
 							}
@@ -769,6 +801,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -796,6 +829,24 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerRefOrdinalCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 			}
 			{
+				this.triggerRefOrdinalText = new Text(this.statisticsComposite, SWT.BORDER);
+				this.triggerRefOrdinalText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.triggerRefOrdinalText.setBounds(360, 105, 325, 20);
+				this.triggerRefOrdinalText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0573));
+				this.triggerRefOrdinalText.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent evt) {
+						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerRefOrdinalText.keyReleased, event=" + evt); //$NON-NLS-1$
+						StatisticsTypeTabItem.this.triggerRefOrdinalComment = StatisticsTypeTabItem.this.triggerRefOrdinalText.getText();
+						if (StatisticsTypeTabItem.this.statisticsType != null) {
+							StatisticsTypeTabItem.this.statisticsType.setComment(StatisticsTypeTabItem.this.triggerRefOrdinalComment);
+							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
+					}
+				});
+			}
+			{
 				this.isSumByTriggerRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.isSumByTriggerRefOrdinalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.isSumByTriggerRefOrdinalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0571));
@@ -810,6 +861,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 							if (StatisticsTypeTabItem.this.statisticsType != null) {
 								StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
 								StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+								StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 							StatisticsTypeTabItem.this.sumTriggerText.setEnabled(true);
 						}
@@ -818,6 +870,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 							if (StatisticsTypeTabItem.this.statisticsType != null) {
 								StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal);
 								StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+								StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 							StatisticsTypeTabItem.this.sumTriggerText.setEnabled(false);
 						}
@@ -845,6 +898,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSumTriggerText(StatisticsTypeTabItem.this.sumTriggerComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -866,11 +920,13 @@ public class StatisticsTypeTabItem extends CTabItem {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(StatisticsTypeTabItem.this.ratioRefOrdinalCombo.getSelectionIndex());
 							StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioText.getText());
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 						else {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
 							StatisticsTypeTabItem.this.ratioText.setText(OSDE.STRING_EMPTY);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -887,6 +943,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(StatisticsTypeTabItem.this.ratioRefOrdinal);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -904,6 +961,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setRatioText(StatisticsTypeTabItem.this.ratioComment);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					}
 				});
@@ -960,12 +1018,14 @@ public class StatisticsTypeTabItem extends CTabItem {
 			if (StatisticsTypeTabItem.this.statisticsType != null) {
 				StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal);
 				StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+				StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 			}
 		}
 		else {
 			//StatisticsTypeTabItem.this.triggerRefOrdinalCombo.setEnabled(false);
 			if (StatisticsTypeTabItem.this.statisticsType != null) {
 				StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+				StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 				StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal = null);
 			}
 		}

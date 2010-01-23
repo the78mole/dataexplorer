@@ -312,7 +312,7 @@ public class DevicePropertiesEditor extends Composite {
 		try {
 			SWTResourceManager.registerResourceUser(this);
 			this.setLayout(new FormLayout());
-			this.setSize(680, 485);
+			this.setSize(680, 500);
 			FormData fd = new FormData();
 			this.getShell().addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
@@ -321,6 +321,7 @@ public class DevicePropertiesEditor extends Composite {
 						String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
 						if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
 							DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
+							DevicePropertiesEditor.this.saveButton.setEnabled(false);
 						}
 						
 						FileUtils.runOnExitRenamer();
@@ -404,6 +405,7 @@ public class DevicePropertiesEditor extends Composite {
 							String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
 							if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
 								DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
+								DevicePropertiesEditor.this.saveButton.setEnabled(false);
 							}
 						}
 						FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.getShell());
@@ -425,6 +427,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.saveButton = new Button(this, SWT.PUSH | SWT.CENTER);
 				this.saveButton.setText(Messages.getString(MessageIds.OSDE_MSGT0486));
 				this.saveButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+				this.saveButton.setEnabled(false);
 				fd = new FormData();
 				fd.width = 250;
 				fd.height = 30;
@@ -435,6 +438,8 @@ public class DevicePropertiesEditor extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
+						DevicePropertiesEditor.this.saveButton.setEnabled(false);
+
 					}
 				});
 			}
@@ -563,6 +568,7 @@ public class DevicePropertiesEditor extends Composite {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
 										DevicePropertiesEditor.this.deviceConfig.setName(DevicePropertiesEditor.this.deviceName = DevicePropertiesEditor.this.nameText.getText());
+										DevicePropertiesEditor.this.enableSaveButton(true);
 									}
 								});
 							}
@@ -580,6 +586,7 @@ public class DevicePropertiesEditor extends Composite {
 										DevicePropertiesEditor.this.deviceImplementationText.setEnabled(DevicePropertiesEditor.this.isDeviceImplementaionClass);
 										if (DevicePropertiesEditor.this.deviceConfig != null) {
 											DevicePropertiesEditor.this.deviceConfig.setUsed(DevicePropertiesEditor.this.isDeviceUsed = usageButton.getSelection());
+											DevicePropertiesEditor.this.enableSaveButton(true);
 										}
 									}
 								});
@@ -593,6 +600,7 @@ public class DevicePropertiesEditor extends Composite {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
 										DevicePropertiesEditor.this.deviceConfig.setDeviceImplName(DevicePropertiesEditor.this.deviceImplementationClass = DevicePropertiesEditor.this.deviceImplementationText.getText().trim());
+										DevicePropertiesEditor.this.enableSaveButton(true);
 									}
 								});
 							}
@@ -604,6 +612,7 @@ public class DevicePropertiesEditor extends Composite {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "manufacturerText.keyReleased, event=" + evt); //$NON-NLS-1$
 										DevicePropertiesEditor.this.deviceConfig.setManufacturer(DevicePropertiesEditor.this.manufacturer = DevicePropertiesEditor.this.manufacturerText.getText());
+										DevicePropertiesEditor.this.enableSaveButton(true);
 									}
 								});
 							}
@@ -615,6 +624,7 @@ public class DevicePropertiesEditor extends Composite {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "manufURLText.keyReleased, event=" + evt); //$NON-NLS-1$
 										DevicePropertiesEditor.this.deviceConfig.setManufacturerURL(DevicePropertiesEditor.this.manufacuturerURL = DevicePropertiesEditor.this.manufURLText.getText());
+										DevicePropertiesEditor.this.enableSaveButton(true);
 									}
 								});
 							}
@@ -626,6 +636,7 @@ public class DevicePropertiesEditor extends Composite {
 									public void keyReleased(KeyEvent evt) {
 										DevicePropertiesEditor.log.log(Level.FINEST, "imageFileNameText.keyReleased, event=" + evt); //$NON-NLS-1$
 										DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
+										DevicePropertiesEditor.this.enableSaveButton(true);
 									}
 								});
 							}
@@ -637,6 +648,7 @@ public class DevicePropertiesEditor extends Composite {
 										DevicePropertiesEditor.log.log(Level.FINEST, "usageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (DevicePropertiesEditor.this.deviceConfig != null) {
 											DevicePropertiesEditor.this.deviceConfig.setUsed(DevicePropertiesEditor.this.isDeviceUsed = usageButton.getSelection());
+											DevicePropertiesEditor.this.enableSaveButton(true);
 										}
 									}
 								});
@@ -651,6 +663,7 @@ public class DevicePropertiesEditor extends Composite {
 										DevicePropertiesEditor.log.log(Level.FINEST, "groupSelectionCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (DevicePropertiesEditor.this.deviceConfig != null) {
 											DevicePropertiesEditor.this.deviceConfig.setDeviceGroup(DevicePropertiesEditor.this.deviceGroup = DeviceTypes.fromValue(DevicePropertiesEditor.this.groupSelectionCombo.getText()));
+											DevicePropertiesEditor.this.enableSaveButton(true);
 										}
 									}
 								});
@@ -677,6 +690,7 @@ public class DevicePropertiesEditor extends Composite {
 											DevicePropertiesEditor.log.log(Level.INFO, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
 											if (DevicePropertiesEditor.this.deviceConfig != null) {
 												DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
+												DevicePropertiesEditor.this.enableSaveButton(true);
 												Image deviceImage = new Image(Display.getDefault(), new Image(Display.getDefault(), fullQualifiedImageSourceName).getImageData().scaledTo(225, 165));
 												boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
 												String deviceImplName = DevicePropertiesEditor.this.deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
@@ -839,7 +853,10 @@ public class DevicePropertiesEditor extends Composite {
 									try {
 										DevicePropertiesEditor.this.timeStep_ms = Double.parseDouble(DevicePropertiesEditor.this.timeBaseTimeStepText.getText().replace(OSDE.STRING_COMMA, OSDE.STRING_DOT));
 										DevicePropertiesEditor.this.timeStep_ms = Double.parseDouble(String.format(Locale.ENGLISH, "%.1f", DevicePropertiesEditor.this.timeStep_ms)); //$NON-NLS-1$
-										if (DevicePropertiesEditor.this.deviceConfig != null) DevicePropertiesEditor.this.deviceConfig.setTimeStep_ms(DevicePropertiesEditor.this.timeStep_ms);
+										if (DevicePropertiesEditor.this.deviceConfig != null) {
+											DevicePropertiesEditor.this.deviceConfig.setTimeStep_ms(DevicePropertiesEditor.this.timeStep_ms);
+											DevicePropertiesEditor.this.enableSaveButton(true);
+										}
 									}
 									catch (NumberFormatException e) {
 										// ignore input
@@ -1178,7 +1195,7 @@ public class DevicePropertiesEditor extends Composite {
 								else {
 									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(DevicePropertiesEditor.this.dataBlockSeparator);
 								}
-							}
+								DevicePropertiesEditor.this.enableSaveButton(true);							}
 						}
 					});
 				}
@@ -1199,6 +1216,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockSize = Integer.parseInt(DevicePropertiesEditor.this.dataBlockSizeText.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockSize(DevicePropertiesEditor.this.dataBlockSize);
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1229,6 +1247,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockTimeUnit = TimeUnitTypes.fromValue(DevicePropertiesEditor.this.dataBlockTimeUnitCombo.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockTimeUnit(DevicePropertiesEditor.this.dataBlockTimeUnit);
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1253,6 +1272,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockSeparator = CommaSeparatorTypes.fromValue(DevicePropertiesEditor.this.dataBlockSeparatorCombo.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(DevicePropertiesEditor.this.dataBlockSeparator);
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1278,6 +1298,7 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockEnding = DevicePropertiesEditor.this.dataBlockEndingCombo.getText();
 						if (DevicePropertiesEditor.this.deviceConfig != null) {
 							DevicePropertiesEditor.this.deviceConfig.setDataBlockEnding(DevicePropertiesEditor.this.dataBlockEnding);
+							DevicePropertiesEditor.this.enableSaveButton(true);
 						}
 					}
 				});
@@ -1324,6 +1345,7 @@ public class DevicePropertiesEditor extends Composite {
 									deviceConfig.setDataBlockCheckSumFormat(null);
 									deviceConfig.setDataBlockCheckSumType(null);
 								}
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1343,6 +1365,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockcheckSumFormat = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockCheckSumFormat(DevicePropertiesEditor.this.dataBlockcheckSumFormat);
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1368,6 +1391,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockCheckSumType = CheckSumTypes.valueOf(DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
 								DevicePropertiesEditor.this.deviceConfig.setDataBlockCheckSumType(DevicePropertiesEditor.this.dataBlockCheckSumType);
+								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
@@ -1390,6 +1414,7 @@ public class DevicePropertiesEditor extends Composite {
 							else {
 								deviceConfig.setDataBlockPreferredDataLocation(null);
 							}
+							DevicePropertiesEditor.this.enableSaveButton(true);
 						}
 					}
 				});
@@ -1405,6 +1430,7 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockOptionalDataLocation = DevicePropertiesEditor.this.preferredDataLocationText.getText();
 						if (DevicePropertiesEditor.this.deviceConfig != null) {
 							DevicePropertiesEditor.this.deviceConfig.setDataBlockPreferredDataLocation(DevicePropertiesEditor.this.dataBlockOptionalDataLocation);
+							DevicePropertiesEditor.this.enableSaveButton(true);
 						}
 					}
 				});
@@ -1435,6 +1461,7 @@ public class DevicePropertiesEditor extends Composite {
 							else {
 								deviceConfig.setDataBlockPreferredFileExtention(null);
 							}
+							DevicePropertiesEditor.this.enableSaveButton(true);
 						}
 					}
 				});
@@ -1450,6 +1477,7 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockOptionalFileExtention = DevicePropertiesEditor.this.preferredFileExtensionText.getText();
 						if (DevicePropertiesEditor.this.deviceConfig != null) {
 							DevicePropertiesEditor.this.deviceConfig.setDataBlockPreferredFileExtention(DevicePropertiesEditor.this.dataBlockOptionalFileExtention);
+							DevicePropertiesEditor.this.enableSaveButton(true);
 						}
 					}
 				});
@@ -1557,6 +1585,7 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	public void createSerialPortTabItem() {
 		this.serialPortTabItem = new SeriaPortTypeTabItem(this.tabFolder, SWT.CLOSE, 1);
+		this.serialPortTabItem.setDeviceConfig(this.deviceConfig);
 	}
 
 	/**
@@ -1754,5 +1783,12 @@ public class DevicePropertiesEditor extends Composite {
   	}
 		messageDialog.open();
 
+	}
+
+	/**
+	 * @param true to set the save button to the enabled state
+	 */
+	public void enableSaveButton(boolean enable) {
+		this.saveButton.setEnabled(enable);
 	}
 }

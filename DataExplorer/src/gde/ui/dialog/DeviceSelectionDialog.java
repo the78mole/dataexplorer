@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.Vector;
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -64,6 +63,7 @@ import osde.data.Channels;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.exception.NotSupportedException;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
@@ -997,11 +997,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							enableSerialPortEntries(true);
 						}
 						// serial port adjustments group
-						this.baudeSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getBaudeRate()).toString());
-						this.dataBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getDataBits()).toString());
-						this.stopBitsSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getStopBits()).toString());
-						this.paritySelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getParity()).toString());
-						this.flowControlSelectLabel.setText(Integer.valueOf(this.selectedActiveDeviceConfig.getFlowCtrlMode()).toString());
+						this.baudeSelectLabel.setText(this.selectedActiveDeviceConfig.getBaudeRate().toString());
+						this.dataBitsSelectLabel.setText(OSDE.STRING_BLANK + this.selectedActiveDeviceConfig.getDataBits().toString().split(OSDE.STRING_UNDER_BAR)[1]);
+						this.stopBitsSelectLabel.setText(OSDE.STRING_BLANK + this.selectedActiveDeviceConfig.getStopBits().toString().split(OSDE.STRING_UNDER_BAR)[1]);
+						this.paritySelectLabel.setText(OSDE.STRING_BLANK + this.selectedActiveDeviceConfig.getParity().toString().split(OSDE.STRING_UNDER_BAR)[1]);
+						this.flowControlSelectLabel.setText(OSDE.STRING_BLANK + this.selectedActiveDeviceConfig.getFlowCtrlMode().toString().split(OSDE.STRING_UNDER_BAR)[1]);
 						this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
 						this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
 					}
