@@ -105,7 +105,7 @@
         <Measurement>
             <name>Steigrate</name>
             <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <unit>m/sec</unit>
             <statistics sigma="true" avg="false" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
@@ -215,7 +215,7 @@
         <Measurement>
             <name>Steigrate</name>
             <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <unit>m/sec</unit>
             <statistics sigma="true" avg="false" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="Kurve" name="regression_type"/>
@@ -327,7 +327,7 @@
         <Measurement>
             <name>Steigrate</name>
             <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <unit>m/sec</unit>
             <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
@@ -439,7 +439,7 @@
         <Measurement>
             <name>Steigrate</name>
             <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <unit>m/sec</unit>
             <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>

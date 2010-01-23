@@ -103,9 +103,9 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Slope</name>
-            <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <name>Climb</name>
+            <symbol>Vc</symbol>
+            <unit>m/sec</unit>
             <statistics sigma="true" avg="false" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
@@ -213,9 +213,9 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Slope</name>
-            <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <name>Climb</name>
+            <symbol>Vc</symbol>
+            <unit>m/sec</unit>
             <statistics sigma="true" avg="false" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
@@ -325,9 +325,9 @@
             <statistics ratioText="Energy/Motoheight" ratioRefOrdinal="5" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Slope</name>
-            <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <name>Climb</name>
+            <symbol>Vc</symbol>
+            <unit>m/sec</unit>
             <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
@@ -437,9 +437,9 @@
             <statistics ratioText="Energy/Motoheight" ratioRefOrdinal="5" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Slope</name>
-            <symbol>Vs</symbol>
-            <unit>m/s</unit>
+            <name>Climb</name>
+            <symbol>Vc</symbol>
+            <unit>m/sec</unit>
             <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             <property type="Integer" value="10" name="regression_interval_sec"/>
             <property type="String" value="regression_type_curve" name="regression_type"/>
