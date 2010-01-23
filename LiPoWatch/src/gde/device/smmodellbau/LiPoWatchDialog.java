@@ -1162,7 +1162,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 		updateBuffer[20] = (byte) (checkSum % 256);
 
-		if (LiPoWatchDialog.log.isLoggable(Level.INFO)) {
+		if (LiPoWatchDialog.log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("updateBuffer = ["); //$NON-NLS-1$
 			for (int i = 0; i < updateBuffer.length; i++) {
@@ -1172,7 +1172,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					sb.append(String.format("%02X ", updateBuffer[i])); //$NON-NLS-1$
 			}
 			sb.append("]"); //$NON-NLS-1$
-			LiPoWatchDialog.log.log(Level.INFO, sb.toString());
+			LiPoWatchDialog.log.log(Level.FINE, sb.toString());
 		}
 
 		return updateBuffer;

@@ -124,7 +124,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 				//reduce receodSet to really available number of cells, calculate average over first 10 measurements since I got different number of cells
 				int numCells = 0;
-				log.log(Level.INFO, "number of measurements = " +  telegrams.size());
+				log.log(Level.FINE, "number of measurements = " +  telegrams.size());
 				for (int j = 0; j < 10 && j < telegrams.size(); j++) {
 					dataBuffer = telegrams.get(j);
 					numCells += (dataBuffer[5] & 0x0F);

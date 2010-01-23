@@ -91,7 +91,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		// timer interval
 		int timeIntervalPosition = readBuffer[13] & 0xFF;
 		this.timeStep_ms = this.time_ms[timeIntervalPosition];
-		log.log(Level.INFO, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
