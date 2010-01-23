@@ -118,11 +118,11 @@ public class DigitalWindow extends CTabItem {
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 			if (activeRecordKeys.length != this.displays.size())
-				this.update(false);
+				this.update(true);
 			else
 				for (String recordKey : activeRecordKeys) {
 					DigitalDisplay display = this.displays.get(recordKey);
-					if (display != null) display.getDigitalLabel().redraw();
+					if (display != null) display.redawDisplay();
 				}
 		}
 	}

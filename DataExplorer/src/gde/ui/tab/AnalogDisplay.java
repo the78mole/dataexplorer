@@ -88,7 +88,6 @@ public class AnalogDisplay extends Composite {
 	final Menu										popupmenu;
 	final TabAreaContextMenu			contextMenu;
 
-
 	/**
 	 * 
 	 */
@@ -260,7 +259,7 @@ public class AnalogDisplay extends Composite {
 	/**
 	 * calculate the tacho needle ploygon using the actual measurement value
 	 */
-	public void calculateNeedle() {
+	private void calculateNeedle() {
 		int needleRadius = this.radius - 5;
 		int innerRadius = (int) (this.radius * 0.1) + 3;
 		double angle = this.angleStart + (this.actualValue - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;

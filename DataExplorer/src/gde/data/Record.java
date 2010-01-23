@@ -123,7 +123,7 @@ public class Record extends Vector<Integer> {
 	boolean							isScaleSynced					= false; // indicates if record is part of syncable records and scale sync is requested
 	boolean							isSyncPlaceholder			= false;
 	DecimalFormat				df;
-	int									numberFormat					= 1;													// 0 = 0000, 1 = 000.0, 2 = 00.00
+	int									numberFormat					= -1;													// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries

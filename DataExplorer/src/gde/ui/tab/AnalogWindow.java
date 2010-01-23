@@ -121,7 +121,7 @@ public class AnalogWindow extends CTabItem {
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
 			if (activeRecordKeys.length != this.displays.size())
-				this.update(false);
+				this.update(true);
 			else
 				for (String recordKey : activeRecordKeys) {
 					AnalogDisplay display = this.displays.get(recordKey);

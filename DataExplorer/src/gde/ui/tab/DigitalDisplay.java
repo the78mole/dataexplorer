@@ -80,6 +80,32 @@ public class DigitalDisplay extends Composite {
 
 	public void create() {
 		{
+			this.addPaintListener(new PaintListener() {
+				public void paintControl(final PaintEvent evt) {
+					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+						if (activeRecordSet != null) {
+							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							if (record != null) {
+								log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
+								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
+
+								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
+								String maxValue = Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								String minValue = Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue + " maxValue=" + maxValue + " minValue=" + minValue);
+								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
+								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
+								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);
+								DigitalDisplay.this.minDigitalLabel.setText(minValue);
+							}
+						}
+					}
+				}
+			});
 			this.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
@@ -91,14 +117,17 @@ public class DigitalDisplay extends Composite {
 			this.textDigitalLabel.setBackground(this.backgroundColor);
 			this.textDigitalLabel.setMenu(this.popupmenu);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINEST, "textDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+				public void paintControl(final PaintEvent evt) {
+					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
-							DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
+							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							if (record != null) {
+								log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
+								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
+							}
 						}
 					}
 				}
@@ -117,15 +146,14 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-								Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
-								if (record != null) {
-									CLabel label = (CLabel) evt.widget;
-									label.setForeground(record.getColor());
-									DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
-									DigitalDisplay.this.actualDigitalLabel.setText(df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0))));
-									DigitalDisplay.this.maxDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0))));
-									DigitalDisplay.this.minDigitalLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0))));
-								}
+							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							if (record != null) {
+								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
+								log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue);
+								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
+								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
+							}
 						}
 					}
 				}
@@ -141,19 +169,57 @@ public class DigitalDisplay extends Composite {
 			this.minDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD)); 
 			this.minDigitalLabel.setBackground(this.backgroundColor);
 			this.minDigitalLabel.setMenu(this.popupmenu);
+			this.minDigitalLabel.addPaintListener(new PaintListener() {
+				public void paintControl(final PaintEvent evt) {
+					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+						if (activeRecordSet != null) {
+							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							if (record != null) {
+								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								String minValue = Messages.getString(MessageIds.OSDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								log.log(Level.FINE, DigitalDisplay.this.recordKey + " minValue=" + minValue);
+								DigitalDisplay.this.minDigitalLabel.setText(minValue);
+							}
+						}
+					}
+				}
+			});
 
 			this.maxDigitalLabel = new CLabel(this.minMaxComposite, SWT.CENTER | SWT.EMBEDDED);
 			this.maxDigitalLabel.setText("MAX : 00,00"); //$NON-NLS-1$
 			this.maxDigitalLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.maxDigitalLabel.setBackground(this.backgroundColor);
 			this.maxDigitalLabel.setMenu(this.popupmenu);
+			this.maxDigitalLabel.addPaintListener(new PaintListener() {
+				public void paintControl(final PaintEvent evt) {
+					log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
+					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+						if (activeRecordSet != null) {
+							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							if (record != null) {
+								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								String maxValue = Messages.getString(MessageIds.OSDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								log.log(Level.FINE, DigitalDisplay.this.recordKey + " maxValue=" + maxValue);
+								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);
+							}
+						}
+					}
+				}
+			});
 		}
 	}
 
 	/**
-	 * @return the digitalLabel
+	 * call redraw method to update values of this display
 	 */
-	public CLabel getDigitalLabel() {
-		return this.actualDigitalLabel;
+	public void redawDisplay() {
+		this.actualDigitalLabel.redraw();
+		this.minDigitalLabel.redraw();
+		this.maxDigitalLabel.redraw();
 	}
 }
