@@ -113,7 +113,7 @@ public class eStationBC6 extends eStation {
 				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(Level.INFO, timeStamps.size() + " timeStamps = " + timeStamps.toString());
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
 		
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
