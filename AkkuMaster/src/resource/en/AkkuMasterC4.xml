@@ -11,7 +11,7 @@
     <SerialPort>
         <port>COM2</port>
         <baudeRate>9600</baudeRate>
-        <dataBits>8</dataBits>
+        <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
         <parity>PARITY_NONE</parity>
         <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
