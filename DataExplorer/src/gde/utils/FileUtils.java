@@ -282,15 +282,15 @@ public class FileUtils {
 		BufferedReader reader;
 		BufferedWriter writer;
 		String line;
-		log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
+		log.log(Level.FINE, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 		JarFile jarFile = new JarFile(jarFilePath);
 
 		reader = new BufferedReader(new InputStreamReader(FileUtils.getFileInputStream(jarFile, jarInternalFilePath), sourceEncoding)); 
-		log.log(Level.INFO, "targetPath = " + targetFilePath); //$NON-NLS-1$
+		log.log(Level.FINE, "targetPath = " + targetFilePath); //$NON-NLS-1$
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), targetEncoding)); //$NON-NLS-1$
 
 		while ((line = reader.readLine()) != null) {
-			log.log(Level.INFO, line);
+			log.log(Level.FINE, line);
 			if (line.indexOf(placeholderKey) > -1) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(line.substring(0, line.indexOf(placeholderKey)));
@@ -298,7 +298,7 @@ public class FileUtils {
 				sb.append(line.substring(line.indexOf(placeholderKey) + placeholderKey.length()));
 				line = sb.toString();
 			}
-			log.log(Level.INFO, line);
+			log.log(Level.FINE, line);
 			writer.write(line+OSDE.LINE_SEPARATOR);
 		}
 		reader.close();
@@ -324,7 +324,7 @@ public class FileUtils {
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFilePath), OSDE.STRING_UTF_8)); 
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), OSDE.STRING_UTF_8)); 
 		while ((line = reader.readLine()) != null) {
-			log.log(Level.INFO, line);
+			log.log(Level.FINE, line);
 			if (line.indexOf(placeHolderKey) > -1) {
 				StringBuilder sb = new StringBuilder();
 					sb.append(line.substring(0, line.indexOf(placeHolderKey)));
@@ -335,7 +335,7 @@ public class FileUtils {
 			
 			line = line.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK)  + OSDE.LINE_SEPARATOR;
 			
-			log.log(Level.INFO, line);
+			log.log(Level.FINE, line);
 			writer.write(line);
 		}
 		reader.close();
@@ -568,7 +568,7 @@ public class FileUtils {
 
 		//copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
-			log.log(Level.INFO, "inEntry = " + inEntry.getName());
+			log.log(Level.FINE, "inEntry = " + inEntry.getName());
 			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) {
 				out.putNextEntry(new JarEntry(inEntry));
 				while ((len = in.read(buf)) > 0) {

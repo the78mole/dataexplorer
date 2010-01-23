@@ -68,7 +68,7 @@ public class TimeSteps extends Vector<Integer> {
 				}
 			}
 		}
-  	log.log(Level.INFO, this.toString());
+  	log.log(Level.FINER, this.toString());
 	}
 	
 	/**

@@ -131,13 +131,13 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				this.serialPortComposite.addFocusListener(new FocusAdapter() {
 					@Override
 					public void focusLost(FocusEvent focusevent) {
-						SeriaPortTypeTabItem.log.log(Level.INFO, "serialPortComposite.focusLost, event=" + focusevent); //$NON-NLS-1$
+						SeriaPortTypeTabItem.log.log(Level.FINEST, "serialPortComposite.focusLost, event=" + focusevent); //$NON-NLS-1$
 						SeriaPortTypeTabItem.this.enableContextmenu(false);
 					}
 					
 					@Override
 					public void focusGained(FocusEvent focusevent) {
-						SeriaPortTypeTabItem.log.log(Level.INFO, "serialPortComposite.focusGained, event=" + focusevent); //$NON-NLS-1$
+						SeriaPortTypeTabItem.log.log(Level.FINEST, "serialPortComposite.focusGained, event=" + focusevent); //$NON-NLS-1$
 						SeriaPortTypeTabItem.this.enableContextmenu(true);
 					}
 				});

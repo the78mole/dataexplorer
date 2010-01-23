@@ -181,7 +181,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 					}
 				}
 			}
-			if (log.isLoggable(Level.INFO)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
 				for (String comPort : availablePorts) {
 					sb.append(comPort).append(" "); //$NON-NLS-1$

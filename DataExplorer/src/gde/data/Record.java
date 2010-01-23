@@ -1395,7 +1395,7 @@ public class Record extends Vector<Integer> {
 		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.getDrawTimeOffset_ms();
 		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
-		log.log(Level.INFO, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
+		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);

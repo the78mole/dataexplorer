@@ -99,7 +99,7 @@ public class CSVSerialDataReaderWriter {
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
-				log.log(Level.INFO, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); 
+				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); 
 				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException("Konfigurationsfehler in " + filePath + "\nAnzahl der definierten Messwerte passt nicht zur Datenblockgröße!\nDas verwendete Separatorzeichen könnte auch an einigen Stellen falsch sein!");
 				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 

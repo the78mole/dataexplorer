@@ -55,7 +55,7 @@ public class Library {
 		FileOutputStream os = null;
 		InputStream is = null;
 		File file = new File(fileName);
-		log.log(Level.INFO, fileName + " exist " + file.exists()); //$NON-NLS-1$
+		log.log(Level.FINE, fileName + " exist " + file.exists()); //$NON-NLS-1$
 		try {
 			is = Library.class.getResourceAsStream("/" + mappedName); //$NON-NLS-1$
 			//log.log(Level.INFO, "jar in = " + is); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class Library {
 					catch (Throwable e) {
 					}
 				}
-				log.log(Level.INFO, fileName + " exist " + new File(fileName).exists()); //$NON-NLS-1$
+				log.log(Level.FINE, fileName + " exist " + new File(fileName).exists()); //$NON-NLS-1$
 				if (load(fileName)) return true;
 			}
 		} catch (Throwable e) {

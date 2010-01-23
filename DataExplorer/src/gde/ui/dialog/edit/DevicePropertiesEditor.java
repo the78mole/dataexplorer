@@ -361,7 +361,7 @@ public class DevicePropertiesEditor extends Composite {
 									}
 									DevicePropertiesEditor.this.devicePropertiesFileName = DevicePropertiesEditor.this.devicePropertiesFileName + OSDE.FILE_ENDING_DOT_XML;
 								}
-								DevicePropertiesEditor.log.log(Level.INFO, "devicePropertiesFileName = " + DevicePropertiesEditor.this.devicePropertiesFileName); //$NON-NLS-1$
+								DevicePropertiesEditor.log.log(Level.FINE, "devicePropertiesFileName = " + DevicePropertiesEditor.this.devicePropertiesFileName); //$NON-NLS-1$
 
 								if (!(new File(getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName)).exists()) {
 									MessageBox okCancelMessageDialog = new MessageBox(DevicePropertiesEditor.this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
@@ -415,7 +415,7 @@ public class DevicePropertiesEditor extends Composite {
 						fileSelectionDialog.setFilterNames(new String[] { Messages.getString(MessageIds.OSDE_MSGT0480) }); 
 						fileSelectionDialog.open();
 						String tmpFileName = fileSelectionDialog.getFileName();
-						DevicePropertiesEditor.log.log(Level.INFO, "devicePropertiesFileName = " + tmpFileName); //$NON-NLS-1$
+						DevicePropertiesEditor.log.log(Level.FINE, "devicePropertiesFileName = " + tmpFileName); //$NON-NLS-1$
 
 						if (tmpFileName != null && tmpFileName.length() > 4 && !tmpFileName.equals(DevicePropertiesEditor.this.devicePropertiesFileName)) {
 							openDevicePropertiesFile(tmpFileName);
@@ -687,7 +687,7 @@ public class DevicePropertiesEditor extends Composite {
 										String fullQualifiedImageSourceName = fileSelectionDialog.getFilterPath()+OSDE.FILE_SEPARATOR_UNIX+DevicePropertiesEditor.this.imageFileName;
 										if (DevicePropertiesEditor.this.imageFileName != null && DevicePropertiesEditor.this.imageFileName.length() > 5) {
 											DevicePropertiesEditor.this.imageFileNameText.setText(DevicePropertiesEditor.this.imageFileName);
-											DevicePropertiesEditor.log.log(Level.INFO, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
+											DevicePropertiesEditor.log.log(Level.FINE, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
 											if (DevicePropertiesEditor.this.deviceConfig != null) {
 												DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
 												DevicePropertiesEditor.this.enableSaveButton(true);
@@ -728,11 +728,11 @@ public class DevicePropertiesEditor extends Composite {
 														{
 															IDevice newInst = null;
 															String className = "osde.device." + DevicePropertiesEditor.this.deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
-															log.log(Level.INFO, "loading Class " + className); //$NON-NLS-1$
+															log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 															ClassLoader loader = Thread.currentThread().getContextClassLoader();
 															Class c = loader.loadClass(className);
 															Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-															log.log(Level.INFO, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+															log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 															if (constructor != null) {
 																newInst = (IDevice) constructor.newInstance(new Object[] { DevicePropertiesEditor.this.deviceConfig });
 																deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
@@ -747,7 +747,7 @@ public class DevicePropertiesEditor extends Composite {
 														//}
 														tmpDeviceJarPath = deviceJarPath.substring(0, deviceJarPath.lastIndexOf(OSDE.STRING_DOT)) + OSDE.FILE_ENDING_DOT_TMP;
 														String addJarEntryName = "resource/" + DevicePropertiesEditor.this.imageFileName; //$NON-NLS-1$
-														log.log(Level.INFO, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
+														log.log(Level.FINE, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 														FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
 													}
@@ -985,7 +985,7 @@ public class DevicePropertiesEditor extends Composite {
 					}
 
 					public void close(CTabFolderEvent evt) {
-						DevicePropertiesEditor.log.log(Level.INFO, "tabFolder.close, event=" + evt); //$NON-NLS-1$
+						DevicePropertiesEditor.log.log(Level.FINE, "tabFolder.close, event=" + evt); //$NON-NLS-1$
 						CTabItem tabItem = ((CTabItem) evt.item);
 						if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0470))) {
 							tabItem.dispose();

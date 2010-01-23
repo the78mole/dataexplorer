@@ -177,13 +177,13 @@ public class SWTResourceManager {
 		if (resources.containsKey(name) && !((Menu)resources.get(name)).isDisposed()) 
 			return (Menu) resources.get(name);
 		if(resources.containsKey(name) && ((Menu)resources.get(name)).isDisposed())
-			log.log(Level.INFO, "menu isDisposed = " + implClassName); //$NON-NLS-1$
+			log.log(Level.FINE, "menu isDisposed = " + implClassName); //$NON-NLS-1$
 		
 		Menu menu = new Menu(shell, style);
 		menu.addDisposeListener(new DisposeListener() {	
 			@Override
 			public void widgetDisposed(DisposeEvent disposeevent) {
-				log.log(Level.INFO, "menu.widgetDisposed " + implClassName); //$NON-NLS-1$
+				log.log(Level.FINE, "menu.widgetDisposed " + implClassName); //$NON-NLS-1$
 				resources.remove(implClassName);
 			}
 		});

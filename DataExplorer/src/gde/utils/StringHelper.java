@@ -300,7 +300,7 @@ public class StringHelper {
 		char[] chars = new char[eventText.length()];
 		eventText.getChars(0, chars.length, chars, 0);
 		for (int i = 0; i < chars.length; i++) {
-			log.log(Level.INFO, "\"" + chars[i] + "\"");
+			log.log(Level.FINER, "\"" + chars[i] + "\"");
 			if (OSDE.IS_WINDOWS) {
 				if (!('0' <= chars[i] && chars[i] <= '9' || 'c' == chars[i] || 'C' == chars[i] || 'o' == chars[i] || 'O' == chars[i] || 'm' == chars[i] || 'M' == chars[i] || ' ' == chars[i])) {
 					return false;
