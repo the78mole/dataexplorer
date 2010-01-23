@@ -16,7 +16,6 @@
     </TimeBase>
     <DataBlock>
         <format ending="0D0A" separator="semicolon" timeUnit="msec" size="1" type="TEXT"/>
-        <preferredDataLocation>d:\Documents\Person\OpenSerialDataExplorer\CSV2SerialDataAdapter</preferredDataLocation>
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
@@ -24,8 +23,8 @@
     </State>
     <Channel type="TYPE_CONFIG" name="Thermik">
         <Measurement>
-            <name>Spannung</name>
-            <symbol>Ue</symbol>
+            <name>Voltage</name>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>

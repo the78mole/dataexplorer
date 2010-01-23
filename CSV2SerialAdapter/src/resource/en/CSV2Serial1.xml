@@ -16,7 +16,6 @@
     </TimeBase>
     <DataBlock>
         <format ending="0D0A" separator="semicolon" timeUnit="sec" size="13" type="TEXT"/>
-        <preferredDataLocation>d:\Documents\Person\OpenSerialDataExplorer\CSV2SerialAdapterTestSamples</preferredDataLocation>
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
@@ -24,22 +23,22 @@
     </State>
     <Channel type="TYPE_CONFIG" name="Thermik">
         <Measurement>
-            <name>EmpfSpannung</name>
-            <symbol>Ue</symbol>
+            <name>RecVoltage</name>
+            <symbol>Ur</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
             <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Höhe</name>
+            <name>Height</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics ratioText="verbrauchte Akkukapazität/Höhenmeter" ratioRefOrdinal="4" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sumTriggerText="Erreicht Motorhöhe" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Motor-Strom</name>
+            <name>MotorCurrent</name>
             <symbol>I</symbol>
             <unit>A</unit>
             <active>true</active>
@@ -48,7 +47,7 @@
             </statistics>
         </Measurement>
         <Measurement>
-            <name>Motor-Spannung</name>
+            <name>MotorVoltage</name>
             <symbol>U</symbol>
             <unit>mV</unit>
             <active>true</active>
@@ -56,55 +55,55 @@
             <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>MotorAkkuKapazität</name>
+            <name>MotorBatteryCapacity</name>
             <symbol>C</symbol>
             <unit>mAh</unit>
             <active>true</active>
             <statistics ratioRefOrdinal="1" sumTriggerText="Verbrauchte Motorakkukapazität" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
         </Measurement>
         <Measurement>
-            <name>Geschwindigkeit</name>
+            <name>Velocity</name>
             <symbol>V</symbol>
             <unit>km/h</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Temperatur</name>
+            <name>Temperature</name>
             <symbol>T</symbol>
             <unit>°C</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>GPS-Länge</name>
+            <name>Longitude</name>
             <symbol>L</symbol>
             <unit>°</unit>
             <active>true</active>
         </Measurement>
         <Measurement>
-            <name>GPS-Breite</name>
+            <name>Latitude</name>
             <symbol>B</symbol>
             <unit>°</unit>
             <active>true</active>
         </Measurement>
         <Measurement>
-            <name>GPS-Höhe</name>
+            <name>GPS-Height</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>GPS-Geschwindigkeit</name>
-            <symbol>Vgps</symbol>
+            <name>GPS-Velocity</name>
+            <symbol>V</symbol>
             <unit>km/h</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Steigen</name>
-            <symbol>Vs</symbol>
+            <name>Climb</name>
+            <symbol>Vc</symbol>
             <unit>m/sec</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -112,8 +111,8 @@
         </Measurement>
         <Measurement>
             <name>ServoImpuls</name>
-            <symbol>St</symbol>
-            <unit>us</unit>
+            <symbol>si</symbol>
+            <unit>µs</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
