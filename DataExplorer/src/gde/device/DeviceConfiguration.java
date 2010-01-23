@@ -19,7 +19,6 @@ package osde.device;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -333,90 +332,124 @@ public class DeviceConfiguration {
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort() {
-		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort != null ? this.serialPort.getPort() : OSDE.STRING_EMPTY;
+		if (this.serialPort == null) createSerialPort();
+		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort.getPort();
 	}
 
 	/**
 	 * @return the port configured in SerialPortType
 	 */
 	public String getPortString() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getPort();
 	}
 
 	public void setPort(String newPort) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setPort(newPort);
 	}
 
-	public int getBaudeRate() {
-		return this.serialPort.getBaudeRate().intValue();
+	public Integer getBaudeRate() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getBaudeRate();
 	}
 	
-	public void setBaudeRate(BigInteger value) {
+	public void setBaudeRate(Integer value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setBaudeRate(value);
 	}
 
-	public int getDataBits() {
-		return this.serialPort.getDataBits().intValue();
+	public DataBitsTypes getDataBits() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getDataBits();
 	}
 
-	public void setDataBits(BigInteger value) {
+	public void setDataBits(DataBitsTypes value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setDataBits(value);
 	}
 
-	public int getStopBits() {
-		return this.serialPort.getStopBits().ordinal()+1; // starts with 1
+	public StopBitsTypes getStopBits() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getStopBits();
 	}
 
 	public void setStopBits(StopBitsTypes enumOrdinal) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setStopBits(enumOrdinal);
 	}
 
-	public int getFlowCtrlMode() {
-		return this.serialPort.getFlowControlMode().ordinal();
+	public FlowControlTypes getFlowCtrlMode() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getFlowControlMode();
 	}
 
 	public void setFlowCtrlMode(FlowControlTypes value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setFlowControlMode(value);
 	}
 
-	public int getParity() {
-		return this.serialPort.getParity().ordinal();
+	public ParityTypes getParity() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getParity();
+	}
+
+	/**
+	 * create a serial port type with default values
+	 */
+	private void createSerialPort() {
+		this.deviceProps.serialPort = this.serialPort = new ObjectFactory().createSerialPortType();
+		this.serialPort.setPort(OSDE.STRING_EMPTY);
+		this.serialPort.setBaudeRate(9600);
+		this.serialPort.setParity(ParityTypes.PARITY_NONE);
+		this.serialPort.setDataBits(DataBitsTypes.DATABITS_8);
+		this.serialPort.setStopBits(StopBitsTypes.STOPBITS_1);
+		this.serialPort.setFlowControlMode(FlowControlTypes.FLOWCONTROL_NONE);
+		this.serialPort.setIsDTR(false);
+		this.serialPort.setIsRTS(false);
 	}
 
 	public void setParity(ParityTypes value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setParity(value);
 	}
 
 	public boolean isDTR() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.isIsDTR();
 	}
 
 	public void setIsDTR(boolean value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setIsDTR(value);
 	}
 
 	public boolean isRTS() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.isIsRTS();
 	}
 
 	public void setIsRTS(boolean value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		this.serialPort.setIsRTS(value);
 	}
 	
 	public int getRTOCharDelayTime() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOCharDelayTime() : 0;
 	}
 
 	public void setRTOCharDelayTime(int value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
@@ -424,11 +457,13 @@ public class DeviceConfiguration {
 	}
 	
 	public int getRTOExtraDelayTime() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getRTOExtraDelayTime() : 0;
 	}
 
 	public void setRTOExtraDelayTime(int value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
@@ -436,11 +471,13 @@ public class DeviceConfiguration {
 	}
 	
 	public int getWTOCharDelayTime() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOCharDelayTime() : 0;
 	}
 
 	public void setWTOCharDelayTime(int value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
@@ -448,11 +485,13 @@ public class DeviceConfiguration {
 	}
 	
 	public int getWTOExtraDelayTime() {
+		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getTimeOut() != null ? this.serialPort.getTimeOut().getWTOExtraDelayTime() : 0;
 	}
 
 	public void setWTOExtraDelayTime(int value) {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() == null) {
 			this.serialPort.setTimeOut(new ObjectFactory().createTimeOutType());
 		}
@@ -461,6 +500,7 @@ public class DeviceConfiguration {
 	
 	public void removeSerialPortTimeOut() {
 		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
 		if (this.serialPort.getTimeOut() != null) {
 			this.serialPort.setTimeOut(null);
 		}
@@ -739,7 +779,7 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
-		return this.dataBlock.getPreferredDataLocation();
+		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : OSDE.STRING_BLANK) : OSDE.STRING_BLANK;
 	}
 
 	public void setDataBlockPreferredDataLocation(String value) {

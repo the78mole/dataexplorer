@@ -11,6 +11,8 @@ package osde.device;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
+import osde.OSDE;
+
 
 /**
  * <p>Java class for parity_type.
@@ -48,4 +50,11 @@ public enum ParityTypes {
         return valueOf(v);
     }
 
+  	public static String[] valuesAsStingArray() {
+  		StringBuilder sb = new StringBuilder();
+  		for (ParityTypes element : ParityTypes.values()) {
+  			sb.append(element).append(OSDE.STRING_DASH);
+  		}
+  		return sb.toString().split(OSDE.STRING_DASH);
+  	}
 }

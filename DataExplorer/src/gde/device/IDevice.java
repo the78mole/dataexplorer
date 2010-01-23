@@ -192,27 +192,27 @@ public interface IDevice {
 	/**
 	 * @return the baude rate of the device
 	 */
-	public int getBaudeRate();
+	public Integer getBaudeRate();
 	
 	/**
 	 * @return the data bit configuration of the device
 	 */
-	public int getDataBits();
+	public DataBitsTypes getDataBits();
 	
 	/**
 	 * @return the stop bit configuration of the device
 	 */
-	public int getStopBits();
+	public StopBitsTypes getStopBits();
 	
 	/**
 	 * @return the flow control configuration of the device
 	 */
-	public int getFlowCtrlMode();
+	public FlowControlTypes getFlowCtrlMode();
 	
 	/**
 	 * @return the parity bit configuration of the device
 	 */
-	public int getParity();
+	public ParityTypes getParity();
 	
 	/**
 	 * @return  the DTR configuration of the device
