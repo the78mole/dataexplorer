@@ -600,7 +600,7 @@ public class AkkuMasterChannelTab {
 															setRetryCounter(10);
 														}
 														else {
-															log.log(Level.INFO, "Waiting for device activation - " + AkkuMasterChannelTab.this.name); //$NON-NLS-1$
+															log.log(Level.FINE, "Waiting for device activation - " + AkkuMasterChannelTab.this.name); //$NON-NLS-1$
 															AkkuMasterChannelTab.this.application.setStatusMessage("=====> Waiting for device activation - " + AkkuMasterChannelTab.this.name); //$NON-NLS-1$
 														}
 													}
