@@ -695,7 +695,10 @@ public class FileUtils {
 	 */
 	public static void updateFileInDeviceJar(DeviceConfiguration deviceConfig, String devicePropsFileName) {
 		String deviceJarPath = null;
-		devicePropsFileName = devicePropsFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+		if (devicePropsFileNameResource.contains(OSDE.FILE_SEPARATOR_UNIX)) { //seams full qualified, strip directory
+			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
+		}
 
 		try {
 			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
@@ -720,7 +723,7 @@ public class FileUtils {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
 				}
-				String addJarEntryName = "resource/" + devicePropsFileName; //$NON-NLS-1$
+				String addJarEntryName = "resource/" + Settings.getInstance().getLocale() + devicePropsFileNameResource; //$NON-NLS-1$
 				String tmpDeviceJarPath = null;
 				deviceJarPath = getJarFileNameOfDevice(deviceConfig);
 
