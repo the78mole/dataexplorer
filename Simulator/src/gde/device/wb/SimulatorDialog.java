@@ -51,6 +51,7 @@ import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
+import osde.device.wb.simulator.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
