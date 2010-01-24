@@ -27,6 +27,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -40,7 +44,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import osde.log.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
@@ -52,7 +55,11 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import osde.OSDE;
+import osde.config.Settings;
+import osde.device.DeviceConfiguration;
+import osde.device.IDevice;
 import osde.exception.ApplicationConfigurationException;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -63,8 +70,15 @@ import osde.ui.dialog.edit.DevicePropertiesEditor;
  * @author Winfried Brügmann
  */
 public class FileUtils {
-	private static final Logger	log			= Logger.getLogger(FileUtils.class.getName());
+	private static final Logger				log							= Logger.getLogger(FileUtils.class.getName());
+	public final static List<String>	onExitRenameJar	= new ArrayList<String>();
 
+	/**
+	 * copy from to file
+	 * @param in
+	 * @param out
+	 * @throws IOException
+	 */
 	public static void copyFile(File in, File out) throws IOException {
 		FileChannel inChannel = new FileInputStream(in).getChannel();
 		FileChannel outChannel = new FileOutputStream(out).getChannel();
@@ -80,6 +94,13 @@ public class FileUtils {
 		}
 	}
 
+	/**
+	 * copy all files from source directory to target directory 
+	 * @param srcDir
+	 * @param tgtDir
+	 * @throws IOException
+	 * @throws ApplicationConfigurationException
+	 */
 	public static void copyAllFiles(String srcDir, String tgtDir) throws IOException, ApplicationConfigurationException {
 		File sourceDir = new File(srcDir);
 		String[] files = sourceDir.list();
@@ -100,7 +121,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * check existens of a directory and create if not exist
+	 * check if directory exist and create if required (not exist)
 	 * @param directory
 	 * @return false if directory needs to be created
 	 */
@@ -160,7 +181,7 @@ public class FileUtils {
 						file.delete();
 					}
 					else {
-						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath());
+						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
 				dir.delete();
@@ -175,7 +196,7 @@ public class FileUtils {
 			}
 		}
 		else {
-			log.log(Level.WARNING, "no delete permission on " + dir.getAbsolutePath());
+			log.log(Level.WARNING, "no delete permission on " + dir.getAbsolutePath()); //$NON-NLS-1$
 		}
 		return exist;
 	}	
@@ -197,10 +218,10 @@ public class FileUtils {
 		if (checkFileExist(filePath)) {
 			File file = new File(filePath);
 			if (file.canWrite()) {
-				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(".")+1) + extension)); //$NON-NLS-1$
+				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(OSDE.STRING_DOT)+1) + extension)); //$NON-NLS-1$
 			}
 			else {
-				log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath());
+				log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath()); //$NON-NLS-1$
 			}
 		}
 	}
@@ -215,7 +236,7 @@ public class FileUtils {
 			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) 
 				fileToBeDeleted.delete();
 			else
-				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !" );
+				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !" ); //$NON-NLS-1$
 		}
 	}
 
@@ -241,11 +262,11 @@ public class FileUtils {
 					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
-						log.log(Level.FINE, "evaluating " + tmpFileName);
+						log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
 						if ( (startSignature.length() == 0 && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature)) 	// "*register.sh"
 							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() == 0) 	// "bootstrap.log*"
 							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature))) {  // "swt*448.dll"
-							log.log(Level.FINE, "deleting " + tmpFileName);
+							log.log(Level.FINE, "deleting " + tmpFileName); //$NON-NLS-1$
 							FileUtils.cleanFile(fileBasePath + tmpFileName);
 						}
 					}
@@ -433,7 +454,7 @@ public class FileUtils {
 		if (sourceFile.exists() && sourceFile.canWrite()) {
 			isRenamed = sourceFile.renameTo(new File(targetDirectory + targetFileName));
 			if (!isRenamed) {
-				log.log(Level.WARNING, "renaming to " + targetDirectory + targetFileName + " failed !");
+				log.log(Level.WARNING, "renaming to " + targetDirectory + targetFileName + " failed !"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		return isRenamed;
@@ -476,7 +497,7 @@ public class FileUtils {
 				setAccessPermission(fileName, unixPermissions);
 			}
 			else { 
-				log.log(Level.WARNING, jarSourceDirectory + fileName + " does not exist!");
+				log.log(Level.WARNING, jarSourceDirectory + fileName + " does not exist!"); //$NON-NLS-1$
 			}
 		}
 		catch (Throwable e) {
@@ -519,7 +540,7 @@ public class FileUtils {
 		while (enties.hasMoreElements()) {
 			JarEntry jarEntry = enties.nextElement();
 			String entryName = jarEntry.getName();
-			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(".") && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$ //$NON-NLS-2$
+			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(OSDE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$ //$NON-NLS-2$
 				ZipEntry ze = jarFile.getEntry(entryName);
 				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)));
 				try {
@@ -550,7 +571,63 @@ public class FileUtils {
 	}
 
 	/**
-	 * updates an jar file with additional content
+	 * update an device image file within a device plug-in jar
+	 * @param deviceConfig
+	 * @param imageFileName
+	 * @param deviceImage
+	 */
+	public static void updateImageInDeviceJar(DeviceConfiguration deviceConfig, String imageFileName, Image deviceImage) {
+		try {
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
+			if (isStartedWithinEclipse) {
+				log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
+				String fullQualifiedImageTargetName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + imageFileName; //$NON-NLS-1$
+				log.log(Level.INFO, "fullQualifiedImageTargetName = " + fullQualifiedImageTargetName); //$NON-NLS-1$
+				ImageLoader imageLoader = new ImageLoader();
+				imageLoader.data = new ImageData[] { deviceImage.getImageData() };
+				try {
+					imageLoader.save(new FileOutputStream(fullQualifiedImageTargetName), SWT.IMAGE_JPEG);
+				}
+				catch (IOException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+			}
+			else 
+			{
+				if (OpenSerialDataExplorer.application != null) { // started within OSDE
+					log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
+				}
+				else { // started outside OSDE
+					log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
+					try {
+						Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+					}
+					catch (Throwable e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
+				String addJarEntryName = "resource/" + imageFileName; //$NON-NLS-1$
+				String deviceJarPath = getJarFileNameOfDevice(deviceConfig);
+
+				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
+//				if (isStartedWithinEclipse) {
+//					deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
+//				}
+
+				String tmpDeviceJarPath = deviceJarPath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+				tmpDeviceJarPath = OSDE.JAVA_IO_TMPDIR.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1, tmpDeviceJarPath.length());
+				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
+
+				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
+			}
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * updates an jar file with additional image content
 	 * @param deviceJarPath
 	 * @param tmpDeviceJarPath
 	 * @param addJarEntryName
@@ -559,6 +636,19 @@ public class FileUtils {
 	 * @throws FileNotFoundException
 	 */
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, Image deviceImage, Shell messageBoxShell) throws IOException, FileNotFoundException {
+		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
+			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
+			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
+			int ret = mBox.open();
+			if (SWT.CANCEL == ret)
+				return;
+			else if (SWT.NO == ret) {
+				FileUtils.renameFile(tmpDeviceJarPath, OSDE.FILE_ENDING_BAK);
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(OSDE.STRING_DOT)+1) + OSDE.FILE_ENDING_BAK;
+			}
+		}
+		
 		JarInputStream in = new JarInputStream(new FileInputStream(deviceJarPath));
 		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), new JarFile(deviceJarPath).getManifest());
 
@@ -568,8 +658,8 @@ public class FileUtils {
 
 		//copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
-			log.log(Level.FINE, "inEntry = " + inEntry.getName());
-			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) {
+			log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
+			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
 				out.putNextEntry(new JarEntry(inEntry));
 				while ((len = in.read(buf)) > 0) {
 					out.write(buf, 0, len);
@@ -589,35 +679,206 @@ public class FileUtils {
 		out.closeEntry();
 		out.close();
 
-		rename(deviceJarPath, tmpDeviceJarPath);
-		
-		if (tmpDeviceJarPath != null) {
-			File tmpFile = new File(tmpDeviceJarPath);
-			if (tmpFile.exists() && DevicePropertiesEditor.onExitRenameJar != null) {
-				DevicePropertiesEditor.onExitRenameJar.add(deviceJarPath + "2" + tmpDeviceJarPath);
-				MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-				mBox.setText(OSDE.OSDE_NAME_LONG);
-				mBox.setMessage("The file " + deviceJarPath + " could not be updated with new content.\nTo enable the update the application needs to be re-started soon.");
-				mBox.open();
-			}
+		File tmpFile = new File(tmpDeviceJarPath);
+		if (tmpFile.exists()) {
+			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
+			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
+			mBox.open();
 		}
 	}
 
 	/**
-	 * run on exit a thread/process to rename files while the JVM shuts down
+	 * update an device properties file within a device plug-in jar
+	 * @param deviceConfig
+	 * @param devicePropsFileName
+	 */
+	public static void updateFileInDeviceJar(DeviceConfiguration deviceConfig, String devicePropsFileName) {
+		String deviceJarPath = null;
+		devicePropsFileName = devicePropsFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+
+		try {
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
+			if (isStartedWithinEclipse) {
+				log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
+				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig)
+						+ "/src/resource/" + Settings.getInstance().getLocale() + OSDE.FILE_SEPARATOR_UNIX + devicePropsFileName; //$NON-NLS-1$
+				log.log(Level.INFO, "fullQualifiedImageTargetFileName = " + fullQualifiedPropertiesTargetFileName); //$NON-NLS-1$
+				deviceConfig.storeDeviceProperties(fullQualifiedPropertiesTargetFileName);
+			}
+			else 
+			{
+				if (OpenSerialDataExplorer.application != null) { // started within OSDE
+					log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
+				}
+				else { // started outside OSDE
+					log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
+					try {
+						Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+					}
+					catch (Throwable e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
+				String addJarEntryName = "resource/" + devicePropsFileName; //$NON-NLS-1$
+				String tmpDeviceJarPath = null;
+				deviceJarPath = getJarFileNameOfDevice(deviceConfig);
+
+				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
+//				if (isStartedWithinEclipse) {
+//					deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
+//				}
+
+				tmpDeviceJarPath = deviceJarPath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+				tmpDeviceJarPath = OSDE.JAVA_IO_TMPDIR + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
+				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
+
+				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, devicePropsFileName, DevicePropertiesEditor.dialogShell);
+			}
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * find project directory of current device while application is loaded within eclipse
+	 * @param deviceConfig
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 * @throws ApplicationConfigurationException
+	 * @throws ClassNotFoundException
+	 */
+	@SuppressWarnings("rawtypes")
+	public static String findDeviceProjectDirectoryPath(DeviceConfiguration deviceConfig) throws MalformedURLException, URISyntaxException, ApplicationConfigurationException,
+			ClassNotFoundException {
+		String deviceImplName = deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		String className = deviceImplName.contains(OSDE.STRING_DOT) ? deviceImplName  // full qualified
+				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+		Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		Class c = loader.loadClass(className);
+		String basPath = c.getProtectionDomain().getCodeSource().getLocation().getPath();
+		return basPath.substring(0, basPath.indexOf("bin")-1);
+	}
+
+	/**
+	 * find the device jar name, where the device corresponding to the given device configuration
+	 * @param deviceConfig
+	 * @return deviceJarPath
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws NoClassDefFoundError
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig) throws ClassNotFoundException, NoSuchMethodException,
+			InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
+		String deviceJarPath = null;
+		String deviceImplName = deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		IDevice newInst = null;
+		String className = deviceImplName.contains(OSDE.STRING_DOT) ? deviceImplName  // full qualified
+				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		Class c = loader.loadClass(className);
+		Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
+		log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (constructor != null) {
+			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });
+			deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+		}
+		else
+			throw new NoClassDefFoundError(Messages.getString(MessageIds.OSDE_MSGE0016));
+		
+		log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath); //$NON-NLS-1$
+		return deviceJarPath;
+	}
+
+	/**
+	 * updates an jar file with additional image content
+	 * @param deviceJarPath
+	 * @param tmpDeviceJarPath
+	 * @param addJarEntryName
+	 * @param addJarFileName
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, String addJarFileName, Shell messageBoxShell) throws IOException, FileNotFoundException {
+		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
+			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
+			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
+			int ret = mBox.open();
+			if (SWT.CANCEL == ret)
+				return;
+			else if (SWT.NO == ret) {
+				FileUtils.renameFile(tmpDeviceJarPath, OSDE.FILE_ENDING_BAK);
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(OSDE.STRING_DOT)+1) + OSDE.FILE_ENDING_BAK;
+			}
+		}
+		
+		JarInputStream in = new JarInputStream(new FileInputStream(deviceJarPath));
+		JarOutputStream out = new JarOutputStream(new FileOutputStream(new File(tmpDeviceJarPath)), new JarFile(deviceJarPath).getManifest());
+
+		JarEntry inEntry;
+		byte[] buf = new byte[1024];
+		int len = 0;
+
+		//copy content to tmpDeviceJarPath
+		while ((inEntry = in.getNextJarEntry()) != null) {
+			log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
+			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
+				out.putNextEntry(new JarEntry(inEntry));
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+				out.closeEntry();
+			}
+			in.closeEntry();
+		}
+		in.close();
+
+		//add new entry as image file
+		JarEntry jarAddEntry = new JarEntry(addJarEntryName);
+		out.putNextEntry(jarAddEntry);
+		InputStream addIn = new FileInputStream(addJarFileName);
+		len = 0;
+		while ((len = addIn.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		addIn.close();
+		out.closeEntry();
+		out.close();
+
+		File tmpFile = new File(tmpDeviceJarPath);
+		if (tmpFile.exists()) {
+			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
+			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
+			mBox.open();
+		}
+	}
+
+	/**
+	 * run on exit a thread/process to rename files while the JVM shuts down, take care to have possible access rights !!!
 	 */
 	public static void runOnExitRenamer() {
-		if (DevicePropertiesEditor.onExitRenameJar != null && DevicePropertiesEditor.onExitRenameJar.size() > 0) {
+		if (FileUtils.onExitRenameJar != null && FileUtils.onExitRenameJar.size() > 0) {
 			Thread onExitThread = new Thread() {
 				public void run() {
-						for (String job : DevicePropertiesEditor.onExitRenameJar) {
+						for (String job : FileUtils.onExitRenameJar) {
 							//log.log(Level.INFO, "onExitRenameJar.job = " + job);
-							String deviceJarPath = job.split("2")[0];
-							String tmpDeviceJarPath = job.split("2")[1];
+							String deviceJarPath = job.split("2")[0]; //$NON-NLS-1$
+							String tmpDeviceJarPath = job.split("2")[1]; //$NON-NLS-1$
 							try {
-								String javaexec = System.getProperty("java.home").replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + "/bin/java";
+								String javaexec = System.getProperty("java.home").replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
 								String classpath = OperatingSystemHelper.getClasspathAsString().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
-								String command = javaexec + " -classpath '" + classpath + "' osde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'";  //$NON-NLS-1$ //$NON-NLS-2$
+								String command = javaexec + " -classpath '" + classpath + "' osde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 								log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 
 								//new ProcessBuilder(java -classpath OpenSerialDataExplorer.jar osde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
@@ -640,7 +901,7 @@ public class FileUtils {
 	public static void main(String[] args) {
 		try {
 			if (args.length < 2 || args[0].equals(args[1])) {
-				System.out.println("Usage: java -classpath OpenSerialDataExplorer.jar osde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName");
+				System.out.println("Usage: java -classpath OpenSerialDataExplorer.jar osde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName"); //$NON-NLS-1$
 			}
 			Thread.sleep(1000);
 			rename(args[0].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX), args[1].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
@@ -657,10 +918,10 @@ public class FileUtils {
 	 */
 	public static void rename(String sourceFullQualifiedFileName, String targetFullQualifiedFileName) {
 		if (!new File(sourceFullQualifiedFileName).delete()) {
-			log.log(Level.WARNING, "could not delete jar file " + sourceFullQualifiedFileName);
+			log.log(Level.WARNING, "could not delete jar file " + sourceFullQualifiedFileName); //$NON-NLS-1$
 		}
 		else if (!new File(targetFullQualifiedFileName).renameTo(new File(sourceFullQualifiedFileName))) {
-			log.log(Level.WARNING, "could not rename jar file " + targetFullQualifiedFileName + " to " + sourceFullQualifiedFileName);
+			log.log(Level.WARNING, "could not rename jar file " + targetFullQualifiedFileName + " to " + sourceFullQualifiedFileName); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -726,7 +987,7 @@ public class FileUtils {
 			try {
 				//jarPath = basePath + "build" + OSDE.FILE_SEPARATOR_UNIX + "target" + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
-				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(OSDE.STRING_BLANK)[0] + OSDE.STRING_UNDER_BAR + OSDE.BIT_MODE + "/OpenSerialDataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(OSDE.STRING_BLANK)[0] + OSDE.STRING_UNDER_BAR + OSDE.BIT_MODE + "/OpenSerialDataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);

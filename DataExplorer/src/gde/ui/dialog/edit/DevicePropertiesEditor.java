@@ -17,16 +17,10 @@
 package osde.ui.dialog.edit;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -49,8 +43,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -79,12 +71,12 @@ import osde.device.DesktopPropertyTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.DeviceTypes;
 import osde.device.FormatTypes;
-import osde.device.IDevice;
 import osde.device.LineEndingTypes;
 import osde.device.MeasurementPropertyTypes;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.device.TimeUnitTypes;
+import osde.log.Level;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -100,8 +92,6 @@ import osde.utils.StringHelper;
 public class DevicePropertiesEditor extends Composite {
 	final static Logger					log												= Logger.getLogger(DevicePropertiesEditor.class.getName());
 	public static Shell 				dialogShell;										
-
-	public final static List<String>			onExitRenameJar						= new ArrayList<String>();
 
 	private static DevicePropertiesEditor devicePropsEditor = null;
 
@@ -308,6 +298,13 @@ public class DevicePropertiesEditor extends Composite {
     logger.setUseParentHandlers(true);
 	}
 
+	public int openYesNoMessageDialog(final String message) {
+		MessageBox yesNoMessageDialog = new MessageBox(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+		yesNoMessageDialog.setText(OSDE.OSDE_NAME_LONG);
+		yesNoMessageDialog.setMessage(message);
+		return yesNoMessageDialog.open();
+	}
+
 	public void open() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
@@ -318,13 +315,15 @@ public class DevicePropertiesEditor extends Composite {
 				public void widgetDisposed(DisposeEvent evt) {
 					DevicePropertiesEditor.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
-						String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
-						if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
+						String msg = Messages.getString(MessageIds.OSDE_MSGI0041, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
+						if (DevicePropertiesEditor.this.openYesNoMessageDialog(msg) == SWT.YES) {
 							DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
 							DevicePropertiesEditor.this.saveButton.setEnabled(false);
 						}
 						
-						FileUtils.runOnExitRenamer();
+						if (DevicePropertiesEditor.this.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0042)) == SWT.YES) {
+							FileUtils.updateFileInDeviceJar(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getPropertiesFileName());
+						}	
 					}
 				}
 			});
@@ -402,10 +401,14 @@ public class DevicePropertiesEditor extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						DevicePropertiesEditor.log.log(Level.FINEST, "fileSelectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
-							String msg = Messages.getString(MessageIds.OSDE_MSGT0469, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
-							if (OpenSerialDataExplorer.getInstance().openYesNoMessageDialog(DevicePropertiesEditor.this.getShell(), msg) == SWT.YES) {
+							String msg = Messages.getString(MessageIds.OSDE_MSGI0041, new String[] {DevicePropertiesEditor.this.devicePropertiesFileName});
+							if (DevicePropertiesEditor.this.openYesNoMessageDialog(msg) == SWT.YES) {
 								DevicePropertiesEditor.this.deviceConfig.storeDeviceProperties();
 								DevicePropertiesEditor.this.saveButton.setEnabled(false);
+							}
+							
+							if (DevicePropertiesEditor.this.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0042)) == SWT.YES) {
+								FileUtils.updateFileInDeviceJar(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getPropertiesFileName());
 							}
 						}
 						FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.getShell());
@@ -675,7 +678,6 @@ public class DevicePropertiesEditor extends Composite {
 								this.fileSelectButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 								this.fileSelectButton.setBounds(415, 130, 30, 20);
 								this.fileSelectButton.addSelectionListener(new SelectionAdapter() {
-									@SuppressWarnings({ "unchecked", "rawtypes" })
 									public void widgetSelected(SelectionEvent evt) {
 										FileDialog fileSelectionDialog = new FileDialog(DevicePropertiesEditor.this.getShell());
 										fileSelectionDialog.setText("OpenSerialDataExplorer Device Image File"); //$NON-NLS-1$
@@ -691,73 +693,8 @@ public class DevicePropertiesEditor extends Composite {
 											if (DevicePropertiesEditor.this.deviceConfig != null) {
 												DevicePropertiesEditor.this.deviceConfig.setImageFileName(DevicePropertiesEditor.this.imageFileName = DevicePropertiesEditor.this.imageFileNameText.getText());
 												DevicePropertiesEditor.this.enableSaveButton(true);
-												Image deviceImage = new Image(Display.getDefault(), new Image(Display.getDefault(), fullQualifiedImageSourceName).getImageData().scaledTo(225, 165));
-												boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
-												String deviceImplName = DevicePropertiesEditor.this.deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
-												if (isStartedWithinEclipse) {
-													log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
-													String basPath = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-													String fullQualifiedImageTargetName = basPath.substring(0, basPath.indexOf(OSDE.OSDE_NAME_LONG))+deviceImplName+"/src/resource/" + DevicePropertiesEditor.this.imageFileName; //$NON-NLS-1$
-													log.log(Level.INFO, "fullQualifiedImageTargetName = " + fullQualifiedImageTargetName); //$NON-NLS-1$
-													ImageLoader imageLoader = new ImageLoader();
-													imageLoader.data = new ImageData[] { deviceImage.getImageData() };
-													try {
-														imageLoader.save(new FileOutputStream(fullQualifiedImageTargetName), SWT.IMAGE_JPEG);	
-													}
-													catch (IOException e) {
-														log.log(Level.WARNING, e.getMessage(), e);
-													}
-												}
-												else 
-												{
-													if (OpenSerialDataExplorer.application != null) { // started within OSDE
-														log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
-													}
-													else { // started outside OSDE
-														log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
-														try {
-															Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
-														}
-														catch (Throwable e) {
-															log.log(Level.WARNING, e.getMessage(), e);
-														}
-													}
-													String deviceJarPath = null;
-													String tmpDeviceJarPath = null;
-													try {
-														{
-															IDevice newInst = null;
-															String className = "osde.device." + DevicePropertiesEditor.this.deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
-															log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-															ClassLoader loader = Thread.currentThread().getContextClassLoader();
-															Class c = loader.loadClass(className);
-															Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-															log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-															if (constructor != null) {
-																newInst = (IDevice) constructor.newInstance(new Object[] { DevicePropertiesEditor.this.deviceConfig });
-																deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
-															}
-															else
-																throw new NoClassDefFoundError(Messages.getString(MessageIds.OSDE_MSGE0016));
-														}
-														//Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
-																	
-														//if (isStartedWithinEclipse) {
-														//	deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
-														//}
-														tmpDeviceJarPath = deviceJarPath.substring(0, deviceJarPath.lastIndexOf(OSDE.STRING_DOT)) + OSDE.FILE_ENDING_DOT_TMP;
-														String addJarEntryName = "resource/" + DevicePropertiesEditor.this.imageFileName; //$NON-NLS-1$
-														log.log(Level.FINE, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
-														FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
-													}
-													catch (NoClassDefFoundError e) {
-														log.log(Level.SEVERE, e.getMessage(), e);
-													}
-													catch (Exception e) {
-														log.log(Level.SEVERE, e.getMessage(), e);
-													}
-												}
+												FileUtils.updateImageInDeviceJar(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.imageFileName, new Image(Display.getDefault(), new Image(Display.getDefault(), fullQualifiedImageSourceName).getImageData().scaledTo(225, 165)));
 											}
 										}
 									}

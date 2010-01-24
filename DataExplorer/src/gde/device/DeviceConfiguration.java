@@ -188,7 +188,22 @@ public class DeviceConfiguration {
 			this.isChangePropery = false;
 		}
 	}
-	
+
+
+	/**
+	 * writes device properties XML to given full qualified file name
+	 * @param fullQualifiedFileName
+	 */
+	public void storeDeviceProperties(String fullQualifiedFileName) {
+			try {
+				this.marshaller.marshal(this.elememt,  new FileOutputStream(fullQualifiedFileName));
+			}
+			catch (Throwable t) {
+				log.log(Level.SEVERE, t.getMessage(), t);
+			}
+			this.isChangePropery = false;
+	}
+
 	/**
 	 * get the active device configuration
 	 */
