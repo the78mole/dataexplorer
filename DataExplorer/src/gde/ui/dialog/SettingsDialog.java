@@ -79,7 +79,7 @@ import osde.utils.StringHelper;
  */
 public class SettingsDialog extends Dialog {
 	final static Logger									log											= Logger.getLogger(SettingsDialog.class.getName());
-	static final String									STRING_LOG_LEVEL_INFO		= "INFO";																					//$NON-NLS-1$
+	static final String									DEFAULT_LOG_LEVEL				= "WARNING";																				//$NON-NLS-1$
 
 	public static final String					LOGGER_NAME							= "logger_name";																		//$NON-NLS-1$
 	public static final String					LOG_LEVEL								= "log_level";																			//$NON-NLS-1$
@@ -1342,42 +1342,42 @@ public class SettingsDialog extends Dialog {
 	 */
 	void updateLoggingLevels() {
 		if (this.settings.getProperty(Settings.GLOBAL_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.GLOBAL_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.globalLoggingCombo.setText(this.settings.getProperty(Settings.GLOBAL_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.UI_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.UI_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.uiLevelCombo.setText(this.settings.getProperty(Settings.UI_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.DATA_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.DATA_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.commonLevelCombo.setText(this.settings.getProperty(Settings.DATA_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.DEVICE_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.DEVICE_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.deviceLevelCombo.setText(this.settings.getProperty(Settings.DEVICE_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.CONFIG_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.CONFIG_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.configLevelCombo.setText(this.settings.getProperty(Settings.CONFIG_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.UTILS_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.UTILS_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.utilsLevelCombo.setText(this.settings.getProperty(Settings.UTILS_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.FILE_IO_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.FILE_IO_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.fileIOLevelCombo.setText(this.settings.getProperty(Settings.FILE_IO_LOG_LEVEL));
 
 		if (this.settings.getProperty(Settings.SERIAL_IO_LOG_LEVEL) == null) {
-			this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.STRING_LOG_LEVEL_INFO);
+			this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.serialIOLevelCombo.setText(this.settings.getProperty(Settings.SERIAL_IO_LOG_LEVEL));
 	}
