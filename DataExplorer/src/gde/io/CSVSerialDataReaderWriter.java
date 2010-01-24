@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import osde.log.Level;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
+
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -67,7 +70,7 @@ public class CSVSerialDataReaderWriter {
 	 * @throws DataTypeException 
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordSetNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = OSDE.STRING_STAR;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
@@ -82,7 +85,7 @@ public class CSVSerialDataReaderWriter {
 				activeChannel = channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) application.setStatusMessage("Reading serial text data input from: " + filePath);
+				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0594) + filePath);
 				activeChannelConfigNumber = activeChannel.getNumber();
 				
 				
@@ -99,8 +102,8 @@ public class CSVSerialDataReaderWriter {
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
-				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); 
-				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException("Konfigurationsfehler in " + filePath + "\nAnzahl der definierten Messwerte passt nicht zur Datenblockgröße!\nDas verwendete Separatorzeichen könnte auch an einigen Stellen falsch sein!");
+				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
+				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0041, new String[] {filePath}));
 				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
@@ -115,7 +118,7 @@ public class CSVSerialDataReaderWriter {
 					}
 				}
 				binReader.close();
-				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException("Defined line ending does not occur in first " + chars + " characters of " + filePath);
+				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0042, new Object[] {chars, filePath}));
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$			
 				while ((line = reader.readLine()) != null) {
@@ -123,12 +126,12 @@ public class CSVSerialDataReaderWriter {
 					data.parse(line);
 
 					if (device.getStateType() == null) 
-						throw new DataInconsitsentException("no state defined");
+						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
 					try {
 						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
 					}
 					catch (Exception e) {
-						throw new DevicePropertiesInconsistenceException("Device state " + data.state + " in " + filePath + " is not defined in " + device.getPropertiesFileName());
+						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
 					}
 
 					//detect states where a new record set has to be created
@@ -138,8 +141,8 @@ public class CSVSerialDataReaderWriter {
 							//check reasonable size of data points
 							if (recordSet.get(0).realSize() < 3) {
 								activeChannel.remove(recordSetName);
-								log.log(Level.WARNING, "remove record set with < 3 data points");
-								application.openMessageDialog("remove record set with < 3 data points");
+								log.log(Level.WARNING, "remove record set with < 3 data points"); //$NON-NLS-1$
+								application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0040));
 
 							}
 							else
@@ -188,7 +191,7 @@ public class CSVSerialDataReaderWriter {
 			application.openMessageDialog(e.getMessage());
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + " line number " + lineNumber + ", please correct!";
+			String msg = Messages.getString(MessageIds.OSDE_MSGE0045, new Object[] {e.getMessage(), lineNumber});
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 		}

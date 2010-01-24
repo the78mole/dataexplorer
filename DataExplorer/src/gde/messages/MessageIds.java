@@ -61,6 +61,15 @@ public class MessageIds {
 	public final static String	OSDE_MSGE0038 = "OSDE_MSGE0038";
 	public final static String	OSDE_MSGE0039 = "OSDE_MSGE0039";
 	public final static String	OSDE_MSGE0040 = "OSDE_MSGE0040";
+	public final static String	OSDE_MSGE0041 = "OSDE_MSGE0041";
+	public final static String	OSDE_MSGE0042 = "OSDE_MSGE0042";
+	public final static String	OSDE_MSGE0043 = "OSDE_MSGE0043";
+	public final static String	OSDE_MSGE0044 = "OSDE_MSGE0044";
+	public final static String	OSDE_MSGE0045 = "OSDE_MSGE0045";
+	public final static String	OSDE_MSGE0046 = "OSDE_MSGE00461";
+	public final static String	OSDE_MSGE0047 = "OSDE_MSGE00462";
+	public final static String	OSDE_MSGE0048 = "OSDE_MSGE00465";
+	public final static String	OSDE_MSGE0049 = "OSDE_MSGE00466";
 	public final static String	OSDE_MSGW0001 = "OSDE_MSGW0001";
 	public final static String	OSDE_MSGW0002 = "OSDE_MSGW0002";
 	public final static String	OSDE_MSGW0003 = "OSDE_MSGW0003";
@@ -103,6 +112,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGW0540 = "OSDE_MSGW0540";
 	public final static String	OSDE_MSGW0541 = "OSDE_MSGW0541";
 	public final static String	OSDE_MSGW0542 = "OSDE_MSGW0542";
+	public final static String	OSDE_MSGW0543 = "OSDE_MSGW0543";
 	public final static String	OSDE_MSGI0001 = "OSDE_MSGI0001";
 	public final static String	OSDE_MSGI0002 = "OSDE_MSGI0002";
 	public final static String	OSDE_MSGI0003 = "OSDE_MSGI0003";
@@ -141,6 +151,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGI0037 = "OSDE_MSGI0037";
 	public final static String	OSDE_MSGI0038 = "OSDE_MSGI0038";
 	public final static String	OSDE_MSGI0039 = "OSDE_MSGI0039";
+	public final static String	OSDE_MSGI0040 = "OSDE_MSGI0040";
 	public final static String	OSDE_MSGT0000 = "OSDE_MSGT0000";
 	public final static String	OSDE_MSGT0001 = "OSDE_MSGT0001";
 	public final static String	OSDE_MSGT0002 = "OSDE_MSGT0002";
@@ -663,5 +674,7 @@ public class MessageIds {
 	public final static String	OSDE_MSGT0591 = "OSDE_MSGT0591";
 	public final static String	OSDE_MSGT0592 = "OSDE_MSGT0592";
 	public final static String	OSDE_MSGT0593 = "OSDE_MSGT0593";
+	public final static String	OSDE_MSGT0594 = "OSDE_MSGT0594";
+	public final static String	OSDE_MSGT0595 = "OSDE_MSGT0595";
 
  }

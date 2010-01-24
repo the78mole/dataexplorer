@@ -17,6 +17,9 @@
 package osde.io;
 
 import osde.log.Level;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
+
 import java.util.logging.Logger;
 
 import osde.device.CheckSumTypes;
@@ -53,13 +56,15 @@ public class DataParser {
 
 	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, NumberFormatException {
 		try {
-			if(!inputLine.startsWith("$")) throw new DevicePropertiesInconsistenceException("fehlendes '$' am Anfang der Zeile!");
-			if(!inputLine.contains(separator)) throw new DevicePropertiesInconsistenceException(inputLine + "\nDefined separator\"" + separator + "\" not contained in data line!");
+			if(!inputLine.startsWith(Messages.getString(MessageIds.OSDE_MSGT0595))) 
+				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0046, new String[] {Messages.getString(MessageIds.OSDE_MSGT0595)}));
+			if(!inputLine.contains(separator)) 
+				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0047, new String[] {inputLine, separator})); 
 			
 			this.values = new int[this.size];
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
-			log.log(Level.FINER, "parser inputLine = " + inputLine);
-			if (strValues.length-4 != this.size)  throw new DevicePropertiesInconsistenceException(inputLine + "\nAnzahl der definierten Messwerte passt nicht zur Gerätekonfigurationsdatei\nDas verwendete Separatorzeichen könnte auch an einigen Stellen falsch sein!");
+			log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+			if (strValues.length-4 != this.size)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0048, new String[] {inputLine}));
 			
 			String strValue = strValues[0].trim().substring(1);
 			this.recordNumber = Integer.parseInt(strValue);
@@ -104,7 +109,7 @@ public class DataParser {
 				}
 			}
 			if (!isValid) {
-				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException("Checksum error: actual value = " + strValue);
+				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0049, new String[] {strValue})); 
 				log.log(Level.WARNING, e.getMessage(), e);
 				throw e;
 			}
