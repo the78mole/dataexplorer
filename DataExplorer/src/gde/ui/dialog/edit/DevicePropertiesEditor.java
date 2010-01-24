@@ -1700,7 +1700,10 @@ public class DevicePropertiesEditor extends Composite {
 						}
 						int index = 1;
 						for (CTabItem child : DevicePropertiesEditor.this.stateTabFolder.getItems()) {
-							((PropertyTypeTabItem) child).setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getStateProperty(index++), true, null, new String[]{DataTypes.INTEGER.value()}, false);
+							if (DevicePropertiesEditor.this.deviceConfig.getStateProperty(index) != null) {
+								((PropertyTypeTabItem) child).setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getStateProperty(index++), true, null,
+										new String[] { DataTypes.INTEGER.value() }, false);
+							}
 						}
 						DevicePropertiesEditor.this.stateTabFolder.setSelection(0);
 					}

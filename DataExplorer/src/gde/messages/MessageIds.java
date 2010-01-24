@@ -66,10 +66,10 @@ public class MessageIds {
 	public final static String	OSDE_MSGE0043 = "OSDE_MSGE0043";
 	public final static String	OSDE_MSGE0044 = "OSDE_MSGE0044";
 	public final static String	OSDE_MSGE0045 = "OSDE_MSGE0045";
-	public final static String	OSDE_MSGE0046 = "OSDE_MSGE00461";
-	public final static String	OSDE_MSGE0047 = "OSDE_MSGE00462";
-	public final static String	OSDE_MSGE0048 = "OSDE_MSGE00465";
-	public final static String	OSDE_MSGE0049 = "OSDE_MSGE00466";
+	public final static String	OSDE_MSGE0046 = "OSDE_MSGE0046";
+	public final static String	OSDE_MSGE0047 = "OSDE_MSGE0047";
+	public final static String	OSDE_MSGE0048 = "OSDE_MSGE0048";
+	public final static String	OSDE_MSGE0049 = "OSDE_MSGE0049";
 	public final static String	OSDE_MSGW0001 = "OSDE_MSGW0001";
 	public final static String	OSDE_MSGW0002 = "OSDE_MSGW0002";
 	public final static String	OSDE_MSGW0003 = "OSDE_MSGW0003";
