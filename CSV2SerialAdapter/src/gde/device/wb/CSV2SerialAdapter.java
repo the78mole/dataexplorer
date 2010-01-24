@@ -134,7 +134,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 				
@@ -154,7 +154,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + ", please correct!";
+			String msg = e.getMessage() + Messages.getString(osde.messages.MessageIds.OSDE_MSGW0543);
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
@@ -212,7 +212,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -226,10 +226,10 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 		
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
 			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
@@ -337,7 +337,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}	
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(Level.FINE, "add to displayable counter: " + record.getName());
+				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
@@ -394,9 +394,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog("Import textual data files", new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), OSDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), OSDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
 		String selectedImportFile = fd.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile);
+		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
 		if (fd.getFileName().length() > 4) {
 			try {

@@ -41,7 +41,6 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
-import osde.device.wstech.MessageIds;
 import osde.log.Level;
 import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
@@ -100,12 +99,11 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				dialogShell.layout();
 				//dialogShell.pack();
 				dialogShell.setSize(310, 10 + 30 + 90 + measurementsCount * 30 + 55);
-				dialogShell.setText(device.getName() + "Dialog");
 				this.dialogShell.setText(device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt);
+						log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (device.isChangePropery()) {
 							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGT0469);
 							if (application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
@@ -132,11 +130,11 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						//saveButtonLData.right = new FormAttachment(1000, 1000, -163);
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
 						saveButton.setLayoutData(saveButtonLData);
-						saveButton.setText("save");
+						saveButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0486));
 						saveButton.setEnabled(false);
 						saveButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt);
+								log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								device.storeDeviceProperties();
 								saveButton.setEnabled(false);
 							}
@@ -151,10 +149,10 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						closeButton.setLayoutData(closeButtonLData);
-						closeButton.setText("close");
+						closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0485));
 						closeButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt);
+								log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								dialogShell.dispose();
 							}
 						});

@@ -94,7 +94,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 			tabItemLabelLData.heightHint = 30;
 			tabItemLabelLData.widthHint = 292;
 			tabItemLabel.setLayoutData(tabItemLabelLData);
-			tabItemLabel.setText("measurements visibility control");
+			tabItemLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1801));
 		}
 		{
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -124,10 +124,10 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 				buttonCompositeLData.heightHint = 30;
 				buttonCompositeLData.widthHint = 292;
 				inputFileButton.setLayoutData(inputFileButtonLData);
-				inputFileButton.setText("open file");
+				inputFileButton.setText(Messages.getString(MessageIds.OSDE_MSGT1802));
 				inputFileButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "inputFileButton.widgetSelected, event=" + evt);
+						log.log(Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (isVisibilityChanged) {
 							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGT0469);
 							if (application.openYesNoMessageDialog(dialog.getDialogShell(), msg) == SWT.YES) {
