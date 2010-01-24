@@ -105,7 +105,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (device.isChangePropery()) {
-							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGT0469);
+							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGI0041);
 							if (application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								device.storeDeviceProperties();
