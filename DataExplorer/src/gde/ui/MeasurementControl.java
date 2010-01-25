@@ -42,7 +42,7 @@ import osde.device.MeasurementType;
  * @author Winfried Brügmann
  */
 public class MeasurementControl extends Composite {
-	final static Logger						log											= Logger.getLogger(MeasurementControl.class.getName());
+	final static Logger						log	= Logger.getLogger(MeasurementControl.class.getName());
 
 	Composite											measurementComposite;
 	Button												measurement;
@@ -51,13 +51,12 @@ public class MeasurementControl extends Composite {
 	Label													measurementUnitLabel;
 	Label													measurementSymbolLabel;
 
-	final IDevice									device;																																						// get device specific things, get serial port, ...
-	final OpenSerialDataExplorer	application;																																			// interaction with application instance
-	final Channels								channels;																																					// interaction with channels, source of all records
+	final IDevice									device;																										// get device specific things, get serial port, ...
+	final OpenSerialDataExplorer	application;																								// interaction with application instance
+	final Channels								channels;																									// interaction with channels, source of all records
 	final DeviceDialog						dialog;
-	final	MeasurementType					measurementType;
-	final int 										ordinal;
-
+	final MeasurementType					measurementType;
+	final int											ordinal;
 
 	public MeasurementControl(Composite parentComposite, DeviceDialog parentDialog, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice) {
 		super(parentComposite, SWT.NONE);
@@ -76,51 +75,55 @@ public class MeasurementControl extends Composite {
 		this.setLayoutData(thisLData);
 		this.setLayout(thisLayout);
 		{
-			measurement = new Button(this, SWT.CHECK | SWT.LEFT);
+			this.measurement = new Button(this, SWT.CHECK | SWT.LEFT);
 			RowData measurementLData = new RowData();
 			measurementLData.width = 180;
 			measurementLData.height = 20;
-			measurement.setLayoutData(measurementLData);
-			measurement.setText(measurementType.getName());
-			measurement.setSelection(measurementType.isActive());
-			measurement.addSelectionListener(new SelectionAdapter() {
+			this.measurement.setLayoutData(measurementLData);
+			this.measurement.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurement.setText(this.measurementType.getName());
+			this.measurement.setSelection(this.measurementType.isActive());
+			this.measurement.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt);
-					boolean isVisible = measurement.getSelection();
-					Channel activeChannel = channels.getActiveChannel();
+					boolean isVisible = MeasurementControl.this.measurement.getSelection();
+					Channel activeChannel = MeasurementControl.this.channels.getActiveChannel();
 					if (activeChannel != null) {
-						device.setMeasurementActive(activeChannel.getNumber(), ordinal, isVisible);
+						MeasurementControl.this.device.setMeasurementActive(activeChannel.getNumber(), MeasurementControl.this.ordinal, isVisible);
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-							activeRecordSet.get(activeRecordSet.getRecordNames()[ordinal]).setActive(isVisible);
-							activeRecordSet.get(activeRecordSet.getRecordNames()[ordinal]).setVisible(isVisible);
-							activeRecordSet.get(activeRecordSet.getRecordNames()[ordinal]).setDisplayable(isVisible);
-							device.updateVisibilityStatus(activeRecordSet);
-							application.updateGraphicsWindow();
+							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setActive(isVisible);
+							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setVisible(isVisible);
+							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setDisplayable(isVisible);
+							MeasurementControl.this.device.updateVisibilityStatus(activeRecordSet);
+							MeasurementControl.this.application.updateGraphicsWindow();
 						}
 					}
-					dialog.enableSaveButton(true);
+					MeasurementControl.this.dialog.enableSaveButton(true);
 				}
 			});
 		}
 		{
-			measurementSymbolLabel = new Label(this, SWT.CENTER);
+			this.measurementSymbolLabel = new Label(this, SWT.CENTER);
 			RowData measurementSymbolLabelLData = new RowData();
 			measurementSymbolLabelLData.width = 50;
 			measurementSymbolLabelLData.height = 20;
-			measurementSymbolLabel.setLayoutData(measurementSymbolLabelLData);
-			measurementSymbolLabel.setText(measurementType.getSymbol());
+			this.measurementSymbolLabel.setLayoutData(measurementSymbolLabelLData);
+			this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementSymbolLabel.setText(this.measurementType.getSymbol());
 		}
 		{
-			measurementUnitLabel = new Label(this, SWT.CENTER);
+			this.measurementUnitLabel = new Label(this, SWT.CENTER);
 			RowData measurementUnitLabelLData = new RowData();
 			measurementUnitLabelLData.width = 50;
 			measurementUnitLabelLData.height = 20;
-			measurementUnitLabel.setLayoutData(measurementUnitLabelLData);
-			measurementUnitLabel.setText(OSDE.STRING_LEFT_BRACKET + measurementType.getUnit() + OSDE.STRING_RIGHT_BRACKET);
+			this.measurementUnitLabel.setLayoutData(measurementUnitLabelLData);
+			this.measurementUnitLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementUnitLabel.setText(OSDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + OSDE.STRING_RIGHT_BRACKET);
 		}
 
-		}
+	}
 
 }
