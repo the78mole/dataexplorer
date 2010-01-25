@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -41,7 +43,6 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.device.IDevice;
-import osde.log.Level;
 import osde.messages.Messages;
 import osde.ui.SWTResourceManager;
 
@@ -50,18 +51,18 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class CSV2SerialAdapterDialog extends DeviceDialog {
-	final static Logger						log	= Logger.getLogger(CSV2SerialAdapterDialog.class.getName());
-	
-	CTabFolder tabFolder;
-	Button closeButton;
-	Button saveButton;
+	final static Logger		log								= Logger.getLogger(CSV2SerialAdapterDialog.class.getName());
 
-	final IDevice								device;																						// get device specific things, get serial port, ...
-	final Settings								settings;																						// application configuration settings
+	CTabFolder						tabFolder;
+	Button								closeButton;
+	Button								saveButton;
 
-	int measurementsCount = 0;
-	final List<CTabItem>					configurations = new ArrayList<CTabItem>();
-	
+	final IDevice					device;																																				// get device specific things, get serial port, ...
+	final Settings				settings;																																			// application configuration settings
+
+	int										measurementsCount	= 0;
+	final List<CTabItem>	configurations		= new ArrayList<CTabItem>();
+
 	/**
 	 * default constructor initialize all variables required
 	 * @param parent Shell
@@ -73,16 +74,17 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 		this.settings = Settings.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
 			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
-			measurementsCount = actualMeasurementCount > measurementsCount ? actualMeasurementCount : measurementsCount;
+			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 		}
 	}
 
+	@Override
 	public void open() {
 		try {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -95,65 +97,95 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 
 				FormLayout dialogShellLayout = new FormLayout();
-				dialogShell.setLayout(dialogShellLayout);
-				dialogShell.layout();
+				this.dialogShell.setLayout(dialogShellLayout);
+				this.dialogShell.layout();
 				//dialogShell.pack();
-				dialogShell.setSize(310, 10 + 30 + 90 + measurementsCount * 30 + 55);
-				this.dialogShell.setText(device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
+				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-				dialogShell.addDisposeListener(new DisposeListener() {
+				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (device.isChangePropery()) {
+						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						if (CSV2SerialAdapterDialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGI0041);
-							if (application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								device.storeDeviceProperties();
+							if (CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
+								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								CSV2SerialAdapterDialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
 						}
 					}
 				});
+				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
+					public void helpRequested(HelpEvent evt) {
+						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						CSV2SerialAdapterDialog.this.application.openHelpDialog("CSV2SerialAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
+				// enable fade in/out alpha blending (do not fade-in on top)
+//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+//					@Override
+//					public void mouseEnter(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
+//					}
+//
+//					@Override
+//					public void mouseHover(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+//					}
+//
+//					@Override
+//					public void mouseExit(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
+//					}
+//				});
 				{
-					tabFolder = new CTabFolder(dialogShell, SWT.NONE);
+					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					{
-						for (int i = 0; i < device.getChannelCount(); i++) {
-							this.configurations.add(new CSV2SerialAdapterDialogTabItem(tabFolder, this, (i + 1), device));
+						for (int i = 0; i < this.device.getChannelCount(); i++) {
+							this.configurations.add(new CSV2SerialAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device));
 						}
 					}
 					{
-						saveButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
 						saveButtonLData.width = 120;
 						saveButtonLData.height = 30;
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						//saveButtonLData.right = new FormAttachment(1000, 1000, -163);
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
-						saveButton.setLayoutData(saveButtonLData);
-						saveButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0486));
-						saveButton.setEnabled(false);
-						saveButton.addSelectionListener(new SelectionAdapter() {
+						this.saveButton.setLayoutData(saveButtonLData);
+						this.saveButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.saveButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0486));
+						this.saveButton.setEnabled(false);
+						this.saveButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								device.storeDeviceProperties();
-								saveButton.setEnabled(false);
+								log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								CSV2SerialAdapterDialog.this.device.storeDeviceProperties();
+								CSV2SerialAdapterDialog.this.saveButton.setEnabled(false);
 							}
 						});
 					}
 					{
-						closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
 						closeButtonLData.width = 120;
 						closeButtonLData.height = 30;
-						//closeButtonLData.left = new FormAttachment(0, 1000, 152);
 						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						closeButton.setLayoutData(closeButtonLData);
-						closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0485));
-						closeButton.addSelectionListener(new SelectionAdapter() {
+						this.closeButton.setLayoutData(closeButtonLData);
+						this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0485));
+						this.closeButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								dialogShell.dispose();
+								log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								CSV2SerialAdapterDialog.this.dialogShell.dispose();
 							}
 						});
 					}
@@ -162,50 +194,52 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					tabFolder.setLayoutData(tabFolderLData);
-					tabFolder.addSelectionListener(new SelectionAdapter() {
+					this.tabFolder.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tabFolder.setLayoutData(tabFolderLData);
+					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
-							int channelNumber = tabFolder.getSelectionIndex();
-							if (channelNumber >= 0 && channelNumber <= device.getChannelCount()) { // enable other tabs for future use
+							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+							int channelNumber = CSV2SerialAdapterDialog.this.tabFolder.getSelectionIndex();
+							if (channelNumber >= 0 && channelNumber <= CSV2SerialAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
 								channelNumber += 1;
 								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
 								Channels channels = Channels.getInstance();
 								Channel activeChannel = channels.getActiveChannel();
 								if (activeChannel != null) {
-									log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1801));
+										int answer = CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1801));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
 											Channel tmpChannel = channels.get(channelNumber);
 											if (tmpChannel != null) {
-												log.log(Level.FINE, "move record set " + recordSetKey + " to channel/configuration " + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+												log.log(java.util.logging.Level.FINE,
+														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
 												activeChannel.remove(recordSetKey);
 												channels.switchChannel(channelNumber, recordSetKey);
 												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
 												if (newActiveRecordSet != null) {
-													device.updateVisibilityStatus(newActiveRecordSet);
-													device.makeInActiveDisplayable(newActiveRecordSet);
+													CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+													CSV2SerialAdapterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 												}
 											}
 										}
-										device.updateVisibilityStatus(activeRecordSet);
+										CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(activeRecordSet);
 									}
 								}
 							}
 						}
 					});
 				}
-				
+
 				try {
-					tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber()-1);
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 				}
-				catch (RuntimeException e){
-					tabFolder.setSelection(0);
+				catch (RuntimeException e) {
+					this.tabFolder.setSelection(0);
 				}
 
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
@@ -221,13 +255,14 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * implementation of noop method from base dialog class
 	 */
+	@Override
 	public void enableSaveButton(boolean enable) {
 		this.saveButton.setEnabled(enable);
 	}
@@ -236,6 +271,6 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 	 * @return the tabFolder selection index
 	 */
 	public Integer getTabFolderSelectionIndex() {
-		return tabFolder.getSelectionIndex();
+		return this.tabFolder.getSelectionIndex();
 	}
 }
