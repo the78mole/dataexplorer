@@ -78,7 +78,7 @@ public class DataParser {
 			for (int i = 0; i < this.size; i++) { 
 				strValue = strValues[i+3].trim();
 				try {
-					long tmpValue = Integer.parseInt(strValue);
+					long tmpValue = strValue.length() > 0 ? Integer.parseInt(strValue) : 0;
 					if (tmpValue > Integer.MAX_VALUE/1000 || tmpValue < Integer.MIN_VALUE/1000)
 						this.values[i] = Integer.parseInt(strValue);
 					else
