@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -46,8 +48,10 @@ import osde.device.DeviceConfiguration;
 import osde.device.ObjectFactory;
 import osde.device.StatisticsType;
 import osde.device.TriggerType;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -396,6 +400,13 @@ public class StatisticsTypeTabItem extends CTabItem {
 			});
 			this.statisticsComposite = new Composite(this.scrolledComposite, SWT.NONE);
 			this.statisticsComposite.setLayout(null);
+			this.statisticsComposite.addHelpListener(new HelpListener() {			
+				@Override
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINEST, "statisticsComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.statisticsComposite.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {

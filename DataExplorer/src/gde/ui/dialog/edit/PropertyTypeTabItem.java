@@ -24,6 +24,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -44,6 +46,7 @@ import osde.device.DeviceConfiguration;
 import osde.device.MeasurementPropertyTypes;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -231,6 +234,13 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.setControl(this.propertyTypeComposite);
 			this.propertyTypeComposite.setLayout(null);
 			this.propertyTypeComposite.setSize(300, 160);
+			this.propertyTypeComposite.addHelpListener(new HelpListener() {			
+				@Override
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINEST, "propertyTypeComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.propertyTypeComposite.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {

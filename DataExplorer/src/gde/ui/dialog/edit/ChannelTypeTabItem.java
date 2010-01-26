@@ -24,6 +24,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -44,8 +46,10 @@ import osde.device.ChannelTypes;
 import osde.device.DeviceConfiguration;
 import osde.device.MeasurementType;
 import osde.device.ObjectFactory;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -198,6 +202,13 @@ public class ChannelTypeTabItem extends CTabItem {
 				this.channelConfigComposite = new Composite(this.channelConfigInnerTabFolder, SWT.NONE);
 				this.setControl(this.channelConfigComposite);
 				this.channelConfigComposite.setLayout(new FormLayout());
+				this.channelConfigComposite.addHelpListener(new HelpListener() {			
+					@Override
+					public void helpRequested(HelpEvent evt) {
+						log.log(Level.FINEST, "channelConfigComposite.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				this.channelConfigComposite.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {

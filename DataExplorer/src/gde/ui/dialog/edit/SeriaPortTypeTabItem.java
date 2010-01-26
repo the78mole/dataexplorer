@@ -26,6 +26,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -47,9 +49,11 @@ import osde.device.DeviceConfiguration;
 import osde.device.FlowControlTypes;
 import osde.device.ParityTypes;
 import osde.device.StopBitsTypes;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -115,6 +119,13 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				this.serialPortComposite = new Composite(this.tabFolder, SWT.NONE);
 				this.serialPortComposite.setLayout(null);
 				this.setControl(this.serialPortComposite);
+				this.serialPortComposite.addHelpListener(new HelpListener() {			
+					@Override
+					public void helpRequested(HelpEvent evt) {
+						log.log(Level.FINEST, "serialPortComposite.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				this.serialPortComposite.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {

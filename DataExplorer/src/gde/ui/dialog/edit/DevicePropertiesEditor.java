@@ -319,7 +319,7 @@ public class DevicePropertiesEditor extends Composite {
 			this.addHelpListener(new HelpListener() {			
 				@Override
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINEST, "DevicePropertiesEditor.dialogShell.helpRequested " + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
@@ -1116,6 +1116,13 @@ public class DevicePropertiesEditor extends Composite {
 			this.dataBlockComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.dataBlockComposite.setLayout(null);
 			this.dataBlockTabItem.setControl(this.dataBlockComposite);
+			this.dataBlockComposite.addHelpListener(new HelpListener() {			
+				@Override
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINEST, "dataBlockComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			{
 				this.dataBlockDescriptionLabel = new Label(this.dataBlockComposite, SWT.CENTER);
 				this.dataBlockDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0516));
@@ -1507,6 +1514,13 @@ public class DevicePropertiesEditor extends Composite {
 			this.stateComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.stateComposite.setLayout(null);
 			this.stateTabItem.setControl(this.stateComposite);
+			this.stateComposite.addHelpListener(new HelpListener() {			
+				@Override
+				public void helpRequested(HelpEvent evt) {
+					log.log(Level.FINEST, "stateComposite.helpRequested " + evt); //$NON-NLS-1$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			this.stateComposite.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {

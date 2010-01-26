@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -45,8 +47,10 @@ import osde.device.MeasurementType;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.device.StatisticsType;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
+import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -276,6 +280,13 @@ public class MeasurementTypeTabItem extends CTabItem {
 				this.measurementsComposite = new Composite(this.measurementsTabFolder, SWT.NONE);
 				this.measurementsComposite.setLayout(null);
 				this.setControl(this.measurementsComposite);
+				this.measurementsComposite.addHelpListener(new HelpListener() {			
+					@Override
+					public void helpRequested(HelpEvent evt) {
+						log.log(Level.FINEST, "measurementsComposite.helpRequested " + evt); //$NON-NLS-1$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
 				this.measurementsComposite.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {
