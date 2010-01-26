@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -55,31 +54,31 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public class ChannelTypeTabItem extends CTabItem {
-	final static Logger	log								= Logger.getLogger(ChannelTypeTabItem.class.getName());
+	final static Logger						log								= Logger.getLogger(ChannelTypeTabItem.class.getName());
 
-	Composite						channelConfigComposite;
-	Button							channelConfigAddButton;
-	Label								channelConfigLabel;
-	CCombo							channelConfigTypeCombo;
-	Text								channelConfigText;
-	CTabFolder					measurementsTabFolder;
+	Composite											channelConfigComposite;
+	Button												channelConfigAddButton;
+	Label													channelConfigLabel;
+	CCombo												channelConfigTypeCombo;
+	Text													channelConfigText;
+	CTabFolder										measurementsTabFolder;
 
-	ChannelTypes				channelConfigType	= ChannelTypes.TYPE_OUTLET;
-	String							channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0527);
+	ChannelTypes									channelConfigType	= ChannelTypes.TYPE_OUTLET;
+	String												channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0527);
 
-	final CTabFolder		channelConfigInnerTabFolder;
-	final DevicePropertiesEditor propsEditor;
-	final String				tabName;
-	DeviceConfiguration	deviceConfig;
-	int									channelConfigNumber;
-	ChannelType					channelType;
+	final CTabFolder							channelConfigInnerTabFolder;
+	final DevicePropertiesEditor	propsEditor;
+	final String									tabName;
+	DeviceConfiguration						deviceConfig;
+	int														channelConfigNumber;
+	ChannelType										channelType;
 
 	public ChannelTypeTabItem(CTabFolder parent, int style, int index) {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
 		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
-		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem " + this.tabName); //$NON-NLS-1$
+		log.log(java.util.logging.Level.FINE, "ChannelTypeTabItem " + this.tabName); //$NON-NLS-1$
 		initGUI();
 	}
 
@@ -88,12 +87,12 @@ public class ChannelTypeTabItem extends CTabItem {
 	 * @param useChannelType the ChannelType to set
 	 */
 	public void setChannelType(DeviceConfiguration useDeviceConfig, ChannelType useChannelType, int useChannelConfigNumber) {
-		ChannelTypeTabItem.log.log(Level.FINE, "ChannelTypeTabItem.setChannelType"); //$NON-NLS-1$
+		log.log(java.util.logging.Level.FINE, "ChannelTypeTabItem.setChannelType"); //$NON-NLS-1$
 		this.deviceConfig = useDeviceConfig;
 		this.channelType = useChannelType;
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.channelConfigComposite.redraw();
-		this.setText(this.tabName + this.channelType.getName());
+		this.setText(OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + OSDE.STRING_BLANK + this.channelType.getName());
 
 		//MeasurementType begin
 		int measurementTypeCount = this.channelType.getMeasurement().size();
@@ -118,14 +117,14 @@ public class ChannelTypeTabItem extends CTabItem {
 				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, i);
 			}
 		}
-		this.measurementsTabFolder.getItem(measurementTypeCount-1).setShowClose(true);
+		this.measurementsTabFolder.getItem(measurementTypeCount - 1).setShowClose(true);
 		for (int i = 0; i < measurementTypeCount; i++) {
 			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
 			measurementTabItem.setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
 		}
-		((MeasurementTypeTabItem)this.measurementsTabFolder.getSelection()).enableContextMenu(true);
+		((MeasurementTypeTabItem) this.measurementsTabFolder.getSelection()).enableContextMenu(true);
 		//MeasurementType end
-		
+
 		this.channelConfigInnerTabFolder.setSelection(0);
 	}
 
@@ -137,11 +136,12 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = useChannelType;
 		initGUI();
 	}
-	
+
+	@Override
 	public synchronized ChannelTypeTabItem clone() {
 		return new ChannelTypeTabItem(this);
 	}
-	
+
 	/**
 	 * copy constructor
 	 * @param copyFrom
@@ -153,15 +153,15 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.deviceConfig = copyFrom.deviceConfig;
 		this.channelConfigNumber = this.channelConfigInnerTabFolder.getItemCount();
 		this.channelType = new ObjectFactory().createChannelType();
-		this.channelConfigType	= copyFrom.channelConfigType;
-		this.channelConfigName	= copyFrom.channelConfigName;
+		this.channelConfigType = copyFrom.channelConfigType;
+		this.channelConfigName = copyFrom.channelConfigName;
 		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : Messages.getString(MessageIds.OSDE_MSGT0507));
 		this.channelType.setType(this.channelConfigType);
-		this.tabName = OSDE.STRING_BLANK + this.channelConfigNumber + OSDE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : OSDE.STRING_EMPTY) ;
+		this.tabName = OSDE.STRING_BLANK + this.channelConfigNumber + OSDE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : OSDE.STRING_EMPTY);
 		initGUI();
-		
+
 		//MeasurementType begin - fix number tab items
-		int measurementTypeCount =copyFrom.channelType.getMeasurement().size();
+		int measurementTypeCount = copyFrom.channelType.getMeasurement().size();
 		int actualTabItemCount = this.measurementsTabFolder.getItemCount();
 		if (measurementTypeCount < actualTabItemCount) {
 			for (int i = measurementTypeCount; i < actualTabItemCount; i++) {
@@ -174,7 +174,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, i);
 			}
 		}
-		this.measurementsTabFolder.getItem(measurementTypeCount-1).setShowClose(true);
+		this.measurementsTabFolder.getItem(measurementTypeCount - 1).setShowClose(true);
 		//MeasurementType end
 		if (this.deviceConfig != null) {
 			this.deviceConfig.addChannelType(this.channelType);
@@ -184,8 +184,8 @@ public class ChannelTypeTabItem extends CTabItem {
 				MeasurementType tmpMeasurementType = copyFrom.channelType.getMeasurement().get(i).clone();
 				measurementTabItem.setMeasurementType(this.deviceConfig, tmpMeasurementType, this.channelConfigNumber);
 				this.channelType.getMeasurement().add(tmpMeasurementType);
-			}	
-		}			
+			}
+		}
 	}
 
 	private void initGUI() {
@@ -199,8 +199,9 @@ public class ChannelTypeTabItem extends CTabItem {
 				this.setControl(this.channelConfigComposite);
 				this.channelConfigComposite.setLayout(new FormLayout());
 				this.channelConfigComposite.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
-						ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
 						if (ChannelTypeTabItem.this.channelConfigComposite.isVisible()) {
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
@@ -216,16 +217,16 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
 					fd = new FormData();
-			    fd.left = new FormAttachment(0, 1000, 9);
-			    fd.top = new FormAttachment(0, 1000, 7);
-			    fd.width = 120;
-			    fd.height = 18;
-			    this.channelConfigTypeCombo.setLayoutData(fd);
+					fd.left = new FormAttachment(0, 1000, 9);
+					fd.top = new FormAttachment(0, 1000, 7);
+					fd.width = 120;
+					fd.height = 18;
+					this.channelConfigTypeCombo.setLayoutData(fd);
 					this.channelConfigTypeCombo.setItems(StringHelper.enumValues2StringArray(ChannelTypes.values()));
 					this.channelConfigTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(java.util.logging.Level.FINEST, "channelConfigTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ChannelTypeTabItem.this.channelConfigType = ChannelTypes.valueOf(ChannelTypeTabItem.this.channelConfigTypeCombo.getText());
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setType(ChannelTypeTabItem.this.channelConfigType);
@@ -241,21 +242,21 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigText.setBounds(147, 9, 128, 20);
 					fd = new FormData();
-			    fd.left = new FormAttachment(0, 1000, 150);
-			    fd.top = new FormAttachment(0, 1000, 7);
-			    fd.width = 130;
-			    fd.height = 16;
-			    this.channelConfigText.setLayoutData(fd);
+					fd.left = new FormAttachment(0, 1000, 150);
+					fd.top = new FormAttachment(0, 1000, 7);
+					fd.width = 130;
+					fd.height = 16;
+					this.channelConfigText.setLayoutData(fd);
 					this.channelConfigText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigText.keyReleased, event=" + evt); //$NON-NLS-1$
+							log.log(java.util.logging.Level.FINEST, "channelConfigText.keyReleased, event=" + evt); //$NON-NLS-1$
 							ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelConfigText.getText().trim();
 							if (ChannelTypeTabItem.this.channelType != null) {
 								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
 								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
 								ChannelTypeTabItem.this.propsEditor.enableSaveButton(true);
-								ChannelTypeTabItem.this.setText(ChannelTypeTabItem.this.tabName + ChannelTypeTabItem.this.channelConfigName);
+								ChannelTypeTabItem.this.setText(OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigName);
 							}
 						}
 					});
@@ -266,21 +267,21 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigLabel.setBounds(289, 9, 279, 20);
 					fd = new FormData();
-			    fd.top = new FormAttachment(0, 1000, 9);
-			    fd.right = new FormAttachment(1000, 1000, -60);
-			    fd.width = 280;
-			    fd.height = 18;
-			    this.channelConfigLabel.setLayoutData(fd);
+					fd.top = new FormAttachment(0, 1000, 9);
+					fd.right = new FormAttachment(1000, 1000, -60);
+					fd.width = 280;
+					fd.height = 18;
+					this.channelConfigLabel.setLayoutData(fd);
 				}
 				{
 					this.measurementsTabFolder = new CTabFolder(this.channelConfigComposite, SWT.NONE | SWT.BORDER);
 					//this.measurementsTabFolder.setBounds(0, 35, 622, 225);
 					fd = new FormData();
-			    fd.top = new FormAttachment(0, 1000, 35);
-			    fd.left = new FormAttachment(0, 1000, 0);
-			    fd.right = new FormAttachment(1000, 1000, 0);
-			    fd.bottom = new FormAttachment(1000, 1000, 0);
-			    this.measurementsTabFolder.setLayoutData(fd);
+					fd.top = new FormAttachment(0, 1000, 35);
+					fd.left = new FormAttachment(0, 1000, 0);
+					fd.right = new FormAttachment(1000, 1000, 0);
+					fd.bottom = new FormAttachment(1000, 1000, 0);
+					this.measurementsTabFolder.setLayoutData(fd);
 					{
 						//create initial measurement type
 						new MeasurementTypeTabItem(this.measurementsTabFolder, SWT.NONE, 0);
@@ -289,30 +290,30 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.measurementsTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 						@Override
 						public void restore(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.restore, event=" + evt); //$NON-NLS-1$
+							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.restore, event=" + evt); //$NON-NLS-1$
 							((CTabItem) evt.item).getControl();
 						}
 
 						@Override
 						public void close(CTabFolderEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
+							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
 							MeasurementTypeTabItem tabItem = ((MeasurementTypeTabItem) evt.item);
-							if (deviceConfig != null) {
-								deviceConfig.removeMeasurementFromChannel(ChannelTypeTabItem.this.channelConfigNumber, tabItem.measurementType);
+							if (ChannelTypeTabItem.this.deviceConfig != null) {
+								ChannelTypeTabItem.this.deviceConfig.removeMeasurementFromChannel(ChannelTypeTabItem.this.channelConfigNumber, tabItem.measurementType);
 							}
-							ChannelTypeTabItem.this.measurementsTabFolder.setSelection(measurementsTabFolder.getSelectionIndex() - 1);
+							ChannelTypeTabItem.this.measurementsTabFolder.setSelection(ChannelTypeTabItem.this.measurementsTabFolder.getSelectionIndex() - 1);
 							tabItem.dispose();
-							
-							int itemCount = measurementsTabFolder.getItemCount();
-							if (itemCount > 1)
-								ChannelTypeTabItem.this.measurementsTabFolder.getItem(itemCount-1).setShowClose(true);
+
+							int itemCount = ChannelTypeTabItem.this.measurementsTabFolder.getItemCount();
+							if (itemCount > 1) ChannelTypeTabItem.this.measurementsTabFolder.getItem(itemCount - 1).setShowClose(true);
 						}
 					});
 					this.measurementsTabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
-							((MeasurementTypeTabItem)ChannelTypeTabItem.this.measurementsTabFolder.getSelection()).enableContextMenu(true);;
+							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
+							((MeasurementTypeTabItem) ChannelTypeTabItem.this.measurementsTabFolder.getSelection()).enableContextMenu(true);
+							;
 						}
 					});
 				}
@@ -322,18 +323,18 @@ public class ChannelTypeTabItem extends CTabItem {
 					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
 					fd = new FormData();
-			    fd.top = new FormAttachment(0, 1000, 7);
-			    fd.width = 42;
-			    fd.height = 20;
-			    fd.right = new FormAttachment(1000, 1000, -10);
-			    this.channelConfigAddButton.setLayoutData(fd);
+					fd.top = new FormAttachment(0, 1000, 7);
+					fd.width = 42;
+					fd.height = 20;
+					fd.right = new FormAttachment(1000, 1000, -10);
+					this.channelConfigAddButton.setLayoutData(fd);
 					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0526));
 					this.channelConfigAddButton.setSize(40, 20);
 					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							ChannelTypeTabItem.log.log(Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount()-1).setShowClose(false);
+							log.log(java.util.logging.Level.FINEST, "channelConfigAddButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItem(ChannelTypeTabItem.this.channelConfigInnerTabFolder.getItemCount() - 1).setShowClose(false);
 							ChannelTypeTabItem.this.clone();
 						}
 					});

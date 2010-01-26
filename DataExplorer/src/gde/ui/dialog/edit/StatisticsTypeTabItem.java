@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -57,15 +56,14 @@ import osde.utils.StringHelper;
  * @author Winfried Brügmann
 */
 public class StatisticsTypeTabItem extends CTabItem {
-	final static Logger	log	= Logger.getLogger(StatisticsTypeTabItem.class.getName());
-	final static String[]	STRING_ARRAY_TRIGGER_SECONDS	= new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }; //$NON-NLS-1$
-	final static String[]	STRING_ARRAY_TRIGGER_VALUES		= new String[] { "250", "500", "1000", "1500", "2000", "2500", "3000", "3500", "4000", "5000", "7500" }; //$NON-NLS-1$
-
+	final static Logger						log														= Logger.getLogger(StatisticsTypeTabItem.class.getName());
+	final static String[]					STRING_ARRAY_TRIGGER_SECONDS	= new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }; //$NON-NLS-1$
+	final static String[]					STRING_ARRAY_TRIGGER_VALUES		= new String[] { "250", "500", "1000", "1500", "2000", "2500", "3000", "3500", "4000", "5000", "7500" };													//$NON-NLS-1$
 
 	final MeasurementTypeTabItem	measurementTypeTabItem;
 	final CTabFolder							channelConfigMeasurementPropertiesTabFolder;
 	final String									tabName;
-	final DevicePropertiesEditor 	propsEditor;
+	final DevicePropertiesEditor	propsEditor;
 
 	Menu													popupMenu;
 	MeasurementContextmenu				contextMenu;
@@ -100,14 +98,14 @@ public class StatisticsTypeTabItem extends CTabItem {
 	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment, triggerRefOrdinalComment;
 	Boolean												isGreater, isSumTriggerTime, isCountByTrigger, isRatioRefOrdinal;
 	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
-	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;	// must be equal !!!
-	boolean												isSomeTriggerDefined	= false;
+	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;																																																											// must be equal !!!
+	boolean												isSomeTriggerDefined					= false;
 	String[]											measurementReferenceItems;
 
-	DeviceConfiguration	deviceConfig;
-	int									channelConfigNumber;
-	StatisticsType			statisticsType;
-	TriggerType					triggerType;
+	DeviceConfiguration						deviceConfig;
+	int														channelConfigNumber;
+	StatisticsType								statisticsType;
+	TriggerType										triggerType;
 
 	public StatisticsTypeTabItem(CTabFolder parent, int style, String name, MeasurementTypeTabItem useMeasurementTypeTabItem) {
 		super(parent, style);
@@ -119,10 +117,11 @@ public class StatisticsTypeTabItem extends CTabItem {
 		initGUI();
 	}
 
+	@Override
 	public synchronized StatisticsTypeTabItem clone() {
 		return new StatisticsTypeTabItem(this);
 	}
-	
+
 	/**
 	 * copy constructor
 	 * @param copyFrom
@@ -138,7 +137,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.statisticsMax = copyFrom.statisticsMax;
 		this.statisticsAvg = copyFrom.statisticsAvg;
 		this.statisticsSigma = copyFrom.statisticsSigma;
-		
+
 		//do not copy trigger attributes, only one trigger permitted per channel/configuration measurements
 		//this.triggerLevel = copyFrom.triggerLevel;
 		//this.triggerComment = copyFrom.triggerComment;
@@ -153,10 +152,10 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.isRatioRefOrdinal = copyFrom.isRatioRefOrdinal;
 		this.ratioRefOrdinal = copyFrom.ratioRefOrdinal;
 		this.ratioComment = copyFrom.ratioComment;
-		
+
 		this.deviceConfig = copyFrom.deviceConfig;
-		this.channelConfigNumber = copyFrom.channelConfigNumber;	
-		
+		this.channelConfigNumber = copyFrom.channelConfigNumber;
+
 		initGUI();
 	}
 
@@ -179,10 +178,10 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.triggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 		this.sumByTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 		this.ratioRefOrdinalCombo.setItems(this.measurementReferenceItems);
-		
+
 		updateTriggerDependent(this.isSomeTriggerDefined = isSomeTriggerDefined());
-		
-		if (triggerRefOrdinal != sumByTriggerRefOrdinal) {
+
+		if (this.triggerRefOrdinal != this.sumByTriggerRefOrdinal) {
 			MessageBox mb = new MessageBox(this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.OK);
 			mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540));
 			mb.setMessage(Messages.getString(MessageIds.OSDE_MSGW0542));
@@ -204,19 +203,19 @@ public class StatisticsTypeTabItem extends CTabItem {
 		this.isGreaterButton.setEnabled(isTriggerDefined && this.triggerType != null);
 		this.minTimeSecLabel.setEnabled(isTriggerDefined && this.triggerType != null);
 		this.minTimeSecCombo.setEnabled(isTriggerDefined && this.triggerType != null);
-		
+
 		if (isTriggerDefined && this.triggerType != null) {
 			this.triggerLevelCombo.setText(OSDE.STRING_EMPTY + (this.triggerLevel = this.triggerType.getLevel()));
 			this.triggerCommentText.setText(this.triggerComment = this.triggerType.getComment() == null ? OSDE.STRING_EMPTY : this.triggerType.getComment());
 			this.isGreaterButton.setSelection(this.isGreater = this.triggerType.isGreater());
 			this.minTimeSecCombo.select((this.minTimeSec = this.triggerType.getMinTimeSec()) - 1);
 		}
-		else if (this.statisticsType != null && this.statisticsType.getTrigger() != null){
+		else if (this.statisticsType != null && this.statisticsType.getTrigger() != null) {
 			this.statisticsType.removeTrigger();
 			this.deviceConfig.setChangePropery(true);
 			this.propsEditor.enableSaveButton(true);
 		}
-		
+
 		this.sumTriggerTimeButton.setEnabled(isTriggerDefined);
 		this.countByTriggerButton.setEnabled(isTriggerDefined);
 		this.triggerRefOrdinalButton.setEnabled(isTriggerDefined && this.triggerType == null);
@@ -374,7 +373,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 	 */
 	private int getTriggerReferenceOrdinal() {
 		for (int i = 0; this.deviceConfig != null && i < this.deviceConfig.getMeasurementNames(this.channelConfigNumber).length; i++) {
-			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i)!= null && this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
+			if (this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i) != null && this.deviceConfig.getMeasurementStatistic(this.channelConfigNumber, i).getTrigger() != null) {
 				return i;
 			}
 		}
@@ -391,7 +390,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
-					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					StatisticsTypeTabItem.this.enableContextMenu(false);
 				}
 			});
@@ -400,7 +399,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.statisticsComposite.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINEST, "statisticsComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "statisticsComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					if (StatisticsTypeTabItem.this.statisticsComposite.isVisible()) {
 						StatisticsTypeTabItem.this.statisticsMinButton.setSelection(StatisticsTypeTabItem.this.statisticsMin == null ? StatisticsTypeTabItem.this.statisticsMin = false
 								: StatisticsTypeTabItem.this.statisticsMin);
@@ -410,7 +409,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								: StatisticsTypeTabItem.this.statisticsMax);
 						StatisticsTypeTabItem.this.statisticsSigmaButton.setSelection(StatisticsTypeTabItem.this.statisticsSigma == null ? StatisticsTypeTabItem.this.statisticsSigma = false
 								: StatisticsTypeTabItem.this.statisticsSigma);
-						
+
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.updateTriggerDependent(StatisticsTypeTabItem.this.isSomeTriggerDefined = StatisticsTypeTabItem.this.isSomeTriggerDefined());
 						}
@@ -430,7 +429,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
 						StatisticsTypeTabItem.this.triggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.triggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
 								: StatisticsTypeTabItem.this.triggerRefOrdinal);
-						StatisticsTypeTabItem.this.triggerRefOrdinalText.setText(StatisticsTypeTabItem.this.triggerRefOrdinalComment != null ? StatisticsTypeTabItem.this.triggerRefOrdinalComment 
+						StatisticsTypeTabItem.this.triggerRefOrdinalText.setText(StatisticsTypeTabItem.this.triggerRefOrdinalComment != null ? StatisticsTypeTabItem.this.triggerRefOrdinalComment
 								: OSDE.STRING_EMPTY);
 						StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
 						StatisticsTypeTabItem.this.sumByTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
@@ -439,7 +438,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 						StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.ratioRefOrdinal != null);
 						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);
 						StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.ratioComment);
-						
+
 						StatisticsTypeTabItem.this.enableContextMenu(true);
 					}
 				}
@@ -452,7 +451,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsMinButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "staisticsMinButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "staisticsMinButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.statisticsMin = StatisticsTypeTabItem.this.statisticsMinButton.getSelection();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setMin(StatisticsTypeTabItem.this.statisticsMin);
@@ -470,7 +469,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsAvgButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "statisticsAvgButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "statisticsAvgButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.statisticsAvg = StatisticsTypeTabItem.this.statisticsAvgButton.getSelection();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setAvg(StatisticsTypeTabItem.this.statisticsAvg);
@@ -488,7 +487,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsMaxButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "statisticsMaxButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "statisticsMaxButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.statisticsMax = StatisticsTypeTabItem.this.statisticsMaxButton.getSelection();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setMax(StatisticsTypeTabItem.this.statisticsMax);
@@ -506,7 +505,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.statisticsSigmaButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "statisticsSigmaButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "statisticsSigmaButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.statisticsSigma = StatisticsTypeTabItem.this.statisticsSigmaButton.getSelection();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSigma(StatisticsTypeTabItem.this.statisticsSigma);
@@ -525,30 +524,33 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerLevelButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerLevelButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							if (StatisticsTypeTabItem.this.triggerLevelButton.getSelection()) {
 								if (StatisticsTypeTabItem.this.statisticsType.getTrigger() == null) {
 									StatisticsTypeTabItem.this.statisticsType.setTrigger(StatisticsTypeTabItem.this.triggerType = new ObjectFactory().createTriggerType());
 									StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 									StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
-									
-									StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel == null ? StatisticsTypeTabItem.this.triggerLevel=0 : StatisticsTypeTabItem.this.triggerLevel);
+
+									StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel == null ? StatisticsTypeTabItem.this.triggerLevel = 0
+											: StatisticsTypeTabItem.this.triggerLevel);
 									StatisticsTypeTabItem.this.triggerType.setComment(StatisticsTypeTabItem.this.triggerComment);
-									StatisticsTypeTabItem.this.triggerType.setIsGreater(StatisticsTypeTabItem.this.isGreater == null ? (StatisticsTypeTabItem.this.isGreater=true) : StatisticsTypeTabItem.this.isGreater);
-									StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec=1 : StatisticsTypeTabItem.this.minTimeSec);
+									StatisticsTypeTabItem.this.triggerType.setIsGreater(StatisticsTypeTabItem.this.isGreater == null ? (StatisticsTypeTabItem.this.isGreater = true)
+											: StatisticsTypeTabItem.this.isGreater);
+									StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec = 1
+											: StatisticsTypeTabItem.this.minTimeSec);
 									StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
 									StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
-									
+
 									StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setSumTriggerText(null);
 									StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setRatioText(null);
-									
+
 									StatisticsTypeTabItem.this.statisticsComposite.redraw();
 								}
-								
+
 								StatisticsTypeTabItem.this.triggerRefOrdinalButton.setEnabled(false);
 								StatisticsTypeTabItem.this.triggerRefOrdinalText.setEnabled(false);
 								StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setEnabled(false);
@@ -608,11 +610,11 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.triggerLevelCombo.setBounds(280, 5, 75, 20);
 				this.triggerLevelCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0562));
-				this.triggerLevelCombo.setItems(STRING_ARRAY_TRIGGER_VALUES);
+				this.triggerLevelCombo.setItems(StatisticsTypeTabItem.STRING_ARRAY_TRIGGER_VALUES);
 				this.triggerLevelCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.triggerLevel = Integer.valueOf(StatisticsTypeTabItem.this.triggerLevelCombo.getText());
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel);
@@ -624,7 +626,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelCombo.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerLevelCombo.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerLevelCombo.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.triggerLevel = Integer.valueOf(StatisticsTypeTabItem.this.triggerLevelCombo.getText());
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setLevel(StatisticsTypeTabItem.this.triggerLevel);
@@ -636,7 +638,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerLevelCombo.addVerifyListener(new VerifyListener() {
 					@Override
 					public void verifyText(VerifyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerLevelCombo.verifyText, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerLevelCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
@@ -648,7 +650,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerCommentText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerCommentText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerCommentText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.triggerComment = StatisticsTypeTabItem.this.triggerCommentText.getText();
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setComment(StatisticsTypeTabItem.this.triggerComment);
@@ -667,7 +669,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isGreaterButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "isGreaterButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "isGreaterButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.isGreater = StatisticsTypeTabItem.this.isGreaterButton.getSelection();
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setIsGreater(StatisticsTypeTabItem.this.isGreater);
@@ -689,11 +691,11 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.minTimeSecCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minTimeSecCombo.setBounds(280, 30, 75, 20);
 				this.minTimeSecCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0566));
-				this.minTimeSecCombo.setItems(STRING_ARRAY_TRIGGER_SECONDS);
+				this.minTimeSecCombo.setItems(StatisticsTypeTabItem.STRING_ARRAY_TRIGGER_SECONDS);
 				this.minTimeSecCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "minTimeSecCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "minTimeSecCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.minTimeSec = Integer.valueOf(StatisticsTypeTabItem.this.minTimeSecCombo.getText());
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec);
@@ -705,7 +707,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.minTimeSecCombo.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "minTimeSecCombo.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "minTimeSecCombo.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.minTimeSec = Integer.valueOf(StatisticsTypeTabItem.this.minTimeSecCombo.getText());
 						if (StatisticsTypeTabItem.this.triggerType != null) {
 							StatisticsTypeTabItem.this.triggerType.setMinTimeSec(StatisticsTypeTabItem.this.minTimeSec);
@@ -717,7 +719,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.minTimeSecCombo.addVerifyListener(new VerifyListener() {
 					@Override
 					public void verifyText(VerifyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "minTimeSecCombo.verifyText, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "minTimeSecCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
@@ -731,7 +733,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.sumTriggerTimeButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "sumTriggerTimeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "sumTriggerTimeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.isSumTriggerTime = StatisticsTypeTabItem.this.sumTriggerTimeButton.getSelection();
 						StatisticsTypeTabItem.this.sumTriggerTimeText.setEnabled(StatisticsTypeTabItem.this.isSumTriggerTime);
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
@@ -749,7 +751,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.sumTriggerTimeText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "sumTriggerTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "sumTriggerTimeText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.sumTriggerTimeComment = StatisticsTypeTabItem.this.sumTriggerTimeText.getText().trim();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSumTriggerTimeText(StatisticsTypeTabItem.this.sumTriggerTimeComment);
@@ -768,7 +770,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.countByTriggerButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "countByTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "countByTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.isCountByTrigger = StatisticsTypeTabItem.this.countByTriggerButton.getSelection() == false ? null : true;
 						StatisticsTypeTabItem.this.countByTriggerText.setEnabled(StatisticsTypeTabItem.this.isCountByTrigger != null);
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
@@ -780,7 +782,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 								StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(null);
 							}
 							else {
-								if (statisticsType.getTrigger() == null) {
+								if (StatisticsTypeTabItem.this.statisticsType.getTrigger() == null) {
 									StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(true);
 									handleTriggerRefOrdinalSelectionEvent();
 								}
@@ -796,7 +798,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.countByTriggerText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "countByTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "countByTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.countByTriggerComment = StatisticsTypeTabItem.this.countByTriggerText.getText().trim();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
@@ -815,7 +817,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "isTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "isTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						handleTriggerRefOrdinalSelectionEvent();
 					}
 				});
@@ -836,7 +838,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.triggerRefOrdinalText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "triggerRefOrdinalText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "triggerRefOrdinalText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.triggerRefOrdinalComment = StatisticsTypeTabItem.this.triggerRefOrdinalText.getText();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setComment(StatisticsTypeTabItem.this.triggerRefOrdinalComment);
@@ -855,7 +857,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isSumByTriggerRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "isSumByTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "isSumByTriggerRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.getSelection()) {
 							StatisticsTypeTabItem.this.triggerRefOrdinal = StatisticsTypeTabItem.this.sumByTriggerRefOrdinal = StatisticsTypeTabItem.this.getTriggerReferenceOrdinal();
 							if (StatisticsTypeTabItem.this.statisticsType != null) {
@@ -893,7 +895,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.sumTriggerText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "sumTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "sumTriggerText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.sumTriggerComment = StatisticsTypeTabItem.this.sumTriggerText.getText();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setSumTriggerText(StatisticsTypeTabItem.this.sumTriggerComment);
@@ -912,7 +914,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.isRatioRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "isRatioRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "isRatioRefOrdinalButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.isRatioRefOrdinal = StatisticsTypeTabItem.this.isRatioRefOrdinalButton.getSelection();
 						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
 						StatisticsTypeTabItem.this.ratioText.setEnabled(StatisticsTypeTabItem.this.isRatioRefOrdinal);
@@ -938,7 +940,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.ratioRefOrdinalCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "ratioRefOrdinalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "ratioRefOrdinalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.ratioRefOrdinal = StatisticsTypeTabItem.this.ratioRefOrdinalCombo.getSelectionIndex();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(StatisticsTypeTabItem.this.ratioRefOrdinal);
@@ -956,7 +958,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				this.ratioText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						StatisticsTypeTabItem.log.log(Level.FINEST, "ratioText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "ratioText.keyReleased, event=" + evt); //$NON-NLS-1$
 						StatisticsTypeTabItem.this.ratioComment = StatisticsTypeTabItem.this.ratioText.getText();
 						if (StatisticsTypeTabItem.this.statisticsType != null) {
 							StatisticsTypeTabItem.this.statisticsType.setRatioText(StatisticsTypeTabItem.this.ratioComment);

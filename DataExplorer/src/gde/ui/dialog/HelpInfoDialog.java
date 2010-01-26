@@ -45,19 +45,19 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 
 	Shell		dialogShell;
 	Browser	textBrowser;
-	final Rectangle primaryMonitoBounds;
+	final Rectangle primaryMonitorBounds;
 	final Settings	settings;
 
 
 	public HelpInfoDialog(Shell parent, int style) {
 		super(parent, style);
-		this.primaryMonitoBounds = parent.getDisplay().getPrimaryMonitor().getBounds();
+		this.primaryMonitorBounds = parent.getDisplay().getPrimaryMonitor().getBounds();
 		this.settings = Settings.getInstance();
 	}
 	
 	/**
 	 * opens a fileURL of help HTML of the given device and pageName, 
-	 * preferred style is SWT.MOZILLA which supports xulrunner on all paltforms 
+	 * preferred style is SWT.MOZILLA which supports xulrunner on all platforms 
 	 * @param deviceName
 	 * @param fileName
 	 * @param style
@@ -76,9 +76,9 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 
 			this.dialogShell.layout();
 			this.dialogShell.pack();
-			int width = this.primaryMonitoBounds.width / 4 * 3;
-			this.dialogShell.setSize(width, (this.primaryMonitoBounds.height * 95 / 100));
-			this.dialogShell.setLocation(this.primaryMonitoBounds.width - width, 0);
+			int width = this.primaryMonitorBounds.width / 4 * 3;
+			this.dialogShell.setSize(width, (this.primaryMonitorBounds.height * 95 / 100));
+			this.dialogShell.setLocation(this.primaryMonitorBounds.width - width, 0);
 
 			this.dialogShell.open();
 		}

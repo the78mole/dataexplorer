@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -40,118 +39,118 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class MeasurementContextmenu {
-	final static Logger					log												= Logger.getLogger(ContextMenu.class.getName());
+	final static Logger						log	= Logger.getLogger(ContextMenu.class.getName());
 
-	final Menu		 menu;
-	final MeasurementTypeTabItem measurementTypeTabItem;
-	final CTabFolder						channelConfigMeasurementPropertiesTabFolder;
-	CTabFolder						measurementPropertiesTabFolder;
-		
-	MenuItem addStatisticsTypeMenuItem, addPropertyTypeMenuItem;
-	Menu addPropertyTypeMenu;
-	MenuItem defaultPropertyMenuItem;
-	MenuItem offsetPropertyMenuItem, factorPropertyMenuItem, reductionPropertyMenuItem;
-	MenuItem regressionIntervalPropertyMenuItem, regressionTypeCurvePropertyMenuItem, regressionTypeLinearPropertyMenuItem;
-	MenuItem numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
-	MenuItem numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
+	final Menu										menu;
+	final MeasurementTypeTabItem	measurementTypeTabItem;
+	final CTabFolder							channelConfigMeasurementPropertiesTabFolder;
+	CTabFolder										measurementPropertiesTabFolder;
 
+	MenuItem											addStatisticsTypeMenuItem, addPropertyTypeMenuItem;
+	Menu													addPropertyTypeMenu;
+	MenuItem											defaultPropertyMenuItem;
+	MenuItem											offsetPropertyMenuItem, factorPropertyMenuItem, reductionPropertyMenuItem;
+	MenuItem											regressionIntervalPropertyMenuItem, regressionTypeCurvePropertyMenuItem, regressionTypeLinearPropertyMenuItem;
+	MenuItem											numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
+	MenuItem											numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
 
 	public MeasurementContextmenu(Menu useMenu, MeasurementTypeTabItem parent, CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
-		menu = useMenu;
-		measurementTypeTabItem = parent;
-		channelConfigMeasurementPropertiesTabFolder = useChannelConfigMeasurementPropertiesTabFolder;
-	}	
+		this.menu = useMenu;
+		this.measurementTypeTabItem = parent;
+		this.channelConfigMeasurementPropertiesTabFolder = useChannelConfigMeasurementPropertiesTabFolder;
+	}
 
 	public void create() {
 		SWTResourceManager.registerResourceUser(this.menu);
-		menu.addMenuListener(new MenuListener() {
+		this.menu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {
-				log.log(Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
-				addStatisticsTypeMenuItem.setEnabled(true);
-				addPropertyTypeMenuItem.setEnabled(true);
-				for (CTabItem tabItem : channelConfigMeasurementPropertiesTabFolder.getItems()) {
+				log.log(java.util.logging.Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.addStatisticsTypeMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.addPropertyTypeMenuItem.setEnabled(true);
+				for (CTabItem tabItem : MeasurementContextmenu.this.channelConfigMeasurementPropertiesTabFolder.getItems()) {
 					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0350))) {
-						addStatisticsTypeMenuItem.setEnabled(false);
+						MeasurementContextmenu.this.addStatisticsTypeMenuItem.setEnabled(false);
 					}
 				}
 				//refresh tab folder it could be destroyed and re-created
-				measurementPropertiesTabFolder = measurementTypeTabItem.measurementPropertiesTabFolder;
+				MeasurementContextmenu.this.measurementPropertiesTabFolder = MeasurementContextmenu.this.measurementTypeTabItem.measurementPropertiesTabFolder;
 			}
 
 			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
-		this.addStatisticsTypeMenuItem = new MenuItem(menu, SWT.PUSH);
+		this.addStatisticsTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0533));
 		this.addStatisticsTypeMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "addStatisticsTypeMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createStatisticsTabItem();
+				log.log(java.util.logging.Level.FINEST, "addStatisticsTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createStatisticsTabItem();
 			}
 		});
-		new MenuItem(menu, SWT.SEPARATOR);
-		this.addPropertyTypeMenuItem = new MenuItem(menu, SWT.CASCADE);
-		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0534)); 
+		new MenuItem(this.menu, SWT.SEPARATOR);
+		this.addPropertyTypeMenuItem = new MenuItem(this.menu, SWT.CASCADE);
+		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0534));
 		this.addPropertyTypeMenu = new Menu(this.addPropertyTypeMenuItem);
 		this.addPropertyTypeMenuItem.setMenu(this.addPropertyTypeMenu);
 		this.addPropertyTypeMenu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {
-				log.log(Level.FINEST, "addPropertyTypeMenu.menuShown action performed! " + e); //$NON-NLS-1$
-				defaultPropertyMenuItem.setEnabled(true);
-				offsetPropertyMenuItem.setEnabled(true);
-				factorPropertyMenuItem.setEnabled(true);
-				reductionPropertyMenuItem.setEnabled(true);
-				regressionIntervalPropertyMenuItem.setEnabled(true);
-				regressionTypeCurvePropertyMenuItem.setEnabled(true);
-				regressionTypeLinearPropertyMenuItem.setEnabled(true);
-				numberMotorPropertyMenuItem.setEnabled(true);
-				revolutionFactorPropertyMenuItem.setEnabled(true);
-				prop100WPropertyMenuItem.setEnabled(true);
-				numberCellsPropertyMenuItem.setEnabled(true);
-				invertCurrentPropertyMenuItem.setEnabled(true);
-				if (measurementPropertiesTabFolder != null) {
-					for (CTabItem tabItem : measurementPropertiesTabFolder.getItems()) {
+				log.log(java.util.logging.Level.FINEST, "addPropertyTypeMenu.menuShown action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.defaultPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.factorPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.regressionTypeCurvePropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.regressionTypeLinearPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.numberMotorPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.revolutionFactorPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.prop100WPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.numberCellsPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.invertCurrentPropertyMenuItem.setEnabled(true);
+				if (MeasurementContextmenu.this.measurementPropertiesTabFolder != null) {
+					for (CTabItem tabItem : MeasurementContextmenu.this.measurementPropertiesTabFolder.getItems()) {
 						try {
 							switch (MeasurementPropertyTypes.fromValue(tabItem.getText())) {
 							case OFFSET:
-								offsetPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(false);
 								break;
 							case FACTOR:
-								factorPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.factorPropertyMenuItem.setEnabled(false);
 								break;
 							case REDUCTION:
-								reductionPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(false);
 								break;
 							case REGRESSION_INTERVAL_SEC:
-								regressionIntervalPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(false);
 								break;
 							case REGRESSION_TYPE_CURVE:
-								regressionTypeCurvePropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.regressionTypeCurvePropertyMenuItem.setEnabled(false);
 								break;
 							case REGRESSION_TYPE_LINEAR:
-								regressionTypeLinearPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.regressionTypeLinearPropertyMenuItem.setEnabled(false);
 								break;
 							case NUMBER_MOTOR:
-								numberMotorPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.numberMotorPropertyMenuItem.setEnabled(false);
 								break;
 							case REVOLUTION_FACTOR:
-								revolutionFactorPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.revolutionFactorPropertyMenuItem.setEnabled(false);
 								break;
 							case NUMBER_CELLS:
-								numberCellsPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.numberCellsPropertyMenuItem.setEnabled(false);
 								break;
 							case PROP_N_100_W:
-								prop100WPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.prop100WPropertyMenuItem.setEnabled(false);
 								break;
 							case IS_INVERT_CURRENT:
-								invertCurrentPropertyMenuItem.setEnabled(false);
+								MeasurementContextmenu.this.invertCurrentPropertyMenuItem.setEnabled(false);
 								break;
 							case NONE_SPECIFIED:
-								MessageBox mb = new MessageBox(menu.getShell(), SWT.OK);
-								mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540)); 
+								MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
+								mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540));
 								mb.setMessage(Messages.getString(MessageIds.OSDE_MSGW0541));
 								mb.open();
 								break;
@@ -167,101 +166,113 @@ public class MeasurementContextmenu {
 			@Override
 			public void menuHidden(MenuEvent e) {
 			}
-		});		
-		this.defaultPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		});
+		this.defaultPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.defaultPropertyMenuItem.setText(MeasurementPropertyTypes.NONE_SPECIFIED.value());
 		this.defaultPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NONE_SPECIFIED.value());
+				log.log(java.util.logging.Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NONE_SPECIFIED.value());
 			}
 		});
-		this.offsetPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.offsetPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.offsetPropertyMenuItem.setText(MeasurementPropertyTypes.OFFSET.value());
 		this.offsetPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
+				log.log(java.util.logging.Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
 			}
 		});
-		this.factorPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.factorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.factorPropertyMenuItem.setText(MeasurementPropertyTypes.FACTOR.value());
 		this.factorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "factorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
+				log.log(java.util.logging.Level.FINEST, "factorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
 			}
 		});
-		this.reductionPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.reductionPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.reductionPropertyMenuItem.setText(MeasurementPropertyTypes.REDUCTION.value());
 		this.reductionPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "reductionPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
+				log.log(java.util.logging.Level.FINEST, "reductionPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
 			}
 		});
-		this.regressionIntervalPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.regressionIntervalPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionIntervalPropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
 		this.regressionIntervalPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "regressionIntervalPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
+				log.log(java.util.logging.Level.FINEST, "regressionIntervalPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
 			}
 		});
-		this.regressionTypeCurvePropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.regressionTypeCurvePropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionTypeCurvePropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
 		this.regressionTypeCurvePropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "regressionTypeCurvePropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
+				log.log(java.util.logging.Level.FINEST, "regressionTypeCurvePropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
 			}
 		});
-		this.regressionTypeLinearPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.regressionTypeLinearPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionTypeLinearPropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
 		this.regressionTypeLinearPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "regressionTypeLinearPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
+				log.log(java.util.logging.Level.FINEST, "regressionTypeLinearPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
 			}
 		});
-		this.numberMotorPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.numberMotorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.numberMotorPropertyMenuItem.setText(MeasurementPropertyTypes.NUMBER_MOTOR.value());
 		this.numberMotorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "numberMotorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_MOTOR.value());
+				log.log(java.util.logging.Level.FINEST, "numberMotorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_MOTOR.value());
 			}
 		});
-		this.revolutionFactorPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.revolutionFactorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.revolutionFactorPropertyMenuItem.setText(MeasurementPropertyTypes.REVOLUTION_FACTOR.value());
 		this.revolutionFactorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "revolutionFactorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REVOLUTION_FACTOR.value());
+				log.log(java.util.logging.Level.FINEST, "revolutionFactorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REVOLUTION_FACTOR.value());
 			}
 		});
-		this.prop100WPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.prop100WPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.prop100WPropertyMenuItem.setText(MeasurementPropertyTypes.PROP_N_100_W.value());
 		this.prop100WPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "prop100WPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.PROP_N_100_W.value());
+				log.log(java.util.logging.Level.FINEST, "prop100WPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.PROP_N_100_W.value());
 			}
 		});
-		this.numberCellsPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.numberCellsPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.numberCellsPropertyMenuItem.setText(MeasurementPropertyTypes.NUMBER_CELLS.value());
 		this.numberCellsPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "numberCellsPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_CELLS.value());
+				log.log(java.util.logging.Level.FINEST, "numberCellsPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_CELLS.value());
 			}
 		});
-		this.invertCurrentPropertyMenuItem = new MenuItem(addPropertyTypeMenu, SWT.PUSH);
+		this.invertCurrentPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.invertCurrentPropertyMenuItem.setText(MeasurementPropertyTypes.IS_INVERT_CURRENT.value());
 		this.invertCurrentPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "invertCurrentPropertyMenuItem action performed! " + e); //$NON-NLS-1$
-				measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.IS_INVERT_CURRENT.value());
+				log.log(java.util.logging.Level.FINEST, "invertCurrentPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.IS_INVERT_CURRENT.value());
 			}
 		});
 	}

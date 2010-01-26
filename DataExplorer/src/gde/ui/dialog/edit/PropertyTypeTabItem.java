@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -61,28 +60,28 @@ public class PropertyTypeTabItem extends CTabItem {
 	final CTabFolder							parentTabFolder;
 	final MeasurementTypeTabItem	measurementTypeTabItem;
 
-	Composite								propertyTypeComposite;
-	Label										nameLabel;
-	Label										typeLabel;
-	Label										valueLabel;
-	Label										descriptionLabel;
-	Text										nameText, valueText, descriptionText;
-	CCombo									typeCombo, valueCombo, nameCombo;
-	KeyAdapter							valueKeyListener;
-	VerifyListener					valueVerifyListener;
+	Composite											propertyTypeComposite;
+	Label													nameLabel;
+	Label													typeLabel;
+	Label													valueLabel;
+	Label													descriptionLabel;
+	Text													nameText, valueText, descriptionText;
+	CCombo												typeCombo, valueCombo, nameCombo;
+	KeyAdapter										valueKeyListener;
+	VerifyListener								valueVerifyListener;
 
-	DeviceConfiguration			deviceConfig;
-	boolean									isStateType;									//1000
-	boolean									isValueOnlyEnabledType;				//0001
-	boolean									isNameSelectionEnabledType;		//01**
-	boolean									isTypeSelectionEnabledType;		//0*1*
+	DeviceConfiguration						deviceConfig;
+	boolean												isStateType;																									//1000
+	boolean												isValueOnlyEnabledType;																			//0001
+	boolean												isNameSelectionEnabledType;																	//01**
+	boolean												isTypeSelectionEnabledType;																	//0*1*
 
-	Menu										popupMenu;
-	MeasurementContextmenu	contextMenu;
-	String									tabName;
-	PropertyType						propertyType;
+	Menu													popupMenu;
+	MeasurementContextmenu				contextMenu;
+	String												tabName;
+	PropertyType									propertyType;
 
-	final DevicePropertiesEditor propsEditor;
+	final DevicePropertiesEditor	propsEditor;
 
 	/**
 	 * constructor without any variables input
@@ -92,7 +91,7 @@ public class PropertyTypeTabItem extends CTabItem {
 	 * @param useTabName
 	 * @param useMeasurementTypeTabItem2CreatePopupMenu != null signal a popup menu should be initialized
 	 */
-	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, MeasurementTypeTabItem	useMeasurementTypeTabItem2CreatePopupMenu) {
+	public PropertyTypeTabItem(CTabFolder parent, int style, String useTabName, MeasurementTypeTabItem useMeasurementTypeTabItem2CreatePopupMenu) {
 		super(parent, style);
 		this.parentTabFolder = parent;
 		this.propsEditor = DevicePropertiesEditor.getInstance();
@@ -149,15 +148,15 @@ public class PropertyTypeTabItem extends CTabItem {
 	public void setProperty(DeviceConfiguration useDeviceConfig, PropertyType useProperty, boolean enableEditName, String[] nameSelectionItems, String[] typeSelectionItems, boolean enableEditValue) {
 		this.deviceConfig = useDeviceConfig;
 		this.propertyType = useProperty;
-		
-		isStateType = enableEditName && nameSelectionItems != null && typeSelectionItems != null && !enableEditValue; 						//1000
-		isValueOnlyEnabledType = !enableEditName && nameSelectionItems != null && typeSelectionItems != null && enableEditValue; 	//0001
-		isNameSelectionEnabledType = !enableEditName && nameSelectionItems != null && nameSelectionItems.length > 1; 																							//01**
-		isTypeSelectionEnabledType = typeSelectionItems != null && typeSelectionItems.length > 1; 																																	//**1*
-	
+
+		this.isStateType = enableEditName && nameSelectionItems != null && typeSelectionItems != null && !enableEditValue; //1000
+		this.isValueOnlyEnabledType = !enableEditName && nameSelectionItems != null && typeSelectionItems != null && enableEditValue; //0001
+		this.isNameSelectionEnabledType = !enableEditName && nameSelectionItems != null && nameSelectionItems.length > 1; //01**
+		this.isTypeSelectionEnabledType = typeSelectionItems != null && typeSelectionItems.length > 1; //**1*
+
 		this.setText(this.tabName = this.propertyType.getName());
 
-		if (isNameSelectionEnabledType) {
+		if (this.isNameSelectionEnabledType) {
 			this.nameText.setVisible(false);
 			this.nameCombo.setVisible(true);
 			this.nameCombo.setItems(nameSelectionItems);
@@ -167,13 +166,13 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.nameText.setEditable(enableEditName);
 			this.nameCombo.setVisible(false);
 		}
-		
-		this.typeCombo.setEnabled(isTypeSelectionEnabledType);
-		
+
+		this.typeCombo.setEnabled(this.isTypeSelectionEnabledType);
+
 		if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 			this.valueText.setVisible(false);
-			this.valueCombo.setVisible(true);		
-			PropertyTypeTabItem.this.valueCombo.select(propertyType.getValue().equals(OSDE.STRING_TRUE) ? 0 : 1);
+			this.valueCombo.setVisible(true);
+			PropertyTypeTabItem.this.valueCombo.select(this.propertyType.getValue().equals(OSDE.STRING_TRUE) ? 0 : 1);
 		}
 		else {
 			this.valueCombo.setVisible(false);
@@ -213,7 +212,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				break;
 			}
 		}
-		return dataTypeItems == null ? new String[]{OSDE.STRING_EMPTY} : dataTypeItems;
+		return dataTypeItems == null ? new String[] { OSDE.STRING_EMPTY } : dataTypeItems;
 	}
 
 	private void initGUI() {
@@ -224,7 +223,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
-					log.log(Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					PropertyTypeTabItem.this.enableContextMenu(false);
 				}
 			});
@@ -233,8 +232,9 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.propertyTypeComposite.setLayout(null);
 			this.propertyTypeComposite.setSize(300, 160);
 			this.propertyTypeComposite.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
-					PropertyTypeTabItem.log.log(Level.FINEST, "this.paintControl, event=" + evt); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "this.paintControl, event=" + evt); //$NON-NLS-1$
 					if (PropertyTypeTabItem.this.propertyTypeComposite.isVisible()) {
 						if (PropertyTypeTabItem.this.propertyType != null) {
 							if (PropertyTypeTabItem.this.nameText.isVisible()) {
@@ -305,13 +305,13 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.nameText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "nameText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) {
 							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 							PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
-						PropertyTypeTabItem.this.setText(tabName = PropertyTypeTabItem.this.nameText.getText());
+						PropertyTypeTabItem.this.setText(PropertyTypeTabItem.this.tabName = PropertyTypeTabItem.this.nameText.getText());
 					}
 				});
 			}
@@ -322,7 +322,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.nameCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "nameCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "nameCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setName(PropertyTypeTabItem.this.nameCombo.getText().toLowerCase());
 					}
 				});
@@ -335,7 +335,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.typeCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "typeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "typeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setType(DataTypes.fromValue(PropertyTypeTabItem.this.typeCombo.getText()));
 						if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 							PropertyTypeTabItem.this.valueText.setVisible(false);
@@ -345,7 +345,7 @@ public class PropertyTypeTabItem extends CTabItem {
 								PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 								PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
-							PropertyTypeTabItem.this.valueCombo.select(valueCombo.getText().equals(OSDE.STRING_TRUE) ? 0 : 1);
+							PropertyTypeTabItem.this.valueCombo.select(PropertyTypeTabItem.this.valueCombo.getText().equals(OSDE.STRING_TRUE) ? 0 : 1);
 						}
 						else {
 							PropertyTypeTabItem.this.valueText.setVisible(true);
@@ -368,7 +368,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.valueText.addKeyListener(this.valueKeyListener = new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "valueText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) {
 							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
@@ -377,9 +377,10 @@ public class PropertyTypeTabItem extends CTabItem {
 					}
 				});
 				this.valueText.addVerifyListener(this.valueVerifyListener = new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueText.verifyText, event=" + evt); //$NON-NLS-1$
-						PropertyTypeTabItem.log.log(Level.FINE, evt.text);
+						log.log(java.util.logging.Level.FINEST, "valueText.verifyText, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINE, evt.text);
 						evt.doit = PropertyTypeTabItem.this.propertyType.getType() == null ? true : StringHelper.verifyTypedInput(PropertyTypeTabItem.this.propertyType.getType(), evt.text);
 					}
 				});
@@ -392,24 +393,24 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.valueCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "valueCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "valueCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (PropertyTypeTabItem.this.deviceConfig != null) {
 							// mode state type is Integer and can not be modified by combo selection
-							
+
 							// check type values for DesktopTypes
 							String guessDesktopTypeName = PropertyTypeTabItem.this.propertyType.getName();
 							if (guessDesktopTypeName.equals(DesktopPropertyTypes.TABLE_TAB.value()) || guessDesktopTypeName.equals(DesktopPropertyTypes.DIGITAL_TAB.value())
 									|| guessDesktopTypeName.equals(DesktopPropertyTypes.ANALOG_TAB.value()) || guessDesktopTypeName.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value())) {
 								PropertyTypeTabItem.this.deviceConfig.setTableTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
 							}
-							else {						
+							else {
 								try { //check for valid and known DataType
 									PropertyTypeTabItem.this.propertyType.setValue(DataTypes.fromValue(PropertyTypeTabItem.this.valueCombo.getText()).value());
 								}
 								catch (Exception e) {
 									PropertyTypeTabItem.this.propertyType.setValue(PropertyTypeTabItem.this.valueCombo.getText());
 								}
-								
+
 							}
 						}
 						else {
@@ -429,7 +430,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.descriptionText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						PropertyTypeTabItem.log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
 						PropertyTypeTabItem.this.propertyType.setDescription(PropertyTypeTabItem.this.descriptionText.getText());
 						if (PropertyTypeTabItem.this.deviceConfig != null) {
 							PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);

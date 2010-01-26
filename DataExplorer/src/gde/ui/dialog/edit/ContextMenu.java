@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -38,36 +37,36 @@ import osde.ui.SWTResourceManager;
  * @author Winfried Brügmann
  */
 public class ContextMenu {
-	final static Logger					log												= Logger.getLogger(ContextMenu.class.getName());
+	final static Logger	log	= Logger.getLogger(ContextMenu.class.getName());
 
-	final Menu		 menu;
-	final CTabFolder parentTabFolder;
-	
-	MenuItem addSerialPortTypeMenuItem, addDataBlockTypeMenuItem, addStateTypeMenuItem;
+	final Menu					menu;
+	final CTabFolder		parentTabFolder;
+
+	MenuItem						addSerialPortTypeMenuItem, addDataBlockTypeMenuItem, addStateTypeMenuItem;
 
 	public ContextMenu(Menu useMenu, CTabFolder parent) {
-		menu = useMenu;
-		parentTabFolder = parent;
-	}	
+		this.menu = useMenu;
+		this.parentTabFolder = parent;
+	}
 
 	public void create() {
 		SWTResourceManager.registerResourceUser(this.menu);
-		menu.addMenuListener(new MenuListener() {
+		this.menu.addMenuListener(new MenuListener() {
 			@Override
 			public void menuShown(MenuEvent e) {
-				log.log(Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
-				addSerialPortTypeMenuItem.setEnabled(true);
-				addDataBlockTypeMenuItem.setEnabled(true);
-				addStateTypeMenuItem.setEnabled(true);
-				for (CTabItem tabItem : parentTabFolder.getItems()) {
+				log.log(java.util.logging.Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
+				ContextMenu.this.addSerialPortTypeMenuItem.setEnabled(true);
+				ContextMenu.this.addDataBlockTypeMenuItem.setEnabled(true);
+				ContextMenu.this.addStateTypeMenuItem.setEnabled(true);
+				for (CTabItem tabItem : ContextMenu.this.parentTabFolder.getItems()) {
 					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0510))) {
-						addSerialPortTypeMenuItem.setEnabled(false);
+						ContextMenu.this.addSerialPortTypeMenuItem.setEnabled(false);
 					}
 					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0515))) {
-						addDataBlockTypeMenuItem.setEnabled(false);
+						ContextMenu.this.addDataBlockTypeMenuItem.setEnabled(false);
 					}
 					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0470))) {
-						addStateTypeMenuItem.setEnabled(false);
+						ContextMenu.this.addStateTypeMenuItem.setEnabled(false);
 					}
 				}
 			}
@@ -76,29 +75,32 @@ public class ContextMenu {
 			public void menuHidden(MenuEvent e) {
 			}
 		});
-		this.addSerialPortTypeMenuItem = new MenuItem(menu, SWT.PUSH);
+		this.addSerialPortTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addSerialPortTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0512));
 		this.addSerialPortTypeMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createSerialPortTabItem();
 			}
 		});
-		new MenuItem(menu, SWT.SEPARATOR);
-		this.addDataBlockTypeMenuItem = new MenuItem(menu, SWT.PUSH);
+		new MenuItem(this.menu, SWT.SEPARATOR);
+		this.addDataBlockTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addDataBlockTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0513));
 		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createDataBlockType();
 			}
 		});
-		new MenuItem(menu, SWT.SEPARATOR);
-		this.addStateTypeMenuItem = new MenuItem(menu, SWT.PUSH);
+		new MenuItem(this.menu, SWT.SEPARATOR);
+		this.addStateTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addStateTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0514));
 		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(Event e) {
-				log.log(Level.FINEST, "addStateTypeMenuItem action performed! " + e); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINEST, "addStateTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createStateTabItem();
 			}
 		});
