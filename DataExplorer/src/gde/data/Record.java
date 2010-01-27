@@ -210,7 +210,6 @@ public class Record extends Vector<Integer> {
 		this.minTriggerTimeSec = (newStatistic != null && newStatistic.getTrigger() != null) ? newStatistic.getTrigger().getMinTimeSec() : null;
 		this.initializeProperties(this, newProperties);
 		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
-		this.numberFormat = 1;
 		
 		// special keys for compare set record are handled with put method
 		//this.channelConfigKey;
