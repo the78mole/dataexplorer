@@ -275,6 +275,16 @@ public interface IDevice {
 	public int getDataBlockTimeUnitFactor();
 	
 	/**
+	 * @return the data block leader character
+	 */
+	public String getDataBlockLeader();
+
+	/**
+	 * @param value set a new character to be used as data line leading edge character
+	 */
+	public void setDataBlockLeader(String value);	
+	
+	/**
 	 * @return the data block value separator as CommaSeparatorTypes
 	 */
 	public CommaSeparatorTypes getDataBlockSeparator();

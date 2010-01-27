@@ -142,10 +142,10 @@ public class DevicePropertiesEditor extends Composite {
 	CTabItem															dataBlockTabItem;
 	Composite															dataBlockComposite;
 	Label																	dataBlockDescriptionLabel;
-	Label																	dataBlockFormatLabel, dataBlockSizeLabel, dataBlockSeparatorLabel, dataBlockTimeUnitLabel, dataBlockEndingLabel, dataBlockCheckSumTypeLabel;
+	Label																	dataBlockFormatLabel, dataBlockSizeLabel, dataBlockSeparatorLabel, dataBlockTimeUnitLabel, dataBlockLeaderLabel, dataBlockEndingLabel, dataBlockCheckSumTypeLabel;
 	Button																dataBlockCheckSumFormatButton, preferredDataLocationButton, preferredFileExtensionButton;
 	CCombo																dataBlockEndingCombo, dataBlockFormatCombo, dataBlockTimeUnitCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo, dataBlockSeparatorCombo;
-	Text																	dataBlockSizeText, preferredDataLocationText, preferredFileExtensionText;
+	Text																	dataBlockSizeText, dataBlockLeaderText, preferredDataLocationText, preferredFileExtensionText;
 	Group																	dataBlockRequiredGroup, dataBlockOptionalGroup;
 
 	FormatTypes														dataBlockFormat													= FormatTypes.BINARY, dataBlockcheckSumFormat = FormatTypes.BINARY;
@@ -153,6 +153,7 @@ public class DevicePropertiesEditor extends Composite {
 	TimeUnitTypes													dataBlockTimeUnit												= TimeUnitTypes.MSEC;
 	CommaSeparatorTypes										dataBlockSeparator											= CommaSeparatorTypes.SEMICOLON;
 	CheckSumTypes													dataBlockCheckSumType										= CheckSumTypes.ADD;
+	String																dataBlockLeader													= OSDE.STRING_DOLLAR;
 	String																dataBlockEnding													= LineEndingTypes.CRLF.value();
 	boolean																isDataBlockOptionalChecksumEnabled			= false;
 	boolean																isDataBlockOptionalDataLocationEnabled	= false;
@@ -911,6 +912,8 @@ public class DevicePropertiesEditor extends Composite {
 									tabItem.dispose();
 									int itemCount = DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItemCount();
 									if (itemCount > 1) DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItem(itemCount - 1).setShowClose(true);
+									
+									DevicePropertiesEditor.this.enableSaveButton(true);
 								}
 							});
 						}
@@ -980,7 +983,10 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockTabItem = null;
 							if (DevicePropertiesEditor.this.deviceConfig != null) DevicePropertiesEditor.this.deviceConfig.removeDataBlockType();
 						}
-						if (DevicePropertiesEditor.this.deviceConfig != null) update();
+						if (DevicePropertiesEditor.this.deviceConfig != null) {
+							DevicePropertiesEditor.this.enableSaveButton(true);
+							update();
+						}
 					}
 				});
 			}
@@ -1134,7 +1140,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockRequiredGroup.setLayout(null);
 				this.dataBlockRequiredGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0517));
 				this.dataBlockRequiredGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockRequiredGroup.setBounds(50, 80, 240, 200);
+				this.dataBlockRequiredGroup.setBounds(50, 80, 240, 230);
 				this.dataBlockRequiredGroup.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {
@@ -1149,6 +1155,10 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockTimeUnitLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 						DevicePropertiesEditor.this.dataBlockTimeUnitCombo.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 						DevicePropertiesEditor.this.dataBlockTimeUnitCombo.select(DevicePropertiesEditor.this.dataBlockTimeUnit.ordinal());
+
+						DevicePropertiesEditor.this.dataBlockLeaderLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+						DevicePropertiesEditor.this.dataBlockLeaderText.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+						DevicePropertiesEditor.this.dataBlockLeaderText.setText(OSDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
 
 						DevicePropertiesEditor.this.dataBlockEndingLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 						DevicePropertiesEditor.this.dataBlockEndingCombo.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
@@ -1270,17 +1280,42 @@ public class DevicePropertiesEditor extends Composite {
 				}
 			}
 			{
+				this.dataBlockLeaderLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
+				this.dataBlockLeaderLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0469));
+				this.dataBlockLeaderLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+				this.dataBlockLeaderLabel.setBounds(25, 150, 100, 20);
+			}
+			{
+				this.dataBlockLeaderText = new Text(this.dataBlockRequiredGroup, SWT.BORDER);
+				this.dataBlockLeaderText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+				this.dataBlockLeaderText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				this.dataBlockLeaderText.setBounds(130, 150, 30, 20);
+				this.dataBlockLeaderText.setText(OSDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
+				this.dataBlockLeaderText.setEnabled(false);
+				this.dataBlockLeaderText.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "dataBlockLeaderText.keyReleased, event=" + evt); //$NON-NLS-1$
+						DevicePropertiesEditor.this.dataBlockLeader = DevicePropertiesEditor.this.dataBlockLeaderText.getText().trim();
+						if (DevicePropertiesEditor.this.deviceConfig != null) {
+							DevicePropertiesEditor.this.deviceConfig.setDataBlockLeader(DevicePropertiesEditor.this.dataBlockLeader);
+							DevicePropertiesEditor.this.enableSaveButton(true);
+						}
+					}
+				});
+			}
+			{
 				this.dataBlockEndingLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
 				this.dataBlockEndingLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0468));
 				this.dataBlockEndingLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0475));
 				this.dataBlockEndingLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockEndingLabel.setBounds(25, 150, 100, 20);
+				this.dataBlockEndingLabel.setBounds(25, 180, 100, 20);
 			}
 			{
 				this.dataBlockEndingCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockEndingCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 				this.dataBlockEndingCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				this.dataBlockEndingCombo.setBounds(130, 150, 90, 20);
+				this.dataBlockEndingCombo.setBounds(130, 180, 90, 20);
 				this.dataBlockEndingCombo.setItems(LineEndingTypes.valuesAsStingArray());
 				this.dataBlockEndingCombo.setEnabled(false);
 				this.dataBlockEndingCombo.addSelectionListener(new SelectionAdapter() {
@@ -1675,6 +1710,7 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockSize = DevicePropertiesEditor.this.deviceConfig.getDataBlockSize();
 						DevicePropertiesEditor.this.dataBlockSeparator = DevicePropertiesEditor.this.deviceConfig.getDataBlockSeparator();
 						DevicePropertiesEditor.this.dataBlockTimeUnit = DevicePropertiesEditor.this.deviceConfig.getDataBlockTimeUnit();
+						DevicePropertiesEditor.this.dataBlockLeader = DevicePropertiesEditor.this.deviceConfig.getDataBlockLeader();
 						DevicePropertiesEditor.this.dataBlockEnding = DevicePropertiesEditor.this.deviceConfig.getDataBlockEndingLineEndingType();
 						DevicePropertiesEditor.this.dataBlockRequiredGroup.redraw();
 

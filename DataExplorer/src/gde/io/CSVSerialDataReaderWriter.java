@@ -104,7 +104,7 @@ public class CSVSerialDataReaderWriter {
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0041, new String[] {filePath}));
-				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
+				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
 				byte[] buffer = new byte[1024];

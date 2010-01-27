@@ -60,7 +60,7 @@ public enum DecimalSeparatorTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (DecimalSeparatorTypes element : DecimalSeparatorTypes.values()) {
-  			sb.append(element.value).append(OSDE.STRING_DASH);
+  			sb.append("  ").append(element.value).append(OSDE.STRING_DASH);  //$NON-NLS-1$
   		}
   		return sb.toString().split(OSDE.STRING_DASH);
   	}

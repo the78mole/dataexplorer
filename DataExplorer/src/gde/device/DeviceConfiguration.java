@@ -347,15 +347,14 @@ public class DeviceConfiguration {
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort() {
-		if (this.serialPort == null) createSerialPort();
-		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort.getPort();
+		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() 
+				: this.serialPort != null ? this.serialPort.getPort() : OSDE.STRING_EMPTY;
 	}
 
 	/**
 	 * @return the port configured in SerialPortType
 	 */
 	public String getPortString() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getPort();
 	}
 
@@ -366,7 +365,6 @@ public class DeviceConfiguration {
 	}
 
 	public Integer getBaudeRate() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getBaudeRate();
 	}
 	
@@ -377,7 +375,6 @@ public class DeviceConfiguration {
 	}
 
 	public DataBitsTypes getDataBits() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getDataBits();
 	}
 
@@ -388,7 +385,6 @@ public class DeviceConfiguration {
 	}
 
 	public StopBitsTypes getStopBits() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getStopBits();
 	}
 
@@ -399,7 +395,6 @@ public class DeviceConfiguration {
 	}
 
 	public FlowControlTypes getFlowCtrlMode() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getFlowControlMode();
 	}
 
@@ -410,7 +405,6 @@ public class DeviceConfiguration {
 	}
 
 	public ParityTypes getParity() {
-		if (this.serialPort == null) createSerialPort();
 		return this.serialPort.getParity();
 	}
 
@@ -711,7 +705,7 @@ public class DeviceConfiguration {
 	public void setDataBlockFormat(FormatTypes value) {
 		this.isChangePropery = true;
 		if (this.dataBlock == null) {
-			this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
+			this.dataBlock = this.deviceProps.dataBlock = new ObjectFactory().createDataBlockType();
 			if (this.dataBlock.getFormat() == null) {
 				this.dataBlock.format = new DataBlockType.Format();
 			}
@@ -720,15 +714,24 @@ public class DeviceConfiguration {
 	}
 
 	public boolean isDataBlockCheckSumDefined() {
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		return this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
 	}
 	
 	public CheckSumTypes getDataBlockCheckSumType() {
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getType(); 
 	}
 
 	public void setDataBlockCheckSumType(CheckSumTypes value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		if (value == null)
 			this.dataBlock.setCheckSum(null);
 		else {
@@ -738,11 +741,17 @@ public class DeviceConfiguration {
 	}
 	
 	public FormatTypes getDataBlockCheckSumFormat() {
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getFormat();
 	}
 	
 	public void setDataBlockCheckSumFormat(FormatTypes value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		if (value == null)
 			this.dataBlock.setCheckSum(null);
 		else {
@@ -751,24 +760,39 @@ public class DeviceConfiguration {
 		}
 	}
 	
+	public String getDataBlockLeader() {
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
+		return this.dataBlock.getFormat().getLeader();
+	}
+
+	public void setDataBlockLeader(String value) {
+		this.isChangePropery = true;
+		if (value == null)
+			this.dataBlock.getFormat().setLeader(null);
+		else
+			this.dataBlock.getFormat().setLeader(value);
+	}
+	
 	public boolean isDataBlockEndingDefined() {
-		return this.dataBlock.getFormat().ending != null;
+		return this.dataBlock.getFormat().trailer != null;
 	}
 
 	public byte[] getDataBlockEnding() {
-		return this.dataBlock.getFormat().getEnding();
+		return this.dataBlock.getFormat().getTrailer();
 	}
 
 	public String getDataBlockEndingLineEndingType() {
-		return LineEndingTypes.valueFrom(this.dataBlock.getFormat().getEnding());
+		return LineEndingTypes.valueFrom(this.dataBlock.getFormat().getTrailer());
 	}
 
 	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
 		if (value == null)
-			this.dataBlock.getFormat().setEnding(null);
+			this.dataBlock.getFormat().setTrailer(null);
 		else
-			this.dataBlock.getFormat().setEnding(LineEndingTypes.bytesFromValue(value));
+			this.dataBlock.getFormat().setTrailer(LineEndingTypes.bytesFromValue(value));
 	}
 
 	public TimeUnitTypes getDataBlockTimeUnit() {

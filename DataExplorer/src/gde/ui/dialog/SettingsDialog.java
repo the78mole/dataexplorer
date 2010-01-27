@@ -63,6 +63,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.device.CommaSeparatorTypes;
+import osde.device.DecimalSeparatorTypes;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
@@ -437,8 +439,8 @@ public class SettingsDialog extends Dialog {
 							this.separatorGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.decimalSeparator.setText(SettingsDialog.this.settings.getDecimalSeparator() + OSDE.STRING_EMPTY);
-									SettingsDialog.this.listSeparator.setText(SettingsDialog.this.settings.getListSeparator() + OSDE.STRING_EMPTY);
+									SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getDecimalSeparator());
+									SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
 								}
 							});
 							{
@@ -451,14 +453,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
-								this.decimalSeparator.setItems(new String[] { " . ", " , " }); //$NON-NLS-1$ //$NON-NLS-2$
+								this.decimalSeparator.setItems(DecimalSeparatorTypes.valuesAsStingArray());
 								this.decimalSeparator.setBounds(153, 24, 43, OSDE.IS_LINUX ? 22 : 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "decimalSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDecimalSeparator(SettingsDialog.this.decimalSeparator.getText().trim());
-										SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.decimalSeparator.getText().trim() + OSDE.STRING_BLANK);
+										SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.decimalSeparator.getText().trim());
 									}
 								});
 							}
@@ -472,14 +474,14 @@ public class SettingsDialog extends Dialog {
 							{
 								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.listSeparator.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
-								this.listSeparator.setItems(new String[] { " , ", " ; ", " : " }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								this.listSeparator.setItems(CommaSeparatorTypes.valuesAsStingArray());
 								this.listSeparator.setBounds(370, 24, 47, OSDE.IS_LINUX ? 22 : 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "listSeparator.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setListSeparator(SettingsDialog.this.listSeparator.getText().trim());
-										SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.listSeparator.getText().trim() + OSDE.STRING_BLANK);
+										SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.listSeparator.getText().trim());
 									}
 								});
 							}

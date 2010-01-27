@@ -44,20 +44,22 @@ public class DataParser {
 
 	final int						timeFactor;
 	final String				separator;
+	final String				leader;
 	final CheckSumTypes	checkSumType;
 	final int						size;
 
-	public DataParser(int useTimeFactor, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
+	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
 		this.timeFactor = useTimeFactor;
 		this.separator = useSeparator;
+		this.leader = useLeaderChar;
 		this.checkSumType = useCheckSumType;
 		this.size = useDataSize;
 	}
 
 	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, NumberFormatException {
 		try {
-			if(!inputLine.startsWith(Messages.getString(MessageIds.OSDE_MSGT0595))) 
-				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0046, new String[] {Messages.getString(MessageIds.OSDE_MSGT0595)}));
+			if(!inputLine.startsWith(this.leader)) 
+				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0046, new String[] {this.leader}));
 			if(!inputLine.contains(separator)) 
 				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0047, new String[] {inputLine, separator})); 
 			
