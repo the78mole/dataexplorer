@@ -14,6 +14,8 @@ At the moment the following devices are enabled:
 											 - eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger (LiPo)
 											 - Pichler P6 , P60 (Pichler)
 											 - VC820, VC840 (Conrad/VoltCraft)
+											 - CSV2SerialAdapter, enables to import CVS files as serial data
+											 - DataVario, DataVarioDuo (WStech) 
 											 - Simulator
 
 More device are under construction. Help doing this is very welcome.											 
@@ -27,11 +29,14 @@ directory and execute running Windows, OpenSerialDataExplorer.exe, running Unix,
 
 As overview the following files are under the OpenSerialDataExplorer program resource directory:
 OpenSerialDataExplorer.exe (Windows)
-OpenSerialDataExplorer.ini (Windows)
+DevicePropertiesEditor.exe (Windows)
 OpenSerialDataExplorer (Linux)
+DevicePropertiesEditor (Linux)
 OpenSerialDataExplorer.xpm (Linux)
 OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer.desktop (Linux)
 OpenSerialDataExplorerMac32 (Mac OS)
+DevicePropertiesEditorMac32 (Mac OS)
 OpenSerialDataExplorer.icns (Mac OS)
 RXTX_Post-Install_MacOS.txt (Mac OS)
 

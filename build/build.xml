@@ -239,7 +239,7 @@
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialDataExplorer.exe" />
-			<fileset file="build/misc/OpenSerialDataExplorer.ini" />
+			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
 			<fileset file="build/misc/OpenSerialDataExplorer.ico" />
 			<fileset file="build/misc/launch.bat" />
@@ -254,7 +254,7 @@
 		<copy todir="${output.windows64.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialDataExplorer.exe" />
-			<fileset file="build/misc/OpenSerialDataExplorer.ini" />
+			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
 			<fileset file="build/misc/OpenSerialDataExplorer.ico" />
 			<fileset file="build/misc/launch.bat" />
@@ -272,6 +272,8 @@
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
 			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+			<fileset file="build/misc/DevicePropertiesEditor" />
+			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
 		</copy>
 		<copy todir="${output.linux32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
@@ -285,6 +287,8 @@
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
 			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
+			<fileset file="build/misc/DevicePropertiesEditor" />
+			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
 		</copy>
 		<copy todir="${output.linux64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
@@ -305,6 +309,7 @@
 		</copy>
 		<copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/OpenSerialDataExplorerMac32" />
+			<fileset file="build/misc/DevicePropertiesEditorMac32" />
 		</copy>
 		<copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
@@ -325,6 +330,7 @@
 		</copy>
 		<copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/OpenSerialDataExplorerMac32" />
+			<fileset file="build/misc/DevicePropertiesEditorMac32" />
 		</copy>
 		<copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
@@ -403,14 +409,18 @@
 		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.linux32}" casesensitive="true" mode="755" >
 				<include name="*/OpenSerialDataExplorer"/>
+				<include name="*/DevicePropertiesEditor"/>
 			</tarfileset>
 			<tarfileset dir="${output.linux32}" casesensitive="true" mode="766" >
 				<include name="*/OpenSerialDataExplorer.desktop"/>
+				<include name="*/DevicePropertiesEditor.desktop"/>
 			</tarfileset>
 			<tarfileset dir="${output.linux32}" casesensitive="true" >
 				<include name="**"/>
 				<exclude name="*/OpenSerialDataExplorer"/>
+				<exclude name="*/DevicePropertiesEditor"/>
 				<exclude name="*/OpenSerialDataExplorer.desktop"/>
+				<exclude name="*/DevicePropertiesEditor.desktop"/>
 			</tarfileset>
 		</tar>
 
@@ -418,14 +428,18 @@
 		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_64.tar.gz" compression="gzip">
 			<tarfileset dir="${output.linux64}" casesensitive="true" mode="755" >
 				<include name="*/OpenSerialDataExplorer"/>
+				<include name="*/DevicePropertiesEditor"/>
 			</tarfileset>
 			<tarfileset dir="${output.linux64}" casesensitive="true" mode="766" >
 				<include name="*/OpenSerialDataExplorer.desktop"/>
+				<include name="*/DevicePropertiesEditor.desktop"/>
 			</tarfileset>
 			<tarfileset dir="${output.linux64}" casesensitive="true" >
 				<include name="**"/>
 				<exclude name="*/OpenSerialDataExplorer"/>
+				<exclude name="*/DevicePropertiesEditor"/>
 				<exclude name="*/OpenSerialDataExplorer.desktop"/>
+				<exclude name="*/DevicePropertiesEditor.desktop"/>
 			</tarfileset>
 		</tar>
 
@@ -433,9 +447,11 @@
 		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_carbon.zip">
 			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
 				<include name="**/OpenSerialDataExplorerMac32"/>
+				<include name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
 			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" >
 				<exclude name="**/OpenSerialDataExplorerMac32"/>
+				<exclude name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
 		</zip>
 
@@ -443,9 +459,11 @@
 		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_cocoa.zip">
 			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
 				<include name="**/OpenSerialDataExplorerMac32"/>
+				<include name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
 			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" >
 				<exclude name="**/OpenSerialDataExplorerMac32"/>
+				<exclude name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
 		</zip>
 	</target>

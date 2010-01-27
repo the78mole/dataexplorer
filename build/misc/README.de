@@ -14,6 +14,8 @@ Zur Zeit sind folgende Gerï¿½te eingebunden:
 											 - eStation BC6, BC610, BC8, 902 (Bantam)
 											 - Pichler P6 , P60 (Pichler)
 											 - VC820, VC840 (Conrad/VoltCraft)
+											 - CSV2SerialAdapter, ermöglicht CVS als serielle Daten zu importieren
+											 - DataVario, DataVarioDuo (WStech) 
 											 - Simulator
 											 
 Weitere Gerï¿½te sind in Arbeit. Hilfe bei der Einbindung von zusï¿½tzlichen Gerï¿½ten ist herzlich willkommen.
@@ -27,11 +29,14 @@ wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialData
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
 OpenSerialDataExplorer.exe (Windows)
-OpenSerialDataExplorer.ini (Windows)
+DevicePropertiesEditor.exe (Windows)
 OpenSerialDataExplorer (Linux)
+DevicePropertiesEditor (Linux)
 OpenSerialDataExplorer.xpm (Linux)
 OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer.desktop (Linux)
 OpenSerialDataExplorerMac32 (Mac OS)
+DevicePropertiesEditorMac32 (Mac OS)
 OpenSerialDataExplorer.icns (Mac OS)
 RXTX_Post-Install_MacOS.txt (Mac OS)
 

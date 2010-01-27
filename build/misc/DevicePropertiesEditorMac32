@@ -1,0 +1,10 @@
+#!/bin/bash
+# ***** script to launch OpenSerialDataExplorer ** 27 Apr 2009 WB *****
+
+# determine and switch to the resource directory of the application bundle
+OSDE_DIR="$(dirname ${0})/../Resources"
+cd ${OSDE_DIR}
+
+echo java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -classpath -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar  osde.ui.dialog.edit.DevicePropertiesEditor
+java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -classpath -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar  osde.ui.dialog.edit.DevicePropertiesEditor
+
