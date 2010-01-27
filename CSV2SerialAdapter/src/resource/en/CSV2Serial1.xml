@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format ending="0D0A" separator="semicolon" timeUnit="sec" size="13" type="TEXT"/>
+        <format trailer="0D0A" separator="semicolon" timeUnit="sec" size="13" type="TEXT"/>
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
