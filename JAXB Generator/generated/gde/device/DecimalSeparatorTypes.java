@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for decimal_separator_types.
  * 
@@ -33,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum DecimalSeparatorTypes {
 
     @XmlEnumValue("dot")
-    DOT("dot"),
+    DOT("."),
     @XmlEnumValue("comma")
-    COMMA("comma");
+    COMMA(",");
     private final String value;
 
     DecimalSeparatorTypes(String v) {
@@ -55,4 +54,11 @@ public enum DecimalSeparatorTypes {
         throw new IllegalArgumentException(v);
     }
 
+  	public static String[] valuesAsStingArray() {
+  		StringBuilder sb = new StringBuilder();
+  		for (DecimalSeparatorTypes element : DecimalSeparatorTypes.values()) {
+  			sb.append(element.value).append("-");
+  		}
+  		return sb.toString().split("-");
+  	}
 }
