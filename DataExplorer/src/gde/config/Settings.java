@@ -1441,7 +1441,7 @@ public class Settings extends Properties {
 
 	/**
 	 * set the border color of the curve compare graphics area
-	 * @param curveAreaBackground
+	 * @param borderColor
 	 */
 	public void setCurveCompareBorderColor(Color borderColor) {
 		this.setProperty(COMPARE_BORDER_COLOR, borderColor.getRed()+OSDE.STRING_COMMA + borderColor.getGreen()+OSDE.STRING_COMMA + borderColor.getBlue());

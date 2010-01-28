@@ -110,7 +110,7 @@ public class TimeSteps extends Vector<Integer> {
 	/**
 	 * query time at an index position
 	 * @param index
-	 * @return
+	 * @return time fit to index
 	 */
 	public double getTime_ms(int index) {
 		return this.isConstant ? (index == 0 ? 0.0 : this.get(0)/10.0*index) : (index < 0 ? this.firstElement() : index > elementCount-1 ? this.lastElement()/10.0 : this.get(index)/10.0);
@@ -119,7 +119,7 @@ public class TimeSteps extends Vector<Integer> {
 	/**
 	 * add a new time step
 	 * @param value
-	 * @return
+	 * @return true if add was successful
 	 */
 	public synchronized boolean add(double value) {
 		return this.isConstant ? true : super.add((int) (value * 10));
@@ -166,7 +166,7 @@ public class TimeSteps extends Vector<Integer> {
 	 * only in case where the given time matches an existing entry both indexes are equal.
 	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
 	 * @param time_ms
-	 * @return
+	 * @return two indexes around given time
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
 		//log.log(Level.INFO, "time_ms = " + time_ms);
@@ -199,7 +199,7 @@ public class TimeSteps extends Vector<Integer> {
 	/**
 	 * find the index closest to given time in msec
 	 * @param time_ms
-	 * @return
+	 * @return index closest to given time
 	 */
 	public int findBestIndex(double time_ms) {
 		int index = 0;

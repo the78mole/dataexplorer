@@ -747,7 +747,7 @@ public class FileUtils {
 	/**
 	 * find project directory of current device while application is loaded within eclipse
 	 * @param deviceConfig
-	 * @return
+	 * @return device project directory path
 	 * @throws MalformedURLException
 	 * @throws URISyntaxException
 	 * @throws ApplicationConfigurationException

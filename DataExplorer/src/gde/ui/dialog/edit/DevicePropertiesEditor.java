@@ -1852,7 +1852,7 @@ public class DevicePropertiesEditor extends Composite {
 	}
 
 	/**
-	 * @param true to set the save button to the enabled state
+	 * @param enable = true to set the save button to the enabled state
 	 */
 	public void enableSaveButton(boolean enable) {
 		this.saveButton.setEnabled(enable);

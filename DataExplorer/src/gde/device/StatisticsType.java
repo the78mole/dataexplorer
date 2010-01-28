@@ -131,7 +131,7 @@ public class StatisticsType {
 	 * 
 	 * @param value
 	 *     allowed object is
-	 *     {@link StatisticsType.Trigger }
+	 *     {@link TriggerType }
 	 *     
 	 */
 	public void setTrigger(TriggerType value) {
@@ -140,11 +140,6 @@ public class StatisticsType {
 
 	/**
 	 * Gets the value of the trigger property.
-	 * 
-	 * @return
-	 *     possible object is
-     *     {@link TriggerType }
-	 *     
 	 */
     public void removeTrigger() {
 		this.trigger = null;

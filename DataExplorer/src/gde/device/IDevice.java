@@ -67,7 +67,7 @@ public interface IDevice {
 	public String	getName();
 	
 	/**
-	 * @param set a new device name
+	 * @param newName set a new device name
 	 */
 	public void setName(String newName);
 	
@@ -82,7 +82,7 @@ public interface IDevice {
 	public String getManufacturer();
 	
 	/**
-	 * @param set a new manufacture name
+	 * @param name set a new manufacture name
 	 */
 	public void setManufacturer(String name);
 
@@ -92,7 +92,7 @@ public interface IDevice {
 	public DeviceTypes getDeviceGroup();
 	
 	/**
-	 * @param set a new manufacture name
+	 * @param name set a new manufacture name
 	 */
 	public void setDeviceGroup(DeviceTypes name);
 	
@@ -102,7 +102,7 @@ public interface IDevice {
 	public String getManufacturerURL();
 
 	/**
-	 * @param set a new manufacture name
+	 * @param name set a new manufacture name
 	 */
 	public void setManufacturerURL(String name);
 
@@ -112,7 +112,7 @@ public interface IDevice {
 	public String getImageFileName();
 
 	/**
-	 * @param set a new image filename(.jpg|.gif|.png)
+	 * @param newImageFileName set a new image filename(.jpg|.gif|.png)
 	 */
 	public void setImageFileName(String newImageFileName);
 
@@ -230,7 +230,7 @@ public interface IDevice {
 	public int getDataBlockSize();
 
 	/**
-	 * @param set a new date block size/length
+	 * @param newSize set a new date block size/length
 	 */
 	public void setDataBlockSize(Integer newSize);
 	
@@ -240,7 +240,7 @@ public interface IDevice {
 	public FormatTypes getDataBlockFormat();
 	
 	/**
-	 * @param set a new format type of the data block ASCII(text) or BINARY(hex)
+	 * @param value set a new format type of the data block ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockFormat(FormatTypes value);
 	
@@ -250,7 +250,7 @@ public interface IDevice {
 	public CheckSumTypes getDataBlockCheckSumType();
 
 	/**
-	 * @param set a new date block size/length
+	 * @param value set a new date block size/length
 	 */
 	public void setDataBlockCheckSumType(CheckSumTypes value);
 	
@@ -260,7 +260,7 @@ public interface IDevice {
 	public FormatTypes getDataBlockCheckSumFormat();
 	
 	/**
-	 * @param set a new date block checksum format type ASCII(text) or BINARY(hex)
+	 * @param value set a new date block checksum format type ASCII(text) or BINARY(hex)
 	 */
 	public void setDataBlockCheckSumFormat(FormatTypes value);
 	
@@ -301,7 +301,7 @@ public interface IDevice {
 	public byte[] getDataBlockEnding();
 
 	/**
-	 * @param set a new date block ending as LineEndingTypes.XY.value
+	 * @param value set a new date block ending as LineEndingTypes.XY.value
 	 */
 	public void setDataBlockEnding(String value);
 
@@ -311,7 +311,7 @@ public interface IDevice {
 	public String getDataBlockPreferredDataLocation();
 
 	/**
-	 * @param set a new full qualified data path location
+	 * @param value set a new full qualified data path location
 	 */
 	public void setDataBlockPreferredDataLocation(String value);
 	
@@ -321,7 +321,7 @@ public interface IDevice {
 	public String getDataBlockPreferredFileExtention();
 
 	/**
-	 * @param set a new file extension if other than *.csv should be used
+	 * @param value set a new file extension if other than *.csv should be used
 	 */
 	public void setDataBlockPreferredFileExtention(String value);
 

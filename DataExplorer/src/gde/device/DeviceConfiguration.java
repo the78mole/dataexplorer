@@ -226,7 +226,7 @@ public class DeviceConfiguration {
 	}
 	
 	/**
-	 * @return the serialPort
+	 * remove the serialPort of the active device configuration
 	 */
 	public void removeSerialPortType() {
 		this.isChangePropery = true;
@@ -268,7 +268,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param set a new device name
+	 * @param newDeviceName set a new device name
 	 */
 	public void setName(String newDeviceName) {
 		this.isChangePropery = true;
@@ -276,7 +276,8 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the device name
+	 * set a implementation name if it does not match the device name
+	 * @param newDeviceImplClass full qualified or the package will be calculated be manufacturer name
 	 */
 	public void setDeviceImplName(String newDeviceImplClass) {
 		this.isChangePropery = true;
@@ -291,7 +292,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param set a new image filename(.jpg|.gif|.png)
+	 * @param newImageFileName set a new image filename(.jpg|.gif|.png)
 	 */
 	public void setImageFileName(String newImageFileName) {
 		this.isChangePropery = true;
@@ -303,7 +304,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param set a new device manufacture name
+	 * @param name set a new device manufacture name
 	 */
 	public void setManufacturer(String name) {
 		this.isChangePropery = true;
@@ -315,7 +316,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param set a new manufacture name
+	 * @param name set a new manufacture name
 	 */
 	public void setManufacturerURL(String name) {
 		this.isChangePropery = true;
@@ -327,7 +328,8 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param set a new manufacture name
+	 * set a device group of a device
+	 * @param name set a new manufacture name
 	 */
 	public void setDeviceGroup(DeviceTypes name) {
 		this.isChangePropery = true;
@@ -554,7 +556,7 @@ public class DeviceConfiguration {
 	
 	/**
 	 * set the desktop type value
-	 * @param dektopType
+	 * @param desktopType
 	 * @param newValue
 	 */
 	public void setDesktopTypeValue(DesktopPropertyTypes desktopType, Boolean newValue) {
@@ -646,7 +648,7 @@ public class DeviceConfiguration {
 	
 	/**
 	 * method to query desktop properties, like: table tab switched of, ...
-	 * @param dektopType
+	 * @param modeStateOrdinal
 	 * @return property of the queried type or null if not defined
 	 */
 	public PropertyType getStateProperty(int modeStateOrdinal) {
@@ -969,7 +971,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @param channelName - size should not exceed 15 char length
+	 * @param channelConfigName - size should not exceed 15 char length
 	 * @param channelNumber
 	 */
 	public void setChannelName(String channelConfigName, int channelNumber) {
@@ -1000,7 +1002,9 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the channel type by given channel number 
+	 * set a new channel type using a channel number
+	 * @param newChannleType the channel type by given channel number 
+	 * @param channelNumber
 	 */
 	public void setChannelTypes(ChannelTypes newChannleType, int channelNumber) {
 		this.isChangePropery = true;
@@ -1018,7 +1022,7 @@ public class DeviceConfiguration {
 	
 	/**
 	 * remove a channel/configuration type at index
-	 * @param channelTypeIndex
+	 * @param channelNumber
 	 */
 	public void removeChannelType(int channelNumber) {
 		this.isChangePropery = true;
@@ -1099,7 +1103,7 @@ public class DeviceConfiguration {
 	/**
 	 * get the channel type by given channel configuration key (name)
 	 * @param channelConfigNumber
-	 * @return
+	 * @return the channel type
 	 */
 	public ChannelType getChannel(int channelConfigNumber) {
 		return this.deviceProps.getChannel().get(channelConfigNumber - 1);
@@ -1108,7 +1112,7 @@ public class DeviceConfiguration {
 	/**
 	 * get the channel type by given channel configuration key (name)
 	 * @param channelConfigKey
-	 * @return
+	 * @return the channel type
 	 */
 	@Deprecated
 	public ChannelType getChannel(String channelConfigKey) {
@@ -1370,7 +1374,6 @@ public class DeviceConfiguration {
 	 * remove the statistics type of the specified measurement
 	 * @param channelConfigNumber
 	 * @param measurementOrdinal
-	 * @return statistics, if statistics does not exist return null
 	 */
 	public void removeStatisticsTypeFromMeasurement(int channelConfigNumber, int measurementOrdinal) {
 		log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$

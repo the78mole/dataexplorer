@@ -449,7 +449,7 @@ public class StringHelper {
 	/**
 	 * convert a hexadecimal input byte array into string
 	 * @param byteBuffer
-	 * @return
+	 * @return string with converted characters
 	 */
 	public static String convertHexInput(byte[] byteBuffer) {
 		StringBuffer sb = new StringBuffer();
@@ -462,7 +462,7 @@ public class StringHelper {
 	/**
 	 * convert a string two char per byte input into byte array 
 	 * @param twoCharsPerByte
-	 * @return
+	 * @return byte array with converted characters
 	 */
 	public static byte[] convert2ByteArray(String twoCharsPerByte) {
 		int length = twoCharsPerByte.length()/2;
@@ -477,7 +477,7 @@ public class StringHelper {
 	/**
 	 * build a sting array from enumeration (combo.setItems(String[]))
 	 * @param enumValues
-	 * @return
+	 * @return string array of the enumeration
 	 */
 	public static String[] enumValues2StringArray(Object[] enumValues) {
 		Vector<String> tmpVec = new Vector<String>();

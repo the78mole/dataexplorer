@@ -115,7 +115,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 
 	/**
 	 * updates the given vector with actual available according black/white list configuration
-	 * @param updateAvailablePorts
 	 * @param doAvialabilityCheck
 	 * @param portBlackList
 	 * @param portWhiteList
@@ -447,7 +446,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	/**
 	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
 	 * the reference to the wait time vector will add the actual wait time to have the read buffer ready to read the given number of bytes
-	 * @param bytes
+	 * @param readBuffer
 	 * @param timeout_msec
 	 * @param waitTimes
 	 * @return the red byte array

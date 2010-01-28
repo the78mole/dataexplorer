@@ -269,7 +269,7 @@ public class GraphicsWindow extends CTabItem {
 	
 	/**
 	 * set the curve graphics background color
-	 * @param curveAreaBackground the curveAreaBackground to set
+	 * @param borderColor the curveAreaBackground to set
 	 */
 	public void setCurveAreaBorderColor(Color borderColor) {
 		this.graphicsComposite.curveAreaBorderColor = borderColor;

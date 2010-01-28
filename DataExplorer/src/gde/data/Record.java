@@ -1117,7 +1117,7 @@ public class Record extends Vector<Integer> {
 	 * only in case where the given time matches an existing entry both indexes are equal.
 	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
 	 * @param time_ms
-	 * @return
+	 * @return two index values around the given time 
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
 		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
@@ -1129,7 +1129,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * find the index closest to given time in msec
 	 * @param time_ms
-	 * @return
+	 * @return index nearest to given time
 	 */
 	public int findBestIndex(double time_ms) {
 		int index = this.timeStep_ms == null ? this.parent.timeStep_ms.findBestIndex(time_ms) : this.timeStep_ms.findBestIndex(time_ms);
@@ -1193,14 +1193,14 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * @param zoomTimeOffset the zoomTimeOffset to set
+	 * @param newZoomTimeOffset the zoomTimeOffset to set
 	 */
 	public void setZoomTimeOffset(double newZoomTimeOffset) {
 			this.zoomTimeOffset = newZoomTimeOffset;
 	}
 
 	/**
-	 * @param drawTimeWidth the potential time width to be drawn
+	 * @param newDrawTimeWidth the potential time width to be drawn
 	 */
 	public void setDrawTimeWidth(double newDrawTimeWidth) {
 			this.drawTimeWidth = newDrawTimeWidth;
@@ -1369,8 +1369,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * get the slope value of two given points, unit depends on device configuration
 	 * @param points describing the time difference (x) as well as the measurement difference (y)
-	 * @param drawAreaBounds
-	 * @return string of value
+	 * @return formated string of value
 	 */
 	public String getSlopeValue(Point points) {
 		log.log(Level.FINE, OSDE.STRING_EMPTY + points.toString());

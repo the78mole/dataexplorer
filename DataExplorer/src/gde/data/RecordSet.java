@@ -496,7 +496,6 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * method to add a series of points to none calculation records (records active or inactive)
 	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
@@ -641,7 +640,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * only in case where the given time matches an existing entry both indexes are equal.
 	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
 	 * @param time_ms
-	 * @return
+	 * @return two indexes around the given time
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
 		return this.timeStep_ms.findBoundingIndexes(time_ms);
@@ -650,7 +649,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * find the index closest to given time in msec
 	 * @param time_ms
-	 * @return
+	 * @return index closest to the given time
 	 */
 	public int findBestIndex(double time_ms) {
 		return this.timeStep_ms.findBestIndex(time_ms);

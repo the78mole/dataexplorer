@@ -170,7 +170,7 @@ public class SWTResourceManager {
 	 * @param implClassName
 	 * @param shell
 	 * @param style
-	 * @return
+	 * @return menu 
 	 */
 	public static Menu getMenu(final String implClassName, Shell shell, int style) {
 		String name = "MENU:" + implClassName; //$NON-NLS-1$

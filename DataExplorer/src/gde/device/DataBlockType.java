@@ -332,7 +332,7 @@ public class DataBlockType {
          * 
          * @return
          *     possible object is
-         *     {@link BigInteger }
+         *     {@link Integer }
          *     
          */
         public Integer getSize() {
@@ -344,7 +344,7 @@ public class DataBlockType {
          * 
          * @param value
          *     allowed object is
-         *     {@link BigInteger }
+         *     {@link Integer }
          *     
          */
         public void setSize(Integer value) {

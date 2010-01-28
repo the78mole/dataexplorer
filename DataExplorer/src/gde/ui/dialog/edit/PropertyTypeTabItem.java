@@ -189,7 +189,7 @@ public class PropertyTypeTabItem extends CTabItem {
 	 * find the DataTypes items and return as String[]
 	 * @param property
 	 * @param dataTypeItems
-	 * @return
+	 * @return string array of property keys
 	 */
 	public static String[] getDataTypesItems(PropertyType property, String[] dataTypeItems) {
 		if (!MeasurementPropertyTypes.isNoneSpecified(property.getName())) {

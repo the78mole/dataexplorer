@@ -165,7 +165,9 @@ public class StatisticsTypeTabItem extends CTabItem {
 
 	/**
 	 * set the statistics type and update all internal variables
-	 * @param statisticsType the statisticsType to set
+	 * @param useDeviceConfig the device configuration used 
+	 * @param useStatisticsType the statisticsType to set
+	 * @param useChannelConfigNumber the channel configuration number
 	 */
 	public void setStatisticsType(DeviceConfiguration useDeviceConfig, StatisticsType useStatisticsType, int useChannelConfigNumber) {
 		this.deviceConfig = useDeviceConfig;
