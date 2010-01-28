@@ -1,9 +1,9 @@
 [Desktop Entry]
 Comment=OpenSerialDataExplorer - explore your serial data
-Comment[en_US]=OpenSerialDataExplorer - device Properties editor
-Comment[de_DE]=OpenSerialDataExplorer - Geräteeigenschaften Editor
+Comment[en_US]=DevicePropertiesEditor - edit device property files
+Comment[de_DE]=DevicePropertiesEditor - editiere Geräteeigenschaftendateien
 Encoding=UTF-8
-Exec=java -Dfile.encoding=UTF-8 -classpath -Xms40m -Xmx256m @OSDE_DIR@OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
+Exec=java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath @OSDE_DIR@OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
 GenericName=DevicePropertiesEditor
 Icon=@OSDE_DIR@OpenSerialDataExplorer.xpm
 Name=DevicePropertiesEditor
