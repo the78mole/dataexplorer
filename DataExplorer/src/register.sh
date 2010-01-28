@@ -5,3 +5,4 @@ xdg-mime install --novendor OpenSerialData-mime.xml
 xdg-icon-resource install --context mimetypes --size 48 OpenSerialDataExplorer.xpm application-x-OpenSerialData
 xdg-desktop-menu install --novendor /tmp/OpenSerialDataExplorer.directory OpenSerialDataExplorer.desktop
 xdg-mime default OpenSerialDataExplorer.desktop application/x-OpenSerialData
+xdg-desktop-menu install --novendor /tmp/DevicePropertiesEditor.directory DevicePropertiesEditor.desktop

@@ -369,6 +369,29 @@ public class OperatingSystemHelper {
 						log.log(Level.WARNING, extractTargetFilePath + " does not exist or does not have write (755) pernission, the OpenSerialDataExplorer MIME-type can not registered"); //$NON-NLS-1$
 					}
 
+					desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
+					extractTargetFilePath = jarBasePath + desktopFileName;
+					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					targetFile = new File(extractTargetFilePath);
+
+					//installation directory must contain OpenSerialDataExplorer.desktop with write permission
+					if (targetFile.exists() && targetFile.canWrite()) {
+						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
+						FileUtils.extract(jarFile, "register.sh", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, "DevicePropertiesEditor.directory", OSDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+						command = "chmod +x " + targetDir + "/register.sh"; //$NON-NLS-1$ //$NON-NLS-2$
+						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+						Runtime.getRuntime().exec(command).waitFor();
+						command = targetDir + "/register.sh"; //$NON-NLS-1$
+						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+						rc = Runtime.getRuntime().exec(command).waitFor();
+					}
+					else {
+						// package error, must not occur in a deliverd driver
+						log.log(Level.WARNING, extractTargetFilePath + " does not exist or does not have write (755) pernission, the OpenSerialDataExplorer MIME-type can not registered"); //$NON-NLS-1$
+					}
+
 					//check if xdg-utls are installed, this is the prerequisite for the registration process
 					if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
 						log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
