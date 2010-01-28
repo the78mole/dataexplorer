@@ -79,8 +79,29 @@ public class OperatingSystemHelper {
 					String description = Messages.getString(MessageIds.OSDE_MSGT0000);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
-					String[] shellLinkArgs = { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
+					String[] shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
+					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
 
+					launchFilename = "DevicePropertiesEditor.exe"; //$NON-NLS-1$
+					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					sourceLaunchFilePath = (sourceBasePath + launchFilename);
+					log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
+					targetBasePath = System.getenv("USERPROFILE") + OSDE.FILE_SEPARATOR_UNIX + "Desktop" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+					targetDesktopLaucherFilePath = targetBasePath + "DeviceProperties Editor.lnk"; //$NON-NLS-1$
+					log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+					fqExecutablePath = sourceLaunchFilePath.replace("/", OSDE.FILE_SEPARATOR); //$NON-NLS-1$
+					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
+					executableArguments = OSDE.STRING_EMPTY; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
+					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
+					workingDirectory = sourceBasePath.replace("/", OSDE.FILE_SEPARATOR); //$NON-NLS-1$
+					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
+					fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
+					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
+					description = Messages.getString(MessageIds.OSDE_MSGT0000);
+					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
+
+					shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
 					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
 					isCreated = true;
 				}
@@ -110,12 +131,33 @@ public class OperatingSystemHelper {
 						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 						log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 						FileUtils.copyFile(new File(extractTargetFilePath), new File(targetDesktopLaucherFilePath));
-
-						isCreated = true;
 					}
 					else {
 						log.log(Level.WARNING, extractTargetFilePath + " does not exist or does not have write (755) pernission, a desktop launcher can not created"); //$NON-NLS-1$
 					}
+					
+					desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
+					extractTargetFilePath = sourceBasePath+desktopFileName;
+					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					targetFile = new File(extractTargetFilePath);
+
+					//installation directory must contain DevicePropertiesEditor.desktop with write permission
+					if (targetFile.exists()  && targetFile.canWrite()) {
+						String jarFilePath = sourceBasePath + "OpenSerialDataExplorer.jar"; //$NON-NLS-1$
+						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
+
+						FileUtils.extractWhileReplace("@OSDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, OSDE.STRING_UTF_8, OSDE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+						targetBasePath = System.getenv("HOME") + OSDE.FILE_SEPARATOR_UNIX + "Desktop" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+						log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
+						log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+						FileUtils.copyFile(new File(extractTargetFilePath), new File(targetDesktopLaucherFilePath));
+					}
+					else {
+						log.log(Level.WARNING, extractTargetFilePath + " does not exist or does not have write (755) pernission, a desktop launcher can not created"); //$NON-NLS-1$
+					}
+					isCreated = true;
 				}
 				catch (UnsupportedEncodingException e) {
 					log.log(Level.WARNING, e.getMessage());
@@ -149,7 +191,7 @@ public class OperatingSystemHelper {
 	}
 
 	/**
-	 * remove destop shortcut to launch the main jar
+	 * remove desktop shortcut to launch the main jar
 	 */
 	public static boolean removeDesktopLink() {
 		boolean isRemoved = false;
@@ -164,8 +206,18 @@ public class OperatingSystemHelper {
 				Process process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				process.waitFor();
 				if (process.exitValue() != 0) {
-					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
+					log.log(Level.WARNING, "failed to remove desktop launcher " + targetBasePath); //$NON-NLS-1$
 				}
+
+				targetDesktopLaucherFilePath = targetBasePath + "DeviceProperties*.lnk"; //$NON-NLS-1$
+				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+
+				process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				process.waitFor();
+				if (process.exitValue() != 0) {
+					log.log(Level.WARNING, "failed to remove desktop launcher " + targetBasePath); //$NON-NLS-1$
+				}
+
 				isRemoved = true;
 			}
 			else if (OSDE.IS_LINUX) {
@@ -178,8 +230,21 @@ public class OperatingSystemHelper {
 				Process process = new ProcessBuilder("rm", "-f", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				if (process.exitValue() != 0) {
-					log.log(Level.WARNING, "failed to remove desktop launcher"); //$NON-NLS-1$
+					log.log(Level.WARNING, "failed to remove desktop launcher " + desktopFileName); //$NON-NLS-1$
 				}
+
+				desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
+				targetBasePath = System.getenv("HOME") + OSDE.FILE_SEPARATOR_UNIX + "Desktop" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
+				log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+
+				process = new ProcessBuilder("rm", "-f", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
+				process.waitFor();
+				if (process.exitValue() != 0) {
+					log.log(Level.WARNING, "failed to remove desktop launcher " + desktopFileName); //$NON-NLS-1$
+				}
+				
 				isRemoved = true;
 			}
 			else {

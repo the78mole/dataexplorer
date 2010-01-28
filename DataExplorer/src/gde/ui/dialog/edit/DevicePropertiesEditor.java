@@ -1345,12 +1345,12 @@ public class DevicePropertiesEditor extends Composite {
 						DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
 						DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.select(DevicePropertiesEditor.this.dataBlockCheckSumType == CheckSumTypes.XOR ? 0 : 1);
 
-						DevicePropertiesEditor.this.preferredDataLocationButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled);
-						DevicePropertiesEditor.this.preferredDataLocationText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled);
+						DevicePropertiesEditor.this.preferredDataLocationButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+						DevicePropertiesEditor.this.preferredDataLocationText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 						DevicePropertiesEditor.this.preferredDataLocationText.setText(DevicePropertiesEditor.this.dataBlockOptionalDataLocation == null ? OSDE.STRING_EMPTY
 								: DevicePropertiesEditor.this.dataBlockOptionalDataLocation);
-						DevicePropertiesEditor.this.preferredFileExtensionButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled);
-						DevicePropertiesEditor.this.preferredFileExtensionText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled);
+						DevicePropertiesEditor.this.preferredFileExtensionButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+						DevicePropertiesEditor.this.preferredFileExtensionText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 						DevicePropertiesEditor.this.preferredFileExtensionText.setText(DevicePropertiesEditor.this.dataBlockOptionalFileExtention == null ? OSDE.STRING_EMPTY
 								: DevicePropertiesEditor.this.dataBlockOptionalFileExtention);
 					}
@@ -1717,7 +1717,7 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockCheckSumType = DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumType();
 
 							DevicePropertiesEditor.this.dataBlockOptionalDataLocation = DevicePropertiesEditor.this.deviceConfig.getDataBlockPreferredDataLocation();
-							DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled = DevicePropertiesEditor.this.dataBlockOptionalDataLocation != null;
+							DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled = DevicePropertiesEditor.this.dataBlockOptionalDataLocation.length() > 1;
 
 							DevicePropertiesEditor.this.dataBlockOptionalFileExtention = DevicePropertiesEditor.this.deviceConfig.getDataBlockPreferredFileExtention();
 							DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockPreferredFileExtentionDefined();

@@ -823,11 +823,11 @@ public class DeviceConfiguration {
 
 	public void setDataBlockPreferredDataLocation(String value) {
 		this.isChangePropery = true;
-		this.dataBlock.setPreferredDataLocation(value);
+		this.dataBlock.setPreferredDataLocation(value != null ? value.trim() : value);
 	}
 	
 	public boolean isDataBlockPreferredFileExtentionDefined() {
-		return this.dataBlock.preferredFileExtention != null;
+		return this.dataBlock != null && this.dataBlock.preferredFileExtention != null && this.dataBlock.preferredFileExtention.length() > 3;
 	}
 	
 	public String getDataBlockPreferredFileExtention() {
