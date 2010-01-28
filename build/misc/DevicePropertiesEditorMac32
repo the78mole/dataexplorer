@@ -6,5 +6,5 @@ OSDE_DIR="$(dirname ${0})/../Resources"
 cd ${OSDE_DIR}
 
 echo java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -classpath -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar  osde.ui.dialog.edit.DevicePropertiesEditor
-java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8 -classpath -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar  osde.ui.dialog.edit.DevicePropertiesEditor
+java -XstartOnFirstThread -d32 -Dfile.encoding=UTF-8  -Xms32m -Xmx256m -classpath ./OpenSerialDataExplorer.jar  osde.ui.dialog.edit.DevicePropertiesEditor
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ***** script to launch OpenSerialDataExplorer ** 27 Apr 2009 WB *****
 
-echo java -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar
-java -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./OpenSerialDataExplorer.jar
+echo java -Dfile.encoding=UTF-8 -Xms32m -Xmx256m -jar ./OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
+java -Dfile.encoding=UTF-8 -Xms32m -Xmx256m -jar ./OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
 
