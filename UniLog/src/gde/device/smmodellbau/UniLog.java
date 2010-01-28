@@ -904,7 +904,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * get the analog modus of A1, A2 and A3 to update the analog measurements of the given channel configuration
 	 * @param dataBuffer
-	 * @param configKey
+	 * @param channelConfigKey
 	 */
 	public void updateMeasurementByAnalogModi(byte[] dataBuffer, final int channelConfigKey) {
 		log.log(Level.FINE, "visit updateMeasurementByAnalogModi");
