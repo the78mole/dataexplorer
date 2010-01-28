@@ -1672,148 +1672,159 @@ public class DevicePropertiesEditor extends Composite {
 		this.devicePropsComposite.redraw();
 		//DeviceType end
 
-		//SerialPortType begin
-		if (this.deviceConfig.getSerialPortType() == null && this.serialPortTabItem != null && !this.serialPortTabItem.isDisposed()) {
-			this.serialPortTabItem.dispose();
-			this.serialPortTabItem = null;
-		}
-		else if (this.deviceConfig.getSerialPortType() != null
-				&& (this.serialPortTabItem == null || this.serialPortTabItem.isDisposed())) {
-			this.serialPortTabItem = new SeriaPortTypeTabItem(this.tabFolder, SWT.CLOSE, 1);
-		}
-		if (this.deviceConfig.getSerialPortType() != null && this.serialPortTabItem != null && !this.serialPortTabItem.isDisposed()) {
-			this.serialPortTabItem.setDeviceConfig(this.deviceConfig);
-		}
-		//SerialPortType end
-
-		//TimeBaseType begin
-		this.timeStep_ms = this.deviceConfig.getTimeStep_ms();
-		//TimeBaseType end
-
-		//DataBlockType begin
-		if (this.deviceConfig.getDataBlockType() == null && this.dataBlockTabItem != null && !this.dataBlockTabItem.isDisposed()) {
-			this.dataBlockTabItem.dispose();
-			this.dataBlockTabItem = null;
-		}
-		else {
-			if (this.deviceConfig.getDataBlockType() != null) {
-				if (this.dataBlockTabItem != null && this.dataBlockTabItem.isDisposed()) {
-					createDataBlockType();
-				}
-				this.dataBlockFormat = this.deviceConfig.getDataBlockFormat();
-				this.dataBlockSize = this.deviceConfig.getDataBlockSize();
-				this.dataBlockSeparator = this.deviceConfig.getDataBlockSeparator();
-				this.dataBlockTimeUnit = this.deviceConfig.getDataBlockTimeUnit();
-				this.dataBlockLeader = this.deviceConfig.getDataBlockLeader();
-				this.dataBlockEnding = this.deviceConfig.getDataBlockEndingLineEndingType();
-				this.dataBlockRequiredGroup.redraw();
-
-				this.dataBlockcheckSumFormat = this.deviceConfig.getDataBlockCheckSumFormat();
-				this.isDataBlockOptionalChecksumEnabled = this.deviceConfig.isDataBlockCheckSumDefined();
-				this.dataBlockCheckSumType = this.deviceConfig.getDataBlockCheckSumType();
-
-				this.dataBlockOptionalDataLocation = this.deviceConfig.getDataBlockPreferredDataLocation();
-				this.isDataBlockOptionalDataLocationEnabled = this.dataBlockOptionalDataLocation != null;
-
-				this.dataBlockOptionalFileExtention = this.deviceConfig.getDataBlockPreferredFileExtention();
-				this.isDataBlockOptionalFileExtentionEnabled = this.deviceConfig.isDataBlockPreferredFileExtentionDefined();
-			}
-		}
-		//DataBlockType end
-
-		//StateType begin
-		int stateCount = (this.deviceConfig.getStateType() == null) ? 0 : this.deviceConfig.getStateSize();
-		if (this.deviceConfig.getStateType() == null
-				|| (stateCount == 0 && (this.deviceConfig.getStateType() != null && !this.stateTabFolder.isDisposed()))) {
-			if (this.stateTabItem != null) {
-				for (CTabItem tmpPropertyTabItem : this.stateTabFolder.getItems()) {
-					((PropertyTypeTabItem) tmpPropertyTabItem).dispose();
-				}
-				this.stateTabItem.dispose();
-				this.stateTabItem = null;
-			}
-		}
-		else {
-			if (this.deviceConfig.getStateType() != null && (this.stateTabItem == null || this.stateTabItem.isDisposed())) {
-				createStateTabItem();
-			}
-			if (this.deviceConfig.getStateType() != null && this.stateTabItem != null && !this.stateTabItem.isDisposed()) {
-				if (stateCount > this.stateTabFolder.getItemCount()) {
-					for (int i = this.stateTabFolder.getItemCount(); i < this.deviceConfig.getStateSize(); i++) {
-						new PropertyTypeTabItem(this.stateTabFolder, SWT.CLOSE, Messages.getString(MessageIds.OSDE_MSGT0470) + this.stateTabFolder.getItemCount(),
-								null);
+		OpenSerialDataExplorer.display.asyncExec( new Runnable() {		
+			@Override
+			public void run() {
+				try {
+					//SerialPortType begin
+					if (DevicePropertiesEditor.this.deviceConfig.getSerialPortType() == null && DevicePropertiesEditor.this.serialPortTabItem != null && !DevicePropertiesEditor.this.serialPortTabItem.isDisposed()) {
+						DevicePropertiesEditor.this.serialPortTabItem.dispose();
+						DevicePropertiesEditor.this.serialPortTabItem = null;
 					}
-				}
-				else if (stateCount < this.stateTabFolder.getItemCount()) {
-					CTabItem[] childs = this.stateTabFolder.getItems();
-					for (int i = stateCount - 1; i < childs.length; i++) {
-						((PropertyTypeTabItem) childs[i]).dispose();
+					else if (DevicePropertiesEditor.this.deviceConfig.getSerialPortType() != null
+							&& (DevicePropertiesEditor.this.serialPortTabItem == null || DevicePropertiesEditor.this.serialPortTabItem.isDisposed())) {
+						DevicePropertiesEditor.this.serialPortTabItem = new SeriaPortTypeTabItem(DevicePropertiesEditor.this.tabFolder, SWT.CLOSE, 1);
 					}
-				}
-				int index = 1;
-				for (CTabItem child : this.stateTabFolder.getItems()) {
-					if (this.deviceConfig.getStateProperty(index) != null) {
-						((PropertyTypeTabItem) child).setProperty(this.deviceConfig, this.deviceConfig.getStateProperty(index++), true, null,
-								new String[] { DataTypes.INTEGER.value() }, false);
+					if (DevicePropertiesEditor.this.deviceConfig.getSerialPortType() != null && DevicePropertiesEditor.this.serialPortTabItem != null && !DevicePropertiesEditor.this.serialPortTabItem.isDisposed()) {
+						DevicePropertiesEditor.this.serialPortTabItem.setDeviceConfig(DevicePropertiesEditor.this.deviceConfig);
 					}
-				}
-				this.stateTabFolder.setSelection(0);
-			}
-		}
-		//StateType end
+					//SerialPortType end
 
-		//ChannelType begin
-		int channelTypeCount = this.deviceConfig.getChannelCount();
-		int actualTabItemCount = this.channelConfigInnerTabFolder.getItemCount();
-		if (channelTypeCount < actualTabItemCount) {
-			for (int i = channelTypeCount; i < actualTabItemCount; i++) {
-				ChannelTypeTabItem tmpChannelTabItem = (ChannelTypeTabItem) this.channelConfigInnerTabFolder.getItem(channelTypeCount);
-				for (CTabItem tmpMeasurementTypeTabItem : tmpChannelTabItem.measurementsTabFolder.getItems()) {
-					if (((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabFolder != null) { // dispose PropertyTypes
-						for (CTabItem tmpPropertyTypeTabItem : ((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabFolder.getItems()) {
-							((PropertyTypeTabItem) tmpPropertyTypeTabItem).dispose();
+					//TimeBaseType begin
+					DevicePropertiesEditor.this.timeStep_ms = DevicePropertiesEditor.this.deviceConfig.getTimeStep_ms();
+					//TimeBaseType end
+
+					//DataBlockType begin
+					if (DevicePropertiesEditor.this.deviceConfig.getDataBlockType() == null && DevicePropertiesEditor.this.dataBlockTabItem != null && !DevicePropertiesEditor.this.dataBlockTabItem.isDisposed()) {
+						DevicePropertiesEditor.this.dataBlockTabItem.dispose();
+						DevicePropertiesEditor.this.dataBlockTabItem = null;
+					}
+					else {
+						if (DevicePropertiesEditor.this.deviceConfig.getDataBlockType() != null) {
+							if (DevicePropertiesEditor.this.dataBlockTabItem != null && DevicePropertiesEditor.this.dataBlockTabItem.isDisposed()) {
+								createDataBlockType();
+							}
+							DevicePropertiesEditor.this.dataBlockFormat = DevicePropertiesEditor.this.deviceConfig.getDataBlockFormat();
+							DevicePropertiesEditor.this.dataBlockSize = DevicePropertiesEditor.this.deviceConfig.getDataBlockSize();
+							DevicePropertiesEditor.this.dataBlockSeparator = DevicePropertiesEditor.this.deviceConfig.getDataBlockSeparator();
+							DevicePropertiesEditor.this.dataBlockTimeUnit = DevicePropertiesEditor.this.deviceConfig.getDataBlockTimeUnit();
+							DevicePropertiesEditor.this.dataBlockLeader = DevicePropertiesEditor.this.deviceConfig.getDataBlockLeader();
+							DevicePropertiesEditor.this.dataBlockEnding = DevicePropertiesEditor.this.deviceConfig.getDataBlockEndingLineEndingType();
+							DevicePropertiesEditor.this.dataBlockRequiredGroup.redraw();
+
+							DevicePropertiesEditor.this.dataBlockcheckSumFormat = DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumFormat();
+							DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockCheckSumDefined();
+							DevicePropertiesEditor.this.dataBlockCheckSumType = DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumType();
+
+							DevicePropertiesEditor.this.dataBlockOptionalDataLocation = DevicePropertiesEditor.this.deviceConfig.getDataBlockPreferredDataLocation();
+							DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled = DevicePropertiesEditor.this.dataBlockOptionalDataLocation != null;
+
+							DevicePropertiesEditor.this.dataBlockOptionalFileExtention = DevicePropertiesEditor.this.deviceConfig.getDataBlockPreferredFileExtention();
+							DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockPreferredFileExtentionDefined();
 						}
-						((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabItem.dispose();
 					}
-					if (((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).statisticsTypeTabItem != null) { // dispose StatisticsType
-						((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).statisticsTypeTabItem.dispose();
+					//DataBlockType end
+
+					//StateType begin
+					int stateCount = (DevicePropertiesEditor.this.deviceConfig.getStateType() == null) ? 0 : DevicePropertiesEditor.this.deviceConfig.getStateSize();
+					if (DevicePropertiesEditor.this.deviceConfig.getStateType() == null
+							|| (stateCount == 0 && (DevicePropertiesEditor.this.deviceConfig.getStateType() != null && !DevicePropertiesEditor.this.stateTabFolder.isDisposed()))) {
+						if (DevicePropertiesEditor.this.stateTabItem != null) {
+							for (CTabItem tmpPropertyTabItem : DevicePropertiesEditor.this.stateTabFolder.getItems()) {
+								((PropertyTypeTabItem) tmpPropertyTabItem).dispose();
+							}
+							DevicePropertiesEditor.this.stateTabItem.dispose();
+							DevicePropertiesEditor.this.stateTabItem = null;
+						}
 					}
-					tmpMeasurementTypeTabItem.dispose();
+					else {
+						if (DevicePropertiesEditor.this.deviceConfig.getStateType() != null && (DevicePropertiesEditor.this.stateTabItem == null || DevicePropertiesEditor.this.stateTabItem.isDisposed())) {
+							createStateTabItem();
+						}
+						if (DevicePropertiesEditor.this.deviceConfig.getStateType() != null && DevicePropertiesEditor.this.stateTabItem != null && !DevicePropertiesEditor.this.stateTabItem.isDisposed()) {
+							if (stateCount > DevicePropertiesEditor.this.stateTabFolder.getItemCount()) {
+								for (int i = DevicePropertiesEditor.this.stateTabFolder.getItemCount(); i < DevicePropertiesEditor.this.deviceConfig.getStateSize(); i++) {
+									new PropertyTypeTabItem(DevicePropertiesEditor.this.stateTabFolder, SWT.CLOSE, Messages.getString(MessageIds.OSDE_MSGT0470) + DevicePropertiesEditor.this.stateTabFolder.getItemCount(),
+											null);
+								}
+							}
+							else if (stateCount < DevicePropertiesEditor.this.stateTabFolder.getItemCount()) {
+								CTabItem[] childs = DevicePropertiesEditor.this.stateTabFolder.getItems();
+								for (int i = stateCount - 1; i < childs.length; i++) {
+									((PropertyTypeTabItem) childs[i]).dispose();
+								}
+							}
+							int index = 1;
+							for (CTabItem child : DevicePropertiesEditor.this.stateTabFolder.getItems()) {
+								if (DevicePropertiesEditor.this.deviceConfig.getStateProperty(index) != null) {
+									((PropertyTypeTabItem) child).setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getStateProperty(index++), true, null,
+											new String[] { DataTypes.INTEGER.value() }, false);
+								}
+							}
+							DevicePropertiesEditor.this.stateTabFolder.setSelection(0);
+						}
+					}
+					//StateType end
+
+					//ChannelType begin
+					int channelTypeCount = DevicePropertiesEditor.this.deviceConfig.getChannelCount();
+					int actualTabItemCount = DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItemCount();
+					if (channelTypeCount < actualTabItemCount) {
+						for (int i = channelTypeCount; i < actualTabItemCount; i++) {
+							ChannelTypeTabItem tmpChannelTabItem = (ChannelTypeTabItem) DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItem(channelTypeCount);
+							for (CTabItem tmpMeasurementTypeTabItem : tmpChannelTabItem.measurementsTabFolder.getItems()) {
+								if (((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabFolder != null) { // dispose PropertyTypes
+									for (CTabItem tmpPropertyTypeTabItem : ((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabFolder.getItems()) {
+										((PropertyTypeTabItem) tmpPropertyTypeTabItem).dispose();
+									}
+									((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).measurementPropertiesTabItem.dispose();
+								}
+								if (((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).statisticsTypeTabItem != null) { // dispose StatisticsType
+									((MeasurementTypeTabItem) tmpMeasurementTypeTabItem).statisticsTypeTabItem.dispose();
+								}
+								tmpMeasurementTypeTabItem.dispose();
+							}
+							tmpChannelTabItem.dispose();
+						}
+					}
+					else if (channelTypeCount > actualTabItemCount) {
+						for (int i = actualTabItemCount; i < channelTypeCount; i++) {
+							new ChannelTypeTabItem(DevicePropertiesEditor.this.channelConfigInnerTabFolder, SWT.NONE, i);
+						}
+					}
+					int itemCount = DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItemCount();
+					if (itemCount > 1) DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItem(itemCount - 1).setShowClose(true);
+
+					for (int i = 0; i < channelTypeCount; i++) {
+						ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem) DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItem(i);
+						channelTabItem.setChannelType(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getChannelType(i + 1), (i + 1));
+					}
+					//ChannelType end
+
+					//DesktopType begin
+					DevicePropertiesEditor.this.desktopInnerTabItem1.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB),
+							false, null, null, true);
+					DevicePropertiesEditor.this.desktopInnerTabItem2.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig
+							.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB), false, null, null, true);
+					DevicePropertiesEditor.this.desktopInnerTabItem3.setProperty(DevicePropertiesEditor.this.deviceConfig,
+							DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB), false, null, null, true);
+					DevicePropertiesEditor.this.desktopInnerTabItem4.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig
+							.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB), false, null, null, true);
+					DevicePropertiesEditor.this.desktopTabFolder.setSelection(0);
+					//DesktopType end
 				}
-				tmpChannelTabItem.dispose();
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+				finally {
+					DevicePropertiesEditor.this.tabFolder.setSelection(0);
+					//SWTResourceManager.listResourceStatus();
+					DevicePropertiesEditor.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+
+					DevicePropertiesEditor.this.enableContextMenu(Messages.getString(MessageIds.OSDE_MSGT0487), true); //Device
+				}
 			}
-		}
-		else if (channelTypeCount > actualTabItemCount) {
-			for (int i = actualTabItemCount; i < channelTypeCount; i++) {
-				new ChannelTypeTabItem(this.channelConfigInnerTabFolder, SWT.NONE, i);
-			}
-		}
-		int itemCount = this.channelConfigInnerTabFolder.getItemCount();
-		if (itemCount > 1) this.channelConfigInnerTabFolder.getItem(itemCount - 1).setShowClose(true);
-
-		for (int i = 0; i < channelTypeCount; i++) {
-			ChannelTypeTabItem channelTabItem = (ChannelTypeTabItem) this.channelConfigInnerTabFolder.getItem(i);
-			channelTabItem.setChannelType(this.deviceConfig, this.deviceConfig.getChannelType(i + 1), (i + 1));
-		}
-		//ChannelType end
-
-		//DesktopType begin
-		this.desktopInnerTabItem1.setProperty(this.deviceConfig, this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB),
-				false, null, null, true);
-		this.desktopInnerTabItem2.setProperty(this.deviceConfig, this.deviceConfig
-				.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB), false, null, null, true);
-		this.desktopInnerTabItem3.setProperty(this.deviceConfig,
-				this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB), false, null, null, true);
-		this.desktopInnerTabItem4.setProperty(this.deviceConfig, this.deviceConfig
-				.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB), false, null, null, true);
-		this.desktopTabFolder.setSelection(0);
-		//DesktopType end
-
-		this.tabFolder.setSelection(0);
-		//SWTResourceManager.listResourceStatus();
-		DevicePropertiesEditor.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-
-		this.enableContextMenu(Messages.getString(MessageIds.OSDE_MSGT0487), true); //Device
+		});
 	}
 
 	/**
