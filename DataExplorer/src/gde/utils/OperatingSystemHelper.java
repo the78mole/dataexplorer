@@ -82,6 +82,7 @@ public class OperatingSystemHelper {
 					String[] shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
 					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
 
+					sourceBasePath = url.getPath();
 					launchFilename = "DevicePropertiesEditor.exe"; //$NON-NLS-1$
 					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
@@ -94,8 +95,6 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
 					executableArguments = OSDE.STRING_EMPTY; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
 					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
-					workingDirectory = sourceBasePath.replace("/", OSDE.FILE_SEPARATOR); //$NON-NLS-1$
-					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
 					description = Messages.getString(MessageIds.OSDE_MSGT0595);
