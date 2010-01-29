@@ -3,7 +3,7 @@
   <headerType>gui</headerType>
   <jar>OpenSerialDataExplorer.jar</jar>
   <outfile>D:\workspaces\osde\build\misc\DevicePropertiesEditor.exe</outfile>
-  <errTitle>OpenSerialDataExplorer</errTitle>
+  <errTitle>DevicePropertiesEditor</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
