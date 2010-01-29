@@ -184,12 +184,12 @@ public class DevicePropertiesEditor extends Composite {
 
 	public static DevicePropertiesEditor getInstance() {
 		if (DevicePropertiesEditor.devicePropsEditor == null) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.MIN | SWT.PRIMARY_MODAL);
-			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NONE);
+			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL);
 		}
 		else if (DevicePropertiesEditor.devicePropsEditor.isDisposed()) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.MIN | SWT.PRIMARY_MODAL);
-			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NONE);
+			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL);
 		}
 
 		return DevicePropertiesEditor.devicePropsEditor;
@@ -205,8 +205,6 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	public static void main(String[] args) {
 		try {
-			Display display = Display.getDefault();
-			Rectangle displayBounds = display.getBounds();
 			DevicePropertiesEditor devicePropsEditor = DevicePropertiesEditor.getInstance();
 			devicePropsEditor.initLogger();
 			devicePropsEditor.open();
@@ -214,7 +212,9 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.setLayout(new FillLayout());
 			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0465));
 			DevicePropertiesEditor.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
-			DevicePropertiesEditor.dialogShell.setLocation(displayBounds.x < 0 ? -size.x : displayBounds.width + displayBounds.x - size.x, displayBounds.height - size.y - 150);
+			DevicePropertiesEditor.dialogShell.setLocation(100, 100);
+			//Rectangle displayBounds = display.getBounds();
+			//DevicePropertiesEditor.dialogShell.setLocation(displayBounds.x < 0 ? -size.x : displayBounds.width + displayBounds.x - size.x, displayBounds.height - size.y - 150);
 			DevicePropertiesEditor.dialogShell.layout();
 			Rectangle shellBounds = DevicePropertiesEditor.dialogShell.computeTrim(0, 0, size.x, size.y);
 			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height);
@@ -228,6 +228,7 @@ public class DevicePropertiesEditor extends Composite {
 				devicePropsEditor.openDevicePropertiesFile(tmpDevFileName);
 			}
 
+			Display display = Display.getDefault();
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
@@ -245,13 +246,12 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.setLayout(new FillLayout());
 			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0465));
 			DevicePropertiesEditor.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
-			DevicePropertiesEditor.dialogShell.setLocation(100, 50);
+			DevicePropertiesEditor.dialogShell.setLocation(OpenSerialDataExplorer.getInstance().getShell().toDisplay(100, 50));
 			DevicePropertiesEditor.dialogShell.layout();
 			Rectangle shellBounds = DevicePropertiesEditor.dialogShell.computeTrim(0, 0, size.x, size.y);
 			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height);
 			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height);
 			DevicePropertiesEditor.dialogShell.open();
-			Display display = DevicePropertiesEditor.dialogShell.getDisplay();
 
 			this.deviceConfig = useDeviceConfiguration;
 			this.devicePropertiesFileName = this.deviceConfig.getPropertiesFileName();
@@ -260,6 +260,7 @@ public class DevicePropertiesEditor extends Composite {
 			this.deviceFileNameSelectionButton.setEnabled(false);
 			update();
 
+			Display display = OpenSerialDataExplorer.display; //DevicePropertiesEditor.dialogShell.getDisplay();
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
