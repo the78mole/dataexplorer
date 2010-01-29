@@ -12,7 +12,7 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>D:\workspaces\osde\build\misc\OpenSerialDataExplorer.ico</icon>
+  <icon>D:\workspaces\osde\build\misc\DevicePropertiesEditor.ico</icon>
   <classPath>
     <mainClass>osde.ui.dialog.edit.DevicePropertiesEditor</mainClass>
     <cp>OpenSerialDataExplorer.jar</cp>

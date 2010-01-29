@@ -5,7 +5,7 @@ Comment[de_DE]=DevicePropertiesEditor - editiere Geräteeigenschaftendateien
 Encoding=UTF-8
 Exec=java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath @OSDE_DIR@OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
 GenericName=DevicePropertiesEditor
-Icon=@OSDE_DIR@OpenSerialDataExplorer.xpm
+Icon=@OSDE_DIR@DevicePropertiesEditor.xpm
 Name=DevicePropertiesEditor
 Path=@OSDE_DIR@
 StartupNotify=true

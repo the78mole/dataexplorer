@@ -269,6 +269,7 @@
 		<copy todir="${output.linux32.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
+			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
 			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
@@ -284,6 +285,7 @@
 		<copy todir="${output.linux64.program}" flatten="yes">
 			<fileset file="OpenSerialDataExplorer/build/*.jar" />
 			<fileset file="build/misc/OpenSerialData-mime.xml" />
+			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer.xpm" />
 			<fileset file="build/misc/OpenSerialDataExplorer" />
 			<fileset file="build/misc/OpenSerialDataExplorer.desktop" />
