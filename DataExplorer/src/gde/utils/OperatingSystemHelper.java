@@ -98,7 +98,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
-					description = Messages.getString(MessageIds.OSDE_MSGT0000);
+					description = Messages.getString(MessageIds.OSDE_MSGT0595);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
