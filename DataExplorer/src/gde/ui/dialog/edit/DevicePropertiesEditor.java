@@ -184,12 +184,12 @@ public class DevicePropertiesEditor extends Composite {
 
 	public static DevicePropertiesEditor getInstance() {
 		if (DevicePropertiesEditor.devicePropsEditor == null) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL);
+			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | (OSDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 		else if (DevicePropertiesEditor.devicePropsEditor.isDisposed()) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL);
+			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | (OSDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 
 		return DevicePropertiesEditor.devicePropsEditor;
