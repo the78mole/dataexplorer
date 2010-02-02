@@ -450,23 +450,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addPoints(int[] points) throws DataInconsitsentException {
-		this.addPoints(points, this.getAverageTimeStep_ms()); // device has constant time step between measurement points
-	}
-
-	/**
-	 * method to add a series of points to the associated records
-	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
-	 * @throws DataInconsitsentException 
-	 */
-	public synchronized void addPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
-		this.timeStep_ms.add(time_ms);
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.recordNames[i]).add(points[i]);
 				
-				// check if record synchronisation is activated and update syncMin/syncMax
+				// check if record synchronization is activated and update syncMin/syncMax
 				if (this.syncableRecords.contains(this.recordNames[i])) {
 					if (this.syncMin == 0 && this.syncMax == 0) {
 						this.syncMin = points[i];
@@ -491,6 +480,17 @@ public class RecordSet extends HashMap<String, Record> {
 			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
 		
 		this.hasDisplayableData = true;
+	}
+
+	/**
+	 * method to add a series of points to the associated records
+	 * @param points as int[], where the length must fit records.size()
+	 * @param time_ms
+	 * @throws DataInconsitsentException 
+	 */
+	public synchronized void addPoints(int[] points, double time_ms) throws DataInconsitsentException {
+		this.timeStep_ms.add(time_ms);
+		this.addPoints(points);
 	}
 
 	/**
