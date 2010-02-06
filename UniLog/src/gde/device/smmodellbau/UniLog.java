@@ -20,6 +20,8 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Vector;
+
 import osde.log.Level;
 import java.util.logging.Logger;
 
@@ -474,10 +476,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
+		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
+		int timeStampBufferSize = 0;
+		if(!recordSet.isTimeStepConstant()) {
+			timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+			byte[] timeStampBuffer = new byte[timeStampBufferSize];
+			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+			}
+			log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
+			recordSet.setTimeStep_ms(timeStamps.lastElement()/(timeStamps.size()-1)/10.0); //UniLog has constant time step, even if the XML says -1
+		}
+		
 		for (int i = 0; i < recordDataSize; i++) {
-			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
+			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
