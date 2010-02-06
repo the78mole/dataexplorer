@@ -1173,23 +1173,26 @@ public class Record extends Vector<Integer> {
 	 * @return the time in msec representing the segment to be displayed, without zooming this is the maximum time represented by the last data point time
 	 */
 	public double getDrawTimeWidth_ms() {
-		if(this.parent.isScopeMode) {
-			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
-				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * this.parent.scopeModeSize / 10.0;
+		if (this.elementCount > 0) {
+			if (this.parent.isScopeMode) {
+				if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
+					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * this.parent.scopeModeSize / 10.0;
+				}
+				else {
+					this.drawTimeWidth = this.timeStep_ms != null ? this.timeStep_ms.getDeltaTime(this.elementCount - 1 - this.parent.scopeModeSize, this.elementCount - 1) : this.parent.timeStep_ms
+							.getDeltaTime(this.elementCount - 1 - this.parent.scopeModeSize, this.elementCount - 1);
+				}
 			}
-			else {
-				this.drawTimeWidth = this.timeStep_ms != null ? this.timeStep_ms.getDeltaTime(this.elementCount-1-this.parent.scopeModeSize, this.elementCount-1) : this.parent.timeStep_ms.getDeltaTime(this.elementCount-1-this.parent.scopeModeSize, this.elementCount-1);
+			else if (!this.parent.isZoomMode) { // normal not manipulated view
+				if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
+					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount - 1) / 10.0;
+				}
+				else {
+					this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.lastElement() : this.parent.timeStep_ms.lastElement()) / 10.0;
+				}
 			}
 		}
-		else if (!this.parent.isZoomMode) { // normal not manipulated view
-			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || (this.parent.timeStep_ms != null && this.parent.timeStep_ms.isConstant)) {
-				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount-1) / 10.0;
-			}
-			else {
-				this.drawTimeWidth = (this.timeStep_ms != null ? this.timeStep_ms.lastElement() : this.parent.timeStep_ms.lastElement()) / 10.0;
-			}
-		}
-		return this.drawTimeWidth;  // for this.parent.isZoomMode=true the width was calculated while setting the zoom bounds
+		return this.drawTimeWidth; // for this.parent.isZoomMode=true the width was calculated while setting the zoom bounds
 	}
 
 	/**
@@ -1296,25 +1299,32 @@ public class Record extends Vector<Integer> {
 	 */
 	public int getVerticalDisplayPointValue(int xPos) {
 		int pointPosY = 0;
-		double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
-		int[] indexs = this.findBoundingIndexes(tmpTimeValue);
-		if (indexs[0] == indexs[1]) {
-			pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
-		}
-		else {
-			int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
-			double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
-			double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
-			log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
-		}
-		log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		//check yPos out of range, the graph might not visible within this area
+		try {
+			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
+			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
+			if (indexs[0] == indexs[1]) {
+				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
+			}
+			else {
+				int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
+				double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+				double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+				log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+			}
+			log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			//check yPos out of range, the graph might not visible within this area
 //		if(pointPosY > this.parent.drawAreaBounds.height) 
 //			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
 //		if(pointPosY < 0) 
 //			log.log(Level.WARNING, "pointPosY < 0");
+		}
+		catch (RuntimeException e) {
+			e.printStackTrace();
+			System.out.println("xPos = " + xPos);
+		}
 		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
 	}
 	

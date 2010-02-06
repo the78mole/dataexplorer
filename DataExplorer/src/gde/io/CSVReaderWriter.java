@@ -81,6 +81,11 @@ public class CSVReaderWriter {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 			line = reader.readLine();
 			String[] headerData = line.split(OSDE.STRING_EMPTY + separator);
+			if (headerData.length > 2) {
+  			NotSupportedFileFormatException e = new NotSupportedFileFormatException("File does have required header information \"device_name[separator<channel/config_name>]\"");
+  			log.log(Level.SEVERE, e.getMessage(), e);
+  			throw e;
+			}
 			for (int i = 0; i < headerData.length; i++) {
 				if (i == 0) header.put(OSDE.DEVICE_NAME, headerData[i].split("\\r")[0].trim());
 				if (i == 1) header.put(OSDE.CHANNEL_CONFIG_NAME, headerData[i].split(" ")[0].split("\\r")[0].trim());
@@ -170,6 +175,7 @@ public class CSVReaderWriter {
 		else { // unknown channel configuration using active one
 			channelConfig = channels.getActiveChannel().getChannelConfigKey();
 			channels.setActiveChannelNumber(channels.getActiveChannelNumber());
+			channelNumber = channels.getActiveChannelNumber();
 		}
 		header.put(OSDE.CHANNEL_CONFIG_NAME, channelConfig);
 		header.put(OSDE.CHANNEL_CONFIG_NUMBER, ""+channels.getActiveChannelNumber());
@@ -226,7 +232,7 @@ public class CSVReaderWriter {
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0134) + filePath);
-				int timeStep_ms = 0, old_time_ms = 0, new_time_ms = 0;
+				int time_ms = 0;
 
 				// check for device name and channel or configuration in first line
 				if (!application.getActiveDevice().getName().equals(fileHeader.get(OSDE.DEVICE_NAME))) {
@@ -295,21 +301,16 @@ public class CSVReaderWriter {
 				while ((line = reader.readLine()) != null) {
 					String[] dataStr = line.split(OSDE.STRING_EMPTY + separator);
 					String data = dataStr[0].trim().replace(',', '.');
-					new_time_ms = (int) (new Double(data).doubleValue() * 1000);
-					timeStep_ms = new_time_ms - old_time_ms;
-					old_time_ms = new_time_ms;
+					time_ms = (int) (new Double(data).doubleValue() * 1000);
 					
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 						data = dataStr[i + 1].trim().replace(',', '.');
 						points[i] = Double.valueOf(data).intValue()*1000;
 					}
-					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points);
-					else 				recordSet.addPoints(points);
+					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points, time_ms);
+					else 				recordSet.addPoints(points, time_ms);
 				}
 
-				// set time base in msec
-				//recordSet.setTimeStep_ms(timeStep_ms);
-				log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
 				recordSet.setSaved(true);
 
 				activeChannel.put(recordSetName, recordSet);

@@ -1106,7 +1106,7 @@ public class DeviceConfiguration {
 	 * @return the channel type
 	 */
 	public ChannelType getChannel(int channelConfigNumber) {
-		return this.deviceProps.getChannel().get(channelConfigNumber - 1);
+		return this.deviceProps.getChannel().size() >= channelConfigNumber ? this.deviceProps.getChannel().get(channelConfigNumber - 1) : null;
 	}
 
 	/**
@@ -1158,7 +1158,7 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(int channelConfigNumber, int measurementOrdinal) {
-		return this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal);
+		return this.deviceProps.channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) : this.getChannel(1).getMeasurement().get(measurementOrdinal);
 	}
 
 	/**

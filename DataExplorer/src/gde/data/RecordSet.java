@@ -499,18 +499,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
-		addNoneCalculationRecordsPoints(points, this.getAverageTimeStep_ms()); // device has constant time step between measurement points
-	}
-
-	/**
-	 * method to add a series of points to none calculation records (records active or inactive)
-	 * @param points as int[], where the length must fit records.size()
-	 * @param time_ms
-	 * @throws DataInconsitsentException 
-	 */
-	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
-		this.timeStep_ms.add(time_ms);
 		if (points.length == this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
@@ -527,6 +516,17 @@ public class RecordSet extends HashMap<String, Record> {
 			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
 		
 		this.hasDisplayableData = true;
+		}
+
+	/**
+	 * method to add a series of points to none calculation records (records active or inactive)
+	 * @param points as int[], where the length must fit records.size()
+	 * @param time_ms
+	 * @throws DataInconsitsentException 
+	 */
+	public synchronized void addNoneCalculationRecordsPoints(int[] points, double time_ms) throws DataInconsitsentException {
+		this.timeStep_ms.add(time_ms);
+		this.addNoneCalculationRecordsPoints(points);
 	}
 
 	/**
@@ -836,7 +836,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		String[] recordNames = device.getMeasurementNames(channelNumber);
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			recordNames = device.getMeasurementNames(1);
+			recordNames = device.getMeasurementNames(channelNumber = 1);
 		}
 		String [] recordSymbols = new String[recordNames.length];
 		String [] recordUnits = new String[recordNames.length];
@@ -1058,14 +1058,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check if all records from this record set are displayable, starts calculation if required by calling makeInActiveDisplayable()
 	 */
 	public void checkAllDisplayable() {
-		for (String recordName : this.keySet()) {
-			Record record = this.get(recordName);
-			record.zoomOffset = 0;
-			record.zoomTimeOffset = 0.0;
-			record.drawTimeWidth = this.getMaxTime_ms();
-			record.minZoomScaleValue	= record.minScaleValue;
-			record.maxZoomScaleValue	= record.maxScaleValue;
-		}
+//		for (String recordName : this.keySet()) {
+//			Record record = this.get(recordName);
+//			record.zoomOffset = 0;
+//			record.zoomTimeOffset = 0.0;
+//			record.drawTimeWidth = this.getMaxTime_ms();
+//			record.minZoomScaleValue	= record.minScaleValue;
+//			record.maxZoomScaleValue	= record.maxScaleValue;
+//		}
 		this.application.getActiveDevice().makeInActiveDisplayable(this);
 		this.isRecalculation = false;
 		

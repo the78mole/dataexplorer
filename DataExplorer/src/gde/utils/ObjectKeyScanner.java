@@ -58,10 +58,12 @@ public class ObjectKeyScanner extends Thread {
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
-		for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
-			this.objectKeys.add(tmpObjKey);
+		if (OpenSerialDataExplorer.getInstance().getMenuToolBar() != null) {
+			for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
+				this.objectKeys.add(tmpObjKey);
+			}
+			//this.setPriority(Thread.MIN_PRIORITY);
 		}
-		//this.setPriority(Thread.MIN_PRIORITY);
 	}
 
 	/**
@@ -76,10 +78,12 @@ public class ObjectKeyScanner extends Thread {
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
-		for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
-			this.objectKeys.add(tmpObjKey);
+		if (OpenSerialDataExplorer.getInstance().getMenuToolBar() != null) {
+			for (String tmpObjKey : OpenSerialDataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
+				this.objectKeys.add(tmpObjKey);
+			}
+			//this.setPriority(Thread.MIN_PRIORITY);
 		}
-		//this.setPriority(Thread.MIN_PRIORITY);
 	}
 
 	public void run() {
