@@ -113,6 +113,17 @@ public class TestSuperClass extends TestCase {
 		String[] files = file.list();
 		DeviceConfiguration devConfig;
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
+		
+		
+		//wait until schema is setup
+		while (this.settings.isXsdThreadAlive()) {
+			try {
+				Thread.sleep(5);
+			}
+			catch (InterruptedException e) {
+				//ignore
+			}
+		}
 
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
@@ -129,7 +140,7 @@ public class TestSuperClass extends TestCase {
 						devConfig.setName(deviceKey);
 						keyString = deviceKey;
 					}
-					//log.log(Level.FINE, deviceKey + OSDE.STRING_MESSAGE_CONCAT + keyString);
+					System.out.println(deviceKey + OSDE.STRING_MESSAGE_CONCAT + keyString);
 					this.deviceConfigurations.put(keyString, devConfig);
 				}
 			}
@@ -146,9 +157,10 @@ public class TestSuperClass extends TestCase {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
-		String selectedDeviceName = selectedActiveDeviceConfig.getName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+		String className = selectedDeviceName.contains(OSDE.STRING_DOT) ? selectedDeviceName  // full qualified
+				: "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
 			//String className = "osde.device.DefaultDeviceDialog";
 			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -206,7 +218,7 @@ public class TestSuperClass extends TestCase {
 		this.curveArea = SWTResourceManager.getImage(maxX, maxY);
 		GC gc = this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
-		
+			
 		//prepare time scale
 		double totalDisplayDeltaTime_ms = recordSet.get(0).getDrawTimeWidth_ms();
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(totalDisplayDeltaTime_ms);
@@ -277,9 +289,8 @@ public class TestSuperClass extends TestCase {
 		// calculate the vertical area available for plotting graphs
 		yMax = 10; // free gap on top of the curves
 		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
-		y0 = bounds.height - gapBot + 1;
+		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		//yMax = y0 - height;	// recalculate due to modulo 10
 		//System.out.println("draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// set offset values used for mouse measurement pointers
 		this.offSetX = x0;
@@ -295,9 +306,10 @@ public class TestSuperClass extends TestCase {
 		//gc.setBackground(this.surroundingBackground);
 
 		//draw the time scale
+		//System.out.println("average time step record 0 = " + recordSet.getAverageTimeStep_ms());
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + deltaTime_ms + " endTime = " + endTimeFormated);
+		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
 		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
@@ -331,9 +343,10 @@ public class TestSuperClass extends TestCase {
 		}
 		
 		// draw each record using sorted record set names
+		//long startTime = new Date().getTime();
 		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
-			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable() && actualRecord.realSize() > 0;
 			//System.out.println("drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
@@ -357,9 +370,9 @@ public class TestSuperClass extends TestCase {
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
-			//System.out.println(strStartTime);
 		}
-	}
+		//System.out.println("draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
+		}
 
 	/**
 	 * draw vertical (time) grid lines according the vector defined during drawing of time scale

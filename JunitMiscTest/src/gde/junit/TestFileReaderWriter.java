@@ -51,7 +51,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(this.devicePath);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".csv")) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && !file.getPath().toLowerCase().contains("csv2serialadapter")) {
 					System.out.println("working with : " + file);
 					try {
 						HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';', file.getAbsolutePath());
