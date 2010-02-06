@@ -168,8 +168,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
+			recordSet.setTimeStep_ms(1478); // no average time available, use a hard coded one
 		}
-		else {
+		else { // none constant time steps
 			byte[] sizeBuffer = new byte[4];
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
 			
@@ -196,11 +197,13 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				sb.append(" - ").append(sumTimeDelta += deltaTime);
 				log.log(Level.FINER, sb.toString());
 				lastDateTime = dateTime;
+				
+				recordSet.addTimeStep_ms(sumTimeDelta);
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			recordSet.setTimeStep_ms((double)sumTimeDelta/recordDataSize);
-			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
+//			recordSet.setTimeStep_ms((double)sumTimeDelta/recordDataSize);
+//			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
