@@ -819,7 +819,7 @@ public class MenuBar {
 					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0219)); //$NON-NLS-1$
 				}
 				else {
-					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/TriangleGreen.gif")); //$NON-NLS-1$
+					this.portMenuItem.setImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.portMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0218)); //$NON-NLS-1$
 				}
 				break;

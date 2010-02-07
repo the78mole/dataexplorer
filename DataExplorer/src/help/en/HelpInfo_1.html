@@ -100,8 +100,10 @@
 Pushing the buttons will create a desktop launcher icon or remove it from desktop.
 The other two buttons enable the OpenSerialData MIME type registration to associate the file endings *.osd and *.lov or remove this registration.
 </P>
-<P align=center><IMG SRC="images/Settingsdialog_3.png" NAME="graphics 3" ALIGN=CENTER>
-</P>
+<P align=center><IMG SRC="images/Settingsdialog_3.png" NAME="graphics 3" ALIGN=CENTER></P>
+<P>The button "Create Link Files" will scan all OSD files and create all missing object directories as well as the link files.
+The button "Clean Link File" will delete object related link files but not the object description files nor the object related directories.
+This function helps to move data files to different platform or backup. 
 </P>
 <H2>Analysis Tab</H2>
 <P>
@@ -113,9 +115,9 @@ slowed down execution an may lead in unknown side effects. So adjust this
 values using this knowledge. The adjustments are scaled in detail level,
 <UL>
 	<LI>SEVERE writes only program execution errors,
-	<LI>WARNING writing errors and warnings,
-	<LI>INFO writing errors, warnings and some informational
-	(default),
+	<LI>WARNING writing errors and warnings,  (default)
+	<LI>TIME writing errors, warnings and time relevant log statements
+	<LI>INFO writing errors, warnings and some informational,
 	<LI>FINE writing all errors warnings and informational, in
 	addition traces of the level fine,
 	<LI>FINER writing more than FINE
