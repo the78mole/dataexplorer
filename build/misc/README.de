@@ -55,7 +55,7 @@ der verwendeten Distribution kann evtl. kein serieller Port ge�ffnet werden.
 Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
 %APPDATA%\<Benutzer>\OpenSerialDataExplorer (Windows)
 /home/<Benutzer>/.OpenSerialDataExplorer (Linux)
-/user/<Benutzer>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
+/User/<Benutzer>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
 angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
 
 F�r das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
