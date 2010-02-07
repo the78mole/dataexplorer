@@ -148,6 +148,8 @@ public class GathererThread extends Thread {
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
+						measurementCount = 0;
+						startCycleTime = 0;
 					}
 
 					// prepare the data for adding to record set
@@ -194,7 +196,6 @@ public class GathererThread extends Thread {
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
 						isProgrammExecuting = false;
-						measurementCount = 0;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1408));
