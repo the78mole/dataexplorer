@@ -36,11 +36,12 @@ import osde.ui.dialog.SettingsDialog;
  */
 public class LogLevelSelectionContextMenu {
 	final static Logger	log					= Logger.getLogger(LogLevelSelectionContextMenu.class.getName());
-	MenuItem						levelWarning, levelInfo, levelFine, levelFiner, levelFinest;
+	MenuItem						levelWarning, levelTime, levelInfo, levelFine, levelFiner, levelFinest;
 	String							loggerName	= "";
 	
 	final Settings						settings;
 	final String strWarning = Level.WARNING.getName();
+	final String strTime = Level.TIME.getName();
 	final String strInfo = Level.INFO.getName();
 	final String strFine = Level.FINE.getName();
 	final String strFiner = Level.FINER.getName();
@@ -57,6 +58,7 @@ public class LogLevelSelectionContextMenu {
 				LogLevelSelectionContextMenu.this.loggerName = (String) popupmenu.getData(SettingsDialog.LOGGER_NAME);
 
 				LogLevelSelectionContextMenu.this.levelWarning.setSelection(false);
+				LogLevelSelectionContextMenu.this.levelTime.setSelection(false);
 				LogLevelSelectionContextMenu.this.levelInfo.setSelection(false);
 				LogLevelSelectionContextMenu.this.levelFine.setSelection(false);
 				LogLevelSelectionContextMenu.this.levelFiner.setSelection(false);
@@ -65,6 +67,9 @@ public class LogLevelSelectionContextMenu {
 				String logLevel = Settings.classbasedLogger.getProperty(LogLevelSelectionContextMenu.this.loggerName);
 				if (LogLevelSelectionContextMenu.this.strWarning.equalsIgnoreCase(logLevel)) {
 					LogLevelSelectionContextMenu.this.levelWarning.setSelection(true);
+				}
+				else if (LogLevelSelectionContextMenu.this.strTime.equalsIgnoreCase(logLevel)) {
+					LogLevelSelectionContextMenu.this.levelTime.setSelection(true);
 				}
 				else if (LogLevelSelectionContextMenu.this.strInfo.equalsIgnoreCase(logLevel)) {
 					LogLevelSelectionContextMenu.this.levelInfo.setSelection(true);
@@ -92,6 +97,15 @@ public class LogLevelSelectionContextMenu {
 			public void handleEvent(Event e) {
 				log.log(Level.FINEST, "levle warning selected! " + e); //$NON-NLS-1$
 				Settings.classbasedLogger.put(LogLevelSelectionContextMenu.this.loggerName, LogLevelSelectionContextMenu.this.strWarning);
+			}
+		});
+
+		this.levelTime = new MenuItem(popupmenu, SWT.CHECK);
+		this.levelTime.setText(this.strTime);
+		this.levelTime.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				log.log(Level.FINEST, "levle info selected! " + e); //$NON-NLS-1$
+				Settings.classbasedLogger.put(LogLevelSelectionContextMenu.this.loggerName, LogLevelSelectionContextMenu.this.strTime);
 			}
 		});
 
