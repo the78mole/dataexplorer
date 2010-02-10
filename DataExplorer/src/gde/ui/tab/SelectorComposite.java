@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -26,8 +25,8 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -43,6 +42,7 @@ import osde.OSDE;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
@@ -140,7 +140,12 @@ public class SelectorComposite extends Composite {
 			curveTableLData.right = new FormAttachment(1000, 1000, 0);
 			this.curveSelectorTable.setLayoutData(curveTableLData);
 			this.curveSelectorTable.setMenu(this.popupmenu);
-			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
+			this.curveSelectorTable.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetDefaultSelected(SelectionEvent evt) {
+					log.log(Level.FINEST, "curveSelectorTable.widgetDefaultSelected, event=" + evt); //$NON-NLS-1$
+					
+				}
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$

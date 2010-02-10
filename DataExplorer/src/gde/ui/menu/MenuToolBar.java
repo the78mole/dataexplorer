@@ -467,7 +467,7 @@ public class MenuToolBar {
 							log.log(Level.INFO, "objectSelectComposite.setSize = " + this.objectSelectComposite.getSize().toString());
 							log.log(Level.INFO, "objectSelectComposite.clinetArea = " + this.objectSelectComposite.getClientArea().toString());
 							log.log(Level.INFO, "objectSelectCombo.setLocation = " + leadFill + "," + ((this.toolButtonHeight - this.objectSelectSize.y) / 2));
-							log.log(Level.INFO, "SWT.PLATFORM = " + org.eclipse.swt.internal.Platform.PLATFORM + ", " + "OSDE.IS_MAC_CARBON = " + OSDE.IS_MAC_CARBON);
+							log.log(Level.INFO, "SWT.PLATFORM = " + SWT.getPlatform() + ", " + "OSDE.IS_MAC_CARBON = " + OSDE.IS_MAC_CARBON);
 						}
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+<TITLE>OpenSerialDataExplorer - Information und Hilfe</TITLE>
+<META NAME="AUTHOR" CONTENT="Winfried Brügmann">
+<LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information und Hilfe</DIV>
+
+<DIV ID="Menu"><A HREF="HelpInfo.html">Information und Hilfe</A><BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo.html">Einleitung</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_01.html">Verwendete Verzeichnisse</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_02.html">Das Anwendungsfenster</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_1.html">Der Einstellungsdialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_2.html">Der Geräteauswahldialog</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_3.html">Menü- und Tool- Bar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_3.html">"Datei"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_31.html">"Bearbeiten"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_32.html">"Gerät"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Grafikvorlagen"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Ansicht"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Hilfe"</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Kanalwahl-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Konfigurationswahl-ToolBar</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Datensatzauswahl-ToolBar</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_4.html">Grafische Anzeige</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Der Kurvenselektor</A><BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_42.html">Zoomen und Positionieren</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_6.html">Tabellarisches Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_7.html">Digitale Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_8.html">Analoge Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_9.html">Zellenspannung Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_10.html">Kurvenvergleich Anzeige</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Datei-Kommentar</A> <BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_11.html">Datensatz-Kommentar</A> <BR />
+<BR />
+&nbsp;&nbsp;<A HREF="HelpInfo_12.html">Objektcharakteristik</A> <BR />
+<BR />
+<A HREF="HelpInfo_A.html">Gerätekonfigurationsdateien</A> <BR />
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_A1.html">Ger&auml;teeigenschafteneditor</A> <BR />
+<BR />
+<A HREF="HelpInfo_B.html">Dateiformat</A>
+</DIV>
+
+<DIV ID="Content" DIR="LTR">
+<H2><A NAME="device_properties_edit"></A>Ger&auml;teeigenschafteneditor</H2>
+<P>&Uuml;ber das Ger&auml;temen&uuml; oder als eigenst&auml;ndige Anwendung aufgerufen lassen sich neue oder vorhandene Ger&auml;teeigenschaftendateien erstellen oder anpassen.
+<IMG SRC="images/DevicePropsEditor_MenuBar.png" NAME="DevicePropsEditor_MenuBar" ALIGN=RIGHT>
+</P>
+<P>
+&Uuml;ber den Knopf in der Kopfzeile kann eine Ger&auml;tedatei direkt aus dem Ger&auml;tedateienordner (Devices) ge&ouml;ffnet werden.
+Ist das der Fall, wird die Ger&auml;tedatei des aktuellen Ger&auml;tes geladen und ein &Auml;ndern der Datei ist nicht möglich.
+Als eigene Anwendung gestartet kann der Name, falls bekannt kann auch direkt eingegeben werden. Ist der Name der Datei nicht im Ger&auml;teordner enthalten, geht die Anwendung davon aus das eine neue Ger&auml;tedatei angelegt werden soll und fragt danach.
+</BR></BR>
+<IMG SRC="images/DevicePropsEditor_NewDevice.png" NAME="DevicePropsEditor_NewDevice" ALIGN=LEFT>
+</BR></BR></BR></BR></BR></BR></BR>
+Hierbei wird dann eine Beispieldatei extrahiert, die dann angepasst werden kann.
+Durch Selektion des Knopfes auf der rechten Seite, kann &uuml;ber einen Dateiauswahldialog die Ger&auml;tedatei ge&ouml;ffnet werden.
+</P>
+<P ALIGN=CENTER><IMG SRC="images/DevicePropsEditor_Device.png" NAME="DevicePropsEditor_Device" ALIGN=MIDDLE></P>
+<P>
+Der Ger&auml;t Tabulator zeigt wie man Name und Herstellerangaben eintr&auml;t.
+</P>
+<P>
+Schaltet man die Implementierung aktiv, muss hier die Ger&auml;teklasse als Klassenname oder mit package, als voll qualifiziert, eingetragen werden. 
+Eine Implementierung kann immer dann verwendet werden, wenn ein Ger&auml;t schon implementiert ist, nur der Name nicht passt. 
+Als Beispiel soll hier der CSV2SerialAdapter genannt werden, Unterschiede bestehen nur in der Spezifikation des Datentextblocks.
+Als weiteres Beispiel k&ouml;nnen die vielen Kopien der Bantam Ladeger&auml;te herangezogen werden, die sich im Aussehen und Namen unterscheiden. 
+Hier m&ouml;chete man die Daten doch unter seinem Ger&auml;tenamen abgelegt vorfinden.
+<IMG SRC="images/DevicePropsEditor_Implementation.png" NAME="DevicePropsEditor_Implementation" ALIGN=MIDDLE>
+</BR>Gibt man das 'package' nicht an beginnt das 'package' immer mit "osde.device.", gefolgt vom namen des Herstellers in Kleinbuchstaben umgewandelt und Leerzeichen, sowie Bindestriche entfernt.
+Aus dem Ger$Auml;tenamen wird der Klassenname ebenfalls durch entfernen von Leerzeichen und Bindestrichen berechnet.
+</P>
+<P>
+Der Bildname kann von Hand eingegeben werden, falls auf ein, im Ger&auml;te Plug-in, vorhandenes Bild in der Ger&auml;teauswahl angezeigt werden soll.
+Wird &uuml;ber den Knopf auf der rechten Seite eine Bilddatei ausgew&auml;hlt, wird diese sofort auf die erforderliche Gr&ouml;&szlig;e (225x165) skaliert.
+Hierbei wird auch angeboten, die Bilddatei sofort in das Ger&auml;te Plug-in einzupacken. 
+Dies kann aber nur in einem tempor&auml;ren Ordner geschehen, da nur hier Schreibrechte garantiert sind. 
+Gegebenenfalls muss sp&auml;ter das Plug-in in den Anwendungsordner kopiert werden.
+<IMG SRC="images/DevicePropsEditor_Image.png" NAME="DevicePropsEditor_Image" ALIGN=MIDDLE>
+</BR>Genaue Anweisungen, wo sich das modifizierte Plug-in befindet und wo es auszutauschen ist, werden als Messagebox angezeigt.
+<P><B>Hinweis : </B>Diese &Auml;nderung geht bei einem Anwendungsupdate verloren, wenn die &Auml;nderungen nicht allgemeingültig und der Anwendung beim bauen zur Verf&uuml;gung gestellt wird.
+Gegebenenfalls selbst für eine Sicherung sorgen.</P>
+</P>
+</P>
+<P><IMG SRC="images/DevicePropsEditor_SerialPort.png" NAME="DevicePropsEditor_SerialPort" ALIGN=RIGHT>
+F&uuml;r den seriellen Port sind die entsprechenden konfigurationsparameter einzutragen.
+Da hier alle Auswahlm&ouml;glichkeiten &uuml;ber Auswahldialoge eingestellt werden sind weiter Hinweise nicht n&ouml;tig.
+<P><B>Hinweis : </B>Werden Timeoutzeiten angegeben muss die Implementierung so geschrieben sein, dass diese auch benutzt werden.
+Werden hier Werte eingetragen werden diese also nicht automatisch benutzt.
+</BR>
+Die Beschreibung der seriellen Schnittstelle ist optional, weil es Gre&auml;te gibt, die einen virtuellen seriellen Input &uuml;ber Textdaten erhalten.
+Beispielsweise haben Ger&auml;te die das CSV2SerialAdapter Plug-in benutzen keine serielle Schnittstelle. 
+</P>
+</P>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+<P>
+<IMG SRC="images/DevicePropsEditor_TimeBase.png" NAME="DevicePropsEditor_TimeBase" ALIGN=RIGHT>
+Zur Zeitbasis konfiguration ist einfach. 
+</BR>
+Ein Wert gr&ouml;sser 0 Millisekunden als Zeitabstand zwischen den Messpunkten wird als konstanter Zeitabstand angenommen. 
+Bei einem Zeitwert kleiner 0 Millisekunden, wird davon ausgegengen, dass das Ger&auml;t die Zeit vorgibt. Das muss nicht heissen, dass der Abstand zwischen den Messpunkten Konstant ist.
+Vorrangig muss hier die Ger&auml;teimplementierung das Richtige daraus machen.
+</P>
+<P><B>Hinweis : </B>Das UniLog als Beispiel hat einen einstellbaren aber konstanten Zeitabstand zwischen den Messpunkten.
+Schlussendlich muss auch hier die Ger&auml;teimplementierung f&uuml;r das richtige Verhalten sorgen.
+</P>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+<P>
+Hier werden 2 verschiedene Datanblockkonfigurationen gegen&uuml;bergestellt. 
+Die UniLog Konfiguration beschreibt bin&auml;re Daten der konstanten Gr&ouml;&szlig;e von 24 Byte.
+Sollte die maximale Anzahl von Datenbytes 24 betragen, k&ouml;nnen als auch mal nur z.B. 20 Bytes zur Verf&uuml;gung stehen, m&uuml;sste hier -24 eingetragen werden.
+Dadurch, dass als Datentyp BINARY gew&auml;hlt ist k&ouml;nnen auch keine Trennzeichen eingegeben werden.
+<IMG SRC="images/DevicePropsEditor_DataBlock1.png" NAME="DevicePropsEditor_DataBlock1" ALIGN=LEFT>
+<IMG SRC="images/DevicePropsEditor_DataBlock2.png" NAME="DevicePropsEditor_DataBlock2" ALIGN=RIGHT>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+Ist als Datentype TEXT gew&auml;hlt m&uuml;ssen zus&auml;tzliche Konfigurationsdaten angegeben werden, die zum verwerten der Daten ben&ouml;tigt werden.
+Interessant sind auch die Dateiendung, die die Dateisuche einschr&auml;nkt, sowie der Dateipfad, der ein Standardverzeichnis spezifiziert, wo die Daten erwartet werden.
+Beides sin optionale Angaben, helfen aber, wenn Daten, wie bei dem DataVario von WStech auf einer Speicherkarte angeliefert werden, die beim einstecken in den Computer einen bestimmten Laufwerkspfad annimmt.
+<P><B>Hinweis : </B>Auch diese Konfiguration ist optional, die Ger&auml;teimplementierung selbst k&ouml;nnte das alles behandeln.</P>
+</P>
+<P>
+<IMG SRC="images/DevicePropsEditor_State.png" NAME="DevicePropsEditor_State" ALIGN=RIGHT>
+<P><B>Hinweis : </B></P>
+</P>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+<P>
+<IMG SRC="images/DevicePropsEditor_ChannelConfig.png" NAME="DevicePropsEditor_Config" ALIGN=RIGHT>
+<IMG SRC="images/DevicePropsEditor_MeasurementProperty.png" NAME="DevicePropsEditor_MeasurementProperty" ALIGN=RIGHT>
+<IMG SRC="images/DevicePropsEditor_MeasurementStatisitcs1.png" NAME="DevicePropsEditor_MeasurementStatisitcs1" ALIGN=RIGHT>
+<IMG SRC="images/DevicePropsEditor_MeasurementStatisitcs2.png" NAME="DevicePropsEditor_MeasurementStatisitcs2" ALIGN=RIGHT>
+<P><B>Hinweis : </B></P>
+</P>
+<P>
+<IMG SRC="images/DevicePropsEditor_Desktop.png" NAME="DevicePropsEditor_Desktop" ALIGN=RIGHT>
+<P><B>Hinweis : </B></P>
+</P>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+</BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
+</BR>
+<P ALIGN=LEFT><A HREF="HelpInfo_3.html">&lt;&lt;== zur&uuml;ck</A></P>
+<P ALIGN=RIGHT><A HREF="HelpInfo_32.html">weiter ==&gt;&gt;</A></P>
+</DIV>
+</BODY>
+</HTML>
