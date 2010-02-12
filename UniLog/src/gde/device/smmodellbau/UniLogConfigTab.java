@@ -400,7 +400,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.currentOffset = new Text(this.powerGroup, SWT.BORDER);
 						this.currentOffset.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.currentOffset.setBounds(245, 63, 50, 20);
+						this.currentOffset.setBounds(245, 63, 50, OSDE.IS_MAC_CARBON ? 30 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.currentOffset.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1341));
 						this.currentOffset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -484,7 +484,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.numCellInput = new Text(this.powerGroup, SWT.LEFT | SWT.BORDER);
 						this.numCellInput.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.numCellInput.setBounds(158, 173, 40, OSDE.IS_LINUX ? 22 : 20);
+						this.numCellInput.setBounds(158, 173, 40, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.numCellInput.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1343));
 						this.numCellInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -575,7 +575,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.prop100WInput = new Text(this.powerGroup, SWT.LEFT | SWT.BORDER);
 						this.prop100WInput.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.prop100WInput.setBounds(158, 217, 40, OSDE.IS_LINUX ? 22 : 20);
+						this.prop100WInput.setBounds(158, 217, 40, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.prop100WInput.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1345));
 						this.prop100WInput.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -834,7 +834,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Text.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a1Text.setBounds(42, 45, 116, OSDE.IS_LINUX ? 22 : 20);
+						this.a1Text.setBounds(42, 45, 116, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a1Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1358));
 						this.a1Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -847,7 +847,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a1Unit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a1Unit.setBounds(160, 45, 45, OSDE.IS_LINUX ? 22 : 20);
+						this.a1Unit.setBounds(160, 45, 45, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a1Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -859,7 +859,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Offset.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a1Offset.setBounds(207, 45, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a1Offset.setBounds(207, 45, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a1Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -876,7 +876,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a1Factor.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a1Factor.setBounds(257, 45, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a1Factor.setBounds(257, 45, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a1Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a1Factor.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -906,7 +906,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Text.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a2Text.setBounds(42, 70, 116, OSDE.IS_LINUX ? 22 : 20);
+						this.a2Text.setBounds(42, 70, 116, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a2Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1360));
 						this.a2Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -919,7 +919,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a2Unit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a2Unit.setBounds(160, 70, 45, OSDE.IS_LINUX ? 22 : 20);
+						this.a2Unit.setBounds(160, 70, 45, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a2Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -931,7 +931,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Offset.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a2Offset.setBounds(207, 70, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a2Offset.setBounds(207, 70, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a2Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -948,7 +948,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a2Factor.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a2Factor.setBounds(257, 70, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a2Factor.setBounds(257, 70, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a2Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a2Factor.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -978,7 +978,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Text.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a3Text.setBounds(42, 95, 116, OSDE.IS_LINUX ? 22 : 20);
+						this.a3Text.setBounds(42, 95, 116, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a3Text.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1362));
 						this.a3Text.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
@@ -991,7 +991,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 						this.a3Unit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a3Unit.setBounds(160, 95, 45, OSDE.IS_LINUX ? 22 : 20);
+						this.a3Unit.setBounds(160, 95, 45, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a3Unit.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Unit.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -1003,7 +1003,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Offset.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a3Offset.setBounds(207, 95, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a3Offset.setBounds(207, 95, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a3Offset.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Offset.keyReleased, event=" + evt); //$NON-NLS-1$
@@ -1020,7 +1020,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
 						this.a3Factor.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a3Factor.setBounds(257, 95, 48, OSDE.IS_LINUX ? 22 : 20);
+						this.a3Factor.setBounds(257, 95, 48, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 						this.a3Factor.addKeyListener(new KeyAdapter() {
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "a3Factor.keyReleased, event=" + evt); //$NON-NLS-1$

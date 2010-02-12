@@ -591,7 +591,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.gearFactorCombo = new Text(this.motorPropGroup, SWT.LEFT | SWT.BORDER);
 									this.gearFactorCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.gearFactorCombo.setBounds(198, 44, 63, OSDE.IS_LINUX ? 22 : 20);
+									this.gearFactorCombo.setBounds(198, 44, 63, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 									this.gearFactorCombo.setText(" 1.0  :  1"); //$NON-NLS-1$
 									this.gearFactorCombo.setEditable(false);
 									this.gearFactorCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
