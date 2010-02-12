@@ -25,8 +25,8 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -140,68 +140,65 @@ public class SelectorComposite extends Composite {
 			curveTableLData.right = new FormAttachment(1000, 1000, 0);
 			this.curveSelectorTable.setLayoutData(curveTableLData);
 			this.curveSelectorTable.setMenu(this.popupmenu);
-			this.curveSelectorTable.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetDefaultSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "curveSelectorTable.widgetDefaultSelected, event=" + evt); //$NON-NLS-1$
-					
-				}
+			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
-					TableItem item = (TableItem) evt.item;
-					String recordName = ((TableItem) evt.item).getText();
-					log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
-					SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
-					SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
-					if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
-						Record activeRecord;
-						switch (SelectorComposite.this.windowType) {
-						case GraphicsWindow.TYPE_COMPARE:
-							activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
-							break;
+					if (evt != null && evt.item != null) {
+						log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+						TableItem item = (TableItem) evt.item;
+						String recordName = item.getText();
+						log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
+						SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
+						SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
+						if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
+							Record activeRecord;
+							switch (SelectorComposite.this.windowType) {
+							case GraphicsWindow.TYPE_COMPARE:
+								activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
+								break;
 
-						default:
-							activeRecord = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
-							break;
-						}
-						if (activeRecord != null) {
-							activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-							if (item.getChecked()) {
-								activeRecord.setVisible(true);
-								SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, true);
-								item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
+							default:
+								activeRecord = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
+								break;
 							}
-							else {
-								activeRecord.setVisible(false);
-								SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-								item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
-							}
-						}
-						else {
-							log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
-							RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
-							if (recordSet != null && recordSet.size() > 0) {
+							if (activeRecord != null) {
+								activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 								if (item.getChecked()) {
+									activeRecord.setVisible(true);
+									SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
-									recordSet.setSyncRequested(true, true);
-									recordSet.setSyncRecordSelected(true);
+									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
 								else {
+									activeRecord.setVisible(false);
+									SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
-									recordSet.setSyncRequested(false, true);
-									recordSet.setSyncRecordSelected(false);
+									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
 							}
+							else {
+								log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
+								RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
+								if (recordSet != null && recordSet.size() > 0) {
+									if (item.getChecked()) {
+										item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+										recordSet.setSyncRequested(true, true);
+										recordSet.setSyncRecordSelected(true);
+									}
+									else {
+										item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+										recordSet.setSyncRequested(false, true);
+										recordSet.setSyncRecordSelected(false);
+									}
+								}
+							}
+							SelectorComposite.this.application.updateGraphicsWindow();
+							SelectorComposite.this.application.updateDigitalWindow();
+							SelectorComposite.this.application.updateAnalogWindow();
+							SelectorComposite.this.application.updateCellVoltageWindow();
+							SelectorComposite.this.application.updateFileCommentWindow();
 						}
-						SelectorComposite.this.application.updateGraphicsWindow();
-						SelectorComposite.this.application.updateDigitalWindow();
-						SelectorComposite.this.application.updateAnalogWindow();
-						SelectorComposite.this.application.updateCellVoltageWindow();
-						SelectorComposite.this.application.updateFileCommentWindow();
 					}
 				}
 			});

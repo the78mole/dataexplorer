@@ -22,7 +22,7 @@
 	<target name="compile" description="compile the project">
 		<property name="include.debug.info" value="no" />
 		<mkdir dir="${module.output}" />
-		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8" debug="true">
+		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8" debug="false">
 			<src path="src" />
 		</javac>
 	</target>

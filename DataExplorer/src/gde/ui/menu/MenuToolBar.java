@@ -462,7 +462,7 @@ public class MenuToolBar {
 						});		
 						this.objectSelectCombo.setSize(this.objectSelectSize);
 						this.objectSelectComposite.setSize(this.objectSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.objectSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.objectSelectCombo.setLocation(leadFill, OSDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 						if (log.isLoggable(Level.INFO)) {
 							log.log(Level.INFO, "objectSelectComposite.setSize = " + this.objectSelectComposite.getSize().toString());
 							log.log(Level.INFO, "objectSelectComposite.clinetArea = " + this.objectSelectComposite.getClientArea().toString());
@@ -651,7 +651,7 @@ public class MenuToolBar {
 						//this.scopePointsComboSize.x = SWTResourceManager.getGC(this.scopePointsCombo.getDisplay()).stringExtent("00000000").x;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
 						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.scopePointsCombo.setLocation(leadFill, (this.toolButtonHeight - this.scopePointsComboSize.y + 1) / 2 - 1);
+						this.scopePointsCombo.setLocation(leadFill, OSDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}					
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
@@ -731,7 +731,7 @@ public class MenuToolBar {
 						});
 						this.channelSelectCombo.setSize(this.channelSelectSize);
 						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.channelSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.channelSelectSize.y) / 2 - 1);
+						this.channelSelectCombo.setLocation(leadFill, OSDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
@@ -825,7 +825,7 @@ public class MenuToolBar {
 						});
 						this.recordSelectCombo.setSize(this.recordSelectSize);
 						this.recordSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.recordSelectCombo.setLocation(leadFill, (this.toolButtonHeight - this.recordSelectSize.y) / 2 - 1);
+						this.recordSelectCombo.setLocation(leadFill, OSDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}
 					recordSelectComboSep.setWidth(this.recordSelectComposite.getSize().x);
 					recordSelectComboSep.setControl(this.recordSelectComposite);

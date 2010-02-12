@@ -222,7 +222,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
-								this.localCombo.setBounds(354, 22, 54, OSDE.IS_LINUX ? 22 : 20);
+								this.localCombo.setBounds(354, OSDE.IS_MAC_COCOA ? 12 : 22, 54, OSDE.IS_LINUX ? 22 : 20);
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -239,7 +239,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.localLabel = new CLabel(this.groupLocale, SWT.LEFT);
 								this.localLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.localLabel.setBounds(15, 22, 292, 20);
+								this.localLabel.setBounds(15, OSDE.IS_MAC_COCOA ? 12 : 22, 292, 20);
 								this.localLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0307));
 								this.localLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0308));
 							}
@@ -265,26 +265,28 @@ public class SettingsDialog extends Dialog {
 								this.defaultDataPathLabel = new CLabel(this.defaultDataPathGroup, SWT.NONE);
 								this.defaultDataPathLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.defaultDataPathLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0311));
-								this.defaultDataPathLabel.setBounds(15, 24, 90, 20);
+								this.defaultDataPathLabel.setBounds(15, OSDE.IS_MAC_COCOA ? 14 : 24, 90, 20);
 							}
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
 								this.defaultDataPath.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.defaultDataPath.setBounds(107, 24, 295, OSDE.IS_LINUX ? 22 : 20);
+								this.defaultDataPath.setBounds(107, OSDE.IS_MAC_COCOA ? 14 : 24, 295, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
 								this.defaultDataPathAdjustButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.defaultDataPathAdjustButton.setText(". . . "); //$NON-NLS-1$
-								this.defaultDataPathAdjustButton.setBounds(405, 24, 30, 20);
+								this.defaultDataPathAdjustButton.setBounds(405, OSDE.IS_MAC_COCOA ? 14 : 24, 30, 20);
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "defaultDataPathAdjustButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										String defaultDataDirectory = SettingsDialog.this.application.openDirFileDialog(Messages.getString(MessageIds.OSDE_MSGT0312), SettingsDialog.this.settings.getDataFilePath());
-										SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
-										SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
-										SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
+										if (defaultDataDirectory != null && defaultDataDirectory.length() > 5) {
+											SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
+											SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
+											SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
+										}
 									}
 								});
 							}
@@ -302,7 +304,7 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0315));
 							this.fileOpenSaveDialogGroup.addPaintListener(new PaintListener() {
 								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINE, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.log.log(Level.FINEST, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
 									SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
 									SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
 								}
@@ -311,11 +313,11 @@ public class SettingsDialog extends Dialog {
 								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestDate.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestDate.setText(Messages.getString(MessageIds.OSDE_MSGT0316));
-								this.suggestDate.setBounds(15, 28, 194, 16);
+								this.suggestDate.setBounds(15, OSDE.IS_MAC_COCOA ? 18 : 28, 194, 16);
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "suggestDate.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageDateAsFileNameLeader(SettingsDialog.this.suggestDate.getSelection());
 									}
 								});
@@ -324,11 +326,11 @@ public class SettingsDialog extends Dialog {
 								this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestObjectKey.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestObjectKey.setText(Messages.getString(MessageIds.OSDE_MSGT0317));
-								this.suggestObjectKey.setBounds(239, 28, 194, 16);
+								this.suggestObjectKey.setBounds(239, OSDE.IS_MAC_COCOA ? 18 : 28, 194, 16);
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINE, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.log.log(Level.FINEST, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageObjectKeyInFileName(SettingsDialog.this.suggestObjectKey.getSelection());
 									}
 								});
@@ -360,7 +362,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogModalButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogModalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogModalButton.setText(Messages.getString(MessageIds.OSDE_MSGT0319));
-								this.deviceDialogModalButton.setBounds(16, 24, 254, 18);
+								this.deviceDialogModalButton.setBounds(16, OSDE.IS_MAC_COCOA ? 14 : 24, 254, 18);
 								this.deviceDialogModalButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
 								this.deviceDialogModalButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -375,7 +377,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogOnTopButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogOnTopButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.OSDE_MSGT0309));
-								this.deviceDialogOnTopButton.setBounds(282, 24, 165, 18);
+								this.deviceDialogOnTopButton.setBounds(282, OSDE.IS_MAC_COCOA ? 14 : 24, 165, 18);
 								this.deviceDialogOnTopButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0320));
 								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -389,7 +391,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogAlphaButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogAlphaButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogAlphaButton.setText(Messages.getString(MessageIds.OSDE_MSGT0321));
-								this.deviceDialogAlphaButton.setBounds(16, 47, 254, 18);
+								this.deviceDialogAlphaButton.setBounds(16, OSDE.IS_MAC_COCOA ? 37 : 47, 254, 18);
 								this.deviceDialogAlphaButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0322));
 								this.deviceDialogAlphaButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -402,7 +404,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.alphaSlider = new Slider(this.deviceDialogGroup, SWT.NONE);
-								this.alphaSlider.setBounds(282, 47, 163, 20);
+								this.alphaSlider.setBounds(282, OSDE.IS_MAC_COCOA ? 28 : 47, 163, OSDE.IS_WINDOWS ? 22 : 28);
 								this.alphaSlider.setIncrement(5);
 								this.alphaSlider.setMinimum(10);
 								this.alphaSlider.setMaximum(180);
@@ -448,13 +450,13 @@ public class SettingsDialog extends Dialog {
 								this.decimalSeparatorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.decimalSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0326));
 								this.decimalSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0327));
-								this.decimalSeparatorLabel.setBounds(10, 24, 140, 22);
+								this.decimalSeparatorLabel.setBounds(10, OSDE.IS_MAC_COCOA ? 14 : 24, 140, 22);
 							}
 							{
 								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 								this.decimalSeparator.setItems(DecimalSeparatorTypes.valuesAsStingArray());
-								this.decimalSeparator.setBounds(153, 24, 43, OSDE.IS_LINUX ? 22 : 20);
+								this.decimalSeparator.setBounds(153, OSDE.IS_MAC_COCOA ? 14 : 24, 43, OSDE.IS_LINUX ? 22 : 20);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -469,13 +471,13 @@ public class SettingsDialog extends Dialog {
 								this.listSeparatorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.listSeparatorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0328));
 								this.listSeparatorLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0329));
-								this.listSeparatorLabel.setBounds(228, 24, 140, 20);
+								this.listSeparatorLabel.setBounds(228, OSDE.IS_MAC_COCOA ? 14 : 24, 140, 20);
 							}
 							{
 								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
 								this.listSeparator.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 								this.listSeparator.setItems(CommaSeparatorTypes.valuesAsStingArray());
-								this.listSeparator.setBounds(370, 24, 47, OSDE.IS_LINUX ? 22 : 20);
+								this.listSeparator.setBounds(370, OSDE.IS_MAC_COCOA ? 14 : 24, 47, OSDE.IS_LINUX ? 22 : 20);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -521,7 +523,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, 13, 243, 22);;
+								this.useGlobalSerialPort.setBounds(15, OSDE.IS_MAC_COCOA ? 3 : 13, 243, 22);;
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -538,7 +540,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.enableBlackListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableBlackListButton.setText(Messages.getString(MessageIds.OSDE_MSGT0336));
-								this.enableBlackListButton.setBounds(15, 35, 243, 22);
+								this.enableBlackListButton.setBounds(15, OSDE.IS_MAC_COCOA ? 25 : 35, 243, 22);
 								this.enableBlackListButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableBlackListButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
 								this.enableBlackListButton.addSelectionListener(new SelectionAdapter() {
@@ -567,7 +569,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, 34, 181, OSDE.IS_LINUX ? 22 : 20);
+								this.serialPortBlackList.setBounds(260, OSDE.IS_MAC_COCOA ? 24 : 34, 181, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -586,7 +588,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.enableWhiteListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableWhiteListButton.setText(Messages.getString(MessageIds.OSDE_MSGT0338));
-								this.enableWhiteListButton.setBounds(15, 57, 243, 22);
+								this.enableWhiteListButton.setBounds(15, OSDE.IS_MAC_COCOA ? 47 : 57, 243, 22);
 								this.enableWhiteListButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableWhiteListButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
 								this.enableWhiteListButton.addSelectionListener(new SelectionAdapter() {
@@ -616,7 +618,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, 57, 181, OSDE.IS_LINUX ? 22 : 20);
+								this.serialPortWhiteList.setBounds(260, OSDE.IS_MAC_COCOA ? 47 : 57, 181, OSDE.IS_LINUX ? 22 : OSDE.IS_MAC_CARBON ? 30 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -634,7 +636,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
-								this.doPortAvailabilityCheck.setBounds(15, 79, 243, 22);
+								this.doPortAvailabilityCheck.setBounds(15, OSDE.IS_MAC_COCOA ? 69 : 79, 243, 22);
 								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.OSDE_MSGT0331));
 								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0332));
@@ -654,12 +656,12 @@ public class SettingsDialog extends Dialog {
 								this.portLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.portLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0164));
 								this.portLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0165));
-								this.portLabel.setBounds(12, 101, 120, 20);
+								this.portLabel.setBounds(12, OSDE.IS_MAC_COCOA ? 91 : 101, 120, 20);
 							}
 							{
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 								this.serialPort.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.serialPort.setBounds(135, 101, 307, OSDE.IS_LINUX ? 22 : 20);
+								this.serialPort.setBounds(135, OSDE.IS_MAC_COCOA ? 91 : 101, 307, OSDE.IS_LINUX ? 22 : 20);
 								this.serialPort.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -1227,7 +1229,7 @@ public class SettingsDialog extends Dialog {
 				okButtonLData.width = 250;
 				okButtonLData.height = 30;
 				okButtonLData.left = new FormAttachment(0, 1000, 116);
-				okButtonLData.bottom = new FormAttachment(1000, 1000, -9);
+				okButtonLData.bottom = new FormAttachment(1000, 1000, OSDE.IS_MAC_COCOA ? -19 : -9);
 				okButtonLData.right = new FormAttachment(1000, 1000, -122);
 				this.okButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.okButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1311,7 +1313,7 @@ public class SettingsDialog extends Dialog {
 					}
 				}
 				catch (Throwable t) {
-					SettingsDialog.log.log(Level.WARNING, t.getMessage(), t);
+					SettingsDialog.log.log(Level.WARNING, t.getMessage());
 				}
 			}
 		};

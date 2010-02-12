@@ -1643,15 +1643,21 @@ public class DevicePropertiesEditor extends Composite {
 	 * @return
 	 */
 	private String getDevicesPath() {
-		String osname = System.getProperty("os.name", OSDE.STRING_EMPTY).toLowerCase(); //$NON-NLS-1$
 		String applHomePath = OSDE.STRING_EMPTY;
-		if (osname.startsWith("windows")) { //$NON-NLS-1$
+		if (OSDE.IS_WINDOWS) {
 			applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + OSDE.OSDE_NAME_LONG + OSDE.FILE_SEPARATOR_UNIX).replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ 
 		}
-		else if (osname.startsWith("linux") || osname.startsWith("mac")) { //$NON-NLS-1$ //$NON-NLS-2$
-			applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer" + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+		else if (OSDE.IS_LINUX) {
+			applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + "." + OSDE.OSDE_NAME_LONG + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		return applHomePath + "Devices"; //$NON-NLS-1$
+		else if (OSDE.IS_MAC) {
+			applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + "Library" + OSDE.FILE_SEPARATOR_UNIX + "Application Support" + OSDE.FILE_SEPARATOR_UNIX + OSDE.OSDE_NAME_LONG + OSDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			log.log(Level.SEVERE, Messages.getString(MessageIds.OSDE_MSGW0001));
+		}
+		log.log(Level.WARNING, "DevicesPath = " + applHomePath + "Devices");
+	return applHomePath + "Devices"; //$NON-NLS-1$
 	}
 
 	/**
