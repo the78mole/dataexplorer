@@ -123,7 +123,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "serialPortComposite.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_serial_port"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.serialPortComposite.addPaintListener(new PaintListener() {

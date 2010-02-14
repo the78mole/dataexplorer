@@ -74,7 +74,7 @@ public class PropertyTypeTabItem extends CTabItem {
 	VerifyListener								valueVerifyListener;
 
 	DeviceConfiguration						deviceConfig;
-	boolean												isStateType;																									//1000
+	boolean												isStateType;																								//1000
 	boolean												isValueOnlyEnabledType;																			//0001
 	boolean												isNameSelectionEnabledType;																	//01**
 	boolean												isTypeSelectionEnabledType;																	//0*1*

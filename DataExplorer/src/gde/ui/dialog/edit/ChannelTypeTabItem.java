@@ -206,7 +206,7 @@ public class ChannelTypeTabItem extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "channelConfigComposite.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_channelConfig"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.channelConfigComposite.addPaintListener(new PaintListener() {

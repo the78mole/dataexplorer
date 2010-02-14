@@ -101,7 +101,8 @@ Gegebenenfalls muss sp&auml;ter das Plug-in in den Anwendungsordner kopiert werd
 Gegebenenfalls selbst für eine Sicherung sorgen.</P>
 </P>
 </P>
-<P><IMG SRC="images/DevicePropsEditor_SerialPort.png" NAME="DevicePropsEditor_SerialPort" ALIGN=RIGHT>
+<P><A NAME="device_properties_serial_port"></A>
+<IMG SRC="images/DevicePropsEditor_SerialPort.png" NAME="DevicePropsEditor_SerialPort" ALIGN=RIGHT>
 F&uuml;r den seriellen Port sind die entsprechenden Konfigurationsparameter einzutragen.
 Da hier alle Auswahlm&ouml;glichkeiten &uuml;ber Auswahldialoge eingestellt werden sind weitere Hinweise nicht n&ouml;tig.
 <P><B>Hinweis : </B>Werden Timeoutzeiten angegeben muss die Implementierung so geschrieben sein, dass diese auch benutzt werden.
@@ -138,7 +139,7 @@ Beides sin optionale Angaben, helfen aber, wenn Daten, wie bei dem DataVario von
 <P><B>Hinweis : </B>Auch diese Konfiguration ist optional, die individuelle Ger&auml;teimplementierung k&ouml;nnte das alles behandeln.</P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
-<P>
+<P><A NAME="device_properties_state"></A>
 <IMG SRC="images/DevicePropsEditor_State.png" NAME="DevicePropsEditor_State" ALIGN=RIGHT>
 Auf der Zustand-Tabulatorseite werden optional die Zust&auml;nde beschrieben, die ein Ger&auml;t einnehmen kann.
 Diese Beschreibung macht haups&auml;chlich Sinn, wenn ein Ger&auml;t mehr wie einen Zustand einnehmen kann oder die Daten &uuml;ber eine Textdatei (CSV2SerialDataAdapter) eingelesen werden. 
@@ -146,7 +147,7 @@ Die Ger&auml;teimplementierung bestimmt wie die sequenziell angeordneten Zust&au
 <P><B>Hinweis : </B>Werden die Daten &uuml;ber eine Textdatei (CSV2SerialDataAdapter) eingelesen, so wird als Zustand 1, wie abgebildet Laden ($1;1;Zeit;Daten;..), und als Zustand 2 Entladen ($1;2;Zeit;Daten;..) verwendet.</P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
-<P>
+<P><A NAME="device_properties_channelConfig"></A>
 <IMG SRC="images/DevicePropsEditor_ChannelConfig.png" NAME="DevicePropsEditor_Config" ALIGN=RIGHT>
 Die Tabulator mit der Beschriftung "Ausganskanal/Konfiguration" ist die komplizierteste und umfangreichste Konfigurationsseite.
 Hier werden, wenn erwünscht oder nötig, die Ausg&auml;nge von einem Ger&auml;t (entsprechen einem Datenkanal) beschreiben oder eben verschiedene Konfigurationen, die auf die Datens&auml;tze angewendet werden sollen.
@@ -163,7 +164,7 @@ Möchte man Kanal/Konfigurationen kopieren, um sie zu vervielf&auml;ltigen ist e
 </P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
-<P>
+<P><A NAME="device_properties_measurement"></A>
 <IMG SRC="images/DevicePropsEditor_MeasurementProperty.png" NAME="DevicePropsEditor_MeasurementProperty" ALIGN=RIGHT>
 Messwerte beschreibt man mit dem Namen, welche Einheit sie besitzen, welche Symbol verwendet werden soll und  ob sie aktiv aus dem Ger&auml;t ausgelesen werden k&ouml;nnen, oder ob sie durch Berechnung entstehen.
 Desweiteren gibt es optionale Eigenschaften, z.B. &uuml;ber Faktor, Offset und Reduktion die Anzeige der (Roh-)Daten beeinflussen.

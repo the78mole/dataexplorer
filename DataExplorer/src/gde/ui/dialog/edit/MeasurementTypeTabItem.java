@@ -284,7 +284,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "measurementsComposite.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_measurement"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.measurementsComposite.addPaintListener(new PaintListener() {
@@ -564,12 +564,14 @@ public class MeasurementTypeTabItem extends CTabItem {
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.INTEGER.value() }, true);
 				break;
 			case REGRESSION_TYPE_CURVE:
+				tmpPropertyType.setName(MeasurementPropertyTypes.REGRESSION_TYPE.value());
 				tmpPropertyType.setType(DataTypes.STRING);
 				tmpPropertyType.setValue(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0539));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.STRING.value() }, true);
 				break;
 			case REGRESSION_TYPE_LINEAR:
+				tmpPropertyType.setName(MeasurementPropertyTypes.REGRESSION_TYPE.value());
 				tmpPropertyType.setType(DataTypes.STRING);
 				tmpPropertyType.setValue(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0540));

@@ -406,7 +406,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "statisticsComposite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_statistics"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.statisticsComposite.addPaintListener(new PaintListener() {

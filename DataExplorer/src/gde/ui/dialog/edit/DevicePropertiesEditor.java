@@ -321,7 +321,7 @@ public class DevicePropertiesEditor extends Composite {
 				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.getShell().addDisposeListener(new DisposeListener() {
@@ -1126,7 +1126,7 @@ public class DevicePropertiesEditor extends Composite {
 				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "dataBlockComposite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_datablock"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -1553,7 +1553,7 @@ public class DevicePropertiesEditor extends Composite {
 				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "stateComposite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_state"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.stateComposite.addPaintListener(new PaintListener() {
