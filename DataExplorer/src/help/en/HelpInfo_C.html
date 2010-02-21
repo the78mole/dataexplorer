@@ -2,13 +2,12 @@
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-<TITLE>OpenSerialDataExplorer - Information and Help</TITLE>
-<META NAME="AUTHOR" CONTENT="Winfried Br�gmann">
+<TITLE>OpenSerialDataExplorer - Information und Hilfe</TITLE>
+<META NAME="AUTHOR" CONTENT="Winfried Brügmann">
 <LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
-<BODY LANG="en-US">
-
-<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information and Help</DIV>
+<BODY LANG="de-DE" DIR="LTR">
+<DIV ID="Header">OpenSerialDataExplorer&nbsp;&nbsp;-&nbsp;&nbsp;Information und Hilfe</DIV>
 
 <DIV ID="Menu"><A HREF="HelpInfo.html">Information and Help</A> </BR>
 </BR>
@@ -63,15 +62,19 @@
 </DIV>
 
 <DIV ID="Content" DIR="LTR">
-<H1><A NAME="table_window"></A>Table View Window</H1>
-<P>The table is showing all data even if a curve is invisible.
-Depending on the amount of data the size of the table can be real big.</P>
-<P ALIGN=CENTER><IMG SRC="images/TableWindow.png" NAME="graphics1" ALIGN=BOTTOM></P>
-<P>The calculation and formating consumes time and memory. 
-Big amount of data making the table unclear. 
-This is the reason to have the capability to disable this calculation individual for each device (<A HREF="HelpInfo_2.html#device_selection_desktop">visibility configuration</A>).</P>
-<P ALIGN=LEFT><A HREF="HelpInfo_4.html">&lt;&lt;== previous</A></P>
-<P ALIGN=RIGHT><A HREF="HelpInfo_7.html">next ==&gt;&gt;</A></P>
+<H1><A NAME="introduction"></A>CSV2SerialAdapter</H1>
+<P>Das Textdatenformat, das hier zu Anwendung kommt entspricht weitestgehen einer standard "Comma Separated Values" CSV-Datei, wie es mit allen Tabellenkalulations-Programmen (Spreadsheet) eingelesen und bearbeitet werden kann.
+Die Anordnung der Daten (Values) entspricht weitestgehend der Form wie sie auch von einigen Ladeger&auml;ten ausgegeben wird.
+Auch das LogView Programm kann derartige Textdaten einlesen und wird hier als "OpenFormat" bezeichnet.
+Wegen des Platform&uuml;bergreifenden Ansatzes vom OpenSerialDataExplorer, m&uuml;ssen allerdings die Spezifikationen etwas umfangreicher angegengen werden.
+Beispielsweise verwenden anderer Platformen andere Zeilenumbruchzeichen, wie z.B. Windows &lt;CR&gt;&lt;LF&gt;, beim Anlegen einer Datei. 
+Andereseits muss auch gew&auml;hrliestet sein, dass auf der einen Platform erzeugten Datendateien mit deren spezifischen Zeilenumbruchzeichen auf der anderen einlesenden Platform die Datendateien interpretiert werden k&ouml;nnen, z.B. Linux &lt;LF&gt; oder Mac &lt;CR&gt;. 
+Siehe hierzu auch die Beschreibung des DevicePropertiesEditor <A HREF="HelpInfo_A1.html#device_properties_datablock">Datenblocks</A>.
+</BR>
+Das Bild zeigt die Zuordnung der jeweil zu konfigurierenden Werte in Relation zu den Textdaten.
+</P>
+<P ALIGN=CENTER><IMG SRC="images/CSV2SerialDataFormat.png" NAME="CSV2SerialDataFormat" ALIGN=MIDDLE></P>
+<P ALIGN=LEFT><A HREF="HelpInfo_B.html">&lt;&lt;== previous</A></P>
 </DIV>
 </BODY>
 </HTML>
