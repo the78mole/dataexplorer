@@ -30,7 +30,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A>
 </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Dataset-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data set-Toolbar</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_41.html">Curve selector</A> </BR>
@@ -49,7 +49,7 @@
 &nbsp;&nbsp;<A HREF="HelpInfo_91.html">Curve compare</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_92.html">File comment</A> </BR>
-&nbsp;&nbsp;<A HREF="HelpInfo_92.html">Dataset comment</A> </BR>
+&nbsp;&nbsp;<A HREF="HelpInfo_92.html">Data set comment</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_93.html">Object characteristic</A> </BR>
 </BR>
@@ -63,7 +63,7 @@
 
 <DIV ID="Content" DIR="LTR">
 <H2><A NAME="device_properties_edit"></A>DevicePropertiesEditor</H2>
-<P>Using the OpenSerialDataExplorer menu bar or started as standallone application it is possible to create new or modify existing device properties files.
+<P>Using the OpenSerialDataExplorer menu bar or started as standalone application it is possible to create new or modify existing device properties files.
 Doing this the device XML files are touched.
 <IMG SRC="images/DevicePropsEditor_MenuBar.png" NAME="DevicePropsEditor_MenuBar" ALIGN=RIGHT>
 </P>
@@ -76,7 +76,7 @@ Is the name unknown to the application and can not be find in the devices direct
 <IMG SRC="images/DevicePropsEditor_NewDevice.png" NAME="DevicePropsEditor_NewDevice" ALIGN=LEFT>
 </BR></BR></BR></BR></BR></BR></BR>
 A sample files gets extracted and needs to be adapted as required.
-Selectiong the button, right hand side, a dialpg will opened to enable selection of an existiong file.
+Selecting the button, right hand side, a dialog will opened to enable selection of an existing file.
 </P>
 <P ALIGN=CENTER><IMG SRC="images/DevicePropsEditor_Device.png" NAME="DevicePropsEditor_Device" ALIGN=MIDDLE></P>
 <P>
@@ -84,21 +84,21 @@ The device tabulator shows how to specify name and manufacturer of an device.
 </P>
 <P>
 Switching the implementation active, the implementing device class name has to be configured, optional as full qualified including the package.
-The implemetaion can always used if an equal device implementation class is already available, and/or if the device name does not fit.
-As an example the CSV2SerialAdapter has seveeral devices using this implementation, differences exist in the data block specification.
+The implementation can always used if an equal device implementation class is already available, and/or if the device name does not fit.
+As an example the CSV2SerialAdapter has several devices using this implementation, differences exist in the data block specification.
 As additional example the several copies of the Bantam charger devices can be named, where differences exist in cover design and device name.
 The captured data should be found under the directory followed the device name, isn't it.
 <IMG SRC="images/DevicePropsEditor_Implementation.png" NAME="DevicePropsEditor_Implementation" ALIGN=MIDDLE>
 </BR>
-If the 'package' is not given, the 'package' gets calculated starting with "osde.device.", followed by the manufactureer name, converted in lower case and hyphen and blanks eleminated.
+If the 'package' is not given, the 'package' gets calculated starting with "osde.device.", followed by the manufacturer name, converted in lower case and hyphen and blanks eliminated.
 The default class name can be calculated by removing blanks and hyphen. 
-Kapital letter are kept.
+capital letter are kept.
 <P>
 The image name can directly typed if known and it references an existing within the device plug-in.
-If the image gets selected by use of the right hand side button and file selection dialog the selected image gest scaled to 225x165 pixel. 
+If the image gets selected by use of the right hand side button and file selection dialog the selected image guest scaled to 225x165 pixel. 
 In addition it is possible to pack the image directly into the referenced plug-in.
-Modifying the plug-in could only done in the temporary folder where write rights are gauaranteed.
-If this option is choosen the modified plug-in must be copied to the aplication directory, where the plug-in can be added to the classpath.
+Modifying the plug-in could only done in the temporary folder where write rights are guaranteed.
+If this option is chosen the modified plug-in must be copied to the application directory, where the plug-in can be added to the class path.
 <IMG SRC="images/DevicePropsEditor_Image.png" NAME="DevicePropsEditor_Image" ALIGN=MIDDLE>
 </BR>
 How to do that will be advised in a message box.
@@ -107,10 +107,10 @@ A backup might be saved somewhere else by your own.</P>
 </P>
 </P>
 <P><IMG SRC="images/DevicePropsEditor_SerialPort.png" NAME="DevicePropsEditor_SerialPort" ALIGN=RIGHT>
-The serial port gets configured easily by selectiong aproriate values from the combo boxes.
-<P><B>Hinweis : </B>If timeouts gest specified the implementation must be written to use this values.
+The serial port gets configured easily by selecting appropriate values from the combo boxes.
+<P><B>Hint : </B>If timeouts guest specified the implementation must be written to use this values.
 </BR>
-The description of the serial port is optional due to the fact that some devices dont use it and read simulated serial data from text files.
+The description of the serial port is optional due to the fact that some devices don't use it and read simulated serial data from text files.
 As example the CSV2SerialAdapter devices does not have a serial port specified.
 </P>
 </P>
@@ -133,13 +133,13 @@ Finally the device implementation must handle the situation and read the time st
 The next two pictures contrast two different data block configurations.
 The UniLog configuration describes binary data with a constant length of 24 bytes.
 Is 24 bytes the maximum and a shorter length as example 20 bytes possible the configuration must point out -24 as value.
-The data type is BINARY and no separator sign is configable.
+The data type is BINARY and no separator sign is configurable.
 <IMG SRC="images/DevicePropsEditor_DataBlock1.png" NAME="DevicePropsEditor_DataBlock1" ALIGN=LEFT>
 <IMG SRC="images/DevicePropsEditor_DataBlock2.png" NAME="DevicePropsEditor_DataBlock2" ALIGN=RIGHT>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
-Is TEXT choosen as data type additionally configuration parameter must be specified.
+Is TEXT chosen as data type additionally configuration parameter must be specified.
 The file extension, what is used during file selection, as well as the standard data path, will help to select files faster.
-Both are optional, but help, if data files are deliverd by a memory card, like the DataVario from WStech, which will appear with an dedicated path value if inserted into the computer.
+Both are optional, but help, if data files are delivered by a memory card, like the DataVario from WStech, which will appear with an dedicated path value if inserted into the computer.
 <P><B>Hint : </B>This configuration are optional. Other implementation might use this parameters in a different way.</P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
@@ -153,57 +153,62 @@ Finally the device implementation use the states and match it somehow with the d
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P>
 <IMG SRC="images/DevicePropsEditor_ChannelConfig.png" NAME="DevicePropsEditor_Config" ALIGN=RIGHT>
-The tabulator with the name channle/configuration is the most complex and the biggest one.
+The tabulator with the name channel/configuration is the most complex and the biggest one.
 Here, as required or desired, the device outlet as a data channel or different configurations gets described.
 As described two different types of channel/configurations are available.
-A charger device with only one outlet to connect one batterie at a time has only needs to configure only one channel/configuration from type outlet.
+A charger device with only one outlet to connect one battery at a time has only needs to configure only one channel/configuration from type outlet.
 The sample on right hand side just showing this.
 </BR>
 Underneath the area where the type and the name has to be configured another tabulator describes the individual measurements.
-The measurement configuration is resposible how the data are finally displayed in the various windows including the unit and the statistic mathematics.
+The measurement configuration is responsible how the data are finally displayed in the various windows including the unit and the statistic mathematics.
 </BR>
-<B>Hint : </B>Is the channel/configuation type is choosen as configuration (TYPE_CONFIG) different configurations could be combined with identical data set.
+<B>Hint : </B>Is the channel/configuration type is chosen as configuration (TYPE_CONFIG) different configurations could be combined with identical data set.
 </BR>
-If a copy of an channel/configuration is nessecary it is sensefull to complete the measurement configuration which belongs together before do the copy.
+If a copy of an channel/configuration is necessary it is sense full to complete the measurement configuration which belongs together before do the copy.
 </P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P>
 <IMG SRC="images/DevicePropsEditor_MeasurementProperty.png" NAME="DevicePropsEditor_MeasurementProperty" ALIGN=RIGHT>
-Messwerte beschreibt man mit dem Namen, welche Einheit sie besitzen, welche Symbol verwendet werden soll und  ob sie aktiv aus dem Ger&auml;t ausgelesen werden k&ouml;nnen, oder ob sie durch Berechnung entstehen.
-Desweiteren gibt es optionale Eigenschaften, z.B. &uuml;ber Faktor, Offset und Reduktion die Anzeige der (Roh-)Daten beeinflussen.
-<P><B>Hinweis : </B>Ben&ouml;tig man weitere Eigenschaften oder Statisikeinstellungen kann man diese durch das Kontextmenu anfordern.
-Nach der Vervollst&auml;ndigung kann man dann die gerade fertiggestellte Messwertkonfiguration in eine Neue, durch Selektion des +Knopfes, kopieren.
+Measurements get described with the name, its unit, its symbol and if the measurement is active captured from the device. 
+Non active measurements are calculated (current * voltage).
+In addition there are optional properties like factor, offset and reduction which influence the view of the (raw) data. 
+<P><B>Hint : </B>Are additional properties and/or statistics configuration required, use the context menu to create.
+After a measurement is completely described by properties and statistics it is possible to copy the complete set into a new one using the + button.
 </BR></BR>
-Zu den Eigenschaften (Properties) ist wenig zu sagen, da hier nur vorbestimmte ausgew&auml;lt werden k&ouml;nnen und nur noch der Wert entsprechend anzupassen ist.
+Adding a property is simple since there are a lot of prepared once available and only the value needs to be specified.
 </P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P><A NAME="device_properties_statistics"></A>
 <IMG SRC="images/DevicePropsEditor_MeasurementStatisitcs1.png" NAME="DevicePropsEditor_MeasurementStatisitcs1" ALIGN=RIGHT>
-Hier wird ein Statistikbeispiel gezeigt, das nicht nur die zu berechnenden Werte beschreibt, sondern auch einen Schwellwert (Trigger) , der &uuml;ber Gr&ouml;&szlig;e und Zeit einen Auswertebereich festlegt.
-Au&szlig;erdem wird bestimmt, dass die Zeit, an der der eingestellte Schwellwert wirksam wird, aufsummiert werden soll. Hieraus kann dann, wie im Beispeil, die wirkliche Motorlaufzeit berechnet werden.
-Zus&auml;tzlich wird eingestellt, dass die Anzahl der Ereignisse gez&auml;hlt werden soll.
-<P><B>Hinweis : </B>Zu den meisten Schwellwert bezogenen Einstellungen gibt es die M&ouml;glichkeit Kommentare hinzuzuf&uuml;gen. Das ist für die Lesbarkeit von gro&szlig;em Vorteil (<A HREF="HelpInfo_5.html">Statistik Anzeige</A>).</P>
+This statistics sample showing how to select average minimum and maximum as well as how to configure an trigger.
+A trigger is described by a value and a time to be specified as a limit. All average, minimum, maximum and deviation are related to this trigger now.
+In addition it is shown how to configure that the time where the trigger is active gets summarized.
+This might calculate the real motor runtime.
+It is also possible to count the trigger events.
+<P><B>Hint : </B>It is possible to add comments to the most of trigger or trigger related statistics. 
+This helps to identify which statistic value relates to an adjusted trigger and which not (<A HREF="HelpInfo_5.html">Statistics Window</A>).
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P>
 <IMG SRC="images/DevicePropsEditor_MeasurementStatisitcs2.png" NAME="DevicePropsEditor_MeasurementStatisitcs2" ALIGN=RIGHT>
-Hier wird gezeigt, wie die Auswertung eines anderen Messwertes durch einen bereitz definierten Schwellert (Trigger) beeinflusst werden kann.
-In dem gezeigten Beispiel wird durch die Anwahl von "sumByTriggerRef" ausschliesslich die H&ouml;he aufsummiert, die im definierten Schwellwert gewonnen wurde.
-Jetzt zeigt sich wie gut eine Luftschrauben-, Motor-Anpassung vorgenommen wurde, beziehungsweise es lassen sich jetzt wirkliche nachvollziehbare Vergleiche anstellen.
+The next sample is showing how a already defined trigger can be used to calculate related statistics data.
+In the sample, while "sumByTriggerRef" is selected, the height gets summarized over the trigger period only to count the total height by motor runtime.
+This will help to identify the best propeller to motor adaption in comparison to other combinations.
 </BR>
-Zus&auml;tzlich wird hier gezeigt, wie hier eine Verh&auml;ltnism&auml;ssigkeit gebildet werden kann, die ein Verh&auml;ltnis der verbrauchten Akkukapazit&auml;t zur erreichten H&ouml;he darstellt.
-Auch das erlaubt gewisse Aussagen &uuml;ber die Anpassung der zur Verf&uuml;gung stehenden Leistung zur Ausgenutzten.
-<P><B>Hinweis : </B>Weitere Konfigurationsbeispiele findet man beim UniLog oder DataVario.</P>
+In addition a proportionality gets calculated to show the used battery capacity versus the height during motor runtime.
+This allows judgments how effective the available power is used up.
+<P><B>Hint : </B>Additional configuration samples can be found in UniLog or DataVario device property files.</P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P>
 <IMG SRC="images/DevicePropsEditor_Desktop.png" NAME="DevicePropsEditor_Desktop" ALIGN=RIGHT>
-Als letzte fehlt noch die Beschreibung, was mit der Desktopkonfiguration gemeint ist.
-Hier wird initial konfiguriert, welcher Anzeigetabulator aktiv geschaltet werden soll. 
-Aktiv bezieht sich auf die Sichtbarkeit selbst, sowie auf den Zeitbedarf, der zur eigentlichen Anzeige, der auf dem Tabulatorfenster befindlichen Daten, verbraucht wird.
-<P><B>Hinweis : </B>Initiale Konfiguration meint, dass &uuml;ber die OpenSerialDataExplorer Anwendung selbst, im <A HREF="HelpInfo_2.html#device_selection_desktop">Ger&auml;teauswahldialog</A>, diese Konfiguration beeinflusst wird.</P>
+At least the description follows about the application visualization.
+At this point it is initially configured which tabulator is active and visible.
+Active relates to visibility and calculation time for the content to be displayed within the window behind.
+<P><B>Hint : </B>Initial means that the application device selection dialog itself allows to modify this, refer to <A HREF="HelpInfo_2.html#device_selection_desktop">Device selection dialog</A>.
+</P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P ALIGN=LEFT><A HREF="HelpInfo_A.html">&lt;&lt;== previous</A></P>
