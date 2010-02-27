@@ -272,20 +272,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
 	public void openCloseSerialPort() {
-		if (this.serialPort != null) {
-			if (!this.serialPort.isConnected()) {
-				try {
-					this.serialPort.open();
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
-				}
-			}
-			else {
-				this.serialPort.close();
-			}
-		}
+		// no serial port is used
 	}
 	
 	/**
