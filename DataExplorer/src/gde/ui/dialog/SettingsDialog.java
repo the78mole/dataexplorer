@@ -19,7 +19,6 @@ package osde.ui.dialog;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
-import osde.log.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -30,14 +29,10 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -65,6 +60,7 @@ import osde.OSDE;
 import osde.config.Settings;
 import osde.device.CommaSeparatorTypes;
 import osde.device.DecimalSeparatorTypes;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
@@ -162,7 +158,7 @@ public class SettingsDialog extends Dialog {
 	final OpenSerialDataExplorer				application;
 	final String[]											supportedLocals					= { "en", "de" };																	//$NON-NLS-1$ //$NON-NLS-2$
 	boolean															isLocaleLanguageChanged	= false;
-
+	
 	final LogLevelSelectionContextMenu	logLevelMenu						= new LogLevelSelectionContextMenu();
 	Menu																popupmenu;
 
@@ -255,12 +251,6 @@ public class SettingsDialog extends Dialog {
 							this.defaultDataPathGroup.setLayoutData(classSelectionGroupLData);
 							this.defaultDataPathGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0310));
-							this.defaultDataPathGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "defaultDataPathGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
-								}
-							});
 							{
 								this.defaultDataPathLabel = new CLabel(this.defaultDataPathGroup, SWT.NONE);
 								this.defaultDataPathLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -302,13 +292,6 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup.setLayout(null);
 							this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0315));
-							this.fileOpenSaveDialogGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "fileOpenSaveDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
-									SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
-								}
-							});
 							{
 								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestDate.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -347,17 +330,6 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
 							this.deviceDialogGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0318));
-							this.deviceDialogGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "deviceDialogGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
-									SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
-									SettingsDialog.this.deviceDialogOnTopButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsOnTop());
-									SettingsDialog.this.deviceDialogAlphaButton.setSelection(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
-									SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
-									SettingsDialog.this.alphaSlider.setSelection(SettingsDialog.this.settings.getDialogAlphaValue());
-								}
-							});
 							{
 								this.deviceDialogModalButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogModalButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -438,13 +410,6 @@ public class SettingsDialog extends Dialog {
 							separatorGroupLData.top = new FormAttachment(0, 1000, 270);
 							this.separatorGroup.setLayoutData(separatorGroupLData);
 							this.separatorGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0325));
-							this.separatorGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "separatorGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getDecimalSeparator());
-									SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
-								}
-							});
 							{
 								this.decimalSeparatorLabel = new CLabel(this.separatorGroup, SWT.RIGHT);
 								this.decimalSeparatorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -499,25 +464,6 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0330));
-							this.serialPortGroup.addPaintListener(new PaintListener() {
-								public void paintControl(PaintEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "serialPortGroup.paintControl, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
-									SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
-
-									SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
-									boolean isBlacklistEnabled = SettingsDialog.this.settings.isSerialPortBlackListEnabled();
-									SettingsDialog.this.enableBlackListButton.setSelection(isBlacklistEnabled);
-									SettingsDialog.this.serialPortBlackList.setEditable(isBlacklistEnabled);
-									SettingsDialog.this.serialPortBlackList.setEnabled(isBlacklistEnabled);
-
-									SettingsDialog.this.serialPortWhiteList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortWhiteListString());
-									boolean isWhitelistEnabled = SettingsDialog.this.settings.isSerialPortWhiteListEnabled();
-									SettingsDialog.this.enableWhiteListButton.setSelection(isWhitelistEnabled);
-									SettingsDialog.this.serialPortWhiteList.setEditable(isWhitelistEnabled);
-									SettingsDialog.this.serialPortWhiteList.setEnabled(isWhitelistEnabled);
-								}
-							});
 							{
 								this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -893,22 +839,6 @@ public class SettingsDialog extends Dialog {
 						this.loggingGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0340));
 						this.analysisTabItem.setControl(this.loggingGroup);
-						this.loggingGroup.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent evt) {
-								SettingsDialog.log.log(Level.FINEST, "loggingGroup.paintControl, event=" + evt); //$NON-NLS-1$
-								SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
-								if (SettingsDialog.this.settings.isGlobalLogLevel()) {
-									enableIndividualLogging(false);
-									SettingsDialog.this.globalLoggingCombo.setEnabled(true);
-								}
-								else {
-									enableIndividualLogging(true);
-									SettingsDialog.this.globalLoggingCombo.setEnabled(false);
-									SettingsDialog.this.globalLogLevel.setSelection(false);
-								}
-								updateLoggingLevels();
-							}
-						});
 						{ // begin gloabal logging settings
 							this.globalLoggingComposite = new Composite(this.loggingGroup, SWT.NONE);
 							this.globalLoggingComposite.setLayout(null);
@@ -1121,7 +1051,7 @@ public class SettingsDialog extends Dialog {
 							this.tree.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt + " Selection:" + SettingsDialog.this.tree.getSelection()[0]); //$NON-NLS-1$ //$NON-NLS-2$
+									SettingsDialog.log.log(Level.FINEST, "tree.widgetSelected, event=" + evt); //$NON-NLS-1$ //$NON-NLS-2$
 									TreeItem tmpItem = (TreeItem) evt.item;
 									if (tmpItem.getParentItem() != null) {
 										StringBuilder sb = new StringBuilder();
@@ -1139,57 +1069,8 @@ public class SettingsDialog extends Dialog {
 					} // end logging group
 					//} // end analysis composite
 				} // end analysis tab item
-				this.settingsTabFolder.addFocusListener(new FocusAdapter() {
-					@Override
-					public void focusGained(FocusEvent evt) {
-						SettingsDialog.log.log(Level.FINEST, "tree.focusGained, event=" + evt); //$NON-NLS-1$
-						SettingsDialog.this.tree.clearAll(true);
-						LogManager manager = LogManager.getLogManager();
-						Enumeration<String> loggerNames = manager.getLoggerNames();
-						StringBuilder sb = new StringBuilder();
-						while (loggerNames.hasMoreElements()) {
-							String loggerName = loggerNames.nextElement();
-							if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) { //$NON-NLS-1$ //$NON-NLS-2$
-								sb.append(loggerName).append(";"); //$NON-NLS-1$
-							}
-						}
-						String[] loggers = sb.toString().split(";"); //$NON-NLS-1$
-						Arrays.sort(loggers);
-						if (SettingsDialog.log.isLoggable(Level.FINER)) {
-							for (String string : loggers) {
-								SettingsDialog.log.log(Level.FINER, string);
-							}
-						}
-						SettingsDialog.this.tree.removeAll();
-						String root = ""; //$NON-NLS-1$
-						TreeItem treeItemRoot = null;
-						TreeItem treeItemNode;
-						for (String string : loggers) {
-							String[] tmp = string.replace('.', ':').split(":"); //$NON-NLS-1$
-							switch (tmp.length) {
-							case 3:
-								if (!root.equals(tmp[0] + "." + tmp[1])) { //$NON-NLS-1$
-									root = tmp[0] + "." + tmp[1]; //$NON-NLS-1$
-									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
-									treeItemRoot.setText(root);
-								}
-								treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
-								treeItemNode.setText(tmp[2]);
-								break;
-							case 4:
-								if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) { //$NON-NLS-1$ //$NON-NLS-2$
-									root = tmp[0] + "." + tmp[1] + "." + tmp[2]; //$NON-NLS-1$ //$NON-NLS-2$
-									treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
-									treeItemRoot.setText(root);
-								}
-								treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
-								treeItemNode.setText(tmp[3]);
-								break;
-							}
-						}
-					}
-				});
 				this.settingsTabFolder.setSelection(0);
+				initialize();
 			} // end tab folder
 
 			this.dialogShell.addHelpListener(new HelpListener() {
@@ -1244,7 +1125,7 @@ public class SettingsDialog extends Dialog {
 				});
 			} // end ok button
 
-			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+			this.dialogShell.setLocation(getParent().toDisplay(100, 10));
 			this.dialogShell.open();
 
 			updateAvailablePorts();
@@ -1384,5 +1265,97 @@ public class SettingsDialog extends Dialog {
 			this.settings.setProperty(Settings.SERIAL_IO_LOG_LEVEL, SettingsDialog.DEFAULT_LOG_LEVEL);
 		}
 		this.serialIOLevelCombo.setText(this.settings.getProperty(Settings.SERIAL_IO_LOG_LEVEL));
+	}
+
+	/**
+	 * initialize buttons, logging according to settings
+	 */
+	private void initialize() {
+		SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
+
+		SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
+		SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
+
+		SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
+		SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
+		SettingsDialog.this.deviceDialogOnTopButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsOnTop());
+		SettingsDialog.this.deviceDialogAlphaButton.setSelection(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
+		SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
+		SettingsDialog.this.alphaSlider.setSelection(SettingsDialog.this.settings.getDialogAlphaValue());
+
+		SettingsDialog.this.decimalSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getDecimalSeparator());
+		SettingsDialog.this.listSeparator.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
+
+		SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
+		SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
+
+		SettingsDialog.this.serialPortBlackList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
+		boolean isBlacklistEnabled = SettingsDialog.this.settings.isSerialPortBlackListEnabled();
+		SettingsDialog.this.enableBlackListButton.setSelection(isBlacklistEnabled);
+		SettingsDialog.this.serialPortBlackList.setEditable(isBlacklistEnabled);
+		SettingsDialog.this.serialPortBlackList.setEnabled(isBlacklistEnabled);
+
+		SettingsDialog.this.serialPortWhiteList.setText(OSDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortWhiteListString());
+		boolean isWhitelistEnabled = SettingsDialog.this.settings.isSerialPortWhiteListEnabled();
+		SettingsDialog.this.enableWhiteListButton.setSelection(isWhitelistEnabled);
+		SettingsDialog.this.serialPortWhiteList.setEditable(isWhitelistEnabled);
+		SettingsDialog.this.serialPortWhiteList.setEnabled(isWhitelistEnabled);
+
+		SettingsDialog.this.globalLogLevel.setSelection(SettingsDialog.this.settings.isGlobalLogLevel());
+		if (SettingsDialog.this.settings.isGlobalLogLevel()) {
+			enableIndividualLogging(false);
+			SettingsDialog.this.globalLoggingCombo.setEnabled(true);
+		}
+		else {
+			enableIndividualLogging(true);
+			SettingsDialog.this.globalLoggingCombo.setEnabled(false);
+			SettingsDialog.this.globalLogLevel.setSelection(false);
+		}
+		updateLoggingLevels();
+
+		SettingsDialog.this.tree.clearAll(true);
+		LogManager manager = LogManager.getLogManager();
+		Enumeration<String> loggerNames = manager.getLoggerNames();
+		StringBuilder sb = new StringBuilder();
+		while (loggerNames.hasMoreElements()) {
+			String loggerName = loggerNames.nextElement();
+			if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) { //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append(loggerName).append(";"); //$NON-NLS-1$
+			}
+		}
+		String[] loggers = sb.toString().split(";"); //$NON-NLS-1$
+		Arrays.sort(loggers);
+		if (SettingsDialog.log.isLoggable(Level.FINER)) {
+			for (String string : loggers) {
+				SettingsDialog.log.log(Level.FINER, string);
+			}
+		}
+		SettingsDialog.this.tree.removeAll();
+		String root = ""; //$NON-NLS-1$
+		TreeItem treeItemRoot = null;
+		TreeItem treeItemNode;
+		for (String string : loggers) {
+			String[] tmp = string.replace('.', ':').split(":"); //$NON-NLS-1$
+			switch (tmp.length) {
+			case 3:
+				if (!root.equals(tmp[0] + "." + tmp[1])) { //$NON-NLS-1$
+					root = tmp[0] + "." + tmp[1]; //$NON-NLS-1$
+					treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
+					treeItemRoot.setText(root);
+				}
+				treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
+				treeItemNode.setText(tmp[2]);
+				break;
+			case 4:
+				if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) { //$NON-NLS-1$ //$NON-NLS-2$
+					root = tmp[0] + "." + tmp[1] + "." + tmp[2]; //$NON-NLS-1$ //$NON-NLS-2$
+					treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
+					treeItemRoot.setText(root);
+				}
+				treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
+				treeItemNode.setText(tmp[3]);
+				break;
+			}
+		}
 	}
 }

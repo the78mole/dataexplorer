@@ -109,7 +109,7 @@ public class SelectorComposite extends Composite {
 		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
+				log.log(Level.FINEST, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
 				SelectorComposite.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -128,7 +128,7 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 		}
 		{
-			this.curveSelectorTable = new Table(this, SWT.SINGLE | SWT.CHECK | SWT.EMBEDDED);
+			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.CHECK);
 			this.curveSelectorTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
@@ -143,6 +143,7 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
+					log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 						TableItem item = (TableItem) evt.item;
@@ -203,7 +204,7 @@ public class SelectorComposite extends Composite {
 				}
 			});
 			{
-				this.tableSelectorColumn = new TableColumn(this.curveSelectorTable, SWT.LEFT);
+				this.tableSelectorColumn = new TableColumn(this.curveSelectorTable, SWT.LEAD);
 				this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
 			}
 		}	

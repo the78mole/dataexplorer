@@ -364,7 +364,7 @@ public class MenuToolBar {
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
 						this.objectSelectComposite.setLayout(null);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
+						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : OSDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
 						this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
 						this.isObjectoriented = this.settings.getActiveObjectIndex() > 0;
@@ -630,7 +630,7 @@ public class MenuToolBar {
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
 						this.scopePointsComposite.setLayout(null);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
+						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : OSDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						this.scopePointsCombo.select(0);
@@ -717,7 +717,7 @@ public class MenuToolBar {
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.channelSelectComposite.setLayout(null);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
+						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : OSDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0075));
@@ -783,7 +783,7 @@ public class MenuToolBar {
 						this.recordSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.recordSelectComposite.setLayout(null);
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
-						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : 10, SWT.NORMAL));
+						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, OSDE.IS_LINUX ? 9 : OSDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.recordSelectCombo.setItems(new String[] { OSDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
